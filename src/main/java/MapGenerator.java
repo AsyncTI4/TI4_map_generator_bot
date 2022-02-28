@@ -9,15 +9,16 @@ public class MapGenerator {
 
     public static void main(String[] args)
             throws LoginException {
-        JDA jda = JDABuilder.createDefault("OTQ3NzYzMTQwNTE3NTYwMzMx.Yhx_NQ.E-Vb0yG51dpPtQH6rYevymiqgi4").build();
+
+        JDA jda = JDABuilder.createDefault(args[0]).build();
         //You can also add event listeners to the already built JDA instance
         // Note that some events may not be received if the listener is added after calling build()
         // This includes events such as the ReadyEvent
-//        jda.addEventListener(new MessageListener());
 
-        JDABuilder.createLight(args[0], GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES)
-                .addEventListeners(new MessageListener())
-//                .setActivity(Activity.playing("Type !ping"))
-                .build();
+//        JDABuilder.createLight(args[0], GatewayIntent.GUILD_MESSAGES, GatewayIntent.DIRECT_MESSAGES)
+//                .addEventListeners(new MessageListener())
+////                .setActivity(Activity.playing("Type !ping"))
+//                .build();
+        jda.addEventListener(new MessageListener());
     }
 }
