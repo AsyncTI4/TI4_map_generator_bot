@@ -40,14 +40,14 @@ public class MessageListener extends ListenerAdapter {
                         response.editMessageFormat("I'm alive!: %d ms", System.currentTimeMillis() - time).queue();
                     });
         }
-        if (msg.getContentRaw().equals("map_reaction")) {
+       else if (msg.getContentRaw().equals("map_reaction")) {
             MessageChannel channel = event.getChannel();
             long time = System.currentTimeMillis();
             event.getChannel().sendMessage("reaction")
                     .flatMap(message -> message.addReaction("✔"))
                     .queue();
         }
-        if (msg.getContentRaw().equals(":image")) {
+        else if (msg.getContentRaw().equals(":image")) {
             MessageChannel channel = event.getChannel();
             URL resource = MessageListener.class.getResource("AbyzFria.png");
             try {
@@ -65,6 +65,15 @@ public class MessageListener extends ListenerAdapter {
 //            File planet = new File("E:\\DEV TI4\\TI4_map_generator_discord_bot\\src\\main\\resources\\AbyzFria.png");
 //            event.getMessage().reply(planet).queue();
 //            event.getChannel().sendFile(planet, "planet image").queue();
+        } else if (msg.getContentRaw().equals(":image")) {
+            MessageChannel channel = event.getChannel();
+            URL resource = MessageListener.class.getResource("AbyzFria.png");
+            try {
+                File planetFile = Paths.get(resource.toURI()).toFile();
+                event.getMessage().reply(planetFile).queue();
+            } catch (URISyntaxException e) {
+                logger.log(Level.SEVERE, "Could not find resource", e);
+            }
         }
     }
 }
