@@ -36,13 +36,15 @@ public class GenerateMap {
 //        graphics.drawImage(mainImage, 0, 0, null);
     }
 
-    public void saveImage() {
+    public File saveImage() {
+        File file = new File("E:\\DEV TI4\\temp\\temp.png");
         try {
-            ImageIO.write(mainImage, "PNG", new File("E:\\DEV TI4\\temp\\temp.png"));
+            ImageIO.write(mainImage, "PNG", file);
             //todo fix temp directory
         } catch (IOException e) {
             logger.log(Level.SEVERE, "Could not save generated map");
         }
+        return file;
     }
 
     public void addTile(File tile, String position) {
