@@ -21,7 +21,13 @@ public class CreateMap implements Command{
 
     @Override
     public void execute(MessageReceivedEvent event) {
-        File setupFile = ResourceHelper.getInstance().getResource("6player_setup.png");
+        String tileFile = ResourceHelper.getInstance().getTileFile("6player_setup.png");
+        if (tileFile == null)
+        {
+            MessageHelper.replyToMessage(event.getMessage(), "Could not find base setup file");
+            return;
+        }
+        File setupFile = new File(tileFile);
         generateMapInstance = new GenerateMap(setupFile);
         MessageHelper.replyToMessage(event.getMessage(), "Map initializes");
     }
