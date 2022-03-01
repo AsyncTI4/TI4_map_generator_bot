@@ -1,5 +1,7 @@
 package ti4;
 
+import ti4.commands.Command;
+import ti4.commands.CommandManager;
 import ti4.generator.GenerateMap;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
@@ -30,6 +32,12 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
+        CommandManager commandManager = CommandManager.getInstance();
+        for (Command command : commandManager.getCommandList()) {
+
+        }
+
+
         Message msg = event.getMessage();
         if (msg.getContentRaw().startsWith("map_log")) {
             if (event.isFromType(ChannelType.PRIVATE)) {

@@ -15,11 +15,10 @@ import java.util.logging.Logger;
 //Handles positions of map
 public class PositionMapper {
 
-    private static Logger logger = Logger.getLogger(PositionMapper.class.getName());
-    private static Properties positionMap = new Properties();
+    private static final Logger logger = Logger.getLogger(PositionMapper.class.getName());
+    private static final Properties positionMap = new Properties();
 
-    public static void init()
-    {
+    public static void init() {
         String positionFile = new ResourceHelper().getPositionFile("6player.properties");
         if (positionFile != null) {
             try (InputStream input = new FileInputStream(positionFile)) {
