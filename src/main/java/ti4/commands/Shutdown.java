@@ -16,6 +16,7 @@ public class Shutdown implements Command {
     @Override
     public void execute(MessageReceivedEvent event) {
         if (event.getAuthor().getId().equals(MapGenerator.userID)) {
+            MessageHelper.replyToMessage(event.getMessage(), "Shutdown accepted");
             MapGenerator.jda.shutdownNow();
         } else {
             MessageHelper.replyToMessage(event.getMessage(), "Not Authorized shutdown attempt");
