@@ -12,13 +12,11 @@ public class GenerateMap {
 
     private static Logger logger = Logger.getLogger(GenerateMap.class.getName());
 
-
-    private File setupFile;
     private Graphics graphics;
     private BufferedImage mainImage;
 
-    public GenerateMap(File setupFile) {
-        this.setupFile = setupFile;
+    public GenerateMap(File setupFile_) {
+        File setupFile = setupFile_;
         BufferedImage setupImage = null;
         try {
             setupImage = ImageIO.read(setupFile);
@@ -33,7 +31,6 @@ public class GenerateMap {
         }
         mainImage = new BufferedImage(setupImage.getWidth(), setupImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
         graphics = mainImage.getGraphics();
-//        graphics.drawImage(mainImage, 0, 0, null);
     }
 
     public File saveImage() {
