@@ -8,13 +8,16 @@ import javax.security.auth.login.LoginException;
 
 public class MapGenerator {
 
+    public static JDA jda;
+
     public static void main(String[] args)
             throws LoginException {
 
-        JDA jda = JDABuilder.createDefault(args[0]).build();
+        jda = JDABuilder.createDefault(args[0]).build();
         jda.addEventListener(new MessageListener());
 
         PositionMapper.init();
+
 
 //        ti4.ResourceHelper resourceHelper = new ti4.ResourceHelper();
 //        File setupFile = resourceHelper.getResource("6player_setup.png");

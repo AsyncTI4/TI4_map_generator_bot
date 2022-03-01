@@ -12,7 +12,7 @@ import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-
+//Handles positions of map
 public class PositionMapper {
 
     private static Logger logger = Logger.getLogger(PositionMapper.class.getName());
