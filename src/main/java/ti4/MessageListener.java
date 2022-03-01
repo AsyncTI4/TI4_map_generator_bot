@@ -1,4 +1,6 @@
-import generator.GenerateMap;
+package ti4;
+
+import ti4.generator.GenerateMap;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
@@ -106,7 +108,7 @@ public class MessageListener extends ListenerAdapter {
                     String planetTileName = tokenizer.nextToken();
                     String position = tokenizer.nextToken();
 
-                    File planet = resourceHelper.getResource("planets/"+planetTileName+".png");
+                    File planet = resourceHelper.getResource("planets/" +planetTileName+".png");
                     generateMapInstance.addTile(planet, position);
                     File file = generateMapInstance.saveImage();
                     event.getMessage().reply(file).queue();
@@ -128,7 +130,7 @@ public class MessageListener extends ListenerAdapter {
                     String unitName = tokenizer.nextToken();
                     String position = tokenizer.nextToken();
 
-                    File planet = resourceHelper.getResource("units/"+unitName+".png");
+                    File planet = resourceHelper.getResource("units/" +unitName+".png");
                     generateMapInstance.addTile(planet, position);
                     File file = generateMapInstance.saveImage();
                     event.getMessage().reply(file).queue();
@@ -138,7 +140,7 @@ public class MessageListener extends ListenerAdapter {
             }
         }
 
-//        ResourceHelper resourceHelper = new ResourceHelper();
+//        ti4.ResourceHelper resourceHelper = new ti4.ResourceHelper();
 //        File setupFile = resourceHelper.getResource("6player_setup.png");
 //        GenerateMap instance = new GenerateMap(setupFile);
 //

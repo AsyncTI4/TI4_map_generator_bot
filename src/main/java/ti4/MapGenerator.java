@@ -1,11 +1,10 @@
-import generator.GenerateMap;
+package ti4;
+
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
-import net.dv8tion.jda.api.entities.Activity;
-import net.dv8tion.jda.api.requests.GatewayIntent;
+import ti4.generator.PositionMapper;
 
 import javax.security.auth.login.LoginException;
-import java.io.File;
 
 public class MapGenerator {
 
@@ -15,9 +14,9 @@ public class MapGenerator {
         JDA jda = JDABuilder.createDefault(args[0]).build();
         jda.addEventListener(new MessageListener());
 
+        PositionMapper.init();
 
-
-//        ResourceHelper resourceHelper = new ResourceHelper();
+//        ti4.ResourceHelper resourceHelper = new ti4.ResourceHelper();
 //        File setupFile = resourceHelper.getResource("6player_setup.png");
 //        GenerateMap instance = new GenerateMap(setupFile);
 //

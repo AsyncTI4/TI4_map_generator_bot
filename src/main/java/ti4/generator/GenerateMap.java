@@ -1,4 +1,4 @@
-package generator;
+package ti4.generator;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
