@@ -14,7 +14,7 @@ public class TilesMapper {
     private static final Properties tilesMap = new Properties();
 
     public static void init() {
-        String positionFile = new ResourceHelper().getInfoFile("tiles.properties");
+        String positionFile = ResourceHelper.getInstance().getInfoFile("tiles.properties");
         if (positionFile != null) {
             try (InputStream input = new FileInputStream(positionFile)) {
                 tilesMap.load(input);

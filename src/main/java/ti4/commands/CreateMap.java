@@ -23,6 +23,6 @@ public class CreateMap implements Command{
     public void execute(MessageReceivedEvent event) {
         File setupFile = ResourceHelper.getInstance().getResource("6player_setup.png");
         generateMapInstance = new GenerateMap(setupFile);
-        MessageHelper.replyToMessage(event.getMessage(), "Map creation started");
+        MessageHelper.replyToMessage(event.getMessage(), "Map initializes");
     }
 }

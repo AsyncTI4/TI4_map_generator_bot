@@ -31,7 +31,13 @@ public class AddUnit implements Command {
                 String planetTileName = tokenizer.nextToken();
                 String position = tokenizer.nextToken();
 
-                File planet = ResourceHelper.getInstance().getResource("planets/" +planetTileName+".png");
+                String path = ResourceHelper.getInstance().getUnitFile(planetTileName);
+                if (path == null)
+                {
+                    MessageHelper.replyToMessage(msg, "Could not find tile");
+                    return;
+                }
+                File planet = new File(path);
                 CreateMap.generateMapInstance.addTile(planet, position);
                 File file = CreateMap.generateMapInstance.saveImage();
                 MessageHelper.replyToMessage(event.getMessage(), file);

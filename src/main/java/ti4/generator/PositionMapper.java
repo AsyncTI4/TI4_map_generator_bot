@@ -19,7 +19,7 @@ public class PositionMapper {
     private static final Properties positionMap = new Properties();
 
     public static void init() {
-        String positionFile = new ResourceHelper().getPositionFile("6player.properties");
+        String positionFile = ResourceHelper.getInstance().getPositionFile("6player.properties");
         if (positionFile != null) {
             try (InputStream input = new FileInputStream(positionFile)) {
                 positionMap.load(input);

@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import ti4.ResourceHelper;
+import ti4.generator.TilesMapper;
 import ti4.message.MessageHelper;
 
 import java.io.File;
@@ -32,7 +33,8 @@ public class AddTile implements Command {
                 String planetTileName = tokenizer.nextToken();
                 String position = tokenizer.nextToken();
 
-                String tilePath = ResourceHelper.getInstance().getTileFile(planetTileName);
+                String tileName = TilesMapper.getTileName(planetTileName);
+                String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
                 if (tilePath == null)
                 {
                     MessageHelper.replyToMessage(msg, "Could not find tile");
