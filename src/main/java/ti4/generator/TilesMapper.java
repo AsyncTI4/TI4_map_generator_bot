@@ -8,16 +8,17 @@ import java.io.InputStream;
 import java.util.Properties;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class TilesMapper {
     private static final Logger logger = Logger.getLogger(TilesMapper.class.getName());
-    private static final Properties tilesMap = new Properties();
+    private static final Properties tiles = new Properties();
 
     public static void init() {
         String positionFile = ResourceHelper.getInstance().getInfoFile("tiles.properties");
         if (positionFile != null) {
             try (InputStream input = new FileInputStream(positionFile)) {
-                tilesMap.load(input);
+                tiles.load(input);
             } catch (IOException e) {
                 logger.log(Level.WARNING, "Could not read tiles name file", e);
             }
@@ -25,6 +26,15 @@ public class TilesMapper {
     }
 
     public static String getTileName(String tileID) {
-        return tilesMap.getProperty(tileID);
+        return tiles.getProperty(tileID);
+    }
+
+    public static String getTilesList()
+    {
+        return  "Tiles: " + tiles.values().stream()
+                .sorted()
+                .filter(value -> value instanceof String)
+                .map(value -> (String) value)
+                .collect(Collectors.joining(", "));
     }
 }

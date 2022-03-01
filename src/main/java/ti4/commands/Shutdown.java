@@ -3,8 +3,9 @@ package ti4.commands;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import ti4.MapGenerator;
+import ti4.message.MessageHelper;
 
-public class Shutdown implements Command{
+public class Shutdown implements Command {
 
     @Override
     public boolean accept(MessageReceivedEvent event) {
@@ -14,6 +15,10 @@ public class Shutdown implements Command{
 
     @Override
     public void execute(MessageReceivedEvent event) {
-        MapGenerator.jda.shutdownNow();
+        if (event.getAuthor().getId().equals(MapGenerator.userID)) {
+            MapGenerator.jda.shutdownNow();
+        } else {
+            MessageHelper.replyToMessage(event.getMessage(), "Not Authorized shutdown attempt");
+        }
     }
 }
