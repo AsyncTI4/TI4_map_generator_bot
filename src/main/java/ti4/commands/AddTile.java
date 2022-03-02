@@ -4,7 +4,11 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import ti4.ResourceHelper;
+import ti4.generator.GenerateMap;
 import ti4.generator.TilesMapper;
+import ti4.map.Map;
+import ti4.map.MapManager;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 import java.io.File;
@@ -19,9 +23,11 @@ public class AddTile implements Command {
 
     @Override
     public void execute(MessageReceivedEvent event) {
-        if (CreateMap.generateMapInstance == null)
+        String userID = event.getAuthor().getId();
+        MapManager mapManager = MapManager.getInstance();
+        if (!mapManager.isUserWithActiveMap(userID))
         {
-            MessageHelper.replyToMessage(event.getMessage(),"Start map creation with :create_map");
+            MessageHelper.replyToMessage(event.getMessage(),"Set your active map using: :set_map mapname");
         }
         else {
             Message msg = event.getMessage();
@@ -40,9 +46,12 @@ public class AddTile implements Command {
                     MessageHelper.replyToMessage(msg, "Could not find tile");
                     return;
                 }
-                File planet = new File(tilePath);
-                CreateMap.generateMapInstance.addTile(planet, position);
-                File file = CreateMap.generateMapInstance.saveImage();
+
+                Tile tile = new Tile(planetTileName, position);
+                Map userActiveMap = mapManager.getUserActiveMap(userID);
+                userActiveMap.setTile(tile);
+
+                File file = GenerateMap.getInstance().saveImage(userActiveMap);
                 MessageHelper.replyToMessage(event.getMessage(), file);
             }
         }

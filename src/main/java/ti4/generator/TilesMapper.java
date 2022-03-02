@@ -26,6 +26,7 @@ public class TilesMapper {
     }
 
     public static String getTileName(String tileID) {
+        //todo add alias support here
         return tiles.getProperty(tileID);
     }
 

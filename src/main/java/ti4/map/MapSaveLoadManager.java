@@ -3,11 +3,11 @@ package ti4.map;
 import ti4.helpers.LoggerHandler;
 import ti4.helpers.Storage;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import javax.annotation.CheckForNull;
+import java.io.*;
 import java.util.HashMap;
+import java.util.Scanner;
+import java.util.StringTokenizer;
 
 public class MapSaveLoadManager {
 
@@ -42,25 +42,53 @@ public class MapSaveLoadManager {
         //todo save units and other tokens
     }
 
-    private File[] readAllMapFiles() {
+    private static File[] readAllMapFiles() {
         File folder = Storage.getMapImageDirectory();
-        File[] listOfFiles = folder.listFiles();
+        if (folder == null) {
+            try {
+                //noinspection ConstantConditions
+                if (folder.createNewFile()) {
+                    folder = Storage.getMapImageDirectory();
+                }
+            } catch (IOException e) {
+                LoggerHandler.log("Could not create folder for maps");
+            }
+
+        }
+        return folder.listFiles();
     }
 
     public static void loadMaps() {
-
         HashMap<String, Map> mapList = new HashMap<>();
-
-        for (java.util.Map.Entry<String, Map> mapEntry : mapList.entrySet()) {
-            saveMap(mapEntry.getValue());
+        File[] files = readAllMapFiles();
+        for (File file : files) {
+            Map map = loadMap(file);
+            if (map != null) {
+                mapList.put(map.getName(), map);
+            }
         }
-
         MapManager.getInstance().setMapList(mapList);
     }
 
-    private static Map loadMap(File file) {
-        File mapFile = Storage.getMapImageStorage(map.getName() + ".txt");
+    @CheckForNull
+    private static Map loadMap(File mapFile) {
         if (mapFile != null) {
+            Map map = new Map();
+            try (Scanner myReader = new Scanner(mapFile)) {
+                map.setOwnerID(myReader.nextLine());
+                map.setName(myReader.nextLine());
+                HashMap<String, Tile> tileMap = new HashMap<>();
+                while (myReader.hasNextLine()) {
+                    String tileData = myReader.nextLine();
+                    Tile tile = readTile(tileData);
+                    tileMap.put(tile.getTileID(), tile);
+                }
+                map.setTileMap(tileMap);
+            } catch (FileNotFoundException e) {
+                LoggerHandler.log("File not found to read map data: " + mapFile.getName(), e);
+            }
+
+
             try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
                 HashMap<String, Tile> tileMap = map.getTileMap();
                 writer.write(map.getOwnerID());
@@ -72,9 +100,16 @@ public class MapSaveLoadManager {
             } catch (IOException e) {
                 LoggerHandler.log("Could not save map: " + map.getName(), e);
             }
+            return map;
         } else {
             LoggerHandler.log("Could not save map, error creating save file");
         }
+        return null;
+    }
+
+    private static Tile readTile(String tileData) {
+        StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
+        return new Tile(tokenizer.nextToken(), tokenizer.nextToken());
     }
 
 }

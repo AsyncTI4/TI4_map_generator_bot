@@ -2,33 +2,49 @@ package ti4.commands;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import ti4.ResourceHelper;
-import ti4.generator.GenerateMap;
+import ti4.map.Map;
+import ti4.map.MapManager;
 import ti4.message.MessageHelper;
 
-import java.io.File;
+import java.util.StringTokenizer;
 
-public class CreateMap implements Command{
-
-    //todo remove static, add map handles. left for testing
-    public static GenerateMap generateMapInstance;
+public class CreateMap implements Command {
 
     @Override
     public boolean accept(MessageReceivedEvent event) {
         Message msg = event.getMessage();
-        return msg.getContentRaw().equals(":create_map");
+        if (msg.getContentRaw().startsWith(":create_map")) {
+            StringTokenizer tokenizer = new StringTokenizer(msg.getContentRaw());
+            String createMap = tokenizer.nextToken(); //ignoring
+            String mapName = tokenizer.nextToken();
+            if (MapManager.getInstance().getMapList().containsKey(mapName)) {
+                MessageHelper.replyToMessage(msg, "Map with such name exist already, choose different name");
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override
     public void execute(MessageReceivedEvent event) {
-        String tileFile = ResourceHelper.getInstance().getTileFile("6player_setup.png");
-        if (tileFile == null)
+        Message msg = event.getMessage();
+        StringTokenizer tokenizer = new StringTokenizer(msg.getContentRaw());
+        String createMap = tokenizer.nextToken(); //ignoring
+        String mapName = tokenizer.nextToken();
+
+        Map map = new Map();
+        String ownerID = event.getAuthor().getId();
+        map.setOwnerID(ownerID);
+        map.setName(mapName);
+
+
+        MapManager mapManager = MapManager.getInstance();
+        mapManager.addMap(map);
+        boolean setMapSuccessful = mapManager.setMapForUser(ownerID, mapName);
+        if (!setMapSuccessful)
         {
-            MessageHelper.replyToMessage(event.getMessage(), "Could not find base setup file");
-            return;
+            MessageHelper.replyToMessage(event.getMessage(), "Could not assign active map " + mapName);
         }
-        File setupFile = new File(tileFile);
-        generateMapInstance = new GenerateMap(setupFile);
-        MessageHelper.replyToMessage(event.getMessage(), "Map initializes");
+        MessageHelper.replyToMessage(event.getMessage(), "Map created with name: " + mapName);
     }
 }
