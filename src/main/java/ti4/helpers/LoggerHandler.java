@@ -1,7 +1,6 @@
 package ti4.helpers;
 
 import ti4.ResourceHelper;
-import ti4.map.Storage;
 
 import java.io.FileInputStream;
 import java.io.IOException;

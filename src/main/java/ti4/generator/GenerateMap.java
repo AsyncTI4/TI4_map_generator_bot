@@ -1,15 +1,13 @@
 package ti4.generator;
 
 import ti4.helpers.LoggerHandler;
-import ti4.map.Storage;
+import ti4.helpers.Storage;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class GenerateMap {
     private Graphics graphics;
@@ -33,7 +31,7 @@ public class GenerateMap {
 
     public File saveImage() {
         //todo fix temp map name
-        File file = Storage.getMapStorage("temp.png");
+        File file = Storage.getMapImageStorage("temp.png");
         try {
             ImageIO.write(mainImage, "PNG", file);
         } catch (IOException e) {
