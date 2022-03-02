@@ -1,6 +1,7 @@
 package ti4;
 
 import org.jetbrains.annotations.Nullable;
+import ti4.helpers.LoggerHandler;
 
 import javax.annotation.CheckForNull;
 import java.io.File;
@@ -10,8 +11,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ResourceHelper {
-
-    private Logger logger = Logger.getLogger(ResourceHelper.class.getName());
     private static ResourceHelper resourceHelper = null;
 
     private ResourceHelper() {
@@ -34,7 +33,7 @@ public class ResourceHelper {
             }
 
         } catch (Exception e) {
-            logger.log(Level.SEVERE, "Could not find asset", e);
+            LoggerHandler.log("Could not find asset", e);
         }
         return resourceFile;
     }
@@ -68,7 +67,7 @@ public class ResourceHelper {
             }
 
         } catch (Exception e) {
-            logger.log(Level.SEVERE, Could_not_find_tile_file, e);
+            LoggerHandler.log(Could_not_find_tile_file, e);
         }
         return resourceFile != null ? resourceFile.getAbsolutePath() : null;
     }

@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import ti4.helpers.LoggerHandler;
 import ti4.message.MessageHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -24,8 +25,6 @@ import java.util.logging.Logger;
 
 public class MessageListener extends ListenerAdapter {
 
-    Logger logger = Logger.getLogger(MessageListener.class.getName());
-
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
         CommandManager commandManager = CommandManager.getInstance();
@@ -33,6 +32,8 @@ public class MessageListener extends ListenerAdapter {
             if (command.accept(event))
             {
                 command.execute(event);
+                String message = event.getMessage().getContentRaw();
+                LoggerHandler.logInfo(message);
             }
         }
 

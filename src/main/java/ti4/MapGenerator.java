@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.JDABuilder;
 import ti4.commands.*;
 import ti4.generator.PositionMapper;
 import ti4.generator.TilesMapper;
+import ti4.message.MessageHelper;
 
 import javax.security.auth.login.LoginException;
 

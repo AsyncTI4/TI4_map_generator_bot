@@ -1,5 +1,8 @@
 package ti4.generator;
 
+import ti4.helpers.LoggerHandler;
+import ti4.map.Storage;
+
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -9,9 +12,6 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class GenerateMap {
-
-    private static Logger logger = Logger.getLogger(GenerateMap.class.getName());
-
     private Graphics graphics;
     private BufferedImage mainImage;
 
@@ -21,12 +21,10 @@ public class GenerateMap {
         try {
             setupImage = ImageIO.read(setupFile);
         } catch (IOException e) {
-
-            logger.log(Level.SEVERE, "Could read file data for setup file", e);
-
+            LoggerHandler.logError("Could read file data for setup file", e);
         }
         if (setupImage == null) {
-            logger.log(Level.SEVERE, "Could not init map generator");
+            LoggerHandler.log( "Could not init map generator");
             //todo message to user
         }
         mainImage = new BufferedImage(setupImage.getWidth(), setupImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -34,12 +32,12 @@ public class GenerateMap {
     }
 
     public File saveImage() {
-        File file = new File("E:\\DEV TI4\\temp\\temp.png");
+        //todo fix temp map name
+        File file = Storage.getMapStorage("temp.png");
         try {
             ImageIO.write(mainImage, "PNG", file);
-            //todo fix temp directory
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Could not save generated map");
+            LoggerHandler.log("Could not save generated map");
         }
         return file;
     }
@@ -50,7 +48,7 @@ public class GenerateMap {
             Point positionPoint = PositionMapper.getPosition(position);
             graphics.drawImage(image, positionPoint.x, positionPoint.y, null);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Could read file data for tile", e);
+            LoggerHandler.log("Could read file data for tile", e);
         }
     }
 }

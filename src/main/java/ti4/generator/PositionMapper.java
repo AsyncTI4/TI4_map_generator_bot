@@ -1,6 +1,7 @@
 package ti4.generator;
 
 import ti4.ResourceHelper;
+import ti4.helpers.LoggerHandler;
 
 import javax.annotation.CheckForNull;
 import java.awt.*;
@@ -15,7 +16,6 @@ import java.util.logging.Logger;
 //Handles positions of map
 public class PositionMapper {
 
-    private static final Logger logger = Logger.getLogger(PositionMapper.class.getName());
     private static final Properties positionMap = new Properties();
 
     public static void init() {
@@ -24,7 +24,7 @@ public class PositionMapper {
             try (InputStream input = new FileInputStream(positionFile)) {
                 positionMap.load(input);
             } catch (IOException e) {
-                logger.log(Level.WARNING, "Could not read position file", e);
+                LoggerHandler.log("Could not read position file", e);
             }
         }
     }
@@ -39,7 +39,7 @@ public class PositionMapper {
                 int y = Integer.parseInt(tokenizer.nextToken());
                 return new Point(x, y);
             } catch (Exception e) {
-                logger.log(Level.WARNING, "Could not parse position coordinates", e);
+                LoggerHandler.log("Could not parse position coordinates", e);
             }
         }
         return null;

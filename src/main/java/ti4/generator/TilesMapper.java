@@ -1,6 +1,7 @@
 package ti4.generator;
 
 import ti4.ResourceHelper;
+import ti4.helpers.LoggerHandler;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -11,7 +12,6 @@ import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
 public class TilesMapper {
-    private static final Logger logger = Logger.getLogger(TilesMapper.class.getName());
     private static final Properties tiles = new Properties();
 
     public static void init() {
@@ -20,7 +20,7 @@ public class TilesMapper {
             try (InputStream input = new FileInputStream(positionFile)) {
                 tiles.load(input);
             } catch (IOException e) {
-                logger.log(Level.WARNING, "Could not read tiles name file", e);
+                LoggerHandler.log("Could not read tiles name file", e);
             }
         }
     }
