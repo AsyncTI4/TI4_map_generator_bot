@@ -21,7 +21,7 @@ public class ListMaps implements Command {
     public void execute(MessageReceivedEvent event) {
         Message msg = event.getMessage();
         HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
-        String mapNameList = mapList.keySet().stream()
+        String mapNameList = "Map List:\n" + mapList.keySet().stream()
                 .sorted()
                 .collect(Collectors.joining("\n"));
         MessageHelper.replyToMessage(msg, mapNameList);

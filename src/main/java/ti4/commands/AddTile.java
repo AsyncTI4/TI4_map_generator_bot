@@ -8,6 +8,7 @@ import ti4.generator.GenerateMap;
 import ti4.generator.TilesMapper;
 import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.map.MapSaveLoadManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
@@ -50,6 +51,8 @@ public class AddTile implements Command {
                 Tile tile = new Tile(planetTileName, position);
                 Map userActiveMap = mapManager.getUserActiveMap(userID);
                 userActiveMap.setTile(tile);
+
+                MapSaveLoadManager.saveMap(userActiveMap);
 
                 File file = GenerateMap.getInstance().saveImage(userActiveMap);
                 MessageHelper.replyToMessage(event.getMessage(), file);

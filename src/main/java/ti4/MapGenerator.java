@@ -40,6 +40,7 @@ public class MapGenerator {
         commandManager.addCommand(new SaveMaps());
         commandManager.addCommand(new ListMaps());
         commandManager.addCommand(new SetMap());
+        commandManager.addCommand(new ShowMap());
 
         MapSaveLoadManager.loadMaps();
     }

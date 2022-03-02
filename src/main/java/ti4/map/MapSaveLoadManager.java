@@ -61,10 +61,12 @@ public class MapSaveLoadManager {
     public static void loadMaps() {
         HashMap<String, Map> mapList = new HashMap<>();
         File[] files = readAllMapFiles();
-        for (File file : files) {
-            Map map = loadMap(file);
-            if (map != null) {
-                mapList.put(map.getName(), map);
+        if (files != null) {
+            for (File file : files) {
+                Map map = loadMap(file);
+                if (map != null) {
+                    mapList.put(map.getName(), map);
+                }
             }
         }
         MapManager.getInstance().setMapList(mapList);

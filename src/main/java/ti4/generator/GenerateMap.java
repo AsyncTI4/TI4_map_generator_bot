@@ -16,6 +16,8 @@ import java.util.HashMap;
 public class GenerateMap {
     private Graphics graphics;
     private BufferedImage mainImage;
+    private int width;
+    private int height;
 
     private static GenerateMap instance;
 
@@ -32,7 +34,13 @@ public class GenerateMap {
             LoggerHandler.log("Could not init map generator");
             //todo message to user
         }
-        mainImage = new BufferedImage(setupImage.getWidth(), setupImage.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        width = setupImage.getWidth();
+        height = setupImage.getHeight();
+        resetImage();
+    }
+
+    private void resetImage() {
+        mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         graphics = mainImage.getGraphics();
     }
 
@@ -44,6 +52,7 @@ public class GenerateMap {
     }
 
     public File saveImage(Map map) {
+        resetImage();
         //todo fix temp map name
         File file = Storage.getMapImageStorage("temp.png");
         try {
