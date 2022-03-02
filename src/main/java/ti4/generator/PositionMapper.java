@@ -29,6 +29,10 @@ public class PositionMapper {
         }
     }
 
+    public static boolean isPositionValid(String position){
+        return positionMap.getProperty(position) != null;
+    }
+
     @CheckForNull
     public static Point getPosition(String position) {
         String value = positionMap.getProperty(position);

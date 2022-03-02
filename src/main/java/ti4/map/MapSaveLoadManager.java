@@ -24,7 +24,9 @@ public class MapSaveLoadManager {
             try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
                 HashMap<String, Tile> tileMap = map.getTileMap();
                 writer.write(map.getOwnerID());
+                writer.write(System.lineSeparator());
                 writer.write(map.getName());
+                writer.write(System.lineSeparator());
                 for (java.util.Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
                     Tile tile = tileEntry.getValue();
                     saveTile(writer, tile);
@@ -39,6 +41,7 @@ public class MapSaveLoadManager {
 
     private static void saveTile(Writer writer, Tile tile) throws IOException {
         writer.write(tile.getTileID() + " " + tile.getPosition());
+        writer.write(System.lineSeparator());
         //todo save units and other tokens
     }
 

@@ -12,7 +12,7 @@ public class Storage {
     public static File getMapImageStorage(String mapName) {
         URL resource = getURL("Could not find temp directories");
         if (resource == null) return null;
-        return new File(resource.getPath() + "/" + mapName);
+        return new File(resource.getPath() + "/maps/" + mapName);
     }
 
     @CheckForNull

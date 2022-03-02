@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import ti4.ResourceHelper;
 import ti4.generator.GenerateMap;
+import ti4.generator.PositionMapper;
 import ti4.generator.TilesMapper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -39,6 +40,10 @@ public class AddTile implements Command {
                 String command = tokenizer.nextToken();//Left command parsing as we need to remove it for code
                 String planetTileName = tokenizer.nextToken();
                 String position = tokenizer.nextToken();
+                if (!PositionMapper.isPositionValid(position)){
+                    MessageHelper.replyToMessage(msg, "Position tile not allowed");
+                    return;
+                }
 
                 String tileName = TilesMapper.getTileName(planetTileName);
                 String tilePath = ResourceHelper.getInstance().getTileFile(tileName);

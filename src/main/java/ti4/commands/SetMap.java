@@ -18,7 +18,7 @@ public class SetMap implements Command {
             StringTokenizer tokenizer = new StringTokenizer(msg.getContentRaw());
             if (tokenizer.countTokens() != 2)
             {
-                MessageHelper.replyToMessage(msg, "Need to specify name for active map. :set_map mapname");
+                MessageHelper.replyToMessage(msg, "Need to specify name for active map. :set_map mapname \nTo list maps use :list_maps");
                 return false;
             }
             String setMap = tokenizer.nextToken(); //ignoring
@@ -40,9 +40,11 @@ public class SetMap implements Command {
         String setMap = tokenizer.nextToken(); //ignoring
         String mapName = tokenizer.nextToken();
         boolean setMapSuccessful = MapManager.getInstance().setMapForUser(userID, mapName);
-        if (!setMapSuccessful)
-        {
+        if (!setMapSuccessful) {
             MessageHelper.replyToMessage(event.getMessage(), "Could not assign active map " + mapName);
+        } else {
+            MessageHelper.replyToMessage(event.getMessage(), "Active Map set: " + mapName);
         }
+
     }
 }
