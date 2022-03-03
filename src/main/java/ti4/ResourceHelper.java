@@ -77,4 +77,10 @@ public class ResourceHelper {
     {
         return getResourceFromFolder("info/", name, "Could not find info file");
     }
+
+    @CheckForNull
+    public String getAliasFile(String name)
+    {
+        return getResourceFromFolder("alias/", name, "Could not find alias file");
+    }
 }

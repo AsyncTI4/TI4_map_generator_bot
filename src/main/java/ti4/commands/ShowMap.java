@@ -34,7 +34,7 @@ public class ShowMap implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String mapName = event.getOptions().get(0).getAsString();
+        String mapName = event.getOptions().get(0).getAsString().toLowerCase();
         Map map = MapManager.getInstance().getMap(mapName);
         File file = GenerateMap.getInstance().saveImage(map);
         MessageHelper.replyToMessage(event, file);

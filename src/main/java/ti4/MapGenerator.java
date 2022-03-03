@@ -12,6 +12,7 @@ import ti4.commands.*;
 import ti4.generator.GenerateMap;
 import ti4.generator.PositionMapper;
 import ti4.generator.TilesMapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.LoggerHandler;
 import ti4.map.Map;
 import ti4.map.MapSaveLoadManager;
@@ -55,6 +56,7 @@ public class MapGenerator {
 
         PositionMapper.init();
         TilesMapper.init();
+        AliasHandler.init();
 
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddTile());

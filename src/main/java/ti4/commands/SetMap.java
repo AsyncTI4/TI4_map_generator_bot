@@ -34,7 +34,7 @@ public class SetMap implements Command {
         }
         String userID = event.getInteraction().getMember().getId();
 
-        String mapName = event.getOptions().get(0).getAsString();
+        String mapName = event.getOptions().get(0).getAsString().toLowerCase();
         boolean setMapSuccessful = MapManager.getInstance().setMapForUser(userID, mapName);
         if (!setMapSuccessful) {
             MessageHelper.replyToMessage(event, "Could not assign active map " + mapName);

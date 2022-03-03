@@ -10,6 +10,7 @@ import ti4.ResourceHelper;
 import ti4.generator.GenerateMap;
 import ti4.generator.PositionMapper;
 import ti4.generator.TilesMapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -40,10 +41,8 @@ public class AddTile implements Command {
         } else {
 
 
-            String planetTileName = event.getOptions().get(0).getAsString();
-            ;
+            String planetTileName = AliasHandler.resolveTile(event.getOptions().get(0).getAsString().toLowerCase());
             String position = event.getOptions().get(1).getAsString();
-            ;
             if (!PositionMapper.isPositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
                 return;
@@ -52,7 +51,7 @@ public class AddTile implements Command {
             String tileName = TilesMapper.getTileName(planetTileName);
             String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
             if (tilePath == null) {
-                MessageHelper.replyToMessage(event, "Could not find tile");
+                MessageHelper.replyToMessage(event, "Could not find tile: " + tileName);
                 return;
             }
 

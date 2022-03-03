@@ -39,7 +39,7 @@ public class CreateMap implements Command {
         Map map = new Map();
         String ownerID = event.getInteraction().getId();
         map.setOwnerID(ownerID);
-        String mapName = event.getOptions().get(0).getAsString();
+        String mapName = event.getOptions().get(0).getAsString().toLowerCase();
         map.setName(mapName);
 
         MapManager mapManager = MapManager.getInstance();
