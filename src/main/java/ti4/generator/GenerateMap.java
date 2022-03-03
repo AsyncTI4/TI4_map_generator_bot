@@ -56,12 +56,18 @@ public class GenerateMap {
         //todo fix temp map name
         File file = Storage.getMapImageStorage("temp.png");
         try {
-            HashMap<String, Tile> tileMap = map.getTileMap();
+            HashMap<String, Tile> tileMap = new HashMap<>(map.getTileMap());
+            String setup = tileMap.keySet().stream()
+                    .filter(key -> key.startsWith("setup"))
+                    .findFirst()
+                    .orElse(null);
+            if (setup != null) {
+                addTile(tileMap.get(setup));
+                tileMap.remove(setup);
+            }
             tileMap.keySet().stream()
                     .sorted()
                     .forEach(key -> addTile(tileMap.get(key)));
-
-
             ImageIO.write(mainImage, "PNG", file);
         } catch (IOException e) {
             LoggerHandler.log("Could not save generated map");
@@ -75,7 +81,7 @@ public class GenerateMap {
             Point positionPoint = PositionMapper.getPosition(tile.getPosition());
             graphics.drawImage(image, positionPoint.x, positionPoint.y, null);
         } catch (IOException e) {
-            LoggerHandler.log("Error drawing tile: " +tile.getTileID(), e);
+            LoggerHandler.log("Error drawing tile: " + tile.getTileID(), e);
         }
     }
 }
