@@ -1,23 +1,29 @@
 package ti4.commands;
 
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.ResourceHelper;
+import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
 import java.io.File;
 import java.util.StringTokenizer;
 
 public class AddUnit implements Command {
+
     @Override
-    public boolean accept(MessageReceivedEvent event) {
-        Message msg = event.getMessage();
-        return msg.getContentRaw().startsWith(":add_unit");
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return event.getName().equals(Constants.ADD_UNIT);
     }
 
     @Override
-    public void execute(MessageReceivedEvent event) {
-        MessageHelper.replyToMessage(event.getMessage(),"Not implemented yet");
+    public void execute(SlashCommandInteractionEvent event) {
+        MessageHelper.replyToMessage(event,"Not implemented yet");
 //        if (CreateMap.generateMapInstance == null)
 //        {
 //            MessageHelper.replyToMessage(event.getMessage(),"Start map creation with :create_map");
@@ -44,5 +50,18 @@ public class AddUnit implements Command {
 //                MessageHelper.replyToMessage(event.getMessage(), file);
 //            }
 //        }
+    }
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
+    public void registerCommands(CommandListUpdateAction commands) {
+        // Moderation commands with required options
+        commands.addCommands(
+                Commands.slash(Constants.ADD_UNIT, "Add unit to map")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAME, "Unit name")
+                                .setRequired(true))
+//                        .addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map")
+//                                .setRequired(true))
+
+        );
     }
 }

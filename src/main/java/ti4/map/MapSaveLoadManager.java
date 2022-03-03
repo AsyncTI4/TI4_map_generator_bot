@@ -61,14 +61,21 @@ public class MapSaveLoadManager {
         return folder.listFiles();
     }
 
+    private static boolean isTxtExtention(File file) {
+        return file.getAbsolutePath().endsWith(".txt");
+
+    }
+
     public static void loadMaps() {
         HashMap<String, Map> mapList = new HashMap<>();
         File[] files = readAllMapFiles();
         if (files != null) {
             for (File file : files) {
-                Map map = loadMap(file);
-                if (map != null) {
-                    mapList.put(map.getName(), map);
+                if (isTxtExtention(file)) {
+                    Map map = loadMap(file);
+                    if (map != null) {
+                        mapList.put(map.getName(), map);
+                    }
                 }
             }
         }
@@ -91,19 +98,6 @@ public class MapSaveLoadManager {
                 map.setTileMap(tileMap);
             } catch (FileNotFoundException e) {
                 LoggerHandler.log("File not found to read map data: " + mapFile.getName(), e);
-            }
-
-
-            try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
-                HashMap<String, Tile> tileMap = map.getTileMap();
-                writer.write(map.getOwnerID());
-                writer.write(map.getName());
-                for (java.util.Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
-                    Tile tile = tileEntry.getValue();
-                    saveTile(writer, tile);
-                }
-            } catch (IOException e) {
-                LoggerHandler.log("Could not save map: " + map.getName(), e);
             }
             return map;
         } else {

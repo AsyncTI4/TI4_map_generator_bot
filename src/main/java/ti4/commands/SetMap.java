@@ -1,50 +1,57 @@
 package ti4.commands;
 
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import ti4.MapGenerator;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.helpers.Constants;
 import ti4.map.MapManager;
 import ti4.message.MessageHelper;
-
-import java.util.StringTokenizer;
 
 public class SetMap implements Command {
 
     @Override
-    public boolean accept(MessageReceivedEvent event) {
-        Message msg = event.getMessage();
-
-        if (msg.getContentRaw().startsWith(":set_map")) {
-            StringTokenizer tokenizer = new StringTokenizer(msg.getContentRaw());
-            if (tokenizer.countTokens() != 2)
-            {
-                MessageHelper.replyToMessage(msg, "Need to specify name for active map. :set_map mapname \nTo list maps use :list_maps");
-                return false;
-            }
-            String setMap = tokenizer.nextToken(); //ignoring
-            String mapName = tokenizer.nextToken();
-            if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-                MessageHelper.replyToMessage(msg, "Map with such name does not exists, use :list_maps");
-            }
-            return true;
+    public boolean accept(SlashCommandInteractionEvent event) {
+        if (!event.getName().equals(Constants.SET_MAP)) {
+            return false;
         }
-        return false;
+        String mapName = event.getOptions().get(0).getAsString();
+        if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
+            MessageHelper.replyToMessage(event, "Map with such name does not exists, use /list_maps");
+            return false;
+        }
+        return true;
     }
 
     @Override
-    public void execute(MessageReceivedEvent event) {
-        String userID = event.getAuthor().getId();
+    public void execute(SlashCommandInteractionEvent event) {
+        Member member = event.getInteraction().getMember();
+        if (member == null) {
+            MessageHelper.replyToMessage(event, "Caller ID not found");
+            return;
+        }
+        String userID = event.getInteraction().getMember().getId();
 
-        Message msg = event.getMessage();
-        StringTokenizer tokenizer = new StringTokenizer(msg.getContentRaw());
-        String setMap = tokenizer.nextToken(); //ignoring
-        String mapName = tokenizer.nextToken();
+        String mapName = event.getOptions().get(0).getAsString();
         boolean setMapSuccessful = MapManager.getInstance().setMapForUser(userID, mapName);
         if (!setMapSuccessful) {
-            MessageHelper.replyToMessage(event.getMessage(), "Could not assign active map " + mapName);
+            MessageHelper.replyToMessage(event, "Could not assign active map " + mapName);
         } else {
-            MessageHelper.replyToMessage(event.getMessage(), "Active Map set: " + mapName);
+            MessageHelper.replyToMessage(event, "Active Map set: " + mapName);
         }
+    }
 
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
+    public void registerCommands(CommandListUpdateAction commands) {
+        // Moderation commands with required options
+        commands.addCommands(
+                Commands.slash(Constants.SET_MAP, "Shows selected map")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name to be shown")
+                                .setRequired(true))
+
+        );
     }
 }

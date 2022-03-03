@@ -1,5 +1,6 @@
 package ti4;
 
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.generator.GenerateMap;
@@ -9,6 +10,8 @@ import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.helpers.LoggerHandler;
+import ti4.map.Map;
+import ti4.map.MapManager;
 import ti4.message.MessageHelper;
 
 import java.io.ByteArrayOutputStream;
@@ -26,16 +29,29 @@ import java.util.logging.Logger;
 public class MessageListener extends ListenerAdapter {
 
     @Override
-    public void onMessageReceived(MessageReceivedEvent event) {
+    public void onSlashCommandInteraction(SlashCommandInteractionEvent event)
+    {
         CommandManager commandManager = CommandManager.getInstance();
         for (Command command : commandManager.getCommandList()) {
             if (command.accept(event))
             {
                 command.execute(event);
-                String message = event.getMessage().getContentRaw();
-                LoggerHandler.logInfo(message);
+//                String message = event.getMessage().getContentRaw();
+//                LoggerHandler.logInfo(message);
             }
         }
+    }
+    @Override
+    public void onMessageReceived(MessageReceivedEvent event) {
+//        CommandManager commandManager = CommandManager.getInstance();
+//        for (Command command : commandManager.getCommandList()) {
+//            if (command.accept(event))
+//            {
+//                command.execute(event);
+//                String message = event.getMessage().getContentRaw();
+//                LoggerHandler.logInfo(message);
+//            }
+//        }
 
         Message msg = event.getMessage();
         if (msg.getContentRaw().startsWith("map_log")) {

@@ -2,6 +2,7 @@ package ti4.message;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.io.File;
 
@@ -12,12 +13,12 @@ public class MessageHelper {
         channel.sendMessage(messageText).queue();
     }
 
-    public static void replyToMessage(Message message, String messageText)
+    public static void replyToMessage(SlashCommandInteractionEvent event, String messageText)
     {
-        message.reply(messageText).queue();
+        event.reply(messageText).queue();
     }
-    public static void replyToMessage(Message message, File file)
+    public static void replyToMessage(SlashCommandInteractionEvent event, File file)
     {
-        message.reply(file).queue();
+        event.replyFile(file).queue();
     }
 }

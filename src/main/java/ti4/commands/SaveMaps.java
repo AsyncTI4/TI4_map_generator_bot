@@ -1,26 +1,38 @@
 package ti4.commands;
 
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.MapGenerator;
+import ti4.helpers.Constants;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
 public class SaveMaps implements Command {
 
     @Override
-    public boolean accept(MessageReceivedEvent event) {
-        Message msg = event.getMessage();
-        return msg.getContentRaw().startsWith(":save_maps");
+    public boolean accept(SlashCommandInteractionEvent event) {
+        return event.getName().equals(Constants.SAVE_MAPS);
     }
 
     @Override
-    public void execute(MessageReceivedEvent event) {
-        if (event.getAuthor().getId().equals(MapGenerator.userID)) {
+    public void execute(SlashCommandInteractionEvent event) {
+        Member member = event.getInteraction().getMember();
+        if (member != null && member.getId().equals(MapGenerator.userID)) {
             MapSaveLoadManager.saveMaps();
-            MessageHelper.replyToMessage(event.getMessage(), "Saved");
+            MessageHelper.replyToMessage(event, "Saved");
         } else {
-            MessageHelper.replyToMessage(event.getMessage(), "Not Authorized save attempt");
+            MessageHelper.replyToMessage(event, "Not Authorized save attempt");
         }
+    }
+
+    @SuppressWarnings("ResultOfMethodCallIgnored")
+    @Override
+    public void registerCommands(CommandListUpdateAction commands) {
+        // Moderation commands with required options
+        commands.addCommands(
+                Commands.slash(Constants.SAVE_MAPS, "Save all maps")
+        );
     }
 }
