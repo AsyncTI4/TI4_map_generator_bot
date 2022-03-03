@@ -51,7 +51,7 @@ public class AddTile implements Command {
             String tileName = TilesMapper.getTileName(planetTileName);
             String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
             if (tilePath == null) {
-                MessageHelper.replyToMessage(event, "Could not find tile: " + tileName);
+                MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
                 return;
             }
 

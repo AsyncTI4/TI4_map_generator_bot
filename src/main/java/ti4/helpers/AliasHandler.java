@@ -27,7 +27,7 @@ public class AliasHandler {
                     StringTokenizer tokenizer = new StringTokenizer(tileALiasProperties.getProperty(id), ",");
                     while (tokenizer.hasMoreTokens())
                     {
-                        tileAliasList.put(tokenizer.nextToken(), id);
+                        tileAliasList.put(tokenizer.nextToken().toLowerCase(), id);
                     }
                 }
             } catch (IOException e) {
