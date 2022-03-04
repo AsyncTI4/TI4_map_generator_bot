@@ -68,6 +68,7 @@ public class MapGenerator {
         commandManager.addCommand(new ListMaps());
         commandManager.addCommand(new SetMap());
         commandManager.addCommand(new ShowMap());
+        commandManager.addCommand(new AddTileList());
 
 
         Guild guild = jda.getGuildById(args[2]);

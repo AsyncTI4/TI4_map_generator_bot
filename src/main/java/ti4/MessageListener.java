@@ -1,5 +1,6 @@
 package ti4;
 
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
@@ -31,6 +32,9 @@ public class MessageListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event)
     {
+//        Member member = event.getMember();
+//        String logText = (member == null ? "NA" : member.getEffectiveName() + " " +member.getId())
+//        LoggerHandler.log(member.getId());
         CommandManager commandManager = CommandManager.getInstance();
         for (Command command : commandManager.getCommandList()) {
             if (command.accept(event))

@@ -11,7 +11,9 @@ public class Constants {
     public static final String CREATE_MAP = "create_map";
     public static final String POSITION = "position";
     public static final String TILE_NAME = "tile_name";
+    public static final String TILE_LIST = "tile_list";
     public static final String UNIT_NAME = "unit_name";
     public static final String ADD_TILE = "add_tile";
+    public static final String ADD_TILE_LIST = "add_tile_list";
     public static final String ADD_UNIT = "add_unit";
 }
