@@ -1,6 +1,5 @@
 package ti4.map;
 
-import java.awt.*;
 import java.util.HashMap;
 
 public class MapManager {
@@ -32,8 +31,13 @@ public class MapManager {
     public void addMap(Map map) {
         mapList.put(map.getName(), map);
     }
+
     public Map getMap(String mapName) {
         return mapList.get(mapName);
+    }
+
+    public Map deleteMap(String mapName) {
+        return mapList.remove(mapName);
     }
 
     public boolean setMapForUser(String userID, String mapName) {

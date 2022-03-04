@@ -76,7 +76,7 @@ public class GenerateMap {
             ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
             if (defaultWriteParam.canWriteCompressed()){
                 defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                defaultWriteParam.setCompressionQuality(0.05f);
+                defaultWriteParam.setCompressionQuality(0.01f);
             }
 
             imageWriter.write(null, new IIOImage(mainImage, null, null), defaultWriteParam);

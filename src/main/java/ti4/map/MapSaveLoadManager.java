@@ -11,6 +11,8 @@ import java.util.StringTokenizer;
 
 public class MapSaveLoadManager {
 
+    public static final String TXT = ".txt";
+
     public static void saveMaps() {
         HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
         for (java.util.Map.Entry<String, Map> mapEntry : mapList.entrySet()) {
@@ -62,8 +64,17 @@ public class MapSaveLoadManager {
     }
 
     private static boolean isTxtExtention(File file) {
-        return file.getAbsolutePath().endsWith(".txt");
+        return file.getAbsolutePath().endsWith(TXT);
 
+    }
+
+    public static boolean deleteMap(String mapName) {
+        File mapStorage = Storage.getMapStorage(mapName+ TXT);
+        if (mapStorage == null) {
+            return false;
+        }
+        File deletedMapStorage = Storage.getDeletedMapStorage(mapName + "_" + System.currentTimeMillis() + TXT);
+        return mapStorage.renameTo(deletedMapStorage);
     }
 
     public static void loadMaps() {

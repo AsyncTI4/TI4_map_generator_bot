@@ -3,24 +3,16 @@ package ti4;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.*;
-import ti4.generator.GenerateMap;
 import ti4.generator.PositionMapper;
 import ti4.generator.TilesMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.LoggerHandler;
-import ti4.map.Map;
+import ti4.helpers.Storage;
 import ti4.map.MapSaveLoadManager;
-import ti4.message.MessageHelper;
 
 import javax.security.auth.login.LoginException;
-import java.io.File;
-import java.util.StringTokenizer;
 
 public class MapGenerator {
 
@@ -46,7 +38,8 @@ public class MapGenerator {
         }
 
 
-
+//        User user = event.getJDA().getUserById();
+//            user.getName()
 
 
 
@@ -57,6 +50,7 @@ public class MapGenerator {
         PositionMapper.init();
         TilesMapper.init();
         AliasHandler.init();
+        Storage.init();
 
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddTile());
@@ -69,7 +63,7 @@ public class MapGenerator {
         commandManager.addCommand(new SetMap());
         commandManager.addCommand(new ShowMap());
         commandManager.addCommand(new AddTileList());
-
+        commandManager.addCommand(new DeleteMap());
 
         Guild guild = jda.getGuildById(args[2]);
 
