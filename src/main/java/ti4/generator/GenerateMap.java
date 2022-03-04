@@ -6,7 +6,10 @@ import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.Tile;
 
+import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.ImageWriter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -68,7 +71,18 @@ public class GenerateMap {
             tileMap.keySet().stream()
                     .sorted()
                     .forEach(key -> addTile(tileMap.get(key)));
-            ImageIO.write(mainImage, "PNG", file);
+            ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
+            imageWriter.setOutput(ImageIO.createImageOutputStream(file));
+            ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
+            if (defaultWriteParam.canWriteCompressed()){
+                defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                defaultWriteParam.setCompressionQuality(0.05f);
+            }
+
+            imageWriter.write(null, new IIOImage(mainImage, null, null), defaultWriteParam);
+
+
+//            ImageIO.write(mainImage, "PNG", file);
         } catch (IOException e) {
             LoggerHandler.log("Could not save generated map");
         }

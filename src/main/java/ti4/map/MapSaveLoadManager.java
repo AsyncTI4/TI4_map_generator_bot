@@ -93,7 +93,7 @@ public class MapSaveLoadManager {
                 while (myReader.hasNextLine()) {
                     String tileData = myReader.nextLine();
                     Tile tile = readTile(tileData);
-                    tileMap.put(tile.getTileID(), tile);
+                    tileMap.put(tile.getPosition(), tile);
                 }
                 map.setTileMap(tileMap);
             } catch (FileNotFoundException e) {

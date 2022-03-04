@@ -21,7 +21,7 @@ public class CreateMap implements Command {
             return false;
         }
         String mapName = event.getOptions().get(0).getAsString();
-        if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
+        if (MapManager.getInstance().getMapList().containsKey(mapName)) {
             MessageHelper.replyToMessage(event, "Map with such name exist already, choose different name");
             return false;
         }

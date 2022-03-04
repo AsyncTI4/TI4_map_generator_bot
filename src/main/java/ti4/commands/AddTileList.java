@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.ResourceHelper;
 import ti4.generator.GenerateMap;
 import ti4.generator.TilesMapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
@@ -45,13 +46,14 @@ public class AddTileList implements Command {
                 return;
             }
 
+            userActiveMap.clearTileMap();
             for (java.util.Map.Entry<String, String> entry : mappedTilesToPosition.entrySet()) {
-                String tileID = entry.getKey();
+                String tileID = entry.getValue();
                 if (tileID.equals("0")){
                     continue;
                 }
                 String tileName = TilesMapper.getTileName(tileID);
-                String position = entry.getValue();
+                String position = entry.getKey();
                 String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
                 if (tilePath == null) {
                     MessageHelper.replyToMessage(event, "Could not find tile: " + tileID);

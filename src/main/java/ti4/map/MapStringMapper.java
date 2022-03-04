@@ -1,5 +1,7 @@
 package ti4.map;
 
+import ti4.helpers.AliasHandler;
+
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -18,7 +20,7 @@ public class MapStringMapper {
             int index = 0;
             while (tokenizer.hasMoreTokens()) {
                 String tileID = tokenizer.nextToken();
-                mappedTiles.put(tileID, mapFor6Player.get(index));
+                mappedTiles.put(mapFor6Player.get(index), AliasHandler.resolveTile(tileID));
                 index++;
             }
         }

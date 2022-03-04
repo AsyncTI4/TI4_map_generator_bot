@@ -36,6 +36,10 @@ public class Map {
         this.tileMap = tileMap;
     }
 
+    public void clearTileMap() {
+        this.tileMap.clear();
+    }
+
     public void setTile(Tile tile)
     {
         tileMap.put(tile.getPosition(), tile);
