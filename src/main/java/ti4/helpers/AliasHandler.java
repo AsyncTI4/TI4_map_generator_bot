@@ -11,15 +11,17 @@ import java.util.StringTokenizer;
 
 public class AliasHandler {
     private static HashMap<String, String> tileAliasList = new HashMap<>();
+    private static HashMap<String, String> unitAliasList = new HashMap<>();
 
     public static void init()
     {
-        initTileAlias();
+        readAliasFile("tile_alias.properties", tileAliasList, "Could not read tiles alias file");
+        readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
     }
 
-    private static void initTileAlias() {
+    private static void readAliasFile(String fileName, HashMap<String, String> aliasList, String errorMessage) {
         Properties tileALiasProperties = new Properties();
-        String aliasFile = ResourceHelper.getInstance().getAliasFile("tile_alias.properties");
+        String aliasFile = ResourceHelper.getInstance().getAliasFile(fileName);
         if (aliasFile != null) {
             try (InputStream input = new FileInputStream(aliasFile)) {
                 tileALiasProperties.load(input);
@@ -27,11 +29,11 @@ public class AliasHandler {
                     StringTokenizer tokenizer = new StringTokenizer(tileALiasProperties.getProperty(id), ",");
                     while (tokenizer.hasMoreTokens())
                     {
-                        tileAliasList.put(tokenizer.nextToken().toLowerCase(), id);
+                        aliasList.put(tokenizer.nextToken().toLowerCase(), id);
                     }
                 }
             } catch (IOException e) {
-                LoggerHandler.log("Could not read tiles name file", e);
+                LoggerHandler.log(errorMessage, e);
             }
         }
     }
@@ -39,6 +41,12 @@ public class AliasHandler {
     public static String resolveTile(String name)
     {
         String aliasID = tileAliasList.get(name);
+        return aliasID != null ? aliasID : name;
+    }
+
+    public static String resolveUnit(String name)
+    {
+        String aliasID = unitAliasList.get(name);
         return aliasID != null ? aliasID : name;
     }
 }

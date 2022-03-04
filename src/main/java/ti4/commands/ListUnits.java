@@ -7,24 +7,24 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
-public class ListTiles implements Command {
+public class ListUnits implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(Constants.LIST_TILES);
+        return event.getName().equals(Constants.LIST_UNITS);
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String tilesList = Mapper.getTilesList();
-        MessageHelper.replyToMessage(event, tilesList);
+        String unitList = Mapper.getUnitList();
+        MessageHelper.replyToMessage(event, unitList);
     }
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(Constants.LIST_TILES, "Shows available tiles")
+                Commands.slash(Constants.LIST_UNITS, "Shows available units")
 
         );
     }

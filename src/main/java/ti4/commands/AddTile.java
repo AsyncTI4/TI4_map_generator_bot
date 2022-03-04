@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.ResourceHelper;
 import ti4.generator.GenerateMap;
 import ti4.generator.PositionMapper;
-import ti4.generator.TilesMapper;
+import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Map;
@@ -43,12 +43,12 @@ public class AddTile implements Command {
 
             String planetTileName = AliasHandler.resolveTile(event.getOptions().get(0).getAsString().toLowerCase());
             String position = event.getOptions().get(1).getAsString();
-            if (!PositionMapper.isPositionValid(position)) {
+            if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
                 return;
             }
 
-            String tileName = TilesMapper.getTileName(planetTileName);
+            String tileName = Mapper.getTileID(planetTileName);
             String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
             if (tilePath == null) {
                 MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);

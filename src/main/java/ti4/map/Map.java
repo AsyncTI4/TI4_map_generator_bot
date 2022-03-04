@@ -24,6 +24,13 @@ public class Map {
         return tileMap;
     }
 
+    public Tile getTile(String tileID) {
+        return tileMap.values().stream()
+                .filter(tile -> tile.getTileID().equals(tileID))
+                .findFirst()
+                .orElse(null);
+    }
+
     public void setOwnerID(String ownerID) {
         this.ownerID = ownerID;
     }

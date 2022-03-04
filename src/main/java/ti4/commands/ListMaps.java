@@ -1,11 +1,8 @@
 package ti4.commands;
 
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.generator.TilesMapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;

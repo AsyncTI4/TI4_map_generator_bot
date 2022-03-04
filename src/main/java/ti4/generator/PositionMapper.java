@@ -1,5 +1,6 @@
 package ti4.generator;
 
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.helpers.LoggerHandler;
 
@@ -10,32 +11,46 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.Properties;
 import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 //Handles positions of map
 public class PositionMapper {
 
-    private static final Properties positionMap = new Properties();
+    private static final Properties positionTileMap6Player = new Properties();
+    private static final Properties unitPositions = new Properties();
 
     public static void init() {
-        String positionFile = ResourceHelper.getInstance().getPositionFile("6player.properties");
+        readData("6player.properties", positionTileMap6Player, "Could not read position file");
+        readData("unit_position.properties", unitPositions, "Could not read unit position file");
+    }
+
+    private static void readData(String fileName, Properties positionMap, String errorMessage) {
+        String positionFile = ResourceHelper.getInstance().getPositionFile(fileName);
         if (positionFile != null) {
             try (InputStream input = new FileInputStream(positionFile)) {
                 positionMap.load(input);
             } catch (IOException e) {
-                LoggerHandler.log("Could not read position file", e);
+                LoggerHandler.log(errorMessage, e);
             }
         }
     }
 
-    public static boolean isPositionValid(String position){
-        return positionMap.getProperty(position) != null;
+    public static boolean isTilePositionValid(String position){
+        return positionTileMap6Player.getProperty(position) != null;
     }
 
     @CheckForNull
-    public static Point getPosition(String position) {
-        String value = positionMap.getProperty(position);
+    public static Point getTilePosition(String position) {
+        return getPosition(position, positionTileMap6Player);
+    }
+
+    @CheckForNull
+    public static Point getUnitPosition(String position) {
+        return getPosition(position, unitPositions);
+    }
+
+    @Nullable
+    private static Point getPosition(String position, Properties positionTileMap6Player) {
+        String value = positionTileMap6Player.getProperty(position);
         if (value != null) {
             StringTokenizer tokenizer = new StringTokenizer(value, ",");
             try {

@@ -74,7 +74,7 @@ public class GenerateMap {
             ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
             imageWriter.setOutput(ImageIO.createImageOutputStream(file));
             ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
-            if (defaultWriteParam.canWriteCompressed()){
+            if (defaultWriteParam.canWriteCompressed()) {
                 defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
                 defaultWriteParam.setCompressionQuality(0.01f);
             }
@@ -92,8 +92,17 @@ public class GenerateMap {
     private void addTile(Tile tile) {
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
-            Point positionPoint = PositionMapper.getPosition(tile.getPosition());
-            graphics.drawImage(image, positionPoint.x, positionPoint.y, null);
+            Point positionPoint = PositionMapper.getTilePosition(tile.getPosition());
+            int tileX = positionPoint.x;
+            int tileY = positionPoint.y;
+            graphics.drawImage(image, tileX, tileY, null);
+
+            for (java.util.Map.Entry<String, String> entry : tile.getUnits().entrySet()) {
+                image = ImageIO.read(new File(tile.getUnitPath(entry.getValue())));
+                Point unitPosition = PositionMapper.getUnitPosition(entry.getKey());
+                graphics.drawImage(image, tileX + unitPosition.x, tileY + unitPosition.y, null);
+            }
+
         } catch (IOException e) {
             LoggerHandler.log("Error drawing tile: " + tile.getTileID(), e);
         }

@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.*;
 import ti4.generator.PositionMapper;
-import ti4.generator.TilesMapper;
+import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.LoggerHandler;
 import ti4.helpers.Storage;
@@ -48,13 +48,13 @@ public class MapGenerator {
         userID = args[1];
 
         PositionMapper.init();
-        TilesMapper.init();
+        Mapper.init();
         AliasHandler.init();
         Storage.init();
 
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddTile());
-        commandManager.addCommand(new AddUnit());
+        commandManager.addCommand(new AddUnits());
         commandManager.addCommand(new CreateMap());
         commandManager.addCommand(new Shutdown());
         commandManager.addCommand(new ListTiles());
@@ -64,6 +64,7 @@ public class MapGenerator {
         commandManager.addCommand(new ShowMap());
         commandManager.addCommand(new AddTileList());
         commandManager.addCommand(new DeleteMap());
+        commandManager.addCommand(new ListUnits());
 
         Guild guild = jda.getGuildById(args[2]);
 
