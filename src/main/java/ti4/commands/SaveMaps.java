@@ -21,7 +21,7 @@ public class SaveMaps implements Command {
         Member member = event.getInteraction().getMember();
         if (member != null && member.getId().equals(MapGenerator.userID)) {
             MapSaveLoadManager.saveMaps();
-            MessageHelper.replyToMessage(event, "Saved");
+            MessageHelper.replyToMessage(event, "Saved all maps");
         } else {
             MessageHelper.replyToMessage(event, "Not Authorized save attempt");
         }

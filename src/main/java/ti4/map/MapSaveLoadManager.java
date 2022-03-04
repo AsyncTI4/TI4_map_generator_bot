@@ -12,6 +12,12 @@ import java.util.StringTokenizer;
 public class MapSaveLoadManager {
 
     public static final String TXT = ".txt";
+    public static final String TILE = "-tile-";
+    public static final String UNITS = "-units-";
+    public static final String ENDUNITS = "-endunits-";
+    public static final String ENDTILE = "-endtile-";
+    public static final String TOKENS = "-tokens-";
+    public static final String ENDTOKENS = "-endtokens-";
 
     public static void saveMaps() {
         HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
@@ -42,9 +48,27 @@ public class MapSaveLoadManager {
     }
 
     private static void saveTile(Writer writer, Tile tile) throws IOException {
+        writer.write(TILE);
+        writer.write(System.lineSeparator());
         writer.write(tile.getTileID() + " " + tile.getPosition());
         writer.write(System.lineSeparator());
-        //todo save units and other tokens
+        writer.write(UNITS);
+        writer.write(System.lineSeparator());
+        HashMap<String, String> units = tile.getUnits();
+        for (java.util.Map.Entry<String, String> entry : units.entrySet()) {
+            writer.write(entry.getKey() + " " + entry.getValue());
+            writer.write(System.lineSeparator());
+        }
+        writer.write(ENDUNITS);
+        writer.write(System.lineSeparator());
+
+        writer.write(TOKENS);
+        writer.write(System.lineSeparator());
+
+        writer.write(ENDTOKENS);
+        writer.write(System.lineSeparator());
+        writer.write(ENDTILE);
+        writer.write(System.lineSeparator());
     }
 
     private static File[] readAllMapFiles() {
@@ -103,8 +127,38 @@ public class MapSaveLoadManager {
                 HashMap<String, Tile> tileMap = new HashMap<>();
                 while (myReader.hasNextLine()) {
                     String tileData = myReader.nextLine();
+                    if (TILE.equals(tileData)) {
+                        continue;
+                    }
+                    if (ENDTILE.equals(tileData)) {
+                        continue;
+                    }
                     Tile tile = readTile(tileData);
                     tileMap.put(tile.getPosition(), tile);
+
+                    while (myReader.hasNextLine()) {
+                        String data = myReader.nextLine();
+                        if (UNITS.equals(data)) {
+                            continue;
+                        }
+                        if (ENDUNITS.equals(data)) {
+                            break;
+                        }
+                        readUnit(tile, data);
+                    }
+
+                    while (myReader.hasNextLine()) {
+                        String data = myReader.nextLine();
+                        if (TOKENS.equals(data)) {
+                            continue;
+                        }
+                        if (ENDTOKENS.equals(data)) {
+                            break;
+                        }
+                        readTokens(tile, data);
+                    }
+
+
                 }
                 map.setTileMap(tileMap);
             } catch (FileNotFoundException e) {
@@ -120,6 +174,17 @@ public class MapSaveLoadManager {
     private static Tile readTile(String tileData) {
         StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
         return new Tile(tokenizer.nextToken(), tokenizer.nextToken());
+    }
+
+    private static void readUnit(Tile tile, String data) {
+        StringTokenizer tokenizer = new StringTokenizer(data, " ");
+        tile.setUnit(tokenizer.nextToken(), tokenizer.nextToken());
+    }
+
+    private static void readTokens(Tile tile, String data) {
+        StringTokenizer tokenizer = new StringTokenizer(data, " ");
+//        tile.setUnit(tokenizer.nextToken(), tokenizer.nextToken());
+        //todo implement token read
     }
 
 }
