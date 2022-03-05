@@ -95,9 +95,9 @@ public class AddUnits implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(Constants.ADD_UNITS, "Add units to map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Unit name/s. Example: DN, DN, CA")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System name")
                                 .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Unit name/s. Example: DN, DN, CA")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color")
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: DN, DN, CA")
                                 .setRequired(true))
