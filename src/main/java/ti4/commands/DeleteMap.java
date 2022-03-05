@@ -6,7 +6,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.MapGenerator;
 import ti4.helpers.Constants;
+import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
@@ -40,6 +42,16 @@ public class DeleteMap implements Command {
             return;
         }
         String mapName = event.getOptions().get(0).getAsString().toLowerCase();
+        Map map = MapManager.getInstance().getMap(mapName);
+        if (map == null) {
+            MessageHelper.replyToMessage(event, "Map: " + mapName + " was not found.");
+            return;
+        }
+        if (!map.getOwnerID().equals(member.getId()) && !member.getId().equals(MapGenerator.userID)){
+            MessageHelper.replyToMessage(event, "Map: " + mapName + " can be deleted by it's creator or admin.");
+            return;
+        }
+
         if (MapSaveLoadManager.deleteMap(mapName)) {
             MapManager.getInstance().deleteMap(mapName);
             MessageHelper.replyToMessage(event, "Map: " + mapName + " deleted.");

@@ -37,7 +37,7 @@ public class CreateMap implements Command {
             return;
         }
         Map map = new Map();
-        String ownerID = event.getInteraction().getId();
+        String ownerID = member.getId();
         map.setOwnerID(ownerID);
         String mapName = event.getOptions().get(0).getAsString().toLowerCase();
         map.setName(mapName);
