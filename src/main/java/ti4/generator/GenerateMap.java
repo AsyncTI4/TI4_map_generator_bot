@@ -93,7 +93,7 @@ public class GenerateMap {
         }
         String absolutePath = file.getAbsolutePath().replace(".png", ".jpg");
         try (FileInputStream fileInputStream = new FileInputStream(file);
-             FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)){
+             FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
 
             final BufferedImage image = ImageIO.read(fileInputStream);
             fileInputStream.close();
@@ -107,11 +107,10 @@ public class GenerateMap {
                 throw new IllegalStateException("Failed to write image.");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LoggerHandler.log("Could not save jpg file", e);
         }
 
         return new File(absolutePath);
-//        return file;
     }
 
     private void addTile(Tile tile) {
@@ -126,7 +125,7 @@ public class GenerateMap {
 
             Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
             UnitHolder spaceUnitHolder = unitHolders.stream().filter(unitHolder -> unitHolder.getName().equals(Constants.SPACE)).findFirst().orElse(null);
-            if (spaceUnitHolder != null){
+            if (spaceUnitHolder != null) {
                 unitHolders.remove(spaceUnitHolder);
                 unitHolders.add(spaceUnitHolder);
             }
@@ -148,13 +147,8 @@ public class GenerateMap {
                         while (searchPosition) {
                             x = (int) (radius * Math.sin(degree));
                             y = (int) (radius * Math.cos(degree));
-
                             int possibleX = tileX + centerPosition.x + x - (image.getWidth() / 2);
                             int possibleY = tileY + centerPosition.y + y - (image.getHeight() / 2);
-
-//                            graphics.setColor(Color.CYAN);
-//                            graphics.drawOval(tileX + centerPosition.x +x, tileY + centerPosition.y+y, 5, 5);
-
                             BufferedImage finalImage = image;
                             if (rectangles.stream().noneMatch(rectangle -> rectangle.intersects(possibleX, possibleY, finalImage.getWidth(), finalImage.getHeight()))) {
                                 searchPosition = false;
@@ -163,23 +157,16 @@ public class GenerateMap {
                                 degree += 3;//To chage degree if we did not find place, might be better placement then
                             }
                             degree += degreeChange;
-                            if (!searchPosition)
-                            {
+                            if (!searchPosition) {
                                 rectangles.add(new Rectangle(possibleX, possibleY, finalImage.getWidth(), finalImage.getHeight()));
                             }
                         }
                         graphics.drawImage(image, tileX + centerPosition.x + x - (image.getWidth() / 2), tileY + centerPosition.y + y - (image.getHeight() / 2), null);
-
-//                        graphics.setColor(Color.CYAN);
-//                        graphics.drawOval(tileX + centerPosition.x, tileY + centerPosition.y, 5, 5);
-//                        graphics.setColor(Color.magenta);
-//                        graphics.drawOval(tileX + centerPosition.x + x, tileY + centerPosition.y + y, 5, 5);
                     }
                 }
             }
 
-        } catch (
-                IOException e) {
+        } catch (IOException e) {
             LoggerHandler.log("Error drawing tile: " + tile.getTileID(), e);
         }
     }
