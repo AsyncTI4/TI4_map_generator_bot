@@ -179,7 +179,6 @@ public class MapSaveLoadManager {
                                 break;
                             }
                             readUnit(tile, data, spaceHolder);
-                            data = null;
                         }
 
                         while (myReader.hasNextLine()) {

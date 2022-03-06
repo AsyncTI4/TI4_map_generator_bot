@@ -25,6 +25,8 @@ public class Constants {
     public static final String SPACE = "space";
     public static final String GF = "gf";
     public static final String FF = "ff";
+    public static final String BULK_GF = "cgf";
+    public static final String BULK_FF = "cff";
     public static final int SPACE_RADIUS = 120;
     public static final int RADIUS = 40;
     public static final Point SPACE_CENTER_POSITION = new Point(172,150);

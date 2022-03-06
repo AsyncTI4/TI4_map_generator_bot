@@ -1,6 +1,5 @@
 package ti4.generator;
 
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.helpers.LoggerHandler;
 
@@ -16,12 +15,10 @@ import java.util.StringTokenizer;
 public class PositionMapper {
 
     private static final Properties positionTileMap6Player = new Properties();
-    private static final Properties unitPositions = new Properties();
     private static final Properties planetPositions = new Properties();
 
     public static void init() {
         readData("6player.properties", positionTileMap6Player, "Could not read position file");
-        readData("unit_position.properties", unitPositions, "Could not read unit position file");
         readData("planet.properties", planetPositions, "Could not read planet position file");
     }
 
@@ -40,7 +37,7 @@ public class PositionMapper {
         }
     }
 
-    public static boolean isTilePositionValid(String position){
+    public static boolean isTilePositionValid(String position) {
         return positionTileMap6Player.getProperty(position) != null;
     }
 
@@ -49,12 +46,6 @@ public class PositionMapper {
         return getPosition(position, positionTileMap6Player);
     }
 
-    @CheckForNull
-    public static Point getUnitPosition(String position) {
-        return getPosition(position, unitPositions);
-    }
-
-    @Nullable
     private static Point getPosition(String position, Properties positionTileMap6Player) {
         String value = positionTileMap6Player.getProperty(position);
         return getPoint(value);
