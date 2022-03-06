@@ -39,44 +39,49 @@ public class AddUnits implements Command {
             MessageHelper.replyToMessage(event, "Set your active map using: /set_map mapname");
         } else {
 
-            String tileID = AliasHandler.resolveTile(event.getOptions().get(0).getAsString().toLowerCase());
+            String color = event.getOptions().get(0).getAsString().toLowerCase();
+            if (!Mapper.isColorValid(color)) {
+                MessageHelper.replyToMessage(event, "Color not valid");
+                return;
+            }
 
+            String tileID = AliasHandler.resolveTile(event.getOptions().get(1).getAsString().toLowerCase());
             Map activeMap = mapManager.getUserActiveMap(userID);
             Tile tile = activeMap.getTile(tileID);
             if (tile == null) {
                 MessageHelper.replyToMessage(event, "Tile in map not found");
                 return;
             }
-            String color = event.getOptions().get(1).getAsString().toLowerCase();
-            if (!Mapper.isColorValid(color)) {
-                MessageHelper.replyToMessage(event, "Color not valid");
-                return;
-            }
+
 
             String unitList = event.getOptions().get(2).getAsString().toLowerCase();
             unitList = unitList.replace(", ", ",");
             StringTokenizer tokenizer = new StringTokenizer(unitList, ",");
             while (tokenizer.hasMoreTokens()) {
                 StringTokenizer unitInfoTokenizer = new StringTokenizer(tokenizer.nextToken(), " ");
-                String unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
-                String unitID = Mapper.getUnitID(unit, color);
-                String unitPath = tile.getUnitPath(unitID);
-                if (unitPath == null) {
-                    MessageHelper.replyToMessage(event, "Unit: " + unit + " is not valid and not supported.");
-                }
+
                 int count = 1;
                 boolean numberIsSet = false;
                 String planetName = Constants.SPACE;
+                String unit = "";
                 if (unitInfoTokenizer.hasMoreTokens()) {
                     String ifNumber = unitInfoTokenizer.nextToken();
                     try {
                         count = Integer.parseInt(ifNumber);
                         numberIsSet = true;
                     } catch (Exception e) {
-                        planetName = AliasHandler.resolvePlanet(ifNumber);
+                        unit = AliasHandler.resolveUnit(ifNumber);
                     }
                 }
                 if (unitInfoTokenizer.hasMoreTokens() && numberIsSet) {
+                    unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
+                }
+                String unitID = Mapper.getUnitID(unit, color);
+                String unitPath = tile.getUnitPath(unitID);
+                if (unitPath == null) {
+                    MessageHelper.replyToMessage(event, "Unit: " + unit + " is not valid and not supported.");
+                }
+                if (unitInfoTokenizer.hasMoreTokens()) {
                     planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
                 }
                 tile.addUnit(planetName, unitID, count);
@@ -94,11 +99,11 @@ public class AddUnits implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(Constants.ADD_UNITS, "Add units to map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System name")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color: red, green etc.")
                                 .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: DN, DN, CA")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")
                                 .setRequired(true))
 
 

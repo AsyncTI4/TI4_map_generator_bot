@@ -126,8 +126,8 @@ public class GenerateMap {
                             int possibleX = tileX + centerPosition.x + x - (image.getWidth() / 2);
                             int possibleY = tileY + centerPosition.y + y - (image.getHeight() / 2);
 
-                            graphics.setColor(Color.CYAN);
-                            graphics.drawOval(tileX + centerPosition.x +x, tileY + centerPosition.y+y, 5, 5);
+//                            graphics.setColor(Color.CYAN);
+//                            graphics.drawOval(tileX + centerPosition.x +x, tileY + centerPosition.y+y, 5, 5);
 
                             BufferedImage finalImage = image;
                             if (rectangles.stream().noneMatch(rectangle -> rectangle.intersects(possibleX, possibleY, finalImage.getWidth(), finalImage.getHeight()))) {
@@ -143,10 +143,10 @@ public class GenerateMap {
                         }
                         graphics.drawImage(image, tileX + centerPosition.x + x - (image.getWidth() / 2), tileY + centerPosition.y + y - (image.getHeight() / 2), null);
 
-                        graphics.setColor(Color.CYAN);
-                        graphics.drawOval(tileX + centerPosition.x, tileY + centerPosition.y, 5, 5);
-                        graphics.setColor(Color.magenta);
-                        graphics.drawOval(tileX + centerPosition.x + x, tileY + centerPosition.y + y, 5, 5);
+//                        graphics.setColor(Color.CYAN);
+//                        graphics.drawOval(tileX + centerPosition.x, tileY + centerPosition.y, 5, 5);
+//                        graphics.setColor(Color.magenta);
+//                        graphics.drawOval(tileX + centerPosition.x + x, tileY + centerPosition.y + y, 5, 5);
                     }
                 }
             }

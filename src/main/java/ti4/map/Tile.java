@@ -29,7 +29,7 @@ public class Tile {
         String tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
         if (tilePlanetPositions != null) {
             StringTokenizer tokenizer = new StringTokenizer(tilePlanetPositions, ";");
-            if (tokenizer.countTokens() > 0) {
+            while (tokenizer.hasMoreTokens()) {
                 String planetInfo = tokenizer.nextToken();
                 if (planetInfo.length() > 4) {
                     StringTokenizer planetTokenizer = new StringTokenizer(planetInfo, " ");
