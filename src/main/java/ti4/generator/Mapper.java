@@ -3,6 +3,7 @@ package ti4.generator;
 import ti4.ResourceHelper;
 import ti4.helpers.LoggerHandler;
 
+import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;

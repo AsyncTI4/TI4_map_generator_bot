@@ -6,10 +6,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.ResourceHelper;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Map;
@@ -19,8 +17,6 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 import java.io.File;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.StringTokenizer;
 
 public class AddUnits implements Command {
@@ -60,28 +56,31 @@ public class AddUnits implements Command {
             String unitList = event.getOptions().get(2).getAsString().toLowerCase();
             unitList = unitList.replace(", ", ",");
             StringTokenizer tokenizer = new StringTokenizer(unitList, ",");
-            if (tokenizer.countTokens() > 15){
-                MessageHelper.replyToMessage(event, "Too many units, max possible in system is 15");
-            return;
-        }
-
-            List<String> units = new ArrayList<>();
-            while (tokenizer.hasMoreTokens()){
-                String unit = AliasHandler.resolveUnit(tokenizer.nextToken());
+            while (tokenizer.hasMoreTokens()) {
+                StringTokenizer unitInfoTokenizer = new StringTokenizer(tokenizer.nextToken(), " ");
+                String unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
                 String unitID = Mapper.getUnitID(unit, color);
                 String unitPath = tile.getUnitPath(unitID);
                 if (unitPath == null) {
                     MessageHelper.replyToMessage(event, "Unit: " + unit + " is not valid and not supported.");
-                    return;
                 }
-                units.add(unitID);
+                int count = 1;
+                boolean numberIsSet = false;
+                String planetName = Constants.SPACE;
+                if (unitInfoTokenizer.hasMoreTokens()) {
+                    String ifNumber = unitInfoTokenizer.nextToken();
+                    try {
+                        count = Integer.parseInt(ifNumber);
+                        numberIsSet = true;
+                    } catch (Exception e) {
+                        planetName = AliasHandler.resolvePlanet(ifNumber);
+                    }
+                }
+                if (unitInfoTokenizer.hasMoreTokens() && numberIsSet) {
+                    planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
+                }
+                tile.addUnit(planetName, unitID, count);
             }
-            int index = 0;
-            for (String unit : units) {
-                tile.setUnit(Integer.toString(index), unit);
-                index++;
-            }
-
             MapSaveLoadManager.saveMap(activeMap);
 
             File file = GenerateMap.getInstance().saveImage(activeMap);

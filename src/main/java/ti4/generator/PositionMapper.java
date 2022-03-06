@@ -17,10 +17,16 @@ public class PositionMapper {
 
     private static final Properties positionTileMap6Player = new Properties();
     private static final Properties unitPositions = new Properties();
+    private static final Properties planetPositions = new Properties();
 
     public static void init() {
         readData("6player.properties", positionTileMap6Player, "Could not read position file");
         readData("unit_position.properties", unitPositions, "Could not read unit position file");
+        readData("planet.properties", planetPositions, "Could not read planet position file");
+    }
+
+    public static String getTilePlanetPositions(String tileID) {
+        return (String) planetPositions.get(tileID);
     }
 
     private static void readData(String fileName, Properties positionMap, String errorMessage) {
@@ -51,6 +57,10 @@ public class PositionMapper {
     @Nullable
     private static Point getPosition(String position, Properties positionTileMap6Player) {
         String value = positionTileMap6Player.getProperty(position);
+        return getPoint(value);
+    }
+
+    public static Point getPoint(String value) {
         if (value != null) {
             StringTokenizer tokenizer = new StringTokenizer(value, ",");
             try {

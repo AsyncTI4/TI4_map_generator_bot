@@ -5,6 +5,7 @@ import ti4.helpers.LoggerHandler;
 import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -14,6 +15,7 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.Collection;
 import java.util.HashMap;
 
 public class GenerateMap {
@@ -21,6 +23,9 @@ public class GenerateMap {
     private BufferedImage mainImage;
     private int width;
     private int height;
+
+    private static int DELTA_X = -20;
+    private static int DELTA_Y = -20;
 
     private static GenerateMap instance;
 
@@ -97,10 +102,25 @@ public class GenerateMap {
             int tileY = positionPoint.y;
             graphics.drawImage(image, tileX, tileY, null);
 
-            for (java.util.Map.Entry<String, String> entry : tile.getUnits().entrySet()) {
-                image = ImageIO.read(new File(tile.getUnitPath(entry.getValue())));
-                Point unitPosition = PositionMapper.getUnitPosition(entry.getKey());
-                graphics.drawImage(image, tileX + unitPosition.x, tileY + unitPosition.y, null);
+            Collection<UnitHolder> unitHolders = tile.getUnitHolders().values();
+            for (UnitHolder unitHolder : unitHolders) {
+
+                HashMap<Point, String> units = unitHolder.getUnitsForImage();
+                for (java.util.Map.Entry<Point, String> unitEntry : units.entrySet()) {
+                    String key = unitEntry.getValue();
+                    Point point = unitEntry.getKey();
+                    image = ImageIO.read(new File(tile.getUnitPath(key)));
+                    Point centerPosition = unitHolder.getHolderCenterPosition();
+
+                    graphics.drawImage(image, tileX + centerPosition.x + point.x-(image.getWidth()/2), tileY + centerPosition.y + point.y-(image.getHeight()/2), null);
+
+                    graphics.setColor(Color.CYAN);
+                    graphics.drawOval(tileX + centerPosition.x, tileY + centerPosition.y, 5, 5);
+                    graphics.setColor(Color.magenta);
+                    graphics.drawOval(tileX + centerPosition.x+point.x, tileY + centerPosition.y+ point.y, 5, 5);
+                }
+
+
             }
 
         } catch (IOException e) {

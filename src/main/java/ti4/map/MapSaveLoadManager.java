@@ -13,11 +13,16 @@ public class MapSaveLoadManager {
 
     public static final String TXT = ".txt";
     public static final String TILE = "-tile-";
+    public static final String TMP = "-tmp-";
     public static final String UNITS = "-units-";
+    public static final String UNITHOLDER = "-unitholder-";
+    public static final String ENDUNITHOLDER = "-endunitholder-";
     public static final String ENDUNITS = "-endunits-";
     public static final String ENDTILE = "-endtile-";
     public static final String TOKENS = "-tokens-";
     public static final String ENDTOKENS = "-endtokens-";
+    public static final String PLANET_TOKENS = "-planettokens-";
+    public static final String PLANET_ENDTOKENS = "-planetendtokens-";
 
     public static void saveMaps() {
         HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
@@ -52,14 +57,29 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(tile.getTileID() + " " + tile.getPosition());
         writer.write(System.lineSeparator());
-        writer.write(UNITS);
+        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+        writer.write(UNITHOLDER);
         writer.write(System.lineSeparator());
-        HashMap<String, String> units = tile.getUnits();
-        for (java.util.Map.Entry<String, String> entry : units.entrySet()) {
-            writer.write(entry.getKey() + " " + entry.getValue());
+        for (UnitHolder unitHolder : unitHolders.values()) {
+            writer.write(UNITS);
+            writer.write(System.lineSeparator());
+            writer.write(unitHolder.getName());
+            writer.write(System.lineSeparator());
+            HashMap<String, Integer> units = unitHolder.getUnits();
+            for (java.util.Map.Entry<String, Integer> entry : units.entrySet()) {
+                writer.write(entry.getKey() + " " + Integer.toString(entry.getValue()));
+                writer.write(System.lineSeparator());
+            }
+            writer.write(ENDUNITS);
+            writer.write(System.lineSeparator());
+
+            writer.write(PLANET_TOKENS);
+            writer.write(System.lineSeparator());
+
+            writer.write(PLANET_ENDTOKENS);
             writer.write(System.lineSeparator());
         }
-        writer.write(ENDUNITS);
+        writer.write(ENDUNITHOLDER);
         writer.write(System.lineSeparator());
 
         writer.write(TOKENS);
@@ -93,7 +113,7 @@ public class MapSaveLoadManager {
     }
 
     public static boolean deleteMap(String mapName) {
-        File mapStorage = Storage.getMapStorage(mapName+ TXT);
+        File mapStorage = Storage.getMapStorage(mapName + TXT);
         if (mapStorage == null) {
             return false;
         }
@@ -137,14 +157,41 @@ public class MapSaveLoadManager {
                     tileMap.put(tile.getPosition(), tile);
 
                     while (myReader.hasNextLine()) {
-                        String data = myReader.nextLine();
-                        if (UNITS.equals(data)) {
+                        String tmpData = myReader.nextLine();
+                        if (UNITHOLDER.equals(tmpData)) {
                             continue;
                         }
-                        if (ENDUNITS.equals(data)) {
+                        if (ENDUNITHOLDER.equals(tmpData)) {
                             break;
                         }
-                        readUnit(tile, data);
+                        String spaceHolder = null;
+                        while (myReader.hasNextLine()) {
+                            String data = tmpData != null ? tmpData : myReader.nextLine();
+                            tmpData = null;
+                            if (UNITS.equals(data)) {
+                                spaceHolder = myReader.nextLine();
+                                if (!tile.isSpaceHolderValid(spaceHolder)) {
+                                    LoggerHandler.log("Not valid space holder detected: " + spaceHolder);
+                                }
+                                continue;
+                            }
+                            if (ENDUNITS.equals(data)) {
+                                break;
+                            }
+                            readUnit(tile, data, spaceHolder);
+                            data = null;
+                        }
+
+                        while (myReader.hasNextLine()) {
+                            String data = myReader.nextLine();
+                            if (PLANET_TOKENS.equals(data)) {
+                                continue;
+                            }
+                            if (PLANET_ENDTOKENS.equals(data)) {
+                                break;
+                            }
+                            readPlanetTokens(tile, data, spaceHolder);
+                        }
                     }
 
                     while (myReader.hasNextLine()) {
@@ -176,9 +223,15 @@ public class MapSaveLoadManager {
         return new Tile(tokenizer.nextToken(), tokenizer.nextToken());
     }
 
-    private static void readUnit(Tile tile, String data) {
+    private static void readUnit(Tile tile, String data, String spaceHolder) {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
-        tile.setUnit(tokenizer.nextToken(), tokenizer.nextToken());
+        tile.addUnit(spaceHolder, tokenizer.nextToken(), tokenizer.nextToken());
+    }
+
+    private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {
+        StringTokenizer tokenizer = new StringTokenizer(data, " ");
+//        tile.setUnit(tokenizer.nextToken(), tokenizer.nextToken());
+        //todo implement token read
     }
 
     private static void readTokens(Tile tile, String data) {

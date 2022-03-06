@@ -7,11 +7,14 @@ import javax.annotation.CheckForNull;
 import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class ResourceHelper {
     private static ResourceHelper resourceHelper = null;
+    private HashMap<String, String> unitCache = new HashMap<>();
+    private HashMap<String, String> tileCache = new HashMap<>();
 
     private ResourceHelper() {
     }
@@ -47,13 +50,27 @@ public class ResourceHelper {
     @CheckForNull
     public String getTileFile(String name)
     {
-        return getResourceFromFolder("tiles/", name, "Could not find tile file");
+        String unitPath = tileCache.get(name);
+        if (unitPath != null)
+        {
+            return unitPath;
+        }
+        String tile = getResourceFromFolder("tiles/", name, "Could not find tile file");
+        tileCache.put(name, tile);
+        return tile;
     }
 
     @CheckForNull
     public String getUnitFile(String name)
     {
-        return getResourceFromFolder("units/", name, "Could not find tile file");
+        String unitPath = unitCache.get(name);
+        if (unitPath != null)
+        {
+            return unitPath;
+        }
+        String unit = getResourceFromFolder("units/", name, "Could not find tile file");
+        unitCache.put(name, unit);
+        return unit;
     }
 
     @Nullable
