@@ -15,6 +15,8 @@ import javax.imageio.ImageWriter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -86,11 +88,30 @@ public class GenerateMap {
             imageWriter.write(null, new IIOImage(mainImage, null, null), defaultWriteParam);
 
 
-//            ImageIO.write(mainImage, "PNG", file);
         } catch (IOException e) {
             LoggerHandler.log("Could not save generated map");
         }
-        return file;
+        String absolutePath = file.getAbsolutePath().replace(".png", ".jpg");
+        try (FileInputStream fileInputStream = new FileInputStream(file);
+             FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)){
+
+            final BufferedImage image = ImageIO.read(fileInputStream);
+            fileInputStream.close();
+
+            final BufferedImage convertedImage = new BufferedImage(image.getWidth(), image.getHeight(), BufferedImage.TYPE_INT_RGB);
+            convertedImage.createGraphics().drawImage(image, 0, 0, Color.black, null);
+
+            final boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
+
+            if (!canWrite) {
+                throw new IllegalStateException("Failed to write image.");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        return new File(absolutePath);
+//        return file;
     }
 
     private void addTile(Tile tile) {
@@ -103,9 +124,14 @@ public class GenerateMap {
 
             ArrayList<Rectangle> rectangles = new ArrayList<>();
 
-            Collection<UnitHolder> unitHolders = tile.getUnitHolders().values();
+            Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
+            UnitHolder spaceUnitHolder = unitHolders.stream().filter(unitHolder -> unitHolder.getName().equals(Constants.SPACE)).findFirst().orElse(null);
+            if (spaceUnitHolder != null){
+                unitHolders.remove(spaceUnitHolder);
+                unitHolders.add(spaceUnitHolder);
+            }
             int degree;
-            int degreeChange = 10;
+            int degreeChange = 5;
             for (UnitHolder unitHolder : unitHolders) {
                 degree = 0;
                 int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
@@ -134,6 +160,7 @@ public class GenerateMap {
                                 searchPosition = false;
                             } else if (degree > 360) {
                                 searchPosition = false;
+                                degree += 3;//To chage degree if we did not find place, might be better placement then
                             }
                             degree += degreeChange;
                             if (!searchPosition)
