@@ -1,5 +1,6 @@
 package ti4.map;
 
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 
 import java.awt.*;
@@ -47,6 +48,11 @@ abstract public class UnitHolder {
                 }
             }
         }
+    }
+
+    public void removeAllUnits(String color) {
+        String colorID = Mapper.getColorID(color);
+        units.keySet().removeIf(key -> key.startsWith(colorID));
     }
 
     public HashMap<Point, String> getUnitsForImage() {

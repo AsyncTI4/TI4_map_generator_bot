@@ -36,6 +36,10 @@ public class Mapper {
         return colors.getProperty(color) != null;
     }
 
+    public static String getColorID(String color){
+        return colors.getProperty(color);
+    }
+
     public static String getTileID(String tileID) {
         return tiles.getProperty(tileID);
     }

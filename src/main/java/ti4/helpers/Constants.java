@@ -23,6 +23,7 @@ public class Constants {
     public static final String ADD_TILE_LIST = "add_tile_list";
     public static final String ADD_UNITS = "add_units";
     public static final String REMOVE_UNITS = "remove_units";
+    public static final String REMOVE_ALL_UNITS = "remove_all_units";
     public static final String SPACE = "space";
     public static final String GF = "gf";
     public static final String FF = "ff";

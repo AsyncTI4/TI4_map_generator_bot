@@ -49,43 +49,46 @@ abstract public class AddRemoveUnits implements Command{
                 return;
             }
 
-
-            String unitList = event.getOptions().get(2).getAsString().toLowerCase();
-            unitList = unitList.replace(", ", ",");
-            StringTokenizer tokenizer = new StringTokenizer(unitList, ",");
-            while (tokenizer.hasMoreTokens()) {
-                StringTokenizer unitInfoTokenizer = new StringTokenizer(tokenizer.nextToken(), " ");
-
-                int count = 1;
-                boolean numberIsSet = false;
-                String planetName = Constants.SPACE;
-                String unit = "";
-                if (unitInfoTokenizer.hasMoreTokens()) {
-                    String ifNumber = unitInfoTokenizer.nextToken();
-                    try {
-                        count = Integer.parseInt(ifNumber);
-                        numberIsSet = true;
-                    } catch (Exception e) {
-                        unit = AliasHandler.resolveUnit(ifNumber);
-                    }
-                }
-                if (unitInfoTokenizer.hasMoreTokens() && numberIsSet) {
-                    unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
-                }
-                String unitID = Mapper.getUnitID(unit, color);
-                String unitPath = tile.getUnitPath(unitID);
-                if (unitPath == null) {
-                    MessageHelper.replyToMessage(event, "Unit: " + unit + " is not valid and not supported.");
-                }
-                if (unitInfoTokenizer.hasMoreTokens()) {
-                    planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
-                }
-                unitAction(tile, count, planetName, unitID);
-            }
+            unitParsingForTile(event, color, tile);
             MapSaveLoadManager.saveMap(activeMap);
 
             File file = GenerateMap.getInstance().saveImage(activeMap);
             MessageHelper.replyToMessage(event, file);
+        }
+    }
+
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
+        String unitList = event.getOptions().get(2).getAsString().toLowerCase();
+        unitList = unitList.replace(", ", ",");
+        StringTokenizer tokenizer = new StringTokenizer(unitList, ",");
+        while (tokenizer.hasMoreTokens()) {
+            StringTokenizer unitInfoTokenizer = new StringTokenizer(tokenizer.nextToken(), " ");
+
+            int count = 1;
+            boolean numberIsSet = false;
+            String planetName = Constants.SPACE;
+            String unit = "";
+            if (unitInfoTokenizer.hasMoreTokens()) {
+                String ifNumber = unitInfoTokenizer.nextToken();
+                try {
+                    count = Integer.parseInt(ifNumber);
+                    numberIsSet = true;
+                } catch (Exception e) {
+                    unit = AliasHandler.resolveUnit(ifNumber);
+                }
+            }
+            if (unitInfoTokenizer.hasMoreTokens() && numberIsSet) {
+                unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
+            }
+            String unitID = Mapper.getUnitID(unit, color);
+            String unitPath = tile.getUnitPath(unitID);
+            if (unitPath == null) {
+                MessageHelper.replyToMessage(event, "Unit: " + unit + " is not valid and not supported.");
+            }
+            if (unitInfoTokenizer.hasMoreTokens()) {
+                planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
+            }
+            unitAction(tile, count, planetName, unitID);
         }
     }
 

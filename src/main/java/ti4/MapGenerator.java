@@ -56,6 +56,7 @@ public class MapGenerator {
         commandManager.addCommand(new AddTile());
         commandManager.addCommand(new AddUnits());
         commandManager.addCommand(new RemoveUnits());
+        commandManager.addCommand(new RemoveAllUnits());
         commandManager.addCommand(new CreateMap());
         commandManager.addCommand(new Shutdown());
         commandManager.addCommand(new ListTiles());

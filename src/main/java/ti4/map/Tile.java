@@ -70,6 +70,12 @@ public class Tile {
         }
     }
 
+    public void removeAllUnits(String color) {
+        for (UnitHolder unitHolder : unitHolders.values()) {
+            unitHolder.removeAllUnits(color);
+        }
+    }
+
     public void addUnit(String spaceHolder, String unitID, String count) {
         try {
             int unitCount = Integer.parseInt(count);
