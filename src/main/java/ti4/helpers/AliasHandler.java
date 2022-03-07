@@ -22,16 +22,19 @@ public class AliasHandler {
     }
 
     private static void readAliasFile(String fileName, HashMap<String, String> aliasList, String errorMessage) {
-        Properties tileALiasProperties = new Properties();
+        Properties aLiasProperties = new Properties();
         String aliasFile = ResourceHelper.getInstance().getAliasFile(fileName);
         if (aliasFile != null) {
             try (InputStream input = new FileInputStream(aliasFile)) {
-                tileALiasProperties.load(input);
-                for (String id: tileALiasProperties.stringPropertyNames()) {
-                    StringTokenizer tokenizer = new StringTokenizer(tileALiasProperties.getProperty(id), ",");
+                aLiasProperties.load(input);
+                for (String id: aLiasProperties.stringPropertyNames()) {
+                    StringTokenizer tokenizer = new StringTokenizer(aLiasProperties.getProperty(id), ",");
                     while (tokenizer.hasMoreTokens())
                     {
-                        aliasList.put(tokenizer.nextToken().toLowerCase(), id);
+                        String aliasToken = tokenizer.nextToken();
+                        if(!aliasToken.isEmpty()) {
+                            aliasList.put(aliasToken.toLowerCase(), id);
+                        }
                     }
                 }
             } catch (IOException e) {
