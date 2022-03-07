@@ -13,4 +13,9 @@ public class RemoveUnits extends AddRemoveUnits {
     protected String getActionID() {
         return Constants.REMOVE_UNITS;
     }
+
+    @Override
+    protected String getActionDescription() {
+        return "Remove units from map";
+    }
 }

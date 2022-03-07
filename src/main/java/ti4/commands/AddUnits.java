@@ -14,5 +14,10 @@ public class AddUnits extends AddRemoveUnits {
         return Constants.ADD_UNITS;
     }
 
+    @Override
+    protected String getActionDescription() {
+        return "Add units to map";
+    }
+
 
 }

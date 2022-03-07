@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
 import ti4.map.Tile;
 
@@ -35,5 +36,10 @@ public class RemoveAllUnits extends AddRemoveUnits {
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
         );
+    }
+
+    @Override
+    protected String getActionDescription() {
+        return "";
     }
 }

@@ -58,8 +58,10 @@ public class Map {
         this.tileMap.clear();
     }
 
-    public void setTile(Tile tile)
-    {
+    public void setTile(Tile tile){
         tileMap.put(tile.getPosition(), tile);
+    }
+    public void removeTile(String position){
+        tileMap.remove(position);
     }
 }

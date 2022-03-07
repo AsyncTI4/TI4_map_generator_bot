@@ -20,6 +20,7 @@ public class Constants {
     public static final String UNIT_NAMES = "unit_names";
     public static final String COLOR = "color";
     public static final String ADD_TILE = "add_tile";
+    public static final String REMOVE_TILE = "remove_tile";
     public static final String ADD_TILE_LIST = "add_tile_list";
     public static final String ADD_UNITS = "add_units";
     public static final String REMOVE_UNITS = "remove_units";

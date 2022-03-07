@@ -114,7 +114,7 @@ abstract public class AddRemoveUnits implements Command{
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), "Remove units from map")
+                Commands.slash(getActionID(), getActionDescription())
                         .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color: red, green etc.")
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
@@ -125,6 +125,8 @@ abstract public class AddRemoveUnits implements Command{
 
         );
     }
+
+    abstract protected String getActionDescription();
 
 
 }
