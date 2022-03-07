@@ -1,10 +1,7 @@
 package ti4.map;
 
-import ti4.ResourceHelper;
 import ti4.helpers.Constants;
-import ti4.helpers.LoggerHandler;
 
-import javax.annotation.CheckForNull;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -38,7 +35,21 @@ abstract public class UnitHolder {
         }
     }
 
-    public HashMap<Point, String> getUnitsForImage(){
+    public void removeUnit(String unit, Integer count) {
+        if (count > 0) {
+            Integer unitCount = units.get(unit);
+            if (unitCount != null) {
+                unitCount -= count;
+                if (unitCount > 0) {
+                    units.put(unit, unitCount);
+                } else {
+                    units.remove(unit);
+                }
+            }
+        }
+    }
+
+    public HashMap<Point, String> getUnitsForImage() {
         HashMap<Point, String> unitPositions = new HashMap<>();
 
         int unitCount = 0;
@@ -52,7 +63,7 @@ abstract public class UnitHolder {
             }
         }
         if (unitCount > 0 || unitCountGFFF > 0) {
-            int degreeChange = 360 / (Math.max(unitCount+1, 6));
+            int degreeChange = 360 / (Math.max(unitCount + 1, 6));
             int degree = 0;
             int radius = name.equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
             for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
