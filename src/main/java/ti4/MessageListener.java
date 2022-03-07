@@ -39,6 +39,7 @@ public class MessageListener extends ListenerAdapter {
         for (Command command : commandManager.getCommandList()) {
             if (command.accept(event))
             {
+                command.logBack(event);
                 command.execute(event);
 //                String message = event.getMessage().getContentRaw();
 //                LoggerHandler.logInfo(message);

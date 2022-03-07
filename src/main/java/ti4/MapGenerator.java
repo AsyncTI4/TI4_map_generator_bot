@@ -72,10 +72,16 @@ public class MapGenerator {
         Guild guild = jda.getGuildById(args[2]);
 
         CommandListUpdateAction commands = guild.updateCommands();
+//        CommandListUpdateAction commands = jda.updateCommands();
 
-        commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
-        commands.queue();
+//        commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
+//        commands.queue();
         //        guild.upsertCommand("show_map", "Shows selected map").queue();
+
+        CommandListUpdateAction commands_ = jda.updateCommands();
+
+        commandManager.getCommandList().forEach(command -> command.registerCommands(commands_));
+        commands_.queue();
 
         MapSaveLoadManager.loadMaps();
     }
