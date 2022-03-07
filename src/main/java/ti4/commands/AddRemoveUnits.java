@@ -43,7 +43,14 @@ abstract public class AddRemoveUnits implements Command{
 
             String tileID = AliasHandler.resolveTile(event.getOptions().get(1).getAsString().toLowerCase());
             Map activeMap = mapManager.getUserActiveMap(userID);
+            if (activeMap.isTileDuplicated(tileID)){
+                MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
+                return;
+            }
             Tile tile = activeMap.getTile(tileID);
+            if (tile == null){
+                tile = activeMap.getTileByPostion(tileID);
+            }
             if (tile == null) {
                 MessageHelper.replyToMessage(event, "Tile in map not found");
                 return;

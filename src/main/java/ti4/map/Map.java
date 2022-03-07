@@ -30,6 +30,17 @@ public class Map {
                 .findFirst()
                 .orElse(null);
     }
+    public Tile getTileByPostion(String position) {
+        return tileMap.get(position);
+    }
+
+    public boolean isTileDuplicated(String tileID) {
+        return tileMap.values().stream()
+                .filter(tile -> tile.getTileID().equals(tileID))
+                .count() > 1;
+    }
+
+
 
     public void setOwnerID(String ownerID) {
         this.ownerID = ownerID;
