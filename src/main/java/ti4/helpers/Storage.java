@@ -26,7 +26,7 @@ public class Storage {
         if (TI_FONT_LARGE != null) {
             return TI_FONT_LARGE;
         }
-        TI_FONT_LARGE = getFont(80f);
+        TI_FONT_LARGE = getFont(30f);
         return TI_FONT_LARGE;
     }
 

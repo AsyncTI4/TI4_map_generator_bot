@@ -28,7 +28,7 @@ public class GenerateMap {
     private int width;
     private int height;
     private static Point tilePositionPoint = new Point(230, 295);
-    private static Point numberPositionPoint = new Point(50, 35);
+    private static Point numberPositionPoint = new Point(45, 35);
 
     private static GenerateMap instance;
 
