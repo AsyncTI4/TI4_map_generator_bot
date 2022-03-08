@@ -27,6 +27,7 @@ public class GenerateMap {
     private BufferedImage mainImage;
     private int width;
     private int height;
+    private static Point tilePositionPoint = new Point(230, 300);
 
     private static GenerateMap instance;
 
@@ -121,6 +122,10 @@ public class GenerateMap {
             int tileY = positionPoint.y;
             graphics.drawImage(image, tileX, tileY, null);
 
+            graphics.setFont(Storage.getFont());
+            graphics.setColor(Color.WHITE);
+            graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x, tileY + tilePositionPoint.y);
+
             ArrayList<Rectangle> rectangles = new ArrayList<>();
 
             Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
@@ -138,7 +143,11 @@ public class GenerateMap {
                 for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
                     String unitID = unitEntry.getKey();
                     Integer unitCount = unitEntry.getValue();
-                    image = ImageIO.read(new File(tile.getUnitPath(unitID)));
+                    try {
+                        image = ImageIO.read(new File(tile.getUnitPath(unitID)));
+                    } catch (Exception e) {
+                        LoggerHandler.log("Could not parse unit file for: " + unitID, e);
+                    }
                     Point centerPosition = unitHolder.getHolderCenterPosition();
                     for (int i = 0; i < unitCount; i++) {
                         boolean searchPosition = true;

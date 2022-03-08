@@ -31,6 +31,6 @@ public class Constants {
     public static final String BULK_GF = "cgf";
     public static final String BULK_FF = "cff";
     public static final int SPACE_RADIUS = 120;
-    public static final int RADIUS = 55;
+    public static final int RADIUS = 53;
     public static final Point SPACE_CENTER_POSITION = new Point(172,150);
 }

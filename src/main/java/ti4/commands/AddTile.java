@@ -7,7 +7,7 @@ import ti4.map.Tile;
 public class AddTile extends AddRemoveTile {
 
     @Override
-    protected String getActionID() {
+    public String getActionID() {
         return Constants.ADD_TILE;
     }
 

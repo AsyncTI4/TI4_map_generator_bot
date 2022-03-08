@@ -3,10 +3,31 @@ package ti4.helpers;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.CheckForNull;
+import java.awt.*;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 import java.net.URL;
 
 public class Storage {
+
+    private static Font TI_FONT = null;
+
+    public static Font getFont() {
+        if (TI_FONT != null) {
+//            return TI_FONT;
+        }
+        URL resource = getURL("Could not find temp directories");
+        if (resource == null) return null;
+        File file = new File(resource.getPath() + "/font/SLIDER.TTF");
+        try (InputStream inputStream = new FileInputStream(file)) {
+            TI_FONT = Font.createFont(Font.TRUETYPE_FONT, inputStream);
+            TI_FONT = TI_FONT.deriveFont(20f);
+        } catch (Exception e) {
+            LoggerHandler.log("Could not load font", e);
+        }
+        return TI_FONT;
+    }
 
     @CheckForNull
     public static File getMapImageStorage(String mapName) {
@@ -54,7 +75,7 @@ public class Storage {
 
     private static void createDirectory(URL resource, String directoryName) {
         File directory = new File(resource.getPath() + directoryName);
-        if (! directory.exists()){
+        if (!directory.exists()) {
             directory.mkdir();
         }
     }

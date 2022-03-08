@@ -10,21 +10,26 @@ import ti4.message.MessageHelper;
 public class ListUnits implements Command {
 
     @Override
+    public String getActionID() {
+        return Constants.LIST_UNITS;
+    }
+
+    @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(Constants.LIST_UNITS);
+        return event.getName().equals(getActionID());
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String unitList = Mapper.getUnitList();
-        MessageHelper.replyToMessage(event, unitList);
+        MessageHelper.sendMessageToChannel(event.getChannel(), unitList);
     }
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(Constants.LIST_UNITS, "Shows available units")
+                Commands.slash(getActionID(), "Shows available units")
 
         );
     }

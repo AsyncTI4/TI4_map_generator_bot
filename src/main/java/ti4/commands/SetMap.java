@@ -13,8 +13,13 @@ import ti4.message.MessageHelper;
 public class SetMap implements Command {
 
     @Override
+    public String getActionID() {
+        return Constants.SET_MAP;
+    }
+
+    @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(Constants.SET_MAP)) {
+        if (!event.getName().equals(getActionID())) {
             return false;
         }
         String mapName = event.getOptions().get(0).getAsString();
@@ -48,8 +53,8 @@ public class SetMap implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(Constants.SET_MAP, "Shows selected map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name to be shown")
+                Commands.slash(getActionID(), "Set map as active")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name to be set as active")
                                 .setRequired(true))
 
         );

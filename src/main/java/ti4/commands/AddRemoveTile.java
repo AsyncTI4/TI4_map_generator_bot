@@ -23,8 +23,6 @@ import ti4.message.MessageHelper;
 import java.io.File;
 
 abstract public class AddRemoveTile implements Command{
-    abstract protected String getActionID();
-
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return event.getName().equals(getActionID());

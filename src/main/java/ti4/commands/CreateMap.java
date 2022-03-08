@@ -16,8 +16,13 @@ public class CreateMap implements Command {
 
 
     @Override
+    public String getActionID() {
+        return Constants.CREATE_MAP;
+    }
+
+    @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(Constants.CREATE_MAP)) {
+        if (!event.getName().equals(getActionID())) {
             return false;
         }
         String mapName = event.getOptions().get(0).getAsString();
@@ -57,7 +62,7 @@ public class CreateMap implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(Constants.CREATE_MAP, "Shows selected map")
+                Commands.slash(getActionID(), "Shows selected map")
                         .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name")
                                 .setRequired(true))
         );

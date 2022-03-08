@@ -5,11 +5,16 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.map.Map;
+import ti4.map.MapManager;
 import ti4.message.MessageHelper;
 
 import java.util.stream.Collectors;
 
 public interface Command {
+
+    String getActionID();
+
     //If command can be executed for given command text
     boolean accept(SlashCommandInteractionEvent event);
 
@@ -19,15 +24,14 @@ public interface Command {
     void registerCommands(CommandListUpdateAction commands);
 
     default void logBack(SlashCommandInteractionEvent event) {
-        Member member = event.getMember();
-        String userName = "N/A";
-        if (member != null) {
-            User user = member.getUser();
-            if (user != null) {
-                userName = user.getName();
-            }
+        User user = event.getUser();
+        String userName = user.getName();
+        Map userActiveMap = MapManager.getInstance().getUserActiveMap(user.getId());
+        String activeMap = "";
+        if (userActiveMap != null){
+            activeMap =  "Active map: " + userActiveMap.getName();
         }
-        String commandExecuted = "User: " + userName + " executed command.\n" +
+        String commandExecuted = "User: " + userName + " executed command. " +activeMap+ "\n" +
                 event.getName() + " " + event.getOptions().stream()
                 .map(OptionMapping::getAsString)
                 .collect(Collectors.joining(" "));

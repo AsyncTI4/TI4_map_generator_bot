@@ -17,8 +17,13 @@ public class DeleteMap implements Command {
 
 
     @Override
+    public String getActionID() {
+        return Constants.DELETE_MAP;
+    }
+
+    @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals(Constants.DELETE_MAP)) {
+        if (!event.getName().equals(getActionID())) {
             return false;
         }
         String mapName = event.getOptions().get(0).getAsString();
@@ -65,7 +70,7 @@ public class DeleteMap implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(Constants.DELETE_MAP, "Delete selected map")
+                Commands.slash(getActionID(), "Delete selected map")
                         .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name")
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type in YES")

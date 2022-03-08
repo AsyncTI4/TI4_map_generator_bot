@@ -11,8 +11,13 @@ import ti4.message.MessageHelper;
 public class Shutdown implements Command {
 
     @Override
+    public String getActionID() {
+        return Constants.SHUTDOWN;
+    }
+
+    @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(Constants.SHUTDOWN);
+        return event.getName().equals(getActionID());
     }
 
     @Override
@@ -31,7 +36,7 @@ public class Shutdown implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash("shutdown", "Shows selected map")
+                Commands.slash(getActionID(), "Shows selected map")
 
         );
     }

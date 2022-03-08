@@ -24,15 +24,11 @@ abstract public class AddRemoveUnits implements Command{
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Member member = event.getInteraction().getMember();
-        if (member == null) {
-            MessageHelper.replyToMessage(event, "Caller ID not found");
-            return;
-        }
-        String userID = member.getId();
+        String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
         if (!mapManager.isUserWithActiveMap(userID)) {
             MessageHelper.replyToMessage(event, "Set your active map using: /set_map mapname");
+            return;
         } else {
 
             String color = event.getOptions().get(0).getAsString().toLowerCase();
@@ -90,7 +86,8 @@ abstract public class AddRemoveUnits implements Command{
             String unitID = Mapper.getUnitID(unit, color);
             String unitPath = tile.getUnitPath(unitID);
             if (unitPath == null) {
-                MessageHelper.replyToMessage(event, "Unit: " + unit + " is not valid and not supported.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit: " + unit + " is not valid and not supported.");
+                continue;
             }
             if (unitInfoTokenizer.hasMoreTokens()) {
                 planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
@@ -105,9 +102,6 @@ abstract public class AddRemoveUnits implements Command{
     public boolean accept(SlashCommandInteractionEvent event) {
         return event.getName().equals(getActionID());
     }
-
-    abstract protected String getActionID();
-
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override

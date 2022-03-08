@@ -10,8 +10,13 @@ import ti4.message.MessageHelper;
 public class ListTiles implements Command {
 
     @Override
+    public String getActionID() {
+        return Constants.LIST_TILES;
+    }
+
+    @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(Constants.LIST_TILES);
+        return event.getName().equals(getActionID());
     }
 
     @Override
@@ -24,7 +29,7 @@ public class ListTiles implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(Constants.LIST_TILES, "Shows available tiles")
+                Commands.slash(getActionID(), "Shows available tiles")
 
         );
     }

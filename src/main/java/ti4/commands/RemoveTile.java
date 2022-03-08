@@ -18,7 +18,7 @@ import ti4.message.MessageHelper;
 public class RemoveTile extends AddRemoveTile {
 
     @Override
-    protected String getActionID() {
+    public String getActionID() {
         return Constants.REMOVE_TILE;
     }
 

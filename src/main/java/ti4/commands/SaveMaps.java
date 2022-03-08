@@ -12,8 +12,13 @@ import ti4.message.MessageHelper;
 public class SaveMaps implements Command {
 
     @Override
+    public String getActionID() {
+        return Constants.SAVE_MAPS;
+    }
+
+    @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(Constants.SAVE_MAPS);
+        return event.getName().equals(getActionID());
     }
 
     @Override
@@ -32,7 +37,7 @@ public class SaveMaps implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(Constants.SAVE_MAPS, "Save all maps")
+                Commands.slash(getActionID(), "Save all maps")
         );
     }
 }

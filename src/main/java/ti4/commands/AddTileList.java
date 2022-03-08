@@ -19,8 +19,13 @@ import java.util.HashMap;
 public class AddTileList implements Command {
 
     @Override
+    public String getActionID() {
+        return Constants.ADD_TILE_LIST;
+    }
+
+    @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(Constants.ADD_TILE_LIST);
+        return event.getName().equals(getActionID());
     }
 
     @Override
@@ -74,7 +79,7 @@ public class AddTileList implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(Constants.ADD_TILE_LIST, "Add tile list to generate map")
+                Commands.slash(getActionID(), "Add tile list to generate map")
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_LIST, "Tile list")
                                 .setRequired(true))
 

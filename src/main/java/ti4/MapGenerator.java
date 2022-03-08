@@ -3,6 +3,7 @@ package ti4;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.*;
 import ti4.generator.PositionMapper;
@@ -13,6 +14,7 @@ import ti4.helpers.Storage;
 import ti4.map.MapSaveLoadManager;
 
 import javax.security.auth.login.LoginException;
+import java.util.List;
 
 public class MapGenerator {
 
@@ -72,6 +74,12 @@ public class MapGenerator {
         Guild guild = jda.getGuildById(args[2]);
 
         CommandListUpdateAction commands = guild.updateCommands();
+
+//        RestAction<List<net.dv8tion.jda.api.interactions.commands.Command>> listRestAction = guild.retrieveCommands();
+//        for (Command command : commandManager.getCommandList()) {
+//            guild.deleteCommandById(command.getActionID());
+//
+//        }
 //        CommandListUpdateAction commands = jda.updateCommands();
 
 //        commandManager.getCommandList().forEach(command -> command.registerCommands(commands));

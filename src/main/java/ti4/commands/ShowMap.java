@@ -17,11 +17,14 @@ import java.util.StringTokenizer;
 
 public class ShowMap implements Command {
 
-
+    @Override
+    public String getActionID() {
+        return Constants.SHOW_MAP;
+    }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (!event.getName().equals("show_map")) {
+        if (!event.getName().equals(getActionID())) {
             return false;
         }
         String mapName = event.getOptions().get(0).getAsString();
@@ -45,7 +48,7 @@ public class ShowMap implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(Constants.SHOW_MAP, "Shows selected map")
+                Commands.slash(getActionID(), "Shows selected map")
                         .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name to be shown") // USER type allows to include members of the server or other users by id
                                 .setRequired(true)) // This command requires a parameter
 

@@ -10,7 +10,7 @@ public class RemoveUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected String getActionID() {
+    public String getActionID() {
         return Constants.REMOVE_UNITS;
     }
 

@@ -1,12 +1,14 @@
 package ti4.generator;
 
 import ti4.ResourceHelper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.LoggerHandler;
 
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
 
@@ -44,6 +46,10 @@ public class Mapper {
         return tiles.getProperty(tileID);
     }
 
+    public static boolean isUnitIDValid(String unitID) {
+        return units.getProperty(unitID) != null;
+    }
+
     public static String getUnitID(String unitID, String color) {
         String property = colors.getProperty(color);
         return property + units.getProperty(unitID);
@@ -60,10 +66,9 @@ public class Mapper {
 
     public static String getUnitList()
     {
-        return  "Units: " + units.values().stream()
+        return  "Units: " +  AliasHandler.getUnitList().stream()
                 .sorted()
-                .filter(value -> value instanceof String)
-                .map(value -> (String) value)
-                .collect(Collectors.joining(", "));
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining("\n "));
     }
 }

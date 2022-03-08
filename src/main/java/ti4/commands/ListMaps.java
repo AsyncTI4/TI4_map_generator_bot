@@ -14,8 +14,13 @@ import java.util.stream.Collectors;
 public class ListMaps implements Command {
 
     @Override
+    public String getActionID() {
+        return Constants.LIST_MAPS;
+    }
+
+    @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(Constants.LIST_MAPS);
+        return event.getName().equals(getActionID());
     }
 
     @Override
@@ -31,7 +36,7 @@ public class ListMaps implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(Constants.LIST_MAPS, "Shows selected map")
+                Commands.slash(getActionID(), "Shows selected map")
 
         );
     }
