@@ -15,7 +15,7 @@ public class Storage {
 
     public static Font getFont() {
         if (TI_FONT != null) {
-//            return TI_FONT;
+            return TI_FONT;
         }
         URL resource = getURL("Could not find temp directories");
         if (resource == null) return null;

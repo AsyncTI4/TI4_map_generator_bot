@@ -70,26 +70,21 @@ public class MapGenerator {
         commandManager.addCommand(new AddTileList());
         commandManager.addCommand(new DeleteMap());
         commandManager.addCommand(new ListUnits());
+        commandManager.addCommand(new TestAction());
 
         Guild guild = jda.getGuildById(args[2]);
 
         CommandListUpdateAction commands = guild.updateCommands();
+        commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
+        commands.queue();
+        //------------------------------------------------
 
-//        RestAction<List<net.dv8tion.jda.api.interactions.commands.Command>> listRestAction = guild.retrieveCommands();
-//        for (Command command : commandManager.getCommandList()) {
-//            guild.deleteCommandById(command.getActionID());
-//
-//        }
-//        CommandListUpdateAction commands = jda.updateCommands();
+//        CommandListUpdateAction commands_ = jda.updateCommands();
+//        commandManager.getCommandList().forEach(command -> command.registerCommands(commands_));
+//        commands_.queue();
 
-//        commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
-//        commands.queue();
-        //        guild.upsertCommand("show_map", "Shows selected map").queue();
-
-        CommandListUpdateAction commands_ = jda.updateCommands();
-
-        commandManager.getCommandList().forEach(command -> command.registerCommands(commands_));
-        commands_.queue();
+        guild.updateCommands().queue();
+        jda.updateCommands().queue();
 
         MapSaveLoadManager.loadMaps();
     }
