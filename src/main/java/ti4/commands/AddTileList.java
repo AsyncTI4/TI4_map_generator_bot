@@ -73,7 +73,7 @@ public class AddTileList implements Command {
             try {
                 Tile tile = new Tile(AliasHandler.resolveTile(Constants.SETUP6), "0");
                 userActiveMap.setTile(tile);
-                tile = new Tile(AliasHandler.resolveTile(Constants.MALLICE), "M");
+                tile = new Tile(AliasHandler.resolveTile(Constants.MALLICE), "TL");
                 userActiveMap.setTile(tile);
                 tile = new Tile(AliasHandler.resolveTile(Constants.MR), "MR");
                 userActiveMap.setTile(tile);

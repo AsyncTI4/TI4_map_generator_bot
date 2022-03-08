@@ -48,7 +48,7 @@ abstract public class AddRemoveTile implements Command{
             MapSaveLoadManager.saveMap(userActiveMap);
 
             File file = GenerateMap.getInstance().saveImage(userActiveMap);
-            MessageHelper.replyToMessage(event, file);
+            MessageHelper.sendFileToChannel(event.getChannel(), file);
         }
     }
 

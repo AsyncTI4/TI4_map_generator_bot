@@ -13,6 +13,11 @@ public class MessageHelper {
         channel.sendMessage(messageText).queue();
     }
 
+    public static void sendFileToChannel(MessageChannel channel, File file)
+    {
+        channel.sendFile(file).queue();
+    }
+
     public static void replyToMessage(SlashCommandInteractionEvent event, String messageText)
     {
         event.reply(messageText).queue();
