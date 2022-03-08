@@ -9,7 +9,9 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.ResourceHelper;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.LoggerHandler;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
@@ -67,6 +69,18 @@ public class AddTileList implements Command {
                 Tile tile = new Tile(tileID, position);
                 userActiveMap.setTile(tile);
             }
+
+            try {
+                Tile tile = new Tile(AliasHandler.resolveTile(Constants.SETUP6), "0");
+                userActiveMap.setTile(tile);
+                tile = new Tile(AliasHandler.resolveTile(Constants.MALLICE), "M");
+                userActiveMap.setTile(tile);
+                tile = new Tile(AliasHandler.resolveTile(Constants.MR), "MR");
+                userActiveMap.setTile(tile);
+            }catch (Exception e){
+                LoggerHandler.log("Could not add setup and Mallice tiles", e);
+            }
+
             MapSaveLoadManager.saveMap(userActiveMap);
 
             File file = GenerateMap.getInstance().saveImage(userActiveMap);

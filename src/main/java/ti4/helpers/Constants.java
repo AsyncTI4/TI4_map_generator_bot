@@ -32,6 +32,9 @@ public class Constants {
     public static final String BULK_FF = "_tkn_ff.png";
     public static final String COLOR_GF = "_gf.png";
     public static final String COLOR_FF = "_ff.png";
+    public static final String SETUP6 = "setup6";
+    public static final String MALLICE = "mallicelocked";
+    public static final String MR = "mr";
     public static final int SPACE_RADIUS = 120;
     public static final int RADIUS = 45;
     public static final Point SPACE_CENTER_POSITION = new Point(172,150);

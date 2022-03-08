@@ -32,17 +32,18 @@ public class MessageListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event)
     {
-//        Member member = event.getMember();
-//        String logText = (member == null ? "NA" : member.getEffectiveName() + " " +member.getId())
-//        LoggerHandler.log(member.getId());
         CommandManager commandManager = CommandManager.getInstance();
         for (Command command : commandManager.getCommandList()) {
             if (command.accept(event))
             {
                 command.logBack(event);
-                command.execute(event);
-//                String message = event.getMessage().getContentRaw();
-//                LoggerHandler.logInfo(message);
+                try {
+                    command.execute(event);
+                } catch (Exception e){
+                    String messageText = "Error trying to execute command: " + command.getActionID();
+                    MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
+                    LoggerHandler.log(messageText, e);
+                }
             }
         }
     }
