@@ -28,6 +28,7 @@ public class GenerateMap {
     private int width;
     private int height;
     private static Point tilePositionPoint = new Point(230, 295);
+    private static Point numberPositionPoint = new Point(50, 35);
 
     private static GenerateMap instance;
 
@@ -87,8 +88,6 @@ public class GenerateMap {
             }
 
             imageWriter.write(null, new IIOImage(mainImage, null, null), defaultWriteParam);
-
-
         } catch (IOException e) {
             LoggerHandler.log("Could not save generated map");
         }
@@ -143,11 +142,24 @@ public class GenerateMap {
                 for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
                     String unitID = unitEntry.getKey();
                     Integer unitCount = unitEntry.getValue();
+
+                    Integer bulkUnitCount = null;
+                    if (unitID.endsWith(Constants.COLOR_FF)) {
+                        unitID = unitID.replace(Constants.COLOR_FF, Constants.BULK_FF);
+                        bulkUnitCount = unitCount;
+                    } else if (unitID.endsWith(Constants.COLOR_GF)) {
+                        unitID = unitID.replace(Constants.COLOR_GF, Constants.BULK_GF);
+                        bulkUnitCount = unitCount;
+                    }
                     try {
                         image = ImageIO.read(new File(tile.getUnitPath(unitID)));
                     } catch (Exception e) {
                         LoggerHandler.log("Could not parse unit file for: " + unitID, e);
                     }
+                    if (bulkUnitCount != null && bulkUnitCount > 0) {
+                        unitCount = 1;
+                    }
+
                     Point centerPosition = unitHolder.getHolderCenterPosition();
                     for (int i = 0; i < unitCount; i++) {
                         boolean searchPosition = true;
@@ -170,7 +182,14 @@ public class GenerateMap {
                                 rectangles.add(new Rectangle(possibleX, possibleY, finalImage.getWidth(), finalImage.getHeight()));
                             }
                         }
-                        graphics.drawImage(image, tileX + centerPosition.x + x - (image.getWidth() / 2), tileY + centerPosition.y + y - (image.getHeight() / 2), null);
+                        int imageX = tileX + centerPosition.x + x - (image.getWidth() / 2);
+                        int imageY = tileY + centerPosition.y + y - (image.getHeight() / 2);
+                        graphics.drawImage(image, imageX, imageY, null);
+                        if (bulkUnitCount != null) {
+                            graphics.setFont(Storage.getLargeFont());
+                            graphics.setColor(Color.WHITE);
+                            graphics.drawString(Integer.toString(bulkUnitCount), imageX + numberPositionPoint.x, imageY + numberPositionPoint.y);
+                        }
                     }
                 }
             }

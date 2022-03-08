@@ -28,9 +28,11 @@ public class Constants {
     public static final String SPACE = "space";
     public static final String GF = "gf";
     public static final String FF = "ff";
-    public static final String BULK_GF = "cgf";
-    public static final String BULK_FF = "cff";
+    public static final String BULK_GF = "_tkn_gf.png";
+    public static final String BULK_FF = "_tkn_ff.png";
+    public static final String COLOR_GF = "_gf.png";
+    public static final String COLOR_FF = "_ff.png";
     public static final int SPACE_RADIUS = 120;
-    public static final int RADIUS = 53;
+    public static final int RADIUS = 45;
     public static final Point SPACE_CENTER_POSITION = new Point(172,150);
 }

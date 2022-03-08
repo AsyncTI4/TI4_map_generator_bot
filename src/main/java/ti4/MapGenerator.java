@@ -83,8 +83,8 @@ public class MapGenerator {
 //        commandManager.getCommandList().forEach(command -> command.registerCommands(commands_));
 //        commands_.queue();
 
-        guild.updateCommands().queue();
-        jda.updateCommands().queue();
+//        guild.updateCommands().queue();
+//        jda.updateCommands().queue();
 
         MapSaveLoadManager.loadMaps();
     }
