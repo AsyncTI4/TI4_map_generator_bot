@@ -1,5 +1,6 @@
 package ti4.map;
 
+import ti4.helpers.Constants;
 import ti4.helpers.LoggerHandler;
 import ti4.helpers.Storage;
 
@@ -75,7 +76,15 @@ public class MapSaveLoadManager {
 
             writer.write(PLANET_TOKENS);
             writer.write(System.lineSeparator());
+            for (String ccID : unitHolder.getCCList()) {
+                writer.write(ccID);
+                writer.write(System.lineSeparator());
+            }
 
+            for (String controlID : unitHolder.getControlList()) {
+                writer.write(controlID);
+                writer.write(System.lineSeparator());
+            }
             writer.write(PLANET_ENDTOKENS);
             writer.write(System.lineSeparator());
         }
@@ -229,8 +238,14 @@ public class MapSaveLoadManager {
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
-//        tile.setUnit(tokenizer.nextToken(), tokenizer.nextToken());
-        //todo implement token read
+        if (tokenizer.hasMoreTokens()) {
+            String token = tokenizer.nextToken();
+            if (token.startsWith(Constants.COMMAND)) {
+                tile.addCC(token);
+            }else if (token.startsWith(Constants.CONTROL)) {
+                tile.addControl(token, unitHolderName);
+            }
+        }
     }
 
     private static void readTokens(Tile tile, String data) {

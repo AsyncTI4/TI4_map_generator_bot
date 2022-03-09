@@ -1,18 +1,19 @@
 package ti4.map;
 
 import ti4.generator.Mapper;
-import ti4.helpers.Constants;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
 abstract public class UnitHolder {
     //ID, Count
     private final HashMap<String, Integer> units = new HashMap<>();
+    private final ArrayList<String> ccList = new ArrayList<>();
+    private final ArrayList<String> controlList = new ArrayList<>();
     private Point holderCenterPosition;
 
-    private String name = null;
+    private String name;
 
 
     public String getName() {
@@ -36,6 +37,25 @@ abstract public class UnitHolder {
         }
     }
 
+    public void addCC(String cc) {
+        ccList.add(cc);
+    }
+
+    public void addControl(String cc) {
+        controlList.add(cc);
+    }
+
+    public void removeCC(String cc) {
+        ccList.remove(cc);
+    }
+    public void removeControl(String cc) {
+        controlList.remove(cc);
+    }
+
+    public void removeAllCC() {
+        ccList.clear();
+    }
+
     public void removeUnit(String unit, Integer count) {
         if (count > 0) {
             Integer unitCount = units.get(unit);
@@ -55,42 +75,16 @@ abstract public class UnitHolder {
         units.keySet().removeIf(key -> key.startsWith(colorID));
     }
 
-    public HashMap<Point, String> getUnitsForImage() {
-        HashMap<Point, String> unitPositions = new HashMap<>();
-
-        int unitCount = 0;
-        int unitCountGFFF = 0;
-        for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-            String key = unitEntry.getKey();
-            if (!Constants.GF.equals(key) && !Constants.FF.equals(key)) {
-                unitCount += unitEntry.getValue();
-            } else {
-                unitCountGFFF += unitEntry.getValue();
-            }
-        }
-        if (unitCount > 0 || unitCountGFFF > 0) {
-            int degreeChange = 360 / (Math.max(unitCount + 1, 6));
-            int degree = 0;
-            int radius = name.equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
-            for (Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-                String key = unitEntry.getKey();
-                Integer value = unitEntry.getValue();
-                if (Constants.GF.equals(key) || Constants.FF.equals(key)) {
-
-                }
-                for (int i = 0; i < value; i++) {
-                    int x = (int) (radius * Math.sin(degree));
-                    int y = (int) (radius * Math.cos(degree));
-                    unitPositions.put(new Point(x, y), key);
-                    degree += degreeChange;
-                }
-            }
-        }
-        return unitPositions;
-    }
-
     public HashMap<String, Integer> getUnits() {
         return units;
+    }
+
+    public ArrayList<String> getCCList() {
+        return ccList;
+    }
+
+    public ArrayList<String> getControlList() {
+        return controlList;
     }
 
     public Point getHolderCenterPosition() {

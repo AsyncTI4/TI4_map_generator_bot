@@ -44,9 +44,6 @@ public class MapGenerator {
 //            user.getName()
 
 
-
-
-
         userID = args[1];
 
         PositionMapper.init();
@@ -70,6 +67,13 @@ public class MapGenerator {
         commandManager.addCommand(new AddTileList());
         commandManager.addCommand(new DeleteMap());
         commandManager.addCommand(new ListUnits());
+        commandManager.addCommand(new AddCC());
+        commandManager.addCommand(new RemoveCC());
+        commandManager.addCommand(new RemoveAllCC());
+        commandManager.addCommand(new AddControl());
+        commandManager.addCommand(new RemoveControl());
+
+
         commandManager.addCommand(new TestAction());
 
         Guild guild = jda.getGuildById(args[2]);

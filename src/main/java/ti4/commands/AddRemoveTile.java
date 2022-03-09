@@ -6,8 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
@@ -22,7 +20,7 @@ import ti4.message.MessageHelper;
 
 import java.io.File;
 
-abstract public class AddRemoveTile implements Command{
+abstract public class AddRemoveTile implements Command {
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return event.getName().equals(getActionID());

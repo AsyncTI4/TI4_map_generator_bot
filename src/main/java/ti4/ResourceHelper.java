@@ -15,6 +15,7 @@ public class ResourceHelper {
     private static ResourceHelper resourceHelper = null;
     private HashMap<String, String> unitCache = new HashMap<>();
     private HashMap<String, String> tileCache = new HashMap<>();
+    private HashMap<String, String> ccCache = new HashMap<>();
 
     private ResourceHelper() {
     }
@@ -61,16 +62,26 @@ public class ResourceHelper {
     }
 
     @CheckForNull
-    public String getUnitFile(String name)
-    {
+    public String getUnitFile(String name) {
         String unitPath = unitCache.get(name);
-        if (unitPath != null)
-        {
+        if (unitPath != null) {
             return unitPath;
         }
-        String unit = getResourceFromFolder("units/", name, "Could not find tile file");
+        String unit = getResourceFromFolder("units/", name, "Could not find unit file");
         unitCache.put(name, unit);
         return unit;
+    }
+    @CheckForNull
+    public String getCCFile(String name)
+    {
+        String ccPath = ccCache.get(name);
+        if (ccPath != null)
+        {
+            return ccPath;
+        }
+        String cc = getResourceFromFolder("command_token/", name, "Could not find command token file");
+        ccCache.put(name, cc);
+        return cc;
     }
 
     @Nullable

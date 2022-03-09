@@ -52,6 +52,16 @@ public class Tile {
         return unitPath;
     }
 
+    @CheckForNull
+    public String getCCPath(String ccID) {
+        String ccPath = ResourceHelper.getInstance().getCCFile(ccID);
+        if (ccPath == null) {
+            LoggerHandler.log("Could not find command counter: " + ccID);
+            return null;
+        }
+        return ccPath;
+    }
+
     public boolean isSpaceHolderValid(String spaceHolder) {
         return unitHolders.get(spaceHolder) != null;
     }
@@ -60,6 +70,40 @@ public class Tile {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
             unitHolder.addUnit(unitID, count);
+        }
+    }
+
+    public void addCC(String ccID) {
+        UnitHolder unitHolder = unitHolders.get(Constants.SPACE);
+        if (unitHolder != null) {
+            unitHolder.addCC(ccID);
+        }
+    }
+
+    public void addControl(String ccID, String spaceHolder) {
+        UnitHolder unitHolder = unitHolders.get(spaceHolder);
+        if (unitHolder != null) {
+            unitHolder.addControl(ccID);
+        }
+    }
+    public void removeControl(String ccID, String spaceHolder) {
+        UnitHolder unitHolder = unitHolders.get(spaceHolder);
+        if (unitHolder != null) {
+            unitHolder.removeControl(ccID);
+        }
+    }
+
+    public void removeCC(String ccID) {
+        UnitHolder unitHolder = unitHolders.get(Constants.SPACE);
+        if (unitHolder != null) {
+            unitHolder.removeCC(ccID);
+        }
+    }
+
+    public void removeAllCC() {
+        UnitHolder unitHolder = unitHolders.get(Constants.SPACE);
+        if (unitHolder != null) {
+            unitHolder.removeAllCC();
         }
     }
 

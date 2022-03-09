@@ -16,11 +16,13 @@ public class Mapper {
     private static final Properties tiles = new Properties();
     private static final Properties units = new Properties();
     private static final Properties colors = new Properties();
+    private static final Properties cc_tokens = new Properties();
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
         readData("units.properties", units, "Could not read unit name file");
         readData("color.properties", colors, "Could not read color name file");
+        readData("cc_tokens.properties", cc_tokens, "Could not read token name file");
     }
 
     private static void readData(String propertyFileName, Properties colors, String s) {
@@ -53,6 +55,16 @@ public class Mapper {
     public static String getUnitID(String unitID, String color) {
         String property = colors.getProperty(color);
         return property + units.getProperty(unitID);
+    }
+
+    public static String getCCID(String color) {
+        String property = colors.getProperty(color);
+        return cc_tokens.get("cc") + property + ".png";
+    }
+
+    public static String getControlID(String color) {
+        String property = colors.getProperty(color);
+        return cc_tokens.get("control") + property + ".png";
     }
 
     public static String getTilesList()

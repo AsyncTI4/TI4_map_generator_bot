@@ -12,7 +12,7 @@ public class AliasHandler {
     private static HashMap<String, String> unitAliasList = new HashMap<>();
     private static ArrayList<String> unitList = new ArrayList<>();
     private static HashMap<String, String> planetAliasList = new HashMap<>();
-    private static HashMap<String, String> tokenAliasList = new HashMap<>();
+    private static HashMap<String, String> cctokenAliasList = new HashMap<>();
 
     public static void init()
     {
@@ -20,7 +20,7 @@ public class AliasHandler {
         readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
         readAliasFile("unit_alias.properties", unitList);
         readAliasFile("planet_alias.properties", planetAliasList, "Could not read planet alias file");
-        readAliasFile("token_alias.properties", tokenAliasList, "Could not read token alias file");
+        readAliasFile("cc_token_alias.properties", cctokenAliasList, "Could not read cc token alias file");
     }
     private static void readAliasFile(String fileName, ArrayList list) {
         Properties aliasProperties = new Properties();
@@ -87,7 +87,7 @@ public class AliasHandler {
 
     public static String resolveToken(String name)
     {
-        String aliasID = tokenAliasList.get(name);
+        String aliasID = cctokenAliasList.get(name);
         return aliasID != null ? aliasID : name;
     }
 }

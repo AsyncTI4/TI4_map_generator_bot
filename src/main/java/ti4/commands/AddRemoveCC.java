@@ -1,12 +1,10 @@
 package ti4.commands;
 
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import org.jetbrains.annotations.NotNull;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -20,7 +18,7 @@ import ti4.message.MessageHelper;
 import java.io.File;
 import java.util.StringTokenizer;
 
-abstract public class AddRemoveUnits implements Command{
+abstract public class AddRemoveCC implements Command{
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -28,15 +26,12 @@ abstract public class AddRemoveUnits implements Command{
         MapManager mapManager = MapManager.getInstance();
         if (!mapManager.isUserWithActiveMap(userID)) {
             MessageHelper.replyToMessage(event, "Set your active map using: /set_map mapname");
-            return;
         } else {
-
             String color = event.getOptions().get(0).getAsString().toLowerCase();
             if (!Mapper.isColorValid(color)) {
                 MessageHelper.replyToMessage(event, "Color not valid");
                 return;
             }
-
             String tileID = AliasHandler.resolveTile(event.getOptions().get(1).getAsString().toLowerCase());
             Map activeMap = mapManager.getUserActiveMap(userID);
             if (activeMap.isTileDuplicated(tileID)){
@@ -52,7 +47,7 @@ abstract public class AddRemoveUnits implements Command{
                 return;
             }
 
-            unitParsingForTile(event, color, tile);
+            parsingForTile(event, color, tile);
             MapSaveLoadManager.saveMap(activeMap);
 
             File file = GenerateMap.getInstance().saveImage(activeMap);
@@ -60,47 +55,7 @@ abstract public class AddRemoveUnits implements Command{
         }
     }
 
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
-        String unitList = event.getOptions().get(2).getAsString().toLowerCase();
-        unitList = unitList.replace(", ", ",");
-        StringTokenizer tokenizer = new StringTokenizer(unitList, ",");
-        while (tokenizer.hasMoreTokens()) {
-            StringTokenizer unitInfoTokenizer = new StringTokenizer(tokenizer.nextToken(), " ");
-
-            int count = 1;
-            boolean numberIsSet = false;
-            String planetName = Constants.SPACE;
-            String unit = "";
-            if (unitInfoTokenizer.hasMoreTokens()) {
-                String ifNumber = unitInfoTokenizer.nextToken();
-                try {
-                    count = Integer.parseInt(ifNumber);
-                    numberIsSet = true;
-                } catch (Exception e) {
-                    unit = AliasHandler.resolveUnit(ifNumber);
-                }
-            }
-            if (unitInfoTokenizer.hasMoreTokens() && numberIsSet) {
-                unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
-            }
-            String unitID = Mapper.getUnitID(unit, color);
-            String unitPath = tile.getUnitPath(unitID);
-            if (unitPath == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit: " + unit + " is not valid and not supported.");
-                continue;
-            }
-            if (unitInfoTokenizer.hasMoreTokens()) {
-                planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
-            }
-            if (!tile.isSpaceHolderValid(planetName)){
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planetName + " is not valid and not supported.");
-            }
-            unitAction(tile, count, planetName, unitID);
-        }
-    }
-
-    abstract protected void unitAction(Tile tile, int count, String planetName, String unitID);
-
+    abstract void parsingForTile(SlashCommandInteractionEvent event, String color, Tile tile);
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return event.getName().equals(getActionID());
@@ -116,10 +71,6 @@ abstract public class AddRemoveUnits implements Command{
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")
-                                .setRequired(true))
-
-
         );
     }
 

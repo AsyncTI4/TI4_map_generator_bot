@@ -131,77 +131,124 @@ public class GenerateMap {
             Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
             UnitHolder spaceUnitHolder = unitHolders.stream().filter(unitHolder -> unitHolder.getName().equals(Constants.SPACE)).findFirst().orElse(null);
             if (spaceUnitHolder != null) {
+                image = addCC(tile, image, tileX, tileY, spaceUnitHolder);
                 unitHolders.remove(spaceUnitHolder);
                 unitHolders.add(spaceUnitHolder);
             }
             int degree;
             int degreeChange = 5;
             for (UnitHolder unitHolder : unitHolders) {
-                degree = 0;
+                degree = 45;
+                image = addControl(tile, image, tileX, tileY, unitHolder);
                 int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
-                HashMap<String, Integer> units = unitHolder.getUnits();
-                for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-                    String unitID = unitEntry.getKey();
-                    Integer unitCount = unitEntry.getValue();
-
-                    Color groupUnitColor = Color.WHITE;
-                    Integer bulkUnitCount = null;
-                    if (unitID.startsWith("ylw")){
-                        groupUnitColor = Color.BLACK;
-                    }
-                    if (unitID.endsWith(Constants.COLOR_FF)) {
-                        unitID = unitID.replace(Constants.COLOR_FF, Constants.BULK_FF);
-                        bulkUnitCount = unitCount;
-                    } else if (unitID.endsWith(Constants.COLOR_GF)) {
-                        unitID = unitID.replace(Constants.COLOR_GF, Constants.BULK_GF);
-                        bulkUnitCount = unitCount;
-                    }
-
-                    try {
-                        image = ImageIO.read(new File(tile.getUnitPath(unitID)));
-                    } catch (Exception e) {
-                        LoggerHandler.log("Could not parse unit file for: " + unitID, e);
-                    }
-                    if (bulkUnitCount != null && bulkUnitCount > 0) {
-                        unitCount = 1;
-                    }
-
-                    Point centerPosition = unitHolder.getHolderCenterPosition();
-                    for (int i = 0; i < unitCount; i++) {
-                        boolean searchPosition = true;
-                        int x = 0;
-                        int y = 0;
-                        while (searchPosition) {
-                            x = (int) (radius * Math.sin(degree));
-                            y = (int) (radius * Math.cos(degree));
-                            int possibleX = tileX + centerPosition.x + x - (image.getWidth() / 2);
-                            int possibleY = tileY + centerPosition.y + y - (image.getHeight() / 2);
-                            BufferedImage finalImage = image;
-                            if (rectangles.stream().noneMatch(rectangle -> rectangle.intersects(possibleX, possibleY, finalImage.getWidth(), finalImage.getHeight()))) {
-                                searchPosition = false;
-                            } else if (degree > 360) {
-                                searchPosition = false;
-                                degree += 3;//To chage degree if we did not find place, might be better placement then
-                            }
-                            degree += degreeChange;
-                            if (!searchPosition) {
-                                rectangles.add(new Rectangle(possibleX, possibleY, finalImage.getWidth(), finalImage.getHeight()));
-                            }
-                        }
-                        int imageX = tileX + centerPosition.x + x - (image.getWidth() / 2);
-                        int imageY = tileY + centerPosition.y + y - (image.getHeight() / 2);
-                        graphics.drawImage(image, imageX, imageY, null);
-                        if (bulkUnitCount != null) {
-                            graphics.setFont(Storage.getLargeFont());
-                            graphics.setColor(groupUnitColor);
-                            graphics.drawString(Integer.toString(bulkUnitCount), imageX + numberPositionPoint.x, imageY + numberPositionPoint.y);
-                        }
-                    }
-                }
+                image = addUnits(tile, image, tileX, tileY, rectangles, degree, degreeChange, unitHolder, radius);
             }
 
         } catch (IOException e) {
             LoggerHandler.log("Error drawing tile: " + tile.getTileID(), e);
         }
+    }
+
+    private BufferedImage addCC(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
+        ArrayList<String> ccList = unitHolder.getCCList();
+        int deltaX = -ccList.size() * 25;
+        for (String ccID : ccList) {
+            String ccPath = tile.getCCPath(ccID);
+            if (ccPath == null) {
+                LoggerHandler.log("Could not parse cc file for: " + ccID);
+                continue;
+            }
+            try {
+                image = ImageIO.read(new File(ccPath));
+            } catch (Exception e) {
+                LoggerHandler.log("Could not parse cc file for: " + ccID, e);
+            }
+            Point centerPosition = unitHolder.getHolderCenterPosition();
+            graphics.drawImage(image, tileX + centerPosition.x + deltaX, tileY, null);
+            deltaX += 25;
+        }
+        return image;
+    }
+
+    private BufferedImage addControl(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
+        ArrayList<String> controlList = unitHolder.getControlList();
+        for (String controlID : controlList) {
+            String controlPath = tile.getCCPath(controlID);
+            if (controlPath == null) {
+                LoggerHandler.log("Could not parse control token file for: " + controlID);
+                continue;
+            }
+            try {
+                image = ImageIO.read(new File(controlPath));
+            } catch (Exception e) {
+                LoggerHandler.log("Could not parse control token file for: " + controlID, e);
+            }
+            Point centerPosition = unitHolder.getHolderCenterPosition();
+            graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - (image.getHeight() / 2), null);
+        }
+        return image;
+    }
+
+    private BufferedImage addUnits(Tile tile, BufferedImage image, int tileX, int tileY, ArrayList<Rectangle> rectangles, int degree, int degreeChange, UnitHolder unitHolder, int radius) {
+        HashMap<String, Integer> units = unitHolder.getUnits();
+        for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+            String unitID = unitEntry.getKey();
+            Integer unitCount = unitEntry.getValue();
+
+            Color groupUnitColor = Color.WHITE;
+            Integer bulkUnitCount = null;
+            if (unitID.startsWith("ylw")) {
+                groupUnitColor = Color.BLACK;
+            }
+            if (unitID.endsWith(Constants.COLOR_FF)) {
+                unitID = unitID.replace(Constants.COLOR_FF, Constants.BULK_FF);
+                bulkUnitCount = unitCount;
+            } else if (unitID.endsWith(Constants.COLOR_GF)) {
+                unitID = unitID.replace(Constants.COLOR_GF, Constants.BULK_GF);
+                bulkUnitCount = unitCount;
+            }
+
+            try {
+                image = ImageIO.read(new File(tile.getUnitPath(unitID)));
+            } catch (Exception e) {
+                LoggerHandler.log("Could not parse unit file for: " + unitID, e);
+            }
+            if (bulkUnitCount != null && bulkUnitCount > 0) {
+                unitCount = 1;
+            }
+
+            Point centerPosition = unitHolder.getHolderCenterPosition();
+            for (int i = 0; i < unitCount; i++) {
+                boolean searchPosition = true;
+                int x = 0;
+                int y = 0;
+                while (searchPosition) {
+                    x = (int) (radius * Math.sin(degree));
+                    y = (int) (radius * Math.cos(degree));
+                    int possibleX = tileX + centerPosition.x + x - (image.getWidth() / 2);
+                    int possibleY = tileY + centerPosition.y + y - (image.getHeight() / 2);
+                    BufferedImage finalImage = image;
+                    if (rectangles.stream().noneMatch(rectangle -> rectangle.intersects(possibleX, possibleY, finalImage.getWidth(), finalImage.getHeight()))) {
+                        searchPosition = false;
+                    } else if (degree > 360) {
+                        searchPosition = false;
+                        degree += 3;//To chage degree if we did not find place, might be better placement then
+                    }
+                    degree += degreeChange;
+                    if (!searchPosition) {
+                        rectangles.add(new Rectangle(possibleX, possibleY, finalImage.getWidth(), finalImage.getHeight()));
+                    }
+                }
+                int imageX = tileX + centerPosition.x + x - (image.getWidth() / 2);
+                int imageY = tileY + centerPosition.y + y - (image.getHeight() / 2);
+                graphics.drawImage(image, imageX, imageY, null);
+                if (bulkUnitCount != null) {
+                    graphics.setFont(Storage.getLargeFont());
+                    graphics.setColor(groupUnitColor);
+                    graphics.drawString(Integer.toString(bulkUnitCount), imageX + numberPositionPoint.x, imageY + numberPositionPoint.y);
+                }
+            }
+        }
+        return image;
     }
 }
