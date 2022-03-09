@@ -75,7 +75,7 @@ public class HelpAction implements Command {
                 "dread <- same single dread into space\n" +
                 "3 dn <- 3 dreads added into space\n" +
                 "3 dn, 2 destroyers <- 3dread and 2 dd added into space\n" +
-                "3 dn, 2 dd, gf quann <- 3 dread and 2dd added into space, 1 gf added onto planet quann\n" +
+                "3 dn, 2 dd, inf quann <- 3 dread and 2dd added into space, 1 inf added onto planet quann\n" +
                 "ws, 6 ff, sd quann, 3 inf quann, mech quann <- warsun and 6 fighters added into space, spacedock, 3 infantry and mech added into quann\n";
     }
 }
