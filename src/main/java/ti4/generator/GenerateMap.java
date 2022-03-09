@@ -143,7 +143,11 @@ public class GenerateMap {
                     String unitID = unitEntry.getKey();
                     Integer unitCount = unitEntry.getValue();
 
+                    Color groupUnitColor = Color.WHITE;
                     Integer bulkUnitCount = null;
+                    if (unitID.startsWith("ylw")){
+                        groupUnitColor = Color.BLACK;
+                    }
                     if (unitID.endsWith(Constants.COLOR_FF)) {
                         unitID = unitID.replace(Constants.COLOR_FF, Constants.BULK_FF);
                         bulkUnitCount = unitCount;
@@ -151,6 +155,7 @@ public class GenerateMap {
                         unitID = unitID.replace(Constants.COLOR_GF, Constants.BULK_GF);
                         bulkUnitCount = unitCount;
                     }
+
                     try {
                         image = ImageIO.read(new File(tile.getUnitPath(unitID)));
                     } catch (Exception e) {
@@ -187,7 +192,7 @@ public class GenerateMap {
                         graphics.drawImage(image, imageX, imageY, null);
                         if (bulkUnitCount != null) {
                             graphics.setFont(Storage.getLargeFont());
-                            graphics.setColor(Color.WHITE);
+                            graphics.setColor(groupUnitColor);
                             graphics.drawString(Integer.toString(bulkUnitCount), imageX + numberPositionPoint.x, imageY + numberPositionPoint.y);
                         }
                     }
