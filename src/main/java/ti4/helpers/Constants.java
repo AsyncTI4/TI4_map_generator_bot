@@ -44,7 +44,7 @@ public class Constants {
     public static final String SETUP6 = "setup6";
     public static final String MALLICE = "mallicelocked";
     public static final String MR = "mr";
-    public static final int SPACE_RADIUS = 120;
+    public static final int SPACE_RADIUS = 115;
     public static final int RADIUS = 45;
     public static final Point SPACE_CENTER_POSITION = new Point(172,150);
 }
