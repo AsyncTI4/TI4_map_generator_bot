@@ -33,7 +33,7 @@ public class RemoveAllCC implements Command {
         if (!mapManager.isUserWithActiveMap(userID)) {
             MessageHelper.replyToMessage(event, "Set your active map using: /set_map mapname");
         } else {
-            String tileID = AliasHandler.resolveTile(event.getOptions().get(1).getAsString().toLowerCase());
+            String tileID = AliasHandler.resolveTile(event.getOptions().get(0).getAsString().toLowerCase());
             Map activeMap = mapManager.getUserActiveMap(userID);
             if (activeMap.isTileDuplicated(tileID)){
                 MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
