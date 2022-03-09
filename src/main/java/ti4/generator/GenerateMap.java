@@ -109,7 +109,8 @@ public class GenerateMap {
         } catch (IOException e) {
             LoggerHandler.log("Could not save jpg file", e);
         }
-
+        //noinspection ResultOfMethodCallIgnored
+        file.delete();
         return new File(absolutePath);
     }
 
