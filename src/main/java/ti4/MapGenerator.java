@@ -3,7 +3,6 @@ package ti4;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.*;
 import ti4.generator.PositionMapper;
@@ -14,7 +13,6 @@ import ti4.helpers.Storage;
 import ti4.map.MapSaveLoadManager;
 
 import javax.security.auth.login.LoginException;
-import java.util.List;
 
 public class MapGenerator {
 
@@ -74,7 +72,7 @@ public class MapGenerator {
         commandManager.addCommand(new RemoveControl());
 
 
-        commandManager.addCommand(new TestAction());
+        commandManager.addCommand(new HelpAction());
 
         Guild guild = jda.getGuildById(args[2]);
 

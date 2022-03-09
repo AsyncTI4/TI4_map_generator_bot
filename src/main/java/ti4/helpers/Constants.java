@@ -16,6 +16,7 @@ public class Constants {
     public static final String DELETE_MAP = "delete_map";
     public static final String POSITION = "position";
     public static final String TILE_NAME = "tile_name";
+    public static final String HELP = "help";
     public static final String PLANET_NAME = "planet_name";
     public static final String TILE_LIST = "tile_list";
     public static final String UNIT_NAMES = "unit_names";
