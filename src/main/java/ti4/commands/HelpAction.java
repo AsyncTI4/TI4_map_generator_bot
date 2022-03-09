@@ -20,7 +20,7 @@ public class HelpAction implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), "TEST ACTION EXECUTED");
+        MessageHelper.sendMessageToChannel(event.getChannel(), getHelpText());
     }
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
