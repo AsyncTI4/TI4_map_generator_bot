@@ -71,8 +71,8 @@ public class HelpAction implements Command {
                 "\n" +
                 "unitList examples and explanation. If dont specify planet, all units go into space\n" +
                 "Listing only unit list, so add into command that you want\n" +
-                "dn <- sinle dread into space\n" +
-                "dread <- same sinle dread into space\n" +
+                "dn <- single dread into space\n" +
+                "dread <- same single dread into space\n" +
                 "3 dn <- 3 dreads added into space\n" +
                 "3 dn, 2 destroyers <- 3dread and 2 dd added into space\n" +
                 "3 dn, 2 dd, gf quann <- 3 dread and 2dd added into space, 1 gf added onto planet quann\n" +
