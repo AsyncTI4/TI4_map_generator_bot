@@ -33,7 +33,7 @@ public class SetMap implements Command {
         if (map.isMapOpen()){
             return true;
         }
-        if (!map.getPlayers().containsKey(userID)){
+        if (!map.getPlayers().containsKey(userID) || userID.equals(map.getOwnerID())){
             MessageHelper.replyToMessage(event, "Your are not a player of selected map.");
             return false;
         }

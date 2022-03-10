@@ -22,14 +22,14 @@ abstract public class JoinLeave implements Command {
         }
         String mapName = event.getOptions().get(0).getAsString();
         if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-            MessageHelper.replyToMessage(event, "Map with such name does not exists, use /list_maps");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Map with such name does not exists, use /list_maps");
             return false;
         }
 
         MapManager mapManager = MapManager.getInstance();
         Map map = mapManager.getMap(mapName);
         if (!map.isMapOpen()) {
-            MessageHelper.replyToMessage(event, "Map is not open. Can leave only open map.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Map is not open. Can leave only open map.");
         }
         return true;
     }
@@ -40,7 +40,7 @@ abstract public class JoinLeave implements Command {
         MapManager mapManager = MapManager.getInstance();
         Map map = mapManager.getMap(mapName);
         if (!map.isMapOpen()) {
-            MessageHelper.replyToMessage(event, "Map is not open. Can leave only open map.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Map is not open. Can leave only open map.");
             return;
         }
         User user = event.getUser();
