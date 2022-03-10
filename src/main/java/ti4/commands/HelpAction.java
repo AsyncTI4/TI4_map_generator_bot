@@ -71,11 +71,16 @@ public class HelpAction implements Command {
                 "\n" +
                 "unitList examples and explanation. If dont specify planet, all units go into space\n" +
                 "Listing only unit list, so add into command that you want\n" +
-                "dn <- single dread into space\n" +
-                "dread <- same single dread into space\n" +
+                "dn <- sinle dread into space\n" +
+                "dread <- same sinle dread into space\n" +
                 "3 dn <- 3 dreads added into space\n" +
                 "3 dn, 2 destroyers <- 3dread and 2 dd added into space\n" +
-                "3 dn, 2 dd, inf quann <- 3 dread and 2dd added into space, 1 inf added onto planet quann\n" +
-                "ws, 6 ff, sd quann, 3 inf quann, mech quann <- warsun and 6 fighters added into space, spacedock, 3 infantry and mech added into quann\n";
+                "3 dn, 2 dd, gf quann <- 3 dread and 2dd added into space, 1 gf added onto planet quann\n" +
+                "ws, 6 ff, sd quann, 3 inf quann, mech quann <- warsun and 6 fighters added into space, spacedock, 3 infantry and mech added into quann\n" +
+                "\n" +
+                "/move_units color systemFrom unitList systemTo unitList addCC\n" +
+                "Standard fields to add tile/system, unit list same as add, remove, and we have optional field addCC, type anything in to not add cc into moved system\n" +
+                "Example:\n" +
+                "/move_units pink quann 2 dn, dd, gf, gf quann wellon 2 dn, dd, 2 gf wellon\n";
     }
 }

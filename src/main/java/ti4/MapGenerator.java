@@ -70,6 +70,7 @@ public class MapGenerator {
         commandManager.addCommand(new RemoveAllCC());
         commandManager.addCommand(new AddControl());
         commandManager.addCommand(new RemoveControl());
+        commandManager.addCommand(new MoveUnits());
 
 
         commandManager.addCommand(new HelpAction());

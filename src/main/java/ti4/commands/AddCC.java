@@ -9,6 +9,10 @@ import ti4.message.MessageHelper;
 public class AddCC extends AddRemoveCC {
     @Override
     void parsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
+        addCC(event, color, tile);
+    }
+
+    public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile) {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {

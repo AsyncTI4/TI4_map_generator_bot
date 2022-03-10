@@ -5,12 +5,13 @@ import ti4.generator.Mapper;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 
 abstract public class UnitHolder {
     //ID, Count
     private final HashMap<String, Integer> units = new HashMap<>();
-    private final ArrayList<String> ccList = new ArrayList<>();
-    private final ArrayList<String> controlList = new ArrayList<>();
+    private final HashSet<String> ccList = new HashSet<>();
+    private final HashSet<String> controlList = new HashSet<>();
     private Point holderCenterPosition;
 
     private String name;
@@ -79,11 +80,11 @@ abstract public class UnitHolder {
         return units;
     }
 
-    public ArrayList<String> getCCList() {
+    public HashSet<String> getCCList() {
         return ccList;
     }
 
-    public ArrayList<String> getControlList() {
+    public HashSet<String> getControlList() {
         return controlList;
     }
 

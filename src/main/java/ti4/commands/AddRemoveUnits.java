@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -39,18 +40,8 @@ abstract public class AddRemoveUnits implements Command{
 
             String tileID = AliasHandler.resolveTile(event.getOptions().get(1).getAsString().toLowerCase());
             Map activeMap = mapManager.getUserActiveMap(userID);
-            if (activeMap.isTileDuplicated(tileID)){
-                MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
-                return;
-            }
-            Tile tile = activeMap.getTile(tileID);
-            if (tile == null){
-                tile = activeMap.getTileByPostion(tileID);
-            }
-            if (tile == null) {
-                MessageHelper.replyToMessage(event, "Tile in map not found");
-                return;
-            }
+            Tile tile = getTile(event, tileID, activeMap);
+            if (tile == null) return;
 
             unitParsingForTile(event, color, tile);
             MapSaveLoadManager.saveMap(activeMap);
@@ -60,8 +51,28 @@ abstract public class AddRemoveUnits implements Command{
         }
     }
 
+    protected Tile getTile(SlashCommandInteractionEvent event, String tileID, Map activeMap) {
+        if (activeMap.isTileDuplicated(tileID)){
+            MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
+            return null;
+        }
+        Tile tile = activeMap.getTile(tileID);
+        if (tile == null){
+            tile = activeMap.getTileByPostion(tileID);
+        }
+        if (tile == null) {
+            MessageHelper.replyToMessage(event, "Tile in map not found");
+            return null;
+        }
+        return tile;
+    }
+
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
         String unitList = event.getOptions().get(2).getAsString().toLowerCase();
+        unitParsing(event, color, tile, unitList);
+    }
+
+    protected void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer tokenizer = new StringTokenizer(unitList, ",");
         while (tokenizer.hasMoreTokens()) {
@@ -118,8 +129,6 @@ abstract public class AddRemoveUnits implements Command{
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")
                                 .setRequired(true))
-
-
         );
     }
 

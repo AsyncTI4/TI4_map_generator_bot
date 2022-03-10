@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class GenerateMap {
     private Graphics graphics;
@@ -150,7 +151,7 @@ public class GenerateMap {
     }
 
     private BufferedImage addCC(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
-        ArrayList<String> ccList = unitHolder.getCCList();
+        HashSet<String> ccList = unitHolder.getCCList();
         int deltaX = -ccList.size() * 25;
         for (String ccID : ccList) {
             String ccPath = tile.getCCPath(ccID);
@@ -171,7 +172,7 @@ public class GenerateMap {
     }
 
     private BufferedImage addControl(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
-        ArrayList<String> controlList = unitHolder.getControlList();
+        HashSet<String> controlList = unitHolder.getControlList();
         for (String controlID : controlList) {
             String controlPath = tile.getCCPath(controlID);
             if (controlPath == null) {
