@@ -1,0 +1,47 @@
+Commands:
+First you need to create map and set active map you modifying.
+To create map use:
+/create_map mapName
+To set active map use:
+/set_map mapName
+
+For easy of setup suggest first command after map creation use
+/add_tile setup 0
+This adds a template with positions
+
+Now additional commands:
+/add_tile tileName positionOnMap
+(We using somno template positions on map. from setup template and you see positions.
+Also we support TopLeft, TopRight, BottomLeft and BottomRight positions coresponding to TL, TR, BL, BR
+Mecatol position is MR)
+/add_tile_list tileList <- tile list is code from map Generators like TTS uses, example: https://ti4-map-generator.derekpeterson.ca/
+You can use also tileID, so liek TI4 marks tiles 01 is Jord for example
+/list_tiles <- lists all tiles, use starting number id to add to map
+/remove_tile tileName or position
+/list_maps <- lists all available maps that are created
+/delete_map <-deletes your map, only can delete the map you created
+/show_map mapName <- displays the map
+/list_units <- lists all possible units
+/add_cc color tile or position
+/remove_cc color tile or position
+/remove_all_cc tile or position
+/add_control color tile planet <- need to specify tile and planet, we working to improve it
+/remove_control color tile planet
+and most interesting is
+/add_units color tile unitList
+/remove_units color tile unitList
+/remove_all_units color tile
+
+unitList examples and explanation. If dont specify planet, all units go into space
+Listing only unit list, so add into command that you want
+dn <- sinle dread into space
+dread <- same sinle dread into space
+3 dn <- 3 dreads added into space
+3 dn, 2 destroyers <- 3dread and 2 dd added into space
+3 dn, 2 dd, gf quann <- 3 dread and 2dd added into space, 1 gf added onto planet quann
+ws, 6 ff, sd quann, 3 inf quann, mech quann <- warsun and 6 fighters added into space, spacedock, 3 infantry and mech added into quann
+
+/move_units color systemFrom unitList systemTo unitList addCC
+Standard fields to add tile/system, unit list same as add, remove, and we have optional field addCC, type anything in to not add cc into moved system
+Example:
+/move_units pink quann 2 dn, dd, gf, gf quann wellon 2 dn, dd, 2 gf wellon

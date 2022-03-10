@@ -85,7 +85,7 @@ public class ResourceHelper {
     }
 
     @Nullable
-    private String getResourceFromFolder(String folder, String name, String Could_not_find_tile_file) {
+    private String getResourceFromFolder(String folder, String name, String errorDescription) {
         File resourceFile = null;
         URL resource = getClass().getClassLoader().getResource(folder + name);
 
@@ -95,7 +95,7 @@ public class ResourceHelper {
             }
 
         } catch (Exception e) {
-            LoggerHandler.log(Could_not_find_tile_file, e);
+            LoggerHandler.log(errorDescription, e);
         }
         return resourceFile != null ? resourceFile.getAbsolutePath() : null;
     }
@@ -110,5 +110,11 @@ public class ResourceHelper {
     public String getAliasFile(String name)
     {
         return getResourceFromFolder("alias/", name, "Could not find alias file");
+    }
+
+    @CheckForNull
+    public String getHelpFile(String name)
+    {
+        return getResourceFromFolder("help/", name, "Could not find alias file");
     }
 }
