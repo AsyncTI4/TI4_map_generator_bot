@@ -6,7 +6,12 @@ import java.util.HashMap;
 public class Map {
 
     private String ownerID;
+    private String ownerName;
     private String name;
+
+    //UserID, UserName
+    private HashMap<String, String> players = new HashMap<>();
+    private MapStatus mapStatus = MapStatus.open;
 
     //Position, Tile
     private HashMap<String, Tile> tileMap = new HashMap<>();
@@ -14,6 +19,14 @@ public class Map {
 
     public String getOwnerID() {
         return ownerID;
+    }
+
+    public String getOwnerName() {
+        return ownerName;
+    }
+
+    public void setOwnerName(String ownerName) {
+        this.ownerName = ownerName;
     }
 
     public String getName() {
@@ -40,7 +53,42 @@ public class Map {
                 .count() > 1;
     }
 
+    public void addPlayer(String id, String name){
+        if (MapStatus.open.equals(mapStatus)) {
+            players.put(id, name);
+        }
+    }
 
+    public HashMap<String, String> getPlayers() {
+        return players;
+    }
+
+    public void removePlayer(String name){
+        if (MapStatus.open.equals(mapStatus)) {
+            String keyToDelete = null;
+            for (java.util.Map.Entry<String, String> playerEntry : players.entrySet()) {
+                if (playerEntry.getValue().equals(name)) {
+                    keyToDelete = playerEntry.getKey();
+                    break;
+                }
+            }
+            if (keyToDelete != null) {
+                players.remove(keyToDelete);
+            }
+        }
+    }
+
+    public void setMapStatus(MapStatus status){
+        mapStatus = status;
+    }
+
+    public boolean isMapOpen(){
+        return mapStatus == MapStatus.open;
+    }
+
+    public String getMapStatus(){
+        return mapStatus.value;
+    }
 
     public void setOwnerID(String ownerID) {
         this.ownerID = ownerID;

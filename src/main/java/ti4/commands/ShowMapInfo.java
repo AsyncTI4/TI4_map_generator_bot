@@ -1,21 +1,28 @@
 package ti4.commands;
 
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.api.utils.concurrent.Task;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.message.MessageHelper;
 
-public class SetMap implements Command {
+import java.util.*;
+
+public class ShowMapInfo implements Command {
+
+    public static final String NEW_LINE = "\n";
 
     @Override
     public String getActionID() {
-        return Constants.SET_MAP;
+        return Constants.SHOW_MAP_INFO;
     }
 
     @Override
@@ -28,28 +35,29 @@ public class SetMap implements Command {
             MessageHelper.replyToMessage(event, "Map with such name does not exists, use /list_maps");
             return false;
         }
-        String userID = event.getUser().getId();
-        Map map = MapManager.getInstance().getMap(mapName);
-        if (map.isMapOpen()){
-            return true;
-        }
-        if (!map.getPlayers().containsKey(userID)){
-            MessageHelper.replyToMessage(event, "Your are not a player of selected map.");
-            return false;
-        }
         return true;
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
         String mapName = event.getOptions().get(0).getAsString().toLowerCase();
-        boolean setMapSuccessful = MapManager.getInstance().setMapForUser(userID, mapName);
-        if (!setMapSuccessful) {
-            MessageHelper.replyToMessage(event, "Could not assign active map " + mapName);
-        } else {
-            MessageHelper.replyToMessage(event, "Active Map set: " + mapName);
+        MapManager mapManager = MapManager.getInstance();
+        Map map = mapManager.getMap(mapName);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Map Info:").append(NEW_LINE);
+        sb.append("Map name: " + map.getName()).append(NEW_LINE);
+
+        sb.append("Map owner: " + map.getOwnerName()).append(NEW_LINE);
+        sb.append("Map status: " + map.getMapStatus()).append(NEW_LINE);
+        sb.append("Players: ").append(NEW_LINE);
+        HashMap<String, String> players = map.getPlayers();
+        int index = 1;
+        ArrayList<String> playerNames = new ArrayList<>(players.values());
+        Collections.sort(playerNames);
+        for (String value : playerNames) {
+            sb.append(index).append(". ").append(value).append(NEW_LINE);
         }
+        MessageHelper.replyToMessage(event, sb.toString());
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -57,10 +65,9 @@ public class SetMap implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), "Set map as active")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name to be set as active")
+                Commands.slash(getActionID(), "Show map info")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name")
                                 .setRequired(true))
-
         );
     }
 }

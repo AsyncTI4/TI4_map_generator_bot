@@ -4,10 +4,18 @@ import java.awt.*;
 
 public class Constants {
     public static final String SHOW_MAP = "show_map";
+    public static final String SHOW_MAP_INFO = "show_map_info";
     public static final String MAP_NAME = "map_name";
+    public static final String MAP_STATUS = "map_status";
     public static final String CONFIRM = "confirm";
     public static final String SHUTDOWN = "shutdown";
+    public static final String LOG_MESSAGE = "log_message";
     public static final String SET_MAP = "set_map";
+    public static final String SET_MAP_STATUS = "set_map_status";
+    public static final String REMOVE_PLAYER = "remove_player";
+    public static final String PLAYER_NAME = "player_name";
+    public static final String JOIN = "join";
+    public static final String LEAVE = "leave";
     public static final String SAVE_MAPS = "save_maps";
     public static final String LIST_TILES = "list_tiles";
     public static final String LIST_UNITS = "list_units";

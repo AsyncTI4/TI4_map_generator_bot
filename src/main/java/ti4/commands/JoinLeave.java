@@ -1,6 +1,6 @@
 package ti4.commands;
 
-import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -11,12 +11,9 @@ import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.message.MessageHelper;
 
-public class SetMap implements Command {
+abstract public class JoinLeave implements Command {
 
-    @Override
-    public String getActionID() {
-        return Constants.SET_MAP;
-    }
+    abstract protected String getActionDescription();
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
@@ -28,37 +25,37 @@ public class SetMap implements Command {
             MessageHelper.replyToMessage(event, "Map with such name does not exists, use /list_maps");
             return false;
         }
-        String userID = event.getUser().getId();
-        Map map = MapManager.getInstance().getMap(mapName);
-        if (map.isMapOpen()){
-            return true;
-        }
-        if (!map.getPlayers().containsKey(userID)){
-            MessageHelper.replyToMessage(event, "Your are not a player of selected map.");
-            return false;
+
+        MapManager mapManager = MapManager.getInstance();
+        Map map = mapManager.getMap(mapName);
+        if (!map.isMapOpen()) {
+            MessageHelper.replyToMessage(event, "Map is not open. Can leave only open map.");
         }
         return true;
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        String mapName = event.getOptions().get(0).getAsString().toLowerCase();
-        boolean setMapSuccessful = MapManager.getInstance().setMapForUser(userID, mapName);
-        if (!setMapSuccessful) {
-            MessageHelper.replyToMessage(event, "Could not assign active map " + mapName);
-        } else {
-            MessageHelper.replyToMessage(event, "Active Map set: " + mapName);
+        String mapName = event.getOptions().get(0).getAsString();
+        MapManager mapManager = MapManager.getInstance();
+        Map map = mapManager.getMap(mapName);
+        if (!map.isMapOpen()) {
+            MessageHelper.replyToMessage(event, "Map is not open. Can leave only open map.");
+            return;
         }
+        User user = event.getUser();
+        action(map, user);
     }
+
+    abstract protected void action(Map map, User user);
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), "Set map as active")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name to be set as active")
+                Commands.slash(getActionID(), getActionDescription())
+                        .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name")
                                 .setRequired(true))
 
         );

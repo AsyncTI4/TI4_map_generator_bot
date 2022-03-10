@@ -3,7 +3,10 @@ package ti4;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import ti4.commands.*;
 import ti4.generator.PositionMapper;
 import ti4.generator.Mapper;
@@ -13,6 +16,7 @@ import ti4.helpers.Storage;
 import ti4.map.MapSaveLoadManager;
 
 import javax.security.auth.login.LoginException;
+import java.util.Arrays;
 
 public class MapGenerator {
 
@@ -22,7 +26,12 @@ public class MapGenerator {
     public static void main(String[] args)
             throws LoginException {
 
-        jda = JDABuilder.createDefault(args[0]).build();
+        jda = JDABuilder.createDefault(args[0])
+//                .enableIntents(GatewayIntent.GUILD_MEMBERS)
+//                .setMemberCachePolicy(MemberCachePolicy.ALL)
+//                .setChunkingFilter(ChunkingFilter.ALL)
+//                .enableIntents(Arrays.asList(GatewayIntent.values()))
+                .build();
 //        jda = JDABuilder.createLight(args[0], Collections.emptyList())
 //                .addEventListeners(new Bot())
 //                .setActivity(Activity.playing("Type /ping"))
@@ -71,9 +80,14 @@ public class MapGenerator {
         commandManager.addCommand(new AddControl());
         commandManager.addCommand(new RemoveControl());
         commandManager.addCommand(new MoveUnits());
+        commandManager.addCommand(new SetMapStatus());
+        commandManager.addCommand(new Join());
+        commandManager.addCommand(new Leave());
+        commandManager.addCommand(new ShowMapInfo());
 
 
         commandManager.addCommand(new HelpAction());
+        commandManager.addCommand(new LogMessage());
 
         Guild guild = jda.getGuildById(args[2]);
 

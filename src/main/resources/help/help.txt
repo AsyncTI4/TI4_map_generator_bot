@@ -4,6 +4,14 @@ To create map use:
 /create_map mapName
 To set active map use:
 /set_map mapName
+/set_map_status mapName status
+status: open or locked
+Status open, means anyone can edit map, can join map as player;
+Status locked means, only joined players and map creator can edit map. No more players can join
+/join mapName <- join an open map to be able to edit even if map is locked
+/leave mapName <- leave an open map
+/show_map_info mapName <- information of map, status if open/locked and player list
+
 
 For easy of setup suggest first command after map creation use
 /add_tile setup 0
