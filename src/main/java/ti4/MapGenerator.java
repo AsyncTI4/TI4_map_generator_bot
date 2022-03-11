@@ -84,6 +84,7 @@ public class MapGenerator {
         commandManager.addCommand(new Join());
         commandManager.addCommand(new Leave());
         commandManager.addCommand(new ShowMapInfo());
+        commandManager.addCommand(new ListPlanets());
 
 
         commandManager.addCommand(new HelpAction());

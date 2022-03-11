@@ -27,6 +27,7 @@ You can use also tileID, so liek TI4 marks tiles 01 is Jord for example
 /list_tiles <- lists all tiles, use starting number id to add to map
 /remove_tile tileName or position
 /list_maps <- lists all available maps that are created
+/list_planets <- lists all available planets
 /delete_map <-deletes your map, only can delete the map you created
 /show_map mapName <- displays the map
 /list_units <- lists all possible units

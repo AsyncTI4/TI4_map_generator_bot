@@ -11,6 +11,7 @@ public class AliasHandler {
     private static HashMap<String, String> tileAliasList = new HashMap<>();
     private static HashMap<String, String> unitAliasList = new HashMap<>();
     private static ArrayList<String> unitList = new ArrayList<>();
+    private static ArrayList<String> planetList = new ArrayList<>();
     private static HashMap<String, String> planetAliasList = new HashMap<>();
     private static HashMap<String, String> cctokenAliasList = new HashMap<>();
 
@@ -19,20 +20,32 @@ public class AliasHandler {
         readAliasFile("tile_alias.properties", tileAliasList, "Could not read tiles alias file");
         readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
         readAliasFile("unit_alias.properties", unitList);
+        readAliasFile("planet_alias.properties", planetList, true);
         readAliasFile("planet_alias.properties", planetAliasList, "Could not read planet alias file");
         readAliasFile("cc_token_alias.properties", cctokenAliasList, "Could not read cc token alias file");
     }
-    private static void readAliasFile(String fileName, ArrayList list) {
+    private static void readAliasFile(String fileName, ArrayList<String> list) {
+        readAliasFile(fileName, list, false);
+    }
+    private static void readAliasFile(String fileName, ArrayList<String> list, boolean keys) {
         Properties aliasProperties = new Properties();
         String aliasFile = ResourceHelper.getInstance().getAliasFile(fileName);
         if (aliasFile != null) {
             try (InputStream input = new FileInputStream(aliasFile)) {
                 aliasProperties.load(input);
-                for (Object value : aliasProperties.values()) {
-                    if (value instanceof String) {
-                        String valueString = (String) value;
-                        //noinspection unchecked
-                        list.add(valueString);
+                if (keys){
+                    for (Object key : aliasProperties.keySet()) {
+                        if (key instanceof String) {
+                            String valueString = (String) key;
+                            list.add(valueString);
+                        }
+                    }
+                } else {
+                    for (Object value : aliasProperties.values()) {
+                        if (value instanceof String) {
+                            String valueString = (String) value;
+                            list.add(valueString);
+                        }
                     }
                 }
             } catch (IOException e) {
@@ -77,6 +90,10 @@ public class AliasHandler {
 
     public static ArrayList<String> getUnitList() {
         return unitList;
+    }
+
+    public static ArrayList<String> getPlanetList() {
+        return planetList;
     }
 
     public static String resolvePlanet(String name)

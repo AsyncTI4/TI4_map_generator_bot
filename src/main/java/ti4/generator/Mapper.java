@@ -69,10 +69,16 @@ public class Mapper {
 
     public static String getTilesList()
     {
-        return  "Tiles: " + tiles.values().stream()
+        return  "Tiles: " +  AliasHandler.getUnitList().stream()
                 .sorted()
-                .filter(value -> value instanceof String)
-                .map(value -> (String) value)
+                .filter(Objects::nonNull)
+                .collect(Collectors.joining("\n "));
+    }
+    public static String getPlanetList()
+    {
+        return  "Planets: " + AliasHandler.getPlanetList().stream()
+                .sorted()
+                .filter(Objects::nonNull)
                 .collect(Collectors.joining(", "));
     }
 

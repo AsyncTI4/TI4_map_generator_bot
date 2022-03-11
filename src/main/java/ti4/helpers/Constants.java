@@ -18,6 +18,7 @@ public class Constants {
     public static final String LEAVE = "leave";
     public static final String SAVE_MAPS = "save_maps";
     public static final String LIST_TILES = "list_tiles";
+    public static final String LIST_PLANETS = "list_planets";
     public static final String LIST_UNITS = "list_units";
     public static final String LIST_MAPS = "list_maps";
     public static final String CREATE_MAP = "create_map";
