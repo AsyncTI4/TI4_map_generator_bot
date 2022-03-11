@@ -17,6 +17,11 @@ public class Leave extends JoinLeave {
     }
 
     @Override
+    protected String getResponseMessage(Map map) {
+        return "Left map: " + map.getName() + " successful";
+    }
+
+    @Override
     protected void action(Map map, User user) {
         map.removePlayer(user.getId());
     }

@@ -2,6 +2,7 @@ package ti4;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.generator.GenerateMap;
@@ -32,6 +33,8 @@ public class MessageListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event)
     {
+        //noinspection ResultOfMethodCallIgnored
+//        event.deferReply();
         CommandManager commandManager = CommandManager.getInstance();
         for (Command command : commandManager.getCommandList()) {
             if (command.accept(event))

@@ -48,9 +48,12 @@ abstract public class JoinLeave implements Command {
         User user = event.getUser();
         action(map, user);
         MapSaveLoadManager.saveMap(map);
+        MessageHelper.replyToMessage(event, getResponseMessage(map));
     }
+    abstract protected String getResponseMessage(Map map);
 
     abstract protected void action(Map map, User user);
+
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override

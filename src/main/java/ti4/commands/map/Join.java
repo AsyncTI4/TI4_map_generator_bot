@@ -3,6 +3,7 @@ package ti4.commands.map;
 import net.dv8tion.jda.api.entities.User;
 import ti4.helpers.Constants;
 import ti4.map.Map;
+import ti4.message.MessageHelper;
 
 public class Join  extends JoinLeave {
 
@@ -14,6 +15,11 @@ public class Join  extends JoinLeave {
     @Override
     protected String getActionDescription() {
         return "Join map as player";
+    }
+
+    @Override
+    protected String getResponseMessage(Map map) {
+        return "Joined map: " + map.getName() + " successful";
     }
 
     @Override

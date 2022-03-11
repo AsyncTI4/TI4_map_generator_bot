@@ -21,11 +21,13 @@ public class MessageHelper {
     public static void replyToMessage(SlashCommandInteractionEvent event, String messageText)
     {
 //        sendMessageToChannel(event.getChannel(), messageText);
+//        event.getHook().sendMessage(messageText).queue();
         event.reply(messageText).queue();
     }
     public static void replyToMessage(SlashCommandInteractionEvent event, File file)
     {
         event.replyFile(file).queue();
+//        event.getHook().sendFile(file).queue();
 //        sendFileToChannel(event.getChannel(), file);
     }
 }
