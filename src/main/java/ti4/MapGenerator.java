@@ -3,11 +3,15 @@ package ti4;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import net.dv8tion.jda.api.utils.ChunkingFilter;
-import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import ti4.commands.*;
+import ti4.commands.info.*;
+import ti4.commands.map.*;
+import ti4.commands.tokens.*;
+import ti4.commands.units.AddUnits;
+import ti4.commands.units.MoveUnits;
+import ti4.commands.units.RemoveAllUnits;
+import ti4.commands.units.RemoveUnits;
 import ti4.generator.PositionMapper;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -16,7 +20,6 @@ import ti4.helpers.Storage;
 import ti4.map.MapSaveLoadManager;
 
 import javax.security.auth.login.LoginException;
-import java.util.Arrays;
 
 public class MapGenerator {
 
