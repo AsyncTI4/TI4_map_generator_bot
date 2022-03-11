@@ -22,8 +22,7 @@ public class Shutdown implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Member member = event.getInteraction().getMember();
-        if (member != null && member.getId().equals(MapGenerator.userID)) {
+        if (event.getUser().getId().equals(MapGenerator.userID)) {
             MessageHelper.replyToMessage(event, "Shutdown accepted");
             MapGenerator.jda.shutdownNow();
         } else {

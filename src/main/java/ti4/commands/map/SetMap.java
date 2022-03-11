@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.MapGenerator;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Map;
@@ -32,6 +33,9 @@ public class SetMap implements Command {
         String userID = event.getUser().getId();
         Map map = MapManager.getInstance().getMap(mapName);
         if (map.isMapOpen()){
+            return true;
+        }
+        if (MapGenerator.userID.equals(userID)){
             return true;
         }
         if (!map.getPlayers().containsKey(userID) && !userID.equals(map.getOwnerID())){

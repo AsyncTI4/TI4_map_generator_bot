@@ -6,10 +6,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.MapGenerator;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.map.MapSaveLoadManager;
 import ti4.map.MapStatus;
 import ti4.message.MessageHelper;
 
@@ -34,7 +36,7 @@ public class SetMapStatus implements Command {
         String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
         Map mapToChangeStatusFor = mapManager.getMap(mapName);
-        if (!mapToChangeStatusFor.getOwnerID().equals(userID)) {
+        if (!mapToChangeStatusFor.getOwnerID().equals(userID) && event.getUser().getId().equals(MapGenerator.userID)) {
             MessageHelper.replyToMessage(event, "Not Authorized Map Status change attempt");
         }
         return true;
@@ -53,6 +55,7 @@ public class SetMapStatus implements Command {
         } else if (mapStatus == MapStatus.locked) {
             mapToChangeStatusFor.setMapStatus(MapStatus.locked);
         }
+        MapSaveLoadManager.saveMap(mapToChangeStatusFor);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

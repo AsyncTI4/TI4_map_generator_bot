@@ -10,6 +10,7 @@ import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
 abstract public class JoinLeave implements Command {
@@ -46,6 +47,7 @@ abstract public class JoinLeave implements Command {
         }
         User user = event.getUser();
         action(map, user);
+        MapSaveLoadManager.saveMap(map);
     }
 
     abstract protected void action(Map map, User user);
