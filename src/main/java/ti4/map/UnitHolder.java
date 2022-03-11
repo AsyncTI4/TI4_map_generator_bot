@@ -43,6 +43,7 @@ abstract public class UnitHolder {
     }
 
     public void addControl(String cc) {
+        controlList.clear();
         controlList.add(cc);
     }
 
