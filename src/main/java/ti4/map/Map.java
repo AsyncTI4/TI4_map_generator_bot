@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class Map {
 
     private String ownerID;
-    private String ownerName;
+    private String ownerName = "";
     private String name;
 
     //UserID, UserName
@@ -22,7 +22,7 @@ public class Map {
     }
 
     public String getOwnerName() {
-        return ownerName;
+        return ownerName == null ? "" : ownerName;
     }
 
     public void setOwnerName(String ownerName) {
@@ -57,6 +57,10 @@ public class Map {
         if (MapStatus.open.equals(mapStatus)) {
             players.put(id, name);
         }
+    }
+
+    public void addPlayerLoad(String id, String name){
+        players.put(id, name);
     }
 
     public HashMap<String, String> getPlayers() {

@@ -14,7 +14,6 @@ public class MapSaveLoadManager {
 
     public static final String TXT = ".txt";
     public static final String TILE = "-tile-";
-    public static final String TMP = "-tmp-";
     public static final String UNITS = "-units-";
     public static final String UNITHOLDER = "-unitholder-";
     public static final String ENDUNITHOLDER = "-endunitholder-";
@@ -24,6 +23,15 @@ public class MapSaveLoadManager {
     public static final String ENDTOKENS = "-endtokens-";
     public static final String PLANET_TOKENS = "-planettokens-";
     public static final String PLANET_ENDTOKENS = "-planetendtokens-";
+
+    public static final String MAPINFO = "-mapinfo-";
+    public static final String ENDMAPINFO = "-endmapinfo-";
+    public static final String GAMEINFO = "-gameinfo-";
+    public static final String ENDGAMEINFO = "-endgameinfo-";
+    public static final String PLAYERINFO = "-playerinfo-";
+    public static final String ENDPLAYERINFO = "-endplayerinfo-";
+    public static final String PLAYER = "-player-";
+    public static final String ENDPLAYER = "-endplayer-";
 
     public static void saveMaps() {
         HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
@@ -39,8 +47,12 @@ public class MapSaveLoadManager {
                 HashMap<String, Tile> tileMap = map.getTileMap();
                 writer.write(map.getOwnerID());
                 writer.write(System.lineSeparator());
+                writer.write(map.getOwnerName());
+                writer.write(System.lineSeparator());
                 writer.write(map.getName());
                 writer.write(System.lineSeparator());
+                saveMapInfo(writer, map);
+
                 for (java.util.Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
                     Tile tile = tileEntry.getValue();
                     saveTile(writer, tile);
@@ -51,6 +63,45 @@ public class MapSaveLoadManager {
         } else {
             LoggerHandler.log("Could not save map, error creating save file");
         }
+    }
+
+    private static void saveMapInfo(FileWriter writer, Map map) throws IOException {
+        writer.write(MAPINFO);
+        writer.write(System.lineSeparator());
+
+        writer.write(map.getMapStatus());
+        writer.write(System.lineSeparator());
+
+        writer.write(GAMEINFO);
+        writer.write(System.lineSeparator());
+        //game information
+
+        writer.write(ENDGAMEINFO);
+        writer.write(System.lineSeparator());
+
+        //Player information
+        writer.write(PLAYERINFO);
+        writer.write(System.lineSeparator());
+        HashMap<String, String> players = map.getPlayers();
+        for (java.util.Map.Entry<String, String> playerEntry : players.entrySet()) {
+            writer.write(PLAYER);
+            writer.write(System.lineSeparator());
+
+            writer.write(playerEntry.getKey());
+            writer.write(System.lineSeparator());
+            writer.write(playerEntry.getValue());
+            writer.write(System.lineSeparator());
+
+            writer.write(ENDPLAYER);
+            writer.write(System.lineSeparator());
+        }
+
+        writer.write(ENDPLAYERINFO);
+        writer.write(System.lineSeparator());
+
+
+        writer.write(ENDMAPINFO);
+        writer.write(System.lineSeparator());
     }
 
     private static void saveTile(Writer writer, Tile tile) throws IOException {
@@ -152,7 +203,59 @@ public class MapSaveLoadManager {
             Map map = new Map();
             try (Scanner myReader = new Scanner(mapFile)) {
                 map.setOwnerID(myReader.nextLine());
+                map.setOwnerName(myReader.nextLine());
                 map.setName(myReader.nextLine());
+                while (myReader.hasNextLine()) {
+                    String data = myReader.nextLine();
+                    if (MAPINFO.equals(data)) {
+                        continue;
+                    }
+                    if (ENDMAPINFO.equals(data)) {
+                        break;
+                    }
+                    map.setMapStatus(MapStatus.valueOf(data));
+
+                    while (myReader.hasNextLine()) {
+                        data = myReader.nextLine();
+                        if (GAMEINFO.equals(data)) {
+                            continue;
+                        }
+                        if (ENDGAMEINFO.equals(data)) {
+                            break;
+                        }
+//                        readGameInfo(map, data);
+                    }
+
+                    while (myReader.hasNextLine()) {
+                        String tmpData = myReader.nextLine();
+                        if (PLAYERINFO.equals(tmpData)) {
+                            continue;
+                        }
+                        if (ENDPLAYERINFO.equals(tmpData)) {
+                            break;
+                        }
+//                        readGameInfo(map, data);
+
+                        while (myReader.hasNextLine()) {
+                            data = tmpData != null ? tmpData : myReader.nextLine();
+                            tmpData = null;
+                            if (PLAYER.equals(data)) {
+
+                                map.addPlayerLoad(myReader.nextLine(), myReader.nextLine());
+                                continue;
+                            }
+                            if (ENDPLAYER.equals(data)) {
+                                break;
+                            }
+//                            data = myReader.nextLine();
+
+//                        readPlayerInfo(map, data);
+                        }
+                    }
+
+                }
+
+
                 HashMap<String, Tile> tileMap = new HashMap<>();
                 while (myReader.hasNextLine()) {
                     String tileData = myReader.nextLine();

@@ -57,6 +57,7 @@ public class ShowMapInfo implements Command {
         Collections.sort(playerNames);
         for (String value : playerNames) {
             sb.append(index).append(". ").append(value).append(NEW_LINE);
+            index++;
         }
         MessageHelper.replyToMessage(event, sb.toString());
     }
