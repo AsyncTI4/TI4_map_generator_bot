@@ -12,23 +12,29 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 public class RemoveControl extends AddRemoveCC {
     @Override
     void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile) {
-        String planet = event.getOptions().get(2).getAsString().toLowerCase();
-        planet = AliasHandler.resolvePlanet(planet);
-        if (!tile.isSpaceHolderValid(planet)){
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planet + " is not valid and not supported.");
-            return;
-        }
-        for (String color : colors) {
-            String ccID = Mapper.getControlID(color);
-            String ccPath = tile.getCCPath(ccID);
-            if (ccPath == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Control token: " + color + " is not valid and not supported.");
+        String planetInfo = event.getOptions().get(2).getAsString().toLowerCase();
+        planetInfo = planetInfo.replace(" ", "");
+        StringTokenizer planetTokenizer = new StringTokenizer(planetInfo, ",");
+        while (planetTokenizer.hasMoreTokens()) {
+            String planet = planetTokenizer.nextToken();
+            planet = AliasHandler.resolvePlanet(planet);
+            if (!tile.isSpaceHolderValid(planet)) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planet + " is not valid and not supported.");
+                continue;
             }
-            tile.removeControl(ccID, planet);
+            for (String color : colors) {
+                String ccID = Mapper.getControlID(color);
+                String ccPath = tile.getCCPath(ccID);
+                if (ccPath == null) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Control token: " + color + " is not valid and not supported.");
+                }
+                tile.removeControl(ccID, planet);
+            }
         }
     }
 
