@@ -3,7 +3,7 @@ First you need to create map and set active map you modifying.
 To create map use:
 /create_map mapName
 To set active map use:
-/set_map mapName
+/set_map mapName <- Map name can only contain a-z A-Z 0-9 symbols
 /set_map_status mapName status
 status: open or locked
 Status open, means anyone can edit map, can join map as player;
