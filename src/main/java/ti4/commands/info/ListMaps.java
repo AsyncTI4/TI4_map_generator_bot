@@ -29,6 +29,7 @@ public class ListMaps implements Command {
         HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
         String mapNameList = "Map List:\n" + mapList.keySet().stream()
                 .sorted()
+                .map(map -> map + ": " + mapList.get(map).getMapStatus())
                 .collect(Collectors.joining("\n"));
         MessageHelper.replyToMessage(event, mapNameList);
     }

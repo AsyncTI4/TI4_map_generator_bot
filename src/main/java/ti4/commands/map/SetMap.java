@@ -27,7 +27,7 @@ public class SetMap implements Command {
         }
         String mapName = event.getOptions().get(0).getAsString();
         if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-            MessageHelper.replyToMessage(event, "Map with such name does not exists, use /list_maps");
+            MessageHelper.replyToMessage(event, "Map with such name: "+mapName+ " does not exists, use /list_maps");
             return false;
         }
         String userID = event.getUser().getId();

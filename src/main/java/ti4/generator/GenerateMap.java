@@ -160,7 +160,8 @@ public class GenerateMap {
 
     private BufferedImage addCC(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
         HashSet<String> ccList = unitHolder.getCCList();
-        int deltaX = -ccList.size() * 25;
+        int deltaX = 0;//ccList.size() * 20;
+        int deltaY = 0;//ccList.size() * 20;
         for (String ccID : ccList) {
             String ccPath = tile.getCCPath(ccID);
             if (ccPath == null) {
@@ -173,8 +174,9 @@ public class GenerateMap {
                 LoggerHandler.log("Could not parse cc file for: " + ccID, e);
             }
             Point centerPosition = unitHolder.getHolderCenterPosition();
-            graphics.drawImage(image, tileX + centerPosition.x + deltaX, tileY, null);
-            deltaX += 25;
+            graphics.drawImage(image, tileX + 10 + deltaX, tileY + centerPosition.y - 40 + deltaY, null);
+            deltaX += image.getWidth()/5;
+            deltaY += image.getHeight()/4;
         }
         return image;
     }
