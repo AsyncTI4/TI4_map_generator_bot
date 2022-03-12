@@ -188,7 +188,7 @@ public class GenerateMap {
                 continue;
             }
             try {
-                image = resizeImage(ImageIO.read(new File(controlPath)), 0.75f);
+                image = resizeImage(ImageIO.read(new File(controlPath)), 0.85f);
             } catch (Exception e) {
                 LoggerHandler.log("Could not parse control token file for: " + controlID, e);
             }
@@ -217,7 +217,7 @@ public class GenerateMap {
                 bulkUnitCount = unitCount;
             }
 
-            float scaleOfUnit = 0.8f;
+            float scaleOfUnit = 0.9f;
             try {
                 image = resizeImage(ImageIO.read(new File(tile.getUnitPath(unitID))), scaleOfUnit);
             } catch (Exception e) {
