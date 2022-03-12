@@ -149,6 +149,14 @@ public class GenerateMap {
             LoggerHandler.log("Error drawing tile: " + tile.getTileID(), e);
         }
     }
+    private BufferedImage resizeImage(BufferedImage originalImage, float percent) throws IOException {
+        int scaledWidth = (int)(originalImage.getWidth() * percent);
+        int scaledHeight = (int)(originalImage.getHeight() * percent);
+        Image resultingImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_DEFAULT);
+        BufferedImage outputImage = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
+        outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
+        return outputImage;
+    }
 
     private BufferedImage addCC(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
         HashSet<String> ccList = unitHolder.getCCList();
@@ -160,7 +168,7 @@ public class GenerateMap {
                 continue;
             }
             try {
-                image = ImageIO.read(new File(ccPath));
+                image = resizeImage(ImageIO.read(new File(ccPath)), 0.75f);
             } catch (Exception e) {
                 LoggerHandler.log("Could not parse cc file for: " + ccID, e);
             }
@@ -180,7 +188,7 @@ public class GenerateMap {
                 continue;
             }
             try {
-                image = ImageIO.read(new File(controlPath));
+                image = resizeImage(ImageIO.read(new File(controlPath)), 0.75f);
             } catch (Exception e) {
                 LoggerHandler.log("Could not parse control token file for: " + controlID, e);
             }
@@ -209,8 +217,9 @@ public class GenerateMap {
                 bulkUnitCount = unitCount;
             }
 
+            float scaleOfUnit = 0.8f;
             try {
-                image = ImageIO.read(new File(tile.getUnitPath(unitID)));
+                image = resizeImage(ImageIO.read(new File(tile.getUnitPath(unitID))), scaleOfUnit);
             } catch (Exception e) {
                 LoggerHandler.log("Could not parse unit file for: " + unitID, e);
             }
@@ -246,8 +255,13 @@ public class GenerateMap {
                 if (bulkUnitCount != null) {
                     graphics.setFont(Storage.getLargeFont());
                     graphics.setColor(groupUnitColor);
-                    graphics.drawString(Integer.toString(bulkUnitCount), imageX + numberPositionPoint.x, imageY + numberPositionPoint.y);
+                    int scaledNumberPositionX = (int)(numberPositionPoint.x * scaleOfUnit);
+                    int scaledNumberPositionY = (int)(numberPositionPoint.y  * scaleOfUnit);
+                    graphics.drawString(Integer.toString(bulkUnitCount), imageX + scaledNumberPositionX, imageY + scaledNumberPositionY);
                 }
+                graphics.setColor(Color.CYAN);
+                graphics.drawLine(tileX+centerPosition.x-5, tileY+centerPosition.y, tileX+centerPosition.x+5, tileY+centerPosition.y);
+                graphics.drawLine(tileX+centerPosition.x, tileY+centerPosition.y-5, tileX+centerPosition.x, tileY+centerPosition.y+5);
             }
         }
         return image;
