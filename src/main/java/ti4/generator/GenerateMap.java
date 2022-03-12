@@ -242,7 +242,7 @@ public class GenerateMap {
                         searchPosition = false;
                     } else if (degree > 360) {
                         searchPosition = false;
-                        degree += 3;//To chage degree if we did not find place, might be better placement then
+                        degree += 3;//To change degree if we did not find place, might be better placement then
                     }
                     degree += degreeChange;
                     if (!searchPosition) {

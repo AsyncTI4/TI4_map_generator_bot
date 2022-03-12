@@ -13,6 +13,9 @@ import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public class CreateMap implements Command {
 
 
@@ -27,6 +30,13 @@ public class CreateMap implements Command {
             return false;
         }
         String mapName = event.getOptions().get(0).getAsString();
+        String regex = "^[a-zA-Z0-9]+$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(mapName);
+        if (!matcher.matches()){
+            MessageHelper.replyToMessage(event, "Map name can only contain a-z A-Z 0-9 symbols");
+            return false;
+        }
         if (MapManager.getInstance().getMapList().containsKey(mapName)) {
             MessageHelper.replyToMessage(event, "Map with such name exist already, choose different name");
             return false;
