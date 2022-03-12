@@ -259,9 +259,11 @@ public class GenerateMap {
                     int scaledNumberPositionY = (int)(numberPositionPoint.y  * scaleOfUnit);
                     graphics.drawString(Integer.toString(bulkUnitCount), imageX + scaledNumberPositionX, imageY + scaledNumberPositionY);
                 }
-                graphics.setColor(Color.CYAN);
-                graphics.drawLine(tileX+centerPosition.x-5, tileY+centerPosition.y, tileX+centerPosition.x+5, tileY+centerPosition.y);
-                graphics.drawLine(tileX+centerPosition.x, tileY+centerPosition.y-5, tileX+centerPosition.x, tileY+centerPosition.y+5);
+
+                //Center of planets and tile marker
+//                graphics.setColor(Color.CYAN);
+//                graphics.drawLine(tileX+centerPosition.x-5, tileY+centerPosition.y, tileX+centerPosition.x+5, tileY+centerPosition.y);
+//                graphics.drawLine(tileX+centerPosition.x, tileY+centerPosition.y-5, tileX+centerPosition.x, tileY+centerPosition.y+5);
             }
         }
         return image;
