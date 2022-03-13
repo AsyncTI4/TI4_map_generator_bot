@@ -108,20 +108,25 @@ abstract public class AddRemoveUnits implements Command {
             if (unitInfoTokenizer.hasMoreTokens()) {
                 planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
             }
-            if (!tile.isSpaceHolderValid(planetName)){
-                Set<String> unitHolderIDs = new HashSet<>(tile.getUnitHolders().keySet());
-                unitHolderIDs.remove(Constants.SPACE);
-                String finalPlanetName = planetName;
-                List<String> validUnitHolderIDs = unitHolderIDs.stream().filter(unitHolderID -> unitHolderID.startsWith(finalPlanetName))
-                        .collect(Collectors.toList());
-                if (validUnitHolderIDs.size() == 1){
-                    planetName = validUnitHolderIDs.get(0);
-                } else {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planetName + " is not valid and not supported.");
-                }
-            }
+            planetName = getPlanet(event, tile, planetName);
             unitAction(tile, count, planetName, unitID);
         }
+    }
+
+    public static String getPlanet(SlashCommandInteractionEvent event, Tile tile, String planetName) {
+        if (!tile.isSpaceHolderValid(planetName)){
+            Set<String> unitHolderIDs = new HashSet<>(tile.getUnitHolders().keySet());
+            unitHolderIDs.remove(Constants.SPACE);
+            String finalPlanetName = planetName;
+            List<String> validUnitHolderIDs = unitHolderIDs.stream().filter(unitHolderID -> unitHolderID.startsWith(finalPlanetName))
+                    .collect(Collectors.toList());
+            if (validUnitHolderIDs.size() == 1){
+                planetName = validUnitHolderIDs.get(0);
+            } else {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planetName + " is not valid and not supported.");
+            }
+        }
+        return planetName;
     }
 
     abstract protected void unitAction(Tile tile, int count, String planetName, String unitID);
@@ -138,7 +143,7 @@ abstract public class AddRemoveUnits implements Command {
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
                         .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color: red, green etc.")
-                                .setRequired(true))
+                                .setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")

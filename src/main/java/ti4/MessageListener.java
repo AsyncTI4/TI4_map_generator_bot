@@ -1,39 +1,41 @@
 package ti4;
 
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
-import ti4.commands.Command;
-import ti4.commands.CommandManager;
-import ti4.generator.GenerateMap;
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import ti4.commands.Command;
+import ti4.commands.CommandManager;
+import ti4.generator.Mapper;
+import ti4.helpers.Constants;
 import ti4.helpers.LoggerHandler;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.message.MessageHelper;
 
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.URISyntaxException;
-import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.List;
 import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.util.stream.Collectors;
 
 public class MessageListener extends ListenerAdapter {
 
     @Override
-    public void onSlashCommandInteraction(SlashCommandInteractionEvent event)
-    {
+    public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
+        if (event.getFocusedOption().getName().equals(Constants.COLOR)) {
+            String enteredValue = event.getFocusedOption().getValue();
+            List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = Mapper.getColors().stream()
+                    .limit(25)
+                    .filter(color -> color.startsWith(enteredValue))
+                    .map(color -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(color, color))
+                    .collect(Collectors.toList());
+            event.replyChoices(options).queue();
+        }
+    }
+
+    @Override
+    public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
         if (mapManager.isUserWithActiveMap(userID)) {
@@ -50,12 +52,11 @@ public class MessageListener extends ListenerAdapter {
 //        event.deferReply();
         CommandManager commandManager = CommandManager.getInstance();
         for (Command command : commandManager.getCommandList()) {
-            if (command.accept(event))
-            {
+            if (command.accept(event)) {
                 command.logBack(event);
                 try {
                     command.execute(event);
-                } catch (Exception e){
+                } catch (Exception e) {
                     String messageText = "Error trying to execute command: " + command.getActionID();
                     MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
                     LoggerHandler.log(messageText, e);
@@ -63,6 +64,7 @@ public class MessageListener extends ListenerAdapter {
             }
         }
     }
+
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
 //        CommandManager commandManager = CommandManager.getInstance();

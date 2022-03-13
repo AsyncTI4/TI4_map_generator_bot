@@ -71,7 +71,7 @@ public class MoveUnits extends AddRemoveUnits {
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
                         .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color: red, green etc.")
-                                .setRequired(true))
+                                .setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "From System/Tile name")
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")

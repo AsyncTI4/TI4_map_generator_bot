@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -23,25 +24,25 @@ public class RemoveControl extends AddRemoveCC {
         OptionMapping option = event.getOption(Constants.PLANET_NAME);
         if (option != null) {
             String planetInfo = option.getAsString().toLowerCase();
-            addControlToken(event, colors, tile, planetInfo);
+            removeControlToken(event, colors, tile, planetInfo);
         } else {
             Set<String> unitHolderIDs = tile.getUnitHolders().keySet();
             if (unitHolderIDs.size() == 2) {
                 HashSet<String> unitHolder = new HashSet<>(unitHolderIDs);
                 unitHolder.remove(Constants.SPACE);
-                addControlToken(event, colors, tile, unitHolder.iterator().next());
+                removeControlToken(event, colors, tile, unitHolder.iterator().next());
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Multiple planets present in system, need to specify planet.");
             }
         }
     }
 
-    private void addControlToken(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, String planetInfo) {
+    private void removeControlToken(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, String planetInfo) {
         planetInfo = planetInfo.replace(" ", "");
         StringTokenizer planetTokenizer = new StringTokenizer(planetInfo, ",");
         while (planetTokenizer.hasMoreTokens()) {
             String planet = planetTokenizer.nextToken();
-            planet = AliasHandler.resolvePlanet(planet);
+            planet = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planet));
             if (!tile.isSpaceHolderValid(planet)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planet + " is not valid and not supported.");
                 continue;
@@ -76,7 +77,7 @@ public class RemoveControl extends AddRemoveCC {
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
                         .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color: red, green etc.")
-                                .setRequired(true))
+                                .setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PLANET_NAME, "Planet name")

@@ -4,10 +4,11 @@ import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.LoggerHandler;
 
-import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
@@ -65,6 +66,13 @@ public class Mapper {
     public static String getControlID(String color) {
         String property = colors.getProperty(color);
         return cc_tokens.get("control") + property + ".png";
+    }
+
+    public static List<String> getColors() {
+        return colors.keySet().stream().filter(color -> color instanceof String)
+                .map(color -> (String) color)
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     public static String getTilesList()

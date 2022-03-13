@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -45,7 +46,7 @@ public class AddControl extends AddRemoveCC {
         StringTokenizer planetTokenizer = new StringTokenizer(planetInfo, ",");
         while (planetTokenizer.hasMoreTokens()) {
             String planet = planetTokenizer.nextToken();
-            planet = AliasHandler.resolvePlanet(planet);
+            planet = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planet));
             if (!tile.isSpaceHolderValid(planet)) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planet + " is not valid and not supported.");
                 continue;
@@ -79,7 +80,7 @@ public class AddControl extends AddRemoveCC {
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
                         .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color: red, green etc.")
-                                .setRequired(true))
+                                .setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PLANET_NAME, "Planet name"))

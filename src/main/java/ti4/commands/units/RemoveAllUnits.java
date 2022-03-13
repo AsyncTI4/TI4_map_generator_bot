@@ -31,7 +31,7 @@ public class RemoveAllUnits extends AddRemoveUnits {
         commands.addCommands(
                 Commands.slash(getActionID(), "Remove units from map")
                         .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color: red, green etc.")
-                                .setRequired(true))
+                                .setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
         );
