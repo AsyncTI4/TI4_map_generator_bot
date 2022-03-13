@@ -20,7 +20,11 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 abstract public class AddRemoveUnits implements Command {
 
@@ -105,7 +109,16 @@ abstract public class AddRemoveUnits implements Command {
                 planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
             }
             if (!tile.isSpaceHolderValid(planetName)){
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planetName + " is not valid and not supported.");
+                Set<String> unitHolderIDs = new HashSet<>(tile.getUnitHolders().keySet());
+                unitHolderIDs.remove(Constants.SPACE);
+                String finalPlanetName = planetName;
+                List<String> validUnitHolderIDs = unitHolderIDs.stream().filter(unitHolderID -> unitHolderID.startsWith(finalPlanetName))
+                        .collect(Collectors.toList());
+                if (validUnitHolderIDs.size() == 1){
+                    planetName = validUnitHolderIDs.get(0);
+                } else {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planetName + " is not valid and not supported.");
+                }
             }
             unitAction(tile, count, planetName, unitID);
         }

@@ -11,23 +11,35 @@ import java.net.URL;
 
 public class Storage {
 
-    private static Font TI_FONT = null;
-    private static Font TI_FONT_LARGE = null;
+    public static final String MAPS_UNDO = "/maps/undo/";
+    public static final String MAPS = "/maps/";
+    public static final String DELETED_MAPS = "/deletedmaps/";
+    private static Font TI_FONT_20 = null;
+    private static Font TI_FONT_26 = null;
+    private static Font TI_FONT_32 = null;
 
-    public static Font getFont() {
-        if (TI_FONT != null) {
-            return TI_FONT;
+    public static Font getFont20() {
+        if (TI_FONT_20 != null) {
+            return TI_FONT_20;
         }
-        TI_FONT = getFont(20f);
-        return TI_FONT;
+        TI_FONT_20 = getFont(20f);
+        return TI_FONT_20;
     }
 
-    public static Font getLargeFont() {
-        if (TI_FONT_LARGE != null) {
-            return TI_FONT_LARGE;
+    public static Font getFont26() {
+        if (TI_FONT_26 != null) {
+            return TI_FONT_26;
         }
-        TI_FONT_LARGE = getFont(26f);
-        return TI_FONT_LARGE;
+        TI_FONT_26 = getFont(26f);
+        return TI_FONT_26;
+    }
+
+    public static Font getFont32() {
+        if (TI_FONT_32 != null) {
+            return TI_FONT_32;
+        }
+        TI_FONT_32 = getFont(32f);
+        return TI_FONT_32;
     }
 
     private static Font getFont(float size) {
@@ -45,17 +57,31 @@ public class Storage {
     }
 
     @CheckForNull
+    public static File getMapUndoStorage(String mapName) {
+        URL resource = getURL("Could not find temp directories");
+        if (resource == null) return null;
+        return new File(getPath(resource) + MAPS_UNDO + mapName);
+    }
+
+    @CheckForNull
+    public static File getMapUndoDirectory() {
+        URL resource = getURL("Could not find temp directories");
+        if (resource == null) return null;
+        return new File(getPath(resource) + MAPS_UNDO);
+    }
+
+    @CheckForNull
     public static File getMapImageStorage(String mapName) {
         URL resource = getURL("Could not find temp directories");
         if (resource == null) return null;
-        return new File(getPath(resource) + "/maps/" + mapName);
+        return new File(getPath(resource) + MAPS + mapName);
     }
 
     @CheckForNull
     public static File getMapImageDirectory() {
         URL resource = getURL("Could not find temp directories");
         if (resource == null) return null;
-        return new File(getPath(resource) + "/maps/");
+        return new File(getPath(resource) + MAPS);
     }
 
     @Nullable
@@ -72,20 +98,20 @@ public class Storage {
     public static File getMapStorage(String mapName) {
         URL resource = getURL("Could not find temp directories for maps");
         if (resource == null) return null;
-        return new File(getPath(resource) + "/maps/" + mapName);
+        return new File(getPath(resource) + MAPS + mapName);
     }
 
     @CheckForNull
     public static File getDeletedMapStorage(String mapName) {
         URL resource = getURL("Could not find temp directories for maps");
         if (resource == null) return null;
-        return new File(getPath(resource) + "/deletedmaps/" + mapName);
+        return new File(getPath(resource) + DELETED_MAPS + mapName);
     }
 
     public static void init() {
         URL resource = getURL("Could not find temp directories for maps");
-        createDirectory(resource, "/deletedmaps/");
-        createDirectory(resource, "/maps/");
+        createDirectory(resource, DELETED_MAPS);
+        createDirectory(resource, MAPS);
     }
 
     private static void createDirectory(URL resource, String directoryName) {

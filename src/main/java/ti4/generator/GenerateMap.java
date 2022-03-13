@@ -123,7 +123,7 @@ public class GenerateMap {
             int tileY = positionPoint.y;
             graphics.drawImage(image, tileX, tileY, null);
 
-            graphics.setFont(Storage.getFont());
+            graphics.setFont(Storage.getFont20());
             graphics.setColor(Color.WHITE);
             graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x, tileY + tilePositionPoint.y);
 
@@ -169,7 +169,7 @@ public class GenerateMap {
                 continue;
             }
             try {
-                image = resizeImage(ImageIO.read(new File(ccPath)), 0.75f);
+                image = resizeImage(ImageIO.read(new File(ccPath)), 0.85f);
             } catch (Exception e) {
                 LoggerHandler.log("Could not parse cc file for: " + ccID, e);
             }
@@ -255,7 +255,7 @@ public class GenerateMap {
                 int imageY = tileY + centerPosition.y + y - (image.getHeight() / 2);
                 graphics.drawImage(image, imageX, imageY, null);
                 if (bulkUnitCount != null) {
-                    graphics.setFont(Storage.getLargeFont());
+                    graphics.setFont(Storage.getFont26());
                     graphics.setColor(groupUnitColor);
                     int scaledNumberPositionX = (int)(numberPositionPoint.x * scaleOfUnit);
                     int scaledNumberPositionY = (int)(numberPositionPoint.y  * scaleOfUnit);

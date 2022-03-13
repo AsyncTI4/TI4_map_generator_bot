@@ -54,3 +54,12 @@ ws, 6 ff, sd quann, 3 inf quann, mech quann <- warsun and 6 fighters added into 
 Standard fields to add tile/system, unit list same as add, remove, and we have optional field addCC, type anything in to not add cc into moved system
 Example:
 /move_units pink quann 2 dn, dd, gf, gf quann wellon 2 dn, dd, 2 gf wellon
+
+now: add_units, remove_units, move_units command, for planet name, you can use short of existing planet
+example
+Arnor/Lor, can use a and l, or ar or arno, or lo
+Sakulag/Lazar example: s and l, or sa and la
+Abyz/Fria like a and f etc
+so you don't need full name, can use first letter or few first letters, if system with same starting letter like
+Tequran/Torkan, can use te and to 🙂
+hope helps speed things up

@@ -3,7 +3,10 @@ package ti4;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.api.utils.ChunkingFilter;
+import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import ti4.commands.*;
 import ti4.commands.info.*;
 import ti4.commands.map.*;
@@ -30,9 +33,9 @@ public class MapGenerator {
             throws LoginException {
 
         jda = JDABuilder.createDefault(args[0])
-//                .enableIntents(GatewayIntent.GUILD_MEMBERS)
-//                .setMemberCachePolicy(MemberCachePolicy.ALL)
-//                .setChunkingFilter(ChunkingFilter.ALL)
+                .enableIntents(GatewayIntent.GUILD_MEMBERS)
+                .setMemberCachePolicy(MemberCachePolicy.ALL)
+                .setChunkingFilter(ChunkingFilter.ALL)
 //                .enableIntents(Arrays.asList(GatewayIntent.values()))
                 .build();
 //        jda = JDABuilder.createLight(args[0], Collections.emptyList())
