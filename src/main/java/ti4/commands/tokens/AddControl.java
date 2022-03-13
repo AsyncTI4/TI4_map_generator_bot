@@ -1,6 +1,7 @@
 package ti4.commands.tokens;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -12,12 +13,34 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class AddControl extends AddRemoveCC {
     @Override
     void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile) {
-        String planetInfo = event.getOptions().get(2).getAsString().toLowerCase();
+        OptionMapping option = event.getOption(Constants.PLANET_NAME);
+        if (option != null) {
+            String planetInfo = option.getAsString().toLowerCase();
+            addControlToken(event, colors, tile, planetInfo);
+        } else {
+            Set<String> unitHolderIDs = tile.getUnitHolders().keySet();
+            if (unitHolderIDs.size() == 2){
+                HashSet<String> unitHolder = new HashSet<>(unitHolderIDs);
+                unitHolder.remove(Constants.SPACE);
+                addControlToken(event, colors, tile, unitHolder.iterator().next());
+            } else {
+                String message = "Multiple planets present in system, need to specify planet.";
+                if (unitHolderIDs.size() == 1){
+                    message = "No planets present in system.";
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            }
+        }
+    }
+
+    private void addControlToken(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, String planetInfo) {
         planetInfo = planetInfo.replace(" ", "");
         StringTokenizer planetTokenizer = new StringTokenizer(planetInfo, ",");
         while (planetTokenizer.hasMoreTokens()) {
@@ -59,8 +82,7 @@ public class AddControl extends AddRemoveCC {
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.PLANET_NAME, "Planet name")
-                                .setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.PLANET_NAME, "Planet name"))
         );
     }
 }
