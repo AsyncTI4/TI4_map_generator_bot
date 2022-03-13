@@ -24,6 +24,7 @@ import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,6 +34,18 @@ public class MessageListener extends ListenerAdapter {
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event)
     {
+        String userID = event.getUser().getId();
+        MapManager mapManager = MapManager.getInstance();
+        if (mapManager.isUserWithActiveMap(userID)) {
+            String channelName = event.getChannel().getName();
+            Map userActiveMap = mapManager.getUserActiveMap(userID);
+            Set<String> mapList = mapManager.getMapList().keySet();
+            if (mapList.stream().anyMatch(channelName::startsWith) && !channelName.startsWith(userActiveMap.getName())) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Active map reset. Channel name indicates to have map associated with it. Please select correct active map or do action in neutral channel");
+                mapManager.resetMapForUser(userID);
+            }
+        }
+
         //noinspection ResultOfMethodCallIgnored
 //        event.deferReply();
         CommandManager commandManager = CommandManager.getInstance();

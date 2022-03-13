@@ -48,6 +48,10 @@ public class MapManager {
         return false;
     }
 
+    public void resetMapForUser(String userID) {
+        setMapForUser.remove(userID);
+    }
+
     public boolean isUserWithActiveMap(String userID) {
         return setMapForUser.containsKey(userID);
     }
