@@ -34,8 +34,8 @@ public class MessageListener extends ListenerAdapter {
         } else if (event.getFocusedOption().getName().equals(Constants.TOKEN)) {
             String enteredValue = event.getFocusedOption().getValue();
             List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = Mapper.getTokens().stream()
+                    .filter(token -> token.contains(enteredValue))
                     .limit(25)
-                    .filter(token -> token.startsWith(enteredValue))
                     .map(token -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(token, token))
                     .collect(Collectors.toList());
             event.replyChoices(options).queue();

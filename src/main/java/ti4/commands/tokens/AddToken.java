@@ -27,20 +27,20 @@ public class AddToken extends AddRemoveToken {
             String tokenName = option.getAsString().toLowerCase();
             tokenName = AliasHandler.resolveAttachment(tokenName);
 
-            String tokenID = Mapper.getAttachmentID(tokenName);
-            String tokenPath = tile.getAttachmentPath(tokenID);
+            String tokenFileName = Mapper.getAttachmentID(tokenName);
+            String tokenPath = tile.getAttachmentPath(tokenFileName);
             if (tokenPath != null) {
-                addToken(event, tile, tokenID, true);
+                addToken(event, tile, tokenFileName, true);
             } else {
                 tokenName = AliasHandler.resolveToken(tokenName);
-                tokenID = Mapper.getTokenID(tokenName);
-                tokenPath = tile.getTokenPath(tokenID);
+                tokenFileName = Mapper.getTokenID(tokenName);
+                tokenPath = tile.getTokenPath(tokenFileName);
 
                 if (tokenPath == null) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Token: " + tokenName + " is not valid");
                     return;
                 }
-                addToken(event, tile, tokenID, false);
+                addToken(event, tile, tokenFileName, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName));
             }
         }
         else {

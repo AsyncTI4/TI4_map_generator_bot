@@ -21,6 +21,7 @@ public class Mapper {
     private static final Properties cc_tokens = new Properties();
     private static final Properties attachment_tokens = new Properties();
     private static final Properties tokens = new Properties();
+    private static final Properties special_case = new Properties();
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
@@ -29,6 +30,7 @@ public class Mapper {
         readData("cc_tokens.properties", cc_tokens, "Could not read cc token name file");
         readData("attachments.properties", attachment_tokens, "Could not read attachment token name file");
         readData("tokens.properties", tokens, "Could not read token name file");
+        readData("special_case.properties", special_case, "Could not read token name file");
     }
 
     private static void readData(String propertyFileName, Properties colors, String s) {
@@ -48,6 +50,11 @@ public class Mapper {
 
     public static String getColorID(String color){
         return colors.getProperty(color);
+    }
+
+    public static String getSpecialCaseValues(String id){
+        String property = special_case.getProperty(id);
+        return property != null ? property : "";
     }
 
     public static String getTileID(String tileID) {

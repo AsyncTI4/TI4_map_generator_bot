@@ -63,4 +63,5 @@ public class Constants {
     public static final int SPACE_RADIUS = 115;
     public static final int RADIUS = 45;
     public static final Point SPACE_CENTER_POSITION = new Point(172,150);
+    public static final String PLANET = "planet";
 }
