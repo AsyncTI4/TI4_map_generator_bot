@@ -64,6 +64,6 @@ so you don't need full name, can use first letter or few first letters, if syste
 Tequran/Torkan, can use te and to 🙂
 hope helps speed things up
 
-/add_token system/tile tokenName planetNameOptional <- same as add control counter, specify token and planet name is optional
-/remove_token system/tile tokenName planetNameOptional <- same as add control counter, specify token and planet name is optional
+/add_token tokenName system/tile planetNameOptional <- same as add control counter, specify token and planet name is optional
+/remove_token tokenName system/tile planetNameOptional <- same as add control counter, specify token and planet name is optional
 Attachement tokens can only be added to planets

@@ -199,7 +199,7 @@ public class GenerateMap {
             if (unitHolder.getTokenList().isEmpty()) {
                 graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - (image.getHeight() / 2), null);
             } else {
-                graphics.drawImage(image, tileX + centerPosition.x + (image.getWidth() / 2), tileY + centerPosition.y + (image.getHeight() / 2), null);
+                graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 4), tileY + centerPosition.y - (image.getHeight() / 4), null);
             }
         }
         return image;
