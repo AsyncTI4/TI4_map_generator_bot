@@ -8,7 +8,7 @@ import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
 
-public class RemoveCC extends AddRemoveCC {
+public class RemoveCC extends AddRemoveToken {
     @Override
     void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile) {
         for (String color : colors) {

@@ -139,8 +139,9 @@ public class GenerateMap {
             int degree;
             int degreeChange = 5;
             for (UnitHolder unitHolder : unitHolders) {
-                degree = 45;
+                degree = 180;
                 image = addControl(tile, image, tileX, tileY, unitHolder);
+                image = addToken(tile, image, tileX, tileY, unitHolder);
                 int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
                 image = addUnits(tile, image, tileX, tileY, rectangles, degree, degreeChange, unitHolder, radius);
             }
@@ -195,7 +196,38 @@ public class GenerateMap {
                 LoggerHandler.log("Could not parse control token file for: " + controlID, e);
             }
             Point centerPosition = unitHolder.getHolderCenterPosition();
-            graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - (image.getHeight() / 2), null);
+            if (unitHolder.getTokenList().isEmpty()) {
+                graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - (image.getHeight() / 2), null);
+            } else {
+                graphics.drawImage(image, tileX + centerPosition.x + (image.getWidth() / 2), tileY + centerPosition.y + (image.getHeight() / 2), null);
+            }
+        }
+        return image;
+    }
+
+    private BufferedImage addToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
+        HashSet<String> tokenList = unitHolder.getTokenList();
+        int deltaY = 0;
+        int deltaYFirst = 0;
+        boolean first = tokenList.size() > 1;
+        for (String tokenID : tokenList) {
+            String tokenPath = tile.getTokenPath(tokenID);
+            if (tokenPath == null) {
+                LoggerHandler.log("Could not parse token file for: " + tokenID);
+                continue;
+            }
+            try {
+                image = resizeImage(ImageIO.read(new File(tokenPath)), 0.85f);
+                if (first){
+                    first = false;
+                    deltaYFirst = image.getHeight();
+                }
+            } catch (Exception e) {
+                LoggerHandler.log("Could not parse control token file for: " + tokenID, e);
+            }
+            Point centerPosition = unitHolder.getHolderCenterPosition();
+            graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - deltaYFirst + deltaY - (image.getHeight() / 2), null);
+            deltaY += image.getHeight();
         }
         return image;
     }

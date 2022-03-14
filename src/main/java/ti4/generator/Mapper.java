@@ -7,7 +7,6 @@ import ti4.helpers.LoggerHandler;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
@@ -18,12 +17,16 @@ public class Mapper {
     private static final Properties units = new Properties();
     private static final Properties colors = new Properties();
     private static final Properties cc_tokens = new Properties();
+    private static final Properties attachment_tokens = new Properties();
+    private static final Properties tokens = new Properties();
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
         readData("units.properties", units, "Could not read unit name file");
         readData("color.properties", colors, "Could not read color name file");
-        readData("cc_tokens.properties", cc_tokens, "Could not read token name file");
+        readData("cc_tokens.properties", cc_tokens, "Could not read cc token name file");
+        readData("attachments.properties", attachment_tokens, "Could not read attachment token name file");
+        readData("tokens.properties", tokens, "Could not read token name file");
     }
 
     private static void readData(String propertyFileName, Properties colors, String s) {
@@ -61,6 +64,14 @@ public class Mapper {
     public static String getCCID(String color) {
         String property = colors.getProperty(color);
         return cc_tokens.get("cc") + property + ".png";
+    }
+
+    public static String getAttachmentID(String tokenID) {
+        return attachment_tokens.getProperty(tokenID);
+    }
+
+    public static String getTokenID(String tokenID) {
+        return tokens.getProperty(tokenID);
     }
 
     public static String getControlID(String color) {

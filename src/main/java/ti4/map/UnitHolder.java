@@ -12,6 +12,7 @@ abstract public class UnitHolder {
     private final HashMap<String, Integer> units = new HashMap<>();
     private final HashSet<String> ccList = new HashSet<>();
     private final HashSet<String> controlList = new HashSet<>();
+    private final HashSet<String> tokenList = new HashSet<>();
     private Point holderCenterPosition;
 
     private String name;
@@ -54,6 +55,13 @@ abstract public class UnitHolder {
         controlList.remove(cc);
     }
 
+    public void addToken(String cc) {
+        tokenList.add(cc);
+    }
+    public void removeToken(String cc) {
+        tokenList.remove(cc);
+    }
+
     public void removeAllCC() {
         ccList.clear();
     }
@@ -83,6 +91,10 @@ abstract public class UnitHolder {
 
     public HashSet<String> getCCList() {
         return ccList;
+    }
+
+    public HashSet<String> getTokenList() {
+        return tokenList;
     }
 
     public HashSet<String> getControlList() {

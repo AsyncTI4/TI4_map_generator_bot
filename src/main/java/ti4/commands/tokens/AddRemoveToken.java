@@ -1,6 +1,7 @@
 package ti4.commands.tokens;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -18,10 +19,9 @@ import ti4.message.MessageHelper;
 
 import java.io.File;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.StringTokenizer;
 
-abstract public class AddRemoveCC implements Command {
+abstract public class AddRemoveToken implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -30,40 +30,48 @@ abstract public class AddRemoveCC implements Command {
         if (!mapManager.isUserWithActiveMap(userID)) {
             MessageHelper.replyToMessage(event, "Set your active map using: /set_map mapname");
         } else {
-            String colorString = event.getOptions().get(0).getAsString().toLowerCase();
-            colorString = colorString.replace(" ", "");
-            StringTokenizer colorTokenizer = new StringTokenizer(colorString, ",");
+            OptionMapping option = event.getOption(Constants.COLOR);
             ArrayList<String> colors = new ArrayList<>();
-            while (colorTokenizer.hasMoreTokens()){
-                String color = colorTokenizer.nextToken();
-                if (!colors.contains(color)) {
-                    colors.add(color);
-                    if (!Mapper.isColorValid(color)) {
-                        MessageHelper.replyToMessage(event, "Color not valid: " + color);
-                        return;
+            if (option != null) {
+                String colorString = option.getAsString().toLowerCase();
+                colorString = colorString.replace(" ", "");
+                StringTokenizer colorTokenizer = new StringTokenizer(colorString, ",");
+                while (colorTokenizer.hasMoreTokens()) {
+                    String color = colorTokenizer.nextToken();
+                    if (!colors.contains(color)) {
+                        colors.add(color);
+                        if (!Mapper.isColorValid(color)) {
+                            MessageHelper.replyToMessage(event, "Color not valid: " + color);
+                            return;
+                        }
                     }
                 }
             }
-            String tileID = AliasHandler.resolveTile(event.getOptions().get(1).getAsString().toLowerCase());
-            Map activeMap = mapManager.getUserActiveMap(userID);
-            if (activeMap.isTileDuplicated(tileID)){
-                MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
-                return;
-            }
-            Tile tile = activeMap.getTile(tileID);
-            if (tile == null){
-                tile = activeMap.getTileByPostion(tileID);
-            }
-            if (tile == null) {
-                MessageHelper.replyToMessage(event, "Tile in map not found");
-                return;
-            }
+            OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
+            if (tileOption != null) {
+                String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
+                Map activeMap = mapManager.getUserActiveMap(userID);
+                if (activeMap.isTileDuplicated(tileID)) {
+                    MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
+                    return;
+                }
+                Tile tile = activeMap.getTile(tileID);
+                if (tile == null) {
+                    tile = activeMap.getTileByPostion(tileID);
+                }
+                if (tile == null) {
+                    MessageHelper.replyToMessage(event, "Tile in map not found");
+                    return;
+                }
 
-            parsingForTile(event, colors, tile);
-            MapSaveLoadManager.saveMap(activeMap);
+                parsingForTile(event, colors, tile);
+                MapSaveLoadManager.saveMap(activeMap);
 
-            File file = GenerateMap.getInstance().saveImage(activeMap);
-            MessageHelper.replyToMessage(event, file);
+                File file = GenerateMap.getInstance().saveImage(activeMap);
+                MessageHelper.replyToMessage(event, file);
+            } else {
+                MessageHelper.replyToMessage(event, "Tile needs to be specified.");
+            }
         }
     }
 
@@ -83,6 +91,7 @@ abstract public class AddRemoveCC implements Command {
                                 .setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.PLANET_NAME, "Planet name"))
         );
     }
 

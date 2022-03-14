@@ -119,7 +119,7 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
             HashMap<String, Integer> units = unitHolder.getUnits();
             for (java.util.Map.Entry<String, Integer> entry : units.entrySet()) {
-                writer.write(entry.getKey() + " " + Integer.toString(entry.getValue()));
+                writer.write(entry.getKey() + " " + entry.getValue());
                 writer.write(System.lineSeparator());
             }
             writer.write(ENDUNITS);
@@ -134,6 +134,11 @@ public class MapSaveLoadManager {
 
             for (String controlID : unitHolder.getControlList()) {
                 writer.write(controlID);
+                writer.write(System.lineSeparator());
+            }
+
+            for (String tokenID : unitHolder.getTokenList()) {
+                writer.write(tokenID);
                 writer.write(System.lineSeparator());
             }
             writer.write(PLANET_ENDTOKENS);
@@ -345,8 +350,10 @@ public class MapSaveLoadManager {
             String token = tokenizer.nextToken();
             if (token.startsWith(Constants.COMMAND)) {
                 tile.addCC(token);
-            }else if (token.startsWith(Constants.CONTROL)) {
+            } else if (token.startsWith(Constants.CONTROL)) {
                 tile.addControl(token, unitHolderName);
+            } else {
+                tile.addToken(token, unitHolderName);
             }
         }
     }

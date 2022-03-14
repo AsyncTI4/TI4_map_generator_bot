@@ -14,6 +14,8 @@ public class AliasHandler {
     private static ArrayList<String> planetList = new ArrayList<>();
     private static HashMap<String, String> planetAliasList = new HashMap<>();
     private static HashMap<String, String> cctokenAliasList = new HashMap<>();
+    private static HashMap<String, String> attachmentAliasList = new HashMap<>();
+    private static HashMap<String, String> tokenAliasList = new HashMap<>();
 
     public static void init()
     {
@@ -23,6 +25,8 @@ public class AliasHandler {
         readAliasFile("planet_alias.properties", planetList, true);
         readAliasFile("planet_alias.properties", planetAliasList, "Could not read planet alias file");
         readAliasFile("cc_token_alias.properties", cctokenAliasList, "Could not read cc token alias file");
+        readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
+        readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
     }
     private static void readAliasFile(String fileName, ArrayList<String> list) {
         readAliasFile(fileName, list, false);
@@ -97,6 +101,12 @@ public class AliasHandler {
     }
 
     public static String resolvePlanet(String name)
+    {
+        String aliasID = planetAliasList.get(name);
+        return aliasID != null ? aliasID : name;
+    }
+
+    public static String resolveAttachment(String name)
     {
         String aliasID = planetAliasList.get(name);
         return aliasID != null ? aliasID : name;

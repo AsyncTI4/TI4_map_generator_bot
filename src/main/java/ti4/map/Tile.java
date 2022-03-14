@@ -62,6 +62,29 @@ public class Tile {
         return ccPath;
     }
 
+    @CheckForNull
+    public String getAttachmentPath(String tokenID) {
+        String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
+        if (tokenPath == null) {
+            LoggerHandler.log("Could not find attachment token: " + tokenID);
+            return null;
+        }
+        return tokenPath;
+    }
+
+    @CheckForNull
+    public String getTokenPath(String tokenID) {
+        String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
+        if (tokenPath == null) {
+            tokenPath = ResourceHelper.getInstance().getTokenFile(tokenID);
+            if (tokenPath == null) {
+                LoggerHandler.log("Could not find token: " + tokenID);
+                return null;
+            }
+        }
+        return tokenPath;
+    }
+
     public boolean isSpaceHolderValid(String spaceHolder) {
         return unitHolders.get(spaceHolder) != null;
     }
@@ -86,10 +109,23 @@ public class Tile {
             unitHolder.addControl(ccID);
         }
     }
-    public void removeControl(String ccID, String spaceHolder) {
+    public void removeControl(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
-            unitHolder.removeControl(ccID);
+            unitHolder.removeControl(tokenID);
+        }
+    }
+
+    public void addToken(String tokenID, String spaceHolder) {
+        UnitHolder unitHolder = unitHolders.get(spaceHolder);
+        if (unitHolder != null) {
+            unitHolder.addToken(tokenID);
+        }
+    }
+    public void removeToken(String tokenID, String spaceHolder) {
+        UnitHolder unitHolder = unitHolders.get(spaceHolder);
+        if (unitHolder != null) {
+            unitHolder.removeToken(tokenID);
         }
     }
 

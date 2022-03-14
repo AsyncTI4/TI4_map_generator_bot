@@ -28,6 +28,7 @@ public class Constants {
     public static final String TILE_NAME_TO = "tile_name_to";
     public static final String HELP = "help";
     public static final String PLANET_NAME = "planet_name";
+    public static final String TOKEN = "token";
     public static final String TILE_LIST = "tile_list";
     public static final String UNIT_NAMES = "unit_names";
     public static final String UNIT_NAMES_TO = "unit_names_to";
@@ -36,6 +37,8 @@ public class Constants {
     public static final String ADD_CC = "add_cc";
     public static final String CC = "cc";
     public static final String ADD_CONTROL = "add_control";
+    public static final String ADD_TOKEN = "add_token";
+    public static final String REMOVE_TOKEN = "remove_token";
     public static final String REMOVE_CC = "remove_cc";
     public static final String REMOVE_CONTROL = "remove_control";
     public static final String REMOVE_ALL_CC = "remove_all_cc";

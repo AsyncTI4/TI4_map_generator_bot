@@ -91,6 +91,8 @@ public class MapGenerator {
         commandManager.addCommand(new Leave());
         commandManager.addCommand(new ShowMapInfo());
         commandManager.addCommand(new ListPlanets());
+        commandManager.addCommand(new RemoveToken());
+        commandManager.addCommand(new AddToken());
 
 
         commandManager.addCommand(new HelpAction());

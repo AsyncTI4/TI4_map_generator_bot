@@ -16,6 +16,8 @@ public class ResourceHelper {
     private HashMap<String, String> unitCache = new HashMap<>();
     private HashMap<String, String> tileCache = new HashMap<>();
     private HashMap<String, String> ccCache = new HashMap<>();
+    private HashMap<String, String> attachmentCache = new HashMap<>();
+    private HashMap<String, String> tokenCache = new HashMap<>();
 
     private ResourceHelper() {
     }
@@ -82,6 +84,32 @@ public class ResourceHelper {
         String cc = getResourceFromFolder("command_token/", name, "Could not find command token file");
         ccCache.put(name, cc);
         return cc;
+    }
+
+    @CheckForNull
+    public String getAttachmentFile(String name)
+    {
+        String tokenPath = attachmentCache.get(name);
+        if (tokenPath != null)
+        {
+            return tokenPath;
+        }
+        String token = getResourceFromFolder("attachment_token/", name, "Could not find attachment token file");
+        attachmentCache.put(name, token);
+        return token;
+    }
+
+    @CheckForNull
+    public String getTokenFile(String name)
+    {
+        String tokenPath = tokenCache.get(name);
+        if (tokenPath != null)
+        {
+            return tokenPath;
+        }
+        String token = getResourceFromFolder("tokens/", name, "Could not find token file");
+        tokenCache.put(name, token);
+        return token;
     }
 
     @Nullable

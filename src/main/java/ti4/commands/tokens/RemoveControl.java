@@ -18,7 +18,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.StringTokenizer;
 
-public class RemoveControl extends AddRemoveCC {
+public class RemoveControl extends AddRemoveToken {
     @Override
     void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile) {
         OptionMapping option = event.getOption(Constants.PLANET_NAME);
@@ -59,7 +59,6 @@ public class RemoveControl extends AddRemoveCC {
         }
     }
 
-
     @Override
     protected String getActionDescription() {
         return "Remove control token to planet";
@@ -68,20 +67,5 @@ public class RemoveControl extends AddRemoveCC {
     @Override
     public String getActionID() {
         return Constants.REMOVE_CONTROL;
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        // Moderation commands with required options
-        commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color: red, green etc.")
-                                .setRequired(true).setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.PLANET_NAME, "Planet name")
-                                .setRequired(true))
-        );
     }
 }
