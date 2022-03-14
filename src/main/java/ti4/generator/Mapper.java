@@ -7,10 +7,12 @@ import ti4.helpers.LoggerHandler;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.Properties;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 public class Mapper {
     private static final Properties tiles = new Properties();
@@ -82,6 +84,14 @@ public class Mapper {
     public static List<String> getColors() {
         return colors.keySet().stream().filter(color -> color instanceof String)
                 .map(color -> (String) color)
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public static List<String> getTokens() {
+        return Stream.of(attachment_tokens.keySet(), tokens.keySet()).flatMap(Collection::stream)
+                .filter(token -> token instanceof String)
+                .map(token -> (String) token)
                 .sorted()
                 .collect(Collectors.toList());
     }
