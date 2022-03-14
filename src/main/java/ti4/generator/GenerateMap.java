@@ -150,9 +150,10 @@ public class GenerateMap {
             LoggerHandler.log("Error drawing tile: " + tile.getTileID(), e);
         }
     }
+
     private BufferedImage resizeImage(BufferedImage originalImage, float percent) throws IOException {
-        int scaledWidth = (int)(originalImage.getWidth() * percent);
-        int scaledHeight = (int)(originalImage.getHeight() * percent);
+        int scaledWidth = (int) (originalImage.getWidth() * percent);
+        int scaledHeight = (int) (originalImage.getHeight() * percent);
         Image resultingImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_DEFAULT);
         BufferedImage outputImage = new BufferedImage(scaledWidth, scaledHeight, BufferedImage.TYPE_INT_ARGB);
         outputImage.getGraphics().drawImage(resultingImage, 0, 0, null);
@@ -176,8 +177,8 @@ public class GenerateMap {
             }
             Point centerPosition = unitHolder.getHolderCenterPosition();
             graphics.drawImage(image, tileX + 10 + deltaX, tileY + centerPosition.y - 40 + deltaY, null);
-            deltaX += image.getWidth()/5;
-            deltaY += image.getHeight()/4;
+            deltaX += image.getWidth() / 5;
+            deltaY += image.getHeight() / 4;
         }
         return image;
     }
@@ -210,6 +211,8 @@ public class GenerateMap {
         int deltaY = 0;
         int deltaYFirst = 0;
         boolean first = tokenList.size() > 1;
+        boolean useOffset = Mapper.getSpecialCaseValues(Constants.POSITION).contains(tile.getTileID());
+        int offSet = 0;
         for (String tokenID : tokenList) {
             String tokenPath = tile.getTokenPath(tokenID);
             if (tokenPath == null) {
@@ -218,16 +221,29 @@ public class GenerateMap {
             }
             try {
                 image = resizeImage(ImageIO.read(new File(tokenPath)), 0.85f);
-                if (first){
+                if (first) {
                     first = false;
                     deltaYFirst = image.getHeight();
+                }
+                if (useOffset) {
+                    if (offSet == 0) {
+                        offSet = -image.getHeight() / 2 - 25;
+                    } else if (offSet < 0) {
+                        offSet = image.getHeight() + 25;
+                    }
                 }
             } catch (Exception e) {
                 LoggerHandler.log("Could not parse control token file for: " + tokenID, e);
             }
             Point centerPosition = unitHolder.getHolderCenterPosition();
-            graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - deltaYFirst + deltaY - (image.getHeight() / 2), null);
-            deltaY += image.getHeight();
+            if (tokenPath.contains(Constants.MIRAGE)) {
+                graphics.drawImage(image, tileX + Constants.MIRAGE_POSITION.x, tileY + Constants.MIRAGE_POSITION.y, null);
+            } else {
+                graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - deltaYFirst + offSet + deltaY - (image.getHeight() / 2), null);
+            }
+            if (!useOffset) {
+                deltaY += image.getHeight();
+            }
         }
         return image;
     }
@@ -289,8 +305,8 @@ public class GenerateMap {
                 if (bulkUnitCount != null) {
                     graphics.setFont(Storage.getFont26());
                     graphics.setColor(groupUnitColor);
-                    int scaledNumberPositionX = (int)(numberPositionPoint.x * scaleOfUnit);
-                    int scaledNumberPositionY = (int)(numberPositionPoint.y  * scaleOfUnit);
+                    int scaledNumberPositionX = (int) (numberPositionPoint.x * scaleOfUnit);
+                    int scaledNumberPositionY = (int) (numberPositionPoint.y * scaleOfUnit);
                     graphics.drawString(Integer.toString(bulkUnitCount), imageX + scaledNumberPositionX, imageY + scaledNumberPositionY);
                 }
 
