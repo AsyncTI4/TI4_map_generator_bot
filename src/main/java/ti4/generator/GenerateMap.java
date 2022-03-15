@@ -2,6 +2,7 @@ package ti4.generator;
 
 import ti4.ResourceHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.helpers.LoggerHandler;
 import ti4.helpers.Storage;
 import ti4.map.Map;
@@ -256,9 +257,20 @@ public class GenerateMap {
 
     private BufferedImage addUnits(Tile tile, BufferedImage image, int tileX, int tileY, ArrayList<Rectangle> rectangles, int degree, int degreeChange, UnitHolder unitHolder, int radius) {
         HashMap<String, Integer> units = unitHolder.getUnits();
+        HashMap<String, Integer> unitDamage = unitHolder.getUnitDamage();
+        float scaleOfUnit = 0.85f;
+        BufferedImage dmgImage = null;
+        try {
+            dmgImage = resizeImage(ImageIO.read(new File(Helper.getDamagePath())), scaleOfUnit);
+        } catch (IOException e) {
+            LoggerHandler.log("Could not parse damage token file.", e);
+        }
+
         for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
             String unitID = unitEntry.getKey();
             Integer unitCount = unitEntry.getValue();
+
+            Integer unitDamageCount = unitDamage.get(unitID);
 
             Color groupUnitColor = Color.WHITE;
             Integer bulkUnitCount = null;
@@ -273,7 +285,7 @@ public class GenerateMap {
                 bulkUnitCount = unitCount;
             }
 
-            float scaleOfUnit = 0.85f;
+
             try {
                 image = resizeImage(ImageIO.read(new File(tile.getUnitPath(unitID))), scaleOfUnit);
             } catch (Exception e) {
@@ -305,8 +317,10 @@ public class GenerateMap {
                         rectangles.add(new Rectangle(possibleX, possibleY, finalImage.getWidth(), finalImage.getHeight()));
                     }
                 }
-                int imageX = tileX + centerPosition.x + x - (image.getWidth() / 2);
-                int imageY = tileY + centerPosition.y + y - (image.getHeight() / 2);
+                int xOriginal = tileX + centerPosition.x + x;
+                int yOriginal = tileY + centerPosition.y + y;
+                int imageX = xOriginal - (image.getWidth() / 2);
+                int imageY = yOriginal - (image.getHeight() / 2);
                 graphics.drawImage(image, imageX, imageY, null);
                 if (bulkUnitCount != null) {
                     graphics.setFont(Storage.getFont26());
@@ -314,6 +328,11 @@ public class GenerateMap {
                     int scaledNumberPositionX = (int) (numberPositionPoint.x * scaleOfUnit);
                     int scaledNumberPositionY = (int) (numberPositionPoint.y * scaleOfUnit);
                     graphics.drawString(Integer.toString(bulkUnitCount), imageX + scaledNumberPositionX, imageY + scaledNumberPositionY);
+                }
+
+                if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
+                    graphics.drawImage(dmgImage, xOriginal - (dmgImage.getWidth() / 2), yOriginal - (dmgImage.getHeight() / 2), null);
+                    unitDamageCount--;
                 }
 
                 //Center of planets and tile marker

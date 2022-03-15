@@ -1,6 +1,7 @@
 package ti4.map;
 
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.helpers.LoggerHandler;
 import ti4.helpers.Storage;
 
@@ -18,6 +19,8 @@ public class MapSaveLoadManager {
     public static final String UNITHOLDER = "-unitholder-";
     public static final String ENDUNITHOLDER = "-endunitholder-";
     public static final String ENDUNITS = "-endunits-";
+    public static final String ENDUNITDAMAGE = "-endunitdamage-";
+    public static final String UNITDAMAGE = "-unitdamage-";
     public static final String ENDTILE = "-endtile-";
     public static final String TOKENS = "-tokens-";
     public static final String ENDTOKENS = "-endtokens-";
@@ -123,6 +126,16 @@ public class MapSaveLoadManager {
                 writer.write(System.lineSeparator());
             }
             writer.write(ENDUNITS);
+            writer.write(System.lineSeparator());
+
+            writer.write(UNITDAMAGE);
+            writer.write(System.lineSeparator());
+            HashMap<String, Integer> unitDamage = unitHolder.getUnitDamage();
+            for (java.util.Map.Entry<String, Integer> entry : unitDamage.entrySet()) {
+                writer.write(entry.getKey() + " " + entry.getValue());
+                writer.write(System.lineSeparator());
+            }
+            writer.write(ENDUNITDAMAGE);
             writer.write(System.lineSeparator());
 
             writer.write(PLANET_TOKENS);
@@ -287,7 +300,9 @@ public class MapSaveLoadManager {
                             tmpData = null;
                             if (UNITS.equals(data)) {
                                 spaceHolder = myReader.nextLine();
-                                if (!tile.isSpaceHolderValid(spaceHolder)) {
+                                if (Constants.MIRAGE.equals(spaceHolder)){
+                                    Helper.addMirageToTile(tile);
+                                } else if (!tile.isSpaceHolderValid(spaceHolder)) {
                                     LoggerHandler.log("Not valid space holder detected: " + spaceHolder);
                                 }
                                 continue;
@@ -296,6 +311,17 @@ public class MapSaveLoadManager {
                                 break;
                             }
                             readUnit(tile, data, spaceHolder);
+                        }
+
+                        while (myReader.hasNextLine()) {
+                            String data = myReader.nextLine();
+                            if (UNITDAMAGE.equals(data)) {
+                                continue;
+                            }
+                            if (ENDUNITDAMAGE.equals(data)) {
+                                break;
+                            }
+                            readUnitDamage(tile, data, spaceHolder);
                         }
 
                         while (myReader.hasNextLine()) {
@@ -342,6 +368,11 @@ public class MapSaveLoadManager {
     private static void readUnit(Tile tile, String data, String spaceHolder) {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         tile.addUnit(spaceHolder, tokenizer.nextToken(), tokenizer.nextToken());
+    }
+
+    private static void readUnitDamage(Tile tile, String data, String spaceHolder) {
+        StringTokenizer tokenizer = new StringTokenizer(data, " ");
+        tile.addUnitDamage(spaceHolder, tokenizer.nextToken(), tokenizer.nextToken());
     }
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {

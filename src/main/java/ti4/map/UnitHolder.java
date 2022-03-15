@@ -10,12 +10,14 @@ import java.util.HashSet;
 abstract public class UnitHolder {
     //ID, Count
     private final HashMap<String, Integer> units = new HashMap<>();
+    //ID, Count
+    private final HashMap<String, Integer> unitsDamage = new HashMap<>();
     private final HashSet<String> ccList = new HashSet<>();
     private final HashSet<String> controlList = new HashSet<>();
     private final HashSet<String> tokenList = new HashSet<>();
-    private Point holderCenterPosition;
+    private final Point holderCenterPosition;
 
-    private String name;
+    private final String name;
 
 
     public String getName() {
@@ -80,6 +82,38 @@ abstract public class UnitHolder {
         }
     }
 
+    public void addUnitDamage(String unit, Integer count) {
+        if (count > 0 && count < 100) {
+            Integer unitCount = unitsDamage.get(unit);
+            if (unitCount != null) {
+                unitCount += count;
+                unitsDamage.put(unit, unitCount);
+            } else {
+                unitsDamage.put(unit, count);
+            }
+        }
+    }
+
+    public void removeUnitDamage(String unit, Integer count) {
+        if (count > 0) {
+            Integer unitCount = units.get(unit);
+            if (unitCount != null) {
+                unitCount -= count;
+                if (unitCount > 0) {
+                    unitsDamage.put(unit, unitCount);
+                } else {
+                    unitsDamage.remove(unit);
+                }
+            }
+        }
+    }
+
+    public void removeAllUnitDamage(String color) {
+        String colorID = Mapper.getColorID(color);
+        unitsDamage.keySet().removeIf(key -> key.startsWith(colorID));
+    }
+
+
     public void removeAllUnits(String color) {
         String colorID = Mapper.getColorID(color);
         units.keySet().removeIf(key -> key.startsWith(colorID));
@@ -87,6 +121,10 @@ abstract public class UnitHolder {
 
     public HashMap<String, Integer> getUnits() {
         return units;
+    }
+
+    public HashMap<String, Integer> getUnitDamage() {
+        return unitsDamage;
     }
 
     public HashSet<String> getCCList() {

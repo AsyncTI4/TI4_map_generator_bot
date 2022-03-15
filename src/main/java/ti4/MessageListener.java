@@ -64,9 +64,9 @@ public class MessageListener extends ListenerAdapter {
             }
         }
         if (mapUpdatesChannel && mapList.stream().anyMatch(map -> map.equals(gameID)) &&
-                mapManager.getUserActiveMap(userID) == null || !mapManager.getUserActiveMap(userID).getName().equals(gameID) &&
+                (mapManager.getUserActiveMap(userID) == null || !mapManager.getUserActiveMap(userID).getName().equals(gameID) &&
                 (mapManager.getMap(gameID) != null && (mapManager.getMap(gameID).isMapOpen() ||
-                        mapManager.getMap(gameID).getPlayers().containsKey(userID)))) {
+                        mapManager.getMap(gameID).getPlayers().containsKey(userID))))) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Active map set to: " + gameID);
             mapManager.setMapForUser(userID, gameID);
         } else if (mapManager.isUserWithActiveMap(userID)) {

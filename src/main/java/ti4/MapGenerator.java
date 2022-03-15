@@ -11,10 +11,7 @@ import ti4.commands.*;
 import ti4.commands.info.*;
 import ti4.commands.map.*;
 import ti4.commands.tokens.*;
-import ti4.commands.units.AddUnits;
-import ti4.commands.units.MoveUnits;
-import ti4.commands.units.RemoveAllUnits;
-import ti4.commands.units.RemoveUnits;
+import ti4.commands.units.*;
 import ti4.generator.PositionMapper;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -51,18 +48,14 @@ public class MapGenerator {
         } catch (InterruptedException e) {
             LoggerHandler.log("Error waiting for bot to get ready");
         }
-
-
 //        User user = event.getJDA().getUserById();
 //            user.getName()
-
-
         userID = args[1];
-
         PositionMapper.init();
         Mapper.init();
         AliasHandler.init();
         Storage.init();
+
 
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddTile());
@@ -93,8 +86,9 @@ public class MapGenerator {
         commandManager.addCommand(new ListPlanets());
         commandManager.addCommand(new RemoveToken());
         commandManager.addCommand(new AddToken());
-
-
+        commandManager.addCommand(new AddUnitDamage());
+        commandManager.addCommand(new RemoveUnitDamage());
+        commandManager.addCommand(new RemoveAllUnitDamage());
         commandManager.addCommand(new HelpAction());
         commandManager.addCommand(new LogMessage());
 
@@ -103,6 +97,12 @@ public class MapGenerator {
         CommandListUpdateAction commands = guild.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
         commands.queue();
+
+        //TI Community game
+        Guild guild2 = jda.getGuildById(args[3]);
+        CommandListUpdateAction commandsC = guild2.updateCommands();
+        commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
+        commandsC.queue();
         //------------------------------------------------
 
 //        CommandListUpdateAction commands_ = jda.updateCommands();

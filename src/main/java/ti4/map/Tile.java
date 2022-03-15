@@ -12,8 +12,8 @@ import java.util.HashMap;
 import java.util.StringTokenizer;
 
 public class Tile {
-    private String tileID;
-    private String position;
+    private final String tileID;
+    private final String position;
     private HashMap<String, UnitHolder> unitHolders = new HashMap();
 
     public Tile(String tileID, String position) {
@@ -66,7 +66,7 @@ public class Tile {
     public String getAttachmentPath(String tokenID) {
         String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
         if (tokenPath == null) {
-            LoggerHandler.log("Could not find attachment token: " + tokenID);
+//            LoggerHandler.log("Could not find attachment token: " + tokenID);
             return null;
         }
         return tokenPath;
@@ -93,6 +93,20 @@ public class Tile {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
             unitHolder.addUnit(unitID, count);
+        }
+    }
+
+     public void addUnitDamage(String spaceHolder, String unitID, Integer count) {
+        UnitHolder unitHolder = unitHolders.get(spaceHolder);
+        if (unitHolder != null) {
+            HashMap<String, Integer> units = unitHolder.getUnits();
+            Integer unitCount = units.get(unitID);
+            if (unitCount != null) {
+                if (unitCount < count){
+                    count = unitCount;
+                }
+                unitHolder.addUnitDamage(unitID, count);
+            }
         }
     }
 
@@ -150,9 +164,22 @@ public class Tile {
         }
     }
 
+    public void removeUnitDamage(String spaceHolder, String unitID, Integer count) {
+        UnitHolder unitHolder = unitHolders.get(spaceHolder);
+        if (unitHolder != null) {
+            unitHolder.removeUnitDamage(unitID, count);
+        }
+    }
+
     public void removeAllUnits(String color) {
         for (UnitHolder unitHolder : unitHolders.values()) {
             unitHolder.removeAllUnits(color);
+        }
+    }
+
+    public void removeAllUnitDamage(String color) {
+        for (UnitHolder unitHolder : unitHolders.values()) {
+            unitHolder.removeAllUnitDamage(color);
         }
     }
 
@@ -160,6 +187,15 @@ public class Tile {
         try {
             int unitCount = Integer.parseInt(count);
             addUnit(spaceHolder, unitID, unitCount);
+        } catch (Exception e) {
+            LoggerHandler.log("Could not parse unit count", e);
+        }
+    }
+
+    public void addUnitDamage(String spaceHolder, String unitID, String count) {
+        try {
+            int unitCount = Integer.parseInt(count);
+            addUnitDamage(spaceHolder, unitID, unitCount);
         } catch (Exception e) {
             LoggerHandler.log("Could not parse unit count", e);
         }

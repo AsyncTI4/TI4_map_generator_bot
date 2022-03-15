@@ -112,8 +112,7 @@ public class ResourceHelper {
         return token;
     }
 
-    @Nullable
-    private String getResourceFromFolder(String folder, String name, String errorDescription) {
+    public String getResourceFromFolder(String folder, String name, String errorDescription) {
         File resourceFile = null;
         URL resource = getClass().getClassLoader().getResource(folder + name);
 
