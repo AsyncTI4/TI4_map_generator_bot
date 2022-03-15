@@ -44,9 +44,9 @@ and most interesting is
 /add_units color tile unitList
 /remove_units color tile unitList
 /remove_all_units color tile
-/add_unit_damage color tile unitList
-/remove_unit_damage color tile unitList
-/remove_all_unit_damage color tile
+/add_damage_unit color tile unitList
+/remove_damage_unit color tile unitList
+/remove_damage_all_unit color tile
 
 unitList examples and explanation. If dont specify planet, all units go into space
 Listing only unit list, so add into command that you want
