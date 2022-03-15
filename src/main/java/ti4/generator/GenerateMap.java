@@ -80,6 +80,11 @@ public class GenerateMap {
             tileMap.keySet().stream()
                     .sorted()
                     .forEach(key -> addTile(tileMap.get(key)));
+
+            graphics.setFont(Storage.getFont32());
+            graphics.setColor(Color.WHITE);
+            graphics.drawString(map.getName(), 0, 34);
+
             ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
             imageWriter.setOutput(ImageIO.createImageOutputStream(file));
             ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
