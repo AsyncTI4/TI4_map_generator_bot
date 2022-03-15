@@ -31,7 +31,7 @@ abstract public class JoinLeave implements Command {
         MapManager mapManager = MapManager.getInstance();
         Map map = mapManager.getMap(mapName);
         if (!map.isMapOpen()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Map is not open. Can leave only open map.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Map is not open. Can join/leave only open map.");
         }
         return true;
     }
@@ -42,7 +42,7 @@ abstract public class JoinLeave implements Command {
         MapManager mapManager = MapManager.getInstance();
         Map map = mapManager.getMap(mapName);
         if (!map.isMapOpen()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Map is not open. Can leave only open map.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Map is not open. Can join/leave only open map.");
             return;
         }
         User user = event.getUser();

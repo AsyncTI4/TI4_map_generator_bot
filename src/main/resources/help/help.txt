@@ -4,6 +4,9 @@ To create map use:
 /create_map mapName
 To set active map use:
 /set_map mapName <- Map name can only contain a-z A-Z 0-9 symbols
+Now automatically sets active map in channels that go: mapName-map-updates
+so in any channel that is named like this, you don't need to set active map, it automatically sets for you
+so switching between games is much easier.
 /set_map_status mapName status
 status: open or locked
 Status open, means anyone can edit map, can join map as player;

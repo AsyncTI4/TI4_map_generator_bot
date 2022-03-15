@@ -17,6 +17,7 @@ import ti4.message.MessageHelper;
 
 import java.util.List;
 import java.util.Set;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 public class MessageListener extends ListenerAdapter {
@@ -46,15 +47,35 @@ public class MessageListener extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
-        if (mapManager.isUserWithActiveMap(userID)) {
-            String channelName = event.getChannel().getName();
-            Map userActiveMap = mapManager.getUserActiveMap(userID);
-            Set<String> mapList = mapManager.getMapList().keySet();
-            if (mapList.stream().anyMatch(channelName::startsWith) && !channelName.startsWith(userActiveMap.getName())) {
+        String channelName = event.getChannel().getName();
+        Map userActiveMap = mapManager.getUserActiveMap(userID);
+        Set<String> mapList = mapManager.getMapList().keySet();
+        StringTokenizer channelNameTokenizer = new StringTokenizer(channelName, "-");
+
+        String gameID = channelNameTokenizer.nextToken();
+        boolean mapUpdatesChannel = false;
+        if (channelNameTokenizer.hasMoreTokens()) {
+            if (channelNameTokenizer.nextToken().equals("map")) {
+                if (channelNameTokenizer.hasMoreTokens()) {
+                    if (channelNameTokenizer.nextToken().equals("updates")) {
+                        mapUpdatesChannel = true;
+                    }
+                }
+            }
+        }
+        if (mapUpdatesChannel && mapList.stream().anyMatch(map -> map.equals(gameID)) &&
+                mapManager.getUserActiveMap(userID) == null || !mapManager.getUserActiveMap(userID).getName().equals(gameID) &&
+                (mapManager.getMap(gameID).isMapOpen() ||
+                        mapManager.getMap(gameID).getPlayers().containsKey(userID))) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Active map set to: " + gameID);
+            mapManager.setMapForUser(userID, gameID);
+        } else if (mapManager.isUserWithActiveMap(userID)) {
+            if (mapList.stream().anyMatch(map -> map.equals(gameID)) && !channelName.startsWith(userActiveMap.getName())) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Active map reset. Channel name indicates to have map associated with it. Please select correct active map or do action in neutral channel");
                 mapManager.resetMapForUser(userID);
             }
         }
+
 
         //noinspection ResultOfMethodCallIgnored
 //        event.deferReply();
