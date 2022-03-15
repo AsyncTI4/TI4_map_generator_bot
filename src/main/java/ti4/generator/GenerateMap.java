@@ -133,6 +133,7 @@ public class GenerateMap {
             UnitHolder spaceUnitHolder = unitHolders.stream().filter(unitHolder -> unitHolder.getName().equals(Constants.SPACE)).findFirst().orElse(null);
             if (spaceUnitHolder != null) {
                 image = addCC(tile, image, tileX, tileY, spaceUnitHolder);
+                image = addToken(tile, image, tileX, tileY, spaceUnitHolder);
                 unitHolders.remove(spaceUnitHolder);
                 unitHolders.add(spaceUnitHolder);
             }
@@ -141,7 +142,9 @@ public class GenerateMap {
             for (UnitHolder unitHolder : unitHolders) {
                 degree = 180;
                 image = addControl(tile, image, tileX, tileY, unitHolder);
-                image = addToken(tile, image, tileX, tileY, unitHolder);
+                if (unitHolder != spaceUnitHolder) {
+                    image = addToken(tile, image, tileX, tileY, unitHolder);
+                }
                 int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
                 image = addUnits(tile, image, tileX, tileY, rectangles, degree, degreeChange, unitHolder, radius);
             }
@@ -209,10 +212,11 @@ public class GenerateMap {
     private BufferedImage addToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
         HashSet<String> tokenList = unitHolder.getTokenList();
         int deltaY = 0;
-        int deltaYFirst = 0;
-        boolean first = tokenList.size() > 1;
         boolean useOffset = Mapper.getSpecialCaseValues(Constants.POSITION).contains(tile.getTileID());
         int offSet = 0;
+        Point centerPosition = unitHolder.getHolderCenterPosition();
+        int x = tileX + centerPosition.x;
+        int y = tileY + centerPosition.y - (tokenList.size() > 1 ? 35 : 0);
         for (String tokenID : tokenList) {
             String tokenPath = tile.getTokenPath(tokenID);
             if (tokenPath == null) {
@@ -221,10 +225,6 @@ public class GenerateMap {
             }
             try {
                 image = resizeImage(ImageIO.read(new File(tokenPath)), 0.85f);
-                if (first) {
-                    first = false;
-                    deltaYFirst = image.getHeight();
-                }
                 if (useOffset) {
                     if (offSet == 0) {
                         offSet = -image.getHeight() / 2 - 25;
@@ -235,11 +235,12 @@ public class GenerateMap {
             } catch (Exception e) {
                 LoggerHandler.log("Could not parse control token file for: " + tokenID, e);
             }
-            Point centerPosition = unitHolder.getHolderCenterPosition();
+
             if (tokenPath.contains(Constants.MIRAGE)) {
                 graphics.drawImage(image, tileX + Constants.MIRAGE_POSITION.x, tileY + Constants.MIRAGE_POSITION.y, null);
             } else {
-                graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - deltaYFirst + offSet + deltaY - (image.getHeight() / 2), null);
+                graphics.drawImage(image, x - (image.getWidth() / 2), y + offSet + deltaY - (image.getHeight() / 2), null);
+                y += image.getHeight();
             }
             if (!useOffset) {
                 deltaY += image.getHeight();
@@ -267,7 +268,7 @@ public class GenerateMap {
                 bulkUnitCount = unitCount;
             }
 
-            float scaleOfUnit = 0.9f;
+            float scaleOfUnit = 0.85f;
             try {
                 image = resizeImage(ImageIO.read(new File(tile.getUnitPath(unitID))), scaleOfUnit);
             } catch (Exception e) {

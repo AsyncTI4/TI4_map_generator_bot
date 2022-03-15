@@ -10,13 +10,13 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.map.Planet;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.awt.*;
+import java.util.*;
 
 public class AddToken extends AddRemoveToken {
     @Override
@@ -81,6 +81,14 @@ public class AddToken extends AddRemoveToken {
                 continue;
             }
             tile.addToken(tokenID, planet);
+            if (Mapper.getTokenID(Constants.MIRAGE).equals(tokenID)){
+                HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+                if (unitHolders.get(Constants.MIRAGE) == null){
+                    Point mirageCenter = new Point(Constants.MIRAGE_POSITION.x + 75, Constants.MIRAGE_POSITION.y + 65);
+                    Planet planetObject = new Planet(Constants.MIRAGE, mirageCenter);
+                    unitHolders.put(Constants.MIRAGE, planetObject);
+                }
+            }
         }
     }
 

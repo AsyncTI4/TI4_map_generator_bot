@@ -10,13 +10,13 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.map.Planet;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.awt.*;
+import java.util.*;
 
 public class RemoveToken extends AddRemoveToken {
     @Override
@@ -30,7 +30,7 @@ public class RemoveToken extends AddRemoveToken {
             String tokenID = Mapper.getAttachmentID(tokenName);
             String tokenPath = tile.getAttachmentPath(tokenID);
             if (tokenPath != null) {
-                addToken(event, tile, tokenID, true);
+                removeToken(event, tile, tokenID, true);
             } else {
                 tokenID = Mapper.getTokenID(tokenName);
                 tokenPath = tile.getTokenPath(tokenID);
@@ -39,7 +39,7 @@ public class RemoveToken extends AddRemoveToken {
                     MessageHelper.replyToMessage(event, "Token: " + tokenName + " is not valid");
                     return;
                 }
-                addToken(event, tile, tokenID, false);
+                removeToken(event, tile, tokenID, false);
             }
         }
         else {
@@ -47,7 +47,7 @@ public class RemoveToken extends AddRemoveToken {
         }
     }
 
-    private void addToken(SlashCommandInteractionEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet) {
+    private void removeToken(SlashCommandInteractionEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet) {
         String unitHolder = Constants.SPACE;
         if (needSpecifyPlanet) {
             OptionMapping option = event.getOption(Constants.PLANET_NAME);
@@ -79,6 +79,12 @@ public class RemoveToken extends AddRemoveToken {
                 continue;
             }
             tile.removeToken(tokenID, planet);
+            if (Mapper.getTokenID(Constants.MIRAGE).equals(tokenID)){
+                HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+                if (unitHolders.get(Constants.MIRAGE) != null){
+                    unitHolders.remove(Constants.MIRAGE);
+                }
+            }
         }
     }
 

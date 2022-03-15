@@ -6,7 +6,7 @@ import java.util.HashMap;
 public class Planet extends UnitHolder{
 
 
-    protected Planet(String name, Point holderCenterPosition) {
+    public Planet(String name, Point holderCenterPosition) {
         super(name, holderCenterPosition);
     }
 
