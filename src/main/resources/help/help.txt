@@ -33,6 +33,7 @@ You can use also tileID, so liek TI4 marks tiles 01 is Jord for example
 /list_planets <- lists all available planets
 /delete_map <-deletes your map, only can delete the map you created
 /show_map mapName <- displays the map
+If you have active map set, it shows your active map if no map name is defines
 /list_units <- lists all possible units
 /add_cc colorList tile or position <- add's cc to system: colorList can be pink,red,black as example/
 /remove_cc color tile or position <- remove's cc from system: ccolorList can be pink,red,black as example/

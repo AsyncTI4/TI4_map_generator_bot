@@ -2,6 +2,7 @@ package ti4.commands.map;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -28,18 +29,35 @@ public class ShowMap implements Command {
         if (!event.getName().equals(getActionID())) {
             return false;
         }
-        String mapName = event.getOptions().get(0).getAsString();
-        if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-            MessageHelper.replyToMessage(event, "Map with such name does not exists, use /list_maps");
-            return false;
+        OptionMapping option = event.getOption(Constants.MAP_NAME);
+        if (option != null) {
+            String mapName = option.getAsString();
+            if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
+                MessageHelper.replyToMessage(event, "Map with such name does not exists, use /list_maps");
+                return false;
+            }
+        } else {
+            Map userActiveMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
+            if (userActiveMap == null){
+                MessageHelper.replyToMessage(event, "No active map set, need to specify what map to show");
+                return false;
+            }
         }
         return true;
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String mapName = event.getOptions().get(0).getAsString().toLowerCase();
-        Map map = MapManager.getInstance().getMap(mapName);
+
+        Map map;
+        OptionMapping option = event.getOption(Constants.MAP_NAME);
+        MapManager mapManager = MapManager.getInstance();
+        if (option != null) {
+            String mapName = option.getAsString().toLowerCase();
+            map = mapManager.getMap(mapName);
+        } else {
+            map = mapManager.getUserActiveMap(event.getUser().getId());
+        }
         File file = GenerateMap.getInstance().saveImage(map);
         MessageHelper.replyToMessage(event, file);
     }
@@ -50,9 +68,6 @@ public class ShowMap implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), "Shows selected map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name to be shown") // USER type allows to include members of the server or other users by id
-                                .setRequired(true)) // This command requires a parameter
-
-        );
+                        .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name to be shown")));
     }
 }
