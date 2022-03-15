@@ -161,6 +161,7 @@ public class Tile {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
             unitHolder.removeUnit(unitID, count);
+            unitHolder.removeUnitDamage(unitID, count);
         }
     }
 
@@ -174,6 +175,7 @@ public class Tile {
     public void removeAllUnits(String color) {
         for (UnitHolder unitHolder : unitHolders.values()) {
             unitHolder.removeAllUnits(color);
+            unitHolder.removeAllUnitDamage(color);
         }
     }
 
