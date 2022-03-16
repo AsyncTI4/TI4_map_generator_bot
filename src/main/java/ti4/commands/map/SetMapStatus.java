@@ -49,13 +49,19 @@ public class SetMapStatus implements Command {
 
         MapManager mapManager = MapManager.getInstance();
         Map mapToChangeStatusFor = mapManager.getMap(mapName);
-        MapStatus mapStatus = MapStatus.valueOf(status);
-        if (mapStatus == MapStatus.open) {
-            mapToChangeStatusFor.setMapStatus(MapStatus.open);
-        } else if (mapStatus == MapStatus.locked) {
-            mapToChangeStatusFor.setMapStatus(MapStatus.locked);
+        try {
+            MapStatus mapStatus = MapStatus.valueOf(status);
+            if (mapStatus == MapStatus.open) {
+                mapToChangeStatusFor.setMapStatus(MapStatus.open);
+            } else if (mapStatus == MapStatus.locked) {
+                mapToChangeStatusFor.setMapStatus(MapStatus.locked);
+            }
+        } catch (Exception e){
+            MessageHelper.replyToMessage(event, "Map: " + mapName + " status was not changed, as invalid status entered.");
+            return;
         }
         MapSaveLoadManager.saveMap(mapToChangeStatusFor);
+        MessageHelper.replyToMessage(event, "Map: "+ mapName +" status changed to: " + mapToChangeStatusFor.getMapStatus());
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

@@ -48,6 +48,12 @@ and most interesting is
 /remove_damage_unit color tile unitList
 /remove_damage_all_unit color tile
 
+commands improvements:
+/remove_units and /move_units
+priority is move/remove damaged units. If we selecte priority_no_damage (and type in yes or y)
+units without damage will be removed/moved to other system
+also moves damage to new system by default if option  is not specified
+
 unitList examples and explanation. If dont specify planet, all units go into space
 Listing only unit list, so add into command that you want
 dn <- sinle dread into space
