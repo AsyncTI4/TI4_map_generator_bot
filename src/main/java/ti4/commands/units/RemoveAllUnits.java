@@ -9,14 +9,15 @@ import ti4.helpers.Constants;
 import ti4.map.Tile;
 
 public class RemoveAllUnits extends AddRemoveUnits {
-    @Override
-    protected void unitAction(Tile tile, int count, String planetName, String unitID) {
-        //No need for this action
-    }
 
     @Override
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
         tile.removeAllUnits(color);
+    }
+
+    @Override
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID) {
+        //No need for this action
     }
 
     @Override

@@ -105,10 +105,11 @@ public class Mapper {
 
     public static String getTilesList()
     {
-        return  "Tiles: " +  AliasHandler.getUnitList().stream()
+        return  "Tiles: " +  tiles.values().stream()
                 .sorted()
-                .filter(Objects::nonNull)
-                .collect(Collectors.joining("\n "));
+                .filter(value -> value instanceof String)
+                .map(value -> (String) value)
+                .collect(Collectors.joining(", "));
     }
     public static String getPlanetList()
     {

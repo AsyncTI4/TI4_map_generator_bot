@@ -11,11 +11,6 @@ import ti4.map.Tile;
 public class RemoveAllUnitDamage extends RemoveAllUnits {
 
     @Override
-    protected void unitAction(Tile tile, int count, String planetName, String unitID) {
-        //No need for this action
-    }
-
-    @Override
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
         tile.removeAllUnitDamage(color);
     }

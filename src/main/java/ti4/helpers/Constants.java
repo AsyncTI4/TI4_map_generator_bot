@@ -31,6 +31,7 @@ public class Constants {
     public static final String TOKEN = "token";
     public static final String TILE_LIST = "tile_list";
     public static final String UNIT_NAMES = "unit_names";
+    public static final String PRIORITY_NO_DAMAGE = "priority_no_damage";
     public static final String UNIT_NAMES_TO = "unit_names_to";
     public static final String COLOR = "color";
     public static final String ADD_TILE = "add_tile";

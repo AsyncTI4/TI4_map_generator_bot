@@ -96,9 +96,9 @@ public class Tile {
         }
     }
 
-     public void addUnitDamage(String spaceHolder, String unitID, Integer count) {
+     public void addUnitDamage(String spaceHolder, String unitID, @CheckForNull Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
-        if (unitHolder != null) {
+        if (unitHolder != null && count != null) {
             HashMap<String, Integer> units = unitHolder.getUnits();
             Integer unitCount = units.get(unitID);
             if (unitCount != null) {
@@ -161,13 +161,12 @@ public class Tile {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
             unitHolder.removeUnit(unitID, count);
-            unitHolder.removeUnitDamage(unitID, count);
         }
     }
 
-    public void removeUnitDamage(String spaceHolder, String unitID, Integer count) {
+    public void removeUnitDamage(String spaceHolder, String unitID, @CheckForNull Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
-        if (unitHolder != null) {
+        if (unitHolder != null && count != null) {
             unitHolder.removeUnitDamage(unitID, count);
         }
     }
