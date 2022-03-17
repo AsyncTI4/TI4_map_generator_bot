@@ -1,7 +1,7 @@
 Commands:
 First you need to create map and set active map you modifying.
 To create map use:
-/create_map mapName
+/create_game mapName
 To set active map use:
 /set_map mapName <- Map name can only contain a-z A-Z 0-9 symbols
 Now automatically sets active map in channels that go: mapName-map-updates

@@ -18,6 +18,8 @@ public class ResourceHelper {
     private HashMap<String, String> ccCache = new HashMap<>();
     private HashMap<String, String> attachmentCache = new HashMap<>();
     private HashMap<String, String> tokenCache = new HashMap<>();
+    private HashMap<String, String> factionCache = new HashMap<>();
+    private HashMap<String, String> generalCache = new HashMap<>();
 
     private ResourceHelper() {
     }
@@ -60,6 +62,32 @@ public class ResourceHelper {
         }
         String tile = getResourceFromFolder("tiles/", name, "Could not find tile file");
         tileCache.put(name, tile);
+        return tile;
+    }
+
+    @CheckForNull
+    public String getFactionFile(String name)
+    {
+        String unitPath = factionCache.get(name);
+        if (unitPath != null)
+        {
+            return unitPath;
+        }
+        String tile = getResourceFromFolder("factions/", name, "Could not find faction file");
+        factionCache.put(name, tile);
+        return tile;
+    }
+
+    @CheckForNull
+    public String getGeneralFile(String name)
+    {
+        String unitPath = generalCache.get(name);
+        if (unitPath != null)
+        {
+            return unitPath;
+        }
+        String tile = getResourceFromFolder("general/", name, "Could not find faction file");
+        generalCache.put(name, tile);
         return tile;
     }
 

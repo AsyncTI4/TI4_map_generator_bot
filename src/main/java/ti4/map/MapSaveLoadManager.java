@@ -85,14 +85,14 @@ public class MapSaveLoadManager {
         //Player information
         writer.write(PLAYERINFO);
         writer.write(System.lineSeparator());
-        HashMap<String, String> players = map.getPlayers();
-        for (java.util.Map.Entry<String, String> playerEntry : players.entrySet()) {
+        HashMap<String, Player> players = map.getPlayers();
+        for (java.util.Map.Entry<String, Player> playerEntry : players.entrySet()) {
             writer.write(PLAYER);
             writer.write(System.lineSeparator());
 
             writer.write(playerEntry.getKey());
             writer.write(System.lineSeparator());
-            writer.write(playerEntry.getValue());
+            writer.write(playerEntry.getValue().getUserName());
             writer.write(System.lineSeparator());
 
             writer.write(ENDPLAYER);
@@ -254,12 +254,13 @@ public class MapSaveLoadManager {
                         }
 //                        readGameInfo(map, data);
 
+                        Player player = null;
                         while (myReader.hasNextLine()) {
                             data = tmpData != null ? tmpData : myReader.nextLine();
                             tmpData = null;
                             if (PLAYER.equals(data)) {
 
-                                map.addPlayerLoad(myReader.nextLine(), myReader.nextLine());
+                                player = map.addPlayerLoad(myReader.nextLine(), myReader.nextLine());
                                 continue;
                             }
                             if (ENDPLAYER.equals(data)) {
@@ -267,7 +268,7 @@ public class MapSaveLoadManager {
                             }
 //                            data = myReader.nextLine();
 
-//                        readPlayerInfo(map, data);
+                            readPlayerInfo(player, data);
                         }
                     }
 
@@ -358,6 +359,10 @@ public class MapSaveLoadManager {
             LoggerHandler.log("Could not save map, error creating save file");
         }
         return null;
+    }
+
+    private static void readPlayerInfo(Player player, String data) {
+
     }
 
     private static Tile readTile(String tileData) {

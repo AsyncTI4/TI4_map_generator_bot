@@ -1,6 +1,5 @@
 package ti4.commands.map;
 
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -16,7 +15,7 @@ import ti4.message.MessageHelper;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CreateMap implements Command {
+public class CreateGame implements Command {
 
 
     @Override

@@ -6,6 +6,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.LoggerHandler;
 import ti4.helpers.Storage;
 import ti4.map.Map;
+import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 
@@ -29,6 +30,7 @@ public class GenerateMap {
     private BufferedImage mainImage;
     private int width;
     private int height;
+    private int heightForGameInfo;
     private static Point tilePositionPoint = new Point(230, 295);
     private static Point numberPositionPoint = new Point(45, 35);
 
@@ -48,7 +50,8 @@ public class GenerateMap {
             //todo message to user
         }
         width = setupImage.getWidth();
-        height = setupImage.getHeight();
+        heightForGameInfo = setupImage.getHeight();
+        height = heightForGameInfo + setupImage.getHeight()/2;
         resetImage();
     }
 
@@ -86,6 +89,8 @@ public class GenerateMap {
             graphics.setColor(Color.WHITE);
             graphics.drawString(map.getName(), 0, 34);
 
+            gameInfo(map);
+
             ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
             imageWriter.setOutput(ImageIO.createImageOutputStream(file));
             ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
@@ -120,6 +125,99 @@ public class GenerateMap {
         file.delete();
         return new File(absolutePath);
     }
+    private String getFactionPath(String factionID) {
+        String factionFileName = Mapper.getFactionFileName(factionID);
+        String factionFile = ResourceHelper.getInstance().getFactionFile(factionFileName);
+        if (factionFile == null) {
+            LoggerHandler.log("Could not find faction: " + factionID);
+        }
+        return factionFile;
+    }
+
+    private String getGeneralPath(String tokenID) {
+        String fileName = Mapper.getGeneralFileName(tokenID);
+        String filePath = ResourceHelper.getInstance().getGeneralFile(fileName);
+        if (filePath == null) {
+            LoggerHandler.log("Could not find general token: " + tokenID);
+        }
+        return filePath;
+    }
+
+    private void gameInfo(Map map) throws IOException {
+
+        int widthOfLine = 1000;
+        int y = heightForGameInfo + 20;
+        int x = 10;
+        HashMap<String, Player> players = map.getPlayers();
+        float percent = 0.16f;
+        int deltaY = 50;
+        graphics.setFont(Storage.getFont32());
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(3));
+        for (Player player : players.values()) {
+            int baseY = y;
+            y += 34;
+            Color color = getColor(player.getColor());
+            graphics.setColor(Color.WHITE);
+            graphics.drawString(player.getUserName(), x, y);
+            y += 2;
+            int iconY = y;
+            String faction = player.getFaction();
+            if (faction != null) {
+                String factionPath = getFactionPath(faction);
+                if (factionPath != null) {
+                    BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(factionPath)), percent);
+                    graphics.drawImage(bufferedImage, x, y, null);
+                }
+            }
+            String generalPath = getGeneralPath(Constants.TG);
+            BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(generalPath)), 0.20f);
+            graphics.drawImage(bufferedImage, x + 100, iconY, null);
+            graphics.setFont(Storage.getFont64());
+
+            graphics.drawString(Integer.toString(player.getTg()), x + 160, y + deltaY);
+
+
+            graphics.setColor(color);
+            y += 100;
+            g2.setColor(color);
+            g2.drawRect(x-2, baseY, x + widthOfLine, y-baseY);
+            y += 3;
+
+        }
+
+    }
+
+    private Color getColor(String color){
+        if (color == null){
+            return Color.WHITE;
+        }
+        switch (color){
+            case "black":
+                return Color.WHITE;
+            case "blue":
+                return Color.BLUE;
+            case "green":
+                return Color.GREEN;
+            case "gray":
+                return Color.GRAY;
+            case "grey":
+                return Color.GRAY;
+            case "orange":
+                return Color.ORANGE;
+            case "pink":
+                return Color.PINK;
+            case "purple":
+                return Color.MAGENTA;
+            case "red":
+                return Color.RED;
+            case "yellow":
+                return Color.YELLOW;
+            default:
+                return Color.WHITE;
+        }
+    }
+
 
     private void addTile(Tile tile) {
         try {

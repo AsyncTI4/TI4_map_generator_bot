@@ -2,6 +2,8 @@ package ti4.map;
 
 
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 
 public class Map {
 
@@ -10,7 +12,7 @@ public class Map {
     private String name;
 
     //UserID, UserName
-    private HashMap<String, String> players = new HashMap<>();
+    private HashMap<String, Player> players = new HashMap<>();
     private MapStatus mapStatus = MapStatus.open;
 
     //Position, Tile
@@ -55,23 +57,33 @@ public class Map {
 
     public void addPlayer(String id, String name){
         if (MapStatus.open.equals(mapStatus)) {
-            players.put(id, name);
+            Player player = new Player(id, name);
+            players.put(id, player);
         }
     }
 
-    public void addPlayerLoad(String id, String name){
-        players.put(id, name);
+    public Player addPlayerLoad(String id, String name){
+        Player player = new Player(id, name);
+        players.put(id, player);
+        return player;
     }
 
-    public HashMap<String, String> getPlayers() {
+    public HashMap<String, Player> getPlayers() {
         return players;
+    }
+
+    public Player getPlayer(String userID) {
+        return players.get(userID);
+    }
+    public Set<String> getPlayerIDs() {
+        return players.keySet();
     }
 
     public void removePlayer(String name){
         if (MapStatus.open.equals(mapStatus)) {
             String keyToDelete = null;
-            for (java.util.Map.Entry<String, String> playerEntry : players.entrySet()) {
-                if (playerEntry.getValue().equals(name)) {
+            for (java.util.Map.Entry<String, Player> playerEntry : players.entrySet()) {
+                if (playerEntry.getValue().getUserName().equals(name)) {
                     keyToDelete = playerEntry.getKey();
                     break;
                 }

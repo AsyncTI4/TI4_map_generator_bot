@@ -22,6 +22,8 @@ public class Mapper {
     private static final Properties attachment_tokens = new Properties();
     private static final Properties tokens = new Properties();
     private static final Properties special_case = new Properties();
+    private static final Properties factions = new Properties();
+    private static final Properties general = new Properties();
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
@@ -31,6 +33,8 @@ public class Mapper {
         readData("attachments.properties", attachment_tokens, "Could not read attachment token name file");
         readData("tokens.properties", tokens, "Could not read token name file");
         readData("special_case.properties", special_case, "Could not read token name file");
+        readData("general.properties", general, "Could not read general token name file");
+        readData("factions.properties", factions, "Could not read factions name file");
     }
 
     private static void readData(String propertyFileName, Properties colors, String s) {
@@ -59,6 +63,14 @@ public class Mapper {
 
     public static String getTileID(String tileID) {
         return tiles.getProperty(tileID);
+    }
+
+    public static String getFactionFileName(String factionID) {
+        return factions.getProperty(factionID);
+    }
+
+    public static String getGeneralFileName(String id) {
+        return general.getProperty(id);
     }
 
     public static boolean isUnitIDValid(String unitID) {
@@ -97,6 +109,14 @@ public class Mapper {
 
     public static List<String> getTokens() {
         return Stream.of(attachment_tokens.keySet(), tokens.keySet()).flatMap(Collection::stream)
+                .filter(token -> token instanceof String)
+                .map(token -> (String) token)
+                .sorted()
+                .collect(Collectors.toList());
+    }
+
+    public static List<String> getFactions() {
+        return factions.keySet().stream()
                 .filter(token -> token instanceof String)
                 .map(token -> (String) token)
                 .sorted()

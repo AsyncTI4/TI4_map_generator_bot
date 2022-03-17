@@ -73,8 +73,10 @@ public class Constants {
 
     public static final String PLAYER = "player";
     public static final String STATS = "stats";
+    public static final String SETUP = "setup";
     public static final String TECH = "tech";
     public static final String TG = "tg";
     public static final String COMMODITIES = "commodities";
     public static final String COMMODITIES_TOTAL = "commodities_total";
+    public static final String FACTION = "faction";
 }

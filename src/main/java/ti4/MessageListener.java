@@ -40,6 +40,14 @@ public class MessageListener extends ListenerAdapter {
                     .map(token -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(token, token))
                     .collect(Collectors.toList());
             event.replyChoices(options).queue();
+        } else if (event.getFocusedOption().getName().equals(Constants.FACTION)) {
+            String enteredValue = event.getFocusedOption().getValue();
+            List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = Mapper.getFactions().stream()
+                    .filter(faction -> faction.contains(enteredValue))
+                    .limit(25)
+                    .map(faction -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(faction, faction))
+                    .collect(Collectors.toList());
+            event.replyChoices(options).queue();
         }
     }
 
@@ -66,7 +74,7 @@ public class MessageListener extends ListenerAdapter {
         if (mapUpdatesChannel && mapList.stream().anyMatch(map -> map.equals(gameID)) &&
                 (mapManager.getUserActiveMap(userID) == null || !mapManager.getUserActiveMap(userID).getName().equals(gameID) &&
                 (mapManager.getMap(gameID) != null && (mapManager.getMap(gameID).isMapOpen() ||
-                        mapManager.getMap(gameID).getPlayers().containsKey(userID))))) {
+                        mapManager.getMap(gameID).getPlayerIDs().contains(userID))))) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Active map set to: " + gameID);
             mapManager.setMapForUser(userID, gameID);
         } else if (mapManager.isUserWithActiveMap(userID)) {

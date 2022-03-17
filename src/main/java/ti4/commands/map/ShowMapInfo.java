@@ -13,6 +13,7 @@ import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.util.*;
@@ -51,12 +52,11 @@ public class ShowMapInfo implements Command {
         sb.append("Map owner: " + map.getOwnerName()).append(NEW_LINE);
         sb.append("Map status: " + map.getMapStatus()).append(NEW_LINE);
         sb.append("Players: ").append(NEW_LINE);
-        HashMap<String, String> players = map.getPlayers();
+        HashMap<String, Player> players = map.getPlayers();
         int index = 1;
-        ArrayList<String> playerNames = new ArrayList<>(players.values());
-        Collections.sort(playerNames);
-        for (String value : playerNames) {
-            sb.append(index).append(". ").append(value).append(NEW_LINE);
+        ArrayList<Player> playerNames = new ArrayList<>(players.values());
+        for (Player value : playerNames) {
+            sb.append(index).append(". ").append(value.getUserName()).append(NEW_LINE);
             index++;
         }
         MessageHelper.replyToMessage(event, sb.toString());
