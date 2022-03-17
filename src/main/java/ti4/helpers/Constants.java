@@ -70,4 +70,11 @@ public class Constants {
     public static final Point MIRAGE_POSITION = new Point(55,5);
     public static final String MIRAGE = "mirage";
     public static final String PLANET = "planet";
+
+    public static final String PLAYER = "player";
+    public static final String INFO = "info";
+    public static final String TECH = "tech";
+    public static final String TG = "tg";
+    public static final String COMMODITIES = "commodities";
+    public static final String COMMODITIES_TOTAL = "commodities_total";
 }
