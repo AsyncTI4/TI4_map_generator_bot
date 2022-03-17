@@ -26,12 +26,12 @@ public class Setup extends PlayerSubcommandData{
         @SuppressWarnings("ConstantConditions")
         String color = event.getOption(Constants.COLOR).getAsString().toLowerCase();
         if (!Mapper.isColorValid(color)) {
-            MessageHelper.replyToMessage(event, "Color not valid");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Color not valid");
             return;
         }
         Player player = activeMap.getPlayer(getUser().getId());
         if (player == null){
-            MessageHelper.replyToMessage(event, "Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
         player.setColor(color);

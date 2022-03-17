@@ -149,7 +149,7 @@ public class GenerateMap {
         int y = heightForGameInfo + 20;
         int x = 10;
         HashMap<String, Player> players = map.getPlayers();
-        float percent = 0.16f;
+        float percent = 0.15f;
         int deltaY = 50;
         graphics.setFont(Storage.getFont32());
         Graphics2D g2 = (Graphics2D) graphics;
@@ -158,6 +158,7 @@ public class GenerateMap {
             int baseY = y;
             y += 34;
             Color color = getColor(player.getColor());
+//            graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
             graphics.drawString(player.getUserName(), x, y);
             y += 2;
@@ -170,19 +171,25 @@ public class GenerateMap {
                     graphics.drawImage(bufferedImage, x, y, null);
                 }
             }
-            String generalPath = getGeneralPath(Constants.TG);
-            BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(generalPath)), 0.20f);
-            graphics.drawImage(bufferedImage, x + 100, iconY, null);
-            graphics.setFont(Storage.getFont64());
+//            String generalPath = getGeneralPath(Constants.TG);
+//            BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(generalPath)), 0.20f);
+//            graphics.drawImage(bufferedImage, x + 100, iconY, null);
+//            graphics.setFont(Storage.getFont50());
+            StringBuilder sb = new StringBuilder();
+            sb.append(player.getTacticalCC()).append("T/");
+            sb.append(player.getFleetCC()).append("F/");
+            sb.append(player.getStrategicCC()).append("S ");
+            sb.append("TG: ").append(player.getTg());
+            sb.append(" C:").append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
 
-            graphics.drawString(Integer.toString(player.getTg()), x + 160, y + deltaY);
+            graphics.drawString(sb.toString(), x + 100, y + deltaY);
 
 
             graphics.setColor(color);
-            y += 100;
+            y += 90;
             g2.setColor(color);
-            g2.drawRect(x-2, baseY, x + widthOfLine, y-baseY);
-            y += 3;
+            g2.drawRect(x-5, baseY, x + widthOfLine, y-baseY);
+            y += 10;
 
         }
 
