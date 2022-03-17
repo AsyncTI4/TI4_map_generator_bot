@@ -72,7 +72,7 @@ public class Constants {
     public static final String PLANET = "planet";
 
     public static final String PLAYER = "player";
-    public static final String INFO = "info";
+    public static final String STATS = "stats";
     public static final String TECH = "tech";
     public static final String TG = "tg";
     public static final String COMMODITIES = "commodities";
