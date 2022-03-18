@@ -24,31 +24,7 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
-        if (event.getFocusedOption().getName().equals(Constants.COLOR)) {
-            String enteredValue = event.getFocusedOption().getValue();
-            List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = Mapper.getColors().stream()
-                    .limit(25)
-                    .filter(color -> color.startsWith(enteredValue))
-                    .map(color -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(color, color))
-                    .collect(Collectors.toList());
-            event.replyChoices(options).queue();
-        } else if (event.getFocusedOption().getName().equals(Constants.TOKEN)) {
-            String enteredValue = event.getFocusedOption().getValue();
-            List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = Mapper.getTokens().stream()
-                    .filter(token -> token.contains(enteredValue))
-                    .limit(25)
-                    .map(token -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(token, token))
-                    .collect(Collectors.toList());
-            event.replyChoices(options).queue();
-        } else if (event.getFocusedOption().getName().equals(Constants.FACTION)) {
-            String enteredValue = event.getFocusedOption().getValue();
-            List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = Mapper.getFactions().stream()
-                    .filter(faction -> faction.contains(enteredValue))
-                    .limit(25)
-                    .map(faction -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(faction, faction))
-                    .collect(Collectors.toList());
-            event.replyChoices(options).queue();
-        }
+        AutoCompleteProvider.autoCompleteListener(event);
     }
 
     @Override
