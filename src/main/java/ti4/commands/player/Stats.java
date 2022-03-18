@@ -1,6 +1,7 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.AliasHandler;
@@ -16,7 +17,16 @@ public class Stats extends PlayerSubcommandData {
         super(Constants.STATS, "Player Stats: CC,TG,Commodities");
         addOptions(new OptionData(OptionType.STRING, Constants.CC, "CC's Example: 3/3/2"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodity count"));
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodity count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.AC, "Action Card count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.PN, "Promissory Note count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.SO, "Secret Objective count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.SO_SCORED, "Score Secret Objective count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.CRF, "Cultural Relic Fragment count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.HRF, "Hazardous Relic Fragment count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.IRF, "Industrial Relic Fragment count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.VRF, "Void Relic Fragment count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Card Number count"));
     }
 
     @Override
@@ -42,8 +52,49 @@ public class Stats extends PlayerSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Not number entered, check CC count again");
             }
         }
-        player.setTg(event.getOption(Constants.TG).getAsInt());
-        player.setCommodities(event.getOption(Constants.COMMODITIES).getAsInt());
-
+        OptionMapping option = event.getOption(Constants.TG);
+        if (option != null) {
+            player.setTg(option.getAsInt());
+        }
+        option = event.getOption(Constants.COMMODITIES);
+        if (option != null) {
+            player.setCommodities(option.getAsInt());
+        }
+        option = event.getOption(Constants.AC);
+        if (option != null) {
+            player.setAc(option.getAsInt());
+        }
+        option = event.getOption(Constants.PN);
+        if (option != null) {
+            player.setPn(option.getAsInt());
+        }
+        option = event.getOption(Constants.SO);
+        if (option != null) {
+            player.setSo(option.getAsInt());
+        }
+        option = event.getOption(Constants.SO_SCORED);
+        if (option != null) {
+            player.setSoScored(option.getAsInt());
+        }
+        option = event.getOption(Constants.CRF);
+        if (option != null) {
+            player.setCrf(option.getAsInt());
+        }
+        option = event.getOption(Constants.HRF);
+        if (option != null) {
+            player.setHrf(option.getAsInt());
+        }
+        option = event.getOption(Constants.IRF);
+        if (option != null) {
+            player.setIrf(option.getAsInt());
+        }
+        option = event.getOption(Constants.VRF);
+        if (option != null) {
+            player.setVrf(option.getAsInt());
+        }
+        option = event.getOption(Constants.SC);
+        if (option != null) {
+            player.setSC(option.getAsInt());
+        }
     }
 }

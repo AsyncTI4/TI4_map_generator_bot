@@ -145,13 +145,13 @@ public class GenerateMap {
 
     private void gameInfo(Map map) throws IOException {
 
-        int widthOfLine = 1000;
+        int widthOfLine = 1800;
         int y = heightForGameInfo + 20;
         int x = 10;
         HashMap<String, Player> players = map.getPlayers();
         float percent = 0.15f;
         int deltaY = 50;
-        graphics.setFont(Storage.getFont32());
+        graphics.setFont(Storage.getFont26());
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(3));
         for (Player player : players.values()) {
@@ -176,17 +176,25 @@ public class GenerateMap {
 //            graphics.drawImage(bufferedImage, x + 100, iconY, null);
 //            graphics.setFont(Storage.getFont50());
             StringBuilder sb = new StringBuilder();
+            sb.append("SC: ").append(player.getSC()).append("   ");
             sb.append(player.getTacticalCC()).append("T/");
             sb.append(player.getFleetCC()).append("F/");
             sb.append(player.getStrategicCC()).append("S ");
             sb.append("TG: ").append(player.getTg());
             sb.append(" C:").append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
+            sb.append(" ").append("AC: ").append(player.getAc()).append(" ");
+            sb.append("PN: ").append(player.getPn()).append(" ");
+            sb.append("SO: ").append(player.getSo()).append(" scored: ").append(player.getSoScored()).append(" ");
+            sb.append("CRF: ").append(player.getCrf()).append(" ");
+            sb.append("HRF: ").append(player.getHrf()).append(" ");
+            sb.append("IRF: ").append(player.getIrf()).append(" ");
+            sb.append("VRF: ").append(player.getVrf()).append(" ");
 
             graphics.drawString(sb.toString(), x + 100, y + deltaY);
 
 
             graphics.setColor(color);
-            y += 90;
+            y += 80;
             g2.setColor(color);
             g2.drawRect(x-5, baseY, x + widthOfLine, y-baseY);
             y += 10;

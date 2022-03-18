@@ -75,8 +75,17 @@ public class Constants {
     public static final String STATS = "stats";
     public static final String SETUP = "setup";
     public static final String TECH = "tech";
-    public static final String TG = "tg";
+    public static final String TG = "trade_goods";
     public static final String COMMODITIES = "commodities";
     public static final String COMMODITIES_TOTAL = "commodities_total";
     public static final String FACTION = "faction";
+    public static final String AC = "action_cards";
+    public static final String PN = "promissary_notes";
+    public static final String SO = "secret_objectives";
+    public static final String SO_SCORED = "secret_objectives_scored";
+    public static final String CRF = "cultural_relic_fragment";
+    public static final String HRF = "hazardous_relic_fragment";
+    public static final String IRF = "industrial_relic_fragment";
+    public static final String VRF = "void_relic_fragment";
+    public static final String SC = "strategy_card";
 }

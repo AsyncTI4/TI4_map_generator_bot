@@ -1,6 +1,5 @@
 package ti4.map;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 
 public class Player {
@@ -20,15 +19,49 @@ public class Player {
     private int commoditiesTotal = 0;
 
     private int ac = 0;
+    private int pn = 0;
     private int so = 0;
     private int soScored = 0;
 
-    private int fragmentCultural = 0;
-    private int fragmentIndustrial = 0;
-    private int fragmentHazardous = 0;
+    private int crf = 0;
+    private int irf = 0;
+    private int hrf = 0;
+    private int vrf = 0;
     private HashSet<String> relics = new HashSet<>();
 
-    private String SC = "";
+    public int getCrf() {
+        return crf;
+    }
+
+    public void setCrf(int crf) {
+        this.crf = crf;
+    }
+
+    public int getIrf() {
+        return irf;
+    }
+
+    public void setIrf(int irf) {
+        this.irf = irf;
+    }
+
+    public int getHrf() {
+        return hrf;
+    }
+
+    public void setHrf(int hrf) {
+        this.hrf = hrf;
+    }
+
+    public int getVrf() {
+        return vrf;
+    }
+
+    public void setVrf(int vrf) {
+        this.vrf = vrf;
+    }
+
+    private int SC = 0;
 
     public Player(String userID, String userName) {
         this.userID = userID;
@@ -89,6 +122,48 @@ public class Player {
 
     public void setTg(int tg) {
         this.tg = tg;
+    }
+
+    public int getAc() {
+        return ac;
+    }
+
+    public void setAc(int ac) {
+        this.ac = ac;
+    }
+
+    public int getPn() {
+        return pn;
+    }
+
+    public void setPn(int pn) {
+        this.pn = pn;
+    }
+
+    public int getSo() {
+        return so;
+    }
+
+    public void setSo(int so) {
+        this.so = so;
+    }
+
+    public int getSoScored() {
+        return soScored;
+    }
+
+    public void setSoScored(int soScored) {
+        this.soScored = soScored;
+    }
+
+
+
+    public int getSC() {
+        return SC;
+    }
+
+    public void setSC(int SC) {
+        this.SC = SC;
     }
 
     public int getCommodities() {
