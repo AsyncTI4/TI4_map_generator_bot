@@ -80,3 +80,6 @@ hope helps speed things up
 /add_token tokenName system/tile planetNameOptional <- same as add control counter, specify token and planet name is optional
 /remove_token tokenName system/tile planetNameOptional <- same as add control counter, specify token and planet name is optional
 Attachement tokens can only be added to planets
+
+/player stats .... <- can set all the major stats for player
+/player setup faction color <- needs to set player faction and color
