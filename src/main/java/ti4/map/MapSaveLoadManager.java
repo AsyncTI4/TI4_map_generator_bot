@@ -92,7 +92,46 @@ public class MapSaveLoadManager {
 
             writer.write(playerEntry.getKey());
             writer.write(System.lineSeparator());
-            writer.write(playerEntry.getValue().getUserName());
+            Player player = playerEntry.getValue();
+            writer.write(player.getUserName());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.FACTION + " " +player.getFaction());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.COLOR + " " + player.getColor());
+            writer.write(System.lineSeparator());
+
+
+            writer.write("T " + player.getTacticalCC());
+            writer.write(System.lineSeparator());
+            writer.write("FS " + player.getFleetCC());
+            writer.write(System.lineSeparator());
+            writer.write("S " + player.getStrategicCC());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.TG +" " +  player.getTg());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.COMMODITIES+" " + player.getCommodities());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.COMMODITIES_TOTAL + " " +player.getCommoditiesTotal());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.AC + " " +player.getAc());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.PN + " " +player.getPn());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.SO + " " +player.getSo());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.SO_SCORED + " " +player.getSoScored());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.CRF + " " +player.getCrf());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.HRF + " " +player.getHrf());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.IRF + " " +player.getIrf());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.VRF + " " +player.getVrf());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.SC + " " +player.getSC());
             writer.write(System.lineSeparator());
 
             writer.write(ENDPLAYER);
@@ -347,8 +386,6 @@ public class MapSaveLoadManager {
                         }
                         readTokens(tile, data);
                     }
-
-
                 }
                 map.setTileMap(tileMap);
             } catch (FileNotFoundException e) {
@@ -362,7 +399,109 @@ public class MapSaveLoadManager {
     }
 
     private static void readPlayerInfo(Player player, String data) {
-
+        if (data.startsWith(Constants.FACTION)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setFaction(tokenizer.nextToken());
+            }
+        } else if (data.startsWith(Constants.COLOR)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setColor(tokenizer.nextToken());
+            }
+        } else if (data.startsWith("T ")){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith("FS ")){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith("S ")){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith(Constants.TG)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setTg(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith(Constants.COMMODITIES)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith(Constants.COMMODITIES_TOTAL)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith(Constants.AC)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setAc(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith(Constants.PN)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setPn(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith(Constants.SO)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setSo(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith(Constants.SO_SCORED)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setSoScored(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith(Constants.CRF)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setCrf(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith(Constants.HRF)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setHrf(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith(Constants.IRF)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setIrf(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith(Constants.VRF)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setVrf(Integer.parseInt(tokenizer.nextToken()));
+            }
+        } else if (data.startsWith(Constants.SC)){
+            StringTokenizer tokenizer = new StringTokenizer(data, " ");
+            if (tokenizer.countTokens() == 2) {
+                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+                player.setSC(Integer.parseInt(tokenizer.nextToken()));
+            }
+        }
     }
 
     private static Tile readTile(String tileData) {

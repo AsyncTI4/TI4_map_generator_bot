@@ -18,6 +18,7 @@ public class Stats extends PlayerSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.CC, "CC's Example: 3/3/2"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodity count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.AC, "Action Card count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.PN, "Promissory Note count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.SO, "Secret Objective count"))
@@ -59,6 +60,10 @@ public class Stats extends PlayerSubcommandData {
         option = event.getOption(Constants.COMMODITIES);
         if (option != null) {
             player.setCommodities(option.getAsInt());
+        }
+        option = event.getOption(Constants.COMMODITIES_TOTAL);
+        if (option != null) {
+            player.setCommoditiesTotal(option.getAsInt());
         }
         option = event.getOption(Constants.AC);
         if (option != null) {

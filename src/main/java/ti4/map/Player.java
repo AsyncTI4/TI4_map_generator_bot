@@ -24,10 +24,17 @@ public class Player {
     private int soScored = 0;
 
     private int crf = 0;
-    private int irf = 0;
     private int hrf = 0;
+    private int irf = 0;
     private int vrf = 0;
     private HashSet<String> relics = new HashSet<>();
+    private int SC = 0;
+
+
+    public Player(String userID, String userName) {
+        this.userID = userID;
+        this.userName = userName;
+    }
 
     public int getCrf() {
         return crf;
@@ -59,13 +66,6 @@ public class Player {
 
     public void setVrf(int vrf) {
         this.vrf = vrf;
-    }
-
-    private int SC = 0;
-
-    public Player(String userID, String userName) {
-        this.userID = userID;
-        this.userName = userName;
     }
 
     public String getUserID() {

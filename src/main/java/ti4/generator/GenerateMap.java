@@ -194,10 +194,10 @@ public class GenerateMap {
 
 
             graphics.setColor(color);
-            y += 80;
+            y += 90;
             g2.setColor(color);
             g2.drawRect(x-5, baseY, x + widthOfLine, y-baseY);
-            y += 10;
+            y += 15;
 
         }
 
