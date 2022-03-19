@@ -23,7 +23,6 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-
         String mapName = event.getOptions().get(0).getAsString();
         if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Map with such name does not exists, use /list_maps");
@@ -33,7 +32,7 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
 
         MapManager mapManager = MapManager.getInstance();
         Map map = mapManager.getMap(mapName);
-        if (!map.getOwnerID().equals(callerUser.getId())){
+        if (!map.getOwnerID().equals(callerUser.getId()) && !event.getUser().getId().equals(MapGenerator.userID)){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game/Map owner can add/remove players.");
             return;
         }

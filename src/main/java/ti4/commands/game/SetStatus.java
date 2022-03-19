@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
@@ -32,6 +33,13 @@ public class SetStatus extends GameSubcommandData{
 
         MapManager mapManager = MapManager.getInstance();
         Map mapToChangeStatusFor = mapManager.getMap(mapName);
+
+        Map map = mapManager.getMap(mapName);
+        if (!map.getOwnerID().equals(event.getUser().getId()) && !event.getUser().getId().equals(MapGenerator.userID)){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game/Map owner can add/remove players.");
+            return;
+        }
+
         try {
             MapStatus mapStatus = MapStatus.valueOf(status);
             if (mapStatus == MapStatus.open) {
