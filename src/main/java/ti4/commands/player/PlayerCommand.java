@@ -57,10 +57,17 @@ public class PlayerCommand implements Command {
         }
         String commandExecuted = "User: " + userName + " executed command. " + activeMap + "\n" +
                 event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
-                .map(option -> option.getName() + ":" + option.getAsString())
+                .map(option -> option.getName() + ":" + getOptionValue(option))
                 .collect(Collectors.joining(" "));
 
         MessageHelper.sendMessageToChannel(event.getChannel(), commandExecuted);
+    }
+
+    private String getOptionValue(OptionMapping option) {
+        if (option.getName().equals(Constants.PLAYER)){
+            return option.getAsUser().getName();
+        }
+        return option.getAsString();
     }
 
     @Override

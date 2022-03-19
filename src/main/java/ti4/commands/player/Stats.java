@@ -27,7 +27,8 @@ public class Stats extends PlayerSubcommandData {
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.HRF, "Hazardous Relic Fragment count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.IRF, "Industrial Relic Fragment count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.VRF, "Void Relic Fragment count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Card Number count"));
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Card Number count"))
+                .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
     }
 
     @Override
@@ -39,21 +40,36 @@ public class Stats extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        @SuppressWarnings("ConstantConditions")
-        String cc = AliasHandler.resolveFaction(event.getOption(Constants.CC).getAsString().toLowerCase());
-        StringTokenizer tokenizer = new StringTokenizer(cc, "/");
-        if (tokenizer.countTokens() != 3) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Wrong format for tokens count. Must be 3/3/3");
-        } else {
-            try {
-                player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
-                player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
-                player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
-            } catch (Exception e) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Not number entered, check CC count again");
+
+        OptionMapping playerOption = event.getOption(Constants.PLAYER);
+        if (playerOption != null) {
+            String playerID = playerOption.getAsUser().getId();
+            if (activeMap.getPlayer(playerID) != null) {
+                player = activeMap.getPlayers().get(playerID);
+            } else {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerOption.getAsUser().getName() + " could not be found in map:" + activeMap.getName());
+                return;
             }
         }
-        OptionMapping option = event.getOption(Constants.TG);
+
+        OptionMapping option = event.getOption(Constants.CC);
+        if (option != null) {
+            @SuppressWarnings("ConstantConditions")
+            String cc = AliasHandler.resolveFaction(option.getAsString().toLowerCase());
+            StringTokenizer tokenizer = new StringTokenizer(cc, "/");
+            if (tokenizer.countTokens() != 3) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Wrong format for tokens count. Must be 3/3/3");
+            } else {
+                try {
+                    player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
+                    player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
+                    player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
+                } catch (Exception e) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Not number entered, check CC count again");
+                }
+            }
+        }
+        option = event.getOption(Constants.TG);
         if (option != null) {
             player.setTg(option.getAsInt());
         }

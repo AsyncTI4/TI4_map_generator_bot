@@ -20,7 +20,7 @@ public class Player {
 
     private int ac = 0;
     private int pn = 0;
-    private int so = 0;
+    private int so = 1;
     private int soScored = 0;
 
     private int crf = 0;

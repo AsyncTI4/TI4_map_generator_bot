@@ -1,6 +1,7 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
@@ -14,7 +15,8 @@ public class Setup extends PlayerSubcommandData{
     public Setup() {
         super(Constants.SETUP, "Player initialisation: Faction and Color");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name").setRequired(true).setAutoComplete(true))
-                .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setRequired(true).setAutoComplete(true));
+                .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setRequired(true).setAutoComplete(true))
+                .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
     }
 
     @Override
@@ -33,6 +35,17 @@ public class Setup extends PlayerSubcommandData{
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
+        OptionMapping playerOption = event.getOption(Constants.PLAYER);
+        if (playerOption != null){
+            String playerID = playerOption.getAsUser().getId();
+            if (activeMap.getPlayer(playerID) != null){
+                player = activeMap.getPlayers().get(playerID);
+            } else {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" +playerOption.getAsUser().getName()+ " could not be found in map:" + activeMap.getName());
+                return;
+            }
+        }
+
         player.setColor(color);
         player.setFaction(faction);
     }
