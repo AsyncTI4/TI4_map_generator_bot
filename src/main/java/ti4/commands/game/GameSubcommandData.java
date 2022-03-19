@@ -1,4 +1,4 @@
-package ti4.commands.player;
+package ti4.commands.game;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -7,7 +7,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.map.Map;
 import ti4.map.MapManager;
 
-public abstract class PlayerSubcommandData extends SubcommandData {
+public abstract class GameSubcommandData extends SubcommandData {
 
     private Map activeMap;
     private User user;
@@ -16,7 +16,7 @@ public abstract class PlayerSubcommandData extends SubcommandData {
         return getName();
     }
 
-    public PlayerSubcommandData(@NotNull String name, @NotNull String description) {
+    public GameSubcommandData(@NotNull String name, @NotNull String description) {
         super(name, description);
     }
 

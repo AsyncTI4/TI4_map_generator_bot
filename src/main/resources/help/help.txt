@@ -7,13 +7,16 @@ To set active map use:
 Now automatically sets active map in channels that go: mapName-map-updates
 so in any channel that is named like this, you don't need to set active map, it automatically sets for you
 so switching between games is much easier.
-/set_map_status mapName status
+
+/game set_map_status mapName status
 status: open or locked
 Status open, means anyone can edit map, can join map as player;
 Status locked means, only joined players and map creator can edit map. No more players can join
-/join mapName <- join an open map to be able to edit even if map is locked
-/leave mapName <- leave an open map
-/show_map_info mapName <- information of map, status if open/locked and player list
+/game join mapName <- join an open map to be able to edit even if map is locked
+/game leave mapName <- leave an open map
+/game info mapName <- information of map, status if open/locked and player list
+/game add mapName @playerName
+/game remove mapName @playerName
 
 
 For easy of setup suggest first command after map creation use

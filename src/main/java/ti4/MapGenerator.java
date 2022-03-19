@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import ti4.commands.*;
+import ti4.commands.game.GameCommand;
 import ti4.commands.info.*;
 import ti4.commands.map.*;
 import ti4.commands.player.PlayerCommand;
@@ -80,10 +81,6 @@ public class MapGenerator {
         commandManager.addCommand(new AddControl());
         commandManager.addCommand(new RemoveControl());
         commandManager.addCommand(new MoveUnits());
-        commandManager.addCommand(new SetMapStatus());
-        commandManager.addCommand(new Join());
-        commandManager.addCommand(new Leave());
-        commandManager.addCommand(new ShowMapInfo());
         commandManager.addCommand(new ListPlanets());
         commandManager.addCommand(new RemoveToken());
         commandManager.addCommand(new AddToken());
@@ -94,6 +91,7 @@ public class MapGenerator {
         commandManager.addCommand(new LogMessage());
 
         commandManager.addCommand(new PlayerCommand());
+        commandManager.addCommand(new GameCommand());
 
         Guild guild = jda.getGuildById(args[2]);
 

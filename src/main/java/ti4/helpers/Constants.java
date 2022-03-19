@@ -15,7 +15,9 @@ public class Constants {
     public static final String REMOVE_PLAYER = "remove_player";
     public static final String PLAYER_NAME = "player_name";
     public static final String JOIN = "join";
+    public static final String ADD = "add";
     public static final String LEAVE = "leave";
+    public static final String REMOVE = "remove";
     public static final String SAVE_MAPS = "save_maps";
     public static final String LIST_TILES = "list_tiles";
     public static final String LIST_PLANETS = "list_planets";
@@ -70,6 +72,9 @@ public class Constants {
     public static final Point MIRAGE_POSITION = new Point(55,5);
     public static final String MIRAGE = "mirage";
     public static final String PLANET = "planet";
+
+    public static final String GAME = "game";
+    public static final String INFO = "info";
 
     public static final String PLAYER = "player";
     public static final String STATS = "stats";
