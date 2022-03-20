@@ -16,6 +16,9 @@ public class Stats extends PlayerSubcommandData {
     public Stats() {
         super(Constants.STATS, "Player Stats: CC,TG,Commodities");
         addOptions(new OptionData(OptionType.STRING, Constants.CC, "CC's Example: 3/3/2"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.TACTICAL, "Tactical command counter count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.FLEET, "Fleet command counter count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY, "Strategy command counter count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodity count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
@@ -26,7 +29,7 @@ public class Stats extends PlayerSubcommandData {
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.CRF, "Cultural Relic Fragment count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.HRF, "Hazardous Relic Fragment count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.IRF, "Industrial Relic Fragment count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.VRF, "Void Relic Fragment count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.VRF, "Unknown Relic Fragment count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Card Number count"))
                 .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
     }
@@ -53,20 +56,37 @@ public class Stats extends PlayerSubcommandData {
         }
 
         OptionMapping option = event.getOption(Constants.CC);
-        if (option != null) {
-            @SuppressWarnings("ConstantConditions")
-            String cc = AliasHandler.resolveFaction(option.getAsString().toLowerCase());
-            StringTokenizer tokenizer = new StringTokenizer(cc, "/");
-            if (tokenizer.countTokens() != 3) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Wrong format for tokens count. Must be 3/3/3");
-            } else {
-                try {
-                    player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
-                    player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
-                    player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
-                } catch (Exception e) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Not number entered, check CC count again");
+        OptionMapping optionT = event.getOption(Constants.TACTICAL);
+        OptionMapping optionF = event.getOption(Constants.FLEET);
+        OptionMapping optionS = event.getOption(Constants.STRATEGY);
+        if (option != null && (optionT != null || optionF != null && optionS != null)){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Use format 3/3/3 for command counters or individual values, not both");
+        } else {
+
+            if (option != null) {
+                @SuppressWarnings("ConstantConditions")
+                String cc = AliasHandler.resolveFaction(option.getAsString().toLowerCase());
+                StringTokenizer tokenizer = new StringTokenizer(cc, "/");
+                if (tokenizer.countTokens() != 3) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Wrong format for tokens count. Must be 3/3/3");
+                } else {
+                    try {
+                        player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
+                        player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
+                        player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
+                    } catch (Exception e) {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "Not number entered, check CC count again");
+                    }
                 }
+            }
+            if (optionT != null) {
+                player.setTacticalCC(optionT.getAsInt());
+            }
+            if (optionF != null) {
+                player.setFleetCC(optionF.getAsInt());
+            }
+            if (optionS != null) {
+                player.setStrategicCC(optionS.getAsInt());
             }
         }
         option = event.getOption(Constants.TG);
