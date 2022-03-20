@@ -79,18 +79,9 @@ public class Map {
         return players.keySet();
     }
 
-    public void removePlayer(String name){
+    public void removePlayer(String playerID){
         if (MapStatus.open.equals(mapStatus)) {
-            String keyToDelete = null;
-            for (java.util.Map.Entry<String, Player> playerEntry : players.entrySet()) {
-                if (playerEntry.getValue().getUserName().equals(name)) {
-                    keyToDelete = playerEntry.getKey();
-                    break;
-                }
-            }
-            if (keyToDelete != null) {
-                players.remove(keyToDelete);
-            }
+            players.remove(playerID);
         }
     }
 

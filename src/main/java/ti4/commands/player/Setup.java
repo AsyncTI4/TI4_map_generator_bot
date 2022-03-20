@@ -24,6 +24,10 @@ public class Setup extends PlayerSubcommandData{
         Map activeMap = getActiveMap();
         @SuppressWarnings("ConstantConditions")
         String faction = AliasHandler.resolveFaction(event.getOption(Constants.FACTION).getAsString().toLowerCase());
+        if (!Mapper.isFaction(faction)) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Faction not valid");
+            return;
+        }
         @SuppressWarnings("ConstantConditions")
         String color = event.getOption(Constants.COLOR).getAsString().toLowerCase();
         if (!Mapper.isColorValid(color)) {

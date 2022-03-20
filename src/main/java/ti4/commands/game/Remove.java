@@ -17,6 +17,6 @@ public class Remove extends AddRemovePlayer {
 
     @Override
     protected void action(Map map, User user) {
-        map.addPlayer(user.getId(), user.getName());
+        map.removePlayer(user.getId());
     }
 }

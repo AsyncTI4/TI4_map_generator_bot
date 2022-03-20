@@ -52,6 +52,10 @@ public class Mapper {
         return colors.getProperty(color) != null;
     }
 
+    public static boolean isFaction(String faction){
+        return factions.getProperty(faction) != null;
+    }
+
     public static String getColorID(String color){
         return colors.getProperty(color);
     }

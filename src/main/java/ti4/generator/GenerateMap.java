@@ -209,7 +209,7 @@ public class GenerateMap {
         }
         switch (color){
             case "black":
-                return Color.WHITE;
+                return Color.BLACK.brighter();
             case "blue":
                 return Color.BLUE;
             case "green":
