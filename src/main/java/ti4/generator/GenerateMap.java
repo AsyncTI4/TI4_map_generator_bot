@@ -151,9 +151,9 @@ public class GenerateMap {
         HashMap<String, Player> players = map.getPlayers();
         float percent = 0.15f;
         int deltaY = 50;
-        graphics.setFont(Storage.getFont26());
+        graphics.setFont(Storage.getFont32());
         Graphics2D g2 = (Graphics2D) graphics;
-        g2.setStroke(new BasicStroke(3));
+        g2.setStroke(new BasicStroke(5));
         for (Player player : players.values()) {
             int baseY = y;
             y += 34;
