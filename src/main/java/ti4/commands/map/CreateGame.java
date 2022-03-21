@@ -12,6 +12,7 @@ import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -28,12 +29,12 @@ public class CreateGame implements Command {
         if (!event.getName().equals(getActionID())) {
             return false;
         }
-        String mapName = event.getOptions().get(0).getAsString();
+        String mapName = event.getOptions().get(0).getAsString().toLowerCase();
         String regex = "^[a-zA-Z0-9]+$";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(mapName);
         if (!matcher.matches()){
-            MessageHelper.replyToMessage(event, "Map name can only contain a-z A-Z 0-9 symbols");
+            MessageHelper.replyToMessage(event, "Map name can only contain a-z 0-9 symbols");
             return false;
         }
         if (MapManager.getInstance().getMapList().containsKey(mapName)) {

@@ -96,7 +96,7 @@ abstract public class UnitHolder {
 
     public void removeUnitDamage(String unit, Integer count) {
         if (count > 0) {
-            Integer unitCount = units.get(unit);
+            Integer unitCount = unitsDamage.get(unit);
             if (unitCount != null) {
                 unitCount -= count;
                 if (unitCount > 0) {
