@@ -51,7 +51,7 @@ public class GenerateMap {
         }
         width = setupImage.getWidth();
         heightForGameInfo = setupImage.getHeight();
-        height = heightForGameInfo + setupImage.getHeight()/2;
+        height = heightForGameInfo + setupImage.getHeight() / 2;
         resetImage();
     }
 
@@ -125,6 +125,7 @@ public class GenerateMap {
         file.delete();
         return new File(absolutePath);
     }
+
     private String getFactionPath(String factionID) {
         String factionFileName = Mapper.getFactionFileName(factionID);
         String factionFile = ResourceHelper.getInstance().getFactionFile(factionFileName);
@@ -196,18 +197,18 @@ public class GenerateMap {
             graphics.setColor(color);
             y += 90;
             g2.setColor(color);
-            g2.drawRect(x-5, baseY, x + widthOfLine, y-baseY);
+            g2.drawRect(x - 5, baseY, x + widthOfLine, y - baseY);
             y += 15;
 
         }
 
     }
 
-    private Color getColor(String color){
-        if (color == null){
+    private Color getColor(String color) {
+        if (color == null) {
             return Color.WHITE;
         }
-        switch (color){
+        switch (color) {
             case "black":
                 return Color.DARK_GRAY;
             case "blue":
@@ -330,12 +331,16 @@ public class GenerateMap {
 
     private BufferedImage addToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
         HashSet<String> tokenList = unitHolder.getTokenList();
-        int deltaY = 0;
-        boolean useOffset = Mapper.getSpecialCaseValues(Constants.POSITION).contains(tile.getTileID());
-        int offSet = 0;
         Point centerPosition = unitHolder.getHolderCenterPosition();
-        int x = tileX + centerPosition.x;
-        int y = tileY + centerPosition.y - (tokenList.size() > 1 ? 35 : 0);
+        int x = tileX;
+        int y = tileY;
+
+        ArrayList<Point> spaceTokenPositions = PositionMapper.getSpaceTokenPositions(tile.getTileID());
+        if (spaceTokenPositions.isEmpty()) {
+            x = tileX + centerPosition.x;
+            y = tileY + centerPosition.y;
+        }
+        int index = 0;
         for (String tokenID : tokenList) {
             String tokenPath = tile.getTokenPath(tokenID);
             if (tokenPath == null) {
@@ -344,25 +349,20 @@ public class GenerateMap {
             }
             try {
                 image = resizeImage(ImageIO.read(new File(tokenPath)), 0.85f);
-                if (useOffset) {
-                    if (offSet == 0) {
-                        offSet = -image.getHeight() / 2 - 25;
-                    } else if (offSet < 0) {
-                        offSet = image.getHeight() + 25;
-                    }
-                }
             } catch (Exception e) {
                 LoggerHandler.log("Could not parse control token file for: " + tokenID, e);
             }
 
             if (tokenPath.contains(Constants.MIRAGE)) {
                 graphics.drawImage(image, tileX + Constants.MIRAGE_POSITION.x, tileY + Constants.MIRAGE_POSITION.y, null);
+            } else if (tokenPath.contains(Constants.SLEEPER)) {
+                graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth()/2), tileY + centerPosition.y - (image.getHeight()/2), null);
             } else {
-                graphics.drawImage(image, x - (image.getWidth() / 2), y + offSet + deltaY - (image.getHeight() / 2), null);
-                y += image.getHeight();
-            }
-            if (!useOffset) {
-                deltaY += image.getHeight();
+                if (spaceTokenPositions.size() > index) {
+                    Point point = spaceTokenPositions.get(index);
+                    graphics.drawImage(image, x + point.x, y + point.y, null);
+                    index++;
+                }
             }
         }
         return image;

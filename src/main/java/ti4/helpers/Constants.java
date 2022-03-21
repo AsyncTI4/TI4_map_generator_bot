@@ -71,6 +71,7 @@ public class Constants {
     public static final Point SPACE_CENTER_POSITION = new Point(172,150);
     public static final Point MIRAGE_POSITION = new Point(55,5);
     public static final String MIRAGE = "mirage";
+    public static final String SLEEPER = "sleeper";
     public static final String PLANET = "planet";
 
     public static final String GAME = "game";
