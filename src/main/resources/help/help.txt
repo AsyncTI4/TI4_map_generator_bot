@@ -1,22 +1,22 @@
 Commands:
-First you need to create map and set active map you modifying.
-To create map use:
-/create_game mapName
-To set active map use:
-/set_map mapName <- Map name can only contain a-z A-Z 0-9 symbols
-Now automatically sets active map in channels that go: mapName-map-updates
+First you need to create game and set active game you modifying.
+To create game use:
+/create_game gameName
+To set active game use:
+/set_game gameName <- Map name can only contain a-z A-Z 0-9 symbols
+Now automatically sets active map in channels that go: gameName-map-updates
 so in any channel that is named like this, you don't need to set active map, it automatically sets for you
 so switching between games is much easier.
 
-/game set_map_status mapName status
+/game set_game_status gameName status
 status: open or locked
 Status open, means anyone can edit map, can join map as player;
 Status locked means, only joined players and map creator can edit map. No more players can join
-/game join mapName <- join an open map to be able to edit even if map is locked
-/game leave mapName <- leave an open map
-/game info mapName <- information of map, status if open/locked and player list
-/game add mapName @playerName
-/game remove mapName @playerName
+/game join gameName <- join an open map to be able to edit even if map is locked
+/game leave gameName <- leave an open map
+/game info gameName <- information of map, status if open/locked and player list
+/game add gameName @playerName
+/game remove gameName @playerName
 
 
 For easy of setup suggest first command after map creation use
@@ -32,15 +32,15 @@ Mecatol position is MR)
 You can use also tileID, so liek TI4 marks tiles 01 is Jord for example
 /list_tiles <- lists all tiles, use starting number id to add to map
 /remove_tile tileName or position
-/list_maps <- lists all available maps that are created
+/list_games <- lists all available maps that are created
 /list_planets <- lists all available planets
-/delete_map <-deletes your map, only can delete the map you created
-/show_map mapName <- displays the map
-If you have active map set, it shows your active map if no map name is defines
+/delete_game <-deletes your game, only can delete the map you created
+/show_game gameName <- displays the game map
+If you have active game set, it shows your active game if no game name is defines
 /list_units <- lists all possible units
 /add_cc colorList tile or position <- add's cc to system: colorList can be pink,red,black as example/
 /remove_cc color tile or position <- remove's cc from system: ccolorList can be pink,red,black as example/
-/remove_all_cc confirmation(YES) <- need to type in YES, will remove all CC's from active map
+/remove_all_cc confirmation(YES) <- need to type in YES, will remove all CC's from active game
 /add_control color tile planetList <- need to specify tile and planetList, example /add_control pink 3a arnor,lor
 /remove_control color tile planet
 and most interesting is

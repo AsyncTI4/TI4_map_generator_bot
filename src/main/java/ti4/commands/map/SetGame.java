@@ -1,6 +1,5 @@
 package ti4.commands.map;
 
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -13,11 +12,11 @@ import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.message.MessageHelper;
 
-public class SetMap implements Command {
+public class SetGame implements Command {
 
     @Override
     public String getActionID() {
-        return Constants.SET_MAP;
+        return Constants.SET_GAME;
     }
 
     @Override
@@ -27,7 +26,7 @@ public class SetMap implements Command {
         }
         String mapName = event.getOptions().get(0).getAsString();
         if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-            MessageHelper.replyToMessage(event, "Map with such name: "+mapName+ " does not exists, use /list_maps");
+            MessageHelper.replyToMessage(event, "Game with such name: "+mapName+ " does not exists, use /list_games");
             return false;
         }
         String userID = event.getUser().getId();
@@ -62,8 +61,8 @@ public class SetMap implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), "Set map as active")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name to be set as active")
+                Commands.slash(getActionID(), "Set active game")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name to be set as active")
                                 .setRequired(true))
 
         );

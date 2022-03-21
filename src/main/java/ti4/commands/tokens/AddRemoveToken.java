@@ -28,7 +28,7 @@ abstract public class AddRemoveToken implements Command {
         String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
         if (!mapManager.isUserWithActiveMap(userID)) {
-            MessageHelper.replyToMessage(event, "Set your active map using: /set_map mapname");
+            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
             OptionMapping option = event.getOption(Constants.COLOR);
             ArrayList<String> colors = new ArrayList<>();

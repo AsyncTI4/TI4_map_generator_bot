@@ -14,12 +14,12 @@ import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
-public class DeleteMap implements Command {
+public class DeleteGame implements Command {
 
 
     @Override
     public String getActionID() {
-        return Constants.DELETE_MAP;
+        return Constants.DELETE_GAME;
     }
 
     @Override
@@ -72,7 +72,7 @@ public class DeleteMap implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), "Delete selected map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name")
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type in YES")
                                 .setRequired(true))

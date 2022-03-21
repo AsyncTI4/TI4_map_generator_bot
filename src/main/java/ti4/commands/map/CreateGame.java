@@ -12,7 +12,6 @@ import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
-import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -21,7 +20,7 @@ public class CreateGame implements Command {
 
     @Override
     public String getActionID() {
-        return Constants.CREATE_MAP;
+        return Constants.CREATE_GAME;
     }
 
     @Override
@@ -69,7 +68,7 @@ public class CreateGame implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), "Shows selected map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name")
                                 .setRequired(true))
         );
     }

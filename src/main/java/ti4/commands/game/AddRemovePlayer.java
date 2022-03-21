@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
-import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -17,7 +16,7 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
 
     public AddRemovePlayer(@NotNull String name, @NotNull String description) {
         super(name, description);
-        addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player @playerName").setRequired(true));
     }
 
@@ -25,7 +24,7 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String mapName = event.getOptions().get(0).getAsString();
         if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Map with such name does not exists, use /list_maps");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Map with such name does not exists, use /list_games");
             return;
         }
         User callerUser = event.getUser();

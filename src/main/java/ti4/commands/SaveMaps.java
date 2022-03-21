@@ -13,7 +13,7 @@ public class SaveMaps implements Command {
 
     @Override
     public String getActionID() {
-        return Constants.SAVE_MAPS;
+        return Constants.SAVE_GAMES;
     }
 
     @Override

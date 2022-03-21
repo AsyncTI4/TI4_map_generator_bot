@@ -34,11 +34,11 @@ public class PlayerCommand implements Command {
             String userID = event.getUser().getId();
             MapManager mapManager = MapManager.getInstance();
             if (!mapManager.isUserWithActiveMap(userID)) {
-                MessageHelper.replyToMessage(event, "Set your active map using: /set_map mapName");
+                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;
             }
             if (!mapManager.getUserActiveMap(userID).getPlayerIDs().contains(userID)) {
-                MessageHelper.replyToMessage(event, "Your not a player of the map, please call function /join mapName");
+                MessageHelper.replyToMessage(event, "Your not a player of the game, please call function /join gameName");
                 return false;
             }
             return true;

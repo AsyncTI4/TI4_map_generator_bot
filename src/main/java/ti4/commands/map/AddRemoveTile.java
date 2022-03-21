@@ -37,7 +37,7 @@ abstract public class AddRemoveTile implements Command {
         String userID = member.getId();
         MapManager mapManager = MapManager.getInstance();
         if (!mapManager.isUserWithActiveMap(userID)) {
-            MessageHelper.replyToMessage(event, "Set your active map using: /set_map mapname");
+            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
 
 

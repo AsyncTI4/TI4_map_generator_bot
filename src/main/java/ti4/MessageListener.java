@@ -51,11 +51,11 @@ public class MessageListener extends ListenerAdapter {
                 (mapManager.getUserActiveMap(userID) == null || !mapManager.getUserActiveMap(userID).getName().equals(gameID) &&
                 (mapManager.getMap(gameID) != null && (mapManager.getMap(gameID).isMapOpen() ||
                         mapManager.getMap(gameID).getPlayerIDs().contains(userID))))) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Active map set to: " + gameID);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Active game set to: " + gameID);
             mapManager.setMapForUser(userID, gameID);
         } else if (mapManager.isUserWithActiveMap(userID)) {
             if (mapList.stream().anyMatch(map -> map.equals(gameID)) && !channelName.startsWith(userActiveMap.getName())) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Active map reset. Channel name indicates to have map associated with it. Please select correct active map or do action in neutral channel");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Active game reset. Channel name indicates to have map associated with it. Please select correct active game or do action in neutral channel");
                 mapManager.resetMapForUser(userID);
             }
         }

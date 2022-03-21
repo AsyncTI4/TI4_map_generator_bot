@@ -42,7 +42,7 @@ public class AddTileList implements Command {
         MapManager mapManager = MapManager.getInstance();
         Map userActiveMap = mapManager.getUserActiveMap(userID);
         if (!mapManager.isUserWithActiveMap(userID)) {
-            MessageHelper.replyToMessage(event, "Set your active map using: /set_map mapname");
+            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
 
 

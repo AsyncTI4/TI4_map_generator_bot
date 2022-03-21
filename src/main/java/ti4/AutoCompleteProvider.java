@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -29,7 +28,7 @@ public class AutoCompleteProvider {
                     .map(token -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(token, token))
                     .collect(Collectors.toList());
             event.replyChoices(options).queue();
-        } else if (event.getFocusedOption().getName().equals(Constants.MAP_STATUS)) {
+        } else if (event.getFocusedOption().getName().equals(Constants.GAME_STATUS)) {
             String enteredValue = event.getFocusedOption().getValue();
             List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = Stream.of("open", "locked")
                     .filter(value -> value.contains(enteredValue))

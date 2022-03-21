@@ -9,21 +9,18 @@ import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 public class SetStatus extends GameSubcommandData{
 
     public SetStatus() {
-        super(Constants.SET_MAP_STATUS, "Game information:");
-       addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name to be set as active").setRequired(true))
-        .addOptions(new OptionData(OptionType.STRING, Constants.MAP_STATUS, "Map status: open, locked").setRequired(true));
+        super(Constants.SET_GAME_STATUS, "Game information:");
+       addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name to be set as active").setRequired(true))
+        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_STATUS, "Game status: open, locked").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        OptionMapping mapNameOption = event.getOption(Constants.MAP_NAME);
-        OptionMapping mapStatusOption = event.getOption(Constants.MAP_STATUS);
+        OptionMapping mapNameOption = event.getOption(Constants.GAME_NAME);
+        OptionMapping mapStatusOption = event.getOption(Constants.GAME_STATUS);
         if (mapNameOption == null || mapStatusOption == null){
             MessageHelper.replyToMessage(event, "Not all fields specified.");
             return;

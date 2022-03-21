@@ -37,7 +37,7 @@ public class RemoveAllCC implements Command {
         String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
         if (!mapManager.isUserWithActiveMap(userID)) {
-            MessageHelper.replyToMessage(event, "Set your active map using: /set_map mapName");
+            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
             Map activeMap = mapManager.getUserActiveMap(userID);
             parsingForTile(event, activeMap);

@@ -15,21 +15,21 @@ abstract public class JoinLeave extends GameSubcommandData {
 
     public JoinLeave(@NotNull String name, @NotNull String description) {
         super(name, description);
-        addOptions(new OptionData(OptionType.STRING, Constants.MAP_NAME, "Map name").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String mapName = event.getOptions().get(0).getAsString();
         if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Map with such name does not exists, use /list_maps");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exists, use /list_games");
             return;
         }
 
         MapManager mapManager = MapManager.getInstance();
         Map map = mapManager.getMap(mapName);
         if (!map.isMapOpen()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Map is not open. Can join/leave only open map.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not open. Can join/leave only open game.");
             return;
         }
         User user = event.getUser();

@@ -69,11 +69,11 @@ public class MapGenerator {
         commandManager.addCommand(new Shutdown());
         commandManager.addCommand(new ListTiles());
         commandManager.addCommand(new SaveMaps());
-        commandManager.addCommand(new ListMaps());
-        commandManager.addCommand(new SetMap());
-        commandManager.addCommand(new ShowMap());
+        commandManager.addCommand(new ListGames());
+        commandManager.addCommand(new SetGame());
+        commandManager.addCommand(new ShowGame());
         commandManager.addCommand(new AddTileList());
-        commandManager.addCommand(new DeleteMap());
+        commandManager.addCommand(new DeleteGame());
         commandManager.addCommand(new ListUnits());
         commandManager.addCommand(new AddCC());
         commandManager.addCommand(new RemoveCC());

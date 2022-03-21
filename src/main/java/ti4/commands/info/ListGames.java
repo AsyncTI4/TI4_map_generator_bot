@@ -12,11 +12,11 @@ import ti4.message.MessageHelper;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-public class ListMaps implements Command {
+public class ListGames implements Command {
 
     @Override
     public String getActionID() {
-        return Constants.LIST_MAPS;
+        return Constants.LIST_GAMES;
     }
 
     @Override
