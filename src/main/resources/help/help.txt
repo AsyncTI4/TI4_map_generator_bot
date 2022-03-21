@@ -17,6 +17,8 @@ Status locked means, only joined players and map creator can edit map. No more p
 /game info gameName <- information of map, status if open/locked and player list
 /game add gameName @playerName
 /game remove gameName @playerName
+/game set_order @playerName1 @playerName2 .....
+Add all players in order for game
 
 
 For easy of setup suggest first command after map creation use

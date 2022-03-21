@@ -3,6 +3,7 @@ package ti4.commands.game;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import org.jetbrains.annotations.NotNull;
@@ -47,7 +48,7 @@ public class GameCommand implements Command {
     }
 
     private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)){
+        if (option.getType().equals(OptionType.USER)){
             return option.getAsUser().getName();
         }
         return option.getAsString();
@@ -76,6 +77,7 @@ public class GameCommand implements Command {
         subcommands.add(new Leave());
         subcommands.add(new Add());
         subcommands.add(new Remove());
+        subcommands.add(new SetOrder());
         return subcommands;
     }
 

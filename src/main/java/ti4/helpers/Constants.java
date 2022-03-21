@@ -76,7 +76,16 @@ public class Constants {
 
     public static final String GAME = "game";
     public static final String INFO = "info";
+    public static final String SET_ORDER = "set_order";
 
+    public static final String PLAYER1 = "player1";
+    public static final String PLAYER2 = "player2";
+    public static final String PLAYER3 = "player3";
+    public static final String PLAYER4 = "player4";
+    public static final String PLAYER5 = "player5";
+    public static final String PLAYER6 = "player6";
+    public static final String PLAYER7 = "player7";
+    public static final String PLAYER8 = "player8";
     public static final String PLAYER = "player";
     public static final String STATS = "stats";
     public static final String SETUP = "setup";

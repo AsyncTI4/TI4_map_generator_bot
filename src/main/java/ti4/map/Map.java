@@ -1,9 +1,7 @@
 package ti4.map;
 
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Map {
 
@@ -12,7 +10,7 @@ public class Map {
     private String name;
 
     //UserID, UserName
-    private HashMap<String, Player> players = new HashMap<>();
+    private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
     private MapStatus mapStatus = MapStatus.open;
 
     //Position, Tile
@@ -68,8 +66,12 @@ public class Map {
         return player;
     }
 
-    public HashMap<String, Player> getPlayers() {
+    public LinkedHashMap<String, Player> getPlayers() {
         return players;
+    }
+
+    public void setPlayers(LinkedHashMap<String, Player> players) {
+        this.players = players;
     }
 
     public Player getPlayer(String userID) {
