@@ -263,7 +263,7 @@ public class GenerateMap {
                 degree = 180;
                 image = addControl(tile, image, tileX, tileY, unitHolder);
                 if (unitHolder != spaceUnitHolder) {
-                    image = addToken(tile, image, tileX, tileY, unitHolder);
+                    image = addPlanetToken(tile, image, tileX, tileY, unitHolder);
                 }
                 int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
                 image = addUnits(tile, image, tileX, tileY, rectangles, degree, degreeChange, unitHolder, radius);
@@ -325,6 +325,30 @@ public class GenerateMap {
             } else {
                 graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 4), tileY + centerPosition.y - (image.getHeight() / 4), null);
             }
+        }
+        return image;
+    }
+
+    private BufferedImage addPlanetToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
+        HashSet<String> tokenList = unitHolder.getTokenList();
+        int deltaY = 0;
+        int offSet = 0;
+        Point centerPosition = unitHolder.getHolderCenterPosition();
+        int x = tileX + centerPosition.x;
+        int y = tileY + centerPosition.y - (tokenList.size() > 1 ? 35 : 0);
+        for (String tokenID : tokenList) {
+            String tokenPath = tile.getTokenPath(tokenID);
+            if (tokenPath == null) {
+                LoggerHandler.log("Could not parse token file for: " + tokenID);
+                continue;
+            }
+            try {
+                image = resizeImage(ImageIO.read(new File(tokenPath)), 0.85f);
+            } catch (Exception e) {
+                LoggerHandler.log("Could not parse control token file for: " + tokenID, e);
+            }
+               graphics.drawImage(image, x - (image.getWidth() / 2), y + offSet + deltaY - (image.getHeight() / 2), null);
+                y += image.getHeight();
         }
         return image;
     }
