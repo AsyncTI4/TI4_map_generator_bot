@@ -258,7 +258,7 @@ public class GenerateMap {
             int degreeChange = 5;
             for (UnitHolder unitHolder : unitHolders) {
                 degree = 180;
-                image = addControl(tile, image, tileX, tileY, unitHolder);
+                image = addControl(tile, image, tileX, tileY, unitHolder, rectangles);
                 int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
                 image = addSleeperToken(tile, image, tileX, tileY, unitHolder);
                 image = addUnits(tile, image, tileX, tileY, rectangles, degree, degreeChange, unitHolder, radius);
@@ -304,27 +304,41 @@ public class GenerateMap {
         return image;
     }
 
-    private BufferedImage addControl(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
-        HashSet<String> controlList = unitHolder.getControlList();
-        for (String controlID : controlList) {
-            String controlPath = tile.getCCPath(controlID);
-            if (controlPath == null) {
-                LoggerHandler.log("Could not parse control token file for: " + controlID);
-                continue;
-            }
-            try {
-                image = resizeImage(ImageIO.read(new File(controlPath)), 0.85f);
-            } catch (Exception e) {
-                LoggerHandler.log("Could not parse control token file for: " + controlID, e);
-            }
+    private BufferedImage addControl(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, ArrayList<Rectangle> rectangles) {
+        ArrayList<String> controlList = new ArrayList<>(unitHolder.getControlList());
+        PlanetTokenPosition planetTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
+        if (planetTokenPosition != null) {
             Point centerPosition = unitHolder.getHolderCenterPosition();
-            if (unitHolder.getTokenList().isEmpty()) {
-                graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - (image.getHeight() / 2), null);
-            } else {
-                graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 4), tileY + centerPosition.y - (image.getHeight() / 4), null);
+            int xDelta = 0;
+            for (String controlID : controlList) {
+                if (controlID.contains(Constants.SLEEPER)) {
+                    continue;
+                }
+                String controlPath = tile.getCCPath(controlID);
+                if (controlPath == null) {
+                    LoggerHandler.log("Could not parse control token file for: " + controlID);
+                    continue;
+                }
+                float scale = 1.00f;
+                try {
+                    image = resizeImage(ImageIO.read(new File(controlPath)), scale);
+                } catch (Exception e) {
+                    LoggerHandler.log("Could not parse control token file for: " + controlID, e);
+                }
+                Point position = planetTokenPosition.getPosition(controlID);
+                if (position != null) {
+                    graphics.drawImage(image, tileX + position.x, tileY + position.y, null);
+                    rectangles.add(new Rectangle(tileX + position.x, tileY + position.y, image.getWidth(), image.getHeight()));
+                } else {
+                    graphics.drawImage(image, tileX + centerPosition.x + xDelta, tileY + centerPosition.y, null);
+                    rectangles.add(new Rectangle(tileX + centerPosition.x + xDelta, tileY + centerPosition.y, image.getWidth(), image.getHeight()));
+                    xDelta += 10;
+                }
             }
+            return image;
+        } else {
+            return oldFormatPlanetTokenAdd(tile, image, tileX, tileY, unitHolder, controlList);
         }
-        return image;
     }
 
     private BufferedImage addSleeperToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
@@ -351,11 +365,10 @@ public class GenerateMap {
 
     private BufferedImage addPlanetToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, ArrayList<Rectangle> rectangles) {
         ArrayList<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
-        Collections.sort(tokenList, (o1, o2) -> {
+        tokenList.sort((o1, o2) -> {
             if ((o1.contains("nanoforge") || o1.contains("titanspn"))) {
                 return -1;
-            }
-            else  if ((o2.contains("nanoforge") || o2.contains("titanspn"))) {
+            } else if ((o2.contains("nanoforge") || o2.contains("titanspn"))) {
                 return -1;
             }
             return o1.compareTo(o2);
