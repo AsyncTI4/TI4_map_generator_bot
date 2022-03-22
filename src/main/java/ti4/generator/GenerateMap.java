@@ -263,7 +263,7 @@ public class GenerateMap {
                 image = addSleeperToken(tile, image, tileX, tileY, unitHolder);
                 image = addUnits(tile, image, tileX, tileY, rectangles, degree, degreeChange, unitHolder, radius);
                 if (unitHolder != spaceUnitHolder) {
-                    image = addPlanetToken(tile, image, tileX, tileY, unitHolder);
+                    image = addPlanetToken(tile, image, tileX, tileY, unitHolder, rectangles);
                 }
             }
 
@@ -334,13 +334,13 @@ public class GenerateMap {
             if (tokenID.contains(Constants.SLEEPER)) {
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
-                    LoggerHandler.log("Could not parse token file for: " + tokenID);
+                    LoggerHandler.log("Could not sleeper token file for: " + tokenID);
                     continue;
                 }
                 try {
                     image = resizeImage(ImageIO.read(new File(tokenPath)), 0.85f);
                 } catch (Exception e) {
-                    LoggerHandler.log("Could not parse control token file for: " + tokenID, e);
+                    LoggerHandler.log("Could not parse sleeper token file for: " + tokenID, e);
                 }
                 Point position = new Point(centerPosition.x - (image.getWidth() / 2), centerPosition.y - (image.getHeight() / 2));
                 graphics.drawImage(image, tileX + position.x, tileY + position.y, null);
@@ -349,7 +349,7 @@ public class GenerateMap {
         return image;
     }
 
-    private BufferedImage addPlanetToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
+    private BufferedImage addPlanetToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, ArrayList<Rectangle> rectangles) {
         ArrayList<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         Collections.sort(tokenList, (o1, o2) -> {
             if ((o1.contains("nanoforge") || o1.contains("titanspn"))) {
@@ -382,8 +382,10 @@ public class GenerateMap {
                 Point position = planetTokenPosition.getPosition(tokenID);
                 if (position != null) {
                     graphics.drawImage(image, tileX + position.x, tileY + position.y, null);
+                    rectangles.add(new Rectangle(tileX + position.x, tileY + position.y, image.getWidth(), image.getHeight()));
                 } else {
                     graphics.drawImage(image, tileX + centerPosition.x + xDelta, tileY + centerPosition.y, null);
+                    rectangles.add(new Rectangle(tileX + centerPosition.x + xDelta, tileY + centerPosition.y, image.getWidth(), image.getHeight()));
                     xDelta += 10;
                 }
             }
