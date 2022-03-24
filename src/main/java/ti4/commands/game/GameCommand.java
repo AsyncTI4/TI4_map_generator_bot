@@ -78,6 +78,7 @@ public class GameCommand implements Command {
         subcommands.add(new Add());
         subcommands.add(new Remove());
         subcommands.add(new SetOrder());
+        subcommands.add(new Undo());
         return subcommands;
     }
 
