@@ -71,6 +71,42 @@ public class MapSaveLoadManager {
         }
     }
 
+    public static void undo(Map map) {
+        File originalMapFile = Storage.getMapImageStorage(map.getName() + Constants.TXT);
+        if (originalMapFile != null) {
+            File mapUndoDirectory = Storage.getMapUndoDirectory();
+            if (mapUndoDirectory == null) {
+                return;
+            }
+            if (!mapUndoDirectory.exists()) {
+                return;
+            }
+
+            String mapName = map.getName();
+            String mapNameForUndoStart = mapName + "_";
+            String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
+            if (mapUndoFiles != null && mapUndoFiles.length > 0) {
+                try {
+                    List<Integer> numbers = Arrays.stream(mapUndoFiles)
+                            .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
+                            .map(fileName -> fileName.replace(Constants.TXT, ""))
+                            .map(Integer::parseInt).toList();
+                    Integer maxNumber = numbers.isEmpty() ? 0 : numbers.stream().mapToInt(value -> value)
+                            .max().orElseThrow(NoSuchElementException::new);
+                    File mapUndoStorage = Storage.getMapUndoStorage(mapName + "_" + maxNumber + Constants.TXT);
+                    CopyOption[] options = {StandardCopyOption.REPLACE_EXISTING};
+                    Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
+                    mapUndoStorage.delete();
+                    Map loadedMap = loadMap(originalMapFile);
+                    MapManager.getInstance().deleteMap(map.getName());
+                    MapManager.getInstance().addMap(loadedMap);
+                } catch (Exception e) {
+                    LoggerHandler.log("Error trying to make undo copy for map: " + mapName, e);
+                }
+            }
+        }
+    }
+
     private static void saveUndo(Map map, File originalMapFile) {
         File mapUndoDirectory = Storage.getMapUndoDirectory();
         if (mapUndoDirectory == null) {
