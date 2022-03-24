@@ -76,6 +76,7 @@ public class Constants {
 
     public static final String GAME = "game";
     public static final String INFO = "info";
+    public static final String UNDO = "undo";
     public static final String SET_ORDER = "set_order";
 
     public static final String PLAYER1 = "player1";
@@ -106,4 +107,5 @@ public class Constants {
     public static final String IRF = "industrial_relic_fragment";
     public static final String VRF = "void_relic_fragment";
     public static final String SC = "strategy_card";
+    public static final String TXT = ".txt";
 }
