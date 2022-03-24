@@ -20,7 +20,10 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
 
 public class GenerateMap {
     private Graphics graphics;
@@ -549,7 +552,9 @@ public class GenerateMap {
                 }
 
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
-                    graphics.drawImage(dmgImage, xOriginal - (dmgImage.getWidth() / 2), yOriginal - (dmgImage.getHeight() / 2), null);
+                    int imageDmgX = position != null ? tileX + position.x + (image.getWidth() / 2) - (dmgImage.getWidth() / 2) : xOriginal - (dmgImage.getWidth() / 2);
+                    int imageDmgY = position != null ? tileY + position.y + (image.getHeight() / 2) - (dmgImage.getHeight() / 2) : yOriginal - (dmgImage.getHeight() / 2);
+                    graphics.drawImage(dmgImage, imageDmgX, imageDmgY, null);
                     unitDamageCount--;
                 }
 

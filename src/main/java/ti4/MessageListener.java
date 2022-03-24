@@ -39,7 +39,7 @@ public class MessageListener extends ListenerAdapter {
         String gameID = channelNameTokenizer.nextToken();
         boolean mapUpdatesChannel = false;
         if (channelNameTokenizer.hasMoreTokens()) {
-            if (channelNameTokenizer.nextToken().equals("map")) {
+            if (channelNameTokenizer.nextToken().equals("game")) {
                 if (channelNameTokenizer.hasMoreTokens()) {
                     if (channelNameTokenizer.nextToken().equals("updates")) {
                         mapUpdatesChannel = true;

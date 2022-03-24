@@ -47,11 +47,7 @@ public class SetOrder extends GameSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game owner can add/remove players.");
             return;
         }
-        if (!map.isMapOpen()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not open. Can add/remove only in open map.");
-            return;
-        }
-
+  
 
         LinkedHashMap<String, Player> newPlayerOrder = new LinkedHashMap<>();
         LinkedHashMap<String, Player> players = new LinkedHashMap<>(map.getPlayers());
