@@ -74,7 +74,6 @@ public class Player {
     }
 
     public void setSecretScored(String id) {
-
         Collection<Integer> values = secretsScored.values();
         int identifier = new Random().nextInt(1000);
         while (values.contains(identifier)) {
