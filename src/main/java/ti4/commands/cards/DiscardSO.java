@@ -35,7 +35,6 @@ public class DiscardSO extends CardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Secret Objective ID found, please retry");
             return;
         }
-        LinkedHashMap<String, Integer> secretObjectives = activeMap.getSecretObjective(player.getUserID());
-        DrawSO.sentSecretObjectivesToUser(event, activeMap, secretObjectives);
+        CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
 }
