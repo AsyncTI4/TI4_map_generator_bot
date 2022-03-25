@@ -88,3 +88,8 @@ Attachement tokens can only be added to planets
 
 /player stats .... <- can set all the major stats for player
 /player setup faction color <- needs to set player faction and color
+
+Cards commands
+/cards draw_so count(optional) <- draws a secret or specified number of secrets
+/cards discard_so soUniqueID <- discards given ID Secret objective and shuffles the SO deck. soUniqueID is generated just for player and are unique each time
+/cards info <- sents player all private cards for given game

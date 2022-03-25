@@ -24,8 +24,6 @@ public class Stats extends PlayerSubcommandData {
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.AC, "Action Card count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.PN, "Promissory Note count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.SO, "Secret Objective count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.SO_SCORED, "Score Secret Objective count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.CRF, "Cultural Relic Fragment count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.HRF, "Hazardous Relic Fragment count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.IRF, "Industrial Relic Fragment count"))
@@ -108,14 +106,6 @@ public class Stats extends PlayerSubcommandData {
         option = event.getOption(Constants.PN);
         if (option != null) {
             player.setPn(option.getAsInt());
-        }
-        option = event.getOption(Constants.SO);
-        if (option != null) {
-            player.setSo(option.getAsInt());
-        }
-        option = event.getOption(Constants.SO_SCORED);
-        if (option != null) {
-            player.setSoScored(option.getAsInt());
         }
         option = event.getOption(Constants.CRF);
         if (option != null) {

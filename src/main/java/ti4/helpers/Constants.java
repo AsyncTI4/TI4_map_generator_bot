@@ -111,8 +111,10 @@ public class Constants {
     public static final String TXT = ".txt";
 
     public static final String COUNT = "count";
+    public static final String SECRET_OBJECTIVE_ID = "secret_objective_id";
     public static final String DRAW_SO = "draw_so";
     public static final String CARDS = "cards";
     public static final String DISCARD_SO = "discard_so";
     public static final String SCORE_SO = "score_so";
+    public static final String MY_CARD_INFO = "show_my_cards";
 }

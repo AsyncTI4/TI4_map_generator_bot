@@ -194,9 +194,11 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.PN + " " + player.getPn());
             writer.write(System.lineSeparator());
-            writer.write(Constants.SO + " " + player.getSo());
+
+
+            writer.write(Constants.SO + " " + getSecretList(player.getSecrets()));
             writer.write(System.lineSeparator());
-            writer.write(Constants.SO_SCORED + " " + player.getSoScored());
+            writer.write(Constants.SO_SCORED + " " + getSecretList(player.getSecretsScored()));
             writer.write(System.lineSeparator());
             writer.write(Constants.CRF + " " + player.getCrf());
             writer.write(System.lineSeparator());
@@ -219,6 +221,14 @@ public class MapSaveLoadManager {
 
         writer.write(ENDMAPINFO);
         writer.write(System.lineSeparator());
+    }
+
+    private static String getSecretList(LinkedHashMap<String, Integer> secrets) {
+        StringBuilder sb = new StringBuilder();
+        for (java.util.Map.Entry<String, Integer> so : secrets.entrySet()) {
+            sb.append(so.getKey()).append(",").append(so.getValue()).append(";");
+        }
+        return sb.toString();
     }
 
     private static void saveTile(Writer writer, Tile tile) throws IOException {
@@ -538,13 +548,25 @@ public class MapSaveLoadManager {
             StringTokenizer tokenizer = new StringTokenizer(data, " ");
             if (tokenizer.countTokens() == 2) {
                 @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
-                player.setSo(Integer.parseInt(tokenizer.nextToken()));
+                StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
+                while (secrets.hasMoreTokens()){
+                    StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
+                    String id = secretInfo.nextToken();
+                    Integer index = Integer.parseInt(secretInfo.nextToken());
+                    player.setSecret(id, index);
+                }
             }
         } else if (data.startsWith(Constants.SO_SCORED)) {
             StringTokenizer tokenizer = new StringTokenizer(data, " ");
             if (tokenizer.countTokens() == 2) {
                 @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
-                player.setSoScored(Integer.parseInt(tokenizer.nextToken()));
+                StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
+                while (secrets.hasMoreTokens()){
+                    StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
+                    String id = secretInfo.nextToken();
+                    Integer index = Integer.parseInt(secretInfo.nextToken());
+                    player.setSecretScored(id, index);
+                }
             }
         } else if (data.startsWith(Constants.CRF)) {
             StringTokenizer tokenizer = new StringTokenizer(data, " ");
