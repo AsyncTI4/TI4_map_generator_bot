@@ -2,6 +2,7 @@ package ti4.message;
 
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.io.File;
@@ -30,6 +31,13 @@ public class MessageHelper {
     public static void sentToMessageToUser(SlashCommandInteractionEvent event, String messageText)
     {
         event.getUser().openPrivateChannel().queue(channel -> {
+            channel.sendMessage(messageText).queue();
+        });
+    }
+
+    public static void sentToMessageToUser(SlashCommandInteractionEvent event, String messageText, User user)
+    {
+        user.openPrivateChannel().queue(channel -> {
             channel.sendMessage(messageText).queue();
         });
     }

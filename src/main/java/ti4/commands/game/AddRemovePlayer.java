@@ -17,7 +17,14 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
     public AddRemovePlayer(@NotNull String name, @NotNull String description) {
         super(name, description);
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player @playerName").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player @playerName").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player @playerName"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player @playerName"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player @playerName"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Player @playerName"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player @playerName"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player @playerName"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player @playerName"));
     }
 
     @Override
@@ -41,11 +48,11 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
         }
 
         User user = event.getOptions().get(1).getAsUser();
-        action(map, user);
+        action(event, map, user);
         MapSaveLoadManager.saveMap(map);
         MessageHelper.replyToMessage(event, getResponseMessage(map, user));
     }
     abstract protected String getResponseMessage(Map map, User user);
 
-    abstract protected void action(Map map, User user);
+    abstract protected void action(SlashCommandInteractionEvent event, Map map, User user);
 }
