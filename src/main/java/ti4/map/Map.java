@@ -29,6 +29,7 @@ public class Map {
     private HashMap<String, Tile> tileMap = new HashMap<>();
 
 
+
     @CheckForNull
     public LinkedHashMap<String, Integer> drawSecretObjective(String userID) {
         if (!secretObjectives.isEmpty()) {
@@ -89,6 +90,9 @@ public class Map {
         }
     }
 
+    public List<String> getSecretObjectives() {
+        return secretObjectives;
+    }
 
     public void setSecretObjectives(List<String> secretObjectives) {
         this.secretObjectives = secretObjectives;

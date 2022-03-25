@@ -11,6 +11,7 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class MapSaveLoadManager {
 
@@ -153,6 +154,8 @@ public class MapSaveLoadManager {
         writer.write(GAMEINFO);
         writer.write(System.lineSeparator());
         //game information
+        writer.write(Constants.SO + " " + String.join(",", map.getSecretObjectives()));
+        writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
@@ -365,7 +368,7 @@ public class MapSaveLoadManager {
                         if (ENDGAMEINFO.equals(data)) {
                             break;
                         }
-//                        readGameInfo(map, data);
+                        readGameInfo(map, data);
                     }
 
                     while (myReader.hasNextLine()) {
@@ -481,6 +484,19 @@ public class MapSaveLoadManager {
             LoggerHandler.log("Could not save map, error creating save file");
         }
         return null;
+    }
+
+    private static void readGameInfo(Map map, String data) {
+        StringTokenizer tokenizer = new StringTokenizer(data, " ");
+        if (tokenizer.countTokens() == 2) {
+            @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ",");
+            List<String> secretObjectives = new ArrayList<>();
+            while (secrets.hasMoreTokens()){
+                secretObjectives.add(secrets.nextToken());
+            }
+            map.setSecretObjectives(secretObjectives);
+        }
     }
 
     private static void readPlayerInfo(Player player, String data) {
