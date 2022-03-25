@@ -1,6 +1,7 @@
 package ti4.map;
 
-import java.util.HashSet;
+import java.util.*;
+import java.util.Map;
 
 public class Player {
 
@@ -22,6 +23,9 @@ public class Player {
     private int pn = 0;
     private int so = 1;
     private int soScored = 0;
+    private LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
+    private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
+
 
     private int crf = 0;
     private int hrf = 0;
@@ -35,6 +39,65 @@ public class Player {
         this.userID = userID;
         this.userName = userName;
     }
+
+    public LinkedHashMap<String, Integer> getSecrets() {
+        return secrets;
+    }
+
+    public void setSecret(String id) {
+
+        Collection<Integer> values = secrets.values();
+        int identifier = new Random().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = new Random().nextInt(1000);
+        }
+        secrets.put(id, identifier);
+    }
+
+    public void setSecret(String id, Integer identifier) {
+        secrets.put(id, identifier);
+    }
+
+    public void removeSecret(Integer identifier) {
+        String idToRemove = "";
+        for (Map.Entry<String, Integer> so : secrets.entrySet()) {
+            if (so.getValue().equals(identifier)){
+                idToRemove = so.getKey();
+                break;
+            }
+        }
+        secrets.remove(idToRemove);
+    }
+
+    public LinkedHashMap<String, Integer> getSecretsScored() {
+        return secretsScored;
+    }
+
+    public void setSecretScored(String id) {
+
+        Collection<Integer> values = secretsScored.values();
+        int identifier = new Random().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = new Random().nextInt(1000);
+        }
+        secretsScored.put(id, identifier);
+    }
+
+    public void setSecretScored(String id, Integer identifier) {
+        secretsScored.put(id, identifier);
+    }
+
+    public void removeSecretScored(Integer identifier) {
+        String idToRemove = "";
+        for (Map.Entry<String, Integer> so : secretsScored.entrySet()) {
+            if (so.getValue().equals(identifier)){
+                idToRemove = so.getKey();
+                break;
+            }
+        }
+        secretsScored.remove(idToRemove);
+    }
+
 
     public int getCrf() {
         return crf;
@@ -141,7 +204,7 @@ public class Player {
     }
 
     public int getSo() {
-        return so;
+        return secrets.size();
     }
 
     public void setSo(int so) {
@@ -149,13 +212,12 @@ public class Player {
     }
 
     public int getSoScored() {
-        return soScored;
+        return secretsScored.size();
     }
 
     public void setSoScored(int soScored) {
         this.soScored = soScored;
     }
-
 
 
     public int getSC() {

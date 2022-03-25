@@ -7,10 +7,7 @@ import ti4.helpers.LoggerHandler;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.Properties;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -24,6 +21,7 @@ public class Mapper {
     private static final Properties special_case = new Properties();
     private static final Properties factions = new Properties();
     private static final Properties general = new Properties();
+    private static final Properties secretObjectives = new Properties();
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
@@ -35,6 +33,7 @@ public class Mapper {
         readData("special_case.properties", special_case, "Could not read token name file");
         readData("general.properties", general, "Could not read general token name file");
         readData("factions.properties", factions, "Could not read factions name file");
+        readData("Secret_objectives.properties", secretObjectives, "Could not read secret objectives file");
     }
 
     private static void readData(String propertyFileName, Properties colors, String s) {
@@ -117,6 +116,16 @@ public class Mapper {
                 .map(token -> (String) token)
                 .sorted()
                 .collect(Collectors.toList());
+    }
+    public static String getSecretObjective(String id) {
+        return (String)secretObjectives.get(id);
+    }
+    public static  HashMap<String, String> getSecretObjectives() {
+        HashMap<String, String> soList = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : secretObjectives.entrySet()) {
+            soList.put((String)entry.getKey(), (String)entry.getValue());
+        }
+        return soList;
     }
 
     public static List<String> getFactions() {

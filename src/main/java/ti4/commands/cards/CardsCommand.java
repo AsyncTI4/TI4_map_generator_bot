@@ -37,8 +37,13 @@ public class CardsCommand implements Command {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;
             }
-            if (!mapManager.getUserActiveMap(userID).getPlayerIDs().contains(userID)) {
+            Map userActiveMap = mapManager.getUserActiveMap(userID);
+            if (!userActiveMap.getPlayerIDs().contains(userID)) {
                 MessageHelper.replyToMessage(event, "Your not a player of the game, please call function /join gameName");
+                return false;
+            }
+            if (!event.getChannel().getName().startsWith(userActiveMap.getName()+"-")){
+                MessageHelper.replyToMessage(event, "Card commands can be executed only in game specific channels");
                 return false;
             }
             return true;
@@ -97,6 +102,8 @@ public class CardsCommand implements Command {
     private Collection<CardsSubcommandData> getSubcommands() {
         Collection<CardsSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new DrawSO());
+        subcommands.add(new DiscardSO());
+        subcommands.add(new CardsInfo());
         return subcommands;
     }
 
