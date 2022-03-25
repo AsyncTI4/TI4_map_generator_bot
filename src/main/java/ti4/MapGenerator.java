@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import ti4.commands.*;
+import ti4.commands.cards.CardsCommand;
 import ti4.commands.game.GameCommand;
 import ti4.commands.info.*;
 import ti4.commands.map.*;
@@ -92,6 +93,7 @@ public class MapGenerator {
 
         commandManager.addCommand(new PlayerCommand());
         commandManager.addCommand(new GameCommand());
+        commandManager.addCommand(new CardsCommand());
 
         Guild guild = jda.getGuildById(args[2]);
 
