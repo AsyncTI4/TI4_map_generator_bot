@@ -113,6 +113,8 @@ public class Constants {
     public static final String COUNT = "count";
     public static final String SECRET_OBJECTIVE_ID = "secret_objective_id";
     public static final String DRAW_SO = "draw_so";
+    public static final String SHOW_SO = "show_so";
+    public static final String SHOW_SO_TO_ALL = "show_so_to_all";
     public static final String CARDS = "cards";
     public static final String DISCARD_SO = "discard_so";
     public static final String SCORE_SO = "score_so";

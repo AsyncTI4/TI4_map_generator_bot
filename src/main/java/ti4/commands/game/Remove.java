@@ -1,6 +1,7 @@
 package ti4.commands.game;
 
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 
@@ -16,7 +17,7 @@ public class Remove extends AddRemovePlayer {
     }
 
     @Override
-    protected void action(Map map, User user) {
+    protected void action(SlashCommandInteractionEvent event, Map map, User user) {
         map.removePlayer(user.getId());
     }
 }

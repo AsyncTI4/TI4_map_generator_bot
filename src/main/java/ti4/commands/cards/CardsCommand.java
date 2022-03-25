@@ -104,6 +104,8 @@ public class CardsCommand implements Command {
         subcommands.add(new DrawSO());
         subcommands.add(new DiscardSO());
         subcommands.add(new CardsInfo());
+        subcommands.add(new ShowSO());
+        subcommands.add(new ShowSOToAll());
         return subcommands;
     }
 

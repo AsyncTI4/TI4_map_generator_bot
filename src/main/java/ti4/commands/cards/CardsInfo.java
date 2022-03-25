@@ -23,8 +23,12 @@ public class CardsInfo extends CardsSubcommandData {
             return;
         }
 
+        sentUserCardInfo(event, activeMap, player);
+    }
+
+    public static void sentUserCardInfo(SlashCommandInteractionEvent event, Map activeMap, Player player) {
         LinkedHashMap<String, Integer> secretObjective = activeMap.getSecretObjective(player.getUserID());
-        LinkedHashMap<String, Integer> scoredSecretObjective = activeMap.getSecretObjective(player.getUserID());
+        LinkedHashMap<String, Integer> scoredSecretObjective = activeMap.getScoredSecretObjective(player.getUserID());
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(activeMap.getName()).append("\n");
         sb.append("Secret Objectives:").append("\n");
@@ -35,7 +39,7 @@ public class CardsInfo extends CardsSubcommandData {
                 index++;
             }
         }
-        sb.append("\n").append("\n").append("Scored Secret Objectives:").append("\n");
+        sb.append("\n").append("Scored Secret Objectives:").append("\n");
         if (scoredSecretObjective != null) {
             for (java.util.Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
                 sb.append(index).append(". (").append(so.getValue()).append(") - ").append(Mapper.getSecretObjective(so.getKey())).append("\n");
