@@ -16,10 +16,9 @@ public class Map {
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
     private MapStatus mapStatus = MapStatus.open;
 
-    private List<String> secretObjectives = new ArrayList<>();
+    private List<String> secretObjectives;
 
     public Map() {
-        //todo temp
         HashMap<String, String> secretObjectives = Mapper.getSecretObjectives();
         this.secretObjectives = new ArrayList<>(secretObjectives.keySet());
         Collections.shuffle(this.secretObjectives);
@@ -27,7 +26,6 @@ public class Map {
 
     //Position, Tile
     private HashMap<String, Tile> tileMap = new HashMap<>();
-
 
 
     @CheckForNull
@@ -44,18 +42,38 @@ public class Map {
         return null;
     }
 
+    public boolean scoreSecretObjective(String userID, Integer soIDNumber) {
+        Player player = getPlayer(userID);
+        if (player != null) {
+            LinkedHashMap<String, Integer> secrets = player.getSecrets();
+            String soID = "";
+            for (java.util.Map.Entry<String, Integer> so : secrets.entrySet()) {
+                if (so.getValue().equals(soIDNumber)) {
+                    soID = so.getKey();
+                    break;
+                }
+            }
+            if (!soID.isEmpty()) {
+                player.removeSecret(soIDNumber);
+                player.setSecretScored(soID);
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean discardSecretObjective(String userID, Integer soIDNumber) {
         Player player = getPlayer(userID);
         if (player != null) {
             LinkedHashMap<String, Integer> secrets = player.getSecrets();
             String soID = "";
             for (java.util.Map.Entry<String, Integer> so : secrets.entrySet()) {
-                if (so.getValue().equals(soIDNumber)){
+                if (so.getValue().equals(soIDNumber)) {
                     soID = so.getKey();
                     break;
                 }
             }
-            if (!soID.isEmpty()){
+            if (!soID.isEmpty()) {
                 player.removeSecret(soIDNumber);
                 secretObjectives.add(soID);
                 Collections.shuffle(secretObjectives);
