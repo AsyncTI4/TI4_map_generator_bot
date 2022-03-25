@@ -68,8 +68,8 @@ public class Constants {
     public static final String MR = "mr";
     public static final int SPACE_RADIUS = 115;
     public static final int RADIUS = 45;
-    public static final Point SPACE_CENTER_POSITION = new Point(172,150);
-    public static final Point MIRAGE_POSITION = new Point(55,5);
+    public static final Point SPACE_CENTER_POSITION = new Point(172, 150);
+    public static final Point MIRAGE_POSITION = new Point(55, 5);
     public static final String MIRAGE = "mirage";
     public static final String SLEEPER = "sleeper";
     public static final String PLANET = "planet";
@@ -107,5 +107,12 @@ public class Constants {
     public static final String IRF = "industrial_relic_fragment";
     public static final String VRF = "void_relic_fragment";
     public static final String SC = "strategy_card";
+
     public static final String TXT = ".txt";
+
+    public static final String COUNT = "count";
+    public static final String DRAW_SO = "draw_so";
+    public static final String CARDS = "cards";
+    public static final String DISCARD_SO = "discard_so";
+    public static final String SCORE_SO = "score_so";
 }
