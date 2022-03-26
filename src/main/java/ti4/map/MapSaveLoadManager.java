@@ -11,7 +11,6 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class MapSaveLoadManager {
 
@@ -492,7 +491,7 @@ public class MapSaveLoadManager {
             @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
             StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ",");
             List<String> secretObjectives = new ArrayList<>();
-            while (secrets.hasMoreTokens()){
+            while (secrets.hasMoreTokens()) {
                 secretObjectives.add(secrets.nextToken());
             }
             map.setSecretObjectives(secretObjectives);
@@ -500,118 +499,54 @@ public class MapSaveLoadManager {
     }
 
     private static void readPlayerInfo(Player player, String data) {
-        if (data.startsWith(Constants.FACTION)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+        StringTokenizer tokenizer = new StringTokenizer(data, " ");
+        if (tokenizer.countTokens() == 2) {
+            data = tokenizer.nextToken();
+            if (data.startsWith(Constants.FACTION)) {
                 player.setFaction(tokenizer.nextToken());
-            }
-        } else if (data.startsWith(Constants.COLOR)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith(Constants.COLOR)) {
                 player.setColor(tokenizer.nextToken());
-            }
-        } else if (data.startsWith("T ")) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith("T ")) {
                 player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
-            }
-        } else if (data.startsWith("FS ")) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith("FS ")) {
                 player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
-            }
-        } else if (data.startsWith("S ")) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith("S ")) {
                 player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
-            }
-        } else if (data.startsWith(Constants.TG)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith(Constants.TG)) {
                 player.setTg(Integer.parseInt(tokenizer.nextToken()));
-            }
-        } else if (data.startsWith(Constants.COMMODITIES)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
-                player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
-            }
-        } else if (data.startsWith(Constants.COMMODITIES_TOTAL)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith(Constants.COMMODITIES_TOTAL)) {
                 player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
-            }
-        } else if (data.startsWith(Constants.AC)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith(Constants.COMMODITIES)) {
+                player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
+            } else if (data.startsWith(Constants.AC)) {
                 player.setAc(Integer.parseInt(tokenizer.nextToken()));
-            }
-        } else if (data.startsWith(Constants.PN)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith(Constants.PN)) {
                 player.setPn(Integer.parseInt(tokenizer.nextToken()));
-            }
-        } else if (data.startsWith(Constants.SO)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith(Constants.SO_SCORED)) {
                 StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
-                while (secrets.hasMoreTokens()){
-                    StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
-                    String id = secretInfo.nextToken();
-                    Integer index = Integer.parseInt(secretInfo.nextToken());
-                    player.setSecret(id, index);
-                }
-            }
-        } else if (data.startsWith(Constants.SO_SCORED)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
-                StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
-                while (secrets.hasMoreTokens()){
+                while (secrets.hasMoreTokens()) {
                     StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
                     String id = secretInfo.nextToken();
                     Integer index = Integer.parseInt(secretInfo.nextToken());
                     player.setSecretScored(id, index);
                 }
-            }
-        } else if (data.startsWith(Constants.CRF)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith(Constants.SO)) {
+                StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
+                while (secrets.hasMoreTokens()) {
+                    StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
+                    String id = secretInfo.nextToken();
+                    Integer index = Integer.parseInt(secretInfo.nextToken());
+                    player.setSecret(id, index);
+                }
+            } else if (data.startsWith(Constants.CRF)) {
                 player.setCrf(Integer.parseInt(tokenizer.nextToken()));
-            }
-        } else if (data.startsWith(Constants.HRF)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith(Constants.HRF)) {
                 player.setHrf(Integer.parseInt(tokenizer.nextToken()));
-            }
-        } else if (data.startsWith(Constants.IRF)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith(Constants.IRF)) {
                 player.setIrf(Integer.parseInt(tokenizer.nextToken()));
-            }
-        } else if (data.startsWith(Constants.VRF)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith(Constants.VRF)) {
                 player.setVrf(Integer.parseInt(tokenizer.nextToken()));
-            }
-        } else if (data.startsWith(Constants.SC)) {
-            StringTokenizer tokenizer = new StringTokenizer(data, " ");
-            if (tokenizer.countTokens() == 2) {
-                @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
+            } else if (data.startsWith(Constants.SC)) {
                 player.setSC(Integer.parseInt(tokenizer.nextToken()));
             }
         }
