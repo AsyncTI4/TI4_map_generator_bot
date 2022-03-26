@@ -222,8 +222,20 @@ public class Map {
         return secretObjectives;
     }
 
+    public List<String> getActionCards() {
+        return actionCards;
+    }
+
     public void setSecretObjectives(List<String> secretObjectives) {
         this.secretObjectives = secretObjectives;
+    }
+
+    public void setActionCards(List<String> actionCards) {
+        this.actionCards = actionCards;
+    }
+
+    public void setDiscardActionCards(LinkedHashMap<String, Integer> discardActionCards) {
+        this.discardActionCards = discardActionCards;
     }
 
     public String getOwnerID() {
