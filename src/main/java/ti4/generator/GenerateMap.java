@@ -10,6 +10,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 
+import javax.annotation.CheckForNull;
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
@@ -126,7 +127,11 @@ public class GenerateMap {
         return new File(absolutePath);
     }
 
+    @CheckForNull
     private String getFactionPath(String factionID) {
+        if (factionID.equals("null")){
+            return null;
+        }
         String factionFileName = Mapper.getFactionFileName(factionID);
         String factionFile = ResourceHelper.getInstance().getFactionFile(factionFileName);
         if (factionFile == null) {
