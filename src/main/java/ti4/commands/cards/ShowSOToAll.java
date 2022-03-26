@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
 public class ShowSOToAll extends CardsSubcommandData {
     public ShowSOToAll() {
         super(Constants.SHOW_SO_TO_ALL, "Show Secret Objective to table");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
     }
 
     @Override

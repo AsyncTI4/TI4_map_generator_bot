@@ -19,6 +19,7 @@ public class Constants {
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
     public static final String SAVE_GAMES = "save_games";
+    public static final String RELOAD_GAME = "reload_game";
     public static final String LIST_TILES = "list_tiles";
     public static final String LIST_PLANETS = "list_planets";
     public static final String LIST_UNITS = "list_units";
@@ -109,11 +110,13 @@ public class Constants {
     public static final String SC = "strategy_card";
 
     public static final String TXT = ".txt";
+    public static final String ADMIN = "admin";
 
     public static final String COUNT = "count";
     public static final String SECRET_OBJECTIVE_ID = "secret_objective_id";
     public static final String DRAW_SO = "draw_so";
     public static final String SHOW_SO = "show_so";
+    public static final String SHOW_ALL_SO = "show_all_so";
     public static final String SHOW_SO_TO_ALL = "show_so_to_all";
     public static final String CARDS = "cards";
     public static final String DISCARD_SO = "discard_so";

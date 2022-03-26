@@ -7,7 +7,9 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
-import ti4.commands.*;
+import ti4.commands.CommandManager;
+import ti4.commands.HelpAction;
+import ti4.commands.admin.AdminCommand;
 import ti4.commands.cards.CardsCommand;
 import ti4.commands.game.GameCommand;
 import ti4.commands.info.*;
@@ -15,8 +17,8 @@ import ti4.commands.map.*;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.tokens.*;
 import ti4.commands.units.*;
-import ti4.generator.PositionMapper;
 import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.LoggerHandler;
 import ti4.helpers.Storage;
@@ -67,9 +69,7 @@ public class MapGenerator {
         commandManager.addCommand(new RemoveUnits());
         commandManager.addCommand(new RemoveAllUnits());
         commandManager.addCommand(new CreateGame());
-        commandManager.addCommand(new Shutdown());
         commandManager.addCommand(new ListTiles());
-        commandManager.addCommand(new SaveMaps());
         commandManager.addCommand(new ListGames());
         commandManager.addCommand(new SetGame());
         commandManager.addCommand(new ShowGame());
@@ -91,6 +91,7 @@ public class MapGenerator {
         commandManager.addCommand(new HelpAction());
         commandManager.addCommand(new LogMessage());
 
+        commandManager.addCommand(new AdminCommand());
         commandManager.addCommand(new PlayerCommand());
         commandManager.addCommand(new GameCommand());
         commandManager.addCommand(new CardsCommand());

@@ -107,6 +107,15 @@ public class MapSaveLoadManager {
         }
     }
 
+    public static void reload(Map map) {
+        File originalMapFile = Storage.getMapImageStorage(map.getName() + Constants.TXT);
+        if (originalMapFile != null) {
+            Map loadedMap = loadMap(originalMapFile);
+            MapManager.getInstance().deleteMap(map.getName());
+            MapManager.getInstance().addMap(loadedMap);
+        }
+    }
+
     private static void saveUndo(Map map, File originalMapFile) {
         File mapUndoDirectory = Storage.getMapUndoDirectory();
         if (mapUndoDirectory == null) {
