@@ -93,5 +93,6 @@ Cards commands
 /cards draw_so count(optional) <- draws a secret or specified number of secrets
 /cards discard_so soUniqueID <- discards given ID Secret objective and shuffles the SO deck. soUniqueID is generated just for player and are unique each time
 /cards info <- sents player all private cards for given game
-/cards show_so soUniqueID player <- sents given SO to player and changes soUniqueID
+/cards show_so soUniqueID player <- sends given Secret Objective to player and changes soUniqueID
+/cards show_all_so player <- sends all Secret Objectives to player
 /cards show_so_to_all soUniqueID <- displays SO to table and changes soUniqueID

@@ -14,7 +14,7 @@ import java.util.LinkedHashMap;
 public class DiscardSO extends CardsSubcommandData {
     public DiscardSO() {
         super(Constants.DISCARD_SO, "Discard Secret Objective");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
     }
 
     @Override

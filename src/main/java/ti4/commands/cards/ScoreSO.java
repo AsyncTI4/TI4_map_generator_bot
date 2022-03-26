@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 public class ScoreSO extends CardsSubcommandData {
     public ScoreSO() {
         super(Constants.SCORE_SO, "Score Secret Objective");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
     }
 
     @Override
