@@ -39,13 +39,9 @@ abstract public class AddRemoveTile implements Command {
         if (!mapManager.isUserWithActiveMap(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
         } else {
-
-
             Map userActiveMap = tileParsing(event, userID, mapManager);
             if (userActiveMap == null) return;
-
             MapSaveLoadManager.saveMap(userActiveMap);
-
             File file = GenerateMap.getInstance().saveImage(userActiveMap);
             MessageHelper.replyToMessage(event, file);
         }
