@@ -8,16 +8,16 @@ Now automatically sets active map in channels that go: gameName-map-updates
 so in any channel that is named like this, you don't need to set active map, it automatically sets for you
 so switching between games is much easier.
 
-/game set_game_status gameName status
+/game set_game_status status gameName(Optional)
 status: open or locked
 Status open, means anyone can edit map, can join map as player;
 Status locked means, only joined players and map creator can edit map. No more players can join
 /game join gameName <- join an open map to be able to edit even if map is locked
 /game leave gameName <- leave an open map
 /game info gameName <- information of map, status if open/locked and player list
-/game add gameName @playerName
-/game remove gameName @playerName
-/game set_order @playerName1 @playerName2 .....
+/game add @playerName... gameName <- add single or multiple players to game, gameName is optional and can bet set if no activeMap present
+/game remove  @playerName... gameName <- remove single or multiple players to game, gameName is optional and can bet set if no activeMap present
+/game set_order @playerName1 @playerName2 .....gameName
 Add all players in order for game
 
 
