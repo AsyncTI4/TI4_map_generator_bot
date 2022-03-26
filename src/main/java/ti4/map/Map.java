@@ -17,16 +17,41 @@ public class Map {
     private MapStatus mapStatus = MapStatus.open;
 
     private List<String> secretObjectives;
+    private List<String> actionCards;
+    private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
 
     public Map() {
         HashMap<String, String> secretObjectives = Mapper.getSecretObjectives();
         this.secretObjectives = new ArrayList<>(secretObjectives.keySet());
         Collections.shuffle(this.secretObjectives);
+
+        HashMap<String, String> actionCards = Mapper.getActionCards();
+        this.actionCards = new ArrayList<>(actionCards.keySet());
+        Collections.shuffle(this.actionCards);
     }
 
     //Position, Tile
     private HashMap<String, Tile> tileMap = new HashMap<>();
 
+
+    @CheckForNull
+    public LinkedHashMap<String, Integer> drawActionCard(String userID) {
+        if (!actionCards.isEmpty()) {
+            String id = actionCards.get(0);
+            Player player = getPlayer(userID);
+            if (player != null) {
+                actionCards.remove(id);
+                player.setActionCard(id);
+                return player.getActionCards();
+            }
+        } else {
+            actionCards.addAll(discardActionCards.keySet());
+            discardActionCards.clear();
+            Collections.shuffle(actionCards);
+            return drawActionCard(userID);
+        }
+        return null;
+    }
 
     @CheckForNull
     public LinkedHashMap<String, Integer> drawSecretObjective(String userID) {
@@ -40,6 +65,62 @@ public class Map {
             }
         }
         return null;
+    }
+
+    private void setDiscardActionCard(String id) {
+        Collection<Integer> values = discardActionCards.values();
+        int identifier = new Random().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = new Random().nextInt(1000);
+        }
+        discardActionCards.put(id, identifier);
+    }
+
+    public boolean discardActionCard(String userID, Integer acIDNumber) {
+        Player player = getPlayer(userID);
+        if (player != null) {
+            LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+            String acID = "";
+            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                if (ac.getValue().equals(acIDNumber)) {
+                    acID = ac.getKey();
+                    break;
+                }
+            }
+            if (!acID.isEmpty()) {
+                player.removeActionCard(acIDNumber);
+                setDiscardActionCard(acID);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void shuffleActionCards() {
+        Collections.shuffle(actionCards);
+    }
+
+    public LinkedHashMap<String, Integer> getDiscardActionCards() {
+        return discardActionCards;
+    }
+
+    public boolean pickActionCard(String userID, Integer acIDNumber) {
+        Player player = getPlayer(userID);
+        if (player != null) {
+            String acID = "";
+            for (java.util.Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
+                if (ac.getValue().equals(acIDNumber)) {
+                    acID = ac.getKey();
+                    break;
+                }
+            }
+            if (!acID.isEmpty()) {
+                discardActionCards.remove(acID);
+                player.setActionCard(acID);
+                return true;
+            }
+        }
+        return false;
     }
 
     public boolean scoreSecretObjective(String userID, Integer soIDNumber) {
@@ -56,6 +137,26 @@ public class Map {
             if (!soID.isEmpty()) {
                 player.removeSecret(soIDNumber);
                 player.setSecretScored(soID);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean unscoreSecretObjective(String userID, Integer soIDNumber) {
+        Player player = getPlayer(userID);
+        if (player != null) {
+            LinkedHashMap<String, Integer> secrets = player.getSecretsScored();
+            String soID = "";
+            for (java.util.Map.Entry<String, Integer> so : secrets.entrySet()) {
+                if (so.getValue().equals(soIDNumber)) {
+                    soID = so.getKey();
+                    break;
+                }
+            }
+            if (!soID.isEmpty()) {
+                player.removeSecretScored(soIDNumber);
+                player.setSecret(soID);
                 return true;
             }
         }
@@ -88,6 +189,15 @@ public class Map {
         Player player = getPlayer(userID);
         if (player != null) {
             return player.getSecrets();
+        }
+        return null;
+    }
+
+    @CheckForNull
+    public LinkedHashMap<String, Integer> getActionCards(String userID) {
+        Player player = getPlayer(userID);
+        if (player != null) {
+            return player.getActionCards();
         }
         return null;
     }

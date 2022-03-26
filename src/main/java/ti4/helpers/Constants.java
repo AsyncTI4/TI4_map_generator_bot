@@ -121,5 +121,17 @@ public class Constants {
     public static final String CARDS = "cards";
     public static final String DISCARD_SO = "discard_so";
     public static final String SCORE_SO = "score_so";
-    public static final String MY_CARD_INFO = "show_my_cards";
+    public static final String UNSCORE_SO = "unscore_so";
+
+    public static final String ACTION_CARD_ID = "action_card_id";
+    public static final String DRAW_AC = "draw_ac";
+    public static final String SHUFFLE_AC_DECK = "shuffle_ac_deck";
+    public static final String SHOW_AC = "show_ac";
+    public static final String SHOW_ALL_AC = "show_all_ac";
+    public static final String SHOW_AC_TO_ALL = "show_ac_to_all";
+    public static final String DISCARD_AC = "discard_ac";
+    public static final String PLAY_AC = "play_ac";
+    public static final String PICK_AC_FROM_DISCARD = "pick_ac_from_discard";
+    public static final String SEND_AC = "send_ac";
+    public static final String SHOW_AC_DISCARD_LIST = "show_ac_discard_list";
 }

@@ -37,21 +37,13 @@ public class MessageListener extends ListenerAdapter {
         StringTokenizer channelNameTokenizer = new StringTokenizer(channelName, "-");
 
         String gameID = channelNameTokenizer.nextToken();
-        boolean mapUpdatesChannel = false;
-        if (channelNameTokenizer.hasMoreTokens()) {
-            if (channelNameTokenizer.nextToken().equals("game")) {
-                if (channelNameTokenizer.hasMoreTokens()) {
-                    if (channelNameTokenizer.nextToken().equals("updates")) {
-                        mapUpdatesChannel = true;
-                    }
-                }
-            }
-        }
-        if (mapUpdatesChannel && mapList.stream().anyMatch(map -> map.equals(gameID)) &&
+        if (mapList.stream().anyMatch(map -> map.equals(gameID)) &&
                 (mapManager.getUserActiveMap(userID) == null || !mapManager.getUserActiveMap(userID).getName().equals(gameID) &&
                 (mapManager.getMap(gameID) != null && (mapManager.getMap(gameID).isMapOpen() ||
                         mapManager.getMap(gameID).getPlayerIDs().contains(userID))))) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Active game set to: " + gameID);
+            if (mapManager.getUserActiveMap(userID) != null && !mapManager.getUserActiveMap(userID).getName().equals(gameID)) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Active game set to: " + gameID);
+            }
             mapManager.setMapForUser(userID, gameID);
         } else if (mapManager.isUserWithActiveMap(userID)) {
             if (mapList.stream().anyMatch(map -> map.equals(gameID)) && !channelName.startsWith(userActiveMap.getName())) {

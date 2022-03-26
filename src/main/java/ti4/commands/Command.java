@@ -29,9 +29,9 @@ public interface Command {
         Map userActiveMap = MapManager.getInstance().getUserActiveMap(user.getId());
         String activeMap = "";
         if (userActiveMap != null){
-            activeMap =  "Active map: " + userActiveMap.getName();
+            activeMap =  "Game: " + userActiveMap.getName();
         }
-        String commandExecuted = "User: " + userName + " executed command. " +activeMap+ "\n" +
+        String commandExecuted = "User: " + userName + ". " +activeMap+ " " +
                 event.getName() + " " + event.getOptions().stream()
                 .map(OptionMapping::getAsString)
                 .collect(Collectors.joining(" "));

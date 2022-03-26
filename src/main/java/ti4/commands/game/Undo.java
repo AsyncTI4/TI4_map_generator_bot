@@ -31,6 +31,11 @@ public class Undo extends GameSubcommandData{
             MessageHelper.replyToMessage(event, "Must set active Game");
             return;
         }
+        if (!event.getChannel().getName().startsWith(userActiveMap.getName()+"-")){
+            MessageHelper.replyToMessage(event, "Undo must be executed in game channel only!");
+            return;
+        }
+
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())){
             MessageHelper.replyToMessage(event, "Must confirm with YES");

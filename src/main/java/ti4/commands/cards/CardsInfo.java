@@ -46,7 +46,17 @@ public class CardsInfo extends CardsSubcommandData {
                 index++;
             }
         }
-        sb.append("\n").append("\n");
+        sb.append("\n").append("Action Cards:").append("\n");
+        index = 1;
+        LinkedHashMap<String, Integer> actionCards = activeMap.getActionCards(player.getUserID());
+        if (actionCards != null) {
+            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                sb.append(index).append(". (").append(ac.getValue()).append(") - ").append(Mapper.getActionCard(ac.getKey())).append("\n");
+                index++;
+            }
+        }
+
+        sb.append("\n");
         MessageHelper.sentToMessageToUser(event, sb.toString());
     }
 

@@ -19,10 +19,8 @@ public class Player {
     private int commodities = 0;
     private int commoditiesTotal = 0;
 
-    private int ac = 0;
     private int pn = 0;
-    private int so = 1;
-    private int soScored = 0;
+    private LinkedHashMap<String, Integer> actionCards = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
 
@@ -38,6 +36,35 @@ public class Player {
     public Player(String userID, String userName) {
         this.userID = userID;
         this.userName = userName;
+    }
+
+
+    public LinkedHashMap<String, Integer> getActionCards() {
+        return actionCards;
+    }
+
+    public void setActionCard(String id) {
+        Collection<Integer> values = actionCards.values();
+        int identifier = new Random().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = new Random().nextInt(1000);
+        }
+        actionCards.put(id, identifier);
+    }
+
+    public void setActionCard(String id, Integer identifier) {
+        actionCards.put(id, identifier);
+    }
+
+    public void removeActionCard(Integer identifier) {
+        String idToRemove = "";
+        for (Map.Entry<String, Integer> so : actionCards.entrySet()) {
+            if (so.getValue().equals(identifier)){
+                idToRemove = so.getKey();
+                break;
+            }
+        }
+        actionCards.remove(idToRemove);
     }
 
     public LinkedHashMap<String, Integer> getSecrets() {
@@ -187,11 +214,7 @@ public class Player {
     }
 
     public int getAc() {
-        return ac;
-    }
-
-    public void setAc(int ac) {
-        this.ac = ac;
+        return actionCards.size();
     }
 
     public int getPn() {
