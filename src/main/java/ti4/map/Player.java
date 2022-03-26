@@ -206,18 +206,9 @@ public class Player {
         return secrets.size();
     }
 
-    public void setSo(int so) {
-        this.so = so;
-    }
-
     public int getSoScored() {
         return secretsScored.size();
     }
-
-    public void setSoScored(int soScored) {
-        this.soScored = soScored;
-    }
-
 
     public int getSC() {
         return SC;
