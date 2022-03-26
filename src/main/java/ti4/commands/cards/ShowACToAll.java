@@ -10,10 +10,12 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ScoreSO extends CardsSubcommandData {
-    public ScoreSO() {
-        super(Constants.SCORE_SO, "Score Secret Objective");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
+import java.util.LinkedHashMap;
+
+public class ShowACToAll extends CardsSubcommandData {
+    public ShowACToAll() {
+        super(Constants.SHOW_AC_TO_ALL, "Show Action Card to table");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
     }
 
     @Override
@@ -24,24 +26,35 @@ public class ScoreSO extends CardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
+        OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Secret Objective to score");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to show to All");
             return;
         }
 
-        boolean scored = activeMap.scoreSecretObjective(getUser().getId(), option.getAsInt());
-        if (!scored) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Secret Objective ID found, please retry");
+        int soIndex = option.getAsInt();
+        String acID = null;
+        boolean scored = false;
+        for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
+            if (so.getValue().equals(soIndex)) {
+                acID = so.getKey();
+                break;
+            }
+        }
+
+        if (acID == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action CardID found, please retry");
             return;
         }
+
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(activeMap.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Scored Secret Objectives:").append("\n");
-        for (String id : player.getSecretsScored().keySet()) {
-            sb.append(Mapper.getSecretObjective(id)).append("\n");
+        sb.append("Showed Action Card:").append("\n");
 
+        sb.append(Mapper.getActionCard(acID)).append("\n");
+        if (!scored) {
+            player.setActionCard(acID);
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);

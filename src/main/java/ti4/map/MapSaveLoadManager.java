@@ -528,7 +528,7 @@ public class MapSaveLoadManager {
             } else if (data.startsWith(Constants.COMMODITIES)) {
                 player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
             } else if (data.startsWith(Constants.AC)) {
-                player.setAc(Integer.parseInt(tokenizer.nextToken()));
+//                player.setAc(Integer.parseInt(tokenizer.nextToken()));
             } else if (data.startsWith(Constants.PN)) {
                 player.setPn(Integer.parseInt(tokenizer.nextToken()));
             } else if (data.startsWith(Constants.SO_SCORED)) {

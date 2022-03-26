@@ -89,8 +89,6 @@ public class CardsCommand implements Command {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
-
-//        File file = GenerateMap.getInstance().saveImage(activeMap);
         MessageHelper.replyToMessage(event, "Card action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
     }
 
@@ -107,7 +105,18 @@ public class CardsCommand implements Command {
         subcommands.add(new ShowSO());
         subcommands.add(new ShowSOToAll());
         subcommands.add(new ScoreSO());
+        subcommands.add(new UnscoreSO());
         subcommands.add(new ShowAllSO());
+        subcommands.add(new DrawAC());
+        subcommands.add(new DiscardAC());
+        subcommands.add(new ShowAC());
+        subcommands.add(new ShowACToAll());
+        subcommands.add(new PlayAC());
+        subcommands.add(new ShuffleACDeck());
+        subcommands.add(new ShowAllAC());
+        subcommands.add(new PickACFromDiscard());
+        subcommands.add(new ShowDiscardActionCards());
+        subcommands.add(new SentAC());
         return subcommands;
     }
 
