@@ -100,6 +100,7 @@ public class Constants {
     public static final String COMMODITIES_TOTAL = "commodities_total";
     public static final String FACTION = "faction";
     public static final String AC = "action_cards";
+    public static final String AC_DISCARDED = "action_cards_discarded";
     public static final String PN = "promissary_notes";
     public static final String SO = "secret_objectives";
     public static final String SO_SCORED = "secret_objectives_scored";

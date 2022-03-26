@@ -30,7 +30,8 @@ public class CardsInfo extends CardsSubcommandData {
         LinkedHashMap<String, Integer> secretObjective = activeMap.getSecretObjective(player.getUserID());
         LinkedHashMap<String, Integer> scoredSecretObjective = activeMap.getScoredSecretObjective(player.getUserID());
         StringBuilder sb = new StringBuilder();
-        sb.append("\n").append("Game: ").append(activeMap.getName()).append("\n");
+        sb.append("--------------------\n");
+        sb.append("Game: ").append(activeMap.getName()).append("\n");
         sb.append("Secret Objectives:").append("\n");
         int index = 1;
         if (secretObjective != null) {
@@ -55,8 +56,7 @@ public class CardsInfo extends CardsSubcommandData {
                 index++;
             }
         }
-
-        sb.append("\n");
+        sb.append("--------------------\n");
         MessageHelper.sentToMessageToUser(event, sb.toString());
     }
 

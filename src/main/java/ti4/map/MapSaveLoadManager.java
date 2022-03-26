@@ -165,6 +165,17 @@ public class MapSaveLoadManager {
         writer.write(Constants.SO + " " + String.join(",", map.getSecretObjectives()));
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.AC + " " + String.join(",", map.getActionCards()));
+        writer.write(System.lineSeparator());
+
+        LinkedHashMap<String, Integer> discardActionCards = map.getDiscardActionCards();
+        StringBuilder sb = new StringBuilder();
+        for (java.util.Map.Entry<String, Integer> entry : discardActionCards.entrySet()) {
+            sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
+        }
+        writer.write(Constants.AC_DISCARDED + " " + sb);
+        writer.write(System.lineSeparator());
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -497,13 +508,32 @@ public class MapSaveLoadManager {
     private static void readGameInfo(Map map, String data) {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.countTokens() == 2) {
-            @SuppressWarnings("unused") String ignoredAsIndicator = tokenizer.nextToken();
-            StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ",");
-            List<String> secretObjectives = new ArrayList<>();
-            while (secrets.hasMoreTokens()) {
-                secretObjectives.add(secrets.nextToken());
+            @SuppressWarnings("unused") String identification = tokenizer.nextToken();
+            if (Constants.SO.equals(identification)) {
+                StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ",");
+                List<String> secretObjectives = new ArrayList<>();
+                while (secrets.hasMoreTokens()) {
+                    secretObjectives.add(secrets.nextToken());
+                }
+                map.setSecretObjectives(secretObjectives);
+            } else if (Constants.AC.equals(identification)) {
+                StringTokenizer actionCards = new StringTokenizer(tokenizer.nextToken(), ",");
+                List<String> actionCardsList = new ArrayList<>();
+                while (actionCards.hasMoreTokens()) {
+                    actionCardsList.add(actionCards.nextToken());
+                }
+                map.setActionCards(actionCardsList);
+            } else if (Constants.AC_DISCARDED.equals(identification)) {
+                StringTokenizer actionCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                LinkedHashMap<String, Integer> discardedActionCards = new LinkedHashMap<>();
+                while (actionCardToken.hasMoreTokens()) {
+                    StringTokenizer actionCardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
+                    String id = actionCardInfo.nextToken();
+                    Integer index = Integer.parseInt(actionCardInfo.nextToken());
+                    discardedActionCards.put(id, index);
+                }
+                map.setDiscardActionCards(discardedActionCards);
             }
-            map.setSecretObjectives(secretObjectives);
         }
     }
 
