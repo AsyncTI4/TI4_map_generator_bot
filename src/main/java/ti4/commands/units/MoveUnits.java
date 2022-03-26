@@ -26,10 +26,10 @@ public class MoveUnits extends AddRemoveUnits {
     @Override
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
         toAction = false;
-        OptionMapping option = event.getOption(Constants.PRIORITY_NO_DAMAGE);
+        OptionMapping optionDmg = event.getOption(Constants.PRIORITY_NO_DAMAGE);
         priorityDmg = true;
-        if (option != null) {
-            String value = option.getAsString().toLowerCase();
+        if (optionDmg != null) {
+            String value = optionDmg.getAsString().toLowerCase();
             if ("yes".equals(value) || "y".equals(value)) {
                 priorityDmg = false;
             }
@@ -53,7 +53,7 @@ public class MoveUnits extends AddRemoveUnits {
         unitList = event.getOptions().get(4).getAsString().toLowerCase();
         unitParsing(event, color, tile, unitList);
 
-        option = event.getOption(Constants.CC);
+        OptionMapping option = event.getOption(Constants.CC);
         if (option == null) {
             AddCC.addCC(event, color, tile);
         }

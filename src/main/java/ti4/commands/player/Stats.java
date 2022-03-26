@@ -53,17 +53,17 @@ public class Stats extends PlayerSubcommandData {
             }
         }
 
-        OptionMapping option = event.getOption(Constants.CC);
+        OptionMapping optionCC = event.getOption(Constants.CC);
         OptionMapping optionT = event.getOption(Constants.TACTICAL);
         OptionMapping optionF = event.getOption(Constants.FLEET);
         OptionMapping optionS = event.getOption(Constants.STRATEGY);
-        if (option != null && (optionT != null || optionF != null && optionS != null)){
+        if (optionCC != null && (optionT != null || optionF != null && optionS != null)){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Use format 3/3/3 for command counters or individual values, not both");
         } else {
 
-            if (option != null) {
+            if (optionCC != null) {
                 @SuppressWarnings("ConstantConditions")
-                String cc = AliasHandler.resolveFaction(option.getAsString().toLowerCase());
+                String cc = AliasHandler.resolveFaction(optionCC.getAsString().toLowerCase());
                 StringTokenizer tokenizer = new StringTokenizer(cc, "/");
                 if (tokenizer.countTokens() != 3) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Wrong format for tokens count. Must be 3/3/3");
@@ -87,45 +87,45 @@ public class Stats extends PlayerSubcommandData {
                 player.setStrategicCC(optionS.getAsInt());
             }
         }
-        option = event.getOption(Constants.TG);
-        if (option != null) {
-            player.setTg(option.getAsInt());
+        OptionMapping optionTG = event.getOption(Constants.TG);
+        if (optionTG != null) {
+            player.setTg(optionTG.getAsInt());
         }
-        option = event.getOption(Constants.COMMODITIES);
-        if (option != null) {
-            player.setCommodities(option.getAsInt());
+        OptionMapping optionC = event.getOption(Constants.COMMODITIES);
+        if (optionC != null) {
+            player.setCommodities(optionC.getAsInt());
         }
-        option = event.getOption(Constants.COMMODITIES_TOTAL);
-        if (option != null) {
-            player.setCommoditiesTotal(option.getAsInt());
+        OptionMapping optionCT = event.getOption(Constants.COMMODITIES_TOTAL);
+        if (optionCT != null) {
+            player.setCommoditiesTotal(optionCT.getAsInt());
         }
-        option = event.getOption(Constants.AC);
-        if (option != null) {
-            player.setAc(option.getAsInt());
+        OptionMapping optionAC = event.getOption(Constants.AC);
+        if (optionAC != null) {
+            player.setAc(optionAC.getAsInt());
         }
-        option = event.getOption(Constants.PN);
-        if (option != null) {
-            player.setPn(option.getAsInt());
+        OptionMapping optionPN = event.getOption(Constants.PN);
+        if (optionPN != null) {
+            player.setPn(optionPN.getAsInt());
         }
-        option = event.getOption(Constants.CRF);
-        if (option != null) {
-            player.setCrf(option.getAsInt());
+        OptionMapping optionCRF = event.getOption(Constants.CRF);
+        if (optionCRF != null) {
+            player.setCrf(optionCRF.getAsInt());
         }
-        option = event.getOption(Constants.HRF);
-        if (option != null) {
-            player.setHrf(option.getAsInt());
+        OptionMapping optionHRF = event.getOption(Constants.HRF);
+        if (optionHRF != null) {
+            player.setHrf(optionHRF.getAsInt());
         }
-        option = event.getOption(Constants.IRF);
-        if (option != null) {
-            player.setIrf(option.getAsInt());
+        OptionMapping optionIRF = event.getOption(Constants.IRF);
+        if (optionIRF != null) {
+            player.setIrf(optionIRF.getAsInt());
         }
-        option = event.getOption(Constants.VRF);
-        if (option != null) {
-            player.setVrf(option.getAsInt());
+        OptionMapping optionVRF = event.getOption(Constants.VRF);
+        if (optionVRF != null) {
+            player.setVrf(optionVRF.getAsInt());
         }
-        option = event.getOption(Constants.SC);
-        if (option != null) {
-            player.setSC(option.getAsInt());
+        OptionMapping optionSC = event.getOption(Constants.SC);
+        if (optionSC != null) {
+            player.setSC(optionSC.getAsInt());
         }
     }
 }
