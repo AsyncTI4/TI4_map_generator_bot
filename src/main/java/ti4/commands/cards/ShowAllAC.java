@@ -36,8 +36,10 @@ public class ShowAllAC extends CardsSubcommandData {
             sb.append("Player: ").append(player.getUserName()).append("\n");
             sb.append("Showed Action Cards:").append("\n");
             LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+            int index = 1;
             for (String id : actionCards.keySet()) {
-                sb.append(Mapper.getActionCard(id)).append("\n");
+                sb.append(index).append(". ").append(Mapper.getActionCard(id)).append("\n");
+                index++;
 
             }
             MessageHelper.sentToMessageToUser(event, sb.toString(), user);

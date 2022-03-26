@@ -51,10 +51,12 @@ public class ShowAC extends CardsSubcommandData {
         if (playerOption != null) {
             User user = playerOption.getAsUser();
             StringBuilder sb = new StringBuilder();
+            sb.append("---------\n");
             sb.append("Game: ").append(activeMap.getName()).append("\n");
             sb.append("Player: ").append(player.getUserName()).append("\n");
             sb.append("Showed Action Cards:").append("\n");
             sb.append(Mapper.getActionCard(acID)).append("\n");
+            sb.append("---------\n");
             player.setActionCard(acID);
 
             MessageHelper.sentToMessageToUser(event, sb.toString(), user);
