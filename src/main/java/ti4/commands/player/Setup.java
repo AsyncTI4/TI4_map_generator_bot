@@ -11,7 +11,9 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class Setup extends PlayerSubcommandData{
+import java.util.LinkedHashMap;
+
+public class Setup extends PlayerSubcommandData {
     public Setup() {
         super(Constants.SETUP, "Player initialisation: Faction and Color");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name").setRequired(true).setAutoComplete(true))
@@ -35,18 +37,31 @@ public class Setup extends PlayerSubcommandData{
             return;
         }
         Player player = activeMap.getPlayer(getUser().getId());
-        if (player == null){
+        if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        if (playerOption != null){
+        if (playerOption != null) {
             String playerID = playerOption.getAsUser().getId();
-            if (activeMap.getPlayer(playerID) != null){
+            if (activeMap.getPlayer(playerID) != null) {
                 player = activeMap.getPlayers().get(playerID);
             } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" +playerOption.getAsUser().getName()+ " could not be found in map:" + activeMap.getName());
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerOption.getAsUser().getName() + " could not be found in map:" + activeMap.getName());
                 return;
+            }
+        }
+
+        LinkedHashMap<String, Player> players = activeMap.getPlayers();
+        for (Player playerInfo : players.values()) {
+            if (playerInfo != player) {
+                if (playerInfo.getColor().equals(color)) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerInfo.getUserName() + " already uses color:" + color);
+                    return;
+                } else if (playerInfo.getFaction().equals(faction)) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
+                    return;
+                }
             }
         }
 
