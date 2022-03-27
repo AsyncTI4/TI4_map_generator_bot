@@ -11,7 +11,7 @@ public class Constants {
     public static final String SHUTDOWN = "shutdown";
     public static final String LOG_MESSAGE = "log_message";
     public static final String SET_GAME = "set_game";
-    public static final String SET_GAME_STATUS = "set_game_status";
+    public static final String SET_STATUS = "set_status";
     public static final String REMOVE_PLAYER = "remove_player";
     public static final String PLAYER_NAME = "player_name";
     public static final String JOIN = "join";

@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 public class SetStatus extends GameSubcommandData{
 
     public SetStatus() {
-        super(Constants.SET_GAME_STATUS, "Game information:");
+        super(Constants.SET_STATUS, "Set Game Status information:");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_STATUS, "Game status: open, locked").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name to be set as active"));
     }
@@ -35,7 +35,7 @@ public class SetStatus extends GameSubcommandData{
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Specify game or set active Game");
                 return;
             }
-            mapName = event.getOptions().get(0).getAsString();
+            mapName = userActiveMap.getName();
         }
 
         OptionMapping mapStatusOption = event.getOption(Constants.GAME_STATUS);
