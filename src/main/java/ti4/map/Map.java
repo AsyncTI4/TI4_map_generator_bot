@@ -16,6 +16,9 @@ public class Map {
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
     private MapStatus mapStatus = MapStatus.open;
 
+    private HashMap<Integer, Boolean> scPlayed = new HashMap<>();
+    private String speaker = "";
+
     private List<String> secretObjectives;
     private List<String> actionCards;
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
@@ -33,6 +36,21 @@ public class Map {
     //Position, Tile
     private HashMap<String, Tile> tileMap = new HashMap<>();
 
+    public HashMap<Integer, Boolean> getScPlayed() {
+        return scPlayed;
+    }
+
+    public void setSCPlayed(Integer scNumber, Boolean playedStatus) {
+        this.scPlayed.put(scNumber, playedStatus);
+    }
+
+    public String getSpeaker() {
+        return speaker;
+    }
+
+    public void setSpeaker(String speaker) {
+        this.speaker = speaker;
+    }
 
     @CheckForNull
     public LinkedHashMap<String, Integer> drawActionCard(String userID) {

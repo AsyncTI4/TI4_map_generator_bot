@@ -10,6 +10,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
+import java.util.LinkedHashMap;
 import java.util.StringTokenizer;
 
 public class Stats extends PlayerSubcommandData {
@@ -28,6 +29,9 @@ public class Stats extends PlayerSubcommandData {
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.IRF, "Industrial Relic Fragment count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.VRF, "Unknown Relic Fragment count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Card Number count"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.SC_PLAYED, "Strategy Card played y/n"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player passed y/n"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
                 .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
     }
 
@@ -56,7 +60,7 @@ public class Stats extends PlayerSubcommandData {
         OptionMapping optionT = event.getOption(Constants.TACTICAL);
         OptionMapping optionF = event.getOption(Constants.FLEET);
         OptionMapping optionS = event.getOption(Constants.STRATEGY);
-        if (optionCC != null && (optionT != null || optionF != null && optionS != null)){
+        if (optionCC != null && (optionT != null || optionF != null && optionS != null)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Use format 3/3/3 for command counters or individual values, not both");
         } else {
 
@@ -118,9 +122,49 @@ public class Stats extends PlayerSubcommandData {
         if (optionVRF != null) {
             player.setVrf(optionVRF.getAsInt());
         }
+
+        OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
+        if (optionSCPlayed != null) {
+            int sc = player.getSC();
+            if (sc > 0) {
+                String value = optionSCPlayed.getAsString().toLowerCase();
+                if ("y".equals(value) || "yes".equals(value)) {
+                    activeMap.setSCPlayed(sc, true);
+                } else if ("n".equals(value) || "no".equals(value)) {
+                    activeMap.setSCPlayed(sc, false);
+                }
+            }
+        }
+        OptionMapping optionSpeaker = event.getOption(Constants.SPEAKER);
+        if (optionSpeaker != null) {
+            String value = optionSpeaker.getAsString().toLowerCase();
+            if ("y".equals(value) || "yes".equals(value)) {
+                activeMap.setSpeaker(player.getUserID());
+            }
+        }
+
+        OptionMapping optionPassed = event.getOption(Constants.PASSED);
+        if (optionPassed != null) {
+            String value = optionPassed.getAsString().toLowerCase();
+            if ("y".equals(value) || "yes".equals(value)) {
+                player.setPassed(true);
+            } else if ("n".equals(value) || "no".equals(value)) {
+                player.setPassed(false);
+            }
+        }
         OptionMapping optionSC = event.getOption(Constants.SC);
         if (optionSC != null) {
-            player.setSC(optionSC.getAsInt());
+            int scNumber = optionSC.getAsInt();
+            if (scNumber > 0) {
+                LinkedHashMap<String, Player> players = activeMap.getPlayers();
+                for (Player playerStats : players.values()) {
+                    if (playerStats.getSC() == scNumber) {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "SC is already picked.");
+                        return;
+                    }
+                }
+                player.setSC(scNumber);
+            }
         }
     }
 }

@@ -176,6 +176,19 @@ public class MapSaveLoadManager {
         writer.write(Constants.AC_DISCARDED + " " + sb);
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.SPEAKER + " " + map.getSpeaker());
+        writer.write(System.lineSeparator());
+
+        HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
+        sb = new StringBuilder();
+        for (java.util.Map.Entry<Integer, Boolean> entry : scPlayed.entrySet()) {
+            sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
+        }
+        writer.write(Constants.SC_PLAYED + " " + sb);
+        writer.write(System.lineSeparator());
+
+
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -198,6 +211,17 @@ public class MapSaveLoadManager {
             writer.write(Constants.COLOR + " " + player.getColor());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.PASSED + " " + player.isPassed());
+            writer.write(System.lineSeparator());
+
+            LinkedHashMap<String, Integer> playerActionCards = player.getActionCards();
+            sb = new StringBuilder();
+            for (java.util.Map.Entry<String, Integer> entry : playerActionCards.entrySet()) {
+                sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
+            }
+
+            writer.write(Constants.AC + " " + sb);
+            writer.write(System.lineSeparator());
 
             writer.write(Constants.TACTICAL + " " + player.getTacticalCC());
             writer.write(System.lineSeparator());
@@ -211,8 +235,6 @@ public class MapSaveLoadManager {
             writer.write(Constants.COMMODITIES + " " + player.getCommodities());
             writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal());
-            writer.write(System.lineSeparator());
-            writer.write(Constants.AC + " " + player.getAc());
             writer.write(System.lineSeparator());
             writer.write(Constants.PN + " " + player.getPn());
             writer.write(System.lineSeparator());
@@ -508,7 +530,7 @@ public class MapSaveLoadManager {
     private static void readGameInfo(Map map, String data) {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.countTokens() == 2) {
-            @SuppressWarnings("unused") String identification = tokenizer.nextToken();
+            String identification = tokenizer.nextToken();
             if (Constants.SO.equals(identification)) {
                 StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ",");
                 List<String> secretObjectives = new ArrayList<>();
@@ -533,6 +555,16 @@ public class MapSaveLoadManager {
                     discardedActionCards.put(id, index);
                 }
                 map.setDiscardActionCards(discardedActionCards);
+            } else if (Constants.SPEAKER.equals(identification)) {
+                map.setSpeaker(tokenizer.nextToken());
+            } else if (Constants.SC_PLAYED.equals(identification)) {
+                StringTokenizer scPlayed = new StringTokenizer(tokenizer.nextToken(), ";");
+                while (scPlayed.hasMoreTokens()) {
+                    StringTokenizer dataInfo = new StringTokenizer(scPlayed.nextToken(), ",");
+                    Integer scID = Integer.parseInt(dataInfo.nextToken());
+                    Boolean status = Boolean.parseBoolean(dataInfo.nextToken());
+                    map.setSCPlayed(scID, status);
+                }
             }
         }
     }
@@ -558,7 +590,13 @@ public class MapSaveLoadManager {
             } else if (data.startsWith(Constants.COMMODITIES)) {
                 player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
             } else if (data.startsWith(Constants.AC)) {
-//                player.setAc(Integer.parseInt(tokenizer.nextToken()));
+                StringTokenizer actionCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                while (actionCardToken.hasMoreTokens()) {
+                    StringTokenizer actionCardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
+                    String id = actionCardInfo.nextToken();
+                    Integer index = Integer.parseInt(actionCardInfo.nextToken());
+                    player.setActionCard(id, index);
+                }
             } else if (data.startsWith(Constants.PN)) {
                 player.setPn(Integer.parseInt(tokenizer.nextToken()));
             } else if (data.startsWith(Constants.SO_SCORED)) {
@@ -587,6 +625,8 @@ public class MapSaveLoadManager {
                 player.setVrf(Integer.parseInt(tokenizer.nextToken()));
             } else if (data.startsWith(Constants.SC)) {
                 player.setSC(Integer.parseInt(tokenizer.nextToken()));
+            } else if (data.startsWith(Constants.PASSED)) {
+                player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
             }
         }
     }

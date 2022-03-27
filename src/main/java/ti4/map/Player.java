@@ -8,6 +8,8 @@ public class Player {
     private String userID;
     private String userName;
 
+    private boolean passed = false;
+
     private String faction;
     private String color;
 
@@ -38,6 +40,13 @@ public class Player {
         this.userName = userName;
     }
 
+    public boolean isPassed() {
+        return passed;
+    }
+
+    public void setPassed(boolean passed) {
+        this.passed = passed;
+    }
 
     public LinkedHashMap<String, Integer> getActionCards() {
         return actionCards;
