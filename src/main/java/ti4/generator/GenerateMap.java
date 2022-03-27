@@ -50,7 +50,7 @@ public class GenerateMap {
             LoggerHandler.log("Could not init map generator");
             //todo message to user
         }
-        width = setupImage.getWidth();
+        width = Math.max(setupImage.getWidth(), 2000);
         heightForGameInfo = setupImage.getHeight();
         height = heightForGameInfo + setupImage.getHeight() / 2;
         resetImage();
@@ -182,7 +182,16 @@ public class GenerateMap {
 //            graphics.drawImage(bufferedImage, x + 100, iconY, null);
 //            graphics.setFont(Storage.getFont50());
             StringBuilder sb = new StringBuilder();
-            sb.append("SC: ").append(player.getSC()).append("   ");
+            int sc = player.getSC();
+            sb.append("SC: ").append(sc).append("   ");
+
+            graphics.setColor(getSCColor(sc, map));
+
+            graphics.drawString(sb.toString(), x + 100, y + deltaY);
+            graphics.setColor(color);
+
+            graphics.setColor(Color.WHITE);
+            sb = new StringBuilder();
             sb.append(player.getTacticalCC()).append("T/");
             sb.append(player.getFleetCC()).append("F/");
             sb.append(player.getStrategicCC()).append("S ");
@@ -195,10 +204,11 @@ public class GenerateMap {
             sb.append("HRF: ").append(player.getHrf()).append(" ");
             sb.append("IRF: ").append(player.getIrf()).append(" ");
             sb.append("VRF: ").append(player.getVrf()).append(" ");
+            if (player.isPassed()) {
+                sb.append(" PASSED");
 
-            graphics.drawString(sb.toString(), x + 100, y + deltaY);
-
-
+            }
+            graphics.drawString(sb.toString(), x + 200, y + deltaY);
             graphics.setColor(color);
             y += 90;
             g2.setColor(color);
@@ -207,6 +217,26 @@ public class GenerateMap {
 
         }
 
+    }
+
+    private Color getSCColor(int sc, Map map) {
+        HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
+        if (scPlayed.get(sc) != null){
+            if (scPlayed.get(sc)) {
+                return Color.GRAY;
+            }
+        }
+        return switch (sc) {
+            case 1 -> Color.RED;
+            case 2 -> Color.ORANGE;
+            case 3 -> Color.YELLOW;
+            case 4 -> Color.GREEN;
+            case 5 -> Color.CYAN;
+            case 6 -> Color.BLUE.brighter().brighter();
+            case 7 -> Color.BLUE;
+            case 8 -> Color.MAGENTA.darker();
+            default -> Color.WHITE;
+        };
     }
 
     private Color getColor(String color) {

@@ -79,6 +79,9 @@ public class Constants {
     public static final String INFO = "info";
     public static final String UNDO = "undo";
     public static final String SET_ORDER = "set_order";
+    public static final String PASSED = "passed";
+    public static final String SC_PLAYED = "sc_played";
+    public static final String SPEAKER = "speaker";
 
     public static final String PLAYER1 = "player1";
     public static final String PLAYER2 = "player2";
