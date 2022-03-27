@@ -199,11 +199,11 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
 
 
-            writer.write("T " + player.getTacticalCC());
+            writer.write(Constants.TACTICAL + " " + player.getTacticalCC());
             writer.write(System.lineSeparator());
-            writer.write("FS " + player.getFleetCC());
+            writer.write(Constants.FLEET + " " +  player.getFleetCC());
             writer.write(System.lineSeparator());
-            writer.write("S " + player.getStrategicCC());
+            writer.write(Constants.STRATEGY + " " +  player.getStrategicCC());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TG + " " + player.getTg());
@@ -545,11 +545,11 @@ public class MapSaveLoadManager {
                 player.setFaction(tokenizer.nextToken());
             } else if (data.startsWith(Constants.COLOR)) {
                 player.setColor(tokenizer.nextToken());
-            } else if (data.startsWith("T ")) {
+            } else if (data.startsWith(Constants.TACTICAL)) {
                 player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith("FS ")) {
+            } else if (data.startsWith(Constants.FLEET)) {
                 player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith("S ")) {
+            } else if (data.startsWith(Constants.STRATEGY)) {
                 player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
             } else if (data.startsWith(Constants.TG)) {
                 player.setTg(Integer.parseInt(tokenizer.nextToken()));
