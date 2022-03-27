@@ -245,8 +245,8 @@ public class GenerateMap {
             case 3 -> Color.YELLOW;
             case 4 -> Color.GREEN;
             case 5 -> Color.CYAN;
-            case 6 -> Color.BLUE.brighter().brighter();
-            case 7 -> Color.BLUE;
+            case 6 -> new Color(128, 166, 206);
+            case 7 -> new Color(80, 133, 188);
             case 8 -> Color.MAGENTA.darker();
             default -> Color.WHITE;
         };
