@@ -420,8 +420,6 @@ public class MapSaveLoadManager {
                         if (ENDPLAYERINFO.equals(tmpData)) {
                             break;
                         }
-//                        readGameInfo(map, data);
-
                         Player player = null;
                         while (myReader.hasNextLine()) {
                             data = tmpData != null ? tmpData : myReader.nextLine();
@@ -434,15 +432,10 @@ public class MapSaveLoadManager {
                             if (ENDPLAYER.equals(data)) {
                                 break;
                             }
-//                            data = myReader.nextLine();
-
                             readPlayerInfo(player, data);
                         }
                     }
-
                 }
-
-
                 HashMap<String, Tile> tileMap = new HashMap<>();
                 while (myReader.hasNextLine()) {
                     String tileData = myReader.nextLine();
@@ -573,23 +566,23 @@ public class MapSaveLoadManager {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.countTokens() == 2) {
             data = tokenizer.nextToken();
-            if (data.startsWith(Constants.FACTION)) {
+            if (data.equals(Constants.FACTION)) {
                 player.setFaction(tokenizer.nextToken());
-            } else if (data.startsWith(Constants.COLOR)) {
+            } else if (data.equals(Constants.COLOR)) {
                 player.setColor(tokenizer.nextToken());
-            } else if (data.startsWith(Constants.TACTICAL)) {
+            } else if (data.equals(Constants.TACTICAL)) {
                 player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith(Constants.FLEET)) {
+            } else if (data.equals(Constants.FLEET)) {
                 player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith(Constants.STRATEGY)) {
+            } else if (data.equals(Constants.STRATEGY)) {
                 player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith(Constants.TG)) {
+            } else if (data.equals(Constants.TG)) {
                 player.setTg(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith(Constants.COMMODITIES_TOTAL)) {
+            } else if (data.equals(Constants.COMMODITIES_TOTAL)) {
                 player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith(Constants.COMMODITIES)) {
+            } else if (data.equals(Constants.COMMODITIES)) {
                 player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith(Constants.AC)) {
+            } else if (data.equals(Constants.AC)) {
                 StringTokenizer actionCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
                 while (actionCardToken.hasMoreTokens()) {
                     StringTokenizer actionCardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
@@ -597,9 +590,9 @@ public class MapSaveLoadManager {
                     Integer index = Integer.parseInt(actionCardInfo.nextToken());
                     player.setActionCard(id, index);
                 }
-            } else if (data.startsWith(Constants.PN)) {
+            } else if (data.equals(Constants.PN)) {
                 player.setPn(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith(Constants.SO_SCORED)) {
+            } else if (data.equals(Constants.SO_SCORED)) {
                 StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
                 while (secrets.hasMoreTokens()) {
                     StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
@@ -607,7 +600,7 @@ public class MapSaveLoadManager {
                     Integer index = Integer.parseInt(secretInfo.nextToken());
                     player.setSecretScored(id, index);
                 }
-            } else if (data.startsWith(Constants.SO)) {
+            } else if (data.equals(Constants.SO)) {
                 StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
                 while (secrets.hasMoreTokens()) {
                     StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
@@ -615,17 +608,17 @@ public class MapSaveLoadManager {
                     Integer index = Integer.parseInt(secretInfo.nextToken());
                     player.setSecret(id, index);
                 }
-            } else if (data.startsWith(Constants.CRF)) {
+            } else if (data.equals(Constants.CRF)) {
                 player.setCrf(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith(Constants.HRF)) {
+            } else if (data.equals(Constants.HRF)) {
                 player.setHrf(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith(Constants.IRF)) {
+            } else if (data.equals(Constants.IRF)) {
                 player.setIrf(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith(Constants.VRF)) {
+            } else if (data.equals(Constants.VRF)) {
                 player.setVrf(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith(Constants.SC)) {
+            } else if (data.equals(Constants.SC)) {
                 player.setSC(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.startsWith(Constants.PASSED)) {
+            } else if (data.equals(Constants.PASSED)) {
                 player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
             }
         }

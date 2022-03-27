@@ -157,6 +157,21 @@ public class GenerateMap {
         HashMap<String, Player> players = map.getPlayers();
         float percent = 0.15f;
         int deltaY = 50;
+
+
+        String speakerID = Mapper.getTokenID(Constants.SPEAKER);
+        String speakerFile = ResourceHelper.getInstance().getTokenFile(speakerID);
+        if (speakerFile != null) {
+            BufferedImage bufferedImage = ImageIO.read(new File(speakerFile));
+            graphics.drawImage(bufferedImage, x, y -bufferedImage.getHeight() - 120, null);
+            graphics.setColor(Color.WHITE);
+            Player player = map.getPlayer(map.getSpeaker());
+            if (player != null) {
+                graphics.drawString(player.getUserName(), x, y - 90);
+            }
+        }
+
+
         graphics.setFont(Storage.getFont32());
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(5));
@@ -164,11 +179,9 @@ public class GenerateMap {
             int baseY = y;
             y += 34;
             Color color = getColor(player.getColor());
-//            graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
             graphics.drawString(player.getUserName(), x, y);
             y += 2;
-            int iconY = y;
             String faction = player.getFaction();
             if (faction != null) {
                 String factionPath = getFactionPath(faction);
