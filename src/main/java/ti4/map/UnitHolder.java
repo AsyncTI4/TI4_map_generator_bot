@@ -113,6 +113,10 @@ abstract public class UnitHolder {
         unitsDamage.keySet().removeIf(key -> key.startsWith(colorID));
     }
 
+    public void removeAllUnitDamage() {
+        unitsDamage.clear();
+    }
+
 
     public void removeAllUnits(String color) {
         String colorID = Mapper.getColorID(color);

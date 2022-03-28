@@ -116,6 +116,9 @@ public class Constants {
     public static final String TXT = ".txt";
     public static final String ADMIN = "admin";
 
+    public static final String STATUS = "status";
+    public static final String CLEANUP = "cleanup";
+
     public static final String COUNT = "count";
     public static final String SECRET_OBJECTIVE_ID = "secret_objective_id";
     public static final String DRAW_SO = "so_draw";

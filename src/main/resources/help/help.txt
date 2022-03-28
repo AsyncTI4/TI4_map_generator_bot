@@ -107,3 +107,5 @@ Cards commands
 /cards ac_pick_from_discard acUniqueIDFromDiscardPile <- Pick a Action card from discard pile and put in your hand
 /cards ac_show_discard_list <- Show all discarded Action cards
 /cards ac_send acUniqueID player <- Sends selected AC from your hand to player hand
+
+/status cleanup confirmYES <- cleans up all CC's, all unit damage, resets passed status and SC played and SC player selection :)
