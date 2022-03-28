@@ -240,14 +240,14 @@ public class GenerateMap {
             }
         }
         return switch (sc) {
-            case 1 -> Color.RED;
-            case 2 -> Color.ORANGE;
-            case 3 -> Color.YELLOW;
-            case 4 -> Color.GREEN;
-            case 5 -> Color.CYAN;
-            case 6 -> new Color(128, 166, 206);
-            case 7 -> new Color(80, 133, 188);
-            case 8 -> Color.MAGENTA.darker();
+            case 1 -> new Color(255, 38, 38);
+            case 2 -> new Color(253, 168, 24);
+            case 3 -> new Color(247, 237, 28);
+            case 4 -> new Color(46, 204, 113);
+            case 5 -> new Color(26, 188, 156);
+            case 6 -> new Color(52, 152, 171);
+            case 7 -> new Color(155, 89, 182);
+            case 8 -> new Color(124, 0, 192);
             default -> Color.WHITE;
         };
     }
