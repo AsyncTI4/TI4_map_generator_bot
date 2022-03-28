@@ -118,24 +118,24 @@ public class Constants {
 
     public static final String COUNT = "count";
     public static final String SECRET_OBJECTIVE_ID = "secret_objective_id";
-    public static final String DRAW_SO = "draw_so";
-    public static final String SHOW_SO = "show_so";
-    public static final String SHOW_ALL_SO = "show_all_so";
-    public static final String SHOW_SO_TO_ALL = "show_so_to_all";
+    public static final String DRAW_SO = "so_draw";
+    public static final String SHOW_SO = "so_show";
+    public static final String SHOW_ALL_SO = "so_show_all";
+    public static final String SHOW_SO_TO_ALL = "so_show_to_all";
     public static final String CARDS = "cards";
-    public static final String DISCARD_SO = "discard_so";
-    public static final String SCORE_SO = "score_so";
-    public static final String UNSCORE_SO = "unscore_so";
+    public static final String DISCARD_SO = "so_discard";
+    public static final String SCORE_SO = "so_score";
+    public static final String UNSCORE_SO = "so_unscore";
 
     public static final String ACTION_CARD_ID = "action_card_id";
-    public static final String DRAW_AC = "draw_ac";
-    public static final String SHUFFLE_AC_DECK = "shuffle_ac_deck";
-    public static final String SHOW_AC = "show_ac";
-    public static final String SHOW_ALL_AC = "show_all_ac";
-    public static final String SHOW_AC_TO_ALL = "show_ac_to_all";
-    public static final String DISCARD_AC = "discard_ac";
-    public static final String PLAY_AC = "play_ac";
-    public static final String PICK_AC_FROM_DISCARD = "pick_ac_from_discard";
-    public static final String SEND_AC = "send_ac";
-    public static final String SHOW_AC_DISCARD_LIST = "show_ac_discard_list";
+    public static final String DRAW_AC = "ac_draw";
+    public static final String SHUFFLE_AC_DECK = "ac_shuffle_deck";
+    public static final String SHOW_AC = "ac_show";
+    public static final String SHOW_ALL_AC = "ac_show_all";
+    public static final String SHOW_AC_TO_ALL = "ac_show_to_all";
+    public static final String DISCARD_AC = "ac_discard";
+    public static final String PLAY_AC = "ac_play";
+    public static final String PICK_AC_FROM_DISCARD = "ac_pick_from_discard";
+    public static final String SEND_AC = "ac_send";
+    public static final String SHOW_AC_DISCARD_LIST = "ac_show_discard_list";
 }

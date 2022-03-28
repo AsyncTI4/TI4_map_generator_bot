@@ -90,20 +90,20 @@ Attachement tokens can only be added to planets
 /player setup faction color <- needs to set player faction and color
 
 Cards commands
-/cards draw_so count(optional) <- draws a secret or specified number of secrets
-/cards discard_so soUniqueID <- discards given ID Secret objective and shuffles the SO deck. soUniqueID is generated just for player and are unique each time
+/cards so_draw count(optional) <- draws a secret or specified number of secrets
+/cards discard soUniqueID <- discards given ID Secret objective and shuffles the SO deck. soUniqueID is generated just for player and are unique each time
 /cards info <- sents player all private cards for given game
-/cards show_so soUniqueID player <- sends given Secret Objective to player and changes soUniqueID
-/cards show_all_so player <- sends all Secret Objectives to player
-/cards show_so_to_all soUniqueID <- displays SO to table and changes soUniqueID
+/cards so_show soUniqueID player <- sends given Secret Objective to player and changes soUniqueID
+/cards so_show_all player <- sends all Secret Objectives to player
+/cards so_show_to_all soUniqueID <- displays SO to table and changes soUniqueID
 
-/cards draw_ac count(optional) <- draws a secret or specified number of secrets
-/cards discard_ac acUniqueID <- discards given ID action card and shuffles the ac deck. acUniqueID is generated just for player and are unique each time
-/cards show_ac acUniqueID player <- sends given action card to player and changes acUniqueID
-/cards show_all_ac player <- sends all action cards to player
-/cards show_ac_to_all acUniqueID <- displays ac to table and changes acUniqueID
-/cards playAC acUniqueID <- displays ac to table that was played and discards
-/cards shuffle_ac_deck <- shuffles Action card deck
-/cards pick_ac_from_discard acUniqueIDFromDiscardPile <- Pick a Action card from discard pile and put in your hand
-/cards show_ac_discard_list <- Show all discarded Action cards
-/cards send_ac acUniqueID player <- Sends selected AC from your hand to player hand
+/cards ac_draw count(optional) <- draws a secret or specified number of secrets
+/cards ac_discard acUniqueID <- discards given ID action card and shuffles the ac deck. acUniqueID is generated just for player and are unique each time
+/cards ac_show acUniqueID player <- sends given action card to player and changes acUniqueID
+/cards ac_show_all player <- sends all action cards to player
+/cards ac_show_to_all acUniqueID <- displays ac to table and changes acUniqueID
+/cards ac_play acUniqueID <- displays ac to table that was played and discards
+/cards ac_shuffle_deck <- shuffles Action card deck
+/cards ac_pick_from_discard acUniqueIDFromDiscardPile <- Pick a Action card from discard pile and put in your hand
+/cards ac_show_discard_list <- Show all discarded Action cards
+/cards ac_send acUniqueID player <- Sends selected AC from your hand to player hand
