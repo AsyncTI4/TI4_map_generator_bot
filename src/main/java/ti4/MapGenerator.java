@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import ti4.commands.CommandManager;
 import ti4.commands.HelpAction;
 import ti4.commands.admin.AdminCommand;
+import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.cards.CardsCommand;
 import ti4.commands.game.GameCommand;
 import ti4.commands.info.*;
@@ -97,6 +98,7 @@ public class MapGenerator {
         commandManager.addCommand(new GameCommand());
         commandManager.addCommand(new CardsCommand());
         commandManager.addCommand(new StatusCommand());
+        commandManager.addCommand(new AgendaCommand());
 
         Guild guild = jda.getGuildById(args[2]);
 

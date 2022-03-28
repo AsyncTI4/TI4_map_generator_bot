@@ -23,6 +23,11 @@ public class Map {
     private List<String> actionCards;
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
 
+    private List<String> agendas;
+    private LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
+    private LinkedHashMap<String, Integer> sentAgendas = new LinkedHashMap<>();
+    private LinkedHashMap<String, Integer> laws = new LinkedHashMap<>();
+
     public Map() {
         HashMap<String, String> secretObjectives = Mapper.getSecretObjectives();
         this.secretObjectives = new ArrayList<>(secretObjectives.keySet());
@@ -31,6 +36,10 @@ public class Map {
         HashMap<String, String> actionCards = Mapper.getActionCards();
         this.actionCards = new ArrayList<>(actionCards.keySet());
         Collections.shuffle(this.actionCards);
+
+        HashMap<String, String> agendas = Mapper.getAgendas();
+        this.agendas = new ArrayList<>(agendas.keySet());
+        Collections.shuffle(this.agendas);
     }
 
     //Position, Tile
@@ -50,6 +59,136 @@ public class Map {
 
     public void setSpeaker(String speaker) {
         this.speaker = speaker;
+    }
+
+    public void setSentAgenda(String id) {
+        Collection<Integer> values = sentAgendas.values();
+        int identifier = new Random().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = new Random().nextInt(1000);
+        }
+        sentAgendas.put(id, identifier);
+    }
+
+    public void addDiscardAgenda(String id) {
+        Collection<Integer> values = discardAgendas.values();
+        int identifier = new Random().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = new Random().nextInt(1000);
+        }
+        discardAgendas.put(id, identifier);
+    }
+
+    public LinkedHashMap<String, Integer> getLaws() {
+        return laws;
+    }
+
+    public LinkedHashMap<String, Integer> getDiscardAgendas() {
+        return discardAgendas;
+    }
+
+    public boolean addLaw(Integer idNumber) {
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
+            if (agendas.getValue().equals(idNumber)) {
+                id = agendas.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+
+            Collection<Integer> values = laws.values();
+            int identifier = new Random().nextInt(1000);
+            while (values.contains(identifier)) {
+                identifier = new Random().nextInt(1000);
+            }
+            discardAgendas.remove(id);
+            laws.put(id, identifier);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removeLaw(Integer idNumber) {
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> ac : laws.entrySet()) {
+            if (ac.getValue().equals(idNumber)) {
+                id = ac.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            laws.remove(id);
+            addDiscardAgenda(id);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean putAgendaTop(Integer idNumber) {
+        if (sentAgendas.containsValue(idNumber)) {
+
+            String id = "";
+            for (java.util.Map.Entry<String, Integer> ac : sentAgendas.entrySet()) {
+                if (ac.getValue().equals(idNumber)) {
+                    id = ac.getKey();
+                    break;
+                }
+            }
+            if (!id.isEmpty()) {
+                agendas.remove(id);
+                agendas.add(0, id);
+                sentAgendas.remove(id);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean putAgendaBottom(Integer idNumber) {
+        if (sentAgendas.containsValue(idNumber)) {
+            String id = "";
+            for (java.util.Map.Entry<String, Integer> ac : sentAgendas.entrySet()) {
+                if (ac.getValue().equals(idNumber)) {
+                    id = ac.getKey();
+                    break;
+                }
+            }
+            if (!id.isEmpty()) {
+                agendas.remove(id);
+                agendas.add(id);
+                sentAgendas.remove(id);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @CheckForNull
+    public java.util.Map.Entry<String, Integer> drawAgenda() {
+        if (!agendas.isEmpty()) {
+            for (String id : agendas) {
+                if (!sentAgendas.containsKey(id)) {
+                    setSentAgenda(id);
+                    for (java.util.Map.Entry<String, Integer> entry : sentAgendas.entrySet()) {
+                        if (entry.getKey().equals(id)) {
+                            return entry;
+                        }
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public String lookAtTopAgenda() {
+        return agendas.get(0);
+    }
+
+    public String revealAgenda() {
+        String id = agendas.remove(0);
+        addDiscardAgenda(id);
+        return id;
     }
 
     @CheckForNull

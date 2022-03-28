@@ -1,4 +1,4 @@
-package ti4.commands.status;
+package ti4.commands.agenda;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -7,26 +7,23 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands.cards.CardsCommand;
-import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class StatusCommand implements Command {
+public class AgendaCommand implements Command {
 
-    private final Collection<StatusSubcommandData> subcommandData = getSubcommands();
+    private final Collection<AgendaSubcommandData> subcommandData = getSubcommands();
 
     @Override
     public String getActionID() {
-        return Constants.STATUS;
+        return Constants.AGENDA;
     }
 
     @Override
@@ -61,28 +58,36 @@ public class StatusCommand implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
-        for (StatusSubcommandData subcommand : subcommandData) {
+        AgendaSubcommandData executedCommand = null;
+        for (AgendaSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
+                executedCommand = subcommand;
             }
         }
-        String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
-
-        File file = GenerateMap.getInstance().saveImage(activeMap);
-        MessageHelper.replyToMessage(event, file);
+        if (executedCommand != null) {
+            MessageHelper.replyToMessage(event, "Executed action: " +executedCommand.getActionID());
+        } else {
+            MessageHelper.replyToMessage(event, "No Action executed");
+        }
     }
 
 
     protected String getActionDescription() {
-        return "Status phase";
+        return "Agenda handling";
     }
 
-    private Collection<StatusSubcommandData> getSubcommands() {
-        Collection<StatusSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new Cleanup());
+    private Collection<AgendaSubcommandData> getSubcommands() {
+        Collection<AgendaSubcommandData> subcommands = new HashSet<>();
+        subcommands.add(new DrawAgenda());
+        subcommands.add(new PutAgendaTop());
+        subcommands.add(new PutAgendaBottom());
+        subcommands.add(new LookAtTopAgenda());
+        subcommands.add(new RevealAgenda());
+        subcommands.add(new AddLaw());
+        subcommands.add(new RemoveLaw());
+        subcommands.add(new ShowDiscardedAgendas());
         return subcommands;
     }
 

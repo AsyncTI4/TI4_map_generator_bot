@@ -23,6 +23,7 @@ public class Mapper {
     private static final Properties general = new Properties();
     private static final Properties secretObjectives = new Properties();
     private static final Properties actionCards = new Properties();
+    private static final Properties agendas = new Properties();
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
@@ -36,6 +37,7 @@ public class Mapper {
         readData("factions.properties", factions, "Could not read factions name file");
         readData("Secret_objectives.properties", secretObjectives, "Could not read secret objectives file");
         readData("action_cards.properties", actionCards, "Could not read action cards file");
+        readData("Agendas.properties", agendas, "Could not read action cards file");
     }
 
     private static void readData(String propertyFileName, Properties colors, String s) {
@@ -126,6 +128,10 @@ public class Mapper {
     public static String getActionCard(String id) {
         return (String)actionCards.get(id);
     }
+
+    public static String getAgenda(String id) {
+        return (String)agendas.get(id);
+    }
     public static  HashMap<String, String> getSecretObjectives() {
         HashMap<String, String> soList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : secretObjectives.entrySet()) {
@@ -140,6 +146,14 @@ public class Mapper {
             acList.put((String)entry.getKey(), (String)entry.getValue());
         }
         return acList;
+    }
+
+    public static  HashMap<String, String> getAgendas() {
+        HashMap<String, String> agendaList = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : agendas.entrySet()) {
+            agendaList.put((String)entry.getKey(), (String)entry.getValue());
+        }
+        return agendaList;
     }
 
     public static List<String> getFactions() {

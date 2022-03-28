@@ -21,10 +21,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
+import java.util.*;
 
 public class GenerateMap {
     private Graphics graphics;
@@ -52,7 +49,7 @@ public class GenerateMap {
         }
         width = Math.max(setupImage.getWidth(), 2000);
         heightForGameInfo = setupImage.getHeight();
-        height = heightForGameInfo + setupImage.getHeight() / 2;
+        height = heightForGameInfo + setupImage.getHeight() / 2 + 300;
         resetImage();
     }
 
@@ -230,7 +227,17 @@ public class GenerateMap {
             y += 15;
 
         }
+        y+= 40;
+        graphics.setColor(Color.WHITE);
+        graphics.setFont(Storage.getFont32());
+        graphics.drawString("LAWS", x, y);
 
+        graphics.setFont(Storage.getFont26());
+        LinkedHashMap<String, Integer> laws = map.getLaws();
+        for (String lawID : laws.keySet()) {
+            y+= 30;
+            graphics.drawString(Mapper.getAgenda(lawID), x, y);
+        }
     }
 
     private Color getSCColor(int sc, Map map) {
