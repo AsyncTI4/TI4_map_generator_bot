@@ -196,7 +196,8 @@ public class GenerateMap {
 //            graphics.setFont(Storage.getFont50());
             StringBuilder sb = new StringBuilder();
             int sc = player.getSC();
-            sb.append("SC: ").append(sc).append("   ");
+            String scText = sc == 0 ? " " : Integer.toString(sc);
+            sb.append("SC: ").append(scText).append("   ");
 
             graphics.setColor(getSCColor(sc, map));
 
