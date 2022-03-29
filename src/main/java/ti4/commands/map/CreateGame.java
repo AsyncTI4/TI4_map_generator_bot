@@ -1,5 +1,6 @@
 package ti4.commands.map;
 
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -46,15 +47,17 @@ public class CreateGame implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map map = new Map();
-        String ownerID = event.getUser().getId();
+        User user = event.getUser();
+        String ownerID = user.getId();
         map.setOwnerID(ownerID);
-        map.setOwnerName(event.getUser().getName());
+        map.setOwnerName(user.getName());
         String mapName = event.getOptions().get(0).getAsString().toLowerCase();
         map.setName(mapName);
 
         MapManager mapManager = MapManager.getInstance();
         mapManager.addMap(map);
         boolean setMapSuccessful = mapManager.setMapForUser(ownerID, mapName);
+        map.addPlayer(user.getId(), user.getName());
         if (!setMapSuccessful) {
             MessageHelper.replyToMessage(event, "Could not assign active map " + mapName);
         }

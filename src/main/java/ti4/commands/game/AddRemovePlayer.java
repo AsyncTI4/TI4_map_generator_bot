@@ -45,7 +45,7 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Specify game or set active Game");
                 return;
             }
-            mapName = event.getOptions().get(0).getAsString();
+            mapName = userActiveMap.getName();
         }
         MapManager mapManager = MapManager.getInstance();
         Map map = mapManager.getMap(mapName);
