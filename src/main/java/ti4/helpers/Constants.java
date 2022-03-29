@@ -95,9 +95,9 @@ public class Constants {
     public static final String STATS = "stats";
     public static final String SETUP = "setup";
     public static final String TECH = "tech";
-    public static final String TACTICAL = "tactical";
-    public static final String FLEET = "fleet";
-    public static final String STRATEGY = "strategy";
+    public static final String TACTICAL = "tactical_cc";
+    public static final String FLEET = "fleet_cc";
+    public static final String STRATEGY = "strategy_cc";
     public static final String TG = "trade_goods";
     public static final String COMMODITIES = "commodities";
     public static final String COMMODITIES_TOTAL = "commodities_total";

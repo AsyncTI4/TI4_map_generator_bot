@@ -123,18 +123,6 @@ public class Stats extends PlayerSubcommandData {
             player.setVrf(optionVRF.getAsInt());
         }
 
-        OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
-        if (optionSCPlayed != null) {
-            int sc = player.getSC();
-            if (sc > 0) {
-                String value = optionSCPlayed.getAsString().toLowerCase();
-                if ("y".equals(value) || "yes".equals(value)) {
-                    activeMap.setSCPlayed(sc, true);
-                } else if ("n".equals(value) || "no".equals(value)) {
-                    activeMap.setSCPlayed(sc, false);
-                }
-            }
-        }
         OptionMapping optionSpeaker = event.getOption(Constants.SPEAKER);
         if (optionSpeaker != null) {
             String value = optionSpeaker.getAsString().toLowerCase();
@@ -164,6 +152,23 @@ public class Stats extends PlayerSubcommandData {
                     }
                 }
                 player.setSC(scNumber);
+            } else if (scNumber == 0){
+                int sc = player.getSC();
+                player.setSC(scNumber);
+                activeMap.setSCPlayed(sc, false);
+            }
+        }
+
+        OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
+        if (optionSCPlayed != null) {
+            int sc = player.getSC();
+            if (sc > 0) {
+                String value = optionSCPlayed.getAsString().toLowerCase();
+                if ("y".equals(value) || "yes".equals(value)) {
+                    activeMap.setSCPlayed(sc, true);
+                } else if ("n".equals(value) || "no".equals(value)) {
+                    activeMap.setSCPlayed(sc, false);
+                }
             }
         }
     }

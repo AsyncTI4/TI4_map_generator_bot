@@ -19,7 +19,7 @@ public class Add extends AddRemovePlayer {
 
     @Override
     protected void action(SlashCommandInteractionEvent event, Map map, User user) {
-        map.addPlayer(user.getId(), user.getName());
+        addExtraUser(event, map, Constants.PLAYER1);
         addExtraUser(event, map, Constants.PLAYER2);
         addExtraUser(event, map, Constants.PLAYER3);
         addExtraUser(event, map, Constants.PLAYER4);
