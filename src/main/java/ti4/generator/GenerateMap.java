@@ -320,10 +320,10 @@ public class GenerateMap {
                 image = addControl(tile, image, tileX, tileY, unitHolder, rectangles);
                 int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
                 image = addSleeperToken(tile, image, tileX, tileY, unitHolder);
-                image = addUnits(tile, image, tileX, tileY, rectangles, degree, degreeChange, unitHolder, radius);
                 if (unitHolder != spaceUnitHolder) {
                     image = addPlanetToken(tile, image, tileX, tileY, unitHolder, rectangles);
                 }
+                image = addUnits(tile, image, tileX, tileY, rectangles, degree, degreeChange, unitHolder, radius);
             }
 
         } catch (IOException e) {
@@ -530,7 +530,20 @@ public class GenerateMap {
     }
 
     private BufferedImage addUnits(Tile tile, BufferedImage image, int tileX, int tileY, ArrayList<Rectangle> rectangles, int degree, int degreeChange, UnitHolder unitHolder, int radius) {
-        HashMap<String, Integer> units = unitHolder.getUnits();
+        HashMap<String, Integer> tempUnits = new HashMap<>(unitHolder.getUnits());
+        LinkedHashMap<String, Integer> units = new LinkedHashMap<>();
+
+            for (java.util.Map.Entry<String, Integer> entry : tempUnits.entrySet()) {
+                String id = entry.getKey();
+                //contains mech image
+                if (id != null && id.contains("mf")){
+                    units.put(id, entry.getValue());
+                }
+            }
+        for (String key : units.keySet()) {
+            tempUnits.remove(key);
+        }
+        units.putAll(tempUnits);
         HashMap<String, Integer> unitDamage = unitHolder.getUnitDamage();
         float scaleOfUnit = 0.80f;
         PlanetTokenPosition planetTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
@@ -613,11 +626,6 @@ public class GenerateMap {
                     graphics.drawImage(dmgImage, imageDmgX, imageDmgY, null);
                     unitDamageCount--;
                 }
-
-                //Center of planets and tile marker
-//                graphics.setColor(Color.CYAN);
-//                graphics.drawLine(tileX+centerPosition.x-5, tileY+centerPosition.y, tileX+centerPosition.x+5, tileY+centerPosition.y);
-//                graphics.drawLine(tileX+centerPosition.x, tileY+centerPosition.y-5, tileX+centerPosition.x, tileY+centerPosition.y+5);
             }
         }
         return image;

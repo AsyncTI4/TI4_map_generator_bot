@@ -3,13 +3,22 @@ package ti4.generator;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class PlanetTokenPosition {
     private String unitHolderName;
-    HashMap<String, ArrayList<Point>> coordinateMap = new HashMap<>();
+    LinkedHashMap<String, ArrayList<Point>> coordinateMap = new LinkedHashMap<>();
     public PlanetTokenPosition(String unitHolderName) {
         this.unitHolderName = unitHolderName;
+    }
+
+    public ArrayList<String> getUnitOrder(){
+        ArrayList<String> unitOrder = new ArrayList<>();
+        for (Map.Entry<String, ArrayList<Point>> entry : coordinateMap.entrySet()) {
+            unitOrder.add(entry.getKey());
+        }
+        return unitOrder;
     }
 
     public void addPosition(String id, Point point) {
