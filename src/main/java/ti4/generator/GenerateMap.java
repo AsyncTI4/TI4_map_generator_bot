@@ -234,9 +234,9 @@ public class GenerateMap {
 
         graphics.setFont(Storage.getFont26());
         LinkedHashMap<String, Integer> laws = map.getLaws();
-        for (String lawID : laws.keySet()) {
+        for (java.util.Map.Entry<String, Integer> lawEntry : laws.entrySet()) {
             y+= 30;
-            graphics.drawString(Mapper.getAgenda(lawID), x, y);
+            graphics.drawString("("+lawEntry.getValue() + ") " + Mapper.getAgenda(lawEntry.getKey()), x, y);
         }
     }
 
