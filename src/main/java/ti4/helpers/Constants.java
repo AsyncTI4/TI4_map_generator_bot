@@ -117,6 +117,11 @@ public class Constants {
     public static final String TXT = ".txt";
     public static final String ADMIN = "admin";
 
+    public static final String LAW = "law";
+    public static final String LAW_INFO = "law_info";
+    public static final String SENT_AGENDAS = "sent_agenda";
+    public static final String DISCARDED_AGENDAS = "discarded_agendas";
+    public static final String AGENDAS = "agendas";
     public static final String AGENDA = "agenda";
     public static final String DRAW = "draw";
     public static final String PUT_TOP = "put_top";

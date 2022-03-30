@@ -241,7 +241,7 @@ public class GenerateMap {
             String text = "(" + lawEntry.getValue() + ") ";
             String optionalText = lawsInfo.get(lawID);
             if (optionalText != null){
-                text += "Elected: " + optionalText + " ";
+                text += "Elected: " + optionalText + " - ";
             }
             graphics.drawString(text + Mapper.getAgenda(lawID), x, y);
         }
