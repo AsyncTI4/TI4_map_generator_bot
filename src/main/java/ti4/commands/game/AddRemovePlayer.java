@@ -58,7 +58,7 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
             return;
         }
 
-        User user = event.getOptions().get(1).getAsUser();
+        User user = event.getUser();
         action(event, map, user);
         MapSaveLoadManager.saveMap(map);
         MessageHelper.replyToMessage(event, getResponseMessage(map, user));
