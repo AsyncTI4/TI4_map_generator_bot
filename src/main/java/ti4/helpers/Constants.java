@@ -127,6 +127,7 @@ public class Constants {
     public static final String REMOVE_LAW = "remove_law";
     public static final String SHOW_DISCARDED = "show_discarded";
     public static final String AGENDA_ID = "agenda_id";
+    public static final String ELECTED = "elected";
 
 
     public static final String STATUS = "status";

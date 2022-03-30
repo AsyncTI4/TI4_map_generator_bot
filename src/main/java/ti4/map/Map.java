@@ -27,6 +27,7 @@ public class Map {
     private LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> sentAgendas = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> laws = new LinkedHashMap<>();
+    private LinkedHashMap<String, String> lawsInfo = new LinkedHashMap<>();
 
     public Map() {
         HashMap<String, String> secretObjectives = Mapper.getSecretObjectives();
@@ -83,11 +84,15 @@ public class Map {
         return laws;
     }
 
+    public LinkedHashMap<String, String> getLawsInfo() {
+        return lawsInfo;
+    }
+
     public LinkedHashMap<String, Integer> getDiscardAgendas() {
         return discardAgendas;
     }
 
-    public boolean addLaw(Integer idNumber) {
+    public boolean addLaw(Integer idNumber, String optionalText) {
         String id = "";
         for (java.util.Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
             if (agendas.getValue().equals(idNumber)) {
@@ -104,6 +109,9 @@ public class Map {
             }
             discardAgendas.remove(id);
             laws.put(id, identifier);
+            if (optionalText != null) {
+                lawsInfo.put(id, optionalText);
+            }
             return true;
         }
         return false;
@@ -119,6 +127,7 @@ public class Map {
         }
         if (!id.isEmpty()) {
             laws.remove(id);
+            lawsInfo.remove(id);
             addDiscardAgenda(id);
             return true;
         }

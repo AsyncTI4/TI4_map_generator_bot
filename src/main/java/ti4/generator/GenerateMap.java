@@ -234,9 +234,16 @@ public class GenerateMap {
 
         graphics.setFont(Storage.getFont26());
         LinkedHashMap<String, Integer> laws = map.getLaws();
+        LinkedHashMap<String, String> lawsInfo = map.getLawsInfo();
         for (java.util.Map.Entry<String, Integer> lawEntry : laws.entrySet()) {
             y+= 30;
-            graphics.drawString("("+lawEntry.getValue() + ") " + Mapper.getAgenda(lawEntry.getKey()), x, y);
+            String lawID = lawEntry.getKey();
+            String text = "(" + lawEntry.getValue() + ") ";
+            String optionalText = lawsInfo.get(lawID);
+            if (optionalText != null){
+                text += "Elected: " + optionalText + " ";
+            }
+            graphics.drawString(text + Mapper.getAgenda(lawID), x, y);
         }
     }
 
