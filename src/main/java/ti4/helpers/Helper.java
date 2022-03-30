@@ -24,7 +24,7 @@ public class Helper {
     public static void addMirageToTile(Tile tile) {
         HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
         if (unitHolders.get(Constants.MIRAGE) == null){
-            Point mirageCenter = new Point(Constants.MIRAGE_POSITION.x + 75, Constants.MIRAGE_POSITION.y + 65);
+            Point mirageCenter = new Point(Constants.MIRAGE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x, Constants.MIRAGE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
             Planet planetObject = new Planet(Constants.MIRAGE, mirageCenter);
             unitHolders.put(Constants.MIRAGE, planetObject);
         }

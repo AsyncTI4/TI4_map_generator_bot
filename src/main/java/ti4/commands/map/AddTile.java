@@ -18,6 +18,6 @@ public class AddTile extends AddRemoveTile {
 
     @Override
     protected String getActionDescription() {
-        return "Remove tile to map";
+        return "Add tile to map";
     }
 }

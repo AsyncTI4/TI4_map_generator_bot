@@ -509,7 +509,8 @@ public class GenerateMap {
                 continue;
             }
             try {
-                image = resizeImage(ImageIO.read(new File(tokenPath)), 0.80f);
+                float scale = tokenPath.contains(Constants.MIRAGE) ? 1.0f : 0.80f;
+                image = resizeImage(ImageIO.read(new File(tokenPath)), scale);
             } catch (Exception e) {
                 LoggerHandler.log("Could not parse control token file for: " + tokenID, e);
             }
@@ -554,6 +555,8 @@ public class GenerateMap {
             LoggerHandler.log("Could not parse damage token file.", e);
         }
 
+        boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
+
         for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
             String unitID = unitEntry.getKey();
             Integer unitCount = unitEntry.getValue();
@@ -585,12 +588,13 @@ public class GenerateMap {
 
 
             Point centerPosition = unitHolder.getHolderCenterPosition();
+
             for (int i = 0; i < unitCount; i++) {
                 Point position = planetTokenPosition != null ? planetTokenPosition.getPosition(unitID) : null;
                 boolean searchPosition = true;
                 int x = 0;
                 int y = 0;
-                while (searchPosition) {
+                while (searchPosition && position == null) {
                     x = (int) (radius * Math.sin(degree));
                     y = (int) (radius * Math.cos(degree));
                     int possibleX = tileX + centerPosition.x + x - (image.getWidth() / 2);
@@ -611,6 +615,11 @@ public class GenerateMap {
                 int yOriginal = tileY + centerPosition.y + y;
                 int imageX = position != null ? tileX + position.x : xOriginal - (image.getWidth() / 2);
                 int imageY = position != null ? tileY + position.y : yOriginal - (image.getHeight() / 2);
+                if (isMirage)
+                {
+                    imageX += Constants.MIRAGE_POSITION.x;
+                    imageY += Constants.MIRAGE_POSITION.y;
+                }
                 graphics.drawImage(image, imageX, imageY, null);
                 if (bulkUnitCount != null) {
                     graphics.setFont(Storage.getFont26());
