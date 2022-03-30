@@ -10,6 +10,7 @@ import ti4.commands.cards.CardsCommand;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
 import java.util.Collection;
@@ -65,6 +66,11 @@ public class AgendaCommand implements Command {
                 subcommand.execute(event);
                 executedCommand = subcommand;
             }
+        }
+
+        Map map = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
+        if (map != null) {
+            MapSaveLoadManager.saveMap(map);
         }
         if (executedCommand != null) {
             MessageHelper.replyToMessage(event, "Executed action: " +executedCommand.getActionID());

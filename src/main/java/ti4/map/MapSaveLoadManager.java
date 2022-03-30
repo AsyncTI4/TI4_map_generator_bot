@@ -168,26 +168,31 @@ public class MapSaveLoadManager {
         writer.write(Constants.AC + " " + String.join(",", map.getActionCards()));
         writer.write(System.lineSeparator());
 
-        LinkedHashMap<String, Integer> discardActionCards = map.getDiscardActionCards();
-        StringBuilder sb = new StringBuilder();
-        for (java.util.Map.Entry<String, Integer> entry : discardActionCards.entrySet()) {
-            sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
-        }
-        writer.write(Constants.AC_DISCARDED + " " + sb);
-        writer.write(System.lineSeparator());
-
+        writeCards(map.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
         writer.write(Constants.SPEAKER + " " + map.getSpeaker());
         writer.write(System.lineSeparator());
 
         HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
-        sb = new StringBuilder();
+        StringBuilder sb = new StringBuilder();
         for (java.util.Map.Entry<Integer, Boolean> entry : scPlayed.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(Constants.SC_PLAYED + " " + sb);
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.AGENDAS + " " + String.join(",", map.getAgendas()));
+        writer.write(System.lineSeparator());
 
+        writeCards(map.getDiscardAgendas(), writer, Constants.DISCARDED_AGENDAS);
+        writeCards(map.getSentAgendas(), writer, Constants.SENT_AGENDAS);
+        writeCards(map.getLaws(), writer, Constants.LAW);
+
+        sb = new StringBuilder();
+        for (java.util.Map.Entry<String, String> entry : map.getLawsInfo().entrySet()) {
+            sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
+        }
+        writer.write(Constants.LAW_INFO + " " + sb);
+        writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
@@ -214,14 +219,7 @@ public class MapSaveLoadManager {
             writer.write(Constants.PASSED + " " + player.isPassed());
             writer.write(System.lineSeparator());
 
-            LinkedHashMap<String, Integer> playerActionCards = player.getActionCards();
-            sb = new StringBuilder();
-            for (java.util.Map.Entry<String, Integer> entry : playerActionCards.entrySet()) {
-                sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
-            }
-
-            writer.write(Constants.AC + " " + sb);
-            writer.write(System.lineSeparator());
+            writeCards(player.getActionCards(), writer, Constants.AC);
 
             writer.write(Constants.TACTICAL + " " + player.getTacticalCC());
             writer.write(System.lineSeparator());
@@ -264,6 +262,15 @@ public class MapSaveLoadManager {
 
 
         writer.write(ENDMAPINFO);
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeCards(LinkedHashMap<String, Integer> cardList, FileWriter writer, String saveID) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        for (java.util.Map.Entry<String, Integer> entry : cardList.entrySet()) {
+            sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
+        }
+        writer.write(saveID + " " + sb);
         writer.write(System.lineSeparator());
     }
 
@@ -525,29 +532,29 @@ public class MapSaveLoadManager {
         if (tokenizer.countTokens() == 2) {
             String identification = tokenizer.nextToken();
             if (Constants.SO.equals(identification)) {
-                StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ",");
-                List<String> secretObjectives = new ArrayList<>();
-                while (secrets.hasMoreTokens()) {
-                    secretObjectives.add(secrets.nextToken());
-                }
-                map.setSecretObjectives(secretObjectives);
+                map.setSecretObjectives(getCardList(tokenizer));
             } else if (Constants.AC.equals(identification)) {
-                StringTokenizer actionCards = new StringTokenizer(tokenizer.nextToken(), ",");
-                List<String> actionCardsList = new ArrayList<>();
-                while (actionCards.hasMoreTokens()) {
-                    actionCardsList.add(actionCards.nextToken());
-                }
-                map.setActionCards(actionCardsList);
+                map.setActionCards(getCardList(tokenizer));
+            } else if (Constants.AGENDAS.equals(identification)) {
+                map.setAgendas(getCardList(tokenizer));
             } else if (Constants.AC_DISCARDED.equals(identification)) {
+                map.setDiscardActionCards(getParsedCards(tokenizer));
+            } else if (Constants.DISCARDED_AGENDAS.equals(identification)) {
+                map.setDiscardAgendas(getParsedCards(tokenizer));
+            } else if (Constants.SENT_AGENDAS.equals(identification)) {
+                map.setSentAgendas(getParsedCards(tokenizer));
+            } else if (Constants.LAW.equals(identification)) {
+                map.setLaws(getParsedCards(tokenizer));
+            } else if (Constants.LAW_INFO.equals(identification)) {
                 StringTokenizer actionCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
-                LinkedHashMap<String, Integer> discardedActionCards = new LinkedHashMap<>();
+                LinkedHashMap<String, String> cards = new LinkedHashMap<>();
                 while (actionCardToken.hasMoreTokens()) {
-                    StringTokenizer actionCardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
-                    String id = actionCardInfo.nextToken();
-                    Integer index = Integer.parseInt(actionCardInfo.nextToken());
-                    discardedActionCards.put(id, index);
+                    StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
+                    String id = cardInfo.nextToken();
+                    String value = cardInfo.nextToken();
+                    cards.put(id, value);
                 }
-                map.setDiscardActionCards(discardedActionCards);
+                map.setLawsInfo(cards);
             } else if (Constants.SPEAKER.equals(identification)) {
                 map.setSpeaker(tokenizer.nextToken());
             } else if (Constants.SC_PLAYED.equals(identification)) {
@@ -562,64 +569,74 @@ public class MapSaveLoadManager {
         }
     }
 
+    private static List<String> getCardList(StringTokenizer tokenizer) {
+        StringTokenizer cards = new StringTokenizer(tokenizer.nextToken(), ",");
+        List<String> cardList = new ArrayList<>();
+        while (cards.hasMoreTokens()) {
+            cardList.add(cards.nextToken());
+        }
+        return cardList;
+    }
+
+    private static LinkedHashMap<String, Integer> getParsedCards(StringTokenizer tokenizer) {
+        StringTokenizer actionCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+        LinkedHashMap<String, Integer> cards = new LinkedHashMap<>();
+        while (actionCardToken.hasMoreTokens()) {
+            StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
+            String id = cardInfo.nextToken();
+            Integer index = Integer.parseInt(cardInfo.nextToken());
+            cards.put(id, index);
+        }
+        return cards;
+    }
+
     private static void readPlayerInfo(Player player, String data) {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.countTokens() == 2) {
             data = tokenizer.nextToken();
-            if (data.equals(Constants.FACTION)) {
-                player.setFaction(tokenizer.nextToken());
-            } else if (data.equals(Constants.COLOR)) {
-                player.setColor(tokenizer.nextToken());
-            } else if (data.equals(Constants.TACTICAL)) {
-                player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.equals(Constants.FLEET)) {
-                player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.equals(Constants.STRATEGY)) {
-                player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.equals(Constants.TG)) {
-                player.setTg(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.equals(Constants.COMMODITIES_TOTAL)) {
-                player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.equals(Constants.COMMODITIES)) {
-                player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.equals(Constants.AC)) {
-                StringTokenizer actionCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
-                while (actionCardToken.hasMoreTokens()) {
-                    StringTokenizer actionCardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
-                    String id = actionCardInfo.nextToken();
-                    Integer index = Integer.parseInt(actionCardInfo.nextToken());
-                    player.setActionCard(id, index);
+            switch (data) {
+                case Constants.FACTION -> player.setFaction(tokenizer.nextToken());
+                case Constants.COLOR -> player.setColor(tokenizer.nextToken());
+                case Constants.TACTICAL -> player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.TG -> player.setTg(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.COMMODITIES -> player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.AC -> {
+                    StringTokenizer actionCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (actionCardToken.hasMoreTokens()) {
+                        StringTokenizer actionCardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
+                        String id = actionCardInfo.nextToken();
+                        Integer index = Integer.parseInt(actionCardInfo.nextToken());
+                        player.setActionCard(id, index);
+                    }
                 }
-            } else if (data.equals(Constants.PN)) {
-                player.setPn(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.equals(Constants.SO_SCORED)) {
-                StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
-                while (secrets.hasMoreTokens()) {
-                    StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
-                    String id = secretInfo.nextToken();
-                    Integer index = Integer.parseInt(secretInfo.nextToken());
-                    player.setSecretScored(id, index);
+                case Constants.PN -> player.setPn(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.SO_SCORED -> {
+                    StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (secrets.hasMoreTokens()) {
+                        StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
+                        String id = secretInfo.nextToken();
+                        Integer index = Integer.parseInt(secretInfo.nextToken());
+                        player.setSecretScored(id, index);
+                    }
                 }
-            } else if (data.equals(Constants.SO)) {
-                StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
-                while (secrets.hasMoreTokens()) {
-                    StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
-                    String id = secretInfo.nextToken();
-                    Integer index = Integer.parseInt(secretInfo.nextToken());
-                    player.setSecret(id, index);
+                case Constants.SO -> {
+                    StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (secrets.hasMoreTokens()) {
+                        StringTokenizer secretInfo = new StringTokenizer(secrets.nextToken(), ",");
+                        String id = secretInfo.nextToken();
+                        Integer index = Integer.parseInt(secretInfo.nextToken());
+                        player.setSecret(id, index);
+                    }
                 }
-            } else if (data.equals(Constants.CRF)) {
-                player.setCrf(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.equals(Constants.HRF)) {
-                player.setHrf(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.equals(Constants.IRF)) {
-                player.setIrf(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.equals(Constants.VRF)) {
-                player.setVrf(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.equals(Constants.SC)) {
-                player.setSC(Integer.parseInt(tokenizer.nextToken()));
-            } else if (data.equals(Constants.PASSED)) {
-                player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.CRF -> player.setCrf(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.HRF -> player.setHrf(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.IRF -> player.setIrf(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.VRF -> player.setVrf(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.SC -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
             }
         }
     }

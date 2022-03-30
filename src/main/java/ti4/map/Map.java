@@ -88,6 +88,34 @@ public class Map {
         return lawsInfo;
     }
 
+    public void setAgendas(List<String> agendas) {
+        this.agendas = agendas;
+    }
+
+    public void setDiscardAgendas(LinkedHashMap<String, Integer> discardAgendas) {
+        this.discardAgendas = discardAgendas;
+    }
+
+    public void setSentAgendas(LinkedHashMap<String, Integer> sentAgendas) {
+        this.sentAgendas = sentAgendas;
+    }
+
+    public void setLaws(LinkedHashMap<String, Integer> laws) {
+        this.laws = laws;
+    }
+
+    public void setLawsInfo(LinkedHashMap<String, String> lawsInfo) {
+        this.lawsInfo = lawsInfo;
+    }
+
+    public List<String> getAgendas() {
+        return agendas;
+    }
+
+    public LinkedHashMap<String, Integer> getSentAgendas() {
+        return sentAgendas;
+    }
+
     public LinkedHashMap<String, Integer> getDiscardAgendas() {
         return discardAgendas;
     }
