@@ -53,10 +53,14 @@ public class MoveUnits extends AddRemoveUnits {
         unitList = event.getOptions().get(4).getAsString().toLowerCase();
         unitParsing(event, color, tile, unitList);
 
-        OptionMapping option = event.getOption(Constants.CC);
-        if (option == null) {
-            AddCC.addCC(event, color, tile);
+        OptionMapping optionCC = event.getOption(Constants.CC);
+        if (optionCC != null) {
+            String value = optionCC.getAsString().toLowerCase();
+            if ("no".equals(value) || "n".equals(value)) {
+                return;
+            }
         }
+        AddCC.addCC(event, color, tile);
     }
 
     @Override
@@ -113,7 +117,7 @@ public class MoveUnits extends AddRemoveUnits {
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Unit name/s. Example: Dread, 2 Warsuns")
                                 .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.CC, "Type no to not add CC"))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.CC, "Type no or n to not add CC"))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units. Type in yes or y"))
         );
     }
