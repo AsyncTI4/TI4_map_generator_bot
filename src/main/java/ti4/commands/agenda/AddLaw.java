@@ -13,6 +13,7 @@ public class AddLaw extends AgendaSubcommandData {
     public AddLaw() {
         super(Constants.ADD_LAW, "Add Agenda as Law");
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected player or PO or anything").setRequired(true));
     }
 
     @Override
@@ -23,7 +24,13 @@ public class AddLaw extends AgendaSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
-        boolean success = activeMap.addLaw(option.getAsInt());
+
+        OptionMapping optionElected = event.getOption(Constants.ELECTED);
+        String optionText = null;
+        if (optionElected != null) {
+           optionText = optionElected.getAsString();
+        }
+        boolean success = activeMap.addLaw(option.getAsInt(), optionText);
         if (success) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law added");
         } else {

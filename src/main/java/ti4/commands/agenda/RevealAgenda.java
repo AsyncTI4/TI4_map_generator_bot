@@ -6,6 +6,8 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
 
+import java.util.LinkedHashMap;
+
 public class RevealAgenda extends AgendaSubcommandData {
     public RevealAgenda() {
         super(Constants.REVEAL, "Reveal top Agenda from deck");
@@ -17,7 +19,13 @@ public class RevealAgenda extends AgendaSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("-----------");
         sb.append("Agenda:\n");
-        sb.append(Mapper.getAgenda(activeMap.revealAgenda()));
+        String id = activeMap.revealAgenda();
+        LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
+        Integer uniqueID = discardAgendas.get(id);
+        if (uniqueID != null) {
+            sb.append("(").append(uniqueID).append(") - ");
+        }
+        sb.append(Mapper.getAgenda(id));
         sb.append("\n-----------\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
