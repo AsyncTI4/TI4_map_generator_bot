@@ -324,9 +324,9 @@ public class GenerateMap {
             int degreeChange = 5;
             for (UnitHolder unitHolder : unitHolders) {
                 degree = 180;
-                image = addControl(tile, image, tileX, tileY, unitHolder, rectangles);
                 int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
                 image = addSleeperToken(tile, image, tileX, tileY, unitHolder);
+                image = addControl(tile, image, tileX, tileY, unitHolder, rectangles);
                 if (unitHolder != spaceUnitHolder) {
                     image = addPlanetToken(tile, image, tileX, tileY, unitHolder, rectangles);
                 }
@@ -423,7 +423,7 @@ public class GenerateMap {
                     LoggerHandler.log("Could not parse sleeper token file for: " + tokenID, e);
                 }
                 Point position = new Point(centerPosition.x - (image.getWidth() / 2), centerPosition.y - (image.getHeight() / 2));
-                graphics.drawImage(image, tileX + position.x, tileY + position.y, null);
+                graphics.drawImage(image, tileX + position.x, tileY + position.y - 10, null);
             }
         }
         return image;
