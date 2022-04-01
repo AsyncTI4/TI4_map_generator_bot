@@ -137,6 +137,14 @@ public class Constants {
 
     public static final String STATUS = "status";
     public static final String CLEANUP = "cleanup";
+    public static final String REVEAL_STATGE1 = "po_reveal_stage1";
+    public static final String REVEAL_STATGE2 = "po_reveal_stage2";
+    public static final String SCORE_OBJECTIVE = "po_score";
+    public static final String UNSCORE_OBJECTIVE = "po_unscore";
+    public static final String SHUFFLE_OBJECTIVE_BACK = "po_suffle_back";
+    public static final String PO_ID = "public_id";
+    public static final String CUSTODIAN = "Custodian";
+
 
     public static final String COUNT = "count";
     public static final String SECRET_OBJECTIVE_ID = "secret_objective_id";
@@ -148,6 +156,7 @@ public class Constants {
     public static final String DISCARD_SO = "so_discard";
     public static final String SCORE_SO = "so_score";
     public static final String UNSCORE_SO = "so_unscore";
+    public static final String CUSTODIAN_VP = "token_custodianvp.png";
 
     public static final String ACTION_CARD_ID = "action_card_id";
     public static final String DRAW_AC = "ac_draw";

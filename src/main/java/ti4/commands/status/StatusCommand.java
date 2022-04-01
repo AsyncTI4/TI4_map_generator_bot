@@ -83,6 +83,11 @@ public class StatusCommand implements Command {
     private Collection<StatusSubcommandData> getSubcommands() {
         Collection<StatusSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new Cleanup());
+        subcommands.add(new RevealStage1());
+        subcommands.add(new RevealStage2());
+        subcommands.add(new ShufflePublicBack());
+        subcommands.add(new ScorePublic());
+        subcommands.add(new UnscorePublic());
         return subcommands;
     }
 
