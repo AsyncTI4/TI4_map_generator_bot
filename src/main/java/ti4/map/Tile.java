@@ -54,12 +54,7 @@ public class Tile {
 
     @CheckForNull
     public String getCCPath(String ccID) {
-        String ccPath = ResourceHelper.getInstance().getCCFile(ccID);
-        if (ccPath == null) {
-            LoggerHandler.log("Could not find command counter: " + ccID);
-            return null;
-        }
-        return ccPath;
+       return Mapper.getCCPath(ccID);
     }
 
     @CheckForNull
@@ -74,15 +69,7 @@ public class Tile {
 
     @CheckForNull
     public String getTokenPath(String tokenID) {
-        String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
-        if (tokenPath == null) {
-            tokenPath = ResourceHelper.getInstance().getTokenFile(tokenID);
-            if (tokenPath == null) {
-                LoggerHandler.log("Could not find token: " + tokenID);
-                return null;
-            }
-        }
-        return tokenPath;
+        return Mapper.getTokenPath(tokenID);
     }
 
     public boolean isSpaceHolderValid(String spaceHolder) {

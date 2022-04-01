@@ -1,9 +1,11 @@
 package ti4.generator;
 
+import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.LoggerHandler;
 
+import javax.annotation.CheckForNull;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -24,6 +26,7 @@ public class Mapper {
     private static final Properties secretObjectives = new Properties();
     private static final Properties actionCards = new Properties();
     private static final Properties agendas = new Properties();
+    private static final Properties publicObjectives = new Properties();
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
@@ -38,6 +41,7 @@ public class Mapper {
         readData("Secret_objectives.properties", secretObjectives, "Could not read secret objectives file");
         readData("action_cards.properties", actionCards, "Could not read action cards file");
         readData("Agendas.properties", agendas, "Could not read action cards file");
+        readData("public_objective.properties", publicObjectives, "Could not read public objective file");
     }
 
     private static void readData(String propertyFileName, Properties colors, String s) {
@@ -129,6 +133,10 @@ public class Mapper {
         return (String)actionCards.get(id);
     }
 
+    public static String getPublicObjective(String id) {
+        return (String)publicObjectives.get(id);
+    }
+
     public static String getAgenda(String id) {
         return (String)agendas.get(id);
     }
@@ -140,12 +148,62 @@ public class Mapper {
         return soList;
     }
 
+    @CheckForNull
+    public static String getCCPath(String ccID) {
+        String ccPath = ResourceHelper.getInstance().getCCFile(ccID);
+        if (ccPath == null) {
+            LoggerHandler.log("Could not find command counter: " + ccID);
+            return null;
+        }
+        return ccPath;
+    }
+
+    @CheckForNull
+    public static String getTokenPath(String tokenID) {
+        String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
+        if (tokenPath == null) {
+            tokenPath = ResourceHelper.getInstance().getTokenFile(tokenID);
+            if (tokenPath == null) {
+                LoggerHandler.log("Could not find token: " + tokenID);
+                return null;
+            }
+        }
+        return tokenPath;
+    }
+
     public static  HashMap<String, String> getActionCards() {
         HashMap<String, String> acList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : actionCards.entrySet()) {
             acList.put((String)entry.getKey(), (String)entry.getValue());
         }
         return acList;
+    }
+
+
+    public static  HashMap<String, String> getPublicObjectivesState1() {
+        return getPublicObjectives("1");
+    }
+
+    public static  HashMap<String, String> getPublicObjectivesState2() {
+        return getPublicObjectives("2");
+    }
+
+    @NotNull
+    private static HashMap<String, String> getPublicObjectives(String requiredStage) {
+        HashMap<String, String> poList = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : publicObjectives.entrySet()) {
+            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
+            if (tokenizer.countTokens() == 4){
+                String name = tokenizer.nextToken();
+                String category = tokenizer.nextToken();
+                String description = tokenizer.nextToken();
+                String stage = tokenizer.nextToken();
+                if (requiredStage.equals(stage)) {
+                    poList.put((String) entry.getKey(), name + ";" + category + ";" + description);
+                }
+            }
+        }
+        return poList;
     }
 
     public static  HashMap<String, String> getAgendas() {

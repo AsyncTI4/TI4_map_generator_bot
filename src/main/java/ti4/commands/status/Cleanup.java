@@ -27,7 +27,6 @@ public class Cleanup extends StatusSubcommandData {
             return;
         }
 
-
         Map activeMap = getActiveMap();
         HashMap<String, Tile> tileMap = activeMap.getTileMap();
         for (Tile tile : tileMap.values()) {

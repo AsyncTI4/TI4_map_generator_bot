@@ -2,6 +2,7 @@ package ti4.map;
 
 
 import ti4.generator.Mapper;
+import ti4.helpers.Constants;
 
 import javax.annotation.CheckForNull;
 import java.util.*;
@@ -28,6 +29,10 @@ public class Map {
     private LinkedHashMap<String, Integer> sentAgendas = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> laws = new LinkedHashMap<>();
     private LinkedHashMap<String, String> lawsInfo = new LinkedHashMap<>();
+    private LinkedHashMap<String, Integer> revealedPublicObjectives = new LinkedHashMap<>();
+    private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
+    private ArrayList<String> publicObjectives1 = new ArrayList<>();
+    private ArrayList<String> publicObjectives2 = new ArrayList<>();
 
     public Map() {
         HashMap<String, String> secretObjectives = Mapper.getSecretObjectives();
@@ -41,6 +46,14 @@ public class Map {
         HashMap<String, String> agendas = Mapper.getAgendas();
         this.agendas = new ArrayList<>(agendas.keySet());
         Collections.shuffle(this.agendas);
+
+        Set<String> po1 = Mapper.getPublicObjectivesState1().keySet();
+        Set<String> po2 = Mapper.getPublicObjectivesState2().keySet();
+        publicObjectives1.addAll(po1);
+        publicObjectives2.addAll(po2);
+        Collections.shuffle(publicObjectives1);
+        Collections.shuffle(publicObjectives2);
+        revealedPublicObjectives.put(Constants.CUSTODIAN, 0);
     }
 
     //Position, Tile
@@ -78,6 +91,129 @@ public class Map {
             identifier = new Random().nextInt(1000);
         }
         discardAgendas.put(id, identifier);
+    }
+
+    public void addRevealedPublicObjective(String id) {
+        Collection<Integer> values = revealedPublicObjectives.values();
+        int identifier = new Random().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = new Random().nextInt(1000);
+        }
+        revealedPublicObjectives.put(id, identifier);
+    }
+
+    public LinkedHashMap<String, Integer> getRevealedPublicObjectives() {
+        return revealedPublicObjectives;
+    }
+
+    public ArrayList<String> getPublicObjectives1() {
+        return publicObjectives1;
+    }
+
+    public ArrayList<String> getPublicObjectives2() {
+        return publicObjectives2;
+    }
+
+    public java.util.Map.Entry<String, Integer> revealState1() {
+        return revealObjective(publicObjectives1);
+    }
+
+    public java.util.Map.Entry<String, Integer> revealState2() {
+        return revealObjective(publicObjectives1);
+    }
+
+    public java.util.Map.Entry<String, Integer> revealObjective(ArrayList<String> objectiveList) {
+        if (!objectiveList.isEmpty()) {
+            String id = objectiveList.get(0);
+            objectiveList.remove(id);
+            addRevealedPublicObjective(id);
+            for (java.util.Map.Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
+                if (entry.getKey().equals(id)) {
+                    return entry;
+                }
+            }
+        }
+        return null;
+    }
+
+    public boolean shuffleObjectiveBackIntoDeck(Integer idNumber) {
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(idNumber)) {
+                id = po.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            revealedPublicObjectives.remove(id);
+            Set<String> po1 = Mapper.getPublicObjectivesState1().keySet();
+            Set<String> po2 = Mapper.getPublicObjectivesState2().keySet();
+            if (po1.contains(id)){
+                publicObjectives1.add(id);
+                Collections.shuffle(publicObjectives1);
+            } else if (po2.contains(id)){
+                publicObjectives2.add(id);
+                Collections.shuffle(publicObjectives2);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean scorePublicObjective(String userID, Integer idNumber) {
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(idNumber)) {
+                id = po.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
+            scoredPlayerList.add(userID);
+            scoredPublicObjectives.put(id, scoredPlayerList);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean unscorePublicObjective(String userID, Integer idNumber) {
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(idNumber)) {
+                id = po.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
+            if (scoredPlayerList.contains(userID)){
+                scoredPlayerList.remove(userID);
+                scoredPublicObjectives.put(id, scoredPlayerList);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void setRevealedPublicObjectives(LinkedHashMap<String, Integer> revealedPublicObjectives) {
+        this.revealedPublicObjectives = revealedPublicObjectives;
+    }
+
+    public void setScoredPublicObjectives(LinkedHashMap<String, List<String>> scoredPublicObjectives) {
+        this.scoredPublicObjectives = scoredPublicObjectives;
+    }
+
+    public void setPublicObjectives1(ArrayList<String> publicObjectives1) {
+        this.publicObjectives1 = publicObjectives1;
+    }
+
+    public void setPublicObjectives2(ArrayList<String> publicObjectives2) {
+        this.publicObjectives2 = publicObjectives2;
+    }
+
+    public LinkedHashMap<String, List<String>> getScoredPublicObjectives() {
+        return scoredPublicObjectives;
     }
 
     public LinkedHashMap<String, Integer> getLaws() {
