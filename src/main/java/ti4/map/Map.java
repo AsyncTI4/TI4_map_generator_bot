@@ -119,7 +119,7 @@ public class Map {
     }
 
     public java.util.Map.Entry<String, Integer> revealState2() {
-        return revealObjective(publicObjectives1);
+        return revealObjective(publicObjectives2);
     }
 
     public java.util.Map.Entry<String, Integer> revealObjective(ArrayList<String> objectiveList) {
@@ -170,6 +170,9 @@ public class Map {
         }
         if (!id.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
+            if (scoredPlayerList.contains(userID)){
+                return false;
+            }
             scoredPlayerList.add(userID);
             scoredPublicObjectives.put(id, scoredPlayerList);
             return true;

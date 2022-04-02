@@ -199,7 +199,8 @@ public class Mapper {
                 String description = tokenizer.nextToken();
                 String stage = tokenizer.nextToken();
                 if (requiredStage.equals(stage)) {
-                    poList.put((String) entry.getKey(), name + ";" + category + ";" + description);
+//                    poList.put((String) entry.getKey(), name + ";" + category + ";" + description);
+                    poList.put((String) entry.getKey(), name);
                 }
             }
         }
