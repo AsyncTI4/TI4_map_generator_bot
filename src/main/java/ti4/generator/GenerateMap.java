@@ -30,6 +30,7 @@ public class GenerateMap {
     private int width;
     private int height;
     private int heightForGameInfo;
+    private int scoreTokenWidth;
     private static Point tilePositionPoint = new Point(230, 295);
     private static Point numberPositionPoint = new Point(45, 35);
 
@@ -41,6 +42,9 @@ public class GenerateMap {
         BufferedImage setupImage = null;
         try {
             setupImage = ImageIO.read(setupFile);
+            String controlID = Mapper.getControlID("red");
+            BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.4f);
+            scoreTokenWidth = bufferedImage.getWidth();
         } catch (IOException e) {
             LoggerHandler.logError("Could read file data for setup file", e);
         }
@@ -48,7 +52,7 @@ public class GenerateMap {
             LoggerHandler.log("Could not init map generator");
             //todo message to user
         }
-        width = Math.max(setupImage.getWidth(), 2500);
+        width = Math.max(setupImage.getWidth(), 2000);
         heightForGameInfo = setupImage.getHeight();
         height = heightForGameInfo + setupImage.getHeight() / 2 + 300;
         resetImage();
@@ -156,17 +160,17 @@ public class GenerateMap {
         float percent = 0.15f;
         int deltaY = 50;
 
-        objectives(map);
+        y = objectives(map, y);
 
         String speakerID = Mapper.getTokenID(Constants.SPEAKER);
         String speakerFile = ResourceHelper.getInstance().getTokenFile(speakerID);
         if (speakerFile != null) {
             BufferedImage bufferedImage = ImageIO.read(new File(speakerFile));
-            graphics.drawImage(bufferedImage, x, y - bufferedImage.getHeight() - 120, null);
+            graphics.drawImage(bufferedImage, x, heightForGameInfo - bufferedImage.getHeight() - 120, null);
             graphics.setColor(Color.WHITE);
             Player player = map.getPlayer(map.getSpeaker());
             if (player != null) {
-                graphics.drawString(player.getUserName(), x, y - 90);
+                graphics.drawString(player.getUserName(), x, heightForGameInfo - 90);
             }
         }
 
@@ -244,53 +248,82 @@ public class GenerateMap {
         }
     }
 
-    private void objectives(Map map) {
-        int x = 2020;
-        int y = 20;
-        String tokenPath = Mapper.getTokenPath(Constants.CUSTODIAN_VP);
-        try {
-            BufferedImage bufferedImage = ImageIO.read(new File(tokenPath));
-            graphics.drawImage(bufferedImage, x, y, null);
-            int height = bufferedImage.getHeight();
-            graphics.setColor(Color.WHITE);
-            Graphics2D g2 = (Graphics2D) graphics;
-            g2.setStroke(new BasicStroke(5));
-            graphics.drawRect(x - 10, y - 10, width - x - 10, height + 20);
+    private int objectives(Map map, int y) {
+        int x = 10;
+//        String tokenPath = Mapper.getTokenPath(Constants.CUSTODIAN_VP);
+//        try {
+//            BufferedImage bufferedImage = ImageIO.read(new File(tokenPath));
+//            graphics.drawImage(bufferedImage, x, y, null);
+//            int height = bufferedImage.getHeight();
+//            graphics.setColor(Color.WHITE);
+//            Graphics2D g2 = (Graphics2D) graphics;
+//            g2.setStroke(new BasicStroke(3));
+//            graphics.drawRect(x - 10, y - 10, width - x - 10, height + 20);
+//
+//        } catch (Exception e) {
+//            LoggerHandler.log("Could not parse custodian CV token file", e);
+//        }
 
-        } catch (Exception e) {
-            LoggerHandler.log("Could not parse custodian CV token file", e);
-        }
 
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(3));
+
+
+//        graphics.drawRect(x - 10, y - 10, width - x - 10, height + 20);
+
+        LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>(map.getScoredPublicObjectives());
+        LinkedHashMap<String, Integer> revealedPublicObjectives = map.getRevealedPublicObjectives();
         LinkedHashMap<String, Player> players = map.getPlayers();
-        LinkedHashMap<String, List<String>> scoredPublicObjectives = map.getScoredPublicObjectives();
-        List<String> scoredPlayerID = scoredPublicObjectives.get(Constants.CUSTODIAN);
-        drawScoreControlMarkers(x, y, players, scoredPlayerID);
-        y += 170;
+        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
+        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
+        Set<String> po1 = publicObjectivesState1.keySet();
+        Set<String> po2 = publicObjectivesState2.keySet();
+
+        graphics.setFont(Storage.getFont20());
+        graphics.setColor(new Color(230, 126, 34));
+        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState1, po1, 1);
+
+        graphics.setColor(new Color(93, 173, 226));
+        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState2, po2, 2);
 
 
-        Set<String> po1 = Mapper.getPublicObjectivesState1().keySet();
-        Set<String> po2 = Mapper.getPublicObjectivesState2().keySet();
+        return y;
+    }
 
-
-        graphics.setColor(Color.ORANGE);
-//        graphics.drawRect(x - 10, y - 10, x + 190, y + height + 20);
-
-//        graphics.setColor(Color.WHITE);
-//        graphics.drawString(player.getUserName(), x, y - 90);
+    private int displayObjectives(int y, int x, LinkedHashMap<String, List<String>> scoredPublicObjectives, LinkedHashMap<String, Integer> revealedPublicObjectives, LinkedHashMap<String, Player> players, HashMap<String, String> publicObjectivesState1, Set<String> po1, int objectiveWorth) {
+        for (java.util.Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
+            String key = revealed.getKey();
+            if (!po1.contains(key)) {
+                continue;
+            }
+            String name = publicObjectivesState1.get(key);
+            Integer index = revealedPublicObjectives.get(key);
+            if (index == null) {
+                continue;
+            }
+            graphics.drawString("(" + index + ") " + name + " - " + objectiveWorth + " VP", x, y + 23);
+            List<String> scoredPlayerID = scoredPublicObjectives.get(key);
+            if (scoredPlayerID != null) {
+                drawScoreControlMarkers(x + 415, y, players, scoredPlayerID);
+            }
+            graphics.drawRect(x - 5, y - 5, 666, 35);
+            y += 40;
+        }
+        return y;
     }
 
     private void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID) {
         try {
-            int tempX = 150;
-            y += 20;
-            for (String id : scoredPlayerID) {
-                Player player = players.get(id);
-                if (player != null) {
+            int tempX = 0;
+            for (java.util.Map.Entry<String, Player> playerEntry : players.entrySet()) {
+                Player player = playerEntry.getValue();
+                String userID = player.getUserID();
+                if (scoredPlayerID.contains(userID)) {
                     String controlID = Mapper.getControlID(player.getColor());
-                    BufferedImage bufferedImage = ImageIO.read(new File(Mapper.getCCPath(controlID)));
+                    BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.4f);
                     graphics.drawImage(bufferedImage, x + tempX, y, null);
-                    tempX += bufferedImage.getWidth() + 10;
                 }
+                tempX += scoreTokenWidth + 2;
             }
         } catch (Exception e) {
             LoggerHandler.log("Could not parse custodian CV token file", e);

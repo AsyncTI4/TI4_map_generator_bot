@@ -58,7 +58,7 @@ public class Setup extends PlayerSubcommandData {
                 if (color.equals(playerInfo.getColor())) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerInfo.getUserName() + " already uses color:" + color);
                     return;
-                } else if (playerInfo.getFaction().equals(faction)) {
+                } else if (faction.equals(playerInfo.getFaction())) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
                     return;
                 }

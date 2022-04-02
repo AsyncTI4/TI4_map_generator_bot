@@ -20,7 +20,7 @@ public class RevealStage2 extends StatusSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-        java.util.Map.Entry<String, Integer> objective = activeMap.revealState1();
+        java.util.Map.Entry<String, Integer> objective = activeMap.revealState2();
 
         StringBuilder sb = new StringBuilder();
         sb.append("**Public Objective Stage 2:**").append("\n");
