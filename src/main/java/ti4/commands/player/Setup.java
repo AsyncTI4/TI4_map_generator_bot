@@ -55,7 +55,7 @@ public class Setup extends PlayerSubcommandData {
         LinkedHashMap<String, Player> players = activeMap.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
-                if (playerInfo.getColor().equals(color)) {
+                if (color.equals(playerInfo.getColor())) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerInfo.getUserName() + " already uses color:" + color);
                     return;
                 } else if (playerInfo.getFaction().equals(faction)) {
