@@ -43,7 +43,11 @@ public class PickACFromDiscard extends CardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        activeMap.pickActionCard(player.getUserID(), acIndex);
+        boolean picked = activeMap.pickActionCard(player.getUserID(), acIndex);
+        if (!picked) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            return;
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(activeMap.getName()).append(" ");
         sb.append("Player: ").append(player.getUserName()).append("\n");

@@ -138,11 +138,15 @@ public class Constants {
     public static final String STATUS = "status";
     public static final String CLEANUP = "cleanup";
     public static final String REVEAL_STATGE1 = "po_reveal_stage1";
+    public static final String ADD_CUSTOM = "po_add_custom";
+    public static final String REMOVE_CUSTOM = "po_remove_custom";
     public static final String REVEAL_STATGE2 = "po_reveal_stage2";
     public static final String SCORE_OBJECTIVE = "po_score";
     public static final String UNSCORE_OBJECTIVE = "po_unscore";
     public static final String SHUFFLE_OBJECTIVE_BACK = "po_shuffle_back";
     public static final String PO_ID = "public_id";
+    public static final String PO_NAME = "public_name";
+    public static final String PO_VP_WORTH = "public_vp_worth";
     public static final String CUSTODIAN = "Custodian";
 
 

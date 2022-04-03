@@ -30,6 +30,7 @@ public class Map {
     private LinkedHashMap<String, Integer> laws = new LinkedHashMap<>();
     private LinkedHashMap<String, String> lawsInfo = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> revealedPublicObjectives = new LinkedHashMap<>();
+    private LinkedHashMap<String, Integer> customPublicVP = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
     private ArrayList<String> publicObjectives1 = new ArrayList<>();
     private ArrayList<String> publicObjectives2 = new ArrayList<>();
@@ -53,7 +54,7 @@ public class Map {
         publicObjectives2.addAll(po2);
         Collections.shuffle(publicObjectives1);
         Collections.shuffle(publicObjectives2);
-        revealedPublicObjectives.put(Constants.CUSTODIAN, 0);
+        addCustomPO(Constants.CUSTODIAN, 1);
     }
 
     //Position, Tile
@@ -197,6 +198,37 @@ public class Map {
             }
         }
         return false;
+    }
+
+    public Integer addCustomPO(String poName, int vp) {
+        customPublicVP.put(poName, vp);
+        addRevealedPublicObjective(poName);
+        return revealedPublicObjectives.get(poName);
+    }
+
+    public boolean removeCustomPO(Integer idNumber) {
+
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(idNumber)) {
+                id = po.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            revealedPublicObjectives.remove(id);
+            customPublicVP.remove(id);
+            return true;
+        }
+        return false;
+    }
+
+    public LinkedHashMap<String, Integer> getCustomPublicVP() {
+        return customPublicVP;
+    }
+
+    public void setCustomPublicVP(LinkedHashMap<String, Integer> customPublicVP) {
+        this.customPublicVP = customPublicVP;
     }
 
     public void setRevealedPublicObjectives(LinkedHashMap<String, Integer> revealedPublicObjectives) {
