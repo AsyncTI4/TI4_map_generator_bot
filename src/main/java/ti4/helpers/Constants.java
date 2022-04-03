@@ -1,6 +1,9 @@
 package ti4.helpers;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 public class Constants {
     public static final String SHOW_GAME = "show_game";
@@ -147,8 +150,12 @@ public class Constants {
     public static final String PO_ID = "public_id";
     public static final String PO_NAME = "public_name";
     public static final String PO_VP_WORTH = "public_vp_worth";
-    public static final String CUSTODIAN = "Custodian";
-
+    public static final String CUSTODIAN = "Custodian/Imperial";
+    public static final String REVEALED_PO = "revealedPublicObjectives";
+    public static final String CUSTOM_PO_VP = "customPublicVP";
+    public static final String SCORED_PO = "scoredPublicObjectives";
+    public static final String PO1 = "publicObjectives1";
+    public static final String PO2 = "publicObjectives2";
 
     public static final String COUNT = "count";
     public static final String SECRET_OBJECTIVE_ID = "secret_objective_id";

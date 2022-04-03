@@ -171,7 +171,7 @@ public class Map {
         }
         if (!id.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
-            if (scoredPlayerList.contains(userID)){
+            if (!Constants.CUSTODIAN.equals(id) && scoredPlayerList.contains(userID)){
                 return false;
             }
             scoredPlayerList.add(userID);

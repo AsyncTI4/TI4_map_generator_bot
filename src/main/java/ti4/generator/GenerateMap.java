@@ -328,8 +328,9 @@ public class GenerateMap {
             }
             graphics.drawString("(" + index + ") " + name + " - " + objectiveWorth + " VP", x, y + 23);
             List<String> scoredPlayerID = scoredPublicObjectives.get(key);
+            boolean multiScoring = Constants.CUSTODIAN.equals(key);
             if (scoredPlayerID != null) {
-                drawScoreControlMarkers(x + 415, y, players, scoredPlayerID);
+                drawScoreControlMarkers(x + 415, y, players, scoredPlayerID, multiScoring);
             }
             graphics.drawRect(x - 4, y - 5, 662, 35);
             column[0]++;
@@ -343,7 +344,7 @@ public class GenerateMap {
         return y;
     }
 
-    private void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID) {
+    private void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID, boolean multiScoring) {
         try {
             int tempX = 0;
             for (java.util.Map.Entry<String, Player> playerEntry : players.entrySet()) {
@@ -352,9 +353,19 @@ public class GenerateMap {
                 if (scoredPlayerID.contains(userID)) {
                     String controlID = Mapper.getControlID(player.getColor());
                     BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.4f);
-                    graphics.drawImage(bufferedImage, x + tempX, y, null);
+                    if (multiScoring){
+                        int frequency = Collections.frequency(scoredPlayerID, userID);
+                        for (int i = 0; i < frequency; i++) {
+                            graphics.drawImage(bufferedImage, x + tempX, y, null);
+                            tempX += scoreTokenWidth;
+                        }
+                    } else {
+                        graphics.drawImage(bufferedImage, x + tempX, y, null);
+                    }
                 }
-                tempX += scoreTokenWidth;
+                if (!multiScoring) {
+                    tempX += scoreTokenWidth;
+                }
             }
         } catch (Exception e) {
             LoggerHandler.log("Could not parse custodian CV token file", e);
