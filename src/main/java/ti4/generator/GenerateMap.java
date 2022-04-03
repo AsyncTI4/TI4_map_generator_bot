@@ -259,11 +259,13 @@ public class GenerateMap {
         LinkedHashMap<String, Player> players = map.getPlayers();
         HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
         HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
+        HashMap<String, String> secretObjectives = Mapper.getSecretObjectivesJustNames();
         LinkedHashMap<String, Integer> customPublicVP = map.getCustomPublicVP();
         LinkedHashMap<String, String> customPublics = customPublicVP.keySet().stream().collect(Collectors.toMap(key -> key, name -> name, (key1, key2) -> key1, LinkedHashMap::new));
         Set<String> po1 = publicObjectivesState1.keySet();
         Set<String> po2 = publicObjectivesState2.keySet();
         Set<String> customVP = customPublicVP.keySet();
+        Set<String> secret = secretObjectives.keySet();
 
         graphics.setFont(Storage.getFont20());
         graphics.setColor(new Color(230, 126, 34));
@@ -277,6 +279,19 @@ public class GenerateMap {
         graphics.setColor(Color.WHITE);
         y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, customPublics, customVP, null, column, customPublicVP);
 
+        revealedPublicObjectives = new LinkedHashMap<>();
+        scoredPublicObjectives = new LinkedHashMap<>();
+        for (java.util.Map.Entry<String, Player> playerEntry : players.entrySet()) {
+            Player player = playerEntry.getValue();
+            LinkedHashMap<String, Integer> secretsScored = player.getSecretsScored();
+            revealedPublicObjectives.putAll(secretsScored);
+            for (String id : secretsScored.keySet()) {
+                scoredPublicObjectives.put(id, List.of(player.getUserID()));
+            }
+        }
+
+        graphics.setColor(Color.RED);
+        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret, 1, column, customPublicVP);
 
         if (column[0] != 0) {
             y += 40;

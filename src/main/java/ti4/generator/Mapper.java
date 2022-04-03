@@ -148,6 +148,15 @@ public class Mapper {
         return soList;
     }
 
+    public static  HashMap<String, String> getSecretObjectivesJustNames() {
+        HashMap<String, String> soList = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : secretObjectives.entrySet()) {
+            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
+            soList.put((String)entry.getKey(), tokenizer.nextToken());
+        }
+        return soList;
+    }
+
     @CheckForNull
     public static String getCCPath(String ccID) {
         String ccPath = ResourceHelper.getInstance().getCCFile(ccID);
