@@ -54,7 +54,7 @@ public class GenerateMap {
         }
         width = Math.max(setupImage.getWidth(), 2000);
         heightForGameInfo = setupImage.getHeight();
-        height = heightForGameInfo + setupImage.getHeight() / 2 + 300;
+        height = heightForGameInfo + setupImage.getHeight() / 2 + 800;
         resetImage();
     }
 
@@ -249,27 +249,9 @@ public class GenerateMap {
     }
 
     private int objectives(Map map, int y) {
-        int x = 10;
-//        String tokenPath = Mapper.getTokenPath(Constants.CUSTODIAN_VP);
-//        try {
-//            BufferedImage bufferedImage = ImageIO.read(new File(tokenPath));
-//            graphics.drawImage(bufferedImage, x, y, null);
-//            int height = bufferedImage.getHeight();
-//            graphics.setColor(Color.WHITE);
-//            Graphics2D g2 = (Graphics2D) graphics;
-//            g2.setStroke(new BasicStroke(3));
-//            graphics.drawRect(x - 10, y - 10, width - x - 10, height + 20);
-//
-//        } catch (Exception e) {
-//            LoggerHandler.log("Could not parse custodian CV token file", e);
-//        }
-
-
+        int x = 5;
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(3));
-
-
-//        graphics.drawRect(x - 10, y - 10, width - x - 10, height + 20);
 
         LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>(map.getScoredPublicObjectives());
         LinkedHashMap<String, Integer> revealedPublicObjectives = map.getRevealedPublicObjectives();
@@ -281,17 +263,30 @@ public class GenerateMap {
 
         graphics.setFont(Storage.getFont20());
         graphics.setColor(new Color(230, 126, 34));
-        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState1, po1, 1);
+        Integer[] column = new Integer[1];
+        column[0] = 0;
+        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState1, po1, 1, column);
 
         graphics.setColor(new Color(93, 173, 226));
-        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState2, po2, 2);
+        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState2, po2, 2, column);
 
+
+        if (column[0] != 0){
+            y += 40;
+        }
 
         return y;
     }
 
-    private int displayObjectives(int y, int x, LinkedHashMap<String, List<String>> scoredPublicObjectives, LinkedHashMap<String, Integer> revealedPublicObjectives, LinkedHashMap<String, Player> players, HashMap<String, String> publicObjectivesState1, Set<String> po1, int objectiveWorth) {
+    private int displayObjectives(int y, int x, LinkedHashMap<String, List<String>> scoredPublicObjectives, LinkedHashMap<String, Integer> revealedPublicObjectives,
+                                  LinkedHashMap<String, Player> players, HashMap<String, String> publicObjectivesState1, Set<String> po1, int objectiveWorth, Integer[] column) {
         for (java.util.Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
+            switch (column[0]) {
+                case 0 -> x = 5;
+                case 1 -> x = 671;
+                case 2 -> x = 1338;
+            }
+
             String key = revealed.getKey();
             if (!po1.contains(key)) {
                 continue;
@@ -306,8 +301,12 @@ public class GenerateMap {
             if (scoredPlayerID != null) {
                 drawScoreControlMarkers(x + 415, y, players, scoredPlayerID);
             }
-            graphics.drawRect(x - 5, y - 5, 666, 35);
-            y += 40;
+            graphics.drawRect(x - 4, y - 5, 662, 35);
+            column[0]++;
+            if (column[0] > 2){
+                column[0] = 0;
+                y += 40;
+            }
         }
         return y;
     }
@@ -323,7 +322,7 @@ public class GenerateMap {
                     BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.4f);
                     graphics.drawImage(bufferedImage, x + tempX, y, null);
                 }
-                tempX += scoreTokenWidth + 2;
+                tempX += scoreTokenWidth;
             }
         } catch (Exception e) {
             LoggerHandler.log("Could not parse custodian CV token file", e);
