@@ -23,6 +23,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class GenerateMap {
     private Graphics graphics;
@@ -254,24 +255,30 @@ public class GenerateMap {
         g2.setStroke(new BasicStroke(3));
 
         LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>(map.getScoredPublicObjectives());
-        LinkedHashMap<String, Integer> revealedPublicObjectives = map.getRevealedPublicObjectives();
+        LinkedHashMap<String, Integer> revealedPublicObjectives = new LinkedHashMap<>(map.getRevealedPublicObjectives());
         LinkedHashMap<String, Player> players = map.getPlayers();
         HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
         HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
+        LinkedHashMap<String, Integer> customPublicVP = map.getCustomPublicVP();
+        LinkedHashMap<String, String> customPublics = customPublicVP.keySet().stream().collect(Collectors.toMap(key -> key, name -> name, (key1, key2) -> key1, LinkedHashMap::new));
         Set<String> po1 = publicObjectivesState1.keySet();
         Set<String> po2 = publicObjectivesState2.keySet();
+        Set<String> customVP = customPublicVP.keySet();
 
         graphics.setFont(Storage.getFont20());
         graphics.setColor(new Color(230, 126, 34));
         Integer[] column = new Integer[1];
         column[0] = 0;
-        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState1, po1, 1, column);
+        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState1, po1, 1, column, null);
 
         graphics.setColor(new Color(93, 173, 226));
-        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState2, po2, 2, column);
+        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState2, po2, 2, column, null);
+
+        graphics.setColor(Color.WHITE);
+        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, customPublics, customVP, null, column, customPublicVP);
 
 
-        if (column[0] != 0){
+        if (column[0] != 0) {
             y += 40;
         }
 
@@ -279,7 +286,8 @@ public class GenerateMap {
     }
 
     private int displayObjectives(int y, int x, LinkedHashMap<String, List<String>> scoredPublicObjectives, LinkedHashMap<String, Integer> revealedPublicObjectives,
-                                  LinkedHashMap<String, Player> players, HashMap<String, String> publicObjectivesState1, Set<String> po1, int objectiveWorth, Integer[] column) {
+                                  LinkedHashMap<String, Player> players, HashMap<String, String> publicObjectivesState, Set<String> po, Integer objectiveWorth, Integer[] column, LinkedHashMap<String, Integer> customPublicVP) {
+        Set<String> keysToRemove = new HashSet<>();
         for (java.util.Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
             switch (column[0]) {
                 case 0 -> x = 5;
@@ -288,13 +296,20 @@ public class GenerateMap {
             }
 
             String key = revealed.getKey();
-            if (!po1.contains(key)) {
+            if (!po.contains(key)) {
                 continue;
             }
-            String name = publicObjectivesState1.get(key);
+            String name = publicObjectivesState.get(key);
             Integer index = revealedPublicObjectives.get(key);
             if (index == null) {
                 continue;
+            }
+            keysToRemove.add(key);
+            if (customPublicVP != null){
+                objectiveWorth = customPublicVP.get(key);
+                if (objectiveWorth == null){
+                    objectiveWorth = 1;
+                }
             }
             graphics.drawString("(" + index + ") " + name + " - " + objectiveWorth + " VP", x, y + 23);
             List<String> scoredPlayerID = scoredPublicObjectives.get(key);
@@ -303,11 +318,13 @@ public class GenerateMap {
             }
             graphics.drawRect(x - 4, y - 5, 662, 35);
             column[0]++;
-            if (column[0] > 2){
+            if (column[0] > 2) {
                 column[0] = 0;
                 y += 40;
             }
         }
+        keysToRemove.forEach(revealedPublicObjectives::remove);
+
         return y;
     }
 

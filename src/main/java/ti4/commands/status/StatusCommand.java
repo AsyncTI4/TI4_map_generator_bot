@@ -88,6 +88,8 @@ public class StatusCommand implements Command {
         subcommands.add(new ShufflePublicBack());
         subcommands.add(new ScorePublic());
         subcommands.add(new UnscorePublic());
+        subcommands.add(new AddCustomPO());
+        subcommands.add(new RemoveCustomPO());
         return subcommands;
     }
 
