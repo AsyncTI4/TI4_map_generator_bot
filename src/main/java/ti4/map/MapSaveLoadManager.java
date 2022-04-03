@@ -194,6 +194,22 @@ public class MapSaveLoadManager {
         writer.write(Constants.LAW_INFO + " " + sb);
         writer.write(System.lineSeparator());
 
+        writeCards(map.getRevealedPublicObjectives(), writer, Constants.REVEALED_PO);
+        writeCards(map.getCustomPublicVP(), writer, Constants.CUSTOM_PO_VP);
+        writer.write(Constants.PO1 + " " + String.join(",", map.getPublicObjectives1()));
+        writer.write(System.lineSeparator());
+        writer.write(Constants.PO2 + " " + String.join(",", map.getPublicObjectives2()));
+        writer.write(System.lineSeparator());
+
+
+        StringBuilder sb1 = new StringBuilder();
+        for (java.util.Map.Entry<String, List<String>> entry : map.getScoredPublicObjectives().entrySet()) {
+            String userIds = String.join("-", entry.getValue());
+            sb1.append(entry.getKey()).append(",").append(userIds).append(";");
+        }
+        writer.write(Constants.SCORED_PO + " " + sb1);
+        writer.write(System.lineSeparator());
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -223,9 +239,9 @@ public class MapSaveLoadManager {
 
             writer.write(Constants.TACTICAL + " " + player.getTacticalCC());
             writer.write(System.lineSeparator());
-            writer.write(Constants.FLEET + " " +  player.getFleetCC());
+            writer.write(Constants.FLEET + " " + player.getFleetCC());
             writer.write(System.lineSeparator());
-            writer.write(Constants.STRATEGY + " " +  player.getStrategicCC());
+            writer.write(Constants.STRATEGY + " " + player.getStrategicCC());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TG + " " + player.getTg());
@@ -535,6 +551,16 @@ public class MapSaveLoadManager {
                 map.setSecretObjectives(getCardList(tokenizer));
             } else if (Constants.AC.equals(identification)) {
                 map.setActionCards(getCardList(tokenizer));
+            } else if (Constants.PO1.equals(identification)) {
+                map.setPublicObjectives1(getCardList(tokenizer));
+            } else if (Constants.PO2.equals(identification)) {
+                map.setPublicObjectives2(getCardList(tokenizer));
+            } else if (Constants.REVEALED_PO.equals(identification)) {
+                map.setRevealedPublicObjectives(getParsedCards(tokenizer));
+            } else if (Constants.CUSTOM_PO_VP.equals(identification)) {
+                map.setCustomPublicVP(getParsedCards(tokenizer));
+            } else if (Constants.SCORED_PO.equals(identification)) {
+                map.setScoredPublicObjectives(getParsedCardsForScoredPO(tokenizer));
             } else if (Constants.AGENDAS.equals(identification)) {
                 map.setAgendas(getCardList(tokenizer));
             } else if (Constants.AC_DISCARDED.equals(identification)) {
@@ -569,9 +595,9 @@ public class MapSaveLoadManager {
         }
     }
 
-    private static List<String> getCardList(StringTokenizer tokenizer) {
+    private static ArrayList<String> getCardList(StringTokenizer tokenizer) {
         StringTokenizer cards = new StringTokenizer(tokenizer.nextToken(), ",");
-        List<String> cardList = new ArrayList<>();
+        ArrayList<String> cardList = new ArrayList<>();
         while (cards.hasMoreTokens()) {
             cardList.add(cards.nextToken());
         }
@@ -588,6 +614,23 @@ public class MapSaveLoadManager {
             cards.put(id, index);
         }
         return cards;
+    }
+
+    private static LinkedHashMap<String, List<String>> getParsedCardsForScoredPO(StringTokenizer tokenizer) {
+        StringTokenizer po = new StringTokenizer(tokenizer.nextToken(), ";");
+        LinkedHashMap<String, List<String>> scoredPOs = new LinkedHashMap<>();
+        while (po.hasMoreTokens()) {
+            StringTokenizer poInfo = new StringTokenizer(po.nextToken(), ",");
+            String id = poInfo.nextToken();
+
+            StringTokenizer userIDs = new StringTokenizer(poInfo.nextToken(), "-");
+            List<String> userIDList = new ArrayList<>();
+            while (userIDs.hasMoreTokens()) {
+                userIDList.add(userIDs.nextToken());
+            }
+            scoredPOs.put(id, userIDList);
+        }
+        return scoredPOs;
     }
 
     private static void readPlayerInfo(Player player, String data) {
