@@ -413,6 +413,9 @@ public class GenerateMap {
                 if (unitHolder != spaceUnitHolder) {
                     image = addPlanetToken(tile, image, tileX, tileY, unitHolder, rectangles);
                 }
+                if (spaceUnitHolder != null) {
+                    image = addCC(tile, image, tileX, tileY, spaceUnitHolder);
+                }
                 image = addUnits(tile, image, tileX, tileY, rectangles, degree, degreeChange, unitHolder, radius);
             }
 
