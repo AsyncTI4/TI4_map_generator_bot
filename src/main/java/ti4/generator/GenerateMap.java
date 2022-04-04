@@ -1,14 +1,13 @@
 package ti4.generator;
 
+import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.LoggerHandler;
 import ti4.helpers.Storage;
+import ti4.map.*;
 import ti4.map.Map;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
 
 import javax.annotation.CheckForNull;
 import javax.imageio.IIOImage;
@@ -21,6 +20,11 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneOffset;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -91,7 +95,8 @@ public class GenerateMap {
 
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
-            graphics.drawString(map.getName(), 0, 34);
+            String timeStamp = getTimeStamp();
+            graphics.drawString(map.getName()+" "+timeStamp, 0, 34);
 
             gameInfo(map);
 
@@ -107,7 +112,9 @@ public class GenerateMap {
         } catch (IOException e) {
             LoggerHandler.log("Could not save generated map");
         }
-        String absolutePath = file.getAbsolutePath().replace(".png", ".jpg");
+
+        String timeStamp = getTimeStamp();
+        String absolutePath = file.getParent()+"/"+map.getName()+"_"+timeStamp+".jpg";
         try (FileInputStream fileInputStream = new FileInputStream(file);
              FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
 
@@ -127,7 +134,16 @@ public class GenerateMap {
         }
         //noinspection ResultOfMethodCallIgnored
         file.delete();
-        return new File(absolutePath);
+        File jpgFile = new File(absolutePath);
+        MapFileDeleter.addFileToDelete(jpgFile);
+        return jpgFile;
+    }
+
+    @NotNull
+    private String getTimeStamp() {
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss");
+        return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
+
     }
 
     @CheckForNull
