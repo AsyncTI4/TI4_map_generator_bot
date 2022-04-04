@@ -12,6 +12,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.LoggerHandler;
 import ti4.map.Map;
+import ti4.map.MapFileDeleter;
 import ti4.map.MapManager;
 import ti4.message.MessageHelper;
 
@@ -35,6 +36,8 @@ public class MessageListener extends ListenerAdapter {
         Map userActiveMap = mapManager.getUserActiveMap(userID);
         Set<String> mapList = mapManager.getMapList().keySet();
         StringTokenizer channelNameTokenizer = new StringTokenizer(channelName, "-");
+
+        MapFileDeleter.deleteFiles();
 
         String gameID = channelNameTokenizer.nextToken();
         if (mapList.stream().anyMatch(map -> map.equals(gameID)) &&
