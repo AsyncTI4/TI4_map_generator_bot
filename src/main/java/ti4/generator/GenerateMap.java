@@ -426,9 +426,9 @@ public class GenerateMap {
             case "orange":
                 return Color.ORANGE;
             case "pink":
-                return Color.PINK;
+                return new Color(246, 153, 205);
             case "purple":
-                return Color.MAGENTA;
+                return new Color(166, 85, 247);
             case "red":
                 return Color.RED;
             case "yellow":
@@ -456,7 +456,6 @@ public class GenerateMap {
             Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
             UnitHolder spaceUnitHolder = unitHolders.stream().filter(unitHolder -> unitHolder.getName().equals(Constants.SPACE)).findFirst().orElse(null);
             if (spaceUnitHolder != null) {
-                image = addCC(tile, image, tileX, tileY, spaceUnitHolder);
                 image = addToken(tile, image, tileX, tileY, spaceUnitHolder);
                 unitHolders.remove(spaceUnitHolder);
                 unitHolders.add(spaceUnitHolder);
@@ -464,15 +463,17 @@ public class GenerateMap {
             int degree;
             int degreeChange = 5;
             for (UnitHolder unitHolder : unitHolders) {
-                degree = 180;
-                int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
                 image = addSleeperToken(tile, image, tileX, tileY, unitHolder);
                 image = addControl(tile, image, tileX, tileY, unitHolder, rectangles);
+            }
+            if (spaceUnitHolder != null) {
+                image = addCC(tile, image, tileX, tileY, spaceUnitHolder);
+            }
+            for (UnitHolder unitHolder : unitHolders) {
+                degree = 180;
+                int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
                 if (unitHolder != spaceUnitHolder) {
                     image = addPlanetToken(tile, image, tileX, tileY, unitHolder, rectangles);
-                }
-                if (spaceUnitHolder != null) {
-                    image = addCC(tile, image, tileX, tileY, spaceUnitHolder);
                 }
                 image = addUnits(tile, image, tileX, tileY, rectangles, degree, degreeChange, unitHolder, radius);
             }
