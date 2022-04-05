@@ -19,12 +19,14 @@ public class PositionMapper {
     private static final Properties planetPositions = new Properties();
     private static final Properties spaceTokenPositions = new Properties();
     private static final Properties planetTokenPositions = new Properties();
+    private static final Properties playerInfo = new Properties();
 
     public static void init() {
         readData("6player.properties", positionTileMap6Player, "Could not read position file");
         readData("planet.properties", planetPositions, "Could not read planet position file");
         readData("space_token.properties", spaceTokenPositions, "Could not read space token position file");
         readData("planet_token.properties", planetTokenPositions, "Could not read planet token position file");
+        readData("6player_info.properties", playerInfo, "Could not read player info position file");
     }
 
     public static String getTilePlanetPositions(String tileID) {
@@ -93,20 +95,43 @@ public class PositionMapper {
         return null;
     }
 
-    public static PlanetTokenPosition getPlanetTokenPosition(String planetName){
+    public static ArrayList<Point> getPlayerPosition(int playerPosition) {
+        ArrayList<Point> positions = new ArrayList<>();
+        String info = (String) playerInfo.get(Integer.toString(playerPosition));
+        if (info == null) {
+            return positions;
+        }
+
+        try {
+            StringTokenizer pointInfo = new StringTokenizer(info, ";");
+            while (pointInfo.hasMoreTokens()) {
+                StringTokenizer individualPoints = new StringTokenizer(pointInfo.nextToken(), ",");
+                String x = individualPoints.nextToken();
+                String y = individualPoints.nextToken();
+                positions.add(new Point(Integer.parseInt(x), Integer.parseInt(y)));
+            }
+        } catch (Exception e) {
+            LoggerHandler.log("Could not parse player positions", e);
+        }
+
+        return positions;
+    }
+
+
+    public static PlanetTokenPosition getPlanetTokenPosition(String planetName) {
         Object value = planetTokenPositions.get(planetName);
         if (value == null) {
             return null;
         }
         PlanetTokenPosition planetTokenPosition = new PlanetTokenPosition(planetName);
-        String valuePosition = (String)value;
+        String valuePosition = (String) value;
         StringTokenizer tokenizer = new StringTokenizer(valuePosition, ";");
-        while (tokenizer.hasMoreTokens()){
+        while (tokenizer.hasMoreTokens()) {
             String positionTemp = tokenizer.nextToken();
             String position = positionTemp.stripLeading();
-            if (!position.isEmpty()){
+            if (!position.isEmpty()) {
                 StringTokenizer tokenPositionTokenizer = new StringTokenizer(position, " ");
-                if (tokenPositionTokenizer.countTokens() == 2){
+                if (tokenPositionTokenizer.countTokens() == 2) {
                     String id = tokenPositionTokenizer.nextToken();
                     String pointValue = tokenPositionTokenizer.nextToken();
                     StringTokenizer positionTokenizer = new StringTokenizer(pointValue, ",");
