@@ -118,6 +118,8 @@ public class Constants {
     public static final String SC = "strategy_card";
 
     public static final String TXT = ".txt";
+    public static final String JPG = ".jpg";
+    public static final String PNG = ".png";
     public static final String ADMIN = "admin";
 
     public static final String LAW = "law";
