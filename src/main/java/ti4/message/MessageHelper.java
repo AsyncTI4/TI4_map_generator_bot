@@ -1,8 +1,7 @@
 package ti4.message;
 
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.PrivateChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import java.io.File;
@@ -10,6 +9,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MessageHelper {
+
+    public static void sendMessageToChannel(SlashCommandInteractionEvent event, String messageText, String... reaction) {
+        splitAndSent(messageText, event.getChannel(), event, reaction);
+    }
 
     public static void sendMessageToChannel(MessageChannel channel, String messageText) {
         splitAndSent(messageText, channel);
@@ -39,6 +42,9 @@ public class MessageHelper {
     }
 
     private static void splitAndSent(String messageText, MessageChannel channel) {
+        splitAndSent(messageText, channel, null, "");
+    }
+    private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, String... reaction) {
         if (messageText.length() > 1500) {
             List<String> texts = new ArrayList<>();
             int index = 0;
@@ -50,7 +56,23 @@ public class MessageHelper {
                 channel.sendMessage(text).queue();
             }
         } else {
-            channel.sendMessage(messageText).queue();
+            if (event == null || reaction.length == 0) {
+                channel.sendMessage(messageText).queue();
+            } else {
+                Guild guild = event.getGuild();
+                if (guild != null) {
+                    Message complete = channel.sendMessage(messageText).complete();
+                    for (String reactionID : reaction) {
+                        Emote emoteById = guild.getEmoteById(reactionID);
+                        if (emoteById == null) {
+                            continue;
+                        }
+                        complete.addReaction(emoteById).queue();
+                    }
+                    return;
+                }
+                channel.sendMessage(messageText).queue();
+            }
         }
     }
 
