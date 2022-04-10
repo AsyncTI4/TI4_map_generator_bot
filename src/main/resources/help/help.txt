@@ -19,7 +19,7 @@ Status locked means, only joined players and map creator can edit map. No more p
 /game remove  @playerName... gameName <- remove single or multiple players to game, gameName is optional and can bet set if no activeMap present
 /game set_order @playerName1 @playerName2 .....gameName
 Add all players in order for game
-
+/game sc_count <- sets game SC count, used if game requires more than 8 Strategy cards, default is 8
 
 For easy of setup suggest first command after map creation use
 /add_tile setup 0
@@ -86,7 +86,7 @@ hope helps speed things up
 /remove_token tokenName system/tile planetNameOptional <- same as add control counter, specify token and planet name is optional
 Attachement tokens can only be added to planets
 
-/player stats .... <- can set all the major stats for player
+/player stats .... <- can set all the major stats for player, when SC is picked, TG's automatically added to user Trade Goods from left on SC TG's
 /player setup faction color <- needs to set player faction and color
 
 Cards commands
@@ -126,3 +126,4 @@ Cards commands
 /status po_score id <- score existing objevtcive
 /status po_unscore id <- unscore if you scored by mistake
 /status po_shuffle_back id <- shuffles given objective back into deck, don't use for custom ones, just remove those
+/status sc_trade_goods scNumber tgCount <- add's Trade goods to unchoose strategy cards, tgCount is total how much it should be on card, when SC is picked, TG's automatically added to user Trade Goods

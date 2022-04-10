@@ -159,6 +159,9 @@ public class Constants {
     public static final String PO1 = "publicObjectives1";
     public static final String PO2 = "publicObjectives2";
 
+    public static final String SC_TRADE_GOODS = "sc_trade_goods";
+    public static final String SC_COUNT = "sc_count";
+
     public static final String COUNT = "count";
     public static final String SECRET_OBJECTIVE_ID = "secret_objective_id";
     public static final String DRAW_SO = "so_draw";
