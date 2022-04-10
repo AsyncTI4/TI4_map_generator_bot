@@ -194,6 +194,13 @@ public class MapSaveLoadManager {
         writer.write(Constants.LAW_INFO + " " + sb);
         writer.write(System.lineSeparator());
 
+        sb = new StringBuilder();
+        for (java.util.Map.Entry<Integer, Integer> entry : map.getScTradeGoods().entrySet()) {
+            sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
+        }
+        writer.write(Constants.SC_TRADE_GOODS + " " + sb);
+        writer.write(System.lineSeparator());
+
         writeCards(map.getRevealedPublicObjectives(), writer, Constants.REVEALED_PO);
         writeCards(map.getCustomPublicVP(), writer, Constants.CUSTOM_PO_VP);
         writer.write(Constants.PO1 + " " + String.join(",", map.getPublicObjectives1()));
@@ -581,6 +588,14 @@ public class MapSaveLoadManager {
                     cards.put(id, value);
                 }
                 map.setLawsInfo(cards);
+            } else if (Constants.SC_TRADE_GOODS.equals(identification)) {
+                StringTokenizer scTokenizer = new StringTokenizer(tokenizer.nextToken(), ";");
+                while (scTokenizer.hasMoreTokens()) {
+                    StringTokenizer cardInfo = new StringTokenizer(scTokenizer.nextToken(), ",");
+                    Integer id = Integer.parseInt(cardInfo.nextToken());
+                    Integer value = Integer.parseInt(cardInfo.nextToken());
+                    map.setScTradeGood(id, value);
+                }
             } else if (Constants.SPEAKER.equals(identification)) {
                 map.setSpeaker(tokenizer.nextToken());
             } else if (Constants.SC_PLAYED.equals(identification)) {
