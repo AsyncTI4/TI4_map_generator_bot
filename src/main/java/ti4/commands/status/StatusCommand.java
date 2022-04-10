@@ -90,6 +90,7 @@ public class StatusCommand implements Command {
         subcommands.add(new UnscorePublic());
         subcommands.add(new AddCustomPO());
         subcommands.add(new RemoveCustomPO());
+        subcommands.add(new SCTradeGoods());
         return subcommands;
     }
 

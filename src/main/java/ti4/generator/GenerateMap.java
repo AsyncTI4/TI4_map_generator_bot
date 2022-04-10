@@ -233,6 +233,9 @@ public class GenerateMap {
             y += 15;
 
         }
+        y = strategyCards(map, y);
+
+
         y += 40;
         graphics.setColor(Color.WHITE);
         graphics.setFont(Storage.getFont32());
@@ -253,6 +256,30 @@ public class GenerateMap {
         }
     }
 
+    private int strategyCards(Map map, int y) {
+        y += 80;
+        LinkedHashMap<Integer, Integer> scTradeGoods = map.getScTradeGoods();
+        Collection<Player> players = map.getPlayers().values();
+        Set<Integer> scPicked = players.stream().map(Player::getSC).collect(Collectors.toSet());
+        int x = 20;
+        for (java.util.Map.Entry<Integer, Integer> scTGs : scTradeGoods.entrySet()) {
+            Integer sc = scTGs.getKey();
+            if (!scPicked.contains(sc)) {
+                graphics.setColor(getSCColor(sc));
+                graphics.setFont(Storage.getFont64());
+                graphics.drawString(Integer.toString(sc), x, y);
+                Integer tg = scTGs.getValue();
+                if (tg > 0) {
+                    graphics.setFont(Storage.getFont26());
+                    graphics.setColor(Color.WHITE);
+                    graphics.drawString("TG:" + tg, x, y + 30);
+                }
+            }
+            x += 80;
+        }
+        return y+ 40;
+    }
+
     private void playerInfo(Map map) {
         int playerPosition = 1;
         graphics.setFont(Storage.getFont32());
@@ -266,7 +293,7 @@ public class GenerateMap {
             Player player = playerEntry.getValue();
             String userName = player.getUserName();
 
-            graphics.drawString(userName.substring(0, Math.min(userName.length(), 10)), points.get(0).x, points.get(0).y);
+            graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), points.get(0).x, points.get(0).y);
             Integer vpCount = userVPs.get(player);
             vpCount = vpCount == null ? 0 : vpCount;
             graphics.drawString("VP - " + vpCount, points.get(1).x, points.get(1).y);
@@ -429,6 +456,10 @@ public class GenerateMap {
                 return Color.GRAY;
             }
         }
+        return getSCColor(sc);
+    }
+
+    private Color getSCColor(int sc) {
         return switch (sc) {
             case 1 -> new Color(255, 38, 38);
             case 2 -> new Color(253, 168, 24);
@@ -438,6 +469,8 @@ public class GenerateMap {
             case 6 -> new Color(52, 152, 171);
             case 7 -> new Color(155, 89, 182);
             case 8 -> new Color(124, 0, 192);
+            case 9 -> new Color(251, 96, 213);
+            case 10 -> new Color(165, 211, 34);
             default -> Color.WHITE;
         };
     }

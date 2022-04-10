@@ -22,14 +22,14 @@ public class MessageHelper {
     public static void replyToMessage(SlashCommandInteractionEvent event, String messageText) {
         if (messageText.length() > 1500) {
             splitAndSent(messageText, event.getChannel());
-            event.reply("Message to long for replay, sent all information in base messages").queue();
+            event.getHook().sendMessage("Message to long for replay, sent all information in base messages").queue();
         } else {
-            event.reply(messageText).queue();
+            event.getHook().sendMessage(messageText).queue();
         }
     }
 
     public static void replyToMessage(SlashCommandInteractionEvent event, File file) {
-        event.replyFile(file).queue();
+        event.getHook().sendFile(file).queue();
     }
 
     public static void sentToMessageToUser(SlashCommandInteractionEvent event, String messageText) {

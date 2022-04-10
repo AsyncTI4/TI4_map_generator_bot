@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.generator.Mapper;
@@ -30,6 +31,7 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+        event.getInteraction().deferReply().queue();
         String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
         String channelName = event.getChannel().getName();

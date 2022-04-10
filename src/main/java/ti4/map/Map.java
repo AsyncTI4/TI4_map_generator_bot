@@ -25,6 +25,7 @@ public class Map {
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
 
     private List<String> agendas;
+    private LinkedHashMap<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> sentAgendas = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> laws = new LinkedHashMap<>();
@@ -55,6 +56,11 @@ public class Map {
         Collections.shuffle(publicObjectives1);
         Collections.shuffle(publicObjectives2);
         addCustomPO(Constants.CUSTODIAN, 1);
+
+        //Default SC initialization
+        for (int i = 0; i < 8; i++) {
+            scTradeGoods.put(i + 1, 0);
+        }
     }
 
     //Position, Tile
@@ -103,6 +109,22 @@ public class Map {
         revealedPublicObjectives.put(id, identifier);
     }
 
+    public LinkedHashMap<Integer, Integer> getScTradeGoods() {
+        return scTradeGoods;
+    }
+
+    public void setScTradeGoods(LinkedHashMap<Integer, Integer> scTradeGoods) {
+        this.scTradeGoods = scTradeGoods;
+    }
+
+    public void setScTradeGood(Integer sc, Integer tradeGoodCount) {
+        scTradeGoods.put(sc, tradeGoodCount);
+    }
+
+    public void setScPlayed(HashMap<Integer, Boolean> scPlayed) {
+        this.scPlayed = scPlayed;
+    }
+
     public LinkedHashMap<String, Integer> getRevealedPublicObjectives() {
         return revealedPublicObjectives;
     }
@@ -149,10 +171,10 @@ public class Map {
             revealedPublicObjectives.remove(id);
             Set<String> po1 = Mapper.getPublicObjectivesState1().keySet();
             Set<String> po2 = Mapper.getPublicObjectivesState2().keySet();
-            if (po1.contains(id)){
+            if (po1.contains(id)) {
                 publicObjectives1.add(id);
                 Collections.shuffle(publicObjectives1);
-            } else if (po2.contains(id)){
+            } else if (po2.contains(id)) {
                 publicObjectives2.add(id);
                 Collections.shuffle(publicObjectives2);
             }
@@ -171,7 +193,7 @@ public class Map {
         }
         if (!id.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
-            if (!Constants.CUSTODIAN.equals(id) && scoredPlayerList.contains(userID)){
+            if (!Constants.CUSTODIAN.equals(id) && scoredPlayerList.contains(userID)) {
                 return false;
             }
             scoredPlayerList.add(userID);
@@ -191,7 +213,7 @@ public class Map {
         }
         if (!id.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(id, key -> new ArrayList<>());
-            if (scoredPlayerList.contains(userID)){
+            if (scoredPlayerList.contains(userID)) {
                 scoredPlayerList.remove(userID);
                 scoredPublicObjectives.put(id, scoredPlayerList);
                 return true;

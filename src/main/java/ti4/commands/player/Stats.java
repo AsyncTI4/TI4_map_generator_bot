@@ -143,6 +143,11 @@ public class Stats extends PlayerSubcommandData {
         OptionMapping optionSC = event.getOption(Constants.SC);
         if (optionSC != null) {
             int scNumber = optionSC.getAsInt();
+            LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
+            if (!scTradeGoods.containsKey(scNumber)){
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card must be from possible ones in Game");
+                return;
+            }
             if (scNumber > 0) {
                 LinkedHashMap<String, Player> players = activeMap.getPlayers();
                 for (Player playerStats : players.values()) {
@@ -152,6 +157,12 @@ public class Stats extends PlayerSubcommandData {
                     }
                 }
                 player.setSC(scNumber);
+                Integer tgCount = scTradeGoods.get(scNumber);
+                if (tgCount != null) {
+                    int tg = player.getTg();
+                    tg += tgCount;
+                    player.setTg(tg);
+                }
             } else if (scNumber == 0){
                 int sc = player.getSC();
                 player.setSC(scNumber);
