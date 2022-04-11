@@ -27,6 +27,6 @@ public class RevealAgenda extends AgendaSubcommandData {
         }
         sb.append(Mapper.getAgenda(id));
         sb.append("\n-----------\n");
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        MessageHelper.sendMessageToChannel(event, sb.toString(), "962921609671364658", "962923748938362931");
     }
 }
