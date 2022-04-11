@@ -49,7 +49,6 @@ public class PlayAC extends CardsSubcommandData {
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Played: ");
         sb.append(Mapper.getActionCard(acID)).append("\n");
-//        event.getChannel().sendMessage("test").complete().addReaction(event.getGuild().getEmoteById("959145801152593940")).queue();
         MessageHelper.sendMessageToChannel(event, sb.toString(), "962783456541171712", "962784058159546388");
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
