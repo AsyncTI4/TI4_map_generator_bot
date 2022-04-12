@@ -187,7 +187,8 @@ public class GenerateMap {
             y += 34;
             Color color = getColor(player.getColor());
             graphics.setColor(Color.WHITE);
-            graphics.drawString(player.getUserName(), x, y);
+            String userName = player.getUserName() + " (" + player.getColor() + ")";
+            graphics.drawString(userName, x, y);
             y += 2;
             String faction = player.getFaction();
             if (faction != null) {
