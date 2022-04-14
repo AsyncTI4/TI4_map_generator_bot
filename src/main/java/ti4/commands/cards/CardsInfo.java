@@ -1,5 +1,6 @@
 package ti4.commands.cards;
 
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -57,7 +58,12 @@ public class CardsInfo extends CardsSubcommandData {
             }
         }
         sb.append("--------------------\n");
-        MessageHelper.sentToMessageToUser(event, sb.toString());
+        User userById = event.getJDA().getUserById(player.getUserID());
+        if (userById != null) {
+        MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
+        } else {
+            MessageHelper.sentToMessageToUser(event, "Player: " + player.getUserName() + " not found");
+        }
     }
 
 }
