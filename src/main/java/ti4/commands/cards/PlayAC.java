@@ -42,7 +42,6 @@ public class PlayAC extends CardsSubcommandData {
             return;
         }
         activeMap.discardActionCard(player.getUserID(), acIndex);
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
 
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(activeMap.getName()).append(" ");
