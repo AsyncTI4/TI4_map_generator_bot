@@ -6,8 +6,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.LoggerHandler;
 import ti4.helpers.Storage;
-import ti4.map.*;
 import ti4.map.Map;
+import ti4.map.*;
 
 import javax.annotation.CheckForNull;
 import javax.imageio.IIOImage;
@@ -34,6 +34,7 @@ public class GenerateMap {
     private int height;
     private int heightForGameInfo;
     private int scoreTokenWidth;
+    private int extraWidth = 200;
     private static Point tilePositionPoint = new Point(230, 295);
     private static Point numberPositionPoint = new Point(45, 35);
     private static HashMap<Player, Integer> userVPs = new HashMap<>();
@@ -56,7 +57,7 @@ public class GenerateMap {
             LoggerHandler.log("Could not init map generator");
             //todo message to user
         }
-        width = Math.max(setupImage.getWidth(), 2000);
+        width = Math.max(setupImage.getWidth(), 2000 + (extraWidth * 2));
         heightForGameInfo = setupImage.getHeight();
         height = heightForGameInfo + setupImage.getHeight() / 2 + 800;
         resetImage();
@@ -95,7 +96,7 @@ public class GenerateMap {
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
             String timeStamp = getTimeStamp();
-            graphics.drawString(map.getName()+" "+timeStamp, 0, 34);
+            graphics.drawString(map.getName() + " " + timeStamp, 0, 34);
 
             gameInfo(map);
 
@@ -113,7 +114,7 @@ public class GenerateMap {
         }
 
         String timeStamp = getTimeStamp();
-        String absolutePath = file.getParent()+"/"+map.getName()+"_"+timeStamp+".jpg";
+        String absolutePath = file.getParent() + "/" + map.getName() + "_" + timeStamp + ".jpg";
         try (FileInputStream fileInputStream = new FileInputStream(file);
              FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
 
@@ -170,7 +171,7 @@ public class GenerateMap {
     private void gameInfo(Map map) throws IOException {
 
         int widthOfLine = 1800;
-        int y = heightForGameInfo + 20;
+        int y = heightForGameInfo + 60;
         int x = 10;
         HashMap<String, Player> players = map.getPlayers();
         float percent = 0.15f;
@@ -278,7 +279,7 @@ public class GenerateMap {
             }
             x += 80;
         }
-        return y+ 40;
+        return y + 40;
     }
 
     private void playerInfo(Map map) {
@@ -299,7 +300,16 @@ public class GenerateMap {
             vpCount = vpCount == null ? 0 : vpCount;
             graphics.drawString("VP - " + vpCount, points.get(1).x, points.get(1).y);
 
-            if (player == speaker){
+
+            String ccID = Mapper.getCCID(player.getColor());
+            String fleetCCID = Mapper.getFleeCCID(player.getColor());
+            int x = points.get(2).x;
+            int y = points.get(2).y;
+            drawCCOfPlayer(ccID, x, y, player.getTacticalCC());
+            drawCCOfPlayer(fleetCCID, x, y+65, player.getFleetCC());
+            drawCCOfPlayer(ccID, x, y+130, player.getStrategicCC());
+
+            if (player == speaker) {
                 String speakerID = Mapper.getTokenID(Constants.SPEAKER);
                 String speakerFile = ResourceHelper.getInstance().getTokenFile(speakerID);
                 if (speakerFile != null) {
@@ -317,6 +327,19 @@ public class GenerateMap {
         }
 
 
+    }
+
+    private void drawCCOfPlayer(String ccID, int x, int y, int tacticalCC) {
+        String ccPath = Mapper.getCCPath(ccID);
+        try {
+            BufferedImage ccImage = resizeImage(ImageIO.read(new File(ccPath)), 0.75f);
+            int delta = 20;
+            for (int i = 0; i < tacticalCC; i++) {
+                 graphics.drawImage(ccImage, x + (delta * i), y, null);
+            }
+        } catch (Exception e) {
+            LoggerHandler.log("Could not parse cc file for: " + ccID, e);
+        }
     }
 
     private int objectives(Map map, int y) {
@@ -338,7 +361,7 @@ public class GenerateMap {
         Set<String> customVP = customPublicVP.keySet();
         Set<String> secret = secretObjectives.keySet();
 
-        graphics.setFont(Storage.getFont20());
+        graphics.setFont(Storage.getFont26());
         graphics.setColor(new Color(230, 126, 34));
         Integer[] column = new Integer[1];
         column[0] = 0;
@@ -377,8 +400,8 @@ public class GenerateMap {
         for (java.util.Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
             switch (column[0]) {
                 case 0 -> x = 5;
-                case 1 -> x = 671;
-                case 2 -> x = 1338;
+                case 1 -> x = 771;
+                case 2 -> x = 1538;
             }
 
             String key = revealed.getKey();
@@ -391,9 +414,9 @@ public class GenerateMap {
                 continue;
             }
             keysToRemove.add(key);
-            if (customPublicVP != null){
+            if (customPublicVP != null) {
                 objectiveWorth = customPublicVP.get(key);
-                if (objectiveWorth == null){
+                if (objectiveWorth == null) {
                     objectiveWorth = 1;
                 }
             }
@@ -401,13 +424,13 @@ public class GenerateMap {
             List<String> scoredPlayerID = scoredPublicObjectives.get(key);
             boolean multiScoring = Constants.CUSTODIAN.equals(key);
             if (scoredPlayerID != null) {
-                drawScoreControlMarkers(x + 415, y, players, scoredPlayerID, multiScoring, objectiveWorth);
+                drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, multiScoring, objectiveWorth);
             }
-            graphics.drawRect(x - 4, y - 5, 662, 35);
+            graphics.drawRect(x - 4, y - 5, 762, 38);
             column[0]++;
             if (column[0] > 2) {
                 column[0] = 0;
-                y += 40;
+                y += 43;
             }
         }
         keysToRemove.forEach(revealedPublicObjectives::remove);
@@ -423,12 +446,12 @@ public class GenerateMap {
                 String userID = player.getUserID();
                 if (scoredPlayerID.contains(userID)) {
                     String controlID = Mapper.getControlID(player.getColor());
-                    BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.4f);
+                    BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.55f);
                     Integer vpCount = userVPs.get(player);
-                    if (vpCount == null){
+                    if (vpCount == null) {
                         vpCount = 0;
                     }
-                    if (multiScoring){
+                    if (multiScoring) {
                         int frequency = Collections.frequency(scoredPlayerID, userID);
                         vpCount += frequency;
                         for (int i = 0; i < frequency; i++) {
@@ -511,7 +534,7 @@ public class GenerateMap {
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
             Point positionPoint = PositionMapper.getTilePosition(tile.getPosition());
-            int tileX = positionPoint.x;
+            int tileX = positionPoint.x + extraWidth;
             int tileY = positionPoint.y;
             graphics.drawImage(image, tileX, tileY, null);
 

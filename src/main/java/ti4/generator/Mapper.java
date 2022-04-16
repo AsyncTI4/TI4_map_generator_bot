@@ -98,6 +98,11 @@ public class Mapper {
         return cc_tokens.get("cc") + property + ".png";
     }
 
+    public static String getFleeCCID(String color) {
+        String property = colors.getProperty(color);
+        return cc_tokens.get("fleet") + property + ".png";
+    }
+
     public static String getAttachmentID(String tokenID) {
         return attachment_tokens.getProperty(tokenID);
     }
