@@ -48,7 +48,7 @@ public class GenerateMap {
         try {
             setupImage = ImageIO.read(setupFile);
             String controlID = Mapper.getControlID("red");
-            BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.4f);
+            BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.45f);
             scoreTokenWidth = bufferedImage.getWidth();
         } catch (IOException e) {
             LoggerHandler.logError("Could read file data for setup file", e);
@@ -400,8 +400,8 @@ public class GenerateMap {
         for (java.util.Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
             switch (column[0]) {
                 case 0 -> x = 5;
-                case 1 -> x = 771;
-                case 2 -> x = 1538;
+                case 1 -> x = 801;
+                case 2 -> x = 1598;
             }
 
             String key = revealed.getKey();
@@ -426,7 +426,7 @@ public class GenerateMap {
             if (scoredPlayerID != null) {
                 drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, multiScoring, objectiveWorth);
             }
-            graphics.drawRect(x - 4, y - 5, 762, 38);
+            graphics.drawRect(x - 4, y - 5, 785, 38);
             column[0]++;
             if (column[0] > 2) {
                 column[0] = 0;
