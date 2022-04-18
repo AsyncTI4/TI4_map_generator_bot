@@ -9,6 +9,7 @@ public class Constants {
     public static final String SHOW_GAME = "show_game";
     public static final String SHOW_GAME_INFO = "show_game_info";
     public static final String GAME_NAME = "game_name";
+    public static final String STATS_ONLY = "stats_only";
     public static final String GAME_STATUS = "game_status";
     public static final String CONFIRM = "confirm";
     public static final String SHUTDOWN = "shutdown";

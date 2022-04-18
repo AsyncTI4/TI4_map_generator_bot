@@ -32,7 +32,10 @@ public class GenerateMap {
     private BufferedImage mainImage;
     private int width;
     private int height;
+    private int heightStorage;
+    private int heightStats;
     private int heightForGameInfo;
+    private int heightForGameInfoStorage;
     private int scoreTokenWidth;
     private int extraWidth = 200;
     private static Point tilePositionPoint = new Point(230, 295);
@@ -59,7 +62,10 @@ public class GenerateMap {
         }
         width = Math.max(setupImage.getWidth(), 2000 + (extraWidth * 2));
         heightForGameInfo = setupImage.getHeight();
+        heightForGameInfoStorage = heightForGameInfo;
         height = heightForGameInfo + setupImage.getHeight() / 2 + 800;
+        heightStats = setupImage.getHeight() / 2 + 800;
+        heightStorage = height;
         resetImage();
     }
 
@@ -76,29 +82,39 @@ public class GenerateMap {
     }
 
     public File saveImage(Map map) {
+        return saveImage(map, false);
+    }
+    public File saveImage(Map map, boolean statsOnly) {
+        if (statsOnly) {
+            heightForGameInfo = 40;
+            height = heightStats;
+        } else {
+            heightForGameInfo = heightForGameInfoStorage;
+            height = heightStorage;
+        }
         resetImage();
-        //todo fix temp map name
         File file = Storage.getMapImageStorage("temp.png");
         try {
-            HashMap<String, Tile> tileMap = new HashMap<>(map.getTileMap());
-            String setup = tileMap.keySet().stream()
-                    .filter(key -> key.startsWith("setup"))
-                    .findFirst()
-                    .orElse(null);
-            if (setup != null) {
-                addTile(tileMap.get(setup));
-                tileMap.remove(setup);
+            if (!statsOnly) {
+                HashMap<String, Tile> tileMap = new HashMap<>(map.getTileMap());
+                String setup = tileMap.keySet().stream()
+                        .filter(key -> key.startsWith("setup"))
+                        .findFirst()
+                        .orElse(null);
+                if (setup != null) {
+                    addTile(tileMap.get(setup));
+                    tileMap.remove(setup);
+                }
+                tileMap.keySet().stream()
+                        .sorted()
+                        .forEach(key -> addTile(tileMap.get(key)));
             }
-            tileMap.keySet().stream()
-                    .sorted()
-                    .forEach(key -> addTile(tileMap.get(key)));
-
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
             String timeStamp = getTimeStamp();
             graphics.drawString(map.getName() + " " + timeStamp, 0, 34);
 
-            gameInfo(map);
+            gameInfo(map, statsOnly);
 
             ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
             imageWriter.setOutput(ImageIO.createImageOutputStream(file));
@@ -168,7 +184,7 @@ public class GenerateMap {
         return filePath;
     }
 
-    private void gameInfo(Map map) throws IOException {
+    private void gameInfo(Map map, boolean statsOnly) throws IOException {
 
         int widthOfLine = 1800;
         int y = heightForGameInfo + 60;
@@ -178,7 +194,9 @@ public class GenerateMap {
         int deltaY = 50;
 
         y = objectives(map, y);
-        playerInfo(map);
+        if (!statsOnly) {
+            playerInfo(map);
+        }
 
         graphics.setFont(Storage.getFont32());
         Graphics2D g2 = (Graphics2D) graphics;
