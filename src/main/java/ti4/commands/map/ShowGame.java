@@ -56,7 +56,13 @@ public class ShowGame implements Command {
         } else {
             map = mapManager.getUserActiveMap(event.getUser().getId());
         }
-        File file = GenerateMap.getInstance().saveImage(map);
+
+        boolean statsOnly = false;
+        OptionMapping statsOption = event.getOption(Constants.STATS_ONLY);
+        if (statsOption != null) {
+            statsOnly = statsOption.getAsBoolean();
+        }
+        File file = GenerateMap.getInstance().saveImage(map, statsOnly);
         MessageHelper.replyToMessage(event, file);
     }
 
@@ -66,6 +72,7 @@ public class ShowGame implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), "Shows selected map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown")));
+                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown"))
+                        .addOptions(new OptionData(OptionType.BOOLEAN, Constants.STATS_ONLY, "Show only stats for map")));
     }
 }
