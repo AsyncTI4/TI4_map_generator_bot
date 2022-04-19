@@ -551,35 +551,35 @@ public class MapSaveLoadManager {
     }
 
     private static void readGameInfo(Map map, String data) {
-        StringTokenizer tokenizer = new StringTokenizer(data, " ");
-        if (tokenizer.countTokens() == 2) {
-            String identification = tokenizer.nextToken();
+        String[] tokenizer = data.split(" ", 2);
+        if (tokenizer.length == 2) {
+            String identification = tokenizer[0];
             if (Constants.SO.equals(identification)) {
-                map.setSecretObjectives(getCardList(tokenizer));
+                map.setSecretObjectives(getCardList(tokenizer[1]));
             } else if (Constants.AC.equals(identification)) {
-                map.setActionCards(getCardList(tokenizer));
+                map.setActionCards(getCardList(tokenizer[1]));
             } else if (Constants.PO1.equals(identification)) {
-                map.setPublicObjectives1(getCardList(tokenizer));
+                map.setPublicObjectives1(getCardList(tokenizer[1]));
             } else if (Constants.PO2.equals(identification)) {
-                map.setPublicObjectives2(getCardList(tokenizer));
+                map.setPublicObjectives2(getCardList(tokenizer[1]));
             } else if (Constants.REVEALED_PO.equals(identification)) {
-                map.setRevealedPublicObjectives(getParsedCards(tokenizer));
+                map.setRevealedPublicObjectives(getParsedCards(tokenizer[1]));
             } else if (Constants.CUSTOM_PO_VP.equals(identification)) {
-                map.setCustomPublicVP(getParsedCards(tokenizer));
+                map.setCustomPublicVP(getParsedCards(tokenizer[1]));
             } else if (Constants.SCORED_PO.equals(identification)) {
-                map.setScoredPublicObjectives(getParsedCardsForScoredPO(tokenizer));
+                map.setScoredPublicObjectives(getParsedCardsForScoredPO(tokenizer[1]));
             } else if (Constants.AGENDAS.equals(identification)) {
-                map.setAgendas(getCardList(tokenizer));
+                map.setAgendas(getCardList(tokenizer[1]));
             } else if (Constants.AC_DISCARDED.equals(identification)) {
-                map.setDiscardActionCards(getParsedCards(tokenizer));
+                map.setDiscardActionCards(getParsedCards(tokenizer[1]));
             } else if (Constants.DISCARDED_AGENDAS.equals(identification)) {
-                map.setDiscardAgendas(getParsedCards(tokenizer));
+                map.setDiscardAgendas(getParsedCards(tokenizer[1]));
             } else if (Constants.SENT_AGENDAS.equals(identification)) {
-                map.setSentAgendas(getParsedCards(tokenizer));
+                map.setSentAgendas(getParsedCards(tokenizer[1]));
             } else if (Constants.LAW.equals(identification)) {
-                map.setLaws(getParsedCards(tokenizer));
+                map.setLaws(getParsedCards(tokenizer[1]));
             } else if (Constants.LAW_INFO.equals(identification)) {
-                StringTokenizer actionCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                StringTokenizer actionCardToken = new StringTokenizer(tokenizer[1], ";");
                 LinkedHashMap<String, String> cards = new LinkedHashMap<>();
                 while (actionCardToken.hasMoreTokens()) {
                     StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
@@ -589,7 +589,7 @@ public class MapSaveLoadManager {
                 }
                 map.setLawsInfo(cards);
             } else if (Constants.SC_TRADE_GOODS.equals(identification)) {
-                StringTokenizer scTokenizer = new StringTokenizer(tokenizer.nextToken(), ";");
+                StringTokenizer scTokenizer = new StringTokenizer(tokenizer[1], ";");
                 while (scTokenizer.hasMoreTokens()) {
                     StringTokenizer cardInfo = new StringTokenizer(scTokenizer.nextToken(), ",");
                     Integer id = Integer.parseInt(cardInfo.nextToken());
@@ -597,9 +597,9 @@ public class MapSaveLoadManager {
                     map.setScTradeGood(id, value);
                 }
             } else if (Constants.SPEAKER.equals(identification)) {
-                map.setSpeaker(tokenizer.nextToken());
+                map.setSpeaker(tokenizer[1]);
             } else if (Constants.SC_PLAYED.equals(identification)) {
-                StringTokenizer scPlayed = new StringTokenizer(tokenizer.nextToken(), ";");
+                StringTokenizer scPlayed = new StringTokenizer(tokenizer[1], ";");
                 while (scPlayed.hasMoreTokens()) {
                     StringTokenizer dataInfo = new StringTokenizer(scPlayed.nextToken(), ",");
                     Integer scID = Integer.parseInt(dataInfo.nextToken());
@@ -610,8 +610,8 @@ public class MapSaveLoadManager {
         }
     }
 
-    private static ArrayList<String> getCardList(StringTokenizer tokenizer) {
-        StringTokenizer cards = new StringTokenizer(tokenizer.nextToken(), ",");
+    private static ArrayList<String> getCardList(String tokenizer) {
+        StringTokenizer cards = new StringTokenizer(tokenizer, ",");
         ArrayList<String> cardList = new ArrayList<>();
         while (cards.hasMoreTokens()) {
             cardList.add(cards.nextToken());
@@ -619,8 +619,8 @@ public class MapSaveLoadManager {
         return cardList;
     }
 
-    private static LinkedHashMap<String, Integer> getParsedCards(StringTokenizer tokenizer) {
-        StringTokenizer actionCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+    private static LinkedHashMap<String, Integer> getParsedCards(String tokenizer) {
+        StringTokenizer actionCardToken = new StringTokenizer(tokenizer, ";");
         LinkedHashMap<String, Integer> cards = new LinkedHashMap<>();
         while (actionCardToken.hasMoreTokens()) {
             StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
@@ -631,8 +631,8 @@ public class MapSaveLoadManager {
         return cards;
     }
 
-    private static LinkedHashMap<String, List<String>> getParsedCardsForScoredPO(StringTokenizer tokenizer) {
-        StringTokenizer po = new StringTokenizer(tokenizer.nextToken(), ";");
+    private static LinkedHashMap<String, List<String>> getParsedCardsForScoredPO(String tokenizer) {
+        StringTokenizer po = new StringTokenizer(tokenizer, ";");
         LinkedHashMap<String, List<String>> scoredPOs = new LinkedHashMap<>();
         while (po.hasMoreTokens()) {
             StringTokenizer poInfo = new StringTokenizer(po.nextToken(), ",");
