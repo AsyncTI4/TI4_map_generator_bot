@@ -2,10 +2,7 @@ package ti4.generator;
 
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
-import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.helpers.LoggerHandler;
-import ti4.helpers.Storage;
+import ti4.helpers.*;
 import ti4.map.Map;
 import ti4.map.*;
 
@@ -82,12 +79,26 @@ public class GenerateMap {
     }
 
     public File saveImage(Map map) {
-        return saveImage(map, false);
+        if (map.getDisplayTypeForced() != null){
+            return saveImage(map, map.getDisplayTypeForced());
+        }
+        return saveImage(map, DisplayType.all);
     }
-    public File saveImage(Map map, boolean statsOnly) {
-        if (statsOnly) {
+    public File saveImage(Map map, @CheckForNull DisplayType displayType) {
+        if (map.getDisplayTypeForced() != null){
+            displayType = map.getDisplayTypeForced();
+        } else if (displayType == null){
+            displayType = map.getDisplayTypeForced();
+            if (displayType == null){
+                displayType = DisplayType.all;
+            }
+        }
+        if (displayType == DisplayType.stats) {
             heightForGameInfo = 40;
             height = heightStats;
+        } else if (displayType == DisplayType.map) {
+            heightForGameInfo = heightForGameInfoStorage;
+            height = heightForGameInfoStorage + 300;
         } else {
             heightForGameInfo = heightForGameInfoStorage;
             height = heightStorage;
@@ -95,7 +106,7 @@ public class GenerateMap {
         resetImage();
         File file = Storage.getMapImageStorage("temp.png");
         try {
-            if (!statsOnly) {
+            if (displayType == DisplayType.all || displayType == DisplayType.map) {
                 HashMap<String, Tile> tileMap = new HashMap<>(map.getTileMap());
                 String setup = tileMap.keySet().stream()
                         .filter(key -> key.startsWith("setup"))
@@ -114,7 +125,7 @@ public class GenerateMap {
             String timeStamp = getTimeStamp();
             graphics.drawString(map.getName() + " " + timeStamp, 0, 34);
 
-            gameInfo(map, statsOnly);
+            gameInfo(map, displayType);
 
             ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
             imageWriter.setOutput(ImageIO.createImageOutputStream(file));
@@ -184,7 +195,7 @@ public class GenerateMap {
         return filePath;
     }
 
-    private void gameInfo(Map map, boolean statsOnly) throws IOException {
+    private void gameInfo(Map map, DisplayType displayType) throws IOException {
 
         int widthOfLine = 1800;
         int y = heightForGameInfo + 60;
@@ -194,85 +205,87 @@ public class GenerateMap {
         int deltaY = 50;
 
         y = objectives(map, y);
-        if (!statsOnly) {
+        if (displayType != DisplayType.stats) {
             playerInfo(map);
         }
 
-        graphics.setFont(Storage.getFont32());
-        Graphics2D g2 = (Graphics2D) graphics;
-        g2.setStroke(new BasicStroke(5));
-        for (Player player : players.values()) {
-            int baseY = y;
-            y += 34;
-            Color color = getColor(player.getColor());
-            graphics.setColor(Color.WHITE);
-            String userName = player.getUserName() + " (" + player.getColor() + ")";
-            graphics.drawString(userName, x, y);
-            y += 2;
-            String faction = player.getFaction();
-            if (faction != null) {
-                String factionPath = getFactionPath(faction);
-                if (factionPath != null) {
-                    BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(factionPath)), percent);
-                    graphics.drawImage(bufferedImage, x, y, null);
+        if (displayType == DisplayType.all || displayType == DisplayType.stats) {
+            graphics.setFont(Storage.getFont32());
+            Graphics2D g2 = (Graphics2D) graphics;
+            g2.setStroke(new BasicStroke(5));
+            for (Player player : players.values()) {
+                int baseY = y;
+                y += 34;
+                Color color = getColor(player.getColor());
+                graphics.setColor(Color.WHITE);
+                String userName = player.getUserName() + " (" + player.getColor() + ")";
+                graphics.drawString(userName, x, y);
+                y += 2;
+                String faction = player.getFaction();
+                if (faction != null) {
+                    String factionPath = getFactionPath(faction);
+                    if (factionPath != null) {
+                        BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(factionPath)), percent);
+                        graphics.drawImage(bufferedImage, x, y, null);
+                    }
                 }
+                StringBuilder sb = new StringBuilder();
+                int sc = player.getSC();
+                String scText = sc == 0 ? " " : Integer.toString(sc);
+                sb.append("SC: ").append(scText).append("   ");
+
+                graphics.setColor(getSCColor(sc, map));
+
+                graphics.drawString(sb.toString(), x + 100, y + deltaY);
+                graphics.setColor(color);
+
+                graphics.setColor(Color.WHITE);
+                sb = new StringBuilder();
+                sb.append(player.getTacticalCC()).append("T/");
+                sb.append(player.getFleetCC()).append("F/");
+                sb.append(player.getStrategicCC()).append("S ");
+                sb.append("TG: ").append(player.getTg());
+                sb.append(" C:").append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
+                sb.append(" ").append("AC: ").append(player.getAc()).append(" ");
+                sb.append("PN: ").append(player.getPn()).append(" ");
+                sb.append("SO: ").append(player.getSo()).append(" scored: ").append(player.getSoScored()).append(" ");
+                sb.append("CRF: ").append(player.getCrf()).append(" ");
+                sb.append("HRF: ").append(player.getHrf()).append(" ");
+                sb.append("IRF: ").append(player.getIrf()).append(" ");
+                sb.append("VRF: ").append(player.getVrf()).append(" ");
+                if (player.isPassed()) {
+                    sb.append(" PASSED");
+
+                }
+                graphics.drawString(sb.toString(), x + 200, y + deltaY);
+                graphics.setColor(color);
+                y += 90;
+                g2.setColor(color);
+                g2.drawRect(x - 5, baseY, x + widthOfLine, y - baseY);
+                y += 15;
+
             }
-            StringBuilder sb = new StringBuilder();
-            int sc = player.getSC();
-            String scText = sc == 0 ? " " : Integer.toString(sc);
-            sb.append("SC: ").append(scText).append("   ");
+            y = strategyCards(map, y);
 
-            graphics.setColor(getSCColor(sc, map));
 
-            graphics.drawString(sb.toString(), x + 100, y + deltaY);
-            graphics.setColor(color);
-
+            y += 40;
             graphics.setColor(Color.WHITE);
-            sb = new StringBuilder();
-            sb.append(player.getTacticalCC()).append("T/");
-            sb.append(player.getFleetCC()).append("F/");
-            sb.append(player.getStrategicCC()).append("S ");
-            sb.append("TG: ").append(player.getTg());
-            sb.append(" C:").append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
-            sb.append(" ").append("AC: ").append(player.getAc()).append(" ");
-            sb.append("PN: ").append(player.getPn()).append(" ");
-            sb.append("SO: ").append(player.getSo()).append(" scored: ").append(player.getSoScored()).append(" ");
-            sb.append("CRF: ").append(player.getCrf()).append(" ");
-            sb.append("HRF: ").append(player.getHrf()).append(" ");
-            sb.append("IRF: ").append(player.getIrf()).append(" ");
-            sb.append("VRF: ").append(player.getVrf()).append(" ");
-            if (player.isPassed()) {
-                sb.append(" PASSED");
+            graphics.setFont(Storage.getFont32());
+            graphics.drawString("LAWS", x, y);
 
+            graphics.setFont(Storage.getFont26());
+            LinkedHashMap<String, Integer> laws = map.getLaws();
+            LinkedHashMap<String, String> lawsInfo = map.getLawsInfo();
+            for (java.util.Map.Entry<String, Integer> lawEntry : laws.entrySet()) {
+                y += 30;
+                String lawID = lawEntry.getKey();
+                String text = "(" + lawEntry.getValue() + ") ";
+                String optionalText = lawsInfo.get(lawID);
+                if (optionalText != null) {
+                    text += "Elected: " + optionalText + " - ";
+                }
+                graphics.drawString(text + Mapper.getAgenda(lawID), x, y);
             }
-            graphics.drawString(sb.toString(), x + 200, y + deltaY);
-            graphics.setColor(color);
-            y += 90;
-            g2.setColor(color);
-            g2.drawRect(x - 5, baseY, x + widthOfLine, y - baseY);
-            y += 15;
-
-        }
-        y = strategyCards(map, y);
-
-
-        y += 40;
-        graphics.setColor(Color.WHITE);
-        graphics.setFont(Storage.getFont32());
-        graphics.drawString("LAWS", x, y);
-
-        graphics.setFont(Storage.getFont26());
-        LinkedHashMap<String, Integer> laws = map.getLaws();
-        LinkedHashMap<String, String> lawsInfo = map.getLawsInfo();
-        for (java.util.Map.Entry<String, Integer> lawEntry : laws.entrySet()) {
-            y += 30;
-            String lawID = lawEntry.getKey();
-            String text = "(" + lawEntry.getValue() + ") ";
-            String optionalText = lawsInfo.get(lawID);
-            if (optionalText != null) {
-                text += "Elected: " + optionalText + " - ";
-            }
-            graphics.drawString(text + Mapper.getAgenda(lawID), x, y);
         }
     }
 

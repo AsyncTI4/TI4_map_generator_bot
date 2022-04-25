@@ -1,9 +1,6 @@
 package ti4.map;
 
-import ti4.helpers.Constants;
-import ti4.helpers.Helper;
-import ti4.helpers.LoggerHandler;
-import ti4.helpers.Storage;
+import ti4.helpers.*;
 
 import javax.annotation.CheckForNull;
 import java.io.*;
@@ -208,6 +205,11 @@ public class MapSaveLoadManager {
         writer.write(Constants.PO2 + " " + String.join(",", map.getPublicObjectives2()));
         writer.write(System.lineSeparator());
 
+        DisplayType displayTypeForced = map.getDisplayTypeForced();
+        if (displayTypeForced != null) {
+            writer.write(Constants.DISPLAY_TYPE + " " + displayTypeForced.getValue());
+            writer.write(System.lineSeparator());
+        }
 
         StringBuilder sb1 = new StringBuilder();
         for (java.util.Map.Entry<String, List<String>> entry : map.getScoredPublicObjectives().entrySet()) {
@@ -598,6 +600,16 @@ public class MapSaveLoadManager {
                 }
             } else if (Constants.SPEAKER.equals(identification)) {
                 map.setSpeaker(tokenizer[1]);
+            } else if (Constants.DISPLAY_TYPE.equals(identification)) {
+                String displayType = tokenizer[1];
+                if (displayType.equals(DisplayType.stats.getValue())){
+                    map.setDisplayTypeForced(DisplayType.stats);
+                } else if (displayType.equals(DisplayType.map.getValue())){
+                    map.setDisplayTypeForced(DisplayType.map);
+                } else if (displayType.equals(DisplayType.all.getValue())){
+                    map.setDisplayTypeForced(DisplayType.all);
+                }
+
             } else if (Constants.SC_PLAYED.equals(identification)) {
                 StringTokenizer scPlayed = new StringTokenizer(tokenizer[1], ";");
                 while (scPlayed.hasMoreTokens()) {

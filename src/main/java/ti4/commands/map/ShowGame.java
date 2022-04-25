@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.message.MessageHelper;
@@ -57,12 +58,19 @@ public class ShowGame implements Command {
             map = mapManager.getUserActiveMap(event.getUser().getId());
         }
 
-        boolean statsOnly = false;
-        OptionMapping statsOption = event.getOption(Constants.STATS_ONLY);
+        DisplayType displayType = null;
+        OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);
         if (statsOption != null) {
-            statsOnly = statsOption.getAsBoolean();
+            String temp = statsOption.getAsString();
+            if (temp.equals(DisplayType.all.getValue())){
+                displayType = DisplayType.all;
+            } else if (temp.equals(DisplayType.map.getValue())){
+                displayType = DisplayType.map;
+            } else if (temp.equals(DisplayType.stats.getValue())){
+                displayType = DisplayType.stats;
+            }
         }
-        File file = GenerateMap.getInstance().saveImage(map, statsOnly);
+        File file = GenerateMap.getInstance().saveImage(map, displayType);
         MessageHelper.replyToMessage(event, file);
     }
 
@@ -73,6 +81,6 @@ public class ShowGame implements Command {
         commands.addCommands(
                 Commands.slash(getActionID(), "Shows selected map")
                         .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name to be shown"))
-                        .addOptions(new OptionData(OptionType.BOOLEAN, Constants.STATS_ONLY, "Show only stats for map")));
+                        .addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setAutoComplete(true)));
     }
 }
