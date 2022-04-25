@@ -3,6 +3,7 @@ package ti4.map;
 
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 
 import javax.annotation.CheckForNull;
 import java.util.*;
@@ -12,6 +13,9 @@ public class Map {
     private String ownerID;
     private String ownerName = "";
     private String name;
+
+    @CheckForNull
+    private DisplayType displayTypeForced = null;
 
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
@@ -68,6 +72,14 @@ public class Map {
 
     public HashMap<Integer, Boolean> getScPlayed() {
         return scPlayed;
+    }
+
+    public DisplayType getDisplayTypeForced() {
+        return displayTypeForced;
+    }
+
+    public void setDisplayTypeForced(DisplayType displayTypeForced) {
+        this.displayTypeForced = displayTypeForced;
     }
 
     public void setSCPlayed(Integer scNumber, Boolean playedStatus) {

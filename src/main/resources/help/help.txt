@@ -20,6 +20,7 @@ Status locked means, only joined players and map creator can edit map. No more p
 /game set_order @playerName1 @playerName2 .....gameName
 Add all players in order for game
 /game sc_count <- sets game SC count, used if game requires more than 8 Strategy cards, default is 8
+/game setup display_type <- sets default display type for game. All (map + player stats), map or player stats
 
 For easy of setup suggest first command after map creation use
 /add_tile setup 0
@@ -37,7 +38,7 @@ You can use also tileID, so liek TI4 marks tiles 01 is Jord for example
 /list_games <- lists all available maps that are created
 /list_planets <- lists all available planets
 /delete_game <-deletes your game, only can delete the map you created
-/show_game gameName <- displays the game map
+/show_game gameName(optional) display_type(optional) <- displays the game map, display_type can be set to all, map, stats. Displays map + player stats, just map or just player stats
 If you have active game set, it shows your active game if no game name is defines
 /list_units <- lists all possible units
 /add_cc colorList tile or position <- add's cc to system: colorList can be pink,red,black as example/

@@ -13,6 +13,7 @@ import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
@@ -51,7 +52,7 @@ abstract public class AddRemoveUnits implements Command {
             unitParsingForTile(event, color, tile);
             MapSaveLoadManager.saveMap(activeMap);
 
-            File file = GenerateMap.getInstance().saveImage(activeMap);
+            File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.map);
             MessageHelper.replyToMessage(event, file);
         }
     }
