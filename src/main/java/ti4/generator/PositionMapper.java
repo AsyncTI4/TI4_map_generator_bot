@@ -2,6 +2,7 @@ package ti4.generator;
 
 import ti4.ResourceHelper;
 import ti4.helpers.LoggerHandler;
+import ti4.map.Map;
 
 import javax.annotation.CheckForNull;
 import java.awt.*;
@@ -16,17 +17,21 @@ import java.util.StringTokenizer;
 public class PositionMapper {
 
     private static final Properties positionTileMap6Player = new Properties();
+    private static final Properties positionTileMap8Player = new Properties();
     private static final Properties planetPositions = new Properties();
     private static final Properties spaceTokenPositions = new Properties();
     private static final Properties planetTokenPositions = new Properties();
     private static final Properties playerInfo = new Properties();
+    private static final Properties playerInfo8 = new Properties();
 
     public static void init() {
         readData("6player.properties", positionTileMap6Player, "Could not read position file");
+        readData("8player.properties", positionTileMap8Player, "Could not read position file");
         readData("planet.properties", planetPositions, "Could not read planet position file");
         readData("space_token.properties", spaceTokenPositions, "Could not read space token position file");
         readData("planet_token.properties", planetTokenPositions, "Could not read planet token position file");
         readData("6player_info.properties", playerInfo, "Could not read player info position file");
+        readData("8player_info.properties", playerInfo8, "Could not read player info position file");
     }
 
     public static String getTilePlanetPositions(String tileID) {
@@ -67,12 +72,18 @@ public class PositionMapper {
         }
     }
 
-    public static boolean isTilePositionValid(String position) {
+    public static boolean isTilePositionValid(String position, Map userActiveMap) {
+        if (userActiveMap != null && userActiveMap.getPlayerCountForMap() == 8){
+            return positionTileMap8Player.getProperty(position) != null;
+        }
         return positionTileMap6Player.getProperty(position) != null;
     }
 
     @CheckForNull
-    public static Point getTilePosition(String position) {
+    public static Point getTilePosition(String position, Map map) {
+        if (map != null && map.getPlayerCountForMap() == 8){
+            return getPosition(position, positionTileMap8Player);
+        }
         return getPosition(position, positionTileMap6Player);
     }
 
@@ -95,9 +106,14 @@ public class PositionMapper {
         return null;
     }
 
-    public static ArrayList<Point> getPlayerPosition(int playerPosition) {
+    public static ArrayList<Point> getPlayerPosition(int playerPosition, Map map) {
         ArrayList<Point> positions = new ArrayList<>();
-        String info = (String) playerInfo.get(Integer.toString(playerPosition));
+        String info;
+        if (map != null && map.getPlayerCountForMap() == 8){
+            info = (String) playerInfo8.get(Integer.toString(playerPosition));
+        } else {
+            info = (String) playerInfo.get(Integer.toString(playerPosition));
+        }
         if (info == null) {
             return positions;
         }

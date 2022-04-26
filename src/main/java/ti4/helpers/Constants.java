@@ -15,6 +15,7 @@ public class Constants {
     public static final String SET_STATUS = "set_status";
     public static final String REMOVE_PLAYER = "remove_player";
     public static final String PLAYER_NAME = "player_name";
+    public static final String PLAYER_COUNT_FOR_MAP = "player_count_for_map";
     public static final String JOIN = "join";
     public static final String ADD = "add";
     public static final String LEAVE = "leave";

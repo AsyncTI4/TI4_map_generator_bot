@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
@@ -37,6 +38,8 @@ public class Info extends GameSubcommandData{
 
         sb.append("Map owner: " + map.getOwnerName()).append(NEW_LINE);
         sb.append("Map status: " + map.getMapStatus()).append(NEW_LINE);
+        sb.append("Map player count: " + map.getPlayerCountForMap()).append(NEW_LINE);
+        sb.append("Map Display type count: " + (map.getDisplayTypeForced() != null ? map.getDisplayTypeForced().getValue() : DisplayType.all.getValue())).append(NEW_LINE);
         sb.append("Players: ").append(NEW_LINE);
         HashMap<String, Player> players = map.getPlayers();
         int index = 1;
