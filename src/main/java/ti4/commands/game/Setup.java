@@ -50,6 +50,5 @@ public class Setup extends GameSubcommandData {
         if (displayType != null) {
             activeMap.setDisplayTypeForced(displayType);
         }
-        MapSaveLoadManager.saveMap(activeMap);
     }
 }

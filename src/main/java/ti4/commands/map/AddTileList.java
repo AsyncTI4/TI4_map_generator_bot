@@ -47,7 +47,7 @@ public class AddTileList implements Command {
 
 
             String tileList = event.getOptions().get(0).getAsString().toLowerCase();
-            HashMap<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList);
+            HashMap<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, userActiveMap);
             if (mappedTilesToPosition.isEmpty()) {
                 MessageHelper.replyToMessage(event, "Could not map all tiles to map positions");
                 return;

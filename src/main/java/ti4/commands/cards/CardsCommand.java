@@ -118,6 +118,8 @@ public class CardsCommand implements Command {
         subcommands.add(new ShowAllAC());
         subcommands.add(new PickACFromDiscard());
         subcommands.add(new ShowDiscardActionCards());
+        subcommands.add(new ShuffleACBackIntoDeck());
+        subcommands.add(new RevealAndPutACIntoDiscard());
         subcommands.add(new SentAC());
         return subcommands;
     }

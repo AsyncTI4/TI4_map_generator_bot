@@ -182,6 +182,8 @@ public class Constants {
     public static final String DISCARD_AC = "ac_discard";
     public static final String PLAY_AC = "ac_play";
     public static final String PICK_AC_FROM_DISCARD = "ac_pick_from_discard";
+    public static final String SHUFFLE_AC_BACK_INTO_DECK = "ac_shuffle_back_into_deck";
+    public static final String REVEAL_AND_PUT_AC_INTO_DISCARD = "ac_reveal_and_put_into_discard";
     public static final String SEND_AC = "ac_send";
     public static final String SHOW_AC_DISCARD_LIST = "ac_show_discard_list";
 }
