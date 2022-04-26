@@ -10,6 +10,7 @@ import org.jetbrains.annotations.NotNull;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
@@ -63,6 +64,11 @@ public class GameCommand implements Command {
                 subcommand.execute(event);
             }
         }
+        String userID = event.getUser().getId();
+        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        MapSaveLoadManager.saveMap(activeMap);
+        File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.stats);
+        MessageHelper.replyToMessage(event, file);
     }
 
     protected String getActionDescription() {

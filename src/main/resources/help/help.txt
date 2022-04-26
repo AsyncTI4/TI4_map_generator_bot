@@ -107,6 +107,8 @@ Cards commands
 /cards ac_play acUniqueID <- displays ac to table that was played and discards
 /cards ac_shuffle_deck <- shuffles Action card deck
 /cards ac_pick_from_discard acUniqueIDFromDiscardPile <- Pick a Action card from discard pile and put in your hand
+/cards ac_shuffle_back_into_deck acUniqueIDFromDiscardPile <- Shuffle Action card from discard pile back into Action card Deck
+/cards ac_reveal_and_put_into_discard <- Reveal top Action card from deck and put into discard pile
 /cards ac_show_discard_list <- Show all discarded Action cards
 /cards ac_send acUniqueID player <- Sends selected AC from your hand to player hand
 

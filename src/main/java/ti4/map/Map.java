@@ -462,6 +462,21 @@ public class Map {
     }
 
     @CheckForNull
+    public String drawActionCardAndDiscard() {
+        if (!actionCards.isEmpty()) {
+            String id = actionCards.get(0);
+            actionCards.remove(id);
+            setDiscardActionCard(id);
+            return id;
+        } else {
+            actionCards.addAll(discardActionCards.keySet());
+            discardActionCards.clear();
+            Collections.shuffle(actionCards);
+            return drawActionCardAndDiscard();
+        }
+    }
+
+    @CheckForNull
     public LinkedHashMap<String, Integer> drawSecretObjective(String userID) {
         if (!secretObjectives.isEmpty()) {
             String id = secretObjectives.get(0);
@@ -527,6 +542,24 @@ public class Map {
                 player.setActionCard(acID);
                 return true;
             }
+        }
+        return false;
+    }
+
+    public boolean shuffleActionCardBackIntoDeck(Integer acIDNumber) {
+        String acID = "";
+        for (java.util.Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
+            if (ac.getValue().equals(acIDNumber)) {
+                acID = ac.getKey();
+                break;
+            }
+        }
+        if (!acID.isEmpty()) {
+            discardActionCards.remove(acID);
+            actionCards.add(acID);
+            Collections.shuffle(actionCards);
+            return true;
+
         }
         return false;
     }
