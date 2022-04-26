@@ -20,7 +20,8 @@ Status locked means, only joined players and map creator can edit map. No more p
 /game set_order @playerName1 @playerName2 .....gameName
 Add all players in order for game
 /game sc_count <- sets game SC count, used if game requires more than 8 Strategy cards, default is 8
-/game setup display_type <- sets default display type for game. All (map + player stats), map or player stats
+/game setup display_type(optional) player_count_for_map(optional) <- sets default display type for game. All (map + player stats), map or player stats
+player_count_for_map set player map count 6 (default) or 8 for bigger map
 
 For easy of setup suggest first command after map creation use
 /add_tile setup 0
