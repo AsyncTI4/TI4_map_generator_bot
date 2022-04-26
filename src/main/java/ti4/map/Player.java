@@ -1,5 +1,6 @@
 package ti4.map;
 
+import java.awt.*;
 import java.util.*;
 import java.util.Map;
 
@@ -183,7 +184,7 @@ public class Player {
     }
 
     public String getColor() {
-        return color;
+        return color != null ? color : "white";
     }
 
     public void setColor(String color) {
