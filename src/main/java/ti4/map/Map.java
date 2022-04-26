@@ -16,6 +16,7 @@ public class Map {
 
     @CheckForNull
     private DisplayType displayTypeForced = null;
+    private int playerCountForMap = 6;
 
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
@@ -80,6 +81,14 @@ public class Map {
 
     public void setDisplayTypeForced(DisplayType displayTypeForced) {
         this.displayTypeForced = displayTypeForced;
+    }
+
+    public int getPlayerCountForMap() {
+        return playerCountForMap;
+    }
+
+    public void setPlayerCountForMap(int playerCountForMap) {
+        this.playerCountForMap = playerCountForMap;
     }
 
     public void setSCPlayed(Integer scNumber, Boolean playedStatus) {

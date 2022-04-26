@@ -211,6 +211,9 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
         }
 
+        writer.write(Constants.PLAYER_COUNT_FOR_MAP + " " + map.getPlayerCountForMap());
+        writer.write(System.lineSeparator());
+
         StringBuilder sb1 = new StringBuilder();
         for (java.util.Map.Entry<String, List<String>> entry : map.getScoredPublicObjectives().entrySet()) {
             String userIds = String.join("-", entry.getValue());
@@ -600,13 +603,25 @@ public class MapSaveLoadManager {
                 }
             } else if (Constants.SPEAKER.equals(identification)) {
                 map.setSpeaker(tokenizer[1]);
+            } else if (Constants.PLAYER_COUNT_FOR_MAP.equals(identification)) {
+                String count = tokenizer[1];
+                try {
+                    int playerCount = Integer.parseInt(count);
+                    if (playerCount == 6 || playerCount == 8) {
+                        map.setPlayerCountForMap(playerCount);
+                    } else {
+                        map.setPlayerCountForMap(6);
+                    }
+                } catch (Exception e) {
+                    map.setPlayerCountForMap(6);
+                }
             } else if (Constants.DISPLAY_TYPE.equals(identification)) {
                 String displayType = tokenizer[1];
-                if (displayType.equals(DisplayType.stats.getValue())){
+                if (displayType.equals(DisplayType.stats.getValue())) {
                     map.setDisplayTypeForced(DisplayType.stats);
-                } else if (displayType.equals(DisplayType.map.getValue())){
+                } else if (displayType.equals(DisplayType.map.getValue())) {
                     map.setDisplayTypeForced(DisplayType.map);
-                } else if (displayType.equals(DisplayType.all.getValue())){
+                } else if (displayType.equals(DisplayType.all.getValue())) {
                     map.setDisplayTypeForced(DisplayType.all);
                 }
 

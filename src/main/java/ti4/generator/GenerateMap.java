@@ -39,31 +39,38 @@ public class GenerateMap {
     private static Point numberPositionPoint = new Point(45, 35);
     private static HashMap<Player, Integer> userVPs = new HashMap<>();
 
+    private final int width6 = 2000;
+    private final int heght6 = 2100;
+    private final int width8 = 2500;
+    private final int heght8 = 3050;
+
     private static GenerateMap instance;
 
     private GenerateMap() {
-        String tileFile = ResourceHelper.getInstance().getTileFile("6player_setup.png");
-        File setupFile = new File(tileFile);
-        BufferedImage setupImage = null;
         try {
-            setupImage = ImageIO.read(setupFile);
             String controlID = Mapper.getControlID("red");
             BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.45f);
             scoreTokenWidth = bufferedImage.getWidth();
         } catch (IOException e) {
             LoggerHandler.logError("Could read file data for setup file", e);
         }
-        if (setupImage == null) {
-            LoggerHandler.log("Could not init map generator");
-            //todo message to user
-        }
-        width = Math.max(setupImage.getWidth(), 2000 + (extraWidth * 2));
-        heightForGameInfo = setupImage.getHeight();
-        heightForGameInfoStorage = heightForGameInfo;
-        height = heightForGameInfo + setupImage.getHeight() / 2 + 800;
-        heightStats = setupImage.getHeight() / 2 + 800;
-        heightStorage = height;
+        init(null);
         resetImage();
+    }
+
+    private void init(Map map) {
+        int mapWidth = width6;
+        int mapHeight = heght6;
+        if (map != null && map.getPlayerCountForMap() == 8){
+            mapWidth = width8;
+            mapHeight = heght8;
+        }
+        width = mapWidth + (extraWidth * 2);
+        heightForGameInfo = mapHeight;
+        heightForGameInfoStorage = heightForGameInfo;
+        height = heightForGameInfo + mapHeight / 2 + 1000;
+        heightStats = mapHeight / 2 + 1000;
+        heightStorage = height;
     }
 
     private void resetImage() {
@@ -79,17 +86,19 @@ public class GenerateMap {
     }
 
     public File saveImage(Map map) {
-        if (map.getDisplayTypeForced() != null){
+        if (map.getDisplayTypeForced() != null) {
             return saveImage(map, map.getDisplayTypeForced());
         }
         return saveImage(map, DisplayType.all);
     }
+
     public File saveImage(Map map, @CheckForNull DisplayType displayType) {
-        if (map.getDisplayTypeForced() != null){
+        init(map);
+        if (map.getDisplayTypeForced() != null) {
             displayType = map.getDisplayTypeForced();
-        } else if (displayType == null){
+        } else if (displayType == null) {
             displayType = map.getDisplayTypeForced();
-            if (displayType == null){
+            if (displayType == null) {
                 displayType = DisplayType.all;
             }
         }
@@ -113,12 +122,12 @@ public class GenerateMap {
                         .findFirst()
                         .orElse(null);
                 if (setup != null) {
-                    addTile(tileMap.get(setup));
+                    addTile(tileMap.get(setup), map);
                     tileMap.remove(setup);
                 }
                 tileMap.keySet().stream()
                         .sorted()
-                        .forEach(key -> addTile(tileMap.get(key)));
+                        .forEach(key -> addTile(tileMap.get(key), map));
             }
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
@@ -226,7 +235,7 @@ public class GenerateMap {
                     String factionPath = getFactionPath(faction);
                     if (factionPath != null) {
                         BufferedImage bufferedImage;
-                        if ("keleres".equals(faction)){
+                        if ("keleres".equals(faction)) {
                             bufferedImage = resizeImage(ImageIO.read(new File(factionPath)), 0.7f);
                         } else {
                             bufferedImage = resizeImage(ImageIO.read(new File(factionPath)), percent);
@@ -324,7 +333,7 @@ public class GenerateMap {
         graphics.setColor(Color.WHITE);
         Player speaker = map.getPlayer(map.getSpeaker());
         for (java.util.Map.Entry<String, Player> playerEntry : map.getPlayers().entrySet()) {
-            ArrayList<Point> points = PositionMapper.getPlayerPosition(playerPosition);
+            ArrayList<Point> points = PositionMapper.getPlayerPosition(playerPosition, map);
             if (points.isEmpty()) {
                 continue;
             }
@@ -342,8 +351,8 @@ public class GenerateMap {
             int x = points.get(2).x;
             int y = points.get(2).y;
             drawCCOfPlayer(ccID, x, y, player.getTacticalCC());
-            drawCCOfPlayer(fleetCCID, x, y+65, player.getFleetCC());
-            drawCCOfPlayer(ccID, x, y+130, player.getStrategicCC());
+            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC());
+            drawCCOfPlayer(ccID, x, y + 130, player.getStrategicCC());
 
             if (player == speaker) {
                 String speakerID = Mapper.getTokenID(Constants.SPEAKER);
@@ -371,7 +380,7 @@ public class GenerateMap {
             BufferedImage ccImage = resizeImage(ImageIO.read(new File(ccPath)), 0.75f);
             int delta = 20;
             for (int i = 0; i < tacticalCC; i++) {
-                 graphics.drawImage(ccImage, x + (delta * i), y, null);
+                graphics.drawImage(ccImage, x + (delta * i), y, null);
             }
         } catch (Exception e) {
             LoggerHandler.log("Could not parse cc file for: " + ccID, e);
@@ -566,10 +575,13 @@ public class GenerateMap {
     }
 
 
-    private void addTile(Tile tile) {
+    private void addTile(Tile tile, Map map) {
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
-            Point positionPoint = PositionMapper.getTilePosition(tile.getPosition());
+            Point positionPoint = PositionMapper.getTilePosition(tile.getPosition(), map);
+            if (positionPoint == null){
+                System.out.println();
+            }
             int tileX = positionPoint.x + extraWidth;
             int tileY = positionPoint.y;
             graphics.drawImage(image, tileX, tileY, null);
