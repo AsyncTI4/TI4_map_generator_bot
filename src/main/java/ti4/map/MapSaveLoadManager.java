@@ -665,12 +665,14 @@ public class MapSaveLoadManager {
             StringTokenizer poInfo = new StringTokenizer(po.nextToken(), ",");
             String id = poInfo.nextToken();
 
-            StringTokenizer userIDs = new StringTokenizer(poInfo.nextToken(), "-");
-            List<String> userIDList = new ArrayList<>();
-            while (userIDs.hasMoreTokens()) {
-                userIDList.add(userIDs.nextToken());
+            if (poInfo.hasMoreTokens()) {
+                StringTokenizer userIDs = new StringTokenizer(poInfo.nextToken(), "-");
+                List<String> userIDList = new ArrayList<>();
+                while (userIDs.hasMoreTokens()) {
+                    userIDList.add(userIDs.nextToken());
+                }
+                scoredPOs.put(id, userIDList);
             }
-            scoredPOs.put(id, userIDList);
         }
         return scoredPOs;
     }
