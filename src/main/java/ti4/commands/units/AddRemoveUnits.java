@@ -52,7 +52,7 @@ abstract public class AddRemoveUnits implements Command {
             unitParsingForTile(event, color, tile);
             MapSaveLoadManager.saveMap(activeMap);
 
-            File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.map);
+            File file = GenerateMap.getInstance().saveImage(activeMap);
             MessageHelper.replyToMessage(event, file);
         }
     }
