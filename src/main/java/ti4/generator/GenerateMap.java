@@ -246,6 +246,9 @@ public class GenerateMap {
                 StringBuilder sb = new StringBuilder();
                 int sc = player.getSC();
                 String scText = sc == 0 ? " " : Integer.toString(sc);
+                if (player.getFaction().equals("naalu")){
+                    scText = "0/" +scText;
+                }
                 sb.append("SC: ").append(scText).append("   ");
 
                 graphics.setColor(getSCColor(sc, map));
@@ -271,7 +274,7 @@ public class GenerateMap {
                     sb.append(" PASSED");
 
                 }
-                graphics.drawString(sb.toString(), x + 200, y + deltaY);
+                graphics.drawString(sb.toString(), x + 230, y + deltaY);
                 graphics.setColor(color);
                 y += 90;
                 g2.setColor(color);
@@ -345,7 +348,17 @@ public class GenerateMap {
             vpCount = vpCount == null ? 0 : vpCount;
             graphics.drawString("VP - " + vpCount, points.get(1).x, points.get(1).y);
 
+            int sc = player.getSC();
+            String scText = sc == 0 ? " " : Integer.toString(sc);
+            if (player.getFaction().equals("naalu")){
+                scText = "0";
+            }
+            graphics.setColor(getSCColor(sc, map));
+            graphics.setFont(Storage.getFont64());
+            graphics.drawString(scText, points.get(4).x, points.get(4).y);
 
+            graphics.setColor(Color.WHITE);
+            graphics.setFont(Storage.getFont32());
             String ccID = Mapper.getCCID(player.getColor());
             String fleetCCID = Mapper.getFleeCCID(player.getColor());
             int x = points.get(2).x;

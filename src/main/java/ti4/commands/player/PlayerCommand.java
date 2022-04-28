@@ -84,7 +84,7 @@ public class PlayerCommand implements Command {
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
 
-        File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.stats);
+        File file = GenerateMap.getInstance().saveImage(activeMap);
         MessageHelper.replyToMessage(event, file);
     }
 
