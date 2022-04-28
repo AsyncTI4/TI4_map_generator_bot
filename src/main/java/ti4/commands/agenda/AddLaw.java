@@ -13,7 +13,7 @@ public class AddLaw extends AgendaSubcommandData {
     public AddLaw() {
         super(Constants.ADD_LAW, "Add Agenda as Law");
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected player or PO or anything").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected player or PO or anything").setRequired(false));
     }
 
     @Override
