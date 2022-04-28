@@ -381,6 +381,12 @@ public class GenerateMap {
                     graphics.setColor(Color.WHITE);
                 }
             }
+            if (player.isPassed()){
+                graphics.setColor(new Color(238, 58, 80));
+                graphics.drawString("PASSED", points.get(5).x, points.get(5).y);
+                graphics.setColor(Color.WHITE);
+            }
+
             playerPosition++;
         }
 
