@@ -50,6 +50,7 @@ public class Constants {
     public static final String REMOVE_ALL_CC = "remove_all_cc";
     public static final String REMOVE_TILE = "remove_tile";
     public static final String ADD_TILE_LIST = "add_tile_list";
+    public static final String ADD_FRONTIER_TOKENS = "add_frontier_tokens";
     public static final String ADD_UNITS = "add_units";
     public static final String ADD_UNIT_DAMAGE = "add_damage_unit";
     public static final String MOVE_UNITS = "move_units";
@@ -77,6 +78,7 @@ public class Constants {
     public static final String MIRAGE = "mirage";
     public static final String SLEEPER = "sleeper";
     public static final String PLANET = "planet";
+    public static final String FRONTIER = "frontier";
 
     public static final String GAME = "game";
     public static final String INFO = "info";

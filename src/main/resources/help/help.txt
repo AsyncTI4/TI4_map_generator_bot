@@ -54,6 +54,7 @@ and most interesting is
 /add_damage_unit color tile unitList
 /remove_damage_unit color tile unitList
 /remove_damage_all_unit color tile
+/add_frontier_tokens CONFIRM(YES) <- adds frontier tokens to all tiles that can have one
 
 commands improvements:
 /remove_units and /move_units
