@@ -166,6 +166,7 @@ public class Constants {
     public static final String COUNT = "count";
     public static final String SECRET_OBJECTIVE_ID = "secret_objective_id";
     public static final String DRAW_SO = "so_draw";
+    public static final String DEAL_SO = "so_deal";
     public static final String SHOW_SO = "so_show";
     public static final String SHOW_ALL_SO = "so_show_all";
     public static final String SHOW_SO_TO_ALL = "so_show_to_all";
