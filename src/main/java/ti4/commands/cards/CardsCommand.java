@@ -112,6 +112,7 @@ public class CardsCommand implements Command {
         subcommands.add(new ShowAllSO());
         subcommands.add(new DrawAC());
         subcommands.add(new DiscardAC());
+        subcommands.add(new DiscardACRandom());
         subcommands.add(new ShowAC());
         subcommands.add(new ShowACToAll());
         subcommands.add(new PlayAC());
@@ -122,6 +123,7 @@ public class CardsCommand implements Command {
         subcommands.add(new ShuffleACBackIntoDeck());
         subcommands.add(new RevealAndPutACIntoDiscard());
         subcommands.add(new SentAC());
+        subcommands.add(new SentACRandom());
         return subcommands;
     }
 
