@@ -99,6 +99,7 @@ Cards commands
 /cards so_show soUniqueID player <- sends given Secret Objective to player and changes soUniqueID
 /cards so_show_all player <- sends all Secret Objectives to player
 /cards so_show_to_all soUniqueID <- displays SO to table and changes soUniqueID
+/cards so_deal @player count(optional) <- draws a Secret objective for specified player, can specify count
 
 /cards ac_draw count(optional) <- draws a secret or specified number of secrets
 /cards ac_discard acUniqueID <- discards given ID action card and shuffles the ac deck. acUniqueID is generated just for player and are unique each time
@@ -112,6 +113,8 @@ Cards commands
 /cards ac_reveal_and_put_into_discard <- Reveal top Action card from deck and put into discard pile
 /cards ac_show_discard_list <- Show all discarded Action cards
 /cards ac_send acUniqueID player <- Sends selected AC from your hand to player hand
+/cards ac_send_random player <- Sends random AC from your hand to player hand
+/cards ac_discard_random <- Discards random AC from hand
 
 /status cleanup confirmYES <- cleans up all CC's, all unit damage, resets passed status and SC played and SC player selection :)
 
