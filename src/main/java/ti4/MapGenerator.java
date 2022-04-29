@@ -81,6 +81,7 @@ public class MapGenerator {
         commandManager.addCommand(new AddCC());
         commandManager.addCommand(new RemoveCC());
         commandManager.addCommand(new RemoveAllCC());
+        commandManager.addCommand(new AddFrontierTokens());
         commandManager.addCommand(new AddControl());
         commandManager.addCommand(new RemoveControl());
         commandManager.addCommand(new MoveUnits());

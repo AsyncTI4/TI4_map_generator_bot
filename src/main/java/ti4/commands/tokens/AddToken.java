@@ -27,29 +27,32 @@ public class AddToken extends AddRemoveToken {
         if (option != null) {
             String tokenName = option.getAsString().toLowerCase();
             tokenName = AliasHandler.resolveAttachment(tokenName);
-
-            String tokenFileName = Mapper.getAttachmentID(tokenName);
-            String tokenPath = tile.getAttachmentPath(tokenFileName);
-            if (tokenPath != null) {
-                addToken(event, tile, tokenFileName, true);
-            } else {
-                tokenName = AliasHandler.resolveToken(tokenName);
-                tokenFileName = Mapper.getTokenID(tokenName);
-                tokenPath = tile.getTokenPath(tokenFileName);
-
-                if (tokenPath == null) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Token: " + tokenName + " is not valid");
-                    return;
-                }
-                addToken(event, tile, tokenFileName, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName));
-            }
+            addToken(event, tile, tokenName);
         }
         else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Token not specified.");
         }
     }
 
-    private void addToken(SlashCommandInteractionEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet) {
+    public static void addToken(SlashCommandInteractionEvent event, Tile tile, String tokenName) {
+        String tokenFileName = Mapper.getAttachmentID(tokenName);
+        String tokenPath = tile.getAttachmentPath(tokenFileName);
+        if (tokenPath != null) {
+            addToken(event, tile, tokenFileName, true);
+        } else {
+            tokenName = AliasHandler.resolveToken(tokenName);
+            tokenFileName = Mapper.getTokenID(tokenName);
+            tokenPath = tile.getTokenPath(tokenFileName);
+
+            if (tokenPath == null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Token: " + tokenName + " is not valid");
+                return;
+            }
+            addToken(event, tile, tokenFileName, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName));
+        }
+    }
+
+    private static void addToken(SlashCommandInteractionEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet) {
         String unitHolder = Constants.SPACE;
         if (needSpecifyPlanet) {
             OptionMapping option = event.getOption(Constants.PLANET_NAME);
