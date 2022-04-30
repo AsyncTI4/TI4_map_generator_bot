@@ -97,6 +97,7 @@ public class PlayerCommand implements Command {
         Collection<PlayerSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new Stats());
         subcommands.add(new Tech());
+        subcommands.add(new Planets());
         subcommands.add(new Setup());
         return subcommands;
     }

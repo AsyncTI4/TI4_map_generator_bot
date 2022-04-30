@@ -116,12 +116,12 @@ Cards commands
 /cards ac_send_random player <- Sends random AC from your hand to player hand
 /cards ac_discard_random <- Discards random AC from hand
 
-/promissory_notes pn_show pnID player <- shows given PN to player and changes pnID
-/promissory_notes pn_show_all player <- shows all PNs to player and changes pnIDs
-/promissory_notes pn_show_to_all  pnID <- shows PNs to all
-/promissory_notes pn_play  pnID <- plays PN, it showed to all and sent back to owner
-/promissory_notes pn_play_into_play_area  pnID <- plays PN and puts it into player area
-/promissory_notes pn_send  pnID player <- send PN to selected player. If Alliance or SftT automatically is played into target players play area
+/pn show pnID player <- shows given PN to player and changes pnID
+/pn show_all player <- shows all PNs to player and changes pnIDs
+/pn show_to_all  pnID <- shows PNs to all
+/pn play  pnID <- plays PN, it showed to all and sent back to owner
+/pn play_into_play_area  pnID <- plays PN and puts it into player area
+/pn send  pnID player <- send PN to selected player. If Alliance or SftT automatically is played into target players play area
 
 /agenda draw countOptional <- draw top agendas from deck. Agendas "remain" in deck till you place them. Meaning if you forget to use commands put_top or put_bottom and try reveal agenda, the sent to you will be in deck still :)
 /agenda put_top agendaID <- put given agenda at top. Example you draw A and B agenda. And put A at top, then B at top. You end up with order B, A, to reveal. It's like physically you would do top and next top covers previous one
