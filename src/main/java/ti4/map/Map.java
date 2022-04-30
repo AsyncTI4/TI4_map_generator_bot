@@ -635,15 +635,6 @@ public class Map {
     }
 
     @CheckForNull
-    public LinkedHashMap<String, Integer> getActionCards(String userID) {
-        Player player = getPlayer(userID);
-        if (player != null) {
-            return player.getActionCards();
-        }
-        return null;
-    }
-
-    @CheckForNull
     public LinkedHashMap<String, Integer> getScoredSecretObjective(String userID) {
         Player player = getPlayer(userID);
         if (player != null) {

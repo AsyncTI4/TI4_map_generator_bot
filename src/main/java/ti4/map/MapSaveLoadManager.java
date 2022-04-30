@@ -248,6 +248,9 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writeCards(player.getActionCards(), writer, Constants.AC);
+            writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
+            writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
+            writer.write(System.lineSeparator());
 
             writer.write(Constants.TACTICAL + " " + player.getTacticalCC());
             writer.write(System.lineSeparator());
@@ -262,9 +265,6 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal());
             writer.write(System.lineSeparator());
-            writer.write(Constants.PN + " " + player.getPn());
-            writer.write(System.lineSeparator());
-
 
             writer.write(Constants.SO + " " + getSecretList(player.getSecrets()));
             writer.write(System.lineSeparator());
@@ -699,7 +699,16 @@ public class MapSaveLoadManager {
                         player.setActionCard(id, index);
                     }
                 }
-                case Constants.PN -> player.setPn(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.PROMISSORY_NOTES -> {
+                    StringTokenizer pnToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (pnToken.hasMoreTokens()) {
+                        StringTokenizer pnInfo = new StringTokenizer(pnToken.nextToken(), ",");
+                        String id = pnInfo.nextToken();
+                        Integer index = Integer.parseInt(pnInfo.nextToken());
+                        player.setPromissoryNote(id, index);
+                    }
+                }
+                case Constants.PROMISSORY_NOTES_PLAY_AREA -> player.setPromissoryNotesInPlayArea(getCardList(tokenizer.nextToken()));
                 case Constants.SO_SCORED -> {
                     StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (secrets.hasMoreTokens()) {

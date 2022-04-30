@@ -9,6 +9,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public class CardsInfo extends CardsSubcommandData {
     public CardsInfo() {
@@ -50,11 +51,33 @@ public class CardsInfo extends CardsSubcommandData {
         }
         sb.append("\n").append("**Action Cards:**").append("\n");
         index = 1;
-        LinkedHashMap<String, Integer> actionCards = activeMap.getActionCards(player.getUserID());
+        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null) {
             for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 sb.append(index).append(". (").append(ac.getValue()).append(") - ").append(Mapper.getActionCard(ac.getKey())).append("\n");
                 index++;
+            }
+        }
+        sb.append("\n").append("**Promissory Notes:**").append("\n");
+        index = 1;
+        LinkedHashMap<String, Integer> promissoryNotes = player.getPromissoryNotes();
+        List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
+        if (promissoryNotes != null) {
+            for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
+                if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
+                    sb.append(index).append(". (").append(pn.getValue()).append(") - ").append(Mapper.getPromissoryNote(pn.getKey()));
+                    sb.append("\n");
+                    index++;
+                }
+            }
+            sb.append("\n");
+            sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
+            for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
+                if (promissoryNotesInPlayArea.contains(pn.getKey())) {
+                    sb.append(index).append(". (").append(pn.getValue()).append(") - ").append(Mapper.getPromissoryNote(pn.getKey()));
+                    sb.append("\n");
+                    index++;
+                }
             }
         }
         sb.append("--------------------\n");

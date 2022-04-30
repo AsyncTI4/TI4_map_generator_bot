@@ -27,6 +27,7 @@ public class Mapper {
     private static final Properties actionCards = new Properties();
     private static final Properties agendas = new Properties();
     private static final Properties publicObjectives = new Properties();
+    private static final Properties promissoryNotes = new Properties();
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
@@ -42,6 +43,7 @@ public class Mapper {
         readData("action_cards.properties", actionCards, "Could not read action cards file");
         readData("Agendas.properties", agendas, "Could not read action cards file");
         readData("public_objective.properties", publicObjectives, "Could not read public objective file");
+        readData("Promissory_Notes.properties", promissoryNotes, "Could not read promissory notes file");
     }
 
     private static void readData(String propertyFileName, Properties colors, String s) {
@@ -53,6 +55,21 @@ public class Mapper {
                 LoggerHandler.log(s, e);
             }
         }
+    }
+
+    public static List<String>  getPromissoryNotes(String color, String faction){
+        List<String> pnList = new ArrayList<>();
+        if (Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
+            for (Map.Entry<Object, Object> entry : promissoryNotes.entrySet()) {
+                String value = (String) entry.getValue();
+                String[] pns = value.split(";");
+                String id = pns[1].toLowerCase();
+                if (id.equals(color) || id.equals(faction)) {
+                    pnList.add((String)entry.getKey());
+                }
+            }
+        }
+        return pnList;
     }
 
     public static boolean isColorValid(String color){
@@ -136,6 +153,16 @@ public class Mapper {
 
     public static String getActionCard(String id) {
         return (String)actionCards.get(id);
+    }
+
+    public static String getPromissoryNote(String id) {
+        return (String)promissoryNotes.get(id);
+    }
+
+    public static String getPromissoryNoteOwner(String id) {
+        String pnInfo = (String) promissoryNotes.get(id);
+        String[] pns = pnInfo.split(";");
+        return pns[1].toLowerCase();
     }
 
     public static String getPublicObjective(String id) {

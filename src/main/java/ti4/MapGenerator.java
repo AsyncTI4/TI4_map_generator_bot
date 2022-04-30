@@ -12,6 +12,7 @@ import ti4.commands.HelpAction;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.cards.CardsCommand;
+import ti4.commands.cardspn.PNCardsCommand;
 import ti4.commands.game.GameCommand;
 import ti4.commands.info.*;
 import ti4.commands.map.*;
@@ -98,6 +99,7 @@ public class MapGenerator {
         commandManager.addCommand(new PlayerCommand());
         commandManager.addCommand(new GameCommand());
         commandManager.addCommand(new CardsCommand());
+        commandManager.addCommand(new PNCardsCommand());
         commandManager.addCommand(new StatusCommand());
         commandManager.addCommand(new AgendaCommand());
 

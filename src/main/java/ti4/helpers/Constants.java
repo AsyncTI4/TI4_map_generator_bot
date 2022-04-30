@@ -109,7 +109,6 @@ public class Constants {
     public static final String FACTION = "faction";
     public static final String AC = "action_cards";
     public static final String AC_DISCARDED = "action_cards_discarded";
-    public static final String PN = "promissary_notes";
     public static final String SO = "secret_objectives";
     public static final String SO_SCORED = "secret_objectives_scored";
     public static final String CRF = "cultural_relic_fragment";
@@ -171,6 +170,7 @@ public class Constants {
     public static final String SHOW_ALL_SO = "so_show_all";
     public static final String SHOW_SO_TO_ALL = "so_show_to_all";
     public static final String CARDS = "cards";
+    public static final String PN = "promissory_notes";
     public static final String DISCARD_SO = "so_discard";
     public static final String SCORE_SO = "so_score";
     public static final String UNSCORE_SO = "so_unscore";
@@ -191,4 +191,14 @@ public class Constants {
     public static final String SEND_AC = "ac_send";
     public static final String SEND_AC_RANDOM = "ac_send_random";
     public static final String SHOW_AC_DISCARD_LIST = "ac_show_discard_list";
+
+    public static final String PROMISSORY_NOTE_ID = "promissory_note_id";
+    public static final String PROMISSORY_NOTES = "promissory_notes";
+    public static final String PROMISSORY_NOTES_PLAY_AREA = "promissory_notes_play_area";
+    public static final String SHOW_PN = "pn_show";
+    public static final String SHOW_ALL_PN = "pn_show_all";
+    public static final String SHOW_PN_TO_ALL = "pn_show_to_all";
+    public static final String PLAY_PN = "pn_play";
+    public static final String PLAY_PN_INTO_PLAY_AREA = "pn_play_into_play_area";
+    public static final String SEND_PN = "pn_send";
 }
