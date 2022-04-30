@@ -100,6 +100,7 @@ public class Constants {
     public static final String STATS = "stats";
     public static final String SETUP = "setup";
     public static final String TECH = "tech";
+    public static final String PLANETS = "planets";
     public static final String TACTICAL = "tactical_cc";
     public static final String FLEET = "fleet_cc";
     public static final String STRATEGY = "strategy_cc";
@@ -170,7 +171,7 @@ public class Constants {
     public static final String SHOW_ALL_SO = "so_show_all";
     public static final String SHOW_SO_TO_ALL = "so_show_to_all";
     public static final String CARDS = "cards";
-    public static final String PN = "promissory_notes";
+    public static final String PN = "pn";
     public static final String DISCARD_SO = "so_discard";
     public static final String SCORE_SO = "so_score";
     public static final String UNSCORE_SO = "so_unscore";
@@ -195,10 +196,10 @@ public class Constants {
     public static final String PROMISSORY_NOTE_ID = "promissory_note_id";
     public static final String PROMISSORY_NOTES = "promissory_notes";
     public static final String PROMISSORY_NOTES_PLAY_AREA = "promissory_notes_play_area";
-    public static final String SHOW_PN = "pn_show";
-    public static final String SHOW_ALL_PN = "pn_show_all";
-    public static final String SHOW_PN_TO_ALL = "pn_show_to_all";
-    public static final String PLAY_PN = "pn_play";
-    public static final String PLAY_PN_INTO_PLAY_AREA = "pn_play_into_play_area";
-    public static final String SEND_PN = "pn_send";
+    public static final String SHOW_PN = "show";
+    public static final String SHOW_ALL_PN = "show_all";
+    public static final String SHOW_PN_TO_ALL = "show_to_all";
+    public static final String PLAY_PN = "play";
+    public static final String PLAY_PN_INTO_PLAY_AREA = "play_into_play_area";
+    public static final String SEND_PN = "send";
 }
