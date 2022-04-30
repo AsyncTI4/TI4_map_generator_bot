@@ -23,7 +23,6 @@ public class Stats extends PlayerSubcommandData {
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodity count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.PN, "Promissory Note count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.CRF, "Cultural Relic Fragment count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.HRF, "Hazardous Relic Fragment count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.IRF, "Industrial Relic Fragment count"))
@@ -101,10 +100,6 @@ public class Stats extends PlayerSubcommandData {
         OptionMapping optionCT = event.getOption(Constants.COMMODITIES_TOTAL);
         if (optionCT != null) {
             player.setCommoditiesTotal(optionCT.getAsInt());
-        }
-        OptionMapping optionPN = event.getOption(Constants.PN);
-        if (optionPN != null) {
-            player.setPn(optionPN.getAsInt());
         }
         OptionMapping optionCRF = event.getOption(Constants.CRF);
         if (optionCRF != null) {

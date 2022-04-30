@@ -1,7 +1,9 @@
 package ti4.map;
 
-import java.awt.*;
+import ti4.generator.Mapper;
+
 import java.util.*;
+import java.util.List;
 import java.util.Map;
 
 public class Player {
@@ -22,10 +24,11 @@ public class Player {
     private int commodities = 0;
     private int commoditiesTotal = 0;
 
-    private int pn = 0;
     private LinkedHashMap<String, Integer> actionCards = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
+    private LinkedHashMap<String, Integer> promissoryNotes = new LinkedHashMap<>();
+    private List<String> promissoryNotesInPlayArea = new ArrayList<>();
 
 
     private int crf = 0;
@@ -53,6 +56,14 @@ public class Player {
         return actionCards;
     }
 
+    public LinkedHashMap<String, Integer> getPromissoryNotes() {
+        return promissoryNotes;
+    }
+
+    public List<String> getPromissoryNotesInPlayArea() {
+        return promissoryNotesInPlayArea;
+    }
+
     public void setActionCard(String id) {
         Collection<Integer> values = actionCards.values();
         int identifier = new Random().nextInt(1000);
@@ -62,8 +73,35 @@ public class Player {
         actionCards.put(id, identifier);
     }
 
+    public void setPromissoryNote(String id) {
+        Collection<Integer> values = promissoryNotes.values();
+        int identifier = new Random().nextInt(100);
+        while (values.contains(identifier)) {
+            identifier = new Random().nextInt(100);
+        }
+        promissoryNotes.put(id, identifier);
+    }
+
+    public void setPromissoryNotesInPlayArea(String id){
+        if (!promissoryNotesInPlayArea.contains(id)) {
+            promissoryNotesInPlayArea.add(id);
+        }
+    }
+
+    public void setPromissoryNotesInPlayArea(List<String> promissoryNotesInPlayArea) {
+        this.promissoryNotesInPlayArea = promissoryNotesInPlayArea;
+    }
+
+    public void removePromissoryNotesInPlayArea(String id){
+        promissoryNotesInPlayArea.remove(id);
+    }
+
     public void setActionCard(String id, Integer identifier) {
         actionCards.put(id, identifier);
+    }
+
+    public void setPromissoryNote(String id, Integer identifier) {
+        promissoryNotes.put(id, identifier);
     }
 
     public void removeActionCard(Integer identifier) {
@@ -75,6 +113,22 @@ public class Player {
             }
         }
         actionCards.remove(idToRemove);
+    }
+
+    public void removePromissoryNote(Integer identifier) {
+        String idToRemove = "";
+        for (Map.Entry<String, Integer> so : promissoryNotes.entrySet()) {
+            if (so.getValue().equals(identifier)){
+                idToRemove = so.getKey();
+                break;
+            }
+        }
+        promissoryNotes.remove(idToRemove);
+    }
+
+    public void removePromissoryNote(String id) {
+       promissoryNotes.remove(id);
+       removePromissoryNotesInPlayArea(id);
     }
 
     public LinkedHashMap<String, Integer> getSecrets() {
@@ -181,6 +235,7 @@ public class Player {
 
     public void setFaction(String faction) {
         this.faction = faction;
+        initPNs();
     }
 
     public String getColor() {
@@ -189,6 +244,16 @@ public class Player {
 
     public void setColor(String color) {
         this.color = color;
+        initPNs();
+    }
+
+    private void initPNs() {
+        if (color != null && faction != null) {
+            List<String> promissoryNotes = Mapper.getPromissoryNotes(color, faction);
+            for (String promissoryNote : promissoryNotes) {
+                setPromissoryNote(promissoryNote);
+            }
+        }
     }
 
     public int getTacticalCC() {
@@ -227,12 +292,8 @@ public class Player {
         return actionCards.size();
     }
 
-    public int getPn() {
-        return pn;
-    }
-
-    public void setPn(int pn) {
-        this.pn = pn;
+    public int getPnCount() {
+        return (promissoryNotes.size() - promissoryNotesInPlayArea.size());
     }
 
     public int getSo() {

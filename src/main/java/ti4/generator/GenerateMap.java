@@ -61,7 +61,7 @@ public class GenerateMap {
     private void init(Map map) {
         int mapWidth = width6;
         int mapHeight = heght6;
-        if (map != null && map.getPlayerCountForMap() == 8){
+        if (map != null && map.getPlayerCountForMap() == 8) {
             mapWidth = width8;
             mapHeight = heght8;
         }
@@ -211,7 +211,7 @@ public class GenerateMap {
         int x = 10;
         HashMap<String, Player> players = map.getPlayers();
         float percent = 0.15f;
-        int deltaY = 50;
+        int deltaY = 35;
 
         y = objectives(map, y);
         if (displayType != DisplayType.stats) {
@@ -246,8 +246,8 @@ public class GenerateMap {
                 StringBuilder sb = new StringBuilder();
                 int sc = player.getSC();
                 String scText = sc == 0 ? " " : Integer.toString(sc);
-                if (player.getFaction().equals("naalu")){
-                    scText = "0/" +scText;
+                if (player.getFaction().equals("naalu")) {
+                    scText = "0/" + scText;
                 }
                 sb.append("SC: ").append(scText).append("   ");
 
@@ -264,7 +264,7 @@ public class GenerateMap {
                 sb.append("TG: ").append(player.getTg());
                 sb.append(" C:").append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
                 sb.append(" ").append("AC: ").append(player.getAc()).append(" ");
-                sb.append("PN: ").append(player.getPn()).append(" ");
+                sb.append("PN: ").append(player.getPnCount()).append(" ");
                 sb.append("SO: ").append(player.getSo()).append(" scored: ").append(player.getSoScored()).append(" ");
                 sb.append("CRF: ").append(player.getCrf()).append(" ");
                 sb.append("HRF: ").append(player.getHrf()).append(" ");
@@ -275,6 +275,31 @@ public class GenerateMap {
 
                 }
                 graphics.drawString(sb.toString(), x + 230, y + deltaY);
+
+                int pnX = 0;
+                int pnY = 40;
+                List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
+                for (String id : promissoryNotesInPlayArea) {
+                    if (id.endsWith("_sftt")) {
+                        continue;
+                    }
+                    String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);
+                    for (Player player_ : players.values()) {
+                        if (player_ != player) {
+                            String playerColor = player_.getColor();
+                            String playerFaction = player_.getFaction();
+                            if (playerColor != null && playerColor.equals(promissoryNoteOwner) ||
+                                    playerFaction != null && playerFaction.equals(promissoryNoteOwner)) {
+                                graphics.setColor(getColor(player_.getColor()));
+                                String promissoryNote = Mapper.getPromissoryNote(id);
+                                String[] pnSplit = promissoryNote.split(";");
+                                graphics.drawString(pnSplit[0] +"(" + playerFaction + ")" , x + 230 + pnX, y + deltaY + pnY);
+                                pnX = pnX + pnSplit[0].length() * 18;
+                            }
+                        }
+                    }
+                }
+
                 graphics.setColor(color);
                 y += 90;
                 g2.setColor(color);
@@ -283,7 +308,6 @@ public class GenerateMap {
 
             }
             y = strategyCards(map, y);
-
 
             y += 40;
             graphics.setColor(Color.WHITE);
@@ -350,7 +374,7 @@ public class GenerateMap {
 
             int sc = player.getSC();
             String scText = sc == 0 ? " " : Integer.toString(sc);
-            if (player.getFaction().equals("naalu")){
+            if (player.getFaction().equals("naalu")) {
                 scText = "0";
             }
             graphics.setColor(getSCColor(sc, map));
@@ -381,7 +405,7 @@ public class GenerateMap {
                     graphics.setColor(Color.WHITE);
                 }
             }
-            if (player.isPassed()){
+            if (player.isPassed()) {
                 graphics.setColor(new Color(238, 58, 80));
                 graphics.drawString("PASSED", points.get(5).x, points.get(5).y);
                 graphics.setColor(Color.WHITE);
@@ -451,10 +475,54 @@ public class GenerateMap {
         graphics.setColor(Color.RED);
         y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret, 1, column, customPublicVP);
 
+        graphics.setColor(Color.green);
+        y = displaySftT(y, x, players, column);
+
         if (column[0] != 0) {
             y += 40;
         }
 
+        return y;
+    }
+
+    private int displaySftT(int y, int x, LinkedHashMap<String, Player> players, Integer[] column) {
+        for (Player player : players.values()) {
+            List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
+            for (String id : promissoryNotesInPlayArea) {
+                if (id.endsWith("_sftt")) {
+                    Set<String> keysToRemove = new HashSet<>();
+
+                    switch (column[0]) {
+                        case 0 -> x = 5;
+                        case 1 -> x = 801;
+                        case 2 -> x = 1598;
+                    }
+                    String[] pnSplit = Mapper.getPromissoryNote(id).split(";");
+                    String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);
+                    StringBuilder name = new StringBuilder(pnSplit[0] + " - ");
+                    for (Player player_ : players.values()) {
+                        if (player_ != player) {
+                            String playerColor = player_.getColor();
+                            String playerFaction = player_.getFaction();
+                            if (playerColor != null && playerColor.equals(promissoryNoteOwner) ||
+                                    playerFaction != null && playerFaction.equals(promissoryNoteOwner)) {
+                                name.append(playerFaction).append(" (").append(playerColor).append(")");
+                            }
+                        }
+                    }
+
+                    graphics.drawString(name + " - " + 1 + " VP", x, y + 23);
+                    boolean multiScoring = false;
+                    drawScoreControlMarkers(x + 515, y, players, Collections.singletonList(player.getUserID()), multiScoring, 1);
+                    graphics.drawRect(x - 4, y - 5, 785, 38);
+                    column[0]++;
+                    if (column[0] > 2) {
+                        column[0] = 0;
+                        y += 43;
+                    }
+                }
+            }
+        }
         return y;
     }
 
@@ -598,7 +666,7 @@ public class GenerateMap {
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
             Point positionPoint = PositionMapper.getTilePosition(tile.getPosition(), map);
-            if (positionPoint == null){
+            if (positionPoint == null) {
                 System.out.println();
             }
             int tileX = positionPoint.x + extraWidth;

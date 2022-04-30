@@ -1,4 +1,4 @@
-package ti4.commands.cards;
+package ti4.commands.cardspn;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands.cardspn.*;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -18,13 +17,13 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class CardsCommand implements Command {
+public class PNCardsCommand implements Command {
 
-    private final Collection<CardsSubcommandData> subcommandData = getSubcommands();
+    private final Collection<PNCardsSubcommandData> subcommandData = getSubcommands();
 
     @Override
     public String getActionID() {
-        return Constants.CARDS;
+        return Constants.PN;
     }
 
     @Override
@@ -45,7 +44,7 @@ public class CardsCommand implements Command {
                 MessageHelper.replyToMessage(event, "Your not a player of the game, please call function /join gameName");
                 return false;
             }
-            if (!event.getChannel().getName().startsWith(userActiveMap.getName()+"-")){
+            if (!event.getChannel().getName().startsWith(userActiveMap.getName() + "-")) {
                 MessageHelper.replyToMessage(event, "Commands can be executed only in game specific channels");
                 return false;
             }
@@ -64,7 +63,7 @@ public class CardsCommand implements Command {
             activeMap = "Active map: " + userActiveMap.getName();
         }
         String commandExecuted = "User: " + userName + " executed command. " + activeMap + "\n" +
-                event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
+                event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
                 .map(option -> option.getName() + ":" + getOptionValue(option))
                 .collect(Collectors.joining(" "));
 
@@ -72,7 +71,7 @@ public class CardsCommand implements Command {
     }
 
     private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)){
+        if (option.getName().equals(Constants.PLAYER)) {
             return option.getAsUser().getName();
         }
         return option.getAsString();
@@ -80,9 +79,9 @@ public class CardsCommand implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        CardsSubcommandData subCommandExecuted = null;
+        PNCardsSubcommandData subCommandExecuted = null;
         String subcommandName = event.getInteraction().getSubcommandName();
-        for (CardsSubcommandData subcommand : subcommandData) {
+        for (PNCardsSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
@@ -92,39 +91,22 @@ public class CardsCommand implements Command {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
-        MessageHelper.replyToMessage(event, "Card action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
+        MessageHelper.replyToMessage(event, "Promissory Notes action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
     }
 
 
     protected String getActionDescription() {
-        return "Cards";
+        return "Promissory Notes";
     }
 
-    private Collection<CardsSubcommandData> getSubcommands() {
-        Collection<CardsSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new DrawSO());
-        subcommands.add(new DiscardSO());
-        subcommands.add(new CardsInfo());
-        subcommands.add(new ShowSO());
-        subcommands.add(new ShowSOToAll());
-        subcommands.add(new ScoreSO());
-        subcommands.add(new DealSO());
-        subcommands.add(new UnscoreSO());
-        subcommands.add(new ShowAllSO());
-        subcommands.add(new DrawAC());
-        subcommands.add(new DiscardAC());
-        subcommands.add(new DiscardACRandom());
-        subcommands.add(new ShowAC());
-        subcommands.add(new ShowACToAll());
-        subcommands.add(new PlayAC());
-        subcommands.add(new ShuffleACDeck());
-        subcommands.add(new ShowAllAC());
-        subcommands.add(new PickACFromDiscard());
-        subcommands.add(new ShowDiscardActionCards());
-        subcommands.add(new ShuffleACBackIntoDeck());
-        subcommands.add(new RevealAndPutACIntoDiscard());
-        subcommands.add(new SentAC());
-        subcommands.add(new SentACRandom());
+    private Collection<PNCardsSubcommandData> getSubcommands() {
+        Collection<PNCardsSubcommandData> subcommands = new HashSet<>();
+        subcommands.add(new ShowPN());
+        subcommands.add(new ShowAllPN());
+        subcommands.add(new ShowPNToAll());
+        subcommands.add(new PlayPN());
+        subcommands.add(new SentPN());
+        subcommands.add(new PlayPNIntoPlayArea());
         return subcommands;
     }
 

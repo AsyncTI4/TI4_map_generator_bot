@@ -1,21 +1,23 @@
-package ti4.commands.cards;
+package ti4.commands.cardspn;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.cards.CardsInfo;
+import ti4.commands.cards.CardsSubcommandData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SentAC extends CardsSubcommandData {
-    public SentAC() {
-        super(Constants.SEND_AC, "Send Action Card to player");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to send the Action Card").setRequired(true));
+public class ShowPN extends PNCardsSubcommandData {
+    public ShowPN() {
+        super(Constants.SHOW_PN, "Show Promissory Note to player");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to show Action Card").setRequired(true));
     }
 
     @Override
@@ -26,37 +28,38 @@ public class SentAC extends CardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
+        OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to send");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Promissory Note to show");
             return;
         }
 
         int acIndex = option.getAsInt();
         String acID = null;
-        for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
+        for (java.util.Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
             if (so.getValue().equals(acIndex)) {
                 acID = so.getKey();
             }
         }
 
         if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Promissory Note ID found, please retry");
             return;
         }
 
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         if (playerOption != null) {
             User user = playerOption.getAsUser();
-            Player targetPlayer = activeMap.getPlayer(user.getId());
-            if (targetPlayer == null){
-                MessageHelper.sendMessageToChannel(event.getChannel(), "No such Player in game");
-                return;
-            }
+            StringBuilder sb = new StringBuilder();
+            sb.append("---------\n");
+            sb.append("Game: ").append(activeMap.getName()).append("\n");
+            sb.append("Player: ").append(player.getUserName()).append("\n");
+            sb.append("Showed Promissory Note:").append("\n");
+            sb.append(Mapper.getPromissoryNote(acID)).append("\n");
+            sb.append("---------\n");
+            player.setPromissoryNote(acID);
 
-            player.removeActionCard(acIndex);
-            targetPlayer.setActionCard(acID);
-            CardsInfo.sentUserCardInfo(event, activeMap, targetPlayer);
+            MessageHelper.sentToMessageToUser(event, sb.toString(), user);
             CardsInfo.sentUserCardInfo(event, activeMap, player);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Need to specify player");
