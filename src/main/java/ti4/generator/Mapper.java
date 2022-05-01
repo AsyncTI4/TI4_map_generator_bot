@@ -172,6 +172,28 @@ public class Mapper {
     public static String getAgenda(String id) {
         return (String)agendas.get(id);
     }
+
+    public static String getAgendaForOnly(String id) {
+        StringBuilder agenda = new StringBuilder((String) agendas.get(id));
+        try {
+            String[] split = agenda.toString().split(";");
+            agenda = new StringBuilder();
+            boolean justAddNext = false;
+            for (String part : split) {
+                if ("For/Against".equals(part)){
+                    justAddNext = true;
+                    continue;
+                }
+                agenda.append(part).append(";");
+                if (justAddNext){
+                    break;
+                }
+            }
+        } catch (Exception e){
+            agenda = new StringBuilder((String) agendas.get(id));
+        }
+        return agenda.toString();
+    }
     public static  HashMap<String, String> getSecretObjectives() {
         HashMap<String, String> soList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : secretObjectives.entrySet()) {
