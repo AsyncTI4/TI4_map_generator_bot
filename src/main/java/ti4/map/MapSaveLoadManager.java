@@ -222,6 +222,11 @@ public class MapSaveLoadManager {
         writer.write(Constants.SCORED_PO + " " + sb1);
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.CREATION_DATE + " " + map.getCreationDate());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.LAST_MODIFIED_DATE + " " + Helper.getDateRepresentation(new Date().getTime()));
+        writer.write(System.lineSeparator());
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -633,7 +638,17 @@ public class MapSaveLoadManager {
                     Boolean status = Boolean.parseBoolean(dataInfo.nextToken());
                     map.setSCPlayed(scID, status);
                 }
+            } else if (Constants.CREATION_DATE.equals(identification)) {
+                map.setCreationDate(tokenizer[1]);
+            } else if (Constants.LAST_MODIFIED_DATE.equals(identification)) {
+                String lastModificationDate = tokenizer[1];
+                try {
+                    map.setLastModifiedDate(Long.parseLong(lastModificationDate));
+                } catch (Exception exception) {
+                    LoggerHandler.log("Could not parse last modified date", exception);
+                }
             }
+
         }
     }
 

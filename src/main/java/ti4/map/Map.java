@@ -1,9 +1,11 @@
 package ti4.map;
 
 
+import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.Helper;
 
 import javax.annotation.CheckForNull;
 import java.util.*;
@@ -24,6 +26,8 @@ public class Map {
 
     private HashMap<Integer, Boolean> scPlayed = new HashMap<>();
     private String speaker = "";
+    private String creationDate;
+    private long lastModifiedDate;
 
     private List<String> secretObjectives;
     private List<String> actionCards;
@@ -42,6 +46,9 @@ public class Map {
     private ArrayList<String> publicObjectives2 = new ArrayList<>();
 
     public Map() {
+        creationDate = Helper.getDateRepresentation(new Date().getTime());
+        lastModifiedDate = new Date().getTime();
+
         HashMap<String, String> secretObjectives = Mapper.getSecretObjectives();
         this.secretObjectives = new ArrayList<>(secretObjectives.keySet());
         Collections.shuffle(this.secretObjectives);
@@ -66,6 +73,22 @@ public class Map {
         for (int i = 0; i < 8; i++) {
             scTradeGoods.put(i + 1, 0);
         }
+    }
+
+    public String getCreationDate() {
+        return creationDate;
+    }
+
+    public void setCreationDate(String creationDate) {
+        this.creationDate = creationDate;
+    }
+
+    public long getLastModifiedDate() {
+        return lastModifiedDate;
+    }
+
+    public void setLastModifiedDate(long lastModifiedDate) {
+        this.lastModifiedDate = lastModifiedDate;
     }
 
     //Position, Tile

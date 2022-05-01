@@ -7,6 +7,8 @@ import ti4.map.UnitHolder;
 
 import javax.annotation.CheckForNull;
 import java.awt.*;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.HashMap;
 
 public class Helper {
@@ -28,5 +30,11 @@ public class Helper {
             Planet planetObject = new Planet(Constants.MIRAGE, mirageCenter);
             unitHolders.put(Constants.MIRAGE, planetObject);
         }
+    }
+
+    public static String getDateRepresentation(long dateInfo) {
+        Date date = new Date(dateInfo);
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
+        return simpleDateFormat.format(date);
     }
 }
