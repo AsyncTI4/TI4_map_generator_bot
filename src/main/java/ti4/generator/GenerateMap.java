@@ -325,7 +325,7 @@ public class GenerateMap {
                 if (optionalText != null) {
                     text += "Elected: " + optionalText + " - ";
                 }
-                graphics.drawString(text + Mapper.getAgenda(lawID), x, y);
+                graphics.drawString(text + Mapper.getAgendaForOnly(lawID), x, y);
             }
         }
     }
