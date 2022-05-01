@@ -176,7 +176,7 @@ public class GenerateMap {
     }
 
     @NotNull
-    private String getTimeStamp() {
+    public static String getTimeStamp() {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss");
         return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
 
@@ -807,6 +807,8 @@ public class GenerateMap {
                 return -1;
             } else if ((o2.contains("nanoforge") || o2.contains("titanspn"))) {
                 return -1;
+            } else if (o1.contains(Constants.DMZ_LARGE) || o2.contains(Constants.DMZ_LARGE)) {
+                return 1;
             }
             return o1.compareTo(o2);
         });
@@ -824,8 +826,9 @@ public class GenerateMap {
                     continue;
                 }
                 float scale = 1.00f;
-                boolean isDMZLargeOrWorldDestroyed = tokenPath.contains(Constants.DMZ_LARGE) || tokenPath.contains(Constants.WORLD_DESTROYED);
-                if (isDMZLargeOrWorldDestroyed) {
+                if (tokenPath.contains(Constants.DMZ_LARGE)) {
+                    scale = 0.6f;
+                } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
                     scale = 0.8f;
                 }
                 try {
@@ -833,7 +836,7 @@ public class GenerateMap {
                 } catch (Exception e) {
                     LoggerHandler.log("Could not parse control token file for: " + tokenID, e);
                 }
-                if (isDMZLargeOrWorldDestroyed) {
+                if (tokenPath.contains(Constants.DMZ_LARGE) || tokenPath.contains(Constants.WORLD_DESTROYED)) {
                     graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - (image.getHeight() / 2), null);
                 } else {
                     Point position = planetTokenPosition.getPosition(tokenID);
