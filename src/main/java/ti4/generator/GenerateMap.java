@@ -246,7 +246,7 @@ public class GenerateMap {
                 StringBuilder sb = new StringBuilder();
                 int sc = player.getSC();
                 String scText = sc == 0 ? " " : Integer.toString(sc);
-                if (player.getFaction().equals("naalu")) {
+                if ("naalu".equals(player.getFaction())) {
                     scText = "0/" + scText;
                 }
                 sb.append("SC: ").append(scText).append("   ");
@@ -294,7 +294,7 @@ public class GenerateMap {
                                 String promissoryNote = Mapper.getPromissoryNote(id);
                                 String[] pnSplit = promissoryNote.split(";");
                                 graphics.drawString(pnSplit[0] +"(" + playerFaction + ")" , x + 230 + pnX, y + deltaY + pnY);
-                                pnX = pnX + pnSplit[0].length() * 18;
+                                pnX = pnX + pnSplit[0].length() * 25;
                             }
                         }
                     }
@@ -374,7 +374,7 @@ public class GenerateMap {
 
             int sc = player.getSC();
             String scText = sc == 0 ? " " : Integer.toString(sc);
-            if (player.getFaction().equals("naalu")) {
+            if ("naalu".equals(player.getFaction())) {
                 scText = "0";
             }
             graphics.setColor(getSCColor(sc, map));
