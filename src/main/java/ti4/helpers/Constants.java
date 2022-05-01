@@ -77,6 +77,8 @@ public class Constants {
     public static final Point MIRAGE_CENTER_POSITION = new Point(70, 60);
     public static final String MIRAGE = "mirage";
     public static final String SLEEPER = "sleeper";
+    public static final String DMZ_LARGE = "dmz_large";
+    public static final String WORLD_DESTROYED = "worlddestroyed";
     public static final String PLANET = "planet";
     public static final String FRONTIER = "frontier";
 

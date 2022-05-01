@@ -824,19 +824,27 @@ public class GenerateMap {
                     continue;
                 }
                 float scale = 1.00f;
+                boolean isDMZLargeOrWorldDestroyed = tokenPath.contains(Constants.DMZ_LARGE) || tokenPath.contains(Constants.WORLD_DESTROYED);
+                if (isDMZLargeOrWorldDestroyed) {
+                    scale = 0.8f;
+                }
                 try {
                     image = resizeImage(ImageIO.read(new File(tokenPath)), scale);
                 } catch (Exception e) {
                     LoggerHandler.log("Could not parse control token file for: " + tokenID, e);
                 }
-                Point position = planetTokenPosition.getPosition(tokenID);
-                if (position != null) {
-                    graphics.drawImage(image, tileX + position.x, tileY + position.y, null);
-                    rectangles.add(new Rectangle(tileX + position.x, tileY + position.y, image.getWidth(), image.getHeight()));
+                if (isDMZLargeOrWorldDestroyed) {
+                    graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - (image.getHeight() / 2), null);
                 } else {
-                    graphics.drawImage(image, tileX + centerPosition.x + xDelta, tileY + centerPosition.y, null);
-                    rectangles.add(new Rectangle(tileX + centerPosition.x + xDelta, tileY + centerPosition.y, image.getWidth(), image.getHeight()));
-                    xDelta += 10;
+                    Point position = planetTokenPosition.getPosition(tokenID);
+                    if (position != null) {
+                        graphics.drawImage(image, tileX + position.x, tileY + position.y, null);
+                        rectangles.add(new Rectangle(tileX + position.x, tileY + position.y, image.getWidth(), image.getHeight()));
+                    } else {
+                        graphics.drawImage(image, tileX + centerPosition.x + xDelta, tileY + centerPosition.y, null);
+                        rectangles.add(new Rectangle(tileX + centerPosition.x + xDelta, tileY + centerPosition.y, image.getWidth(), image.getHeight()));
+                        xDelta += 10;
+                    }
                 }
             }
             return image;
