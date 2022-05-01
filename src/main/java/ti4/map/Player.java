@@ -82,6 +82,10 @@ public class Player {
         promissoryNotes.put(id, identifier);
     }
 
+    public void clearPromissoryNotes(){
+        promissoryNotes.clear();
+    }
+
     public void setPromissoryNotesInPlayArea(String id){
         if (!promissoryNotesInPlayArea.contains(id)) {
             promissoryNotesInPlayArea.add(id);
@@ -247,7 +251,7 @@ public class Player {
         initPNs();
     }
 
-    private void initPNs() {
+    public void initPNs() {
         if (color != null && faction != null) {
             List<String> promissoryNotes = Mapper.getPromissoryNotes(color, faction);
             for (String promissoryNote : promissoryNotes) {

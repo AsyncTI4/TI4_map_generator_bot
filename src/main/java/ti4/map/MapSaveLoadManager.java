@@ -224,7 +224,7 @@ public class MapSaveLoadManager {
 
         writer.write(Constants.CREATION_DATE + " " + map.getCreationDate());
         writer.write(System.lineSeparator());
-        writer.write(Constants.LAST_MODIFIED_DATE + " " + Helper.getDateRepresentation(new Date().getTime()));
+        writer.write(Constants.LAST_MODIFIED_DATE + " " + new Date().getTime());
         writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
@@ -716,6 +716,7 @@ public class MapSaveLoadManager {
                 }
                 case Constants.PROMISSORY_NOTES -> {
                     StringTokenizer pnToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    player.clearPromissoryNotes();
                     while (pnToken.hasMoreTokens()) {
                         StringTokenizer pnInfo = new StringTokenizer(pnToken.nextToken(), ",");
                         String id = pnInfo.nextToken();
