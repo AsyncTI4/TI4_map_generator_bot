@@ -253,6 +253,7 @@ public class Player {
 
     public void initPNs() {
         if (color != null && faction != null) {
+            promissoryNotes.clear();
             List<String> promissoryNotes = Mapper.getPromissoryNotes(color, faction);
             for (String promissoryNote : promissoryNotes) {
                 setPromissoryNote(promissoryNote);
