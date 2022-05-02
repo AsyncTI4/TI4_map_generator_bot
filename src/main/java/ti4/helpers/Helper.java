@@ -1,6 +1,10 @@
 package ti4.helpers;
 
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.ResourceHelper;
+import ti4.map.Map;
 import ti4.map.Planet;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
@@ -50,5 +54,18 @@ public class Helper {
             case 8 -> "<@&947965671394906172>";
             default -> "**" + sc + "**";
         };
+    }
+
+    public static String getGamePing(SlashCommandInteractionEvent event, Map activeMap) {
+        String categoryForPlayers = "";
+        Guild guild = event.getGuild();
+        if (guild != null) {
+            for (Role role : guild.getRoles()) {
+                if (activeMap.getName().equals(role.getName().toLowerCase())) {
+                    categoryForPlayers = role.getAsMention();
+                }
+            }
+        }
+        return categoryForPlayers;
     }
 }

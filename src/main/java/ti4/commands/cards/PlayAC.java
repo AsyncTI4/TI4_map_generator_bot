@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -43,6 +44,8 @@ public class PlayAC extends CardsSubcommandData {
         }
         activeMap.discardActionCard(player.getUserID(), acIndex);
 
+
+
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(activeMap.getName()).append(" ");
         sb.append("Player: ").append(player.getUserName()).append("\n");
@@ -50,7 +53,7 @@ public class PlayAC extends CardsSubcommandData {
         sb.append(Mapper.getActionCard(acID)).append("\n");
 
         MessageHelper.sendMessageToChannel(event, sb.toString());
-        String text = "Please react to the following image <:nosabo:962783456541171712> with your faction symbol to note no sabotage";
+        String text = Helper.getGamePing(event, activeMap) + " Please react to the following image <:nosabo:962783456541171712> with your faction symbol to note no sabotage";
         MessageHelper.sendMessageToChannel(event, text);
         MessageHelper.sendMessageToChannel(event, "<:nosabo:962783456541171712>");
         CardsInfo.sentUserCardInfo(event, activeMap, player);
