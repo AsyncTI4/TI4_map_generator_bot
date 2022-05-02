@@ -92,6 +92,8 @@ public class Constants {
     public static final String SET_ORDER = "set_order";
     public static final String PASSED = "passed";
     public static final String SC_PLAYED = "sc_played";
+    public static final String SC_PLAY = "sc_play";
+    public static final String PASS = "pass";
     public static final String SPEAKER = "speaker";
 
     public static final String PLAYER1 = "player1";
@@ -128,6 +130,8 @@ public class Constants {
     public static final String JPG = ".jpg";
     public static final String PNG = ".png";
     public static final String ADMIN = "admin";
+    public static final String NAALU_PN = "gift";
+    public static final String NAALU = "naalu";
 
     public static final String LAW = "law";
     public static final String LAW_INFO = "law_info";

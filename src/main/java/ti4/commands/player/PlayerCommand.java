@@ -99,6 +99,8 @@ public class PlayerCommand implements Command {
         subcommands.add(new Tech());
         subcommands.add(new Planets());
         subcommands.add(new Setup());
+        subcommands.add(new SCPlay());
+        subcommands.add(new Pass());
         return subcommands;
     }
 

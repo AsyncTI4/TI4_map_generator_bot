@@ -246,9 +246,7 @@ public class GenerateMap {
                 StringBuilder sb = new StringBuilder();
                 int sc = player.getSC();
                 String scText = sc == 0 ? " " : Integer.toString(sc);
-                if ("naalu".equals(player.getFaction())) {
-                    scText = "0/" + scText;
-                }
+                scText = getSCNumberIfNaaluInPlay(player, map, scText);
                 sb.append("SC: ").append(scText).append("   ");
 
                 graphics.setColor(getSCColor(sc, map));
@@ -293,7 +291,7 @@ public class GenerateMap {
                                 graphics.setColor(getColor(player_.getColor()));
                                 String promissoryNote = Mapper.getPromissoryNote(id);
                                 String[] pnSplit = promissoryNote.split(";");
-                                graphics.drawString(pnSplit[0] +"(" + playerFaction + ")" , x + 230 + pnX, y + deltaY + pnY);
+                                graphics.drawString(pnSplit[0] + "(" + playerFaction + ")", x + 230 + pnX, y + deltaY + pnY);
                                 pnX = pnX + pnSplit[0].length() * 25;
                             }
                         }
@@ -328,6 +326,24 @@ public class GenerateMap {
                 graphics.drawString(text + Mapper.getAgendaForOnly(lawID), x, y);
             }
         }
+    }
+
+    private String getSCNumberIfNaaluInPlay(Player player, Map map, String scText) {
+        if (Constants.NAALU.equals(player.getFaction())) {
+            boolean giftPlayed = false;
+            for (Player player_ : map.getPlayers().values()) {
+                if (player != player_ && player_.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
+                    giftPlayed = true;
+                    break;
+                }
+            }
+            if (!giftPlayed) {
+                scText = "0/" + scText;
+            }
+        } else if (player.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
+            scText = "0/" + scText;
+        }
+        return scText;
     }
 
     private int strategyCards(Map map, int y) {
@@ -374,9 +390,7 @@ public class GenerateMap {
 
             int sc = player.getSC();
             String scText = sc == 0 ? " " : Integer.toString(sc);
-            if ("naalu".equals(player.getFaction())) {
-                scText = "0";
-            }
+            scText = getSCNumberIfNaaluInPlay(player, map, scText);
             graphics.setColor(getSCColor(sc, map));
             graphics.setFont(Storage.getFont64());
             graphics.drawString(scText, points.get(4).x, points.get(4).y);
