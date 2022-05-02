@@ -3,6 +3,7 @@ package ti4.commands.player;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -33,15 +34,7 @@ public class SCPlay extends PlayerSubcommandData {
             return;
         }
         activeMap.setSCPlayed(sc, true);
-        String categoryForPlayers = "";
-        Guild guild = event.getGuild();
-        if (guild != null) {
-            for (Role role : guild.getRoles()) {
-                if (activeMap.getName().equals(role.getName().toLowerCase())) {
-                    categoryForPlayers = role.getAsMention();
-                }
-            }
-        }
+        String categoryForPlayers = Helper.getGamePing(event, activeMap);
         String message = "";
         if (!categoryForPlayers.isEmpty()){
             message += categoryForPlayers + "\n";
@@ -49,4 +42,5 @@ public class SCPlay extends PlayerSubcommandData {
         message += "Strategy card "+ Helper.getSCAsMention(sc)+" played. Please react with your faction to pass on the secondary or post it to follow.";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
+
 }
