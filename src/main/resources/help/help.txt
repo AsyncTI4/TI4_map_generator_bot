@@ -91,6 +91,8 @@ Attachement tokens can only be added to planets
 
 /player stats .... <- can set all the major stats for player, when SC is picked, TG's automatically added to user Trade Goods from left on SC TG's
 /player setup faction color <- needs to set player faction and color
+/player sc_play <- plays your SC that you have in game
+/player pass <- passes
 
 Cards commands
 /cards so_draw count(optional) <- draws a secret or specified number of secrets

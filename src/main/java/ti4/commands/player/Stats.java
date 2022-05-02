@@ -139,7 +139,7 @@ public class Stats extends PlayerSubcommandData {
         if (optionSC != null) {
             int scNumber = optionSC.getAsInt();
             LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
-            if (!scTradeGoods.containsKey(scNumber)){
+            if (!scTradeGoods.containsKey(scNumber) && scNumber != 0){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card must be from possible ones in Game");
                 return;
             }

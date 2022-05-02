@@ -25,7 +25,7 @@ public class Helper {
 
     public static void addMirageToTile(Tile tile) {
         HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        if (unitHolders.get(Constants.MIRAGE) == null){
+        if (unitHolders.get(Constants.MIRAGE) == null) {
             Point mirageCenter = new Point(Constants.MIRAGE_POSITION.x + Constants.MIRAGE_CENTER_POSITION.x, Constants.MIRAGE_POSITION.y + Constants.MIRAGE_CENTER_POSITION.y);
             Planet planetObject = new Planet(Constants.MIRAGE, mirageCenter);
             unitHolders.put(Constants.MIRAGE, planetObject);
@@ -36,5 +36,19 @@ public class Helper {
         Date date = new Date(dateInfo);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy.MM.dd");
         return simpleDateFormat.format(date);
+    }
+
+    public static String getSCAsMention(int sc) {
+        return switch (sc) {
+            case 1 -> "<@&947965021168762890>";
+            case 2 -> "<@&947965277633650699>";
+            case 3 -> "<@&947965381488807956>";
+            case 4 -> "<@&947965493376061441>";
+            case 5 -> "<@&947965546660495381>";
+            case 6 -> "<@&947965592013525022>";
+            case 7 -> "<@&947965632933146634>";
+            case 8 -> "<@&947965671394906172>";
+            default -> "**" + sc + "**";
+        };
     }
 }
