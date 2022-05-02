@@ -48,7 +48,11 @@ public class PlayAC extends CardsSubcommandData {
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Played: ");
         sb.append(Mapper.getActionCard(acID)).append("\n");
-        MessageHelper.sendMessageToChannel(event, sb.toString(), "962783456541171712", "962784058159546388");
+
+        MessageHelper.sendMessageToChannel(event, sb.toString());
+        String text = "Please react to the following image <:nosabo:962783456541171712> with your faction symbol to note no sabotage";
+        MessageHelper.sendMessageToChannel(event, text);
+        MessageHelper.sendMessageToChannel(event, "<:nosabo:962783456541171712>");
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
 }
