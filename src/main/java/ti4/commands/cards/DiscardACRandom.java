@@ -15,6 +15,7 @@ import java.util.*;
 public class DiscardACRandom extends CardsSubcommandData {
     public DiscardACRandom() {
         super(Constants.DISCARD_AC_RANDOM, "Discard Random Action Card");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
     }
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -25,22 +26,34 @@ public class DiscardACRandom extends CardsSubcommandData {
             return;
         }
 
+        OptionMapping option = event.getOption(Constants.COUNT);
+        int count = 1;
+        if (option != null) {
+            int providedCount = option.getAsInt();
+            count = providedCount > 0 ? providedCount : 1;
+        }
+
         LinkedHashMap<String, Integer> actionCardsMap = player.getActionCards();
         List<String> actionCards = new ArrayList<>(actionCardsMap.keySet());
         if (actionCards.isEmpty()){
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Action Cards in hand");
         }
-        Collections.shuffle(actionCards);
-        String acID = actionCards.get(0);
-        boolean removed = activeMap.discardActionCard(player.getUserID(), actionCardsMap.get(acID));
-        if (!removed) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Cards found, please retry");
-            return;
-        }
         StringBuilder sb = new StringBuilder();
         sb.append("Player: ").append(player.getUserName()).append(" - ");
         sb.append("Discarded Action Card:").append("\n");
-        sb.append(Mapper.getActionCard(acID)).append("\n");
+        for (int i = 0; i < count; i++) {
+            if (actionCards.size() > 0) {
+                Collections.shuffle(actionCards);
+                String acID = actionCards.get(0);
+                boolean removed = activeMap.discardActionCard(player.getUserID(), actionCardsMap.get(acID));
+                if (!removed) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Cards found, please retry");
+                    return;
+                }
+                sb.append(Mapper.getActionCard(acID)).append("\n");
+            }
+        }
+
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
