@@ -129,6 +129,7 @@ Cards commands
 /agenda put_top agendaID <- put given agenda at top. Example you draw A and B agenda. And put A at top, then B at top. You end up with order B, A, to reveal. It's like physically you would do top and next top covers previous one
 /agenda put_bottom agendaID <- puts agenda bottom
 /agenda look_at_top <- shows top agenda, no action possible
+/agenda look_at_bottom <- shows bottom agenda, no action possible
 /agenda show_discarded <- shows discarded agendas and the id's
 /agenda reveal <- reveals agenda to all with ID and automatically puts in discard pile
 /agenda add_law agendaID optionalTextForElected <- add's law to game map and optionalTextForElected is used to define player, or PO or anything, free text can be entered. AgendaID is used from discard pile or when revealed

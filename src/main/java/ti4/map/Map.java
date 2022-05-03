@@ -1,7 +1,6 @@
 package ti4.map;
 
 
-import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -457,6 +456,10 @@ public class Map {
 
     public String lookAtTopAgenda() {
         return agendas.get(0);
+    }
+
+    public String lookAtBottomAgenda() {
+        return agendas.get(agendas.size() - 1);
     }
 
     public String revealAgenda() {

@@ -90,6 +90,7 @@ public class AgendaCommand implements Command {
         subcommands.add(new PutAgendaTop());
         subcommands.add(new PutAgendaBottom());
         subcommands.add(new LookAtTopAgenda());
+        subcommands.add(new LookAtBottomAgenda());
         subcommands.add(new RevealAgenda());
         subcommands.add(new AddLaw());
         subcommands.add(new RemoveLaw());
