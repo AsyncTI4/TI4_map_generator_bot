@@ -29,7 +29,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         sb.append(Mapper.getAgenda(id));
         sb.append("\n-----------\n");
         MessageHelper.sendMessageToChannel(event, sb.toString());
-        String text = Helper.getGamePing(event, activeMap) + " Please response with your faction symbol in response to the next two posts - respond to <:nowhens:962921609671364658> or no whens and respond to <:noafters:962923748938362931> for no afters.";
+        String text = Helper.getGamePing(event, activeMap) + " Please response with your faction symbol in response to the next two posts - respond to <:nowhens:962921609671364658> for no whens and respond to <:noafters:962923748938362931> for no afters.";
         MessageHelper.sendMessageToChannel(event, text);
         MessageHelper.sendMessageToChannel(event, "<:nowhens:962921609671364658>");
         MessageHelper.sendMessageToChannel(event, "<:noafters:962923748938362931>");
