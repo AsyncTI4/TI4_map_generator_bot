@@ -793,17 +793,31 @@ public class GenerateMap {
     }
 
     private BufferedImage addSleeperToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
-        HashSet<String> tokenList = unitHolder.getTokenList();
         Point centerPosition = unitHolder.getHolderCenterPosition();
+        ArrayList<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
+        tokenList.sort((o1, o2) -> {
+            if ((o1.contains(Constants.SLEEPER) || o2.contains(Constants.SLEEPER))) {
+                return -1;
+            }  else if (o1.contains(Constants.DMZ_LARGE) || o2.contains(Constants.DMZ_LARGE)) {
+                return 1;
+            }
+            return o1.compareTo(o2);
+        });
         for (String tokenID : tokenList) {
-            if (tokenID.contains(Constants.SLEEPER)) {
+            if (tokenID.contains(Constants.SLEEPER) || tokenID.contains(Constants.DMZ_LARGE) || tokenID.contains(Constants.WORLD_DESTROYED)) {
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
                     LoggerHandler.log("Could not sleeper token file for: " + tokenID);
                     continue;
                 }
+                float scale = 0.85f;
+                if (tokenPath.contains(Constants.DMZ_LARGE)) {
+                    scale = 0.6f;
+                } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
+                    scale = 0.8f;
+                }
                 try {
-                    image = resizeImage(ImageIO.read(new File(tokenPath)), 0.85f);
+                    image = resizeImage(ImageIO.read(new File(tokenPath)), scale);
                 } catch (Exception e) {
                     LoggerHandler.log("Could not parse sleeper token file for: " + tokenID, e);
                 }
@@ -831,7 +845,7 @@ public class GenerateMap {
             Point centerPosition = unitHolder.getHolderCenterPosition();
             int xDelta = 0;
             for (String tokenID : tokenList) {
-                if (tokenID.contains(Constants.SLEEPER)) {
+                if (tokenID.contains(Constants.SLEEPER) || tokenID.contains(Constants.DMZ_LARGE) || tokenID.contains(Constants.WORLD_DESTROYED)) {
                     continue;
                 }
                 String tokenPath = tile.getTokenPath(tokenID);
@@ -840,11 +854,6 @@ public class GenerateMap {
                     continue;
                 }
                 float scale = 1.00f;
-                if (tokenPath.contains(Constants.DMZ_LARGE)) {
-                    scale = 0.6f;
-                } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
-                    scale = 0.8f;
-                }
                 try {
                     image = resizeImage(ImageIO.read(new File(tokenPath)), scale);
                 } catch (Exception e) {
