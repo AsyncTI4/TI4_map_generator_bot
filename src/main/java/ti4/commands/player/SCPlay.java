@@ -39,7 +39,7 @@ public class SCPlay extends PlayerSubcommandData {
         if (!categoryForPlayers.isEmpty()){
             message += categoryForPlayers + "\n";
         }
-        message += "Strategy card "+ Helper.getSCAsMention(sc)+" played. Please react with your faction to pass on the secondary or post it to follow.";
+        message += "Strategy card "+ Helper.getSCAsMention(sc)+" played. Please react with your faction symbol to pass on the secondary or post it to follow.";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 
