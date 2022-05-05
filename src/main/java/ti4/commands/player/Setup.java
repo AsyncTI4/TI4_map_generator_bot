@@ -24,6 +24,11 @@ public class Setup extends PlayerSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
+        if (!activeMap.isMapOpen()){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Can do faction setup only when map is open and not locked");
+            return;
+        }
+
         @SuppressWarnings("ConstantConditions")
         String faction = AliasHandler.resolveFaction(event.getOption(Constants.FACTION).getAsString().toLowerCase());
         if (!Mapper.isFaction(faction)) {
