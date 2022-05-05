@@ -8,6 +8,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -29,6 +30,7 @@ public class CardsInfo extends CardsSubcommandData {
     }
 
     public static void sentUserCardInfo(SlashCommandInteractionEvent event, Map activeMap, Player player) {
+        checkAndAddPNs(activeMap, player);
         LinkedHashMap<String, Integer> secretObjective = activeMap.getSecretObjective(player.getUserID());
         LinkedHashMap<String, Integer> scoredSecretObjective = activeMap.getScoredSecretObjective(player.getUserID());
         StringBuilder sb = new StringBuilder();
@@ -89,4 +91,22 @@ public class CardsInfo extends CardsSubcommandData {
         }
     }
 
+    private static void checkAndAddPNs(Map activeMap, Player player) {
+        String playerColor = player.getColor();
+        String playerFaction = player.getFaction();
+        if (Mapper.isColorValid(playerColor) && Mapper.isFaction(playerFaction)){
+            List<String> promissoryNotes = new ArrayList<>(Mapper.getPromissoryNotes(playerColor, playerFaction));
+            for (Player player_ : activeMap.getPlayers().values()) {
+                    promissoryNotes.removeAll(player_.getPromissoryNotes().keySet());
+                    promissoryNotes.removeAll(player_.getPromissoryNotesInPlayArea());
+                }
+            promissoryNotes.removeAll(player.getPromissoryNotes().keySet());
+            promissoryNotes.removeAll(player.getPromissoryNotesInPlayArea());
+            if (!promissoryNotes.isEmpty()){
+                for (String promissoryNote : promissoryNotes) {
+                    player.setPromissoryNote(promissoryNote);
+                }
+            }
+        }
+    }
 }
