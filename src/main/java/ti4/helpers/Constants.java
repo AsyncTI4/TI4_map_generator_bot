@@ -213,4 +213,7 @@ public class Constants {
     public static final String PLAY_PN = "play";
     public static final String PLAY_PN_INTO_PLAY_AREA = "play_into_play_area";
     public static final String SEND_PN = "send";
+
+    public static final String TECH_ADD = "tech_add";
+    public static final String TECH_REMOVE = "tech_remove";
 }

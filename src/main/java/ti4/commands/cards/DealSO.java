@@ -30,7 +30,7 @@ public class DealSO extends CardsSubcommandData {
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         if (playerOption != null) {
             User user = playerOption.getAsUser();
-            Player player = activeMap.getPlayer(getUser().getId());
+            Player player = activeMap.getPlayer(user.getId());
             for (int i = 0; i < count; i++) {
                 activeMap.drawSecretObjective(player.getUserID());
             }
@@ -38,7 +38,5 @@ public class DealSO extends CardsSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
         }
-
-
     }
 }

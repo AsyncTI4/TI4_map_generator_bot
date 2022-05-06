@@ -29,6 +29,7 @@ public class Player {
     private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> promissoryNotes = new LinkedHashMap<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
+    private List<String> techs = new ArrayList<>();
 
 
     private int crf = 0;
@@ -323,6 +324,24 @@ public class Player {
 
     public void setCommodities(int commodities) {
         this.commodities = commodities;
+    }
+
+    public List<String> getTechs() {
+        return techs;
+    }
+
+    public void setTechs(List<String> techs) {
+        this.techs = techs;
+    }
+
+    public void addTech(String tech) {
+        if (!techs.contains(tech)) {
+            techs.add(tech);
+        }
+    }
+
+    public void removeTech(String tech) {
+            techs.remove(tech);
     }
 
     public int getCommoditiesTotal() {

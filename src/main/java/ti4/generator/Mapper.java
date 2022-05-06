@@ -28,6 +28,8 @@ public class Mapper {
     private static final Properties agendas = new Properties();
     private static final Properties publicObjectives = new Properties();
     private static final Properties promissoryNotes = new Properties();
+    private static final Properties techs = new Properties();
+    private static final HashMap<String, String> techList = new HashMap<>();
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
@@ -44,6 +46,7 @@ public class Mapper {
         readData("Agendas.properties", agendas, "Could not read action cards file");
         readData("public_objective.properties", publicObjectives, "Could not read public objective file");
         readData("Promissory_Notes.properties", promissoryNotes, "Could not read promissory notes file");
+        readData("tech.properties", techs, "Could not read tech file");
     }
 
     private static void readData(String propertyFileName, Properties colors, String s) {
@@ -240,6 +243,27 @@ public class Mapper {
             acList.put((String)entry.getKey(), (String)entry.getValue());
         }
         return acList;
+    }
+
+    public static String getTechType(String id) {
+        String property = techs.getProperty(id);
+        return property.split(",")[1];
+    }
+
+    public static  HashMap<String, String> getTechs() {
+        if (techList.isEmpty()) {
+            for (Map.Entry<Object, Object> entry : techs.entrySet()) {
+                String value = (String) entry.getValue();
+                value = value.split(",")[0];
+                techList.put((String) entry.getKey(), value);
+            }
+        }
+        return techList;
+    }
+
+    public static boolean isValidTech(String id){
+        HashMap<String, String> techs = getTechs();
+        return techs.get(id) != null;
     }
 
 
