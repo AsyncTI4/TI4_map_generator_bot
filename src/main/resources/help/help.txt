@@ -56,6 +56,25 @@ and most interesting is
 /remove_damage_all_unit color tile
 /add_frontier_tokens CONFIRM(YES) <- adds frontier tokens to all tiles that can have one
 
+EXAMPLE
+/add_units color tile unitList
+examples
+tile can be tile name or the number of location at bottom right
+like 1a, 2b, 3c etc
+for units
+can do
+carrier, dread, fighter, infantry, inf all go in space by default
+if you want to place to planet need to do
+inf lodor, sd lodor
+or any char combination like
+lodor, lodo, lod, lo, l
+all work to place unit on planet
+example
+/add_units blue 1c carrier, ff, 2 inf l, sd l, 3 inf
+this command would place blue units in tile 1c
+carrier, fighter, 3 infantry in space
+2 infantry and space dock on lodor planet (or any planet beggining with letter L in that tile)
+
 commands improvements:
 /remove_units and /move_units
 priority is move/remove damaged units. If we selecte priority_no_damage (and type in yes or y)
