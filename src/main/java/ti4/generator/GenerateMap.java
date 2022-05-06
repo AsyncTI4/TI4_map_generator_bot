@@ -206,7 +206,7 @@ public class GenerateMap {
 
     private void gameInfo(Map map, DisplayType displayType) throws IOException {
 
-        int widthOfLine = 1800;
+        int widthOfLine = 2300;
         int y = heightForGameInfo + 60;
         int x = 10;
         HashMap<String, Player> players = map.getPlayers();
@@ -225,6 +225,7 @@ public class GenerateMap {
             for (Player player : players.values()) {
                 int baseY = y;
                 y += 34;
+                graphics.setFont(Storage.getFont32());
                 Color color = getColor(player.getColor());
                 graphics.setColor(Color.WHITE);
                 String userName = player.getUserName() + " (" + player.getColor() + ")";
@@ -297,9 +298,10 @@ public class GenerateMap {
                         }
                     }
                 }
-
+                int techStartY = y + deltaY + pnY;
+                int techY = techs(player, techStartY);
                 graphics.setColor(color);
-                y += 90;
+                y += 90 + (techY - techStartY);
                 g2.setColor(color);
                 g2.drawRect(x - 5, baseY, x + widthOfLine, y - baseY);
                 y += 15;
@@ -442,6 +444,42 @@ public class GenerateMap {
         } catch (Exception e) {
             LoggerHandler.log("Could not parse cc file for: " + ccID, e);
         }
+    }
+
+    private int techs(Player player, int y) {
+        int x = 230;
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(3));
+        graphics.setFont(Storage.getFont26());
+        Integer[] column = new Integer[1];
+        column[0] = 0;
+        List<String> techs = player.getTechs();
+        if (techs.isEmpty()){
+            return y;
+        }
+        techs.sort(Comparator.comparing(Mapper::getTechType));
+        HashMap<String, String> techInfo = Mapper.getTechs();
+        y += 25;
+        for (String tech : techs) {
+            switch (column[0]) {
+                case 0 -> x = 230;
+                case 1 -> x = 630;
+                case 2 -> x = 1030;
+                case 3 -> x = 1430;
+                case 4 -> x = 1830;
+            }
+            graphics.setColor(getTechColor(Mapper.getTechType(tech)));
+            String techName = techInfo.get(tech);
+            if (techName != null) {
+                graphics.drawString(techName, x, y);
+            }
+            column[0]++;
+            if (column[0] > 4) {
+                column[0] = 0;
+                y += 25;
+            }
+        }
+        return y;
     }
 
     private int objectives(Map map, int y) {
@@ -673,6 +711,19 @@ public class GenerateMap {
             default:
                 return Color.WHITE;
         }
+    }
+
+    private Color getTechColor(String type) {
+        if (type == null) {
+            return Color.WHITE;
+        }
+        return switch (type) {
+            case "propulsion" -> new Color(102, 153, 255);
+            case "biotic" -> new Color(0, 204, 0);
+            case "warfare" -> new Color(204, 0, 0);
+            case "cybernetics" -> new Color(230, 230, 0);
+            default -> Color.WHITE;
+        };
     }
 
 

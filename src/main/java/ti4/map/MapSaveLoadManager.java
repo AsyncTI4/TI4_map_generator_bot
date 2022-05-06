@@ -257,6 +257,9 @@ public class MapSaveLoadManager {
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.TACTICAL + " " + player.getTacticalCC());
             writer.write(System.lineSeparator());
             writer.write(Constants.FLEET + " " + player.getFleetCC());
@@ -725,6 +728,7 @@ public class MapSaveLoadManager {
                     }
                 }
                 case Constants.PROMISSORY_NOTES_PLAY_AREA -> player.setPromissoryNotesInPlayArea(getCardList(tokenizer.nextToken()));
+                case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
                 case Constants.SO_SCORED -> {
                     StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (secrets.hasMoreTokens()) {
