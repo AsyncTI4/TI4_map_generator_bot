@@ -19,6 +19,9 @@ public abstract class TechAddRemove extends PlayerSubcommandData{
     public TechAddRemove(String id, String description) {
         super(id, description);
         addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Tech").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH2, "2dn Tech").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd Tech").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th Tech").setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction").setRequired(false));
     }
 
@@ -42,7 +45,13 @@ public abstract class TechAddRemove extends PlayerSubcommandData{
             }
         }
 
-        OptionMapping techOption = event.getOption(Constants.TECH);
+        parseParameter(event, player, event.getOption(Constants.TECH));
+        parseParameter(event, player, event.getOption(Constants.TECH2));
+        parseParameter(event, player, event.getOption(Constants.TECH3));
+        parseParameter(event, player, event.getOption(Constants.TECH4));
+    }
+
+    private void parseParameter(SlashCommandInteractionEvent event, Player player, OptionMapping techOption) {
         if (techOption != null) {
             String techID = techOption.getAsString();
             if (Mapper.isValidTech(techID)) {

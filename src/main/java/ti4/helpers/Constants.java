@@ -108,6 +108,9 @@ public class Constants {
     public static final String STATS = "stats";
     public static final String SETUP = "setup";
     public static final String TECH = "tech";
+    public static final String TECH2 = "tech2";
+    public static final String TECH3 = "tech3";
+    public static final String TECH4 = "tech4";
     public static final String PLANETS = "planets";
     public static final String TACTICAL = "tactical_cc";
     public static final String FLEET = "fleet_cc";
