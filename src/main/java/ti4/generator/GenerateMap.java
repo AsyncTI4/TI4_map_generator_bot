@@ -454,6 +454,7 @@ public class GenerateMap {
         Integer[] column = new Integer[1];
         column[0] = 0;
         List<String> techs = player.getTechs();
+        List<String> exhaustedTechs = player.getExhaustedTechs();
         if (techs.isEmpty()){
             return y;
         }
@@ -468,7 +469,11 @@ public class GenerateMap {
                 case 3 -> x = 1430;
                 case 4 -> x = 1830;
             }
-            graphics.setColor(getTechColor(Mapper.getTechType(tech)));
+            if (exhaustedTechs.contains(tech)){
+                graphics.setColor(Color.GRAY);
+            } else {
+                graphics.setColor(getTechColor(Mapper.getTechType(tech)));
+            }
             String techName = techInfo.get(tech);
             if (techName != null) {
                 graphics.drawString(techName, x, y);

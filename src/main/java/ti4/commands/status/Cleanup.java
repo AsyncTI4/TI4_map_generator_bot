@@ -45,6 +45,7 @@ public class Cleanup extends StatusSubcommandData {
         for (Player player : players.values()) {
             player.setPassed(false);
             player.setSC(0);
+            player.cleanExhaustedTechs();
         }
     }
 }
