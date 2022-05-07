@@ -69,8 +69,6 @@ public abstract class TechAddRemove extends PlayerSubcommandData{
                 }
                 doAction(player, possibleTechs.get(0));
             }
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select valid tech");
         }
     }
 
