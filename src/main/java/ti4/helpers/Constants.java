@@ -108,6 +108,7 @@ public class Constants {
     public static final String STATS = "stats";
     public static final String SETUP = "setup";
     public static final String TECH = "tech";
+    public static final String TECH_EXHAUSTED = "tech_exhausted";
     public static final String TECH2 = "tech2";
     public static final String TECH3 = "tech3";
     public static final String TECH4 = "tech4";
@@ -219,4 +220,6 @@ public class Constants {
 
     public static final String TECH_ADD = "tech_add";
     public static final String TECH_REMOVE = "tech_remove";
+    public static final String TECH_EXHAUST = "tech_exhaust";
+    public static final String TECH_REFRESH = "tech_refresh";
 }

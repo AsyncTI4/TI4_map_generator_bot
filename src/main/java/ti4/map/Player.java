@@ -30,6 +30,7 @@ public class Player {
     private LinkedHashMap<String, Integer> promissoryNotes = new LinkedHashMap<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
+    private List<String> exhaustedTechs = new ArrayList<>();
 
 
     private int crf = 0;
@@ -334,10 +335,32 @@ public class Player {
         this.techs = techs;
     }
 
+    public List<String> getExhaustedTechs() {
+        return exhaustedTechs;
+    }
+
+    public void cleanExhaustedTechs(){
+        exhaustedTechs.clear();
+    }
+
+    public void setExhaustedTechs(List<String> exhaustedTechs) {
+        this.exhaustedTechs = exhaustedTechs;
+    }
+
     public void addTech(String tech) {
         if (!techs.contains(tech)) {
             techs.add(tech);
         }
+    }
+
+    public void exhaustTech(String tech){
+        if (techs.contains(tech)){
+            exhaustedTechs.add(tech);
+        }
+    }
+
+    public void refreshTech(String tech){
+        exhaustedTechs.remove(tech);
     }
 
     public void removeTech(String tech) {

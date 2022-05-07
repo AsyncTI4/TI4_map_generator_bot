@@ -104,6 +104,8 @@ public class PlayerCommand implements Command {
         subcommands.add(new Pass());
         subcommands.add(new TechAdd());
         subcommands.add(new TechRemove());
+        subcommands.add(new TechExhaust());
+        subcommands.add(new TechRefresh());
         return subcommands;
     }
 
