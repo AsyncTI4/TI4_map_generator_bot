@@ -1,19 +1,15 @@
 package ti4.commands.units;
 
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
@@ -64,7 +60,7 @@ abstract public class AddRemoveUnits implements Command {
         }
         Tile tile = activeMap.getTile(tileID);
         if (tile == null){
-            tile = activeMap.getTileByPostion(tileID);
+            tile = activeMap.getTileByPosition(tileID);
         }
         if (tile == null) {
             MessageHelper.replyToMessage(event, "Tile in map not found");

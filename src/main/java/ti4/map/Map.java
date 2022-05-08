@@ -785,7 +785,7 @@ public class Map {
                 .orElse(null);
     }
 
-    public Tile getTileByPostion(String position) {
+    public Tile getTileByPosition(String position) {
         return tileMap.get(position);
     }
 
