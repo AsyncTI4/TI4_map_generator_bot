@@ -125,6 +125,10 @@ public class CardsCommand implements Command {
         subcommands.add(new RevealAndPutACIntoDiscard());
         subcommands.add(new SentAC());
         subcommands.add(new SentACRandom());
+        
+        subcommands.add(new ShuffleExpBackIntoDeck());
+        subcommands.add(new PurgeExp());
+        
         return subcommands;
     }
 

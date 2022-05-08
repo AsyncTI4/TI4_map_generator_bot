@@ -29,6 +29,7 @@ public class Mapper {
     private static final Properties publicObjectives = new Properties();
     private static final Properties promissoryNotes = new Properties();
     private static final Properties techs = new Properties();
+    private static final Properties explore = new Properties();
     private static final HashMap<String, String> techList = new HashMap<>();
 
     public static void init() {
@@ -43,9 +44,10 @@ public class Mapper {
         readData("factions.properties", factions, "Could not read factions name file");
         readData("Secret_objectives.properties", secretObjectives, "Could not read secret objectives file");
         readData("action_cards.properties", actionCards, "Could not read action cards file");
-        readData("Agendas.properties", agendas, "Could not read action cards file");
+        readData("Agendas.properties", agendas, "Could not read agendas file");
         readData("public_objective.properties", publicObjectives, "Could not read public objective file");
         readData("Promissory_Notes.properties", promissoryNotes, "Could not read promissory notes file");
+        readData("exploration.properties", explore, "Could not read explore file");
         readData("tech.properties", techs, "Could not read tech file");
     }
 
@@ -175,6 +177,10 @@ public class Mapper {
     public static String getAgenda(String id) {
         return (String)agendas.get(id);
     }
+    
+    public static String getExplore(String id) {
+    	return (String)explore.get(id);
+    }
 
     public static String getAgendaForOnly(String id) {
         StringBuilder agenda = new StringBuilder((String) agendas.get(id));
@@ -292,6 +298,15 @@ public class Mapper {
             }
         }
         return poList;
+    }
+    
+    public static HashMap<String, String> getExplores() {
+    	HashMap<String, String> expList = new HashMap<>();
+    	for (Map.Entry<Object, Object> entry : explore.entrySet()) {
+    		StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
+    		expList.put((String) entry.getKey(), tokenizer.nextToken());
+    	}
+    	return expList;
     }
 
     public static  HashMap<String, String> getAgendas() {
