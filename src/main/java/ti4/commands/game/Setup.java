@@ -35,6 +35,11 @@ public class Setup extends GameSubcommandData {
         OptionMapping vpOption = event.getOption(Constants.VP_COUNT);
         if (vpOption != null) {
             int count = vpOption.getAsInt();
+            if (count > 14){
+                count = 14;
+            } else if (count < 1){
+                count = 1;
+            }
             activeMap.setVp(count);
         }
 

@@ -18,7 +18,7 @@ public class Map {
     @CheckForNull
     private DisplayType displayTypeForced = null;
     private int playerCountForMap = 6;
-    private int vp = 14;
+    private int vp = 10;
 
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
