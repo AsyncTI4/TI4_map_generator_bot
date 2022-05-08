@@ -214,6 +214,9 @@ public class MapSaveLoadManager {
         writer.write(Constants.PLAYER_COUNT_FOR_MAP + " " + map.getPlayerCountForMap());
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.VP_COUNT + " " + map.getVp());
+        writer.write(System.lineSeparator());
+
         StringBuilder sb1 = new StringBuilder();
         for (java.util.Map.Entry<String, List<String>> entry : map.getScoredPublicObjectives().entrySet()) {
             String userIds = String.join("-", entry.getValue());
@@ -625,6 +628,14 @@ public class MapSaveLoadManager {
                     }
                 } catch (Exception e) {
                     map.setPlayerCountForMap(6);
+                }
+            } else if (Constants.VP_COUNT.equals(identification)) {
+                String count = tokenizer[1];
+                try {
+                    int vpCount = Integer.parseInt(count);
+                    map.setVp(vpCount);
+                } catch (Exception e) {
+                    map.setVp(10);
                 }
             } else if (Constants.DISPLAY_TYPE.equals(identification)) {
                 String displayType = tokenizer[1];
