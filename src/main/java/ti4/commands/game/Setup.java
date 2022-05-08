@@ -14,6 +14,7 @@ public class Setup extends GameSubcommandData {
     public Setup() {
         super(Constants.SETUP, "Game Setup");
         addOptions(new OptionData(OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Specify player map size: 6 or 8. Default 6").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Specify game VP count").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setRequired(false).setAutoComplete(true));
     }
 
@@ -29,6 +30,12 @@ public class Setup extends GameSubcommandData {
             } else {
                 activeMap.setPlayerCountForMap(count);
             }
+        }
+
+        OptionMapping vpOption = event.getOption(Constants.VP_COUNT);
+        if (vpOption != null) {
+            int count = vpOption.getAsInt();
+            activeMap.setVp(count);
         }
 
         DisplayType displayType = null;
