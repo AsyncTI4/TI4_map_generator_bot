@@ -43,6 +43,9 @@ public class Map {
     private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
     private ArrayList<String> publicObjectives1 = new ArrayList<>();
     private ArrayList<String> publicObjectives2 = new ArrayList<>();
+    
+    private ArrayList<String> explore = new ArrayList<>();
+    private ArrayList<String> discardExplore = new ArrayList<>();
 
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
@@ -67,6 +70,10 @@ public class Map {
         Collections.shuffle(publicObjectives1);
         Collections.shuffle(publicObjectives2);
         addCustomPO(Constants.CUSTODIAN, 1);
+        
+        Set<String> exp = Mapper.getExplores().keySet();
+        explore.addAll(exp);
+        Collections.shuffle(explore);
 
         //Default SC initialization
         for (int i = 0; i < 8; i++) {
@@ -487,6 +494,61 @@ public class Map {
         return null;
     }
 
+    private List<String> getExploreDeck(String reqType, List<String> superDeck) {
+    	List<String> deck = new ArrayList<String>();
+    	for(String id : superDeck) {
+    		String card = Mapper.getExplore(id);
+    		StringTokenizer tokenizer = new StringTokenizer(card, ";");
+    		if (tokenizer.countTokens() == 4) {
+    			String name = tokenizer.nextToken();
+    			String type = tokenizer.nextToken();
+    			String count = tokenizer.nextToken();
+    			String description = tokenizer.nextToken();
+    			if (reqType.compareToIgnoreCase(type) == 0) {
+    				deck.add(id);
+    			}
+    		}
+    	}
+    	return deck;
+    }
+    
+    public String drawExplore(String reqType) {
+    	List<String> deck = getExploreDeck(reqType, explore);
+    	if (!deck.isEmpty()) {
+    		String id = deck.get(0);
+    		discardExplore(id);
+    		return id;
+    	} else {
+    		deck = getExploreDeck(reqType, discardExplore);
+    		if (!deck.isEmpty()) {
+    			explore.addAll(deck);
+    			Collections.shuffle(explore);
+    			discardExplore.clear();
+    			return drawExplore(reqType);
+    		}
+    	}
+    	return null;
+    }
+    
+    public void discardExplore(String id) {
+    	explore.remove(id);
+    	if (Mapper.getExplore(id) != null) {
+    		discardExplore.add(id);
+    	}
+    }
+    
+    public void purgeExplore(String id) {
+    	explore.remove(id);
+    	discardExplore.remove(id);
+    }
+    
+    public void addExplore(String id) {
+    	if (Mapper.getExplore(id) != null) {
+    		explore.add(id);
+    	}
+    	discardExplore.remove(id);
+    }
+    
     @CheckForNull
     public String drawActionCardAndDiscard() {
         if (!actionCards.isEmpty()) {

@@ -222,4 +222,13 @@ public class Constants {
     public static final String TECH_REMOVE = "tech_remove";
     public static final String TECH_EXHAUST = "tech_exhaust";
     public static final String TECH_REFRESH = "tech_refresh";
+    
+    public static final String EXPLORE = "explore";
+    public static final String CULTURAL = "cultural";
+    public static final String INDUSTRIAL = "industrial";
+    public static final String HAZARDOUS = "hazardous";
+    public static final String EXPLORE_CARD_ID = "explore_card_id";
+    public static final String SHUFFLE_EXP_BACK_INTO_DECK = "exp_shuffle_back_into_deck";
+    public static final String DISCARD_EXP = "exp_discard";
+    public static final String PURGE_EXP = "exp_purge";
 }
