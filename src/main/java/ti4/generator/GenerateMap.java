@@ -352,8 +352,8 @@ public class GenerateMap {
         int tempX = 0;
         int tempWidth = 0;
         for (Player player : players) {
-            String controlID = Mapper.getControlID(player.getColor());
             try {
+                String controlID = Mapper.getControlID(player.getColor());
                 BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.7f);
                 tempWidth = bufferedImage.getWidth();
                 Integer vpCount = userVPs.get(player);
@@ -362,7 +362,7 @@ public class GenerateMap {
                 }
                 int x = vpCount * width + 5 + tempX;
                 graphics.drawImage(bufferedImage, x, y + (tempCounter*bufferedImage.getHeight()), null);
-            } catch (IOException e) {
+            } catch (Exception e) {
                 LoggerHandler.log("Could not display player: " +player.getUserName() + " VP count", e);
             }
             tempCounter++;
