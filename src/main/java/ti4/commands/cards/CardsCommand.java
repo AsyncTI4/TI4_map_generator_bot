@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands.cardspn.*;
+import ti4.commands.explore.ShuffleExpBackIntoDeck;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -125,10 +126,6 @@ public class CardsCommand implements Command {
         subcommands.add(new RevealAndPutACIntoDiscard());
         subcommands.add(new SentAC());
         subcommands.add(new SentACRandom());
-        
-        subcommands.add(new ShuffleExpBackIntoDeck());
-        subcommands.add(new PurgeExp());
-        
         return subcommands;
     }
 

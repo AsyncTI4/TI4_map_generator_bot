@@ -1,4 +1,4 @@
-package ti4.commands.cards;
+package ti4.commands.explore;
 
 import org.jetbrains.annotations.NotNull;
 
@@ -6,13 +6,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.cards.CardsSubcommandData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PurgeExp extends CardsSubcommandData {
+public class PurgeExp extends ExploreSubcommandData {
 
 	public PurgeExp() {
 		super(Constants.PURGE_EXP, "Remove an Exploration card from the game.");
