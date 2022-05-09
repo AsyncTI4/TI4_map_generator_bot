@@ -18,7 +18,7 @@ public class Tile {
 
     public Tile(String tileID, String position) {
         this.tileID = tileID;
-        this.position = position;
+        this.position = position != null ? position.toLowerCase() : null;
         initPlanetsAndSpace(tileID);
     }
 
@@ -194,7 +194,7 @@ public class Tile {
     }
 
     public String getPosition() {
-        return position;
+        return position != null ? position.toLowerCase() : null;
     }
 
     public String getTilePath() {

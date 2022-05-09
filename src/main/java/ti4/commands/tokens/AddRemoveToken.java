@@ -57,7 +57,7 @@ abstract public class AddRemoveToken implements Command {
                 }
                 Tile tile = activeMap.getTile(tileID);
                 if (tile == null) {
-                    tile = activeMap.getTileByPostion(tileID);
+                    tile = activeMap.getTileByPosition(tileID);
                 }
                 if (tile == null) {
                     MessageHelper.replyToMessage(event, "Tile in map not found");

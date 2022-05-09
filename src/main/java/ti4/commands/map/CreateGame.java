@@ -2,6 +2,7 @@ package ti4.commands.map;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -61,6 +62,17 @@ public class CreateGame implements Command {
         if (!setMapSuccessful) {
             MessageHelper.replyToMessage(event, "Could not assign active map " + mapName);
         }
+        OptionMapping vpOption = event.getOption(Constants.VP_COUNT);
+        if (vpOption != null) {
+            int count = vpOption.getAsInt();
+            if (count > 14){
+                count = 14;
+            } else if (count < 1){
+                count = 1;
+            }
+            map.setVp(count);
+        }
+
         MessageHelper.replyToMessage(event, "Map created with name: " + mapName);
         MapSaveLoadManager.saveMap(map);
     }
@@ -71,8 +83,8 @@ public class CreateGame implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), "Shows selected map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name")
-                                .setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name").setRequired(true))
+                        .addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Specify game VP count").setRequired(false))
         );
     }
 }
