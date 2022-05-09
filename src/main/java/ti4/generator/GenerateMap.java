@@ -213,7 +213,10 @@ public class GenerateMap {
         float percent = 0.15f;
         int deltaY = 35;
 
+        int tempY = y;
+        y += 160;
         y = objectives(map, y);
+        scoreTrack(map, tempY);
         if (displayType != DisplayType.stats) {
             playerInfo(map);
         }
@@ -326,6 +329,46 @@ public class GenerateMap {
                     text += "Elected: " + optionalText + " - ";
                 }
                 graphics.drawString(text + Mapper.getAgendaForOnly(lawID), x, y);
+            }
+        }
+    }
+
+    private void scoreTrack(Map map, int y) {
+
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(5));
+        graphics.setFont(Storage.getFont50());
+        int height = 140;
+        int width = 150;
+        for (int i = 0; i <= map.getVp(); i++) {
+            graphics.setColor(Color.WHITE);
+            graphics.drawString(Integer.toString(i), i * width + 55, y + (height/2) + 25);
+            g2.setColor(Color.RED);
+            g2.drawRect(i * width, y, width, height);
+        }
+
+        Collection<Player> players = map.getPlayers().values();
+        int tempCounter = 0;
+        int tempX = 0;
+        int tempWidth = 0;
+        for (Player player : players) {
+            try {
+                String controlID = Mapper.getControlID(player.getColor());
+                BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.7f);
+                tempWidth = bufferedImage.getWidth();
+                Integer vpCount = userVPs.get(player);
+                if (vpCount == null) {
+                    vpCount = 0;
+                }
+                int x = vpCount * width + 5 + tempX;
+                graphics.drawImage(bufferedImage, x, y + (tempCounter*bufferedImage.getHeight()), null);
+            } catch (Exception e) {
+                LoggerHandler.log("Could not display player: " +player.getUserName() + " VP count", e);
+            }
+            tempCounter++;
+            if (tempCounter >= 4){
+                tempCounter = 0;
+                tempX = tempWidth;
             }
         }
     }

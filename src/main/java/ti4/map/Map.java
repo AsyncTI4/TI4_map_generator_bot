@@ -18,6 +18,7 @@ public class Map {
     @CheckForNull
     private DisplayType displayTypeForced = null;
     private int playerCountForMap = 6;
+    private int vp = 10;
 
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
@@ -79,6 +80,14 @@ public class Map {
         for (int i = 0; i < 8; i++) {
             scTradeGoods.put(i + 1, 0);
         }
+    }
+
+    public int getVp() {
+        return vp;
+    }
+
+    public void setVp(int vp) {
+        this.vp = vp;
     }
 
     public String getCreationDate() {
@@ -800,7 +809,7 @@ public class Map {
                 .orElse(null);
     }
 
-    public Tile getTileByPostion(String position) {
+    public Tile getTileByPosition(String position) {
         return tileMap.get(position);
     }
 
