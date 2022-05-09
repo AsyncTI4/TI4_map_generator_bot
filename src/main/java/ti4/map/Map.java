@@ -494,8 +494,8 @@ public class Map {
         return null;
     }
 
-    private List<String> getExploreDeck(String reqType, List<String> superDeck) {
-    	List<String> deck = new ArrayList<String>();
+    private ArrayList<String> getExplores(String reqType, List<String> superDeck) {
+    	ArrayList<String> deck = new ArrayList<String>();
     	for(String id : superDeck) {
     		String card = Mapper.getExplore(id);
     		StringTokenizer tokenizer = new StringTokenizer(card, ";");
@@ -512,14 +512,22 @@ public class Map {
     	return deck;
     }
     
+    public ArrayList<String> getExploreDeck(String reqType) {
+    	return getExplores(reqType, explore);
+    }
+    
+    public ArrayList<String> getExploreDiscard(String reqType) {
+    	return getExplores(reqType, discardExplore);
+    }
+    
     public String drawExplore(String reqType) {
-    	List<String> deck = getExploreDeck(reqType, explore);
+    	List<String> deck = getExplores(reqType, explore);
     	if (!deck.isEmpty()) {
     		String id = deck.get(0);
     		discardExplore(id);
     		return id;
     	} else {
-    		deck = getExploreDeck(reqType, discardExplore);
+    		deck = getExplores(reqType, discardExplore);
     		if (!deck.isEmpty()) {
     			explore.addAll(deck);
     			Collections.shuffle(explore);
@@ -547,6 +555,13 @@ public class Map {
     		explore.add(id);
     	}
     	discardExplore.remove(id);
+    }
+    
+    public void resetExplore() {
+    	explore.clear();
+    	discardExplore.clear();
+    	Set<String> exp = Mapper.getExplores().keySet();
+    	explore.addAll(exp);
     }
     
     @CheckForNull

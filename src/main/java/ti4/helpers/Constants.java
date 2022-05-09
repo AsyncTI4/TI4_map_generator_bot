@@ -228,7 +228,13 @@ public class Constants {
     public static final String INDUSTRIAL = "industrial";
     public static final String HAZARDOUS = "hazardous";
     public static final String EXPLORE_CARD_ID = "explore_card_id";
-    public static final String SHUFFLE_EXP_BACK_INTO_DECK = "exp_shuffle_back_into_deck";
-    public static final String DISCARD_EXP = "exp_discard";
-    public static final String PURGE_EXP = "exp_purge";
+    public static final String SHUFFLE_EXP_BACK_INTO_DECK = "shuffle_back_into_deck";
+    public static final String DISCARD_EXP = "discard";
+    public static final String PURGE_EXP = "purge";
+    public static final String EXP_DECK = "deck";
+    public static final String EXP_TYPE = "type";
+    public static final String EXP_INFO = "info";
+    public static final String EXP_TYPE_DESCRIPTION = "Cultural, Industrial, Hazardous, or Frontier.";
+    public static final String EXP_PLANET = "planet";
+    public static final String EXP_RESET = "reset";
 }

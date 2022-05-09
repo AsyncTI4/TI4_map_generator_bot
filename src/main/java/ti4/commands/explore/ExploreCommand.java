@@ -21,7 +21,9 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class Explore implements Command {
+public class ExploreCommand implements Command {
+	
+	private final Collection<ExploreSubcommandData> subcommandData = getSubcommands();
 
 	@Override
 	public String getActionID() {
@@ -29,7 +31,7 @@ public class Explore implements Command {
 	}
 	
 	public String getActionDescription() {
-		return "Draw an explore card from the specified deck.";
+		return "Explore";
 	}
 
 	@Override
@@ -39,22 +41,38 @@ public class Explore implements Command {
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
+		//ExploreSubcommandData subCommandExecuted = null;
+		String subcommandName = event.getInteraction().getSubcommandName();
+		for (ExploreSubcommandData subcommand : subcommandData) {
+			if (Objects.equals(subcommand.getName(), subcommandName)) {
+				subcommand.preExecute(event);
+				subcommand.execute(event);
+				//subCommandExecuted = subcommand;
+			}
+		}
 		String userID = event.getUser().getId();
 		Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-		String cardID = activeMap.drawExplore(event.getOptions().get(0).getAsString().toLowerCase());
-		
-		StringBuilder sb = new StringBuilder();
-		String cardInfo = Mapper.getExplore(cardID);
-		sb.append("(").append(cardID).append(") ").append(cardInfo);
-		MessageHelper.replyToMessage(event, sb.toString());
-		MessageHelper.sendMessageToChannel(event.getChannel(), "Card has been discarded. Resolve effects and/or purge manually.");
+		MapSaveLoadManager.saveMap(activeMap);
 	}
 
-	@Override
-	public void registerCommands(CommandListUpdateAction commands) {
-		OptionData type = new OptionData(OptionType.STRING, "type", "Cultural, Industrial, Hazardous, or Frontier.").setRequired(true);
-		commands.addCommands(Commands.slash(getActionID(),getActionDescription()).addOptions(type));
+	private Collection<ExploreSubcommandData> getSubcommands() {
+		Collection<ExploreSubcommandData> subcommands = new HashSet<>();
+		subcommands.add(new DiscardExp());
+		subcommands.add(new ExpDeck());
+		subcommands.add(new PurgeExp());
+		subcommands.add(new ShuffleExpBackIntoDeck());
+		subcommands.add(new ExpInfo());
+		subcommands.add(new ExpPlanet());
+		subcommands.add(new ExpReset());
+		return subcommands;
 	}
 	
+	@Override
+	public void registerCommands(CommandListUpdateAction commands) {
+		commands.addCommands(
+				Commands.slash(getActionID(), getActionDescription())
+					.addSubcommands(getSubcommands()));
+	}
+
 	
 }
