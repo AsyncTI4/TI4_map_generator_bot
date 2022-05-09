@@ -34,7 +34,7 @@ abstract public class AddRemoveUnits implements Command {
             return;
         } else {
 
-            String color = event.getOptions().get(0).getAsString().toLowerCase();
+            String color = AliasHandler.resolveColor(event.getOptions().get(0).getAsString().toLowerCase());
             if (!Mapper.isColorValid(color)) {
                 MessageHelper.replyToMessage(event, "Color not valid");
                 return;

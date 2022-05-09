@@ -17,6 +17,7 @@ public class AliasHandler {
     private static HashMap<String, String> attachmentAliasList = new HashMap<>();
     private static HashMap<String, String> tokenAliasList = new HashMap<>();
     private static HashMap<String, String>  factionAliasList = new HashMap<>();
+    private static HashMap<String, String>  colorAliasList = new HashMap<>();
 
     public static void init()
     {
@@ -29,6 +30,7 @@ public class AliasHandler {
         readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
         readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
         readAliasFile("faction_alias.properties", factionAliasList, "Could not read faction alias file");
+        readAliasFile("color_alias.properties", colorAliasList, "Could not read color alias file");
     }
     private static void readAliasFile(String fileName, ArrayList<String> list) {
         readAliasFile(fileName, list, false);
@@ -91,6 +93,12 @@ public class AliasHandler {
     public static String resolveFaction(String name)
     {
         String aliasID = factionAliasList.get(name);
+        return aliasID != null ? aliasID : name;
+    }
+
+    public static String resolveColor(String name)
+    {
+        String aliasID = colorAliasList.get(name);
         return aliasID != null ? aliasID : name;
     }
 

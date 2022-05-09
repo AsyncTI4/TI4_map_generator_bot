@@ -3,6 +3,7 @@ package ti4.commands.cards;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -92,7 +93,7 @@ public class CardsInfo extends CardsSubcommandData {
     }
 
     private static void checkAndAddPNs(Map activeMap, Player player) {
-        String playerColor = player.getColor();
+        String playerColor = AliasHandler.resolveColor(player.getColor());
         String playerFaction = player.getFaction();
         if (Mapper.isColorValid(playerColor) && Mapper.isFaction(playerFaction)){
             List<String> promissoryNotes = new ArrayList<>(Mapper.getPromissoryNotes(playerColor, playerFaction));
