@@ -54,7 +54,7 @@ public class ExpPlanet extends ExploreSubcommandData {
 		}
 		Tile tile = activeMap.getTile(tileID);
 		if (tile == null) {
-			tile = activeMap.getTileByPostion(tileID);
+			tile = activeMap.getTileByPosition(tileID);
 		}
 		if (tile == null) {
 			MessageHelper.replyToMessage(event,  "Tile not found");
