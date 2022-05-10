@@ -40,7 +40,7 @@ abstract public class AddRemoveUnits implements Command {
                 return;
             }
 
-            String tileID = AliasHandler.resolveTile(event.getOptions().get(1).getAsString());
+            String tileID = AliasHandler.resolveTile(event.getOptions().get(1).getAsString().toLowerCase());
             Map activeMap = mapManager.getUserActiveMap(userID);
             Tile tile = getTile(event, tileID, activeMap);
             if (tile == null) return;
