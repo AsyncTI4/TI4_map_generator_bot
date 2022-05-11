@@ -1,6 +1,7 @@
 package ti4.map;
 
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 
 import java.util.*;
 import java.util.List;
@@ -249,7 +250,7 @@ public class Player {
     }
 
     public void setColor(String color) {
-        this.color = color;
+        this.color = AliasHandler.resolveColor(color);
         initPNs();
     }
 
