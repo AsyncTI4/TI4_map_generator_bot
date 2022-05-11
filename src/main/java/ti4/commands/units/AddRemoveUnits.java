@@ -34,13 +34,13 @@ abstract public class AddRemoveUnits implements Command {
             return;
         } else {
 
-            String color = event.getOptions().get(0).getAsString().toLowerCase();
+            String color = AliasHandler.resolveColor(event.getOptions().get(0).getAsString().toLowerCase());
             if (!Mapper.isColorValid(color)) {
                 MessageHelper.replyToMessage(event, "Color not valid");
                 return;
             }
 
-            String tileID = AliasHandler.resolveTile(event.getOptions().get(1).getAsString());
+            String tileID = AliasHandler.resolveTile(event.getOptions().get(1).getAsString().toLowerCase());
             Map activeMap = mapManager.getUserActiveMap(userID);
             Tile tile = getTile(event, tileID, activeMap);
             if (tile == null) return;

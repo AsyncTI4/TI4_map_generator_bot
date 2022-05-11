@@ -88,6 +88,7 @@ public class AdminCommand implements Command {
         subcommands.add(new SaveMaps());
         subcommands.add(new Shutdown());
         subcommands.add(new ReloadMap());
+        subcommands.add(new CardsInfoForPlayer());
         return subcommands;
     }
 

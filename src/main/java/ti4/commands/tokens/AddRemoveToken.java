@@ -37,7 +37,7 @@ abstract public class AddRemoveToken implements Command {
                 colorString = colorString.replace(" ", "");
                 StringTokenizer colorTokenizer = new StringTokenizer(colorString, ",");
                 while (colorTokenizer.hasMoreTokens()) {
-                    String color = colorTokenizer.nextToken();
+                    String color = AliasHandler.resolveColor(colorTokenizer.nextToken());
                     if (!colors.contains(color)) {
                         colors.add(color);
                         if (!Mapper.isColorValid(color)) {

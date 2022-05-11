@@ -66,6 +66,7 @@ public class Mapper {
 
     public static List<String>  getPromissoryNotes(String color, String faction){
         List<String> pnList = new ArrayList<>();
+        color = AliasHandler.resolveColor(color);
         if (Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
             for (Map.Entry<Object, Object> entry : promissoryNotes.entrySet()) {
                 String value = (String) entry.getValue();

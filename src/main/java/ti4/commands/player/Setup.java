@@ -36,7 +36,7 @@ public class Setup extends PlayerSubcommandData {
             return;
         }
         @SuppressWarnings("ConstantConditions")
-        String color = event.getOption(Constants.COLOR).getAsString().toLowerCase();
+        String color = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
         if (!Mapper.isColorValid(color)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Color not valid");
             return;
