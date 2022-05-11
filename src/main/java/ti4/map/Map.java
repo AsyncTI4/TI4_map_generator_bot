@@ -508,7 +508,7 @@ public class Map {
     	for(String id : superDeck) {
     		String card = Mapper.getExplore(id);
     		StringTokenizer tokenizer = new StringTokenizer(card, ";");
-    		if (tokenizer.countTokens() == 4) {
+    		if (tokenizer.countTokens() >= 5) {
     			String name = tokenizer.nextToken();
     			String type = tokenizer.nextToken();
     			String count = tokenizer.nextToken();
@@ -768,6 +768,22 @@ public class Map {
 
     public List<String> getActionCards() {
         return actionCards;
+    }
+    
+    public List<String> getAllExplores() {
+    	return explore;
+    }
+    
+    public List<String> getAllExploreDiscard() {
+    	return discardExplore;
+    }
+    
+    public void setExploreDeck(ArrayList<String> deck) {
+    	explore = deck;
+    }
+    
+    public void setExploreDiscard(ArrayList<String> discard) {
+    	discardExplore = discard;
     }
 
     public void setSecretObjectives(List<String> secretObjectives) {
