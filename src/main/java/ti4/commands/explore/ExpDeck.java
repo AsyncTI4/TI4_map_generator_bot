@@ -18,7 +18,7 @@ import ti4.message.MessageHelper;
 
 public class ExpDeck extends ExploreSubcommandData {
 	public ExpDeck() {
-		super(Constants.EXP_DECK, "Draw from a specified Exploration Deck.");
+		super(Constants.DECK, "Draw from a specified Exploration Deck.");
 		addOptions(new OptionData(OptionType.STRING, Constants.EXP_TYPE, Constants.EXP_TYPE_DESCRIPTION).setRequired(true));
 	}
 	

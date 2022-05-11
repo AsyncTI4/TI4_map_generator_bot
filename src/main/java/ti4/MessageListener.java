@@ -39,6 +39,7 @@ public class MessageListener extends ListenerAdapter {
         Set<String> mapList = mapManager.getMapList().keySet();
         StringTokenizer channelNameTokenizer = new StringTokenizer(channelName, "-");
 
+
         MapFileDeleter.deleteFiles();
 
         String gameID = channelNameTokenizer.nextToken();
