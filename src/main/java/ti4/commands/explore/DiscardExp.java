@@ -26,7 +26,7 @@ public class DiscardExp extends ExploreSubcommandData {
 		String card = Mapper.getExplore(id);
 		if(card != null) {
 			activeMap.discardExplore(id);
-			sb.append("Card shuffled into explore deck: \n(").append(id).append(") ").append(card);
+			sb.append("Card discarded: \n(").append(id).append(") ").append(card);
 		} else {
 			sb.append("No such Exploration Card ID found, please retry");
 		}
