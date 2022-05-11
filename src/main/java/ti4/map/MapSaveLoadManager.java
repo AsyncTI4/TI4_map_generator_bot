@@ -166,6 +166,13 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
 
         writeCards(map.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
+        
+        writer.write(Constants.EXPLORE + " " + String.join(",", map.getAllExplores()));
+        writer.write(System.lineSeparator());
+        
+        writer.write(Constants.DISCARDED_EXPLORES + " " + String.join(",", map.getAllExploreDiscard()));
+        writer.write(System.lineSeparator());
+        
         writer.write(Constants.SPEAKER + " " + map.getSpeaker());
         writer.write(System.lineSeparator());
 
@@ -597,6 +604,10 @@ public class MapSaveLoadManager {
                 map.setSentAgendas(getParsedCards(tokenizer[1]));
             } else if (Constants.LAW.equals(identification)) {
                 map.setLaws(getParsedCards(tokenizer[1]));
+            } else if (Constants.EXPLORE.equals(identification)) {
+            	map.setExploreDeck(getCardList(tokenizer[1]));
+            } else if (Constants.DISCARDED_EXPLORES.equals(identification)) {
+            	map.setExploreDiscard(getCardList(tokenizer[1]));
             } else if (Constants.LAW_INFO.equals(identification)) {
                 StringTokenizer actionCardToken = new StringTokenizer(tokenizer[1], ";");
                 LinkedHashMap<String, String> cards = new LinkedHashMap<>();

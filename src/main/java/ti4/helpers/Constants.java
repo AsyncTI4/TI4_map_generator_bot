@@ -232,10 +232,15 @@ public class Constants {
     public static final String SHUFFLE_EXP_BACK_INTO_DECK = "shuffle_back_into_deck";
     public static final String DISCARD_EXP = "discard";
     public static final String PURGE_EXP = "purge";
-    public static final String EXP_DECK = "deck";
+    public static final String DECK = "deck";
     public static final String EXP_TYPE = "type";
     public static final String EXP_INFO = "info";
     public static final String EXP_TYPE_DESCRIPTION = "Cultural, Industrial, Hazardous, or Frontier.";
     public static final String EXP_PLANET = "planet";
     public static final String EXP_RESET = "reset";
+    public static final String INSTANT = "instant";
+    public static final String ATTACH = "attach";
+    public static final String EXP_TOKEN = "token";
+    public static final String FRAGMENT = "fragment";
+    public static final String DISCARDED_EXPLORES = "discarded_explores";
 }
