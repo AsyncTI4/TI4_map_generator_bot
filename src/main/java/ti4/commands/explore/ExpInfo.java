@@ -1,6 +1,7 @@
 package ti4.commands.explore;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.StringTokenizer;
 
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +40,9 @@ public class ExpInfo extends ExploreSubcommandData {
 		for (String currentType : types) {
 			StringBuilder info = new StringBuilder();
 			ArrayList<String> deck = activeMap.getExploreDeck(currentType);
+			Collections.shuffle(deck);
 			ArrayList<String> discard = activeMap.getExploreDiscard(currentType);
+			Collections.shuffle(discard);
 			info.append("**").append(currentType.toUpperCase()).append(" EXPLORE DECK**\n").append(listNames(deck)).append("\n");
 			info.append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD**\n").append(listNames(discard)).append("\n");
 			MessageHelper.replyToMessage(event, info.toString());

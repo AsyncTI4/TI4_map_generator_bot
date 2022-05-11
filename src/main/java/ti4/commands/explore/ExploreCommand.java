@@ -64,6 +64,7 @@ public class ExploreCommand implements Command {
 		subcommands.add(new ExpInfo());
 		subcommands.add(new ExpPlanet());
 		subcommands.add(new ExpReset());
+		subcommands.add(new ExpFrontier());
 		return subcommands;
 	}
 	

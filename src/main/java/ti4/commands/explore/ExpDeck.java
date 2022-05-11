@@ -16,9 +16,9 @@ import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
-public class ExpDeck extends ExploreSubcommandData {
+public class ExpDeck extends ExpPlanet {
 	public ExpDeck() {
-		super(Constants.EXP_DECK, "Draw from a specified Exploration Deck.");
+		super(Constants.DECK, "Draw from a specified Exploration Deck.");
 		addOptions(new OptionData(OptionType.STRING, Constants.EXP_TYPE, Constants.EXP_TYPE_DESCRIPTION).setRequired(true));
 	}
 	
@@ -34,10 +34,7 @@ public class ExpDeck extends ExploreSubcommandData {
 		Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
 		String cardID = activeMap.drawExplore(event.getOptions().get(0).getAsString().toLowerCase());
 		
-		StringBuilder sb = new StringBuilder();
-		String cardInfo = Mapper.getExplore(cardID);
-		sb.append("(").append(cardID).append(") ").append(cardInfo);
-		MessageHelper.replyToMessage(event, sb.toString());
+		MessageHelper.replyToMessage(event, displayExplore(cardID));
 		MessageHelper.sendMessageToChannel(event.getChannel(), "Card has been discarded. Resolve effects and/or purge manually.");
 	}
 }
