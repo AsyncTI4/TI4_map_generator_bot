@@ -47,11 +47,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
     protected String displayExplore(String cardID) {
         String card = Mapper.getExplore(cardID);
-		StringTokenizer tokenizer = new StringTokenizer(card, ";");
-
-		String name = tokenizer.nextToken();
-		String description = tokenizer.nextToken();
-
+        String[] cardInfo = card.split(";");
+		String name = cardInfo[0];
+		String description = cardInfo[4];
 		StringBuilder sb = new StringBuilder();
 		sb.append("(").append(cardID).append(") ").append(name).append(" - ").append(description);
         return sb.toString();
