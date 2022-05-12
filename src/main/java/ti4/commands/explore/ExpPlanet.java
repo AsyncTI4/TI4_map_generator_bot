@@ -39,9 +39,10 @@ public class ExpPlanet extends ExploreSubcommandData {
 
         String message = "Card has been discarded. Resolve effects manually.";
         String card = Mapper.getExplore(cardID);
-        StringTokenizer cardInfo = new StringTokenizer(card, ";");
-        String color = cardInfo.nextToken();
-        String cardType = cardInfo.nextToken();
+        String[] cardInfo = card.split(";");
+
+        String color = cardInfo[1];
+        String cardType = cardInfo[3];
         if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
             Player player = activeMap.getPlayer(getUser().getId());
             if (color.equalsIgnoreCase(Constants.CULTURAL)) {
@@ -58,14 +59,14 @@ public class ExpPlanet extends ExploreSubcommandData {
         } else if (cardType.equalsIgnoreCase(Constants.ATTACH)) {
             String tokenFilename = null;
             while (tokenFilename == null) {
-                String token = cardInfo.nextToken();
+                String token = cardInfo[5];
                 tokenFilename = Mapper.getAttachmentID(token);
             }
             tile.addToken(tokenFilename, planetName);
             activeMap.purgeExplore(cardID);
             message = "Token added to planet";
         } else if (cardType.equalsIgnoreCase(Constants.TOKEN)) {
-            String token = cardInfo.nextToken();
+            String token = cardInfo[5];
             String tokenFilename = Mapper.getAttachmentID(token);
             tile.addToken(tokenFilename, Constants.SPACE);
             message = "Token added to map";

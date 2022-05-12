@@ -510,8 +510,8 @@ public class Map {
     	for(String id : superDeck) {
     		String card = Mapper.getExplore(id);
     		if (card != null) {
-    			StringTokenizer tokenizer = new StringTokenizer(card, ";");
-    			String type = tokenizer.nextToken();
+                String[] split = card.split(";");
+    			String type = split[1];
     			if (reqType.equalsIgnoreCase(type)) {
     				deck.add(id);
     			}
