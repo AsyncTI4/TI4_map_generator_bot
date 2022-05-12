@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.map.Map;
-import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
 public class Setup extends GameSubcommandData {
@@ -16,6 +15,7 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Specify player map size: 6 or 8. Default 6").setRequired(false));
         addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Specify game VP count").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setRequired(false).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Add Custom description to game").setRequired(false));
     }
 
     @Override
@@ -59,6 +59,12 @@ public class Setup extends GameSubcommandData {
                 return;
             }
         }
+        OptionMapping customOption = event.getOption(Constants.GAME_CUSTOM_NAME);
+        if (customOption != null){
+            String customName = customOption.getAsString();
+            activeMap.setCustomName(customName);
+        }
+
         if (displayType != null) {
             activeMap.setDisplayTypeForced(displayType);
         }
