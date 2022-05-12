@@ -236,6 +236,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.LAST_MODIFIED_DATE + " " + new Date().getTime());
         writer.write(System.lineSeparator());
+        writer.write(Constants.GAME_CUSTOM_NAME + " " + map.getCustomName());
+        writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
@@ -666,6 +668,8 @@ public class MapSaveLoadManager {
                     Boolean status = Boolean.parseBoolean(dataInfo.nextToken());
                     map.setSCPlayed(scID, status);
                 }
+            } else if (Constants.GAME_CUSTOM_NAME.equals(identification)) {
+                map.setCustomName(tokenizer[1]);
             } else if (Constants.CREATION_DATE.equals(identification)) {
                 map.setCreationDate(tokenizer[1]);
             } else if (Constants.LAST_MODIFIED_DATE.equals(identification)) {
