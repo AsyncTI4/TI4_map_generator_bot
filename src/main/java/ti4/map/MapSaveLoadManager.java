@@ -94,6 +94,7 @@ public class MapSaveLoadManager {
                     CopyOption[] options = {StandardCopyOption.REPLACE_EXISTING};
                     Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
                     mapUndoStorage.delete();
+//                    reload(map);
                     Map loadedMap = loadMap(originalMapFile);
                     MapManager.getInstance().deleteMap(map.getName());
                     MapManager.getInstance().addMap(loadedMap);
