@@ -12,16 +12,18 @@ import ti4.message.MessageHelper;
 
 import java.util.LinkedHashMap;
 import java.util.StringTokenizer;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 public class Stats extends PlayerSubcommandData {
     public Stats() {
         super(Constants.STATS, "Player Stats: CC,TG,Commodities");
         addOptions(new OptionData(OptionType.STRING, Constants.CC, "CC's Example: 3/3/2"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.TACTICAL, "Tactical command counter count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.FLEET, "Fleet command counter count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY, "Strategy command counter count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade goods count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES, "Commodity count"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactical command counter count"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet command counter count"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy command counter count"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade goods count"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.CRF, "Cultural Relic Fragment count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.HRF, "Hazardous Relic Fragment count"))
@@ -80,22 +82,22 @@ public class Stats extends PlayerSubcommandData {
                 }
             }
             if (optionT != null) {
-                player.setTacticalCC(optionT.getAsInt());
+                setValue(event, player, optionT, player::setTacticalCC, player::getTacticalCC);
             }
             if (optionF != null) {
-                player.setFleetCC(optionF.getAsInt());
+                setValue(event, player, optionF, player::setFleetCC, player::getFleetCC);
             }
             if (optionS != null) {
-                player.setStrategicCC(optionS.getAsInt());
+                setValue(event, player, optionS, player::setStrategicCC, player::getStrategicCC);
             }
         }
         OptionMapping optionTG = event.getOption(Constants.TG);
         if (optionTG != null) {
-            player.setTg(optionTG.getAsInt());
+            setValue(event, player, optionTG, player::setTg, player::getTg);
         }
         OptionMapping optionC = event.getOption(Constants.COMMODITIES);
         if (optionC != null) {
-            player.setCommodities(optionC.getAsInt());
+            setValue(event, player, optionC, player::setCommodities, player::getCommodities);
         }
         OptionMapping optionCT = event.getOption(Constants.COMMODITIES_TOTAL);
         if (optionCT != null) {
@@ -176,6 +178,27 @@ public class Stats extends PlayerSubcommandData {
                     activeMap.setSCPlayed(sc, false);
                 }
             }
+        }
+    }
+
+    private void setValue(SlashCommandInteractionEvent event, Player player, OptionMapping option, Consumer<Integer> consumer, Supplier<Integer> supplier) {
+        try  {
+            boolean setValue = true;
+            String value = option.getAsString();
+            if (value.startsWith("+") || value.startsWith("-")) {
+                setValue = false;
+            }
+            int number = Integer.parseInt(value);
+            int existingNumber = supplier.get();
+            if (setValue){
+                consumer.accept(number);
+            } else {
+                number = existingNumber + number;
+                number = Math.max(number, 0);
+                consumer.accept(number);
+            }
+        } catch (Exception e){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not parse number for: " + option.getName());
         }
     }
 }

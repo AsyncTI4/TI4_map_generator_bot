@@ -511,7 +511,6 @@ public class Map {
     		String card = Mapper.getExplore(id);
     		if (card != null) {
     			StringTokenizer tokenizer = new StringTokenizer(card, ";");
-    			String name = tokenizer.nextToken();
     			String type = tokenizer.nextToken();
     			if (reqType.equalsIgnoreCase(type)) {
     				deck.add(id);
