@@ -16,25 +16,30 @@ import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
-public class ExpDeck extends ExpPlanet {
+public class ExpDeck extends ExploreSubcommandData {
 	public ExpDeck() {
-		super(Constants.DECK, "Draw from a specified Exploration Deck.");
-		addOptions(new OptionData(OptionType.STRING, Constants.EXP_TYPE, Constants.EXP_TYPE_DESCRIPTION).setRequired(true));
-	}
-	
-	@Override
-	public String getActionID() {
-		//TODO
-		return "";
+		super(Constants.DRAW_AND_DISCARD, "Draw from a specified Exploration Deck.");
+		addOptions(
+			typeOption.setRequired(true), 
+			new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of cards to draw (default 1)")
+		);
 	}
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
-		String userID = event.getUser().getId();
-		Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-		String cardID = activeMap.drawExplore(event.getOptions().get(0).getAsString().toLowerCase());
-		
-		MessageHelper.replyToMessage(event, displayExplore(cardID));
-		MessageHelper.sendMessageToChannel(event.getChannel(), "Card has been discarded. Resolve effects and/or purge manually.");
+		OptionMapping countOpt = event.getOption(Constants.COUNT);
+		int count;
+		if (countOpt != null) {
+			count = countOpt.getAsInt();
+		} else {
+			count = 1;
+		}
+		for (int i = 0; i < count; i++) {
+			String userID = event.getUser().getId();
+			Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+			String cardID = activeMap.drawExplore(event.getOption(Constants.EXPLORE_TYPE).getAsString().toLowerCase());
+			MessageHelper.replyToMessage(event, displayExplore(cardID));
+		}
+		MessageHelper.sendMessageToChannel(event.getChannel(), "Cards have been discarded. Resolve effects and/or purge manually.");
 	}
 }

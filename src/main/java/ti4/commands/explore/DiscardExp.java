@@ -1,5 +1,7 @@
 package ti4.commands.explore;
 
+import java.util.StringTokenizer;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -14,23 +16,28 @@ import ti4.message.MessageHelper;
 public class DiscardExp extends ExploreSubcommandData {
 
 	public DiscardExp() {
-		super(Constants.DISCARD_EXP, "Discard an Exploration Card from the deck.");
-		addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card ID sent between ()").setRequired(true));
+		super(Constants.DISCARD, "Discard an Exploration Card from the deck.");
+		addOptions(idOption.setRequired(true));
 	}
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		Map activeMap = getActiveMap();
-		String id = event.getOption(Constants.EXPLORE_CARD_ID).getAsString();
-		StringBuilder sb = new StringBuilder();
-		String card = Mapper.getExplore(id);
-		if(card != null) {
-			activeMap.discardExplore(id);
-			sb.append("Card discarded: \n(").append(id).append(") ").append(card);
-		} else {
-			sb.append("No such Exploration Card ID found, please retry");
+		String ids = event.getOption(Constants.EXPLORE_CARD_ID).getAsString().replaceAll(" ", "");
+		StringTokenizer idTokenizer = new StringTokenizer(ids, ",");
+		int count = idTokenizer.countTokens();
+		for (int i = 0; i < count; i++) {
+			String id = idTokenizer.nextToken();
+			StringBuilder sb = new StringBuilder();
+			String card = Mapper.getExplore(id);
+			if(card != null) {
+				activeMap.discardExplore(id);
+				sb.append("Card discarded: \n").append(displayExplore(id));
+			} else {
+				sb.append("Card ID ").append(id).append(" not found, please retry");
+			}
+			MessageHelper.replyToMessage(event, sb.toString());
 		}
-		MessageHelper.replyToMessage(event, sb.toString());
 	}
 	
 }

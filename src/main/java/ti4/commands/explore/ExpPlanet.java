@@ -26,7 +26,7 @@ import ti4.commands.units.AddRemoveUnits;
 public class ExpPlanet extends ExploreSubcommandData {
 
 	public ExpPlanet() {
-		super(Constants.EXP_PLANET, "Explore a specific planet.");
+		super(Constants.PLANET, "Explore a specific planet.");
 		addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile containing the planet").setRequired(true), 
 				new OptionData(OptionType.STRING, Constants.PLANET_NAME, "Planet to explore").setRequired(true));
 	}
@@ -78,7 +78,7 @@ public class ExpPlanet extends ExploreSubcommandData {
 			tile.addToken(tokenFilename, planetName);
 			activeMap.purgeExplore(cardID);
 			message = "Token added to planet";
-		} else if (cardType.equalsIgnoreCase(Constants.EXP_TOKEN)) {
+		} else if (cardType.equalsIgnoreCase(Constants.TOKEN)) {
 			String token = cardInfo.nextToken();
 			String tokenFilename = Mapper.getAttachmentID(token);
 			tile.addToken(tokenFilename, Constants.SPACE);
@@ -91,34 +91,5 @@ public class ExpPlanet extends ExploreSubcommandData {
 		MessageHelper.sendMessageToChannel(event.getChannel(), message);
 	}
 	
-	protected Tile getTile(SlashCommandInteractionEvent event, String tileID, Map activeMap) {
-		if (activeMap.isTileDuplicated(tileID)) {
-			MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
-			return null;
-		}
-		Tile tile = activeMap.getTile(tileID);
-		if (tile == null) {
-			tile = activeMap.getTileByPosition(tileID);
-		}
-		if (tile == null) {
-			MessageHelper.replyToMessage(event,  "Tile not found");
-			return null;
-		}
-		return tile;
-	}
-
-	protected String displayExplore(String cardID) {
-		StringBuilder sb = new StringBuilder();
-		String card = Mapper.getExplore(cardID);
-		StringTokenizer tokenizer = new StringTokenizer(card, ";");
-		
-		String name = tokenizer.nextToken();
-		String color = tokenizer.nextToken();
-		String count = tokenizer.nextToken();
-		String type = tokenizer.nextToken();
-		String description = tokenizer.nextToken();
-		sb.append("(").append(cardID).append(") ").append(name).append(" - ").append(description);
-		return sb.toString();
-	}
 	
 }
