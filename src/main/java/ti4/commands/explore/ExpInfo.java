@@ -20,15 +20,15 @@ import ti4.message.MessageHelper;
 public class ExpInfo extends ExploreSubcommandData {
 
 	public ExpInfo() {
-		super(Constants.EXP_INFO, "Display cards in exploration decks and discards.");
-		addOptions(new OptionData(OptionType.STRING, Constants.EXP_TYPE, Constants.EXP_TYPE_DESCRIPTION));
+		super(Constants.INFO, "Display cards in exploration decks and discards.");
+		addOptions(typeOption);
 	}
 
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		Map activeMap = getActiveMap();
 		ArrayList<String> types = new ArrayList<String>();
-		OptionMapping reqType = event.getOption(Constants.EXP_TYPE);
+		OptionMapping reqType = event.getOption(Constants.EXPLORE_TYPE);
 		if (reqType != null) {
 			types.add(reqType.getAsString());
 		} else {
@@ -40,9 +40,9 @@ public class ExpInfo extends ExploreSubcommandData {
 		for (String currentType : types) {
 			StringBuilder info = new StringBuilder();
 			ArrayList<String> deck = activeMap.getExploreDeck(currentType);
-			Collections.shuffle(deck);
+			Collections.sort(deck);
 			ArrayList<String> discard = activeMap.getExploreDiscard(currentType);
-			Collections.shuffle(discard);
+			Collections.sort(discard);
 			info.append("**").append(currentType.toUpperCase()).append(" EXPLORE DECK**\n").append(listNames(deck)).append("\n");
 			info.append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD**\n").append(listNames(discard)).append("\n");
 			MessageHelper.replyToMessage(event, info.toString());
@@ -52,8 +52,12 @@ public class ExpInfo extends ExploreSubcommandData {
 	private String listNames(ArrayList<String> deck) {
 		StringBuilder sb = new StringBuilder();
 		for (String cardID : deck) {
-			StringTokenizer cardInfo = new StringTokenizer(Mapper.getExplore(cardID), ";");
-			String name = cardInfo.nextToken();
+			String card = Mapper.getExplore(cardID);
+			String name = null;
+			if (card != null) {
+				StringTokenizer cardInfo = new StringTokenizer(card, ";");
+				name = cardInfo.nextToken();
+			}
 			sb.append("(").append(cardID).append(") ").append(name).append("\n");
 		}
 		return sb.toString();

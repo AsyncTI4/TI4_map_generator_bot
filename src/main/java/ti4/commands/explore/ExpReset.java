@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 public class ExpReset extends ExploreSubcommandData {
 
 	public ExpReset() {
-		super(Constants.EXP_RESET, "Reset the exploration decks, emptying discards and adding all cards to their respective decks.");
+		super(Constants.RESET, "Reset the exploration decks, emptying discards and adding all cards to their respective decks.");
 		addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Type YES").setRequired(true));
 	}
 

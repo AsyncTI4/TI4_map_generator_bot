@@ -19,7 +19,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 
-public class ExpFrontier extends ExpPlanet {
+public class ExpFrontier extends ExploreSubcommandData {
 	public ExpFrontier() {
 		super(Constants.FRONTIER, "Explore a frontier tile");
 		addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Location of the frontier tile").setRequired(true));
@@ -51,7 +51,7 @@ public class ExpFrontier extends ExpPlanet {
 				player.setVrf(player.getVrf()+1);
 				message = "Gained relic fragment";
 				activeMap.purgeExplore(cardID);
-			} else if (cardType.equalsIgnoreCase(Constants.EXP_TOKEN)) {
+			} else if (cardType.equalsIgnoreCase(Constants.TOKEN)) {
 				String token = cardInfo.nextToken();
 				String tokenFilename = Mapper.getTokenID(token);
 				tile.addToken(tokenFilename, Constants.SPACE);

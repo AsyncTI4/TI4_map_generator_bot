@@ -5,6 +5,8 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
+import ti4.helpers.LoggerHandler;
+import ti4.message.MessageHelper;
 
 import javax.annotation.CheckForNull;
 import java.util.*;
@@ -507,13 +509,11 @@ public class Map {
     	ArrayList<String> deck = new ArrayList<String>();
     	for(String id : superDeck) {
     		String card = Mapper.getExplore(id);
-    		StringTokenizer tokenizer = new StringTokenizer(card, ";");
-    		if (tokenizer.countTokens() >= 5) {
+    		if (card != null) {
+    			StringTokenizer tokenizer = new StringTokenizer(card, ";");
     			String name = tokenizer.nextToken();
     			String type = tokenizer.nextToken();
-    			String count = tokenizer.nextToken();
-    			String description = tokenizer.nextToken();
-    			if (reqType.compareToIgnoreCase(type) == 0) {
+    			if (reqType.equalsIgnoreCase(type)) {
     				deck.add(id);
     			}
     		}

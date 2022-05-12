@@ -63,6 +63,14 @@ public class AutoCompleteProvider {
                     .map(value -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(value.getValue(), value.getKey()))
                     .collect(Collectors.toList());
             event.replyChoices(options).queue();
+        } else if (optionName.equals(Constants.EXPLORE_TYPE)) {
+            String enteredValue = event.getFocusedOption().getValue();
+            List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = Stream.of(Constants.CULTURAL, Constants.INDUSTRIAL, Constants.HAZARDOUS, Constants.FRONTIER)
+                    .filter(value -> value.contains(enteredValue))
+                    .limit(25)
+                    .map(value -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(value, value))
+                    .collect(Collectors.toList());
+            event.replyChoices(options).queue();
         }
     }
 }
