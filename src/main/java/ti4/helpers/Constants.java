@@ -19,6 +19,7 @@ public class Constants {
     public static final String VP_COUNT = "vp_count";
     public static final String JOIN = "join";
     public static final String ADD = "add";
+    public static final String REPLACE = "replace";
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
     public static final String SAVE_GAMES = "save_games";

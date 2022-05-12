@@ -47,6 +47,14 @@ public class Player {
         this.userName = userName;
     }
 
+    public void setUserID(String userID) {
+        this.userID = userID;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     public boolean isPassed() {
         return passed;
     }
