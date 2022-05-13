@@ -1,6 +1,7 @@
 package ti4.commands.explore;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.units.AddRemoveUnits;
@@ -28,12 +29,13 @@ public class ExpPlanet extends ExploreSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String tileName = event.getOption(Constants.TILE_NAME).getAsString();
-        String planetName = event.getOption(Constants.PLANET_NAME).getAsString();
+        OptionMapping planetOption = event.getOption(Constants.PLANET_NAME);
         String drawColor;
+        String planetName;
         Map activeMap = getActiveMap();
         Tile tile = getTile(event, AliasHandler.resolveTile(tileName), activeMap);
         if (tile == null) return;
-        if (planetName == null) {
+        if (planetOption == null) {
         	Set<String> unitHolderIDs = tile.getUnitHolders().keySet();
         	if (unitHolderIDs.size() == 2) {
         		unitHolderIDs.remove(Constants.SPACE);
@@ -45,6 +47,8 @@ public class ExpPlanet extends ExploreSubcommandData {
         		MessageHelper.replyToMessage(event, "System contains no planets");
         		return;
         	}
+        } else {
+        	planetName = planetOption.getAsString();
         }
 	    planetName = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planetName));
 	    String planet = Mapper.getPlanet(planetName);
@@ -67,10 +71,18 @@ public class ExpPlanet extends ExploreSubcommandData {
             Player player = activeMap.getPlayer(getUser().getId());
             message = "Gained relic fragment";
             switch (color.toLowerCase()) {
-            	case Constants.CULTURAL: player.setCrf(player.getCrf() + 1);
-            	case Constants.INDUSTRIAL: player.setIrf(player.getIrf() + 1);
-            	case Constants.HAZARDOUS: player.setHrf(player.getHrf() + 1);
-            	default: message = "Invalid fragment type";
+            case Constants.CULTURAL: 
+            	player.setCrf(player.getCrf() + 1); 
+            	break;
+            case Constants.INDUSTRIAL: 
+            	player.setIrf(player.getIrf() + 1);
+            	break;
+            case Constants.HAZARDOUS: 
+            	player.setHrf(player.getHrf() + 1);
+            	break;
+            default: 
+            	message = "Invalid fragment type";
+            	break;
             }
             activeMap.purgeExplore(cardID);
         } else if (cardType.equalsIgnoreCase(Constants.ATTACH)) {

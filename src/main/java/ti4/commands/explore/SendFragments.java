@@ -1,12 +1,16 @@
 package ti4.commands.explore;
 
+import java.io.File;
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.map.Map;
+import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -34,11 +38,11 @@ public class SendFragments extends ExploreSubcommandData {
         Player reciever = activeMap.getPlayers().get(playerID);
         Player sender = activeMap.getPlayers().get(user.getId());
         String color = event.getOption(Constants.EXPLORE_TYPE).getAsString();
-        int count = event.getOption(Constants.COUNT).getAsInt();
-        if (event.getOption(Constants.COUNT) == null) {
-        	count = 1;
-        }
-        
+        OptionMapping countOption = event.getOption(Constants.COUNT);
+        int count = 1;
+        if (countOption != null) {
+        	count = event.getOption(Constants.COUNT).getAsInt();
+        } 
         switch (color) {
         case Constants.CULTURAL: 
         	sender.setCrf(sender.getCrf() - count);
@@ -64,6 +68,10 @@ public class SendFragments extends ExploreSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append(count).append(" ").append(color).append(" relic fragments sent to ").append(recieverOption.getAsUser().getName());
         MessageHelper.replyToMessage(event, sb.toString());
+        
+        MapSaveLoadManager.saveMap(activeMap);
+        File file = GenerateMap.getInstance().saveImage(activeMap);
+        MessageHelper.replyToMessage(event, file);
 	}
 
 }
