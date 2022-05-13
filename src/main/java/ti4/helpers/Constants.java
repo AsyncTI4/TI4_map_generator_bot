@@ -240,4 +240,5 @@ public class Constants {
     public static final String ATTACH = "attach";
     public static final String FRAGMENT = "fragment";
     public static final String DISCARDED_EXPLORES = "discarded_explores";
+    public static final String SEND_FRAGMENT = "send_fragment";
 }

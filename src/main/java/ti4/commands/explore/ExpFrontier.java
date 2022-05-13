@@ -11,7 +11,6 @@ import ti4.map.*;
 import ti4.message.MessageHelper;
 
 import java.io.File;
-import java.util.StringTokenizer;
 
 public class ExpFrontier extends ExploreSubcommandData {
     public ExpFrontier() {

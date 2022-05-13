@@ -27,12 +27,14 @@ public class ExpDeck extends ExploreSubcommandData {
         } else {
             count = 1;
         }
+        StringBuilder sb = new StringBuilder();
         for (int i = 0; i < count; i++) {
             String userID = event.getUser().getId();
             Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
             String cardID = activeMap.drawExplore(event.getOption(Constants.EXPLORE_TYPE).getAsString().toLowerCase());
-            MessageHelper.replyToMessage(event, displayExplore(cardID));
+            sb.append(displayExplore(cardID)).append(System.lineSeparator());
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Cards have been discarded. Resolve effects and/or purge manually.");
+        sb.append("Cards have been discarded. Resolve effects and/or purge manually.");
+        MessageHelper.replyToMessage(event, sb.toString());
     }
 }

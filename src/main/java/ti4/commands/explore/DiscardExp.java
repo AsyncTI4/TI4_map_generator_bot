@@ -6,8 +6,6 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
 
-import java.util.StringTokenizer;
-
 public class DiscardExp extends ExploreSubcommandData {
 
     public DiscardExp() {
@@ -19,19 +17,17 @@ public class DiscardExp extends ExploreSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         String ids = event.getOption(Constants.EXPLORE_CARD_ID).getAsString().replaceAll(" ", "");
-        StringTokenizer idTokenizer = new StringTokenizer(ids, ",");
-        int count = idTokenizer.countTokens();
-        for (int i = 0; i < count; i++) {
-            String id = idTokenizer.nextToken();
-            StringBuilder sb = new StringBuilder();
+        String[] idList = ids.split(",");
+        StringBuilder sb = new StringBuilder();
+        for (String id : idList) {
             String card = Mapper.getExplore(id);
             if (card != null) {
                 activeMap.discardExplore(id);
-                sb.append("Card discarded: \n").append(displayExplore(id));
+                sb.append("Card discarded: ").append(displayExplore(id)).append(System.lineSeparator());
             } else {
-                sb.append("Card ID ").append(id).append(" not found, please retry");
+                sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());
             }
-            MessageHelper.replyToMessage(event, sb.toString());
         }
+        MessageHelper.replyToMessage(event, sb.toString());
     }
 }
