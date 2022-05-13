@@ -688,13 +688,13 @@ public class GenerateMap {
                     }
                     if (multiScoring) {
                         int frequency = Collections.frequency(scoredPlayerID, userID);
-                        vpCount += frequency;
+                        vpCount += frequency*objectiveWorth;
                         for (int i = 0; i < frequency; i++) {
                             graphics.drawImage(bufferedImage, x + tempX, y, null);
                             tempX += scoreTokenWidth;
                         }
                     } else {
-                        vpCount++;
+                        vpCount += objectiveWorth;
                         graphics.drawImage(bufferedImage, x + tempX, y, null);
                     }
                     userVPs.put(player, vpCount);
