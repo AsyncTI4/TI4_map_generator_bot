@@ -5,8 +5,6 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
-import ti4.helpers.LoggerHandler;
-import ti4.message.MessageHelper;
 
 import javax.annotation.CheckForNull;
 import java.util.*;
@@ -29,6 +27,7 @@ public class Map {
     private HashMap<Integer, Boolean> scPlayed = new HashMap<>();
     private String speaker = "";
     private String creationDate;
+    private String customName = "";
     private long lastModifiedDate;
 
     private List<String> secretObjectives;
@@ -94,6 +93,14 @@ public class Map {
 
     public String getCreationDate() {
         return creationDate;
+    }
+
+    public String getCustomName() {
+        return customName;
+    }
+
+    public void setCustomName(String customName) {
+        this.customName = customName;
     }
 
     public void setCreationDate(String creationDate) {
@@ -510,9 +517,8 @@ public class Map {
     	for(String id : superDeck) {
     		String card = Mapper.getExplore(id);
     		if (card != null) {
-    			StringTokenizer tokenizer = new StringTokenizer(card, ";");
-    			String name = tokenizer.nextToken();
-    			String type = tokenizer.nextToken();
+                String[] split = card.split(";");
+    			String type = split[1];
     			if (reqType.equalsIgnoreCase(type)) {
     				deck.add(id);
     			}

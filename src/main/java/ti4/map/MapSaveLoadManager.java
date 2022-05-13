@@ -94,6 +94,7 @@ public class MapSaveLoadManager {
                     CopyOption[] options = {StandardCopyOption.REPLACE_EXISTING};
                     Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
                     mapUndoStorage.delete();
+//                    reload(map);
                     Map loadedMap = loadMap(originalMapFile);
                     MapManager.getInstance().deleteMap(map.getName());
                     MapManager.getInstance().addMap(loadedMap);
@@ -235,6 +236,8 @@ public class MapSaveLoadManager {
         writer.write(Constants.CREATION_DATE + " " + map.getCreationDate());
         writer.write(System.lineSeparator());
         writer.write(Constants.LAST_MODIFIED_DATE + " " + new Date().getTime());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.GAME_CUSTOM_NAME + " " + map.getCustomName());
         writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
@@ -666,6 +669,8 @@ public class MapSaveLoadManager {
                     Boolean status = Boolean.parseBoolean(dataInfo.nextToken());
                     map.setSCPlayed(scID, status);
                 }
+            } else if (Constants.GAME_CUSTOM_NAME.equals(identification)) {
+                map.setCustomName(tokenizer[1]);
             } else if (Constants.CREATION_DATE.equals(identification)) {
                 map.setCreationDate(tokenizer[1]);
             } else if (Constants.LAST_MODIFIED_DATE.equals(identification)) {

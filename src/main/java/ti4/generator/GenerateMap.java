@@ -214,9 +214,12 @@ public class GenerateMap {
         int deltaY = 35;
 
         int tempY = y;
-        y += 160;
+        y += 185;
         y = objectives(map, y);
-        scoreTrack(map, tempY);
+
+        graphics.setColor(Color.WHITE);
+        graphics.drawString(map.getCustomName(), 0, tempY);
+        scoreTrack(map, tempY + 25);
         if (displayType != DisplayType.stats) {
             playerInfo(map);
         }
@@ -685,13 +688,13 @@ public class GenerateMap {
                     }
                     if (multiScoring) {
                         int frequency = Collections.frequency(scoredPlayerID, userID);
-                        vpCount += frequency;
+                        vpCount += frequency*objectiveWorth;
                         for (int i = 0; i < frequency; i++) {
                             graphics.drawImage(bufferedImage, x + tempX, y, null);
                             tempX += scoreTokenWidth;
                         }
                     } else {
-                        vpCount++;
+                        vpCount += objectiveWorth;
                         graphics.drawImage(bufferedImage, x + tempX, y, null);
                     }
                     userVPs.put(player, vpCount);
