@@ -177,6 +177,6 @@ for single TG adding of TG
 /explore draw_and_discard deck count(optional) <- draws a number of explore cards (default 1) from the given deck, and immediately discards them all
 /explore info deck(optional) <- sends list of all cards still in the given explore deck, or in all explore decks if none is given
 /explore discard ids <- discards explore cards with given ids (comma separated)
-/explore purge ids <- removes explore cards with given ids (comma separated) from the game
+/explore remove ids <- removes explore cards with given ids (comma separated) from the game
 /explore shuffle_back_into_deck ids <- adds explore cards (including purged) with given ids (comma separated) to the deck
 /explore reset confirmYES <- completely resets explore decks, adding all known cards to their decks and shuffling them. useful if you have a game that started before explores were added
