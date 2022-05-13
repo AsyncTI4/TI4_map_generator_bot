@@ -7,13 +7,12 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
-
-import java.util.StringTokenizer;
 
 public abstract class ExploreSubcommandData extends SubcommandData {
 
@@ -47,11 +46,15 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
     protected String displayExplore(String cardID) {
         String card = Mapper.getExplore(cardID);
-        String[] cardInfo = card.split(";");
-		String name = cardInfo[0];
-		String description = cardInfo[4];
-		StringBuilder sb = new StringBuilder();
-		sb.append("(").append(cardID).append(") ").append(name).append(" - ").append(description);
+        StringBuilder sb = new StringBuilder();
+        if (card != null) {
+	        String[] cardInfo = card.split(";");
+			String name = cardInfo[0];
+			String description = cardInfo[4];
+			sb.append("(").append(cardID).append(") ").append(name).append(" - ").append(description);
+        } else {
+        	sb.append("Invalid ID ").append(cardID);
+        }
         return sb.toString();
     }
 
@@ -60,7 +63,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
             return null;
         }
-        Tile tile = activeMap.getTile(tileID);
+        Tile tile = activeMap.getTile(AliasHandler.resolveTile(tileID));
         if (tile == null) {
             tile = activeMap.getTileByPosition(tileID);
         }
