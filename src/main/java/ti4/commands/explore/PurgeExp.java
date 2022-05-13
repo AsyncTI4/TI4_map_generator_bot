@@ -18,7 +18,7 @@ import ti4.message.MessageHelper;
 public class PurgeExp extends ExploreSubcommandData {
 
 	public PurgeExp() {
-		super(Constants.PURGE, "Remove an Exploration card from the game.");
+		super(Constants.REMOVE, "Remove an Exploration card from the game.");
 		addOptions(new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card ID sent between ()").setRequired(true));
 	}
 

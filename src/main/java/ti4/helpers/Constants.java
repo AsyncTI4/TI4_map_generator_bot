@@ -231,7 +231,6 @@ public class Constants {
     public static final String EXPLORE_CARD_ID = "explore_card_id";
     public static final String SHUFFLE_BACK_INTO_DECK = "shuffle_back_into_deck";
     public static final String DISCARD = "discard";
-    public static final String PURGE = "purge";
     public static final String DRAW_AND_DISCARD = "draw_and_discard";
     public static final String EXPLORE_TYPE = "explore_type";
     public static final String RESET = "reset";
