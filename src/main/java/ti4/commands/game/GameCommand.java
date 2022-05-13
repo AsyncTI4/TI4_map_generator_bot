@@ -57,16 +57,22 @@ public class GameCommand implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
+        boolean undoCommand = false;
         String subcommandName = event.getInteraction().getSubcommandName();
         for (GameSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
+                if (subcommandName.equals(Constants.UNDO)){
+                    undoCommand = true;
+                }
             }
         }
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        if (!undoCommand) {
+            MapSaveLoadManager.saveMap(activeMap);
+        }
         File file = GenerateMap.getInstance().saveImage(activeMap);
         MessageHelper.replyToMessage(event, file);
     }
@@ -87,6 +93,7 @@ public class GameCommand implements Command {
         subcommands.add(new Undo());
         subcommands.add(new SCCount());
         subcommands.add(new Setup());
+        subcommands.add(new Replace());
         return subcommands;
     }
 

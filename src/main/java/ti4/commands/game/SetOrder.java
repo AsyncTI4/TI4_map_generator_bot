@@ -14,6 +14,7 @@ import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -54,7 +55,8 @@ public class SetOrder extends GameSubcommandData {
 
         MapManager mapManager = MapManager.getInstance();
         Map map = mapManager.getMap(mapName);
-        if (!map.getOwnerID().equals(callerUser.getId()) && !event.getUser().getId().equals(MapGenerator.userID)){
+        Collection<Player> players_ = map.getPlayers().values();
+        if (players_.stream().noneMatch(player -> player.getUserID().equals(callerUser.getId())) && !event.getUser().getId().equals(MapGenerator.userID)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game owner can add/remove players.");
             return;
         }

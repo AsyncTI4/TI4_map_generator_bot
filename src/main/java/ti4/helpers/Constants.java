@@ -6,6 +6,7 @@ public class Constants {
     public static final String SHOW_GAME = "show_game";
     public static final String SHOW_GAME_INFO = "show_game_info";
     public static final String GAME_NAME = "game_name";
+    public static final String GAME_CUSTOM_NAME = "game_custom_name";
     public static final String DISPLAY_TYPE = "display_type";
     public static final String GAME_STATUS = "game_status";
     public static final String CONFIRM = "confirm";
@@ -19,6 +20,7 @@ public class Constants {
     public static final String VP_COUNT = "vp_count";
     public static final String JOIN = "join";
     public static final String ADD = "add";
+    public static final String REPLACE = "replace";
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
     public static final String SAVE_GAMES = "save_games";
