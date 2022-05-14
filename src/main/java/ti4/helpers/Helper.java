@@ -54,6 +54,38 @@ public class Helper {
         };
     }
 
+    public static String getFactionIconFromDiscord(String faction) {
+        return switch (faction) {
+            case "arborec" -> "<:Arborec:946891797567799356>";
+            case "argent" -> "<:Argent:946891797366472725>";
+            case "cabal" -> "<:VuilRaith:946891797236441089>";
+            case "empyrean" -> "<:Empyrean:946891797257404466>";
+            case "ghost" -> "<:Creuss:946891797609721866>";
+            case "hacan" -> "<:Hacan:946891797228060684>";
+            case "jolnar" -> "<:JolNar:946891797114789918>";
+            case "l1z1x" -> "<:L1Z1X:946891797219647559>";
+            case "letnev" -> "<:Letnev:946891797458714704>";
+            case "yssaril" -> "<:Yssaril:946891798138196008>";
+            case "mahact" -> "<:Mahact:946891797274165248>";
+            case "mentak" -> "<:Mentak:946891797395800084>";
+            case "muaat" -> "<:Muaat:946891797177716777>";
+            case "naalu" -> "<:Naalu:946891797412601926>";
+            case "naaz" -> "<:NaazRokha:946891797437747200>";
+            case "nekro" -> "<:Nekro:946891797681025054>";
+            case "nomad" -> "<:Nomad:946891797400002561>";
+            case "saar" -> "<:Saar:946891797366472735>";
+            case "sardakk" -> "<:Sardakk:946891797307748436>";
+            case "sol" -> "<:Sol:946891797706194995>";
+            case "titans" -> "<:Titans:946891798062694400>";
+            case "winnu" -> "<:Winnu:946891798050136095>";
+            case "xxcha" -> "<:Xxcha:946891797639086090>";
+            case "yin" -> "<:Yin:94689179747549189>";
+            case "lazax" -> "<:Lazax:946891797639073884>";
+            case "keleres" -> "<:Keleres:968233661654765578>";
+            default -> "";
+        };
+    }
+
     public static String getGamePing(SlashCommandInteractionEvent event, Map activeMap) {
         String categoryForPlayers = "";
         Guild guild = event.getGuild();
