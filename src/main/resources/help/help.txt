@@ -173,6 +173,7 @@ if not specifying SC and TG, it auto adds +1TG to each unselected SC card
 you can also do
 /status sc_trade_goods SC TGCount
 for single TG adding of TG
+/status turn_order <- lists turn order with SC, player and passed status. SC is striked through if played
 
 /explore planet tile planetName <- explores a planet, handling relic fragments and tokens automatically and discarding others
 /explore frontier tile <- explores a frontier token, handling relic fragments and tokens automatically, discarding others, and removing the frontier token

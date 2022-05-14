@@ -2,12 +2,10 @@ package ti4.helpers;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.ResourceHelper;
-import ti4.map.Map;
-import ti4.map.Planet;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.map.*;
 
 import javax.annotation.CheckForNull;
 import java.awt.*;
@@ -67,5 +65,13 @@ public class Helper {
             }
         }
         return categoryForPlayers;
+    }
+
+    public static String getPlayerPing(SlashCommandInteractionEvent event, Player player) {
+        User userById = event.getJDA().getUserById(player.getUserID());
+        if (userById == null){
+            return "";
+        }
+        return userById.getAsMention();
     }
 }

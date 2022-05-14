@@ -178,6 +178,7 @@ public class Constants {
     public static final String PO1 = "publicObjectives1";
     public static final String PO2 = "publicObjectives2";
 
+    public static final String TURN_ORDER = "turn_order";
     public static final String SC_TRADE_GOODS = "sc_trade_goods";
     public static final String SC_COUNT = "sc_count";
 
