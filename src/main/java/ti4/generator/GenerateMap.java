@@ -214,12 +214,13 @@ public class GenerateMap {
         int deltaY = 35;
 
         int tempY = y;
-        y += 185;
+        y += 200;
         y = objectives(map, y);
 
+        graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
         graphics.drawString(map.getCustomName(), 0, tempY);
-        scoreTrack(map, tempY + 25);
+        scoreTrack(map, tempY + 40);
         if (displayType != DisplayType.stats) {
             playerInfo(map);
         }
