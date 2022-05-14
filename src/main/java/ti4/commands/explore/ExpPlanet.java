@@ -16,6 +16,8 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 import java.io.File;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Set;
 
 public class ExpPlanet extends ExploreSubcommandData {
@@ -38,8 +40,9 @@ public class ExpPlanet extends ExploreSubcommandData {
         if (planetOption == null) {
         	Set<String> unitHolderIDs = tile.getUnitHolders().keySet();
         	if (unitHolderIDs.size() == 2) {
-        		unitHolderIDs.remove(Constants.SPACE);
-        		planetName = unitHolderIDs.iterator().next();
+        		HashSet<String> unitHolder = new HashSet<>(unitHolderIDs);
+                unitHolder.remove(Constants.SPACE);
+                planetName = unitHolder.iterator().next();
         	} else if (unitHolderIDs.size() > 2) {
         		MessageHelper.replyToMessage(event, "System contains more than one planet, please specify");
         		return;
