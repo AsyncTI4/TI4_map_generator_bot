@@ -265,7 +265,11 @@ public class GenerateMap {
                 graphics.setColor(Color.WHITE);
                 sb = new StringBuilder();
                 sb.append(player.getTacticalCC()).append("T/");
-                sb.append(player.getFleetCC()).append("F/");
+                if ("letnev".equals(faction)){
+                    sb.append(player.getFleetCC()).append("+2").append("F/");
+                } else {
+                    sb.append(player.getFleetCC()).append("F/");
+                }
                 sb.append(player.getStrategicCC()).append("S ");
                 sb.append("TG: ").append(player.getTg());
                 sb.append(" C:").append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
@@ -450,9 +454,9 @@ public class GenerateMap {
             String fleetCCID = Mapper.getFleeCCID(player.getColor());
             int x = points.get(2).x;
             int y = points.get(2).y;
-            drawCCOfPlayer(ccID, x, y, player.getTacticalCC());
-            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC());
-            drawCCOfPlayer(ccID, x, y + 130, player.getStrategicCC());
+            drawCCOfPlayer(ccID, x, y, player.getTacticalCC(), false);
+            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), "letnev".equals(player.getFaction()));
+            drawCCOfPlayer(ccID, x, y + 130, player.getStrategicCC(), false);
 
             if (player == speaker) {
                 String speakerID = Mapper.getTokenID(Constants.SPEAKER);
@@ -480,13 +484,23 @@ public class GenerateMap {
 
     }
 
-    private void drawCCOfPlayer(String ccID, int x, int y, int tacticalCC) {
+    private void drawCCOfPlayer(String ccID, int x, int y, int ccCount, boolean isLetnev) {
         String ccPath = Mapper.getCCPath(ccID);
         try {
             BufferedImage ccImage = resizeImage(ImageIO.read(new File(ccPath)), 0.75f);
             int delta = 20;
-            for (int i = 0; i < tacticalCC; i++) {
-                graphics.drawImage(ccImage, x + (delta * i), y, null);
+            if (isLetnev) {
+                for (int i = 0; i < 2; i++) {
+                    graphics.drawImage(ccImage, x + (delta * i), y, null);
+                }
+                x += 20;
+                for (int i = 2; i < ccCount + 2; i++) {
+                    graphics.drawImage(ccImage, x + (delta * i), y, null);
+                }
+            } else {
+                for (int i = 0; i < ccCount; i++) {
+                    graphics.drawImage(ccImage, x + (delta * i), y, null);
+                }
             }
         } catch (Exception e) {
             LoggerHandler.log("Could not parse cc file for: " + ccID, e);
