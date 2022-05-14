@@ -19,12 +19,16 @@ public class ListTurnOrder extends StatusSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map map = getActiveMap();
+        turnOrder(event, map);
+    }
+
+    public static void turnOrder(SlashCommandInteractionEvent event, Map map) {
         HashMap<Integer, String> order = new HashMap<>();
         int naaluSC = 0;
         for (Player player : map.getPlayers().values()) {
             int sc = player.getSC();
             String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
-            if (scNumberIfNaaluInPlay.startsWith("0/")){
+            if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 naaluSC = sc;
             }
             boolean passed = player.isPassed();
@@ -54,17 +58,16 @@ public class ListTurnOrder extends StatusSubcommandData {
             }
             order.put(sc, text);
         }
-        Integer max = Collections.max(map.getScTradeGoods().keySet());
         StringBuilder msg = new StringBuilder();
 
 
-        if (naaluSC != 0){
+        if (naaluSC != 0) {
             String text = order.get(naaluSC);
             msg.append(0).append(". ").append(text).append("\n");
         }
-
+        Integer max = Collections.max(map.getScTradeGoods().keySet());
         for (int i = 1; i <= max; i++) {
-            if (naaluSC != 0 && i == naaluSC){
+            if (naaluSC != 0 && i == naaluSC) {
                 continue;
             }
             String text = order.get(i);

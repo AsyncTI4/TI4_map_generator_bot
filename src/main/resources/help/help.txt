@@ -118,6 +118,7 @@ Attachement tokens can only be added to planets
 /player tech_remove techName player(optional) <- removes selected tech to player area
 /player tech_exhaust techName player(optional) <- exhausts selected tech to player area
 /player tech_refresh techName player(optional) <- refreshes selected tech to player area
+/player turn player(optional)  <- pings next player in line. Can do turn for any player
 
 Cards commands
 /cards so_draw count(optional) <- draws a secret or specified number of secrets

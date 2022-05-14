@@ -97,6 +97,7 @@ public class Constants {
     public static final String SC_PLAYED = "sc_played";
     public static final String SC_PLAY = "sc_play";
     public static final String PASS = "pass";
+    public static final String TURN = "turn";
     public static final String SPEAKER = "speaker";
 
     public static final String PLAYER1 = "player1";
