@@ -43,5 +43,4 @@ public abstract class StatusSubcommandData extends SubcommandData {
     public void reply(SlashCommandInteractionEvent event) {
         StatusCommand.reply(event);
     }
-
 }
