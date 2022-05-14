@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
+import ti4.commands.status.StatusSubcommandData;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -76,12 +77,23 @@ public class PlayerCommand implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
+        PlayerSubcommandData executedCommand = null;
         for (PlayerSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
+                executedCommand = subcommand;
+                break;
             }
         }
+        if (executedCommand == null) {
+            reply(event);
+        } else {
+            executedCommand.reply(event);
+        }
+    }
+
+    public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
@@ -106,6 +118,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new TechRemove());
         subcommands.add(new TechExhaust());
         subcommands.add(new TechRefresh());
+        subcommands.add(new Turn());
         return subcommands;
     }
 
