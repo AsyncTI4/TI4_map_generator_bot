@@ -83,17 +83,17 @@ public class Turn extends PlayerSubcommandData {
         int nextSCFound = -1;
         while (tempProtection < 20){
             Boolean isPassed = scPassed.get(scNext);
-            if (isPassed != null && isPassed) {
-                scNext = scNext == max ? (naaluPresent ? 0 : 1) : scNext + 1;
-            } else if (isPassed != null){
+            if (isPassed != null && !isPassed){
                 nextSCFound = scNext;
                 break;
+            } else {
+                scNext = scNext == max ? (naaluPresent ? 0 : 1) : scNext + 1;
             }
             tempProtection++;
         }
         for (Player player : map.getPlayers().values()) {
             int sc = player.getSC();
-            if (sc == nextSCFound){
+            if (sc == nextSCFound || nextSCFound == 0 && naaluSC == sc){
                 String text = "";
                 text += Helper.getFactionIconFromDiscord(player.getFaction());
                 text += " " + Helper.getPlayerPing(event, player);
