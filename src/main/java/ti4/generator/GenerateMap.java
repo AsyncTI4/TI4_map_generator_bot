@@ -381,7 +381,7 @@ public class GenerateMap {
         }
     }
 
-    private String getSCNumberIfNaaluInPlay(Player player, Map map, String scText) {
+    public static String getSCNumberIfNaaluInPlay(Player player, Map map, String scText) {
         if (Constants.NAALU.equals(player.getFaction())) {
             boolean giftPlayed = false;
             for (Player player_ : map.getPlayers().values()) {

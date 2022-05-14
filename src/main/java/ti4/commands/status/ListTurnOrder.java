@@ -1,6 +1,7 @@
 package ti4.commands.status;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -19,8 +20,13 @@ public class ListTurnOrder extends StatusSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map map = getActiveMap();
         HashMap<Integer, String> order = new HashMap<>();
+        int naaluSC = 0;
         for (Player player : map.getPlayers().values()) {
             int sc = player.getSC();
+            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
+            if (scNumberIfNaaluInPlay.startsWith("0/")){
+                naaluSC = sc;
+            }
             boolean passed = player.isPassed();
             String userName = player.getUserName();
             String color = player.getColor();
@@ -50,7 +56,17 @@ public class ListTurnOrder extends StatusSubcommandData {
         }
         Integer max = Collections.max(map.getScTradeGoods().keySet());
         StringBuilder msg = new StringBuilder();
+
+
+        if (naaluSC != 0){
+            String text = order.get(naaluSC);
+            msg.append(0).append(". ").append(text).append("\n");
+        }
+
         for (int i = 1; i <= max; i++) {
+            if (naaluSC != 0 && i == naaluSC){
+                continue;
+            }
             String text = order.get(i);
             if (text != null) {
                 msg.append(i).append(". ").append(text).append("\n");

@@ -79,7 +79,7 @@ public class Helper {
             case "titans" -> "<:Titans:946891798062694400>";
             case "winnu" -> "<:Winnu:946891798050136095>";
             case "xxcha" -> "<:Xxcha:946891797639086090>";
-            case "yin" -> "<:Yin:94689179747549189>";
+            case "yin" -> "<:Yin:946891797475491892>";
             case "lazax" -> "<:Lazax:946891797639073884>";
             case "keleres" -> "<:Keleres:968233661654765578>";
             default -> "";
