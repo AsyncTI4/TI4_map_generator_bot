@@ -55,6 +55,7 @@ public class Replace extends GameSubcommandData {
             return;
         }
         MapSaveLoadManager.saveMap(map);
+        MapSaveLoadManager.reload(map);
         MessageHelper.replyToMessage(event, message);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
