@@ -44,7 +44,7 @@ public class StatusCommand implements Command {
             activeMap = "Active map: " + userActiveMap.getName();
         }
         String commandExecuted = "User: " + userName + " executed command. " + activeMap + "\n" +
-                event.getName() + " " +  event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
+                event.getName() + " " + event.getInteraction().getSubcommandName() + " " + event.getOptions().stream()
                 .map(option -> option.getName() + ":" + getOptionValue(option))
                 .collect(Collectors.joining(" "));
 
@@ -52,7 +52,7 @@ public class StatusCommand implements Command {
     }
 
     private String getOptionValue(OptionMapping option) {
-        if (option.getName().equals(Constants.PLAYER)){
+        if (option.getName().equals(Constants.PLAYER)) {
             return option.getAsUser().getName();
         }
         return option.getAsString();
@@ -61,12 +61,23 @@ public class StatusCommand implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
+        StatusSubcommandData executedCommand = null;
         for (StatusSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
+                executedCommand = subcommand;
+                break;
             }
         }
+        if (executedCommand == null) {
+            reply(event);
+        } else {
+            executedCommand.reply(event);
+        }
+    }
+
+    public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
@@ -91,6 +102,7 @@ public class StatusCommand implements Command {
         subcommands.add(new AddCustomPO());
         subcommands.add(new RemoveCustomPO());
         subcommands.add(new SCTradeGoods());
+        subcommands.add(new ListTurnOrder());
         return subcommands;
     }
 
