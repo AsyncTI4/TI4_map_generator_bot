@@ -113,6 +113,7 @@ Attachement tokens can only be added to planets
 /player stats .... <- can set all the major stats for player, when SC is picked, TG's automatically added to user Trade Goods from left on SC TG's
 /player setup faction color <- needs to set player faction and color
 /player sc_play <- plays your SC that you have in game
+/player sc_pick scNumber <- adds your pick to game. Does not generate map
 /player pass <- passes
 /player tech_add techName player(optional) <- adds selected tech to player area
 /player tech_remove techName player(optional) <- removes selected tech to player area
@@ -128,6 +129,7 @@ Cards commands
 /cards so_show_all player <- sends all Secret Objectives to player
 /cards so_show_to_all soUniqueID <- displays SO to table and changes soUniqueID
 /cards so_deal @player count(optional) <- draws a Secret objective for specified player, can specify count
+/cards so_deal_to_all count(optional) <- draws a Secret objective(s) for all game players
 
 /cards ac_draw count(optional) <- draws a secret or specified number of secrets
 /cards ac_discard acUniqueID <- discards given ID action card and shuffles the ac deck. acUniqueID is generated just for player and are unique each time

@@ -137,35 +137,7 @@ public class Stats extends PlayerSubcommandData {
                 player.setPassed(false);
             }
         }
-        OptionMapping optionSC = event.getOption(Constants.SC);
-        if (optionSC != null) {
-            int scNumber = optionSC.getAsInt();
-            LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
-            if (!scTradeGoods.containsKey(scNumber) && scNumber != 0){
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card must be from possible ones in Game");
-                return;
-            }
-            if (scNumber > 0) {
-                LinkedHashMap<String, Player> players = activeMap.getPlayers();
-                for (Player playerStats : players.values()) {
-                    if (playerStats.getSC() == scNumber) {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "SC is already picked.");
-                        return;
-                    }
-                }
-                player.setSC(scNumber);
-                Integer tgCount = scTradeGoods.get(scNumber);
-                if (tgCount != null) {
-                    int tg = player.getTg();
-                    tg += tgCount;
-                    player.setTg(tg);
-                }
-            } else if (scNumber == 0){
-                int sc = player.getSC();
-                player.setSC(scNumber);
-                activeMap.setSCPlayed(sc, false);
-            }
-        }
+        pickSC(event, activeMap, player, event.getOption(Constants.SC));
 
         OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
         if (optionSCPlayed != null) {
@@ -181,8 +153,43 @@ public class Stats extends PlayerSubcommandData {
         }
     }
 
+    public static void pickSC(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping optionSC) {
+        if (optionSC != null) {
+            int scNumber = optionSC.getAsInt();
+            LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
+            if (!scTradeGoods.containsKey(scNumber) && scNumber != 0) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card must be from possible ones in Game");
+            } else {
+                if (scNumber > 0) {
+                    LinkedHashMap<String, Player> players = activeMap.getPlayers();
+                    boolean scPickedAlready = false;
+                    for (Player playerStats : players.values()) {
+                        if (playerStats.getSC() == scNumber) {
+                            MessageHelper.sendMessageToChannel(event.getChannel(), "SC is already picked.");
+                            scPickedAlready = true;
+                            break;
+                        }
+                    }
+                    if (!scPickedAlready) {
+                        player.setSC(scNumber);
+                        Integer tgCount = scTradeGoods.get(scNumber);
+                        if (tgCount != null) {
+                            int tg = player.getTg();
+                            tg += tgCount;
+                            player.setTg(tg);
+                        }
+                    }
+                } else if (scNumber == 0) {
+                    int sc = player.getSC();
+                    player.setSC(scNumber);
+                    activeMap.setSCPlayed(sc, false);
+                }
+            }
+        }
+    }
+
     private void setValue(SlashCommandInteractionEvent event, Player player, OptionMapping option, Consumer<Integer> consumer, Supplier<Integer> supplier) {
-        try  {
+        try {
             boolean setValue = true;
             String value = option.getAsString();
             if (value.startsWith("+") || value.startsWith("-")) {
@@ -190,14 +197,14 @@ public class Stats extends PlayerSubcommandData {
             }
             int number = Integer.parseInt(value);
             int existingNumber = supplier.get();
-            if (setValue){
+            if (setValue) {
                 consumer.accept(number);
             } else {
                 number = existingNumber + number;
                 number = Math.max(number, 0);
                 consumer.accept(number);
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not parse number for: " + option.getName());
         }
     }
