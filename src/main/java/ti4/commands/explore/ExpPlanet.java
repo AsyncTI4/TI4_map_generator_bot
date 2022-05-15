@@ -17,7 +17,6 @@ import ti4.message.MessageHelper;
 
 import java.io.File;
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.Set;
 
 public class ExpPlanet extends ExploreSubcommandData {
@@ -38,29 +37,29 @@ public class ExpPlanet extends ExploreSubcommandData {
         Tile tile = getTile(event, AliasHandler.resolveTile(tileName), activeMap);
         if (tile == null) return;
         if (planetOption == null) {
-        	Set<String> unitHolderIDs = tile.getUnitHolders().keySet();
-        	if (unitHolderIDs.size() == 2) {
-        		HashSet<String> unitHolder = new HashSet<>(unitHolderIDs);
+            Set<String> unitHolderIDs = tile.getUnitHolders().keySet();
+            if (unitHolderIDs.size() == 2) {
+                HashSet<String> unitHolder = new HashSet<>(unitHolderIDs);
                 unitHolder.remove(Constants.SPACE);
                 planetName = unitHolder.iterator().next();
-        	} else if (unitHolderIDs.size() > 2) {
-        		MessageHelper.replyToMessage(event, "System contains more than one planet, please specify");
-        		return;
-        	} else {
-        		MessageHelper.replyToMessage(event, "System contains no planets");
-        		return;
-        	}
+            } else if (unitHolderIDs.size() > 2) {
+                MessageHelper.replyToMessage(event, "System contains more than one planet, please specify");
+                return;
+            } else {
+                MessageHelper.replyToMessage(event, "System contains no planets");
+                return;
+            }
         } else {
-        	planetName = planetOption.getAsString();
+            planetName = planetOption.getAsString();
         }
-	    planetName = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planetName));
-	    String planet = Mapper.getPlanet(planetName);
-	    if (planet == null) {
-	    	MessageHelper.replyToMessage(event, "Invalid planet");
-	    	return;
-	    }
-	    String[] planetInfo = planet.split(",");
-	    drawColor = planetInfo[1];
+        planetName = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planetName));
+        String planet = Mapper.getPlanet(planetName);
+        if (planet == null) {
+            MessageHelper.replyToMessage(event, "Invalid planet");
+            return;
+        }
+        String[] planetInfo = planet.split(",");
+        drawColor = planetInfo[1];
         String cardID = activeMap.drawExplore(drawColor);
         MessageHelper.replyToMessage(event, displayExplore(cardID));
 
@@ -74,18 +73,18 @@ public class ExpPlanet extends ExploreSubcommandData {
             Player player = activeMap.getPlayer(getUser().getId());
             message = "Gained relic fragment";
             switch (color.toLowerCase()) {
-            case Constants.CULTURAL: 
-            	player.setCrf(player.getCrf() + 1); 
-            	break;
-            case Constants.INDUSTRIAL: 
-            	player.setIrf(player.getIrf() + 1);
-            	break;
-            case Constants.HAZARDOUS: 
-            	player.setHrf(player.getHrf() + 1);
-            	break;
-            default: 
-            	message = "Invalid fragment type";
-            	break;
+                case Constants.CULTURAL:
+                    player.setCrf(player.getCrf() + 1);
+                    break;
+                case Constants.INDUSTRIAL:
+                    player.setIrf(player.getIrf() + 1);
+                    break;
+                case Constants.HAZARDOUS:
+                    player.setHrf(player.getHrf() + 1);
+                    break;
+                default:
+                    message = "Invalid fragment type";
+                    break;
             }
             activeMap.purgeExplore(cardID);
         } else if (cardType.equalsIgnoreCase(Constants.ATTACH)) {
