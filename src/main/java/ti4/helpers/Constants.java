@@ -96,6 +96,7 @@ public class Constants {
     public static final String PASSED = "passed";
     public static final String SC_PLAYED = "sc_played";
     public static final String SC_PLAY = "sc_play";
+    public static final String SC_PICK = "sc_pick";
     public static final String PASS = "pass";
     public static final String TURN = "turn";
     public static final String SPEAKER = "speaker";
@@ -187,6 +188,7 @@ public class Constants {
     public static final String SECRET_OBJECTIVE_ID = "secret_objective_id";
     public static final String DRAW_SO = "so_draw";
     public static final String DEAL_SO = "so_deal";
+    public static final String DEAL_SO_TO_ALL = "so_deal_to_all";
     public static final String SHOW_SO = "so_show";
     public static final String SHOW_ALL_SO = "so_show_all";
     public static final String SHOW_SO_TO_ALL = "so_show_to_all";
