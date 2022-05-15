@@ -97,8 +97,8 @@ public class Turn extends PlayerSubcommandData {
                 String text = "";
                 text += Helper.getFactionIconFromDiscord(player.getFaction());
                 text += " " + Helper.getPlayerPing(event, player);
-                text += " UP NEXT";
-                MessageHelper.replyToMessage(event, text);
+                MessageHelper.sendMessageToChannel(event.getChannel(), text);
+                MessageHelper.replyToMessage(event, "UP NEXT");
                 return;
             }
         }
