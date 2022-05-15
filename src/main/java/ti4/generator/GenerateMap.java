@@ -1024,7 +1024,8 @@ public class GenerateMap {
         Point centerPosition = unitHolder.getHolderCenterPosition();
         int x = tileX;
         int y = tileY;
-
+        int deltaX = 80;
+        int deltaY = 0;
         ArrayList<Point> spaceTokenPositions = PositionMapper.getSpaceTokenPositions(tile.getTileID());
         if (spaceTokenPositions.isEmpty()) {
             x = tileX + centerPosition.x;
@@ -1053,6 +1054,10 @@ public class GenerateMap {
                     Point point = spaceTokenPositions.get(index);
                     graphics.drawImage(image, x + point.x, y + point.y, null);
                     index++;
+                } else {
+                    graphics.drawImage(image, x + deltaX, y + deltaY, null);
+                    deltaX += 30;
+                    deltaY += 30;
                 }
             }
         }
