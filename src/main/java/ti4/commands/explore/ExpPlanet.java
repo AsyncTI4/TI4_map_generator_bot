@@ -89,19 +89,24 @@ public class ExpPlanet extends ExploreSubcommandData {
             }
             activeMap.purgeExplore(cardID);
         } else if (cardType.equalsIgnoreCase(Constants.ATTACH)) {
-            String tokenFilename = null;
-            while (tokenFilename == null) {
-                String token = cardInfo[5];
-                tokenFilename = Mapper.getAttachmentID(token);
-            }
-            tile.addToken(tokenFilename, planetName);
-            activeMap.purgeExplore(cardID);
-            message = "Token added to planet";
-        } else if (cardType.equalsIgnoreCase(Constants.TOKEN)) {
             String token = cardInfo[5];
             String tokenFilename = Mapper.getAttachmentID(token);
-            tile.addToken(tokenFilename, Constants.SPACE);
-            message = "Token added to map";
+            if (tokenFilename != null) {
+            	tile.addToken(tokenFilename, planetName);
+                activeMap.purgeExplore(cardID);
+                message = "Token added to planet";
+            } else {
+            	message = "Invalid token";
+            }
+        } else if (cardType.equalsIgnoreCase(Constants.TOKEN)) {
+            String token = cardInfo[5];
+            String tokenFilename = Mapper.getTokenID(token);
+            if (tokenFilename != null) {
+            	tile.addToken(tokenFilename, Constants.SPACE);
+                message = "Token added to map";
+            } else {
+            	message = "Invalid token";
+            }
         }
 
         MapSaveLoadManager.saveMap(activeMap);
