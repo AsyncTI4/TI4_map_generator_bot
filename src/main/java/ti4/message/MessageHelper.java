@@ -22,6 +22,10 @@ public class MessageHelper {
         channel.sendFile(file).queue();
     }
 
+
+    public static void replyToMessageTI4Logo(SlashCommandInteractionEvent event) {
+        replyToMessage(event, "<:asyncti4:959703535258333264>");
+    }
     public static void replyToMessage(SlashCommandInteractionEvent event, String messageText) {
         if (messageText.length() > 1500) {
             splitAndSent(messageText, event.getChannel());

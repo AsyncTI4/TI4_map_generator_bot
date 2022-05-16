@@ -21,5 +21,11 @@ public class Pass extends PlayerSubcommandData {
         }
         player.setPassed(true);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Player: " + player.getUserName() + " passed.");
+        Turn.pingNextPlayer(event, activeMap, player);
+    }
+
+    @Override
+    public void reply(SlashCommandInteractionEvent event) {
+        MessageHelper.replyToMessageTI4Logo(event);
     }
 }

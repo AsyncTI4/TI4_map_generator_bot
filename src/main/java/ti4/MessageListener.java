@@ -48,7 +48,7 @@ public class MessageListener extends ListenerAdapter {
                 (mapManager.getMap(gameID) != null && (mapManager.getMap(gameID).isMapOpen() ||
                         mapManager.getMap(gameID).getPlayerIDs().contains(userID))))) {
             if (mapManager.getUserActiveMap(userID) != null && !mapManager.getUserActiveMap(userID).getName().equals(gameID)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Active game set to: " + gameID);
+//                MessageHelper.sendMessageToChannel(event.getChannel(), "Active game set to: " + gameID);
             }
             mapManager.setMapForUser(userID, gameID);
         } else if (mapManager.isUserWithActiveMap(userID)) {
