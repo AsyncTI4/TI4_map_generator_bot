@@ -73,9 +73,12 @@ public class Stats extends PlayerSubcommandData {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Wrong format for tokens count. Must be 3/3/3");
                 } else {
                     try {
-                        player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
-                        player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
-                        player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
+                        setValue(event, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken());
+                        setValue(event, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken());
+                        setValue(event, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken());
+//                        player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
+//                        player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
+//                        player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
                     } catch (Exception e) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "Not number entered, check CC count again");
                     }
@@ -189,12 +192,12 @@ public class Stats extends PlayerSubcommandData {
     }
 
     private void setValue(SlashCommandInteractionEvent event, Player player, OptionMapping option, Consumer<Integer> consumer, Supplier<Integer> supplier) {
+        setValue(event, option.getName(), consumer, supplier, option.getAsString());
+    }
+
+    private void setValue(SlashCommandInteractionEvent event, String optionName, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
         try {
-            boolean setValue = true;
-            String value = option.getAsString();
-            if (value.startsWith("+") || value.startsWith("-")) {
-                setValue = false;
-            }
+            boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             int number = Integer.parseInt(value);
             int existingNumber = supplier.get();
             if (setValue) {
@@ -205,7 +208,7 @@ public class Stats extends PlayerSubcommandData {
                 consumer.accept(number);
             }
         } catch (Exception e) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not parse number for: " + option.getName());
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not parse number for: " + optionName);
         }
     }
 }
