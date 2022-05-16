@@ -44,9 +44,13 @@ public class ExpFrontier extends ExploreSubcommandData {
             } else if (cardType.equalsIgnoreCase(Constants.TOKEN)) {
                 String token = cardInfo[5];
                 String tokenFilename = Mapper.getTokenID(token);
-                tile.addToken(tokenFilename, Constants.SPACE);
-                message = "Token added to map";
-                if (token.equalsIgnoreCase(Constants.MIRAGE)) {
+                if (token != null) {
+	                tile.addToken(tokenFilename, Constants.SPACE);
+	                message = "Token added to map";
+                } else {
+                	message = "Invalid token";
+                }
+                if (Constants.MIRAGE.equalsIgnoreCase(token)) {
                     Helper.addMirageToTile(tile);
                     message = "Mirage added to map!";
                 }
