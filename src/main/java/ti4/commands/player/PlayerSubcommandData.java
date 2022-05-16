@@ -34,4 +34,8 @@ public abstract class PlayerSubcommandData extends SubcommandData {
         user = event.getUser();
         activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
     }
+
+    public void reply(SlashCommandInteractionEvent event) {
+        PlayerCommand.reply(event);
+    }
 }

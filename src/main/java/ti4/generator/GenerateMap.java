@@ -214,12 +214,13 @@ public class GenerateMap {
         int deltaY = 35;
 
         int tempY = y;
-        y += 185;
+        y += 200;
         y = objectives(map, y);
 
+        graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
         graphics.drawString(map.getCustomName(), 0, tempY);
-        scoreTrack(map, tempY + 25);
+        scoreTrack(map, tempY + 40);
         if (displayType != DisplayType.stats) {
             playerInfo(map);
         }
@@ -264,7 +265,11 @@ public class GenerateMap {
                 graphics.setColor(Color.WHITE);
                 sb = new StringBuilder();
                 sb.append(player.getTacticalCC()).append("T/");
-                sb.append(player.getFleetCC()).append("F/");
+                if ("letnev".equals(faction)){
+                    sb.append(player.getFleetCC()).append("+2").append("F/");
+                } else {
+                    sb.append(player.getFleetCC()).append("F/");
+                }
                 sb.append(player.getStrategicCC()).append("S ");
                 sb.append("TG: ").append(player.getTg());
                 sb.append(" C:").append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
@@ -376,7 +381,7 @@ public class GenerateMap {
         }
     }
 
-    private String getSCNumberIfNaaluInPlay(Player player, Map map, String scText) {
+    public static String getSCNumberIfNaaluInPlay(Player player, Map map, String scText) {
         if (Constants.NAALU.equals(player.getFaction())) {
             boolean giftPlayed = false;
             for (Player player_ : map.getPlayers().values()) {
@@ -449,9 +454,9 @@ public class GenerateMap {
             String fleetCCID = Mapper.getFleeCCID(player.getColor());
             int x = points.get(2).x;
             int y = points.get(2).y;
-            drawCCOfPlayer(ccID, x, y, player.getTacticalCC());
-            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC());
-            drawCCOfPlayer(ccID, x, y + 130, player.getStrategicCC());
+            drawCCOfPlayer(ccID, x, y, player.getTacticalCC(), false);
+            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), "letnev".equals(player.getFaction()));
+            drawCCOfPlayer(ccID, x, y + 130, player.getStrategicCC(), false);
 
             if (player == speaker) {
                 String speakerID = Mapper.getTokenID(Constants.SPEAKER);
@@ -479,13 +484,23 @@ public class GenerateMap {
 
     }
 
-    private void drawCCOfPlayer(String ccID, int x, int y, int tacticalCC) {
+    private void drawCCOfPlayer(String ccID, int x, int y, int ccCount, boolean isLetnev) {
         String ccPath = Mapper.getCCPath(ccID);
         try {
             BufferedImage ccImage = resizeImage(ImageIO.read(new File(ccPath)), 0.75f);
             int delta = 20;
-            for (int i = 0; i < tacticalCC; i++) {
-                graphics.drawImage(ccImage, x + (delta * i), y, null);
+            if (isLetnev) {
+                for (int i = 0; i < 2; i++) {
+                    graphics.drawImage(ccImage, x + (delta * i), y, null);
+                }
+                x += 20;
+                for (int i = 2; i < ccCount + 2; i++) {
+                    graphics.drawImage(ccImage, x + (delta * i), y, null);
+                }
+            } else {
+                for (int i = 0; i < ccCount; i++) {
+                    graphics.drawImage(ccImage, x + (delta * i), y, null);
+                }
             }
         } catch (Exception e) {
             LoggerHandler.log("Could not parse cc file for: " + ccID, e);
@@ -1009,7 +1024,8 @@ public class GenerateMap {
         Point centerPosition = unitHolder.getHolderCenterPosition();
         int x = tileX;
         int y = tileY;
-
+        int deltaX = 80;
+        int deltaY = 0;
         ArrayList<Point> spaceTokenPositions = PositionMapper.getSpaceTokenPositions(tile.getTileID());
         if (spaceTokenPositions.isEmpty()) {
             x = tileX + centerPosition.x;
@@ -1038,6 +1054,10 @@ public class GenerateMap {
                     Point point = spaceTokenPositions.get(index);
                     graphics.drawImage(image, x + point.x, y + point.y, null);
                     index++;
+                } else {
+                    graphics.drawImage(image, x + deltaX, y + deltaY, null);
+                    deltaX += 30;
+                    deltaY += 30;
                 }
             }
         }
