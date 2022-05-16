@@ -36,6 +36,10 @@ public class Turn extends PlayerSubcommandData {
             }
         }
 
+        pingNextPlayer(event, map, mainPlayer);
+    }
+
+    public static void pingNextPlayer(SlashCommandInteractionEvent event, Map map, Player mainPlayer) {
         int scNext = -1;
         boolean naaluPresent = false;
         int naaluSC = 0;
@@ -96,17 +100,16 @@ public class Turn extends PlayerSubcommandData {
             if (sc == nextSCFound || nextSCFound == 0 && naaluSC == sc){
                 String text = "";
                 text += Helper.getFactionIconFromDiscord(player.getFaction());
-                text += " " + Helper.getPlayerPing(event, player);
+                text += " " + Helper.getPlayerPing(event, player) + " UP NEXT";
                 MessageHelper.sendMessageToChannel(event.getChannel(), text);
-                MessageHelper.replyToMessage(event, "UP NEXT");
                 return;
             }
         }
-        MessageHelper.replyToMessage(event, "Next Player not found");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Next Player not found");
     }
 
     @Override
     public void reply(SlashCommandInteractionEvent event) {
-        //We reply in execute command
+        MessageHelper.replyToMessageTI4Logo(event);
     }
 }
