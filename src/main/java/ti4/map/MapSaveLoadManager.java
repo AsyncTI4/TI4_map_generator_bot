@@ -251,9 +251,9 @@ public class MapSaveLoadManager {
             writer.write(PLAYER);
             writer.write(System.lineSeparator());
 
-            writer.write(playerEntry.getKey());
-            writer.write(System.lineSeparator());
             Player player = playerEntry.getValue();
+            writer.write(player.getUserID());
+            writer.write(System.lineSeparator());
             writer.write(player.getUserName());
             writer.write(System.lineSeparator());
 

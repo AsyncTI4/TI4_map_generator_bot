@@ -862,6 +862,10 @@ public class Map {
         this.players = players;
     }
 
+    public void setPlayer(String playerID, Player player) {
+        players.put(playerID, player);
+    }
+
     public Player getPlayer(String userID) {
         return players.get(userID);
     }
@@ -874,6 +878,10 @@ public class Map {
         if (MapStatus.open.equals(mapStatus)) {
             players.remove(playerID);
         }
+    }
+
+    public void removePlayerForced(String playerID) {
+        players.remove(playerID);
     }
 
     public void setMapStatus(MapStatus status) {

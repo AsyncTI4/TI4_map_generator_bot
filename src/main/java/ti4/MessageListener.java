@@ -64,7 +64,7 @@ public class MessageListener extends ListenerAdapter {
         CommandManager commandManager = CommandManager.getInstance();
         for (Command command : commandManager.getCommandList()) {
             if (command.accept(event)) {
-                command.logBack(event);
+//                command.logBack(event);
                 try {
                     command.execute(event);
                 } catch (Exception e) {
