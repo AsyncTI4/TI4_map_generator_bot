@@ -36,6 +36,7 @@ public class HelpAction implements Command {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find help file");
         }
+        MessageHelper.replyToMessageTI4Logo(event);
     }
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
