@@ -79,7 +79,7 @@ public class Turn extends PlayerSubcommandData {
             }
         }
         if (scPassed.values().stream().allMatch(value -> value)){
-            MessageHelper.replyToMessage(event, "All PASSED " +Helper.getGamePing(event, map));
+            MessageHelper.replyToMessage(event, "All players passed. Please score objectives or react with your faction symbol for no scoring. " +Helper.getGamePing(event, map));
             return;
         }
 

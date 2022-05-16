@@ -2,6 +2,7 @@ package ti4.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -20,7 +21,9 @@ public class Pass extends PlayerSubcommandData {
             return;
         }
         player.setPassed(true);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Player: " + player.getUserName() + " passed.");
+        String text = Helper.getFactionIconFromDiscord(player.getFaction());
+        text += " " + player.getUserName() + " (" + player.getColor() + ") PASSED";
+        MessageHelper.sendMessageToChannel(event.getChannel(), text);
         Turn.pingNextPlayer(event, activeMap, player);
     }
 
