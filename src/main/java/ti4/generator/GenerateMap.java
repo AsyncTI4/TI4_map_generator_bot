@@ -697,6 +697,9 @@ public class GenerateMap {
                 String userID = player.getUserID();
                 if (scoredPlayerID.contains(userID)) {
                     String controlID = Mapper.getControlID(player.getColor());
+                    if (controlID.contains("null")){
+                        continue;
+                    }
                     BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.55f);
                     Integer vpCount = userVPs.get(player);
                     if (vpCount == null) {
