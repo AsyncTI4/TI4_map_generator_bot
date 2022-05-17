@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.MapGenerator;
 import ti4.commands.Command;
 import ti4.commands.cardspn.*;
 import ti4.commands.explore.ShuffleExpBackIntoDeck;
@@ -42,7 +43,7 @@ public class CardsCommand implements Command {
                 return false;
             }
             Map userActiveMap = mapManager.getUserActiveMap(userID);
-            if (!userActiveMap.getPlayerIDs().contains(userID)) {
+            if (!userActiveMap.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(MapGenerator.userID)) {
                 MessageHelper.replyToMessage(event, "Your not a player of the game, please call function /join gameName");
                 return false;
             }
