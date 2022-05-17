@@ -64,7 +64,7 @@ public class Turn extends PlayerSubcommandData {
                 if (scNumberIfNaaluInPlay.startsWith("0/")) {
                     scNext = 0;
                 }
-                scNext = scNext == max ? (naaluPresent ? 0 : 1) : sc + 1;
+                scNext = scNext == max ? (naaluPresent ? 0 : 1) : scNext + 1;
                 break;
             }
         }
