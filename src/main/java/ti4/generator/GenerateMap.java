@@ -455,7 +455,8 @@ public class GenerateMap {
             int x = points.get(2).x;
             int y = points.get(2).y;
             drawCCOfPlayer(ccID, x, y, player.getTacticalCC(), false);
-            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), "letnev".equals(player.getFaction()));
+//            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), "letnev".equals(player.getFaction()));
+            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), false);
             drawCCOfPlayer(ccID, x, y + 130, player.getStrategicCC(), false);
 
             if (player == speaker) {

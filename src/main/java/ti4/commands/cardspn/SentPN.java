@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cards.CardsInfo;
-import ti4.commands.cards.CardsSubcommandData;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -61,8 +60,8 @@ public class SentPN extends PNCardsSubcommandData {
 
             String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);
             if (player.getPromissoryNotesInPlayArea().contains(id)) {
-                String playerColor = player.getColor();
-                String playerFaction = player.getFaction();
+                String playerColor = targetPlayer.getColor();
+                String playerFaction = targetPlayer.getFaction();
                 if (!(playerColor != null && playerColor.equals(promissoryNoteOwner)) &&
                         !(playerFaction != null && playerFaction.equals(promissoryNoteOwner))) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Can send Promissory Notes from Play Area just to Owner of the Note");
@@ -72,7 +71,9 @@ public class SentPN extends PNCardsSubcommandData {
 
             player.removePromissoryNote(id);
             targetPlayer.setPromissoryNote(id);
-            if (id.endsWith("_sftt") || id.endsWith("_an")) {
+            if ((id.endsWith("_sftt") || id.endsWith("_an")) &&
+                    !promissoryNoteOwner.equals(targetPlayer.getFaction()) &&
+                    !promissoryNoteOwner.equals(targetPlayer.getColor())) {
                 targetPlayer.setPromissoryNotesInPlayArea(id);
                 areaPN = true;
             }
