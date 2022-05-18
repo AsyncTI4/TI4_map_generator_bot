@@ -15,6 +15,8 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.util.Collection;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 public class Replace extends GameSubcommandData {
 
@@ -44,6 +46,14 @@ public class Replace extends GameSubcommandData {
                     players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()))) {
                 message = Helper.getGamePing(event, map) + " Player: " + removedUser.getName() + " replaced by player: " + addedUser.getName();
                 Player player = map.getPlayer(removedUser.getId());
+                LinkedHashMap<String, List<String>> scoredPublicObjectives = map.getScoredPublicObjectives();
+                for (java.util.Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
+                    List<String> value = poEntry.getValue();
+                    boolean removed = value.remove(removedUser.getId());
+                    if (removed){
+                        value.add(addedUser.getId());
+                    }
+                }
                 player.setUserName(addedUser.getName());
                 player.setUserID(addedUser.getId());
             } else {
