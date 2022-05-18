@@ -304,7 +304,7 @@ public class GenerateMap {
                                 String promissoryNote = Mapper.getPromissoryNote(id);
                                 String[] pnSplit = promissoryNote.split(";");
                                 graphics.drawString(pnSplit[0] + "(" + playerFaction + ")", x + 230 + pnX, y + deltaY + pnY);
-                                pnX = pnX + pnSplit[0].length() * 25;
+                                pnX = pnX + pnSplit[0].length() * 28;
                             }
                         }
                     }

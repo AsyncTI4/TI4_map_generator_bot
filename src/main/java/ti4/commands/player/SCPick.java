@@ -27,9 +27,15 @@ public class SCPick extends PlayerSubcommandData {
         }
         Stats.pickSC(event, activeMap, player, event.getOption(Constants.SC));
         int sc = player.getSC();
-        String msg;
+        String msg = "";
         if (sc != 0) {
-            msg = "Picked: " + Helper.getSCAsMention(sc);
+            msg += Helper.getFactionIconFromDiscord(player.getFaction());
+            msg += " " + player.getUserName();
+            String color = player.getColor();
+            if (color != null) {
+                msg += " (" + color + ")";
+            }
+            msg += " Picked: " + Helper.getSCAsMention(sc);
         } else {
             msg = "No SC picked.";
         }
