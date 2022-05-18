@@ -245,4 +245,10 @@ public class Constants {
     public static final String FRAGMENT = "fragment";
     public static final String DISCARDED_EXPLORES = "discarded_explores";
     public static final String SEND_FRAGMENT = "send_fragment";
+
+
+    public static final String WARFARE = "warfare";
+    public static final String PROPULSION = "propulsion";
+    public static final String CYBERNETICS = "cybernetics";
+    public static final String BIOTIC = "biotic";
 }

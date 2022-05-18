@@ -32,6 +32,7 @@ public class Mapper {
     private static final Properties explore = new Properties();
     private static final HashMap<String, String> techList = new HashMap<>();
     private static final Properties planets = new Properties();
+    private static final Properties attachmentInfo = new Properties();
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
@@ -51,6 +52,7 @@ public class Mapper {
         readData("exploration.properties", explore, "Could not read explore file");
         readData("tech.properties", techs, "Could not read tech file");
         readData("planets.properties", planets, "Could not read planets file");
+        readData("attachments_info.properties", attachmentInfo, "Could not read attachment info file");
     }
 
     private static void readData(String propertyFileName, Properties colors, String s) {
@@ -187,6 +189,18 @@ public class Mapper {
     
     public static String getPlanet(String id) {
     	return (String)planets.get(id);
+    }
+
+    public static String getAttachmentInfo(String id) {
+    	return (String)attachmentInfo.get(id);
+    }
+
+    public static List<String> getAttachmentInfoAll() {
+        return Stream.of(attachmentInfo.keySet(), tokens.keySet()).flatMap(Collection::stream)
+                .filter(token -> token instanceof String)
+                .map(token -> (String) token)
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     public static String getAgendaForOnly(String id) {
