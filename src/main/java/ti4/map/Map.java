@@ -15,6 +15,8 @@ public class Map {
     private String ownerName = "";
     private String name;
 
+    private HashMap<String, UnitHolder> planets = new HashMap<>();
+
     @CheckForNull
     private DisplayType displayTypeForced = null;
     private int playerCountForMap = 6;
@@ -45,7 +47,7 @@ public class Map {
     private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
     private ArrayList<String> publicObjectives1 = new ArrayList<>();
     private ArrayList<String> publicObjectives2 = new ArrayList<>();
-    
+
     private ArrayList<String> explore = new ArrayList<>();
     private ArrayList<String> discardExplore = new ArrayList<>();
 
@@ -72,7 +74,7 @@ public class Map {
         Collections.shuffle(publicObjectives1);
         Collections.shuffle(publicObjectives2);
         addCustomPO(Constants.CUSTODIAN, 1);
-        
+
         Set<String> exp = Mapper.getExplores().keySet();
         explore.addAll(exp);
         Collections.shuffle(explore);
@@ -513,72 +515,72 @@ public class Map {
     }
 
     private ArrayList<String> getExplores(String reqType, List<String> superDeck) {
-    	ArrayList<String> deck = new ArrayList<String>();
-    	for(String id : superDeck) {
-    		String card = Mapper.getExplore(id);
-    		if (card != null) {
+        ArrayList<String> deck = new ArrayList<String>();
+        for (String id : superDeck) {
+            String card = Mapper.getExplore(id);
+            if (card != null) {
                 String[] split = card.split(";");
-    			String type = split[1];
-    			if (reqType.equalsIgnoreCase(type)) {
-    				deck.add(id);
-    			}
-    		}
-    	}
-    	return deck;
+                String type = split[1];
+                if (reqType.equalsIgnoreCase(type)) {
+                    deck.add(id);
+                }
+            }
+        }
+        return deck;
     }
-    
+
     public ArrayList<String> getExploreDeck(String reqType) {
-    	return getExplores(reqType, explore);
+        return getExplores(reqType, explore);
     }
-    
+
     public ArrayList<String> getExploreDiscard(String reqType) {
-    	return getExplores(reqType, discardExplore);
+        return getExplores(reqType, discardExplore);
     }
-    
+
     public String drawExplore(String reqType) {
-    	List<String> deck = getExplores(reqType, explore);
-    	if (!deck.isEmpty()) {
-    		String id = deck.get(0);
-    		discardExplore(id);
-    		return id;
-    	} else {
-    		deck = getExplores(reqType, discardExplore);
-    		if (!deck.isEmpty()) {
-    			explore.addAll(deck);
-    			Collections.shuffle(explore);
-    			discardExplore.clear();
-    			return drawExplore(reqType);
-    		}
-    	}
-    	return null;
+        List<String> deck = getExplores(reqType, explore);
+        if (!deck.isEmpty()) {
+            String id = deck.get(0);
+            discardExplore(id);
+            return id;
+        } else {
+            deck = getExplores(reqType, discardExplore);
+            if (!deck.isEmpty()) {
+                explore.addAll(deck);
+                Collections.shuffle(explore);
+                discardExplore.clear();
+                return drawExplore(reqType);
+            }
+        }
+        return null;
     }
-    
+
     public void discardExplore(String id) {
-    	explore.remove(id);
-    	if (Mapper.getExplore(id) != null) {
-    		discardExplore.add(id);
-    	}
+        explore.remove(id);
+        if (Mapper.getExplore(id) != null) {
+            discardExplore.add(id);
+        }
     }
-    
+
     public void purgeExplore(String id) {
-    	explore.remove(id);
-    	discardExplore.remove(id);
+        explore.remove(id);
+        discardExplore.remove(id);
     }
-    
+
     public void addExplore(String id) {
-    	if (Mapper.getExplore(id) != null) {
-    		explore.add(id);
-    	}
-    	discardExplore.remove(id);
+        if (Mapper.getExplore(id) != null) {
+            explore.add(id);
+        }
+        discardExplore.remove(id);
     }
-    
+
     public void resetExplore() {
-    	explore.clear();
-    	discardExplore.clear();
-    	Set<String> exp = Mapper.getExplores().keySet();
-    	explore.addAll(exp);
+        explore.clear();
+        discardExplore.clear();
+        Set<String> exp = Mapper.getExplores().keySet();
+        explore.addAll(exp);
     }
-    
+
     @CheckForNull
     public String drawActionCardAndDiscard() {
         if (!actionCards.isEmpty()) {
@@ -775,21 +777,21 @@ public class Map {
     public List<String> getActionCards() {
         return actionCards;
     }
-    
+
     public List<String> getAllExplores() {
-    	return explore;
+        return explore;
     }
-    
+
     public List<String> getAllExploreDiscard() {
-    	return discardExplore;
+        return discardExplore;
     }
-    
+
     public void setExploreDeck(ArrayList<String> deck) {
-    	explore = deck;
+        explore = deck;
     }
-    
+
     public void setExploreDiscard(ArrayList<String> discard) {
-    	discardExplore = discard;
+        discardExplore = discard;
     }
 
     public void setSecretObjectives(List<String> secretObjectives) {
@@ -906,17 +908,37 @@ public class Map {
 
     public void setTileMap(HashMap<String, Tile> tileMap) {
         this.tileMap = tileMap;
+        planets.clear();
     }
 
     public void clearTileMap() {
         this.tileMap.clear();
+        planets.clear();
     }
 
     public void setTile(Tile tile) {
         tileMap.put(tile.getPosition(), tile);
+        planets.clear();
     }
 
     public void removeTile(String position) {
         tileMap.remove(position);
+        planets.clear();
+    }
+
+    public HashMap<String, UnitHolder> getPlanetsInfo() {
+        return planets;
+    }
+    public Set<String> getPlanets() {
+        if (planets.isEmpty()) {
+            for (Tile tile : tileMap.values()) {
+                for (java.util.Map.Entry<String, UnitHolder> unitHolderEntry : tile.getUnitHolders().entrySet()) {
+                    if (unitHolderEntry.getValue() instanceof Planet) {
+                        planets.put(unitHolderEntry.getKey(), unitHolderEntry.getValue());
+                    }
+                }
+            }
+        }
+        return planets.keySet();
     }
 }

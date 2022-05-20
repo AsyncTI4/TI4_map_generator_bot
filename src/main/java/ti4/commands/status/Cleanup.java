@@ -46,6 +46,7 @@ public class Cleanup extends StatusSubcommandData {
             player.setPassed(false);
             player.setSC(0);
             player.cleanExhaustedTechs();
+            player.cleanExhaustedPlanets();
         }
     }
 }

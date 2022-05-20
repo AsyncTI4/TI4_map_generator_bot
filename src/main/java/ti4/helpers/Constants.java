@@ -82,7 +82,7 @@ public class Constants {
     public static final String SLEEPER = "sleeper";
     public static final String DMZ_LARGE = "dmz_large";
     public static final String WORLD_DESTROYED = "worlddestroyed";
-    public static final String PLANET = "planet";
+
     public static final String FRONTIER = "frontier";
 
     public static final String CREATION_DATE = "creation_date";
@@ -112,12 +112,20 @@ public class Constants {
     public static final String PLAYER = "player";
     public static final String STATS = "stats";
     public static final String SETUP = "setup";
+    public static final String PLANETS = "planets";
+    public static final String PLANETS_EXHAUSTED = "planets_exhausted";
+    public static final String PLANETS_ABILITY_EXHAUSTED = "planets_ability_exhausted";
+    public static final String PLANET = "planet";
+    public static final String PLANET2 = "planet2";
+    public static final String PLANET3 = "planet3";
+    public static final String PLANET4 = "planet4";
+    public static final String PLANET5 = "planet5";
+    public static final String PLANET6 = "planet6";
     public static final String TECH = "tech";
     public static final String TECH_EXHAUSTED = "tech_exhausted";
     public static final String TECH2 = "tech2";
     public static final String TECH3 = "tech3";
     public static final String TECH4 = "tech4";
-    public static final String PLANETS = "planets";
     public static final String TACTICAL = "tactical_cc";
     public static final String FLEET = "fleet_cc";
     public static final String STRATEGY = "strategy_cc";
