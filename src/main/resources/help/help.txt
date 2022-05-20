@@ -124,6 +124,7 @@ Attachement tokens can only be added to planets
 /player planet_remove planetName1 planetName2..6(optional) <- removes planet
 /player planet_exhaust planetName1 planetName2..6(optional) <- exhaust planet
 /player planet_refresh planetName1 planetName2..6(optional) <- refreshes planet
+/player planet_refresh_all <- refreshes all planets
 /player planet_exhaust_ability planetName1 planetName2..6(optional) <- exhaust planet ability (legendary)
 /player planet_refresh_ability planetName1 planetName2..6(optional) <- refreshes planet ability (legendary)
 Also if you add a planet that another player has it, it auto removes that planet from other player also transfers ability status, if exhausted, you get exhausted

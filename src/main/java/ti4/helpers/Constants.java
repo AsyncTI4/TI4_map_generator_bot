@@ -242,6 +242,7 @@ public class Constants {
     public static final String PLANET_REMOVE = "planet_remove";
     public static final String PLANET_EXHAUST = "planet_exhaust";
     public static final String PLANET_REFRESH = "planet_refresh";
+    public static final String PLANET_REFRESH_ALL = "planet_refresh_all";
     public static final String PLANET_EXHAUST_ABILITY = "planet_exhaust_ability";
     public static final String PLANET_REFRESH_ABILITY = "planet_refresh_ability";
 
