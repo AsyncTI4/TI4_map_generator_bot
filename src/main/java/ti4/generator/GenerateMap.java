@@ -68,8 +68,8 @@ public class GenerateMap {
         width = mapWidth + (extraWidth * 2);
         heightForGameInfo = mapHeight;
         heightForGameInfoStorage = heightForGameInfo;
-        height = heightForGameInfo + mapHeight / 2 + 2000;
-        heightStats = mapHeight / 2 + 2000;
+        height = heightForGameInfo + mapHeight / 2 + 2500;
+        heightStats = mapHeight / 2 + 2500;
         heightStorage = height;
     }
 
@@ -388,6 +388,12 @@ public class GenerateMap {
             } else {
                 String originalPlanetType = planetHolder.getOriginalPlanetType();
                 if (!originalPlanetType.isEmpty()) {
+                    if ("keleres".equals(player.getFaction()) && ("mentak".equals(originalPlanetType) ||
+                            "xxcha".equals(originalPlanetType) ||
+                            "argent".equals(originalPlanetType))) {
+                        originalPlanetType = "keleres";
+                    }
+
                     String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
                     drawImage(x + deltaX + 2, y + 2, planet, planetTypeName);
                 }
@@ -400,9 +406,9 @@ public class GenerateMap {
             }
 
             boolean hasAbility = planetHolder.isHasAbility();
-            if (hasAbility){
+            if (hasAbility) {
                 String statusOfAbility = exhaustedPlanetsAbilities.contains(planet) ? "_exh" : "_rdy";
-                String planetTypeName = "pc_legendary"+ statusOfAbility +".png";
+                String planetTypeName = "pc_legendary" + statusOfAbility + ".png";
                 drawImage(x + deltaX + 26, y + 60, planet, planetTypeName);
             }
             String originalTechSpeciality = planetHolder.getOriginalTechSpeciality();
@@ -423,11 +429,6 @@ public class GenerateMap {
             drawImage(x + deltaX + 26, y + 103, planet, resFileName);
             drawImage(x + deltaX + 26, y + 125, planet, infFileName);
             drawImage(x + deltaX, y, planet, planetFileName);
-
-
-
-
-
 
 
             deltaX += 56;
@@ -475,7 +476,8 @@ public class GenerateMap {
                 int x = vpCount * width + 5 + tempX;
                 graphics.drawImage(bufferedImage, x, y + (tempCounter * bufferedImage.getHeight()), null);
             } catch (Exception e) {
-                LoggerHandler.log("Could not display player: " + player.getUserName() + " VP count", e);
+                //nothing
+//                LoggerHandler.log("Could not display player: " + player.getUserName() + " VP count", e);
             }
             tempCounter++;
             if (tempCounter >= 4) {

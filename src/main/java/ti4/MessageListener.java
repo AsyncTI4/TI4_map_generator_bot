@@ -2,6 +2,7 @@ package ti4;
 
 import net.dv8tion.jda.api.entities.ChannelType;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
@@ -33,8 +34,29 @@ public class MessageListener extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         event.getInteraction().deferReply().queue();
         String userID = event.getUser().getId();
+        setActiveGame(event.getChannel(), userID);
+
+
+        //noinspection ResultOfMethodCallIgnored
+//        event.deferReply();
+        CommandManager commandManager = CommandManager.getInstance();
+        for (Command command : commandManager.getCommandList()) {
+            if (command.accept(event)) {
+//                command.logBack(event);
+                try {
+                    command.execute(event);
+                } catch (Exception e) {
+                    String messageText = "Error trying to execute command: " + command.getActionID();
+                    MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
+                    LoggerHandler.log(messageText, e);
+                }
+            }
+        }
+    }
+
+    public static void setActiveGame(MessageChannel channel, String userID) {
+        String channelName = channel.getName();
         MapManager mapManager = MapManager.getInstance();
-        String channelName = event.getChannel().getName();
         Map userActiveMap = mapManager.getUserActiveMap(userID);
         Set<String> mapList = mapManager.getMapList().keySet();
         StringTokenizer channelNameTokenizer = new StringTokenizer(channelName, "-");
@@ -53,25 +75,8 @@ public class MessageListener extends ListenerAdapter {
             mapManager.setMapForUser(userID, gameID);
         } else if (mapManager.isUserWithActiveMap(userID)) {
             if (mapList.stream().anyMatch(map -> map.equals(gameID)) && !channelName.startsWith(userActiveMap.getName())) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Active game reset. Channel name indicates to have map associated with it. Please select correct active game or do action in neutral channel");
+                MessageHelper.sendMessageToChannel(channel, "Active game reset. Channel name indicates to have map associated with it. Please select correct active game or do action in neutral channel");
                 mapManager.resetMapForUser(userID);
-            }
-        }
-
-
-        //noinspection ResultOfMethodCallIgnored
-//        event.deferReply();
-        CommandManager commandManager = CommandManager.getInstance();
-        for (Command command : commandManager.getCommandList()) {
-            if (command.accept(event)) {
-//                command.logBack(event);
-                try {
-                    command.execute(event);
-                } catch (Exception e) {
-                    String messageText = "Error trying to execute command: " + command.getActionID();
-                    MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
-                    LoggerHandler.log(messageText, e);
-                }
             }
         }
     }

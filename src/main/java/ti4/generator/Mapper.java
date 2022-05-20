@@ -255,7 +255,7 @@ public class Mapper {
     public static String getCCPath(String ccID) {
         String ccPath = ResourceHelper.getInstance().getCCFile(ccID);
         if (ccPath == null) {
-            LoggerHandler.log("Could not find command counter: " + ccID);
+//            LoggerHandler.log("Could not find command counter: " + ccID);
             return null;
         }
         return ccPath;

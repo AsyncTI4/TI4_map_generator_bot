@@ -68,6 +68,7 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
             event.replyChoices(options).queue();
         } else if (optionName.equals(Constants.PLANET) || optionName.equals(Constants.PLANET2) || optionName.equals(Constants.PLANET3) || optionName.equals(Constants.PLANET4) || optionName.equals(Constants.PLANET5) || optionName.equals(Constants.PLANET6)) {
+            MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId());
             String enteredValue = event.getFocusedOption().getValue().toLowerCase();
             String id = event.getUser().getId();
             Map map = MapManager.getInstance().getUserActiveMap(id);
