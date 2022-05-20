@@ -610,7 +610,8 @@ public class GenerateMap {
                 }
             }
         } catch (Exception e) {
-            LoggerHandler.log("Could not parse cc file for: " + ccID, e);
+            //None
+//            LoggerHandler.log("Could not parse cc file for: " + ccID, e);
         }
     }
 
@@ -966,13 +967,13 @@ public class GenerateMap {
         for (String ccID : ccList) {
             String ccPath = tile.getCCPath(ccID);
             if (ccPath == null) {
-                LoggerHandler.log("Could not parse cc file for: " + ccID);
+//                LoggerHandler.log("Could not parse cc file for: " + ccID);
                 continue;
             }
             try {
                 image = resizeImage(ImageIO.read(new File(ccPath)), 0.85f);
             } catch (Exception e) {
-                LoggerHandler.log("Could not parse cc file for: " + ccID, e);
+//                LoggerHandler.log("Could not parse cc file for: " + ccID, e);
             }
             Point centerPosition = unitHolder.getHolderCenterPosition();
             graphics.drawImage(image, tileX + 10 + deltaX, tileY + centerPosition.y - 40 + deltaY, null);
