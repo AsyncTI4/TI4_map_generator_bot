@@ -120,6 +120,12 @@ public class PlayerCommand implements Command {
         subcommands.add(new TechRefresh());
         subcommands.add(new Turn());
         subcommands.add(new SCPick());
+        subcommands.add(new PlanetAdd());
+        subcommands.add(new PlanetRemove());
+        subcommands.add(new PlanetExhaust());
+        subcommands.add(new PlanetRefresh());
+        subcommands.add(new PlanetExhaustAbility());
+        subcommands.add(new PlanetRefreshAbility());
         return subcommands;
     }
 

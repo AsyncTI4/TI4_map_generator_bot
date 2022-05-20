@@ -7,7 +7,9 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 
 import javax.annotation.CheckForNull;
+import java.awt.*;
 import java.util.*;
+import java.util.List;
 
 public class Map {
 
@@ -927,6 +929,9 @@ public class Map {
     }
 
     public HashMap<String, UnitHolder> getPlanetsInfo() {
+        if (planets.isEmpty()){
+            getPlanets();
+        }
         return planets;
     }
     public Set<String> getPlanets() {
@@ -938,6 +943,7 @@ public class Map {
                     }
                 }
             }
+            planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0,0)));
         }
         return planets.keySet();
     }

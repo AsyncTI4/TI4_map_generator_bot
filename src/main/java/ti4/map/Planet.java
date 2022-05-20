@@ -16,26 +16,25 @@ public class Planet extends UnitHolder {
     private String originalTechSpeciality = "";
     private ArrayList<String> planetType = new ArrayList<>();
     private ArrayList<String> techSpeciality = new ArrayList<>();
+    private boolean hasAbility = false;
 
     public Planet(String name, Point holderCenterPosition) {
         super(name, holderCenterPosition);
         String planetInfo = Mapper.getPlanet(name);
         if (planetInfo != null) {
             String[] split = planetInfo.split(",");
-            String type = split[1];
-            if (Constants.CULTURAL.equals(type) ||
-                    Constants.INDUSTRIAL.equals(type) ||
-                    Constants.HAZARDOUS.equals(type)) {
-                originalPlanetType = type;
-            }
+            originalPlanetType = split[1];
             if (split.length > 4) {
                 String techSpec = split[4];
                 if (Constants.PROPULSION.equals(techSpec) ||
                         Constants.WARFARE.equals(techSpec) ||
                         Constants.BIOTIC.equals(techSpec) ||
-                        Constants.CYBERNETICS.equals(techSpec)) {
+                        Constants.CYBERNETIC.equals(techSpec)) {
                     originalTechSpeciality = techSpec;
                 }
+            }
+            if (split.length > 5){
+                hasAbility = true;
             }
             try {
                 resources = Integer.parseInt(split[2]);
@@ -50,7 +49,7 @@ public class Planet extends UnitHolder {
         if (Constants.PROPULSION.equals(techSpec) ||
                 Constants.WARFARE.equals(techSpec) ||
                 Constants.BIOTIC.equals(techSpec) ||
-                Constants.CYBERNETICS.equals(techSpec)) {
+                Constants.CYBERNETIC.equals(techSpec)) {
             techSpeciality.add(techSpec);
         }
     }
@@ -61,6 +60,10 @@ public class Planet extends UnitHolder {
                 Constants.HAZARDOUS.equals(type)) {
             planetType.add(type);
         }
+    }
+
+    public boolean hasAttachment(){
+       return tokenList.stream().anyMatch(token -> !token.contains("sleeper"));
     }
 
     @Override
@@ -117,5 +120,33 @@ public class Planet extends UnitHolder {
                 }
             }
         }
+    }
+
+    public int getResources() {
+        return resources;
+    }
+
+    public int getInfluence() {
+        return influence;
+    }
+
+    public String getOriginalPlanetType() {
+        return originalPlanetType;
+    }
+
+    public String getOriginalTechSpeciality() {
+        return originalTechSpeciality;
+    }
+
+    public ArrayList<String> getPlanetType() {
+        return planetType;
+    }
+
+    public ArrayList<String> getTechSpeciality() {
+        return techSpeciality;
+    }
+
+    public boolean isHasAbility() {
+        return hasAbility;
     }
 }

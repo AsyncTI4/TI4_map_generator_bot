@@ -14,7 +14,7 @@ abstract public class UnitHolder {
     private final HashMap<String, Integer> unitsDamage = new HashMap<>();
     private final HashSet<String> ccList = new HashSet<>();
     private final HashSet<String> controlList = new HashSet<>();
-    private final HashSet<String> tokenList = new HashSet<>();
+    protected final HashSet<String> tokenList = new HashSet<>();
     private final Point holderCenterPosition;
 
     private final String name;

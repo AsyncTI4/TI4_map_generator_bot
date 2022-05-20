@@ -7,6 +7,7 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
 
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
@@ -70,14 +71,16 @@ public class AutoCompleteProvider {
             String enteredValue = event.getFocusedOption().getValue().toLowerCase();
             String id = event.getUser().getId();
             Map map = MapManager.getInstance().getUserActiveMap(id);
-            if (map == null) {
-                return;
+            Set<String> planetIDs;
+            if (map != null) {
+                planetIDs = map.getPlanets();
+            } else {
+                planetIDs = Collections.emptySet();
             }
-            Set<String> planetIDs = map.getPlanets();
             HashMap<String, String> planets = Mapper.getPlanetRepresentations();
             List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = planets.entrySet().stream()
-                    .filter(planetIDs::contains)
                     .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                    .filter(value -> planetIDs.isEmpty() || planetIDs.contains(value.getKey()))
                     .limit(25)
                     .map(value -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(value.getValue(), value.getKey()))
                     .collect(Collectors.toList());

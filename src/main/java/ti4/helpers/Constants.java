@@ -237,7 +237,14 @@ public class Constants {
     public static final String TECH_REMOVE = "tech_remove";
     public static final String TECH_EXHAUST = "tech_exhaust";
     public static final String TECH_REFRESH = "tech_refresh";
-    
+
+    public static final String PLANET_ADD = "planet_add";
+    public static final String PLANET_REMOVE = "planet_remove";
+    public static final String PLANET_EXHAUST = "planet_exhaust";
+    public static final String PLANET_REFRESH = "planet_refresh";
+    public static final String PLANET_EXHAUST_ABILITY = "planet_exhaust_ability";
+    public static final String PLANET_REFRESH_ABILITY = "planet_refresh_ability";
+
     public static final String EXPLORE = "explore";
     public static final String CULTURAL = "cultural";
     public static final String INDUSTRIAL = "industrial";
@@ -257,6 +264,6 @@ public class Constants {
 
     public static final String WARFARE = "warfare";
     public static final String PROPULSION = "propulsion";
-    public static final String CYBERNETICS = "cybernetics";
+    public static final String CYBERNETIC = "cybernetic";
     public static final String BIOTIC = "biotic";
 }
