@@ -1,6 +1,5 @@
 package ti4;
 
-import org.jetbrains.annotations.Nullable;
 import ti4.helpers.LoggerHandler;
 
 import javax.annotation.CheckForNull;
@@ -8,8 +7,6 @@ import java.io.File;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 public class ResourceHelper {
     private static ResourceHelper resourceHelper = null;
@@ -20,6 +17,7 @@ public class ResourceHelper {
     private HashMap<String, String> tokenCache = new HashMap<>();
     private HashMap<String, String> factionCache = new HashMap<>();
     private HashMap<String, String> generalCache = new HashMap<>();
+    private HashMap<String, String> planetCache = new HashMap<>();
 
     private ResourceHelper() {
     }
@@ -124,6 +122,19 @@ public class ResourceHelper {
         }
         String token = getResourceFromFolder("attachment_token/", name, "Could not find attachment token file");
         attachmentCache.put(name, token);
+        return token;
+    }
+
+    @CheckForNull
+    public String getPlanetResource(String name)
+    {
+        String planetInfoPath = planetCache.get(name);
+        if (planetInfoPath != null)
+        {
+            return planetInfoPath;
+        }
+        String token = getResourceFromFolder("planet_cards/", name, "Could not find planet token file");
+        planetCache.put(name, token);
         return token;
     }
 

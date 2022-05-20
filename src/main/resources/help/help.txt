@@ -120,6 +120,13 @@ Attachement tokens can only be added to planets
 /player tech_exhaust techName player(optional) <- exhausts selected tech to player area
 /player tech_refresh techName player(optional) <- refreshes selected tech to player area
 /player turn player(optional)  <- pings next player in line. Can do turn for any player
+/player planet_add planetName1 planetName2..6(optional) <- adds planet
+/player planet_remove planetName1 planetName2..6(optional) <- removes planet
+/player planet_exhaust planetName1 planetName2..6(optional) <- exhaust planet
+/player planet_refresh planetName1 planetName2..6(optional) <- refreshes planet
+/player planet_exhaust_ability planetName1 planetName2..6(optional) <- exhaust planet ability (legendary)
+/player planet_refresh_ability planetName1 planetName2..6(optional) <- refreshes planet ability (legendary)
+Also if you add a planet that another player has it, it auto removes that planet from other player also transfers ability status, if exhausted, you get exhausted
 
 Cards commands
 /cards so_draw count(optional) <- draws a secret or specified number of secrets

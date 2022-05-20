@@ -265,7 +265,7 @@ public class GenerateMap {
                 graphics.setColor(Color.WHITE);
                 sb = new StringBuilder();
                 sb.append(player.getTacticalCC()).append("T/");
-                if ("letnev".equals(faction)){
+                if ("letnev".equals(faction)) {
                     sb.append(player.getFleetCC()).append("+2").append("F/");
                 } else {
                     sb.append(player.getFleetCC()).append("F/");
@@ -313,6 +313,12 @@ public class GenerateMap {
                 int techY = techs(player, techStartY);
                 graphics.setColor(color);
                 y += 90 + (techY - techStartY);
+
+                if (!player.getPlanets().isEmpty()) {
+                    planetInfo(player, map, 10, y);
+                    y += 225;
+                }
+
                 g2.setColor(color);
                 g2.drawRect(x - 5, baseY, x + widthOfLine, y - baseY);
                 y += 15;
@@ -341,6 +347,94 @@ public class GenerateMap {
         }
     }
 
+    private void planetInfo(Player player, Map map, int x, int y) {
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        List<String> planets = player.getPlanets();
+        List<String> exhaustedPlanets = player.getExhaustedPlanets();
+        List<String> exhaustedPlanetsAbilities = player.getExhaustedPlanetsAbilities();
+
+        int deltaX = 0;
+
+        for (String planet : planets) {
+
+            UnitHolder unitHolder = planetsInfo.get(planet);
+            if (!(unitHolder instanceof Planet planetHolder)) {
+                LoggerHandler.log("Planet unitHolder not found: " + planet);
+                continue;
+            }
+
+            boolean isExhausted = exhaustedPlanets.contains(planet);
+            if (isExhausted) {
+                graphics.setColor(Color.GRAY);
+            } else {
+                graphics.setColor(Color.WHITE);
+            }
+
+            int resources = planetHolder.getResources();
+            int influence = planetHolder.getInfluence();
+            String statusOfPlanet = isExhausted ? "_exh" : "_rdy";
+            String planetFileName = "pc_planetname_" + planet + statusOfPlanet + ".png";
+            String resFileName = "pc_res_" + resources + statusOfPlanet + ".png";
+            String infFileName = "pc_inf_" + influence + statusOfPlanet + ".png";
+
+            graphics.drawRect(x + deltaX, y + 2, 54, 220);
+            drawImage(x + deltaX + 5, y + 50, planet, planetFileName);
+            drawImage(x + deltaX + 5, y + 198, planet, resFileName);
+            drawImage(x + deltaX + 25, y + 198, planet, infFileName);
+
+            if (unitHolder.getTokenList().contains("titanspn")) {
+                String planetTypeName = "pc_attribute_titanspn.png";
+                drawImage(x + deltaX + 5, y + 7, planet, planetTypeName);
+            } else {
+                String originalPlanetType = planetHolder.getOriginalPlanetType();
+                if (!originalPlanetType.isEmpty()) {
+                    String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
+                    drawImage(x + deltaX + 5, y + 7, planet, planetTypeName);
+                }
+            }
+
+            String originalTechSpeciality = planetHolder.getOriginalTechSpeciality();
+            int deltaY = 175;
+            if (!originalTechSpeciality.isEmpty()) {
+                String planetTypeName = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
+                drawImage(x + deltaX + 25, y + deltaY, planet, planetTypeName);
+            }
+
+            ArrayList<String> techSpeciality = planetHolder.getTechSpeciality();
+            for (String techSpec : techSpeciality) {
+                String planetTypeName = "pc_tech_" + techSpec + statusOfPlanet + ".png";
+                drawImage(x + deltaX + 25, y + deltaY, planet, planetTypeName);
+                deltaY -= 20;
+            }
+
+
+            boolean hasAttachment = planetHolder.hasAttachment();
+            if (hasAttachment) {
+                String planetTypeName = "pc_upgrade.png";
+                drawImage(x + deltaX + 25, y + 55, planet, planetTypeName);
+            }
+
+            boolean hasAbility = planetHolder.isHasAbility();
+            if (hasAbility){
+                String statusOfAbility = exhaustedPlanetsAbilities.contains(planet) ? "_exh" : "_rdy";
+                String planetTypeName = "pc_legendary"+ statusOfAbility +".png";
+                drawImage(x + deltaX + 25, y + 75, planet, planetTypeName);
+            }
+            deltaX += 56;
+        }
+    }
+
+    private void drawImage(int x, int y, String planet, String resourceName) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getPlanetResource(resourceName);
+            @SuppressWarnings("ConstantConditions")
+            BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
+            graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            LoggerHandler.log("Could not display planet: " + resourceName, e);
+        }
+    }
+
     private void scoreTrack(Map map, int y) {
 
         Graphics2D g2 = (Graphics2D) graphics;
@@ -350,7 +444,7 @@ public class GenerateMap {
         int width = 150;
         for (int i = 0; i <= map.getVp(); i++) {
             graphics.setColor(Color.WHITE);
-            graphics.drawString(Integer.toString(i), i * width + 55, y + (height/2) + 25);
+            graphics.drawString(Integer.toString(i), i * width + 55, y + (height / 2) + 25);
             g2.setColor(Color.RED);
             g2.drawRect(i * width, y, width, height);
         }
@@ -369,12 +463,12 @@ public class GenerateMap {
                     vpCount = 0;
                 }
                 int x = vpCount * width + 5 + tempX;
-                graphics.drawImage(bufferedImage, x, y + (tempCounter*bufferedImage.getHeight()), null);
+                graphics.drawImage(bufferedImage, x, y + (tempCounter * bufferedImage.getHeight()), null);
             } catch (Exception e) {
-                LoggerHandler.log("Could not display player: " +player.getUserName() + " VP count", e);
+                LoggerHandler.log("Could not display player: " + player.getUserName() + " VP count", e);
             }
             tempCounter++;
-            if (tempCounter >= 4){
+            if (tempCounter >= 4) {
                 tempCounter = 0;
                 tempX = tempWidth;
             }
@@ -517,7 +611,7 @@ public class GenerateMap {
         column[0] = 0;
         List<String> techs = player.getTechs();
         List<String> exhaustedTechs = player.getExhaustedTechs();
-        if (techs.isEmpty()){
+        if (techs.isEmpty()) {
             return y;
         }
         techs.sort(Comparator.comparing(Mapper::getTechType));
@@ -531,7 +625,7 @@ public class GenerateMap {
                 case 3 -> x = 1430;
                 case 4 -> x = 1830;
             }
-            if (exhaustedTechs.contains(tech)){
+            if (exhaustedTechs.contains(tech)) {
                 graphics.setColor(Color.GRAY);
             } else {
                 graphics.setColor(getTechColor(Mapper.getTechType(tech)));
@@ -697,7 +791,7 @@ public class GenerateMap {
                 String userID = player.getUserID();
                 if (scoredPlayerID.contains(userID)) {
                     String controlID = Mapper.getControlID(player.getColor());
-                    if (controlID.contains("null")){
+                    if (controlID.contains("null")) {
                         continue;
                     }
                     BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.55f);
@@ -707,7 +801,7 @@ public class GenerateMap {
                     }
                     if (multiScoring) {
                         int frequency = Collections.frequency(scoredPlayerID, userID);
-                        vpCount += frequency*objectiveWorth;
+                        vpCount += frequency * objectiveWorth;
                         for (int i = 0; i < frequency; i++) {
                             graphics.drawImage(bufferedImage, x + tempX, y, null);
                             tempX += scoreTokenWidth;
@@ -919,7 +1013,7 @@ public class GenerateMap {
         tokenList.sort((o1, o2) -> {
             if ((o1.contains(Constants.SLEEPER) || o2.contains(Constants.SLEEPER))) {
                 return -1;
-            }  else if (o1.contains(Constants.DMZ_LARGE) || o2.contains(Constants.DMZ_LARGE)) {
+            } else if (o1.contains(Constants.DMZ_LARGE) || o2.contains(Constants.DMZ_LARGE)) {
                 return 1;
             }
             return o1.compareTo(o2);

@@ -436,6 +436,8 @@ public class Player {
 
     public void removePlanet(String planet) {
         planets.remove(planet);
+        exhaustedPlanets.remove(planet);
+        exhaustedPlanetsAbilities.remove(planet);
     }
 
 

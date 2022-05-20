@@ -7,11 +7,9 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
-import ti4.map.MapManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
 
@@ -47,24 +45,20 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
             }
         }
 
-        parseParameter(event, player, event.getOption(Constants.PLANET));
-        parseParameter(event, player, event.getOption(Constants.PLANET2));
-        parseParameter(event, player, event.getOption(Constants.PLANET3));
-        parseParameter(event, player, event.getOption(Constants.PLANET4));
-        parseParameter(event, player, event.getOption(Constants.PLANET5));
-        parseParameter(event, player, event.getOption(Constants.PLANET6));
+        parseParameter(event, player, event.getOption(Constants.PLANET), activeMap);
+        parseParameter(event, player, event.getOption(Constants.PLANET2), activeMap);
+        parseParameter(event, player, event.getOption(Constants.PLANET3), activeMap);
+        parseParameter(event, player, event.getOption(Constants.PLANET4), activeMap);
+        parseParameter(event, player, event.getOption(Constants.PLANET5), activeMap);
+        parseParameter(event, player, event.getOption(Constants.PLANET6), activeMap);
     }
 
-    private void parseParameter(SlashCommandInteractionEvent event, Player player, OptionMapping option) {
+    private void parseParameter(SlashCommandInteractionEvent event, Player player, OptionMapping option, Map map) {
         if (option != null) {
             String planetID = option.getAsString();
             if (Mapper.isValidPlanet(planetID)) {
-                doAction(player, planetID);
+                doAction(player, planetID, map);
             } else {
-                Map map = MapManager.getInstance().getUserActiveMap(player.getUserID());
-                if (map == null){
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "No Active Map found");
-                }
                 Set<String> planets = map.getPlanets();
                 List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
                 if (possiblePlanets.isEmpty()){
@@ -74,10 +68,10 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
                     MessageHelper.sendMessageToChannel(event.getChannel(), "More that one matching Planet found");
                     return;
                 }
-                doAction(player, possiblePlanets.get(0));
+                doAction(player, possiblePlanets.get(0), map);
             }
         }
     }
 
-    public abstract void doAction(Player player, String techID);
+    public abstract void doAction(Player player, String techID, Map map);
 }
