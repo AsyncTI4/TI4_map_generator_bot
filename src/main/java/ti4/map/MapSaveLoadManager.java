@@ -272,8 +272,14 @@ public class MapSaveLoadManager {
 
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
             writer.write(System.lineSeparator());
-
             writer.write(Constants.TECH_EXHAUSTED + " " + String.join(",", player.getExhaustedTechs()));
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.PLANETS + " " + String.join(",", player.getPlanets()));
+            writer.write(System.lineSeparator());
+            writer.write(Constants.PLANETS_EXHAUSTED + " " + String.join(",", player.getExhaustedPlanets()));
+            writer.write(System.lineSeparator());
+            writer.write(Constants.PLANETS_ABILITY_EXHAUSTED + " " + String.join(",", player.getExhaustedPlanetsAbilities()));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TACTICAL + " " + player.getTacticalCC());
@@ -758,6 +764,9 @@ public class MapSaveLoadManager {
                     }
                 }
                 case Constants.PROMISSORY_NOTES_PLAY_AREA -> player.setPromissoryNotesInPlayArea(getCardList(tokenizer.nextToken()));
+                case Constants.PLANETS -> player.setPlanets(getCardList(tokenizer.nextToken()));
+                case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
+                case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.SO_SCORED -> {

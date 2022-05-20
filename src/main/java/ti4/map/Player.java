@@ -3,9 +3,8 @@ package ti4.map;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 
-import java.util.*;
-import java.util.List;
 import java.util.Map;
+import java.util.*;
 
 public class Player {
 
@@ -32,6 +31,9 @@ public class Player {
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
     private List<String> exhaustedTechs = new ArrayList<>();
+    private List<String> planets = new ArrayList<>();
+    private List<String> exhaustedPlanets = new ArrayList<>();
+    private List<String> exhaustedPlanetsAbilities = new ArrayList<>();
 
 
     private int crf = 0;
@@ -93,11 +95,11 @@ public class Player {
         promissoryNotes.put(id, identifier);
     }
 
-    public void clearPromissoryNotes(){
+    public void clearPromissoryNotes() {
         promissoryNotes.clear();
     }
 
-    public void setPromissoryNotesInPlayArea(String id){
+    public void setPromissoryNotesInPlayArea(String id) {
         if (!promissoryNotesInPlayArea.contains(id)) {
             promissoryNotesInPlayArea.add(id);
         }
@@ -107,7 +109,7 @@ public class Player {
         this.promissoryNotesInPlayArea = promissoryNotesInPlayArea;
     }
 
-    public void removePromissoryNotesInPlayArea(String id){
+    public void removePromissoryNotesInPlayArea(String id) {
         promissoryNotesInPlayArea.remove(id);
     }
 
@@ -122,7 +124,7 @@ public class Player {
     public void removeActionCard(Integer identifier) {
         String idToRemove = "";
         for (Map.Entry<String, Integer> so : actionCards.entrySet()) {
-            if (so.getValue().equals(identifier)){
+            if (so.getValue().equals(identifier)) {
                 idToRemove = so.getKey();
                 break;
             }
@@ -133,7 +135,7 @@ public class Player {
     public void removePromissoryNote(Integer identifier) {
         String idToRemove = "";
         for (Map.Entry<String, Integer> so : promissoryNotes.entrySet()) {
-            if (so.getValue().equals(identifier)){
+            if (so.getValue().equals(identifier)) {
                 idToRemove = so.getKey();
                 break;
             }
@@ -142,8 +144,8 @@ public class Player {
     }
 
     public void removePromissoryNote(String id) {
-       promissoryNotes.remove(id);
-       removePromissoryNotesInPlayArea(id);
+        promissoryNotes.remove(id);
+        removePromissoryNotesInPlayArea(id);
     }
 
     public LinkedHashMap<String, Integer> getSecrets() {
@@ -167,7 +169,7 @@ public class Player {
     public void removeSecret(Integer identifier) {
         String idToRemove = "";
         for (Map.Entry<String, Integer> so : secrets.entrySet()) {
-            if (so.getValue().equals(identifier)){
+            if (so.getValue().equals(identifier)) {
                 idToRemove = so.getKey();
                 break;
             }
@@ -195,7 +197,7 @@ public class Player {
     public void removeSecretScored(Integer identifier) {
         String idToRemove = "";
         for (Map.Entry<String, Integer> so : secretsScored.entrySet()) {
-            if (so.getValue().equals(identifier)){
+            if (so.getValue().equals(identifier)) {
                 idToRemove = so.getKey();
                 break;
             }
@@ -340,6 +342,30 @@ public class Player {
         return techs;
     }
 
+    public List<String> getPlanets() {
+        return planets;
+    }
+
+    public void setPlanets(List<String> planets) {
+        this.planets = planets;
+    }
+
+    public List<String> getExhaustedPlanets() {
+        return exhaustedPlanets;
+    }
+
+    public void setExhaustedPlanets(List<String> exhaustedPlanets) {
+        this.exhaustedPlanets = exhaustedPlanets;
+    }
+
+    public List<String> getExhaustedPlanetsAbilities() {
+        return exhaustedPlanetsAbilities;
+    }
+
+    public void setExhaustedPlanetsAbilities(List<String> exhaustedPlanetsAbilities) {
+        this.exhaustedPlanetsAbilities = exhaustedPlanetsAbilities;
+    }
+
     public void setTechs(List<String> techs) {
         this.techs = techs;
     }
@@ -348,8 +374,13 @@ public class Player {
         return exhaustedTechs;
     }
 
-    public void cleanExhaustedTechs(){
+    public void cleanExhaustedTechs() {
         exhaustedTechs.clear();
+    }
+
+    public void cleanExhaustedPlanets() {
+        exhaustedPlanets.clear();
+        exhaustedPlanetsAbilities.clear();
     }
 
     public void setExhaustedTechs(List<String> exhaustedTechs) {
@@ -362,19 +393,51 @@ public class Player {
         }
     }
 
-    public void exhaustTech(String tech){
-        if (techs.contains(tech)){
+    public void exhaustTech(String tech) {
+        if (techs.contains(tech)) {
             exhaustedTechs.add(tech);
         }
     }
 
-    public void refreshTech(String tech){
+    public void refreshTech(String tech) {
         exhaustedTechs.remove(tech);
     }
 
     public void removeTech(String tech) {
-            techs.remove(tech);
+        techs.remove(tech);
+        exhaustedTechs.remove(tech);
     }
+
+    public void addPlanet(String planet) {
+        if (!planets.contains(planet)) {
+            planets.add(planet);
+        }
+    }
+
+    public void exhaustPlanet(String planet) {
+        if (planets.contains(planet)) {
+            exhaustedPlanets.add(planet);
+        }
+    }
+
+    public void exhaustPlanetAbility(String planet) {
+        if (planets.contains(planet)) {
+            exhaustedPlanetsAbilities.add(planet);
+        }
+    }
+
+    public void refreshPlanet(String planet) {
+        exhaustedPlanets.remove(planet);
+    }
+
+    public void refreshPlanetAbility(String planet) {
+        exhaustedPlanetsAbilities.remove(planet);
+    }
+
+    public void removePlanet(String planet) {
+        planets.remove(planet);
+    }
+
 
     public int getCommoditiesTotal() {
         return commoditiesTotal;

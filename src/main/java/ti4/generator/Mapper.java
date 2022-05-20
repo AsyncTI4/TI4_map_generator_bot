@@ -32,6 +32,7 @@ public class Mapper {
     private static final Properties explore = new Properties();
     private static final HashMap<String, String> techList = new HashMap<>();
     private static final Properties planets = new Properties();
+    private static final Properties planet_representation = new Properties();
     private static final Properties attachmentInfo = new Properties();
 
     public static void init() {
@@ -53,6 +54,7 @@ public class Mapper {
         readData("tech.properties", techs, "Could not read tech file");
         readData("planets.properties", planets, "Could not read planets file");
         readData("attachments_info.properties", attachmentInfo, "Could not read attachment info file");
+        readData("planets_representation.properties", planet_representation, "Could not read planet representation file");
     }
 
     private static void readData(String propertyFileName, Properties colors, String s) {
@@ -232,6 +234,14 @@ public class Mapper {
         return soList;
     }
 
+    public static HashMap<String, String> getPlanetRepresentations() {
+        HashMap<String, String> planets = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : planet_representation.entrySet()) {
+            planets.put((String)entry.getKey(), (String)entry.getValue());
+        }
+        return planets;
+    }
+
     public static  HashMap<String, String> getSecretObjectivesJustNames() {
         HashMap<String, String> soList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : secretObjectives.entrySet()) {
@@ -291,6 +301,10 @@ public class Mapper {
     public static boolean isValidTech(String id){
         HashMap<String, String> techs = getTechs();
         return techs.get(id) != null;
+    }
+
+    public static boolean isValidPlanet(String id){
+        return  AliasHandler.getPlanetList().contains(id);
     }
 
 
