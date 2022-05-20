@@ -68,8 +68,8 @@ public class GenerateMap {
         width = mapWidth + (extraWidth * 2);
         heightForGameInfo = mapHeight;
         heightForGameInfoStorage = heightForGameInfo;
-        height = heightForGameInfo + mapHeight / 2 + 1000;
-        heightStats = mapHeight / 2 + 1000;
+        height = heightForGameInfo + mapHeight / 2 + 2000;
+        heightStats = mapHeight / 2 + 2000;
         heightStorage = height;
     }
 
@@ -316,7 +316,7 @@ public class GenerateMap {
 
                 if (!player.getPlanets().isEmpty()) {
                     planetInfo(player, map, 10, y);
-                    y += 225;
+                    y += 155;
                 }
 
                 g2.setColor(color);
@@ -355,6 +355,9 @@ public class GenerateMap {
 
         int deltaX = 0;
 
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+
         for (String planet : planets) {
 
             UnitHolder unitHolder = planetsInfo.get(planet);
@@ -377,49 +380,56 @@ public class GenerateMap {
             String resFileName = "pc_res_" + resources + statusOfPlanet + ".png";
             String infFileName = "pc_inf_" + influence + statusOfPlanet + ".png";
 
-            graphics.drawRect(x + deltaX, y + 2, 54, 220);
-            drawImage(x + deltaX + 5, y + 50, planet, planetFileName);
-            drawImage(x + deltaX + 5, y + 198, planet, resFileName);
-            drawImage(x + deltaX + 25, y + 198, planet, infFileName);
+            graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
 
             if (unitHolder.getTokenList().contains("titanspn")) {
                 String planetTypeName = "pc_attribute_titanspn.png";
-                drawImage(x + deltaX + 5, y + 7, planet, planetTypeName);
+                drawImage(x + deltaX + 2, y + 2, planet, planetTypeName);
             } else {
                 String originalPlanetType = planetHolder.getOriginalPlanetType();
                 if (!originalPlanetType.isEmpty()) {
                     String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
-                    drawImage(x + deltaX + 5, y + 7, planet, planetTypeName);
+                    drawImage(x + deltaX + 2, y + 2, planet, planetTypeName);
                 }
             }
-
-            String originalTechSpeciality = planetHolder.getOriginalTechSpeciality();
-            int deltaY = 175;
-            if (!originalTechSpeciality.isEmpty()) {
-                String planetTypeName = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
-                drawImage(x + deltaX + 25, y + deltaY, planet, planetTypeName);
-            }
-
-            ArrayList<String> techSpeciality = planetHolder.getTechSpeciality();
-            for (String techSpec : techSpeciality) {
-                String planetTypeName = "pc_tech_" + techSpec + statusOfPlanet + ".png";
-                drawImage(x + deltaX + 25, y + deltaY, planet, planetTypeName);
-                deltaY -= 20;
-            }
-
 
             boolean hasAttachment = planetHolder.hasAttachment();
             if (hasAttachment) {
                 String planetTypeName = "pc_upgrade.png";
-                drawImage(x + deltaX + 25, y + 55, planet, planetTypeName);
+                drawImage(x + deltaX + 26, y + 40, planet, planetTypeName);
             }
 
             boolean hasAbility = planetHolder.isHasAbility();
             if (hasAbility){
                 String statusOfAbility = exhaustedPlanetsAbilities.contains(planet) ? "_exh" : "_rdy";
                 String planetTypeName = "pc_legendary"+ statusOfAbility +".png";
-                drawImage(x + deltaX + 25, y + 75, planet, planetTypeName);
+                drawImage(x + deltaX + 26, y + 60, planet, planetTypeName);
             }
+            String originalTechSpeciality = planetHolder.getOriginalTechSpeciality();
+            int deltaY = 175;
+            if (!originalTechSpeciality.isEmpty()) {
+                String planetTypeName = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
+                drawImage(x + deltaX + 26, y + 82, planet, planetTypeName);
+            } else {
+                ArrayList<String> techSpeciality = planetHolder.getTechSpeciality();
+                for (String techSpec : techSpeciality) {
+                    String planetTypeName = "pc_tech_" + techSpec + statusOfPlanet + ".png";
+                    drawImage(x + deltaX + 26, y + 82, planet, planetTypeName);
+                    deltaY -= 20;
+                }
+            }
+
+
+            drawImage(x + deltaX + 26, y + 103, planet, resFileName);
+            drawImage(x + deltaX + 26, y + 125, planet, infFileName);
+            drawImage(x + deltaX, y, planet, planetFileName);
+
+
+
+
+
+
+
             deltaX += 56;
         }
     }
