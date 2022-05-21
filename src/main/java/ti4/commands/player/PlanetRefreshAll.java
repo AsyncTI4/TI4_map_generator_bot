@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 
 public class PlanetRefreshAll extends PlayerSubcommandData {
     public PlanetRefreshAll() {
-        super(Constants.PLANET_REFRESH_ALL, "Refresh Planet");
+        super(Constants.PLANET_REFRESH_ALL, "Refresh All Planets");
     }
 
     @Override
