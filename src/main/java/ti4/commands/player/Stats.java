@@ -4,12 +4,15 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import org.jetbrains.annotations.Nullable;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
+import javax.annotation.CheckForNull;
 import java.util.LinkedHashMap;
 import java.util.Objects;
 import java.util.StringTokenizer;
@@ -48,28 +51,12 @@ public class Stats extends PlayerSubcommandData {
             return;
         }
 
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
-        if (playerOption != null) {
-            String playerID = playerOption.getAsUser().getId();
-            if (activeMap.getPlayer(playerID) != null) {
-                player = activeMap.getPlayers().get(playerID);
-            } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerOption.getAsUser().getName() + " could not be found in map:" + activeMap.getName());
-                return;
-            }
-        } else if (factionColorOption != null) {
-            String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString());
-            factionColor = AliasHandler.resolveFaction(factionColor);
-
-            for (Player player_ : activeMap.getPlayers().values()) {
-                if (Objects.equals(factionColor, player_.getFaction()) ||
-                        Objects.equals(factionColor, player_.getColor())) {
-                    player = player_;
-                    break;
-                }
-            }
+        player = Helper.getPlayer(activeMap, player, event);
+        if (player == null){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player/Faction/Color could not be found in map:" + activeMap.getName());
+            return;
         }
+
 
         OptionMapping optionCC = event.getOption(Constants.CC);
         OptionMapping optionT = event.getOption(Constants.TACTICAL);

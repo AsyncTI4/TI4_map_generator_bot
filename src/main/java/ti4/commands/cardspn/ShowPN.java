@@ -9,6 +9,7 @@ import ti4.commands.cards.CardsInfo;
 import ti4.commands.cards.CardsSubcommandData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -48,6 +49,10 @@ public class ShowPN extends PNCardsSubcommandData {
         }
 
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
+
+
+
+
         if (playerOption != null) {
             User user = playerOption.getAsUser();
             StringBuilder sb = new StringBuilder();

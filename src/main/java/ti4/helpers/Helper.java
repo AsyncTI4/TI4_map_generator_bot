@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.ResourceHelper;
 import ti4.map.*;
 
@@ -12,8 +13,34 @@ import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class Helper {
+
+    @CheckForNull
+    public static Player getPlayer(Map activeMap, Player player, SlashCommandInteractionEvent event) {
+        OptionMapping playerOption = event.getOption(Constants.PLAYER);
+        OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
+        if (playerOption != null) {
+            String playerID = playerOption.getAsUser().getId();
+            if (activeMap.getPlayer(playerID) != null) {
+                player = activeMap.getPlayers().get(playerID);
+            } else {
+                player = null;
+            }
+        } else if (factionColorOption != null) {
+            String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString());
+            factionColor = AliasHandler.resolveFaction(factionColor);
+            for (Player player_ : activeMap.getPlayers().values()) {
+                if (Objects.equals(factionColor, player_.getFaction()) ||
+                        Objects.equals(factionColor, player_.getColor())) {
+                    player = player_;
+                    break;
+                }
+            }
+        }
+        return player;
+    }
 
     @CheckForNull
     public static String getDamagePath() {
