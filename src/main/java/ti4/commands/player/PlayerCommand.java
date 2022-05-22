@@ -39,7 +39,8 @@ public class PlayerCommand implements Command {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;
             }
-            if (!mapManager.getUserActiveMap(userID).getPlayerIDs().contains(userID)) {
+            Map userActiveMap = mapManager.getUserActiveMap(userID);
+            if (!userActiveMap.getPlayerIDs().contains(userID) && !userActiveMap.isCommunityMode()) {
                 MessageHelper.replyToMessage(event, "Your not a player of the game, please call function /join gameName");
                 return false;
             }

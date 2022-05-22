@@ -16,6 +16,7 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Specify game VP count").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.DISPLAY_TYPE, "Show map in specific format. all, map, stats").setRequired(false).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Add Custom description to game").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.COMMUNITY_MODE, "Set to YES if want to allow Community Mode for map, FALSE to disable it").setRequired(false));
     }
 
     @Override
@@ -59,11 +60,22 @@ public class Setup extends GameSubcommandData {
                 return;
             }
         }
+        OptionMapping communityOption = event.getOption(Constants.COMMUNITY_MODE);
+        if (communityOption != null){
+            String communityMode = communityOption.getAsString();
+            if ("YES".equals(communityMode)){
+                activeMap.setCommunityMode(true);
+            } else if ("FALSE".equals(communityMode)){
+                activeMap.setCommunityMode(false);
+            }
+        }
+
         OptionMapping customOption = event.getOption(Constants.GAME_CUSTOM_NAME);
         if (customOption != null){
             String customName = customOption.getAsString();
             activeMap.setCustomName(customName);
         }
+
 
         if (displayType != null) {
             activeMap.setDisplayTypeForced(displayType);
