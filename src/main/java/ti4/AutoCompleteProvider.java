@@ -7,10 +7,7 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -29,6 +26,16 @@ public class AutoCompleteProvider {
         } else if (optionName.equals(Constants.FACTION)) {
             String enteredValue = event.getFocusedOption().getValue();
             List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = Mapper.getFactions().stream()
+                    .filter(token -> token.contains(enteredValue))
+                    .limit(25)
+                    .map(token -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(token, token))
+                    .collect(Collectors.toList());
+            event.replyChoices(options).queue();
+        }else if (optionName.equals(Constants.FACTION_COLOR)) {
+            String enteredValue = event.getFocusedOption().getValue();
+            List<String> factionColors = new ArrayList<>(Mapper.getFactions());
+            factionColors.addAll(Mapper.getColors());
+            List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = factionColors.stream()
                     .filter(token -> token.contains(enteredValue))
                     .limit(25)
                     .map(token -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(token, token))
