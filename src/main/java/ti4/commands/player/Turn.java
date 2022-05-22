@@ -18,6 +18,7 @@ public class Turn extends PlayerSubcommandData {
     public Turn() {
         super(Constants.TURN, "End Turn");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     @Override
@@ -25,17 +26,11 @@ public class Turn extends PlayerSubcommandData {
         Map map = getActiveMap();
         Player mainPlayer = map.getPlayer(getUser().getId());
 
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        if (playerOption != null) {
-            String playerID = playerOption.getAsUser().getId();
-            if (map.getPlayer(playerID) != null) {
-                mainPlayer = map.getPlayers().get(playerID);
-            } else {
-                MessageHelper.replyToMessage(event, "Player:" + playerOption.getAsUser().getName() + " could not be found in map:" + map.getName());
-                return;
-            }
+        mainPlayer = Helper.getPlayer(map, mainPlayer, event);
+        if (mainPlayer == null){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player/Faction/Color could not be found in map:" + map.getName());
+            return;
         }
-
         pingNextPlayer(event, map, mainPlayer);
     }
 

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -23,6 +24,8 @@ public abstract class TechAddRemove extends PlayerSubcommandData{
         addOptions(new OptionData(OptionType.STRING, Constants.TECH3, "3rd Tech").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TECH4, "4th Tech").setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
+
     }
 
     @Override
@@ -34,15 +37,10 @@ public abstract class TechAddRemove extends PlayerSubcommandData{
             return;
         }
 
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        if (playerOption != null) {
-            String playerID = playerOption.getAsUser().getId();
-            if (activeMap.getPlayer(playerID) != null) {
-                player = activeMap.getPlayers().get(playerID);
-            } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerOption.getAsUser().getName() + " could not be found in map:" + activeMap.getName());
-                return;
-            }
+        player = Helper.getPlayer(activeMap, player, event);
+        if (player == null){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player/Faction/Color could not be found in map:" + activeMap.getName());
+            return;
         }
 
         parseParameter(event, player, event.getOption(Constants.TECH));
