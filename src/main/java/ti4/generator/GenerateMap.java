@@ -235,8 +235,12 @@ public class GenerateMap {
                 graphics.setFont(Storage.getFont32());
                 Color color = getColor(player.getColor());
                 graphics.setColor(Color.WHITE);
-                String userName = player.getUserName() + " (" + player.getColor() + ")";
+                String userName = player.getUserName() + ("white".equals(player.getColor()) ? "" : " (" + player.getColor() + ")");
                 graphics.drawString(userName, x, y);
+                if (player.getFaction() == null || "white".equals(player.getColor()) || player.getColor() == null){
+                    continue;
+                }
+
                 y += 2;
                 String faction = player.getFaction();
                 if (faction != null) {
