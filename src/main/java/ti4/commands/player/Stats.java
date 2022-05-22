@@ -160,6 +160,10 @@ public class Stats extends PlayerSubcommandData {
         if (optionSC != null) {
             int scNumber = optionSC.getAsInt();
             LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
+            if (player.getColor() == null || "white".equals(player.getColor()) || player.getFaction() == null){
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Can pick SC only if faction and color picked");
+                return;
+            }
             if (!scTradeGoods.containsKey(scNumber) && scNumber != 0) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card must be from possible ones in Game");
             } else {
