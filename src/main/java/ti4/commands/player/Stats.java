@@ -11,6 +11,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -33,7 +34,8 @@ public class Stats extends PlayerSubcommandData {
                 .addOptions(new OptionData(OptionType.STRING, Constants.SC_PLAYED, "Strategy Card played y/n"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player passed y/n"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
-                .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
+                .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
+                .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     @Override
@@ -47,6 +49,7 @@ public class Stats extends PlayerSubcommandData {
         }
 
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
+        OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
         if (playerOption != null) {
             String playerID = playerOption.getAsUser().getId();
             if (activeMap.getPlayer(playerID) != null) {
@@ -54,6 +57,17 @@ public class Stats extends PlayerSubcommandData {
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerOption.getAsUser().getName() + " could not be found in map:" + activeMap.getName());
                 return;
+            }
+        } else if (factionColorOption != null) {
+            String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString());
+            factionColor = AliasHandler.resolveFaction(factionColor);
+
+            for (Player player_ : activeMap.getPlayers().values()) {
+                if (Objects.equals(factionColor, player_.getFaction()) ||
+                        Objects.equals(factionColor, player_.getColor())) {
+                    player = player_;
+                    break;
+                }
             }
         }
 
@@ -160,7 +174,7 @@ public class Stats extends PlayerSubcommandData {
         if (optionSC != null) {
             int scNumber = optionSC.getAsInt();
             LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
-            if (player.getColor() == null || "white".equals(player.getColor()) || player.getFaction() == null){
+            if (player.getColor() == null || "white".equals(player.getColor()) || player.getFaction() == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Can pick SC only if faction and color picked");
                 return;
             }

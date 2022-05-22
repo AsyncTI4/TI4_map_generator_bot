@@ -205,7 +205,6 @@ public class GenerateMap {
     }
 
     private void gameInfo(Map map, DisplayType displayType) throws IOException {
-
         int widthOfLine = 2300;
         int y = heightForGameInfo + 60;
         int x = 10;
