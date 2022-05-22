@@ -26,7 +26,7 @@ public class RemoveAllUnitDamage extends RemoveAllUnits {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), "Remove all unit damage from map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color: red, green etc.")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                                 .setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))

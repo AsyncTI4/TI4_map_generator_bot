@@ -44,22 +44,22 @@ You can use also tileID, so liek TI4 marks tiles 01 is Jord for example
 /show_game gameName(optional) display_type(optional) <- displays the game map, display_type can be set to all, map, stats. Displays map + player stats, just map or just player stats
 If you have active game set, it shows your active game if no game name is defines
 /list_units <- lists all possible units
-/add_cc colorList tile or position <- add's cc to system: colorList can be pink,red,black as example/
-/remove_cc color tile or position <- remove's cc from system: ccolorList can be pink,red,black as example/
+/add_cc colorList(factionList) tile or position <- add's cc to system: colorList can be pink,red,black as example/
+/remove_cc colorList(FactionList) tile or position <- remove's cc from system: colorList can be pink,red,black as example/
 /remove_all_cc confirmation(YES) <- need to type in YES, will remove all CC's from active game
-/add_control color tile planetList <- need to specify tile and planetList, example /add_control pink 3a arnor,lor
-/remove_control color tile planet
+/add_control faction_or_color tile planetList <- need to specify tile and planetList, example /add_control pink 3a arnor,lor
+/remove_control faction_or_color tile planet
 and most interesting is
-/add_units color tile unitList
-/remove_units color tile unitList
-/remove_all_units color tile
-/add_damage_unit color tile unitList
-/remove_damage_unit color tile unitList
-/remove_damage_all_unit color tile
+/add_units faction_or_color tile unitList
+/remove_units faction_or_color tile unitList
+/remove_all_units faction_or_color tile
+/add_damage_unit faction_or_color tile unitList
+/remove_damage_unit faction_or_color tile unitList
+/remove_damage_all_unit faction_or_color tile
 /add_frontier_tokens CONFIRM(YES) <- adds frontier tokens to all tiles that can have one
 
 EXAMPLE
-/add_units color tile unitList
+/add_units faction_or_color tile unitList
 examples
 tile can be tile name or the number of location at bottom right
 like 1a, 2b, 3c etc
@@ -92,7 +92,7 @@ dread <- same sinle dread into space
 3 dn, 2 dd, gf quann <- 3 dread and 2dd added into space, 1 gf added onto planet quann
 ws, 6 ff, sd quann, 3 inf quann, mech quann <- warsun and 6 fighters added into space, spacedock, 3 infantry and mech added into quann
 
-/move_units color systemFrom unitList systemTo unitList addCC
+/move_units faction_or_color systemFrom unitList systemTo unitList addCC
 Standard fields to add tile/system, unit list same as add, remove, and we have optional field addCC, type anything in to not add cc into moved system
 Example:
 /move_units pink quann 2 dn, dd, gf, gf quann wellon 2 dn, dd, 2 gf wellon
