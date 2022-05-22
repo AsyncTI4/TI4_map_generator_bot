@@ -23,6 +23,7 @@ public class Map {
     private DisplayType displayTypeForced = null;
     private int playerCountForMap = 6;
     private int vp = 10;
+    private boolean communityMode = false;
 
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
@@ -105,6 +106,14 @@ public class Map {
 
     public void setCustomName(String customName) {
         this.customName = customName;
+    }
+
+    public boolean isCommunityMode() {
+        return communityMode;
+    }
+
+    public void setCommunityMode(boolean communityMode) {
+        this.communityMode = communityMode;
     }
 
     public void setCreationDate(String creationDate) {
