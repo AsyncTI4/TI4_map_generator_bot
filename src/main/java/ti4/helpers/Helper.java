@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.ResourceHelper;
+import ti4.generator.Mapper;
 import ti4.map.*;
 
 import javax.annotation.CheckForNull;
@@ -40,6 +41,31 @@ public class Helper {
             }
         }
         return player;
+    }
+
+    @CheckForNull
+    public static String getColor(Map activeMap, SlashCommandInteractionEvent event) {
+        OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
+        if (factionColorOption != null) {
+            String colorFromString = getColorFromString(activeMap, factionColorOption.getAsString());
+            if (Mapper.isColorValid(colorFromString)) {
+                return colorFromString;
+            }
+        }
+        return null;
+    }
+
+    @CheckForNull
+    public static String getColorFromString(Map activeMap, String factionColor) {
+        factionColor = AliasHandler.resolveColor(factionColor);
+        factionColor = AliasHandler.resolveFaction(factionColor);
+        for (Player player_ : activeMap.getPlayers().values()) {
+            if (Objects.equals(factionColor, player_.getFaction()) ||
+                    Objects.equals(factionColor, player_.getColor())) {
+                return player_.getColor();
+            }
+        }
+        return factionColor;
     }
 
     @CheckForNull
@@ -128,7 +154,7 @@ public class Helper {
 
     public static String getPlayerPing(SlashCommandInteractionEvent event, Player player) {
         User userById = event.getJDA().getUserById(player.getUserID());
-        if (userById == null){
+        if (userById == null) {
             return "";
         }
         return userById.getAsMention();

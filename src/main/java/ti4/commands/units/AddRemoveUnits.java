@@ -10,6 +10,7 @@ import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
@@ -33,15 +34,14 @@ abstract public class AddRemoveUnits implements Command {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
         } else {
-
-            String color = AliasHandler.resolveColor(event.getOptions().get(0).getAsString().toLowerCase());
+            Map activeMap = mapManager.getUserActiveMap(userID);
+            String color = Helper.getColor(activeMap, event);
             if (!Mapper.isColorValid(color)) {
-                MessageHelper.replyToMessage(event, "Color not valid");
+                MessageHelper.replyToMessage(event, "Color/Faction not valid");
                 return;
             }
 
             String tileID = AliasHandler.resolveTile(event.getOptions().get(1).getAsString().toLowerCase());
-            Map activeMap = mapManager.getUserActiveMap(userID);
             Tile tile = getTile(event, tileID, activeMap);
             if (tile == null) return;
 
@@ -54,12 +54,12 @@ abstract public class AddRemoveUnits implements Command {
     }
 
     protected Tile getTile(SlashCommandInteractionEvent event, String tileID, Map activeMap) {
-        if (activeMap.isTileDuplicated(tileID)){
+        if (activeMap.isTileDuplicated(tileID)) {
             MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
             return null;
         }
         Tile tile = activeMap.getTile(tileID);
-        if (tile == null){
+        if (tile == null) {
             tile = activeMap.getTileByPosition(tileID);
         }
         if (tile == null) {
@@ -111,13 +111,13 @@ abstract public class AddRemoveUnits implements Command {
     }
 
     public static String getPlanet(SlashCommandInteractionEvent event, Tile tile, String planetName) {
-        if (!tile.isSpaceHolderValid(planetName)){
+        if (!tile.isSpaceHolderValid(planetName)) {
             Set<String> unitHolderIDs = new HashSet<>(tile.getUnitHolders().keySet());
             unitHolderIDs.remove(Constants.SPACE);
             String finalPlanetName = planetName;
             List<String> validUnitHolderIDs = unitHolderIDs.stream().filter(unitHolderID -> unitHolderID.startsWith(finalPlanetName))
                     .collect(Collectors.toList());
-            if (validUnitHolderIDs.size() == 1){
+            if (validUnitHolderIDs.size() == 1) {
                 planetName = validUnitHolderIDs.get(0);
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planetName + " is not valid and not supported.");
@@ -139,7 +139,7 @@ abstract public class AddRemoveUnits implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color: red, green etc.")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                                 .setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))

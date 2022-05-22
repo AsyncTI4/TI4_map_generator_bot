@@ -11,6 +11,7 @@ import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
@@ -32,16 +33,17 @@ abstract public class AddRemoveToken implements Command {
         } else {
             OptionMapping option = event.getOption(Constants.COLOR);
             ArrayList<String> colors = new ArrayList<>();
+            Map activeMap = mapManager.getUserActiveMap(userID);
             if (option != null) {
                 String colorString = option.getAsString().toLowerCase();
                 colorString = colorString.replace(" ", "");
                 StringTokenizer colorTokenizer = new StringTokenizer(colorString, ",");
                 while (colorTokenizer.hasMoreTokens()) {
-                    String color = AliasHandler.resolveColor(colorTokenizer.nextToken());
+                    String color = Helper.getColorFromString(activeMap, colorTokenizer.nextToken());
                     if (!colors.contains(color)) {
                         colors.add(color);
                         if (!Mapper.isColorValid(color)) {
-                            MessageHelper.replyToMessage(event, "Color not valid: " + color);
+                            MessageHelper.replyToMessage(event, "Color/faction not valid: " + color);
                             return;
                         }
                     }
@@ -50,7 +52,7 @@ abstract public class AddRemoveToken implements Command {
             OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
             if (tileOption != null) {
                 String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-                Map activeMap = mapManager.getUserActiveMap(userID);
+
                 if (activeMap.isTileDuplicated(tileID)) {
                     MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
                     return;
@@ -87,7 +89,7 @@ abstract public class AddRemoveToken implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color: red, green etc.")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                                 .setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
