@@ -1,9 +1,9 @@
 package ti4.commands.game;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.map.Map;
@@ -19,27 +19,33 @@ public class Info extends GameSubcommandData{
 
     public Info() {
         super(Constants.INFO, "Game information:");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map Name").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game Name"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String mapName = event.getOptions().get(0).getAsString().toLowerCase();
+        OptionMapping gameOption = event.getOption(Constants.GAME_NAME);
         MapManager mapManager = MapManager.getInstance();
-        StringBuilder sb = getGameInfo(mapName, mapManager);
+        Map activeMap = mapManager.getUserActiveMap(event.getUser().getId());
+        StringBuilder sb = getGameInfo(gameOption, mapManager, activeMap);
         MessageHelper.replyToMessage(event, sb.toString());
     }
 
-    public static StringBuilder getGameInfo(String mapName, MapManager mapManager) {
-        Map map = mapManager.getMap(mapName);
+    public static StringBuilder getGameInfo(OptionMapping gameOption, MapManager mapManager, Map map) {
         StringBuilder sb = new StringBuilder();
+        if (map == null && gameOption == null){
+            sb.append("Game not specified");
+            return sb;
+        } else if (map == null ){
+            map = mapManager.getMap(gameOption.getAsString());
+        }
         sb.append("Game Info:").append(NEW_LINE);
-        sb.append("Map name: " + map.getName()).append(NEW_LINE);
+        sb.append("Game name: " + map.getName()).append(NEW_LINE);
 
-        sb.append("Map owner: " + map.getOwnerName()).append(NEW_LINE);
-        sb.append("Map status: " + map.getMapStatus()).append(NEW_LINE);
-        sb.append("Map player count: " + map.getPlayerCountForMap()).append(NEW_LINE);
-        sb.append("Map Display type count: " + (map.getDisplayTypeForced() != null ? map.getDisplayTypeForced().getValue() : DisplayType.all.getValue())).append(NEW_LINE);
+        sb.append("Game owner: " + map.getOwnerName()).append(NEW_LINE);
+        sb.append("Game status: " + map.getMapStatus()).append(NEW_LINE);
+        sb.append("Game player count: " + map.getPlayerCountForMap()).append(NEW_LINE);
+        sb.append("Game Display type count: " + (map.getDisplayTypeForced() != null ? map.getDisplayTypeForced().getValue() : DisplayType.all.getValue())).append(NEW_LINE);
         sb.append("Players: ").append(NEW_LINE);
         HashMap<String, Player> players = map.getPlayers();
         int index = 1;

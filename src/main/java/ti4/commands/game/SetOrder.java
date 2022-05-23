@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.map.Map;
@@ -15,7 +14,6 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 public class SetOrder extends GameSubcommandData {
@@ -82,7 +80,7 @@ public class SetOrder extends GameSubcommandData {
             map.setPlayers(playersBackup);
         }
         MapSaveLoadManager.saveMap(map);
-        MessageHelper.replyToMessage(event, "Player order set for game:\n" + Info.getGameInfo(mapName, MapManager.getInstance()));
+        MessageHelper.replyToMessage(event, "Player order set for game:\n" + Info.getGameInfo(gameOption, MapManager.getInstance(), map));
 
     }
 

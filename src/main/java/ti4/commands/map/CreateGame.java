@@ -35,11 +35,11 @@ public class CreateGame implements Command {
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(mapName);
         if (!matcher.matches()){
-            MessageHelper.replyToMessage(event, "Map name can only contain a-z 0-9 symbols");
+            MessageHelper.replyToMessage(event, "Game name can only contain a-z 0-9 symbols");
             return false;
         }
         if (MapManager.getInstance().getMapList().containsKey(mapName)) {
-            MessageHelper.replyToMessage(event, "Map with such name exist already, choose different name");
+            MessageHelper.replyToMessage(event, "Game with such name exist already, choose different name");
             return false;
         }
         return true;
@@ -60,7 +60,7 @@ public class CreateGame implements Command {
         boolean setMapSuccessful = mapManager.setMapForUser(ownerID, mapName);
         map.addPlayer(user.getId(), user.getName());
         if (!setMapSuccessful) {
-            MessageHelper.replyToMessage(event, "Could not assign active map " + mapName);
+            MessageHelper.replyToMessage(event, "Could not assign active Game " + mapName);
         }
         OptionMapping vpOption = event.getOption(Constants.VP_COUNT);
         if (vpOption != null) {
@@ -73,7 +73,7 @@ public class CreateGame implements Command {
             map.setVp(count);
         }
 
-        MessageHelper.replyToMessage(event, "Map created with name: " + mapName);
+        MessageHelper.replyToMessage(event, "Game created with name: " + mapName);
         MapSaveLoadManager.saveMap(map);
     }
 
@@ -82,8 +82,8 @@ public class CreateGame implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         // Moderation commands with required options
         commands.addCommands(
-                Commands.slash(getActionID(), "Shows selected map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Map name").setRequired(true))
+                Commands.slash(getActionID(), "Shows selected Game")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setRequired(true))
                         .addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Specify game VP count").setRequired(false))
         );
     }
