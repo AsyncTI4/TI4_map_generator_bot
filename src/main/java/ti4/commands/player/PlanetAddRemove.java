@@ -32,14 +32,9 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
+        player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
-
-        player = Helper.getPlayer(activeMap, player, event);
-        if (player == null){
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player/Faction/Color could not be found in map:" + activeMap.getName());
             return;
         }
 

@@ -99,7 +99,7 @@ public class Constants {
     public static final String SC_PLAY = "sc_play";
     public static final String SC_PICK = "sc_pick";
     public static final String PASS = "pass";
-    public static final String TURN = "turn";
+    public static final String TURN = "turn_end";
     public static final String SPEAKER = "speaker";
 
     public static final String PLAYER1 = "player1";

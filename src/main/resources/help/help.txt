@@ -116,6 +116,7 @@ faction_or_color tag helps to define for which player you want to set stats. FOR
 /player sc_play <- plays your SC that you have in game
 /player sc_pick scNumber <- adds your pick to game. Does not generate map
 /player pass <- passes
+/player speaker player(optional) <- assigns speaker to player
 /player tech_add techName player(optional) <- adds selected tech to player area
 /player tech_remove techName player(optional) <- removes selected tech to player area
 /player tech_exhaust techName player(optional) <- exhausts selected tech to player area
