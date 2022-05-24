@@ -68,8 +68,8 @@ public class GenerateMap {
         width = mapWidth + (extraWidth * 2);
         heightForGameInfo = mapHeight;
         heightForGameInfoStorage = heightForGameInfo;
-        height = heightForGameInfo + mapHeight / 2 + 2500;
-        heightStats = mapHeight / 2 + 2500;
+        height = heightForGameInfo + mapHeight / 2 + 2000;
+        heightStats = mapHeight / 2 + 2000;
         heightStorage = height;
     }
 
