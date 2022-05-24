@@ -12,6 +12,7 @@ so switching between games is much easier.
 status: open or locked
 Status open, means anyone can edit map, can join map as player;
 Status locked means, only joined players and map creator can edit map. No more players can join
+Game auto locks open map if it's does not have community mode, when any SC card is picked if was open, will get locked.
 /game join gameName <- join an open map to be able to edit even if map is locked
 /game leave gameName <- leave an open map
 /game info gameName <- information of map, status if open/locked and player list

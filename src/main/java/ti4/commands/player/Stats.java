@@ -9,6 +9,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
+import ti4.map.MapStatus;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -153,6 +154,9 @@ public class Stats extends PlayerSubcommandData {
     }
 
     public static void pickSC(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping optionSC) {
+        if (activeMap.isMapOpen() && !activeMap.isCommunityMode()){
+            activeMap.setMapStatus(MapStatus.locked);
+        }
         if (optionSC != null) {
             int scNumber = optionSC.getAsInt();
             LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
