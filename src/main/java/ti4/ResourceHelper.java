@@ -18,6 +18,7 @@ public class ResourceHelper {
     private HashMap<String, String> factionCache = new HashMap<>();
     private HashMap<String, String> generalCache = new HashMap<>();
     private HashMap<String, String> planetCache = new HashMap<>();
+    private HashMap<String, String> paCache = new HashMap<>();
 
     private ResourceHelper() {
     }
@@ -135,6 +136,19 @@ public class ResourceHelper {
         }
         String token = getResourceFromFolder("planet_cards/", name, "Could not find planet token file");
         planetCache.put(name, token);
+        return token;
+    }
+
+    @CheckForNull
+    public String getPAResource(String name)
+    {
+        String paInfoPath = paCache.get(name);
+        if (paInfoPath != null)
+        {
+            return paInfoPath;
+        }
+        String token = getResourceFromFolder("player_area/", name, "Could not find player area token file");
+        paCache.put(name, token);
         return token;
     }
 

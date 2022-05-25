@@ -211,6 +211,7 @@ public class GenerateMap {
         HashMap<String, Player> players = map.getPlayers();
         float percent = 0.15f;
         int deltaY = 35;
+        int yDelta = 0;
 
         int tempY = y;
         y += 200;
@@ -255,39 +256,68 @@ public class GenerateMap {
                     }
                 }
                 StringBuilder sb = new StringBuilder();
-                int sc = player.getSC();
-                String scText = sc == 0 ? " " : Integer.toString(sc);
-                scText = getSCNumberIfNaaluInPlay(player, map, scText);
-                sb.append("SC: ").append(scText).append("   ");
 
-                graphics.setColor(getSCColor(sc, map));
+                if (map.getName().equals("test1")){
+                    y += 4;
+                    int sc = player.getSC();
+                    String scText = sc == 0 ? " " : Integer.toString(sc);
+                    scText = getSCNumberIfNaaluInPlay(player, map, scText);
+                    graphics.setColor(getSCColor(sc, map));
+                    graphics.setFont(Storage.getFont64());
+                    graphics.drawString(scText, x + 90, y + 70 + yDelta);
 
-                graphics.drawString(sb.toString(), x + 100, y + deltaY);
-                graphics.setColor(color);
+                    graphics.setFont(Storage.getFont20());
+                    graphics.setColor(Color.WHITE);
+                    String acImage = "pa_cardbacks_ac.png";
+                    String soImage = "pa_cardbacks_so.png";
+                    String pnImage = "pa_cardbacks_pn.png";
+                    String tradeGoodImage = "pa_cardbacks_tradegoods.png";
+                    String commoditiesImage = "pa_cardbacks_commodities.png";
+                    drawPAImage(x + 150, y + yDelta, soImage);
+                    drawPAImage(x + 215, y + yDelta, acImage);
+                    drawPAImage(x + 280, y + yDelta, pnImage);
+                    drawPAImage(x + 345, y + yDelta, tradeGoodImage);
+                    drawPAImage(x + 410, y + yDelta, commoditiesImage);
 
-                graphics.setColor(Color.WHITE);
-                sb = new StringBuilder();
-                sb.append(player.getTacticalCC()).append("T/");
-                if ("letnev".equals(faction)) {
-                    sb.append(player.getFleetCC()).append("+2").append("F/");
+                    y += 50;
+
+
                 } else {
-                    sb.append(player.getFleetCC()).append("F/");
-                }
-                sb.append(player.getStrategicCC()).append("S ");
-                sb.append("TG: ").append(player.getTg());
-                sb.append(" C:").append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
-                sb.append(" ").append("AC: ").append(player.getAc()).append(" ");
-                sb.append("PN: ").append(player.getPnCount()).append(" ");
-                sb.append("SO: ").append(player.getSo()).append(" scored: ").append(player.getSoScored()).append(" ");
-                sb.append("CRF: ").append(player.getCrf()).append(" ");
-                sb.append("HRF: ").append(player.getHrf()).append(" ");
-                sb.append("IRF: ").append(player.getIrf()).append(" ");
-                sb.append("VRF: ").append(player.getVrf()).append(" ");
-                if (player.isPassed()) {
-                    sb.append(" PASSED");
+                    int sc = player.getSC();
+                    String scText = sc == 0 ? " " : Integer.toString(sc);
+                    scText = getSCNumberIfNaaluInPlay(player, map, scText);
+                    sb.append("SC: ").append(scText).append("   ");
 
+                    graphics.setColor(getSCColor(sc, map));
+
+                    graphics.drawString(sb.toString(), x + 100, y + deltaY);
+                    graphics.setColor(color);
+
+                    graphics.setColor(Color.WHITE);
+                    sb = new StringBuilder();
+                    sb.append(player.getTacticalCC()).append("T/");
+                    if ("letnev".equals(faction)) {
+                        sb.append(player.getFleetCC()).append("+2").append("F/");
+                    } else {
+                        sb.append(player.getFleetCC()).append("F/");
+                    }
+                    sb.append(player.getStrategicCC()).append("S ");
+                    sb.append("TG: ").append(player.getTg());
+                    sb.append(" C:").append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
+                    sb.append(" ").append("AC: ").append(player.getAc()).append(" ");
+                    sb.append("PN: ").append(player.getPnCount()).append(" ");
+                    sb.append("SO: ").append(player.getSo()).append(" scored: ").append(player.getSoScored()).append(" ");
+                    sb.append("CRF: ").append(player.getCrf()).append(" ");
+                    sb.append("HRF: ").append(player.getHrf()).append(" ");
+                    sb.append("IRF: ").append(player.getIrf()).append(" ");
+                    sb.append("VRF: ").append(player.getVrf()).append(" ");
+                    if (player.isPassed()) {
+                        sb.append(" PASSED");
+
+                    }
+                    graphics.drawString(sb.toString(), x + 230, y + deltaY);
                 }
-                graphics.drawString(sb.toString(), x + 230, y + deltaY);
+
 
                 int pnX = 0;
                 int pnY = 40;
@@ -387,7 +417,7 @@ public class GenerateMap {
 
             if (unitHolder.getTokenList().contains("titanspn")) {
                 String planetTypeName = "pc_attribute_titanspn.png";
-                drawImage(x + deltaX + 2, y + 2, planet, planetTypeName);
+                drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName);
             } else {
                 String originalPlanetType = planetHolder.getOriginalPlanetType();
                 if (!originalPlanetType.isEmpty()) {
@@ -398,47 +428,47 @@ public class GenerateMap {
                     }
 
                     String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
-                    drawImage(x + deltaX + 2, y + 2, planet, planetTypeName);
+                    drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName);
                 }
             }
 
             boolean hasAttachment = planetHolder.hasAttachment();
             if (hasAttachment) {
                 String planetTypeName = "pc_upgrade.png";
-                drawImage(x + deltaX + 26, y + 40, planet, planetTypeName);
+                drawPlanetImage(x + deltaX + 26, y + 40, planetTypeName);
             }
 
             boolean hasAbility = planetHolder.isHasAbility();
             if (hasAbility) {
                 String statusOfAbility = exhaustedPlanetsAbilities.contains(planet) ? "_exh" : "_rdy";
                 String planetTypeName = "pc_legendary" + statusOfAbility + ".png";
-                drawImage(x + deltaX + 26, y + 60, planet, planetTypeName);
+                drawPlanetImage(x + deltaX + 26, y + 60, planetTypeName);
             }
             String originalTechSpeciality = planetHolder.getOriginalTechSpeciality();
             int deltaY = 175;
             if (!originalTechSpeciality.isEmpty()) {
                 String planetTypeName = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
-                drawImage(x + deltaX + 26, y + 82, planet, planetTypeName);
+                drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName);
             } else {
                 ArrayList<String> techSpeciality = planetHolder.getTechSpeciality();
                 for (String techSpec : techSpeciality) {
                     String planetTypeName = "pc_tech_" + techSpec + statusOfPlanet + ".png";
-                    drawImage(x + deltaX + 26, y + 82, planet, planetTypeName);
+                    drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName);
                     deltaY -= 20;
                 }
             }
 
 
-            drawImage(x + deltaX + 26, y + 103, planet, resFileName);
-            drawImage(x + deltaX + 26, y + 125, planet, infFileName);
-            drawImage(x + deltaX, y, planet, planetFileName);
+            drawPlanetImage(x + deltaX + 26, y + 103, resFileName);
+            drawPlanetImage(x + deltaX + 26, y + 125, infFileName);
+            drawPlanetImage(x + deltaX, y, planetFileName);
 
 
             deltaX += 56;
         }
     }
 
-    private void drawImage(int x, int y, String planet, String resourceName) {
+    private void drawPlanetImage(int x, int y, String resourceName) {
         try {
             String resourcePath = ResourceHelper.getInstance().getPlanetResource(resourceName);
             @SuppressWarnings("ConstantConditions")
@@ -446,6 +476,17 @@ public class GenerateMap {
             graphics.drawImage(resourceBufferedImage, x, y, null);
         } catch (Exception e) {
             LoggerHandler.log("Could not display planet: " + resourceName, e);
+        }
+    }
+
+    private void drawPAImage(int x, int y, String resourceName) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            @SuppressWarnings("ConstantConditions")
+            BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
+            graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            LoggerHandler.log("Could not display play area: " + resourceName, e);
         }
     }
 
