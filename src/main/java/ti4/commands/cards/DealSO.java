@@ -13,8 +13,8 @@ import ti4.message.MessageHelper;
 public class DealSO extends CardsSubcommandData {
     public DealSO() {
         super(Constants.DEAL_SO, "Deal Secret Objective");
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to show Action Card").setRequired(true));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to Deal Secret").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to deal, default 1"));
     }
 
     @Override
