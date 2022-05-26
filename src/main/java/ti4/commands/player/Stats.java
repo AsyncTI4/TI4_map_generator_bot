@@ -154,10 +154,10 @@ public class Stats extends PlayerSubcommandData {
     }
 
     public static void pickSC(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping optionSC) {
-        if (activeMap.isMapOpen() && !activeMap.isCommunityMode()){
-            activeMap.setMapStatus(MapStatus.locked);
-        }
         if (optionSC != null) {
+            if (activeMap.isMapOpen() && !activeMap.isCommunityMode()){
+                activeMap.setMapStatus(MapStatus.locked);
+            }
             int scNumber = optionSC.getAsInt();
             LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
             if (player.getColor() == null || "white".equals(player.getColor()) || player.getFaction() == null) {
