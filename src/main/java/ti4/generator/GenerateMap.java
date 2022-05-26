@@ -237,7 +237,7 @@ public class GenerateMap {
                 graphics.setColor(Color.WHITE);
                 String userName = player.getUserName() + ("white".equals(player.getColor()) ? "" : " (" + player.getColor() + ")");
                 graphics.drawString(userName, x, y);
-                if (player.getFaction() == null || "white".equals(player.getColor()) || player.getColor() == null){
+                if (player.getFaction() == null || "white".equals(player.getColor()) || player.getColor() == null) {
                     continue;
                 }
 
@@ -257,7 +257,7 @@ public class GenerateMap {
                 }
                 StringBuilder sb = new StringBuilder();
 
-                if (map.getName().equals("test1")){
+                if (map.getName().equals("test1")) {
                     y += 4;
                     int sc = player.getSC();
                     String scText = sc == 0 ? " " : Integer.toString(sc);
@@ -415,7 +415,7 @@ public class GenerateMap {
 
             graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
 
-            if (unitHolder.getTokenList().contains("titanspn")) {
+            if (unitHolder.getTokenList().contains("attachment_titanspn.png")) {
                 String planetTypeName = "pc_attribute_titanspn.png";
                 drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName);
             } else {
@@ -452,6 +452,9 @@ public class GenerateMap {
             } else {
                 ArrayList<String> techSpeciality = planetHolder.getTechSpeciality();
                 for (String techSpec : techSpeciality) {
+                    if (techSpec.isEmpty()) {
+                        continue;
+                    }
                     String planetTypeName = "pc_tech_" + techSpec + statusOfPlanet + ".png";
                     drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName);
                     deltaY -= 20;
