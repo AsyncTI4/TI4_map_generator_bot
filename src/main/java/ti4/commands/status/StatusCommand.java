@@ -103,6 +103,7 @@ public class StatusCommand implements Command {
         subcommands.add(new RemoveCustomPO());
         subcommands.add(new SCTradeGoods());
         subcommands.add(new ListTurnOrder());
+        subcommands.add(new ListVoteCount());
         return subcommands;
     }
 
