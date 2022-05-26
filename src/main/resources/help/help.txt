@@ -23,7 +23,7 @@ Add all players in order for game
 /game sc_count <- sets game SC count, used if game requires more than 8 Strategy cards, default is 8
 /game setup display_type(optional) vpCount(optional) player_count_for_map(optional) <- sets default display type for game. All (map + player stats), map or player stats, Sets Game VP count (10 default)
 player_count_for_map set player map count 6 (default) or 8 for bigger map
-/game replace @playerToReplace @replacementPlayer <- can replace a player in game, only game players can do command
+/game replace FACTION_COLOR @replacementPlayer <- can replace a player in game (faction/color), only game players can do command
 /game setup game_custom_name @custom text <- can add custom text to game
 
 For easy of setup suggest first command after map creation use
