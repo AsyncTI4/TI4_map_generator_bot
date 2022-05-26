@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.MapGenerator;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -22,7 +23,7 @@ public class Replace extends GameSubcommandData {
 
     public Replace() {
         super(Constants.REPLACE, "Replace player in game");
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Removed player @playerName").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Replace player in Faction/Color ").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Replacement player @playerName").setRequired(true));
     }
 
@@ -37,19 +38,23 @@ public class Replace extends GameSubcommandData {
             return;
         }
         String message = "";
-        OptionMapping removeOption = event.getOption(Constants.PLAYER1);
+        OptionMapping removeOption = event.getOption(Constants.FACTION_COLOR);
         OptionMapping addOption = event.getOption(Constants.PLAYER2);
         if (removeOption != null && addOption != null) {
-            User removedUser = removeOption.getAsUser();
+            Player removedPlayer = Helper.getPlayer(map, null, event);
+            if (removedPlayer == null){
+                MessageHelper.replyToMessage(event, "Could not find player for faction/color to replace");
+                return;
+            }
             User addedUser = addOption.getAsUser();
-            if (players.stream().anyMatch(player -> player.getUserID().equals(removedUser.getId())) &&
+            if (players.stream().anyMatch(player -> player.getUserID().equals(removedPlayer.getUserID())) &&
                     players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()))) {
-                message = Helper.getGamePing(event, map) + " Player: " + removedUser.getName() + " replaced by player: " + addedUser.getName();
-                Player player = map.getPlayer(removedUser.getId());
+                message = Helper.getGamePing(event, map) + " Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
+                Player player = map.getPlayer(removedPlayer.getUserID());
                 LinkedHashMap<String, List<String>> scoredPublicObjectives = map.getScoredPublicObjectives();
                 for (java.util.Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
                     List<String> value = poEntry.getValue();
-                    boolean removed = value.remove(removedUser.getId());
+                    boolean removed = value.remove(removedPlayer.getUserID());
                     if (removed){
                         value.add(addedUser.getId());
                     }
@@ -57,11 +62,11 @@ public class Replace extends GameSubcommandData {
                 player.setUserName(addedUser.getName());
                 player.setUserID(addedUser.getId());
             } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Specify player that is in game to be removed and player that is not in game to be replacement");
+                MessageHelper.replyToMessage(event, "Specify player that is in game to be removed and player that is not in game to be replacement");
                 return;
             }
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify player to remove and replacement");
+            MessageHelper.replyToMessage(event, "Specify player to remove and replacement");
             return;
         }
         MapSaveLoadManager.saveMap(map);
