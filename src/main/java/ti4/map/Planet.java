@@ -25,13 +25,7 @@ public class Planet extends UnitHolder {
             String[] split = planetInfo.split(",");
             originalPlanetType = split[1];
             if (split.length > 4) {
-                String techSpec = split[4];
-                if (Constants.PROPULSION.equals(techSpec) ||
-                        Constants.WARFARE.equals(techSpec) ||
-                        Constants.BIOTIC.equals(techSpec) ||
-                        Constants.CYBERNETIC.equals(techSpec)) {
-                    originalTechSpeciality = techSpec;
-                }
+                originalTechSpeciality = split[4];
             }
             if (split.length > 5){
                 hasAbility = true;
@@ -46,24 +40,15 @@ public class Planet extends UnitHolder {
     }
 
     private void addTechSpec(String techSpec) {
-        if (Constants.PROPULSION.equals(techSpec) ||
-                Constants.WARFARE.equals(techSpec) ||
-                Constants.BIOTIC.equals(techSpec) ||
-                Constants.CYBERNETIC.equals(techSpec)) {
-            techSpeciality.add(techSpec);
-        }
+        techSpeciality.add(techSpec);
     }
 
     private void addType(String type) {
-        if (Constants.CULTURAL.equals(type) ||
-                Constants.INDUSTRIAL.equals(type) ||
-                Constants.HAZARDOUS.equals(type)) {
-            planetType.add(type);
-        }
+        planetType.add(type);
     }
 
     public boolean hasAttachment(){
-       return tokenList.stream().anyMatch(token -> !token.contains("sleeper"));
+       return tokenList.stream().anyMatch(token -> !token.contains("sleeper") && !token.contains("dmz_large"));
     }
 
     @Override
