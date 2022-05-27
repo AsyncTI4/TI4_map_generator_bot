@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
+import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -17,7 +18,7 @@ public class Pass extends PlayerSubcommandData {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Your not a player of this game");
+            MessageHelper.replyToMessage(event, "Your not a player of this game");
             return;
         }
         player.setPassed(true);
@@ -29,6 +30,7 @@ public class Pass extends PlayerSubcommandData {
 
     @Override
     public void reply(SlashCommandInteractionEvent event) {
+        MapSaveLoadManager.saveMap(getActiveMap());
         MessageHelper.replyToMessageTI4Logo(event);
     }
 }

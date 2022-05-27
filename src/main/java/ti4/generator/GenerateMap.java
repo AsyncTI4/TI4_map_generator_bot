@@ -205,7 +205,7 @@ public class GenerateMap {
     }
 
     private void gameInfo(Map map, DisplayType displayType) throws IOException {
-        int widthOfLine = 2300;
+        int widthOfLine = width - 50;
         int y = heightForGameInfo + 60;
         int x = 10;
         HashMap<String, Player> players = map.getPlayers();
@@ -255,70 +255,59 @@ public class GenerateMap {
                         graphics.drawImage(bufferedImage, x, y, null);
                     }
                 }
-                StringBuilder sb = new StringBuilder();
+                y += 4;
+                int sc = player.getSC();
+                String scText = sc == 0 ? " " : Integer.toString(sc);
+                scText = getSCNumberIfNaaluInPlay(player, map, scText);
+                graphics.setColor(getSCColor(sc, map));
+                graphics.setFont(Storage.getFont64());
+                graphics.drawString(scText, x + 90, y + 70 + yDelta);
 
-                if (map.getName().equals("test1")) {
-                    y += 4;
-                    int sc = player.getSC();
-                    String scText = sc == 0 ? " " : Integer.toString(sc);
-                    scText = getSCNumberIfNaaluInPlay(player, map, scText);
-                    graphics.setColor(getSCColor(sc, map));
-                    graphics.setFont(Storage.getFont64());
-                    graphics.drawString(scText, x + 90, y + 70 + yDelta);
+                graphics.setFont(Storage.getFont32());
+                graphics.setColor(Color.WHITE);
+                String acImage = "pa_cardbacks_ac.png";
+                String soImage = "pa_cardbacks_so.png";
+                String pnImage = "pa_cardbacks_pn.png";
+                String tradeGoodImage = "pa_cardbacks_tradegoods.png";
+                String commoditiesImage = "pa_cardbacks_commodities.png";
+                drawPAImage(x + 150, y + yDelta, soImage);
+                graphics.drawString(Integer.toString(player.getSo()), x + 170, y + deltaY + 50);
 
-                    graphics.setFont(Storage.getFont20());
-                    graphics.setColor(Color.WHITE);
-                    String acImage = "pa_cardbacks_ac.png";
-                    String soImage = "pa_cardbacks_so.png";
-                    String pnImage = "pa_cardbacks_pn.png";
-                    String tradeGoodImage = "pa_cardbacks_tradegoods.png";
-                    String commoditiesImage = "pa_cardbacks_commodities.png";
-                    drawPAImage(x + 150, y + yDelta, soImage);
-                    drawPAImage(x + 215, y + yDelta, acImage);
-                    drawPAImage(x + 280, y + yDelta, pnImage);
-                    drawPAImage(x + 345, y + yDelta, tradeGoodImage);
-                    drawPAImage(x + 410, y + yDelta, commoditiesImage);
+                drawPAImage(x + 215, y + yDelta, acImage);
+                graphics.drawString(Integer.toString(player.getAc()), x + 235, y + deltaY + 50);
 
-                    y += 50;
+                drawPAImage(x + 280, y + yDelta, pnImage);
+                graphics.drawString(Integer.toString(player.getPnCount()), x + 300, y + deltaY + 50);
 
+                drawPAImage(x + 345, y + yDelta, tradeGoodImage);
+                graphics.drawString(Integer.toString(player.getTg()), x + 365, y + deltaY + 50);
 
-                } else {
-                    int sc = player.getSC();
-                    String scText = sc == 0 ? " " : Integer.toString(sc);
-                    scText = getSCNumberIfNaaluInPlay(player, map, scText);
-                    sb.append("SC: ").append(scText).append("   ");
+                drawPAImage(x + 410, y + yDelta, commoditiesImage);
+                String comms = player.getCommodities() + "/" + player.getCommoditiesTotal();
+                graphics.drawString(comms, x + 415, y + deltaY + 50);
 
-                    graphics.setColor(getSCColor(sc, map));
-
-                    graphics.drawString(sb.toString(), x + 100, y + deltaY);
-                    graphics.setColor(color);
-
-                    graphics.setColor(Color.WHITE);
-                    sb = new StringBuilder();
-                    sb.append(player.getTacticalCC()).append("T/");
-                    if ("letnev".equals(faction)) {
-                        sb.append(player.getFleetCC()).append("+2").append("F/");
-                    } else {
-                        sb.append(player.getFleetCC()).append("F/");
-                    }
-                    sb.append(player.getStrategicCC()).append("S ");
-                    sb.append("TG: ").append(player.getTg());
-                    sb.append(" C:").append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
-                    sb.append(" ").append("AC: ").append(player.getAc()).append(" ");
-                    sb.append("PN: ").append(player.getPnCount()).append(" ");
-                    sb.append("SO: ").append(player.getSo()).append(" scored: ").append(player.getSoScored()).append(" ");
-                    sb.append("CRF: ").append(player.getCrf()).append(" ");
-                    sb.append("HRF: ").append(player.getHrf()).append(" ");
-                    sb.append("IRF: ").append(player.getIrf()).append(" ");
-                    sb.append("VRF: ").append(player.getVrf()).append(" ");
-                    if (player.isPassed()) {
-                        sb.append(" PASSED");
-
-                    }
-                    graphics.drawString(sb.toString(), x + 230, y + deltaY);
-                }
+                int vrf = player.getVrf();
+                int irf = player.getIrf();
+                String vrfImage = "pa_fragment_urf.png";
+                String irfImage = "pa_fragment_irf.png";
+                int xDelta = 0;
+                xDelta = drawFrags(y, x, yDelta, vrf, vrfImage, xDelta);
+                xDelta += 25;
+                xDelta = drawFrags(y, x, yDelta, irf, irfImage, xDelta);
 
 
+                int xDelta2 = 0;
+                int hrf = player.getHrf();
+                int crf = player.getCrf();
+                String hrfImage = "pa_fragment_hrf.png";
+                String crfImage = "pa_fragment_crf.png";
+                xDelta2 = drawFrags(y + 73, x, yDelta, hrf, hrfImage, xDelta2);
+                xDelta2 += 25;
+                xDelta2 = drawFrags(y + 73, x, yDelta, crf, crfImage, xDelta2);
+
+                xDelta = x + 550 + Math.max(xDelta, xDelta2);
+                int yPlayArea = y - 30;
+                y += 85;
                 int pnX = 0;
                 int pnY = 40;
                 List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
@@ -348,8 +337,7 @@ public class GenerateMap {
                 y += 90 + (techY - techStartY);
 
                 if (!player.getPlanets().isEmpty()) {
-                    planetInfo(player, map, 10, y);
-                    y += 155;
+                    planetInfo(player, map, xDelta, yPlayArea);
                 }
 
                 g2.setColor(color);
@@ -378,6 +366,14 @@ public class GenerateMap {
                 graphics.drawString(text + Mapper.getAgendaForOnly(lawID), x, y);
             }
         }
+    }
+
+    private int drawFrags(int y, int x, int yDelta, int vrf, String vrfImage, int xDelta) {
+        for (int i = 0; i < vrf; i++) {
+            drawPAImage(x + 475 + xDelta, y + yDelta - 25, vrfImage);
+            xDelta += 15;
+        }
+        return xDelta;
     }
 
     private void planetInfo(Player player, Map map, int x, int y) {
