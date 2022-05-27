@@ -258,10 +258,20 @@ public class GenerateMap {
                 y += 4;
                 int sc = player.getSC();
                 String scText = sc == 0 ? " " : Integer.toString(sc);
-                scText = getSCNumberIfNaaluInPlay(player, map, scText);
+                if (sc != 0) {
+                    scText = getSCNumberIfNaaluInPlay(player, map, scText);
+                }
                 graphics.setColor(getSCColor(sc, map));
                 graphics.setFont(Storage.getFont64());
-                graphics.drawString(scText, x + 90, y + 70 + yDelta);
+
+                if (scText.contains("0/")) {
+                    graphics.drawString("0", x + 90, y + 70 + yDelta);
+                    graphics.setFont(Storage.getFont32());
+                    graphics.setColor(Color.WHITE);
+                    graphics.drawString(Integer.toString(sc), x + 120, y + 80 + yDelta);
+                } else {
+                    graphics.drawString(scText, x + 90, y + 70 + yDelta);
+                }
 
                 graphics.setFont(Storage.getFont32());
                 graphics.setColor(Color.WHITE);
@@ -595,8 +605,9 @@ public class GenerateMap {
             scText = getSCNumberIfNaaluInPlay(player, map, scText);
             graphics.setColor(getSCColor(sc, map));
             graphics.setFont(Storage.getFont64());
-            graphics.drawString(scText, points.get(4).x, points.get(4).y);
-
+            if (sc != 0) {
+                graphics.drawString(scText, points.get(4).x, points.get(4).y);
+            }
             graphics.setColor(Color.WHITE);
             graphics.setFont(Storage.getFont32());
             String ccID = Mapper.getCCID(player.getColor());
