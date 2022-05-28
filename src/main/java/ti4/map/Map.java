@@ -804,6 +804,16 @@ public class Map {
     public void setExploreDiscard(ArrayList<String> discard) {
         discardExplore = discard;
     }
+    
+    public String pickExplore(String id) {
+    	if (explore.contains(id)) {
+    		discardExplore(id);
+    		return id;
+    	} else if (discardExplore.contains(id)) {
+    		return id;
+    	} 
+    	return null;
+    }
 
     public void setSecretObjectives(List<String> secretObjectives) {
         this.secretObjectives = secretObjectives;

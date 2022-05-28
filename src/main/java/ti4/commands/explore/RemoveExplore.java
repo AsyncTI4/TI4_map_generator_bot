@@ -6,9 +6,9 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
 
-public class PurgeExp extends ExploreSubcommandData {
+public class RemoveExplore extends ExploreSubcommandData {
 
-	public PurgeExp() {
+	public RemoveExplore() {
 		super(Constants.REMOVE, "Remove an Exploration card from the game.");
 		addOptions(idOption.setRequired(true));
 	}

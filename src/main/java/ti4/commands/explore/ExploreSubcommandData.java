@@ -5,12 +5,20 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+
+import java.io.File;
+
 import org.jetbrains.annotations.NotNull;
+
+import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.map.MapSaveLoadManager;
+import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
@@ -73,5 +81,47 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
         return tile;
     }
+    
+    protected void resolveExplore(SlashCommandInteractionEvent event, String cardID, Tile tile, String planetName) {
+    	String message = "Card has been discarded. Resolve effects manually.";
+        String card = Mapper.getExplore(cardID);
+        String[] cardInfo = card.split(";");
 
+        String cardType = cardInfo[3];
+        if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
+            Player player = activeMap.getPlayer(getUser().getId());
+            message = "Gained relic fragment";
+            player.addRelic(cardID);
+            activeMap.purgeExplore(cardID);
+        } else if (cardType.equalsIgnoreCase(Constants.ATTACH)) {
+            String token = cardInfo[5];
+            String tokenFilename = Mapper.getAttachmentID(token);
+            if (tokenFilename != null) {
+            	tile.addToken(tokenFilename, planetName);
+                activeMap.purgeExplore(cardID);
+                message = "Token added to planet";
+            } else {
+            	message = "Invalid token";
+            }
+        } else if (cardType.equalsIgnoreCase(Constants.TOKEN)) {
+            String token = cardInfo[5];
+            String tokenFilename = Mapper.getTokenID(token);
+            if (tokenFilename != null) {
+            	tile.addToken(tokenFilename, Constants.SPACE);
+                message = "Token added to map";
+                if (Constants.MIRAGE.equalsIgnoreCase(token)) {
+                    Helper.addMirageToTile(tile);
+                    message = "Mirage added to map!";
+                }
+            } else {
+            	message = "Invalid token";
+            }
+        }
+
+        MapSaveLoadManager.saveMap(activeMap);
+        File file = GenerateMap.getInstance().saveImage(activeMap);
+        MessageHelper.replyToMessage(event, file);
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+    }
+    
 }

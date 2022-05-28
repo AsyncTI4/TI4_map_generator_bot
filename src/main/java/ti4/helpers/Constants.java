@@ -264,7 +264,9 @@ public class Constants {
     public static final String FRAGMENT = "fragment";
     public static final String DISCARDED_EXPLORES = "discarded_explores";
     public static final String SEND_FRAGMENT = "send_fragment";
-
+    public static final String USE = "use";
+    public static final String PURGE_FRAGMENTS = "purge_fragments";
+    public static final String RELICS = "relics";
 
     public static final String WARFARE = "warfare";
     public static final String PROPULSION = "propulsion";

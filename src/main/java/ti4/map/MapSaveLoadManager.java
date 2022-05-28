@@ -271,6 +271,9 @@ public class MapSaveLoadManager {
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
             writer.write(System.lineSeparator());
+            
+            writer.write(Constants.RELICS + " " + String.join(",", player.getRelics()));
+            writer.write(System.lineSeparator());
 
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
             writer.write(System.lineSeparator());
@@ -301,14 +304,6 @@ public class MapSaveLoadManager {
             writer.write(Constants.SO + " " + getSecretList(player.getSecrets()));
             writer.write(System.lineSeparator());
             writer.write(Constants.SO_SCORED + " " + getSecretList(player.getSecretsScored()));
-            writer.write(System.lineSeparator());
-            writer.write(Constants.CRF + " " + player.getCrf());
-            writer.write(System.lineSeparator());
-            writer.write(Constants.HRF + " " + player.getHrf());
-            writer.write(System.lineSeparator());
-            writer.write(Constants.IRF + " " + player.getIrf());
-            writer.write(System.lineSeparator());
-            writer.write(Constants.VRF + " " + player.getVrf());
             writer.write(System.lineSeparator());
             writer.write(Constants.SC + " " + player.getSC());
             writer.write(System.lineSeparator());
@@ -796,10 +791,39 @@ public class MapSaveLoadManager {
                         player.setSecret(id, index);
                     }
                 }
-                case Constants.CRF -> player.setCrf(Integer.parseInt(tokenizer.nextToken()));
-                case Constants.HRF -> player.setHrf(Integer.parseInt(tokenizer.nextToken()));
-                case Constants.IRF -> player.setIrf(Integer.parseInt(tokenizer.nextToken()));
-                case Constants.VRF -> player.setVrf(Integer.parseInt(tokenizer.nextToken()));
+                
+                case Constants.RELICS -> {
+                	StringTokenizer relics = new StringTokenizer(tokenizer.nextToken(), ",");
+                	while (relics.hasMoreTokens()) {
+                		player.addRelic(relics.nextToken());
+                	}
+                }
+                //MIGRATION CODE
+                case Constants.CRF -> {
+                	int crf = Integer.parseInt(tokenizer.nextToken());
+                	for (int i=1; i<=crf; i++) {
+                		player.addRelic("crf" + Integer.toString(i));
+                	}
+                }
+                case Constants.HRF -> {
+                	int hrf = Integer.parseInt(tokenizer.nextToken());
+                	for (int i=1; i<=hrf; i++) {
+                		player.addRelic("hrf" + Integer.toString(i));
+                	}
+                }
+                case Constants.IRF -> {
+                	int irf = Integer.parseInt(tokenizer.nextToken());
+                	for (int i=1; i<=irf; i++) {
+                		player.addRelic("irf" + Integer.toString(i));
+                	}
+                }
+                case Constants.VRF -> {
+                	int vrf = Integer.parseInt(tokenizer.nextToken());
+                	for (int i=1; i<=vrf; i++) {
+                		player.addRelic("urf" + Integer.toString(i));
+                	}
+                }
+                //END MIGRATION CODE
                 case Constants.SC -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
             }
