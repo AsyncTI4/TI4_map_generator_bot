@@ -2,6 +2,7 @@ package ti4.map;
 
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Constants;
 
 import java.util.Map;
 import java.util.*;
@@ -40,7 +41,7 @@ public class Player {
     private int hrf = 0;
     private int irf = 0;
     private int vrf = 0;
-    private HashSet<String> relics = new HashSet<>();
+    private List<String> relics = new ArrayList<>();
     private int SC = 0;
 
 
@@ -236,6 +237,46 @@ public class Player {
 
     public void setVrf(int vrf) {
         this.vrf = vrf;
+    }
+    
+    public List<String> getRelics() {
+    	return relics;
+    }
+    
+    public void setRelics(List<String> relicList) {
+    	this.relics = relicList;
+    	updateFragments();
+    }
+    
+    public void addRelic(String relicID) {
+    	this.relics.add(relicID);
+    	updateFragments();
+    }
+    
+    public void removeRelic(String relicID) {
+    	this.relics.remove(relicID);
+    	updateFragments();
+    }
+    
+    private void updateFragments() {
+    	crf = irf = hrf = vrf = 0;
+    	for (String cardID : relics) {
+    		String color = Mapper.getExplore(cardID).split(";")[1].toLowerCase();
+    		switch (color) {
+    		case Constants.CULTURAL:
+    			crf++;
+    			break;
+    		case Constants.INDUSTRIAL:
+    			irf++;
+    			break;
+    		case Constants.HAZARDOUS:
+    			hrf++;
+    			break;
+    		case Constants.FRONTIER:
+    			vrf++;
+    			break;
+    		}
+    	}
     }
 
     public String getUserID() {

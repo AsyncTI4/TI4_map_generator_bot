@@ -49,13 +49,15 @@ public class ExploreCommand implements Command {
         Collection<ExploreSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new DiscardExp());
         subcommands.add(new ExpDeck());
-        subcommands.add(new PurgeExp());
+        subcommands.add(new RemoveExplore());
         subcommands.add(new ShuffleExpBackIntoDeck());
         subcommands.add(new ExpInfo());
         subcommands.add(new ExpPlanet());
         subcommands.add(new ExpReset());
         subcommands.add(new ExpFrontier());
         subcommands.add(new SendFragments());
+        subcommands.add(new UseExplore());
+        subcommands.add(new PurgeFragments());
         return subcommands;
     }
 

@@ -1,6 +1,7 @@
 package ti4.commands.explore;
 
 import java.io.File;
+import java.util.ArrayList;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -8,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.GenerateMap;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapSaveLoadManager;
@@ -43,25 +45,24 @@ public class SendFragments extends ExploreSubcommandData {
         if (countOption != null) {
         	count = event.getOption(Constants.COUNT).getAsInt();
         } 
-        switch (color) {
-        case Constants.CULTURAL: 
-        	sender.setCrf(sender.getCrf() - count);
-        	reciever.setCrf(reciever.getCrf() + count);
-        	break;
-        case Constants.INDUSTRIAL:
-        	sender.setIrf(sender.getIrf() - count);
-        	reciever.setIrf(reciever.getIrf() + count);
-        	break;
-        case Constants.HAZARDOUS:
-        	sender.setHrf(sender.getHrf() - count);
-        	reciever.setHrf(reciever.getHrf() + count);
-        	break;
-        case Constants.FRONTIER:
-        	sender.setVrf(sender.getVrf() - count);
-        	reciever.setVrf(reciever.getVrf() + count);
-        	break;
-        default:
-        	MessageHelper.replyToMessage(event, "Invalid fragment type");
+        
+        ArrayList<String> fragments = new ArrayList<>();
+        for (String cardID : sender.getRelics()) {
+        	String[] card = Mapper.getExplore(cardID).split(";");
+        	if (card[1].equalsIgnoreCase(color)) {
+        		fragments.add(cardID);
+        	}
+        }
+        
+        if (fragments.size() >= count) {
+        	while (count > 0) {
+        		count--;
+        		String fragID = fragments.get(count);
+        		sender.removeRelic(fragID);
+        		reciever.addRelic(fragID);
+        	}
+        } else {
+        	MessageHelper.replyToMessage(event, "Not enough fragments of the specified type");
         	return;
         }
         

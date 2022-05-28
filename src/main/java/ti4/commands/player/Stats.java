@@ -30,10 +30,6 @@ public class Stats extends PlayerSubcommandData {
                 .addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade goods count"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.CRF, "Cultural Relic Fragment count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.HRF, "Hazardous Relic Fragment count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.IRF, "Industrial Relic Fragment count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.VRF, "Unknown Relic Fragment count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Card Number count"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.SC_PLAYED, "Strategy Card played y/n"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player passed y/n"))
@@ -102,22 +98,6 @@ public class Stats extends PlayerSubcommandData {
         OptionMapping optionCT = event.getOption(Constants.COMMODITIES_TOTAL);
         if (optionCT != null) {
             player.setCommoditiesTotal(optionCT.getAsInt());
-        }
-        OptionMapping optionCRF = event.getOption(Constants.CRF);
-        if (optionCRF != null) {
-            player.setCrf(optionCRF.getAsInt());
-        }
-        OptionMapping optionHRF = event.getOption(Constants.HRF);
-        if (optionHRF != null) {
-            player.setHrf(optionHRF.getAsInt());
-        }
-        OptionMapping optionIRF = event.getOption(Constants.IRF);
-        if (optionIRF != null) {
-            player.setIrf(optionIRF.getAsInt());
-        }
-        OptionMapping optionVRF = event.getOption(Constants.VRF);
-        if (optionVRF != null) {
-            player.setVrf(optionVRF.getAsInt());
         }
 
         OptionMapping optionSpeaker = event.getOption(Constants.SPEAKER);

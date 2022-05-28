@@ -31,36 +31,7 @@ public class ExpFrontier extends ExploreSubcommandData {
             String cardID = activeMap.drawExplore(Constants.FRONTIER);
             MessageHelper.replyToMessage(event, displayExplore(cardID));
 
-            String message = "Card has been discarded. Resolve effects manually.";
-            String card = Mapper.getExplore(cardID);
-            String[] cardInfo = card.split(";");
-            String color = cardInfo[1];
-            String cardType = cardInfo[3];
-            if (cardType.equalsIgnoreCase(Constants.FRAGMENT) && color.equalsIgnoreCase(Constants.FRONTIER)) {
-                Player player = activeMap.getPlayer(getUser().getId());
-                player.setVrf(player.getVrf() + 1);
-                message = "Gained relic fragment";
-                activeMap.purgeExplore(cardID);
-            } else if (cardType.equalsIgnoreCase(Constants.TOKEN)) {
-                String token = cardInfo[5];
-                String tokenFilename = Mapper.getTokenID(token);
-                if (token != null) {
-	                tile.addToken(tokenFilename, Constants.SPACE);
-	                message = "Token added to map";
-                } else {
-                	message = "Invalid token";
-                }
-                if (Constants.MIRAGE.equalsIgnoreCase(token)) {
-                    Helper.addMirageToTile(tile);
-                    message = "Mirage added to map!";
-                }
-                activeMap.purgeExplore(cardID);
-            }
-
-            MapSaveLoadManager.saveMap(activeMap);
-            File file = GenerateMap.getInstance().saveImage(activeMap);
-            MessageHelper.replyToMessage(event, file);
-            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            resolveExplore(event, cardID, tile, null);
         } else {
             MessageHelper.replyToMessage(event, "No frontier token in given system.");
         }
