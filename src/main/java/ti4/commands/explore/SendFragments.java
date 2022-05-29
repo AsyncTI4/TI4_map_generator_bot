@@ -47,7 +47,7 @@ public class SendFragments extends ExploreSubcommandData {
         } 
         
         ArrayList<String> fragments = new ArrayList<>();
-        for (String cardID : sender.getRelics()) {
+        for (String cardID : sender.getFragments()) {
         	String[] card = Mapper.getExplore(cardID).split(";");
         	if (card[1].equalsIgnoreCase(color)) {
         		fragments.add(cardID);
@@ -58,8 +58,8 @@ public class SendFragments extends ExploreSubcommandData {
         	while (count > 0) {
         		count--;
         		String fragID = fragments.get(count);
-        		sender.removeRelic(fragID);
-        		reciever.addRelic(fragID);
+        		sender.removeFragment(fragID);
+        		reciever.addFragment(fragID);
         	}
         } else {
         	MessageHelper.replyToMessage(event, "Not enough fragments of the specified type");
