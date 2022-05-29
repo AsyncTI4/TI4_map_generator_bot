@@ -167,13 +167,13 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
 
         writeCards(map.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
-        
+
         writer.write(Constants.EXPLORE + " " + String.join(",", map.getAllExplores()));
         writer.write(System.lineSeparator());
-        
+
         writer.write(Constants.DISCARDED_EXPLORES + " " + String.join(",", map.getAllExploreDiscard()));
         writer.write(System.lineSeparator());
-        
+
         writer.write(Constants.SPEAKER + " " + map.getSpeaker());
         writer.write(System.lineSeparator());
 
@@ -271,8 +271,8 @@ public class MapSaveLoadManager {
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
             writer.write(System.lineSeparator());
-            
-            writer.write(Constants.RELICS + " " + String.join(",", player.getRelics()));
+
+            writer.write(Constants.FRAGMENTS + " " + String.join(",", player.getFragments()));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
@@ -611,9 +611,9 @@ public class MapSaveLoadManager {
             } else if (Constants.LAW.equals(identification)) {
                 map.setLaws(getParsedCards(tokenizer[1]));
             } else if (Constants.EXPLORE.equals(identification)) {
-            	map.setExploreDeck(getCardList(tokenizer[1]));
+                map.setExploreDeck(getCardList(tokenizer[1]));
             } else if (Constants.DISCARDED_EXPLORES.equals(identification)) {
-            	map.setExploreDiscard(getCardList(tokenizer[1]));
+                map.setExploreDiscard(getCardList(tokenizer[1]));
             } else if (Constants.LAW_INFO.equals(identification)) {
                 StringTokenizer actionCardToken = new StringTokenizer(tokenizer[1], ";");
                 LinkedHashMap<String, String> cards = new LinkedHashMap<>();
@@ -678,7 +678,7 @@ public class MapSaveLoadManager {
                 try {
                     boolean value = Boolean.parseBoolean(tokenizer[1]);
                     map.setCommunityMode(value);
-                } catch (Exception e){
+                } catch (Exception e) {
                     //Do nothing
                 }
             } else if (Constants.CREATION_DATE.equals(identification)) {
@@ -791,37 +791,37 @@ public class MapSaveLoadManager {
                         player.setSecret(id, index);
                     }
                 }
-                
-                case Constants.RELICS -> {
-                	StringTokenizer relics = new StringTokenizer(tokenizer.nextToken(), ",");
-                	while (relics.hasMoreTokens()) {
-                		player.addRelic(relics.nextToken());
-                	}
+
+                case Constants.FRAGMENTS -> {
+                    StringTokenizer fragments = new StringTokenizer(tokenizer.nextToken(), ",");
+                    while (fragments.hasMoreTokens()) {
+                        player.addFragment(fragments.nextToken());
+                    }
                 }
                 //MIGRATION CODE
                 case Constants.CRF -> {
-                	int crf = Integer.parseInt(tokenizer.nextToken());
-                	for (int i=1; i<=crf; i++) {
-                		player.addRelic("crf" + Integer.toString(i));
-                	}
+                    int crf = Integer.parseInt(tokenizer.nextToken());
+                    for (int i = 1; i <= crf; i++) {
+                        player.addFragment("crf" + i);
+                    }
                 }
                 case Constants.HRF -> {
-                	int hrf = Integer.parseInt(tokenizer.nextToken());
-                	for (int i=1; i<=hrf; i++) {
-                		player.addRelic("hrf" + Integer.toString(i));
-                	}
+                    int hrf = Integer.parseInt(tokenizer.nextToken());
+                    for (int i = 1; i <= hrf; i++) {
+                        player.addFragment("hrf" + i);
+                    }
                 }
                 case Constants.IRF -> {
-                	int irf = Integer.parseInt(tokenizer.nextToken());
-                	for (int i=1; i<=irf; i++) {
-                		player.addRelic("irf" + Integer.toString(i));
-                	}
+                    int irf = Integer.parseInt(tokenizer.nextToken());
+                    for (int i = 1; i <= irf; i++) {
+                        player.addFragment("irf" + i);
+                    }
                 }
                 case Constants.VRF -> {
-                	int vrf = Integer.parseInt(tokenizer.nextToken());
-                	for (int i=1; i<=vrf; i++) {
-                		player.addRelic("urf" + Integer.toString(i));
-                	}
+                    int vrf = Integer.parseInt(tokenizer.nextToken());
+                    for (int i = 1; i <= vrf; i++) {
+                        player.addFragment("urf" + i);
+                    }
                 }
                 //END MIGRATION CODE
                 case Constants.SC -> player.setSC(Integer.parseInt(tokenizer.nextToken()));

@@ -267,6 +267,7 @@ public class Constants {
     public static final String USE = "use";
     public static final String PURGE_FRAGMENTS = "purge_fragments";
     public static final String RELICS = "relics";
+    public static final String FRAGMENTS = "fragments";
 
     public static final String WARFARE = "warfare";
     public static final String PROPULSION = "propulsion";

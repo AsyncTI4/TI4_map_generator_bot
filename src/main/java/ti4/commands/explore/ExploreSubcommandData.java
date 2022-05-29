@@ -91,7 +91,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
             Player player = activeMap.getPlayer(getUser().getId());
             message = "Gained relic fragment";
-            player.addRelic(cardID);
+            player.addFragment(cardID);
             activeMap.purgeExplore(cardID);
         } else if (cardType.equalsIgnoreCase(Constants.ATTACH)) {
             String token = cardInfo[5];
