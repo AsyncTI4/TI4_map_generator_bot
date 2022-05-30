@@ -39,7 +39,7 @@ public class SendFragments extends ExploreSubcommandData {
         }
         Player reciever = activeMap.getPlayers().get(playerID);
         Player sender = activeMap.getPlayers().get(user.getId());
-        String color = event.getOption(Constants.EXPLORE_TYPE).getAsString();
+        String trait = event.getOption(Constants.TRAIT).getAsString();
         OptionMapping countOption = event.getOption(Constants.COUNT);
         int count = 1;
         if (countOption != null) {
@@ -47,19 +47,18 @@ public class SendFragments extends ExploreSubcommandData {
         } 
         
         ArrayList<String> fragments = new ArrayList<>();
-        for (String cardID : sender.getRelics()) {
+        for (String cardID : sender.getFragments()) {
         	String[] card = Mapper.getExplore(cardID).split(";");
-        	if (card[1].equalsIgnoreCase(color)) {
+        	if (card[1].equalsIgnoreCase(trait)) {
         		fragments.add(cardID);
         	}
         }
         
         if (fragments.size() >= count) {
-        	while (count > 0) {
-        		count--;
-        		String fragID = fragments.get(count);
-        		sender.removeRelic(fragID);
-        		reciever.addRelic(fragID);
+        	for (int i=0; i<count; i++) {
+        		String fragID = fragments.get(i);
+        		sender.removeFragment(fragID);
+        		reciever.addFragment(fragID);
         	}
         } else {
         	MessageHelper.replyToMessage(event, "Not enough fragments of the specified type");
@@ -67,7 +66,7 @@ public class SendFragments extends ExploreSubcommandData {
         }
         
         StringBuilder sb = new StringBuilder();
-        sb.append(count).append(" ").append(color).append(" relic fragments sent to ").append(recieverOption.getAsUser().getName());
+        sb.append(count).append(" ").append(trait).append(" relic fragments sent to ").append(recieverOption.getAsUser().getName());
         MessageHelper.replyToMessage(event, sb.toString());
         
         MapSaveLoadManager.saveMap(activeMap);

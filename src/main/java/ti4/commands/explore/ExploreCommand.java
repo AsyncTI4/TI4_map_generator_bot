@@ -58,6 +58,7 @@ public class ExploreCommand implements Command {
         subcommands.add(new SendFragments());
         subcommands.add(new UseExplore());
         subcommands.add(new PurgeFragments());
+        subcommands.add(new ListFragments());
         return subcommands;
     }
 

@@ -272,7 +272,7 @@ public class MapSaveLoadManager {
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
             writer.write(System.lineSeparator());
             
-            writer.write(Constants.RELICS + " " + String.join(",", player.getRelics()));
+            writer.write(Constants.FRAGMENTS + " " + String.join(",", player.getFragments()));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
@@ -792,35 +792,35 @@ public class MapSaveLoadManager {
                     }
                 }
                 
-                case Constants.RELICS -> {
-                	StringTokenizer relics = new StringTokenizer(tokenizer.nextToken(), ",");
-                	while (relics.hasMoreTokens()) {
-                		player.addRelic(relics.nextToken());
+                case Constants.FRAGMENTS -> {
+                	StringTokenizer fragments = new StringTokenizer(tokenizer.nextToken(), ",");
+                	while (fragments.hasMoreTokens()) {
+                		player.addFragment(fragments.nextToken());
                 	}
                 }
                 //MIGRATION CODE
                 case Constants.CRF -> {
                 	int crf = Integer.parseInt(tokenizer.nextToken());
                 	for (int i=1; i<=crf; i++) {
-                		player.addRelic("crf" + Integer.toString(i));
+                		player.addFragment("crf" + Integer.toString(i));
                 	}
                 }
                 case Constants.HRF -> {
                 	int hrf = Integer.parseInt(tokenizer.nextToken());
                 	for (int i=1; i<=hrf; i++) {
-                		player.addRelic("hrf" + Integer.toString(i));
+                		player.addFragment("hrf" + Integer.toString(i));
                 	}
                 }
                 case Constants.IRF -> {
                 	int irf = Integer.parseInt(tokenizer.nextToken());
                 	for (int i=1; i<=irf; i++) {
-                		player.addRelic("irf" + Integer.toString(i));
+                		player.addFragment("irf" + Integer.toString(i));
                 	}
                 }
                 case Constants.VRF -> {
                 	int vrf = Integer.parseInt(tokenizer.nextToken());
                 	for (int i=1; i<=vrf; i++) {
-                		player.addRelic("urf" + Integer.toString(i));
+                		player.addFragment("urf" + Integer.toString(i));
                 	}
                 }
                 //END MIGRATION CODE

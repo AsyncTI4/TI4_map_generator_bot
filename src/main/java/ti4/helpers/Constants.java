@@ -2,6 +2,8 @@ package ti4.helpers;
 
 import java.awt.*;
 
+import org.jetbrains.annotations.NotNull;
+
 public class Constants {
     public static final String SHOW_GAME = "show_game";
     public static final String SHOW_GAME_INFO = "show_game_info";
@@ -257,7 +259,7 @@ public class Constants {
     public static final String SHUFFLE_BACK_INTO_DECK = "shuffle_back_into_deck";
     public static final String DISCARD = "discard";
     public static final String DRAW_AND_DISCARD = "draw_and_discard";
-    public static final String EXPLORE_TYPE = "explore_type";
+    public static final String TRAIT = "trait";
     public static final String RESET = "reset";
     public static final String INSTANT = "instant";
     public static final String ATTACH = "attach";
@@ -266,7 +268,8 @@ public class Constants {
     public static final String SEND_FRAGMENT = "send_fragment";
     public static final String USE = "use";
     public static final String PURGE_FRAGMENTS = "purge_fragments";
-    public static final String RELICS = "relics";
+    public static final String FRAGMENTS = "fragments";
+    public static final String LIST_FRAGMENTS = "list_fragments";
 
     public static final String WARFARE = "warfare";
     public static final String PROPULSION = "propulsion";

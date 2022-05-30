@@ -31,7 +31,7 @@ public class ExpDeck extends ExploreSubcommandData {
         for (int i = 0; i < count; i++) {
             String userID = event.getUser().getId();
             Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-            String cardID = activeMap.drawExplore(event.getOption(Constants.EXPLORE_TYPE).getAsString().toLowerCase());
+            String cardID = activeMap.drawExplore(event.getOption(Constants.TRAIT).getAsString().toLowerCase());
             sb.append(displayExplore(cardID)).append(System.lineSeparator());
         }
         sb.append("Cards have been discarded. Resolve effects and/or purge manually.");

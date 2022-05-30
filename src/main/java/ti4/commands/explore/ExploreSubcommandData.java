@@ -26,7 +26,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
     private Map activeMap;
     private User user;
-    protected final OptionData typeOption = new OptionData(OptionType.STRING, Constants.EXPLORE_TYPE, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true);
+    protected final OptionData typeOption = new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true);
     protected final OptionData idOption = new OptionData(OptionType.STRING, Constants.EXPLORE_CARD_ID, "Explore card id sent between (). Can include multiple comma-separated ids.");
 
     public String getActionID() {
@@ -91,7 +91,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
             Player player = activeMap.getPlayer(getUser().getId());
             message = "Gained relic fragment";
-            player.addRelic(cardID);
+            player.addFragment(cardID);
             activeMap.purgeExplore(cardID);
         } else if (cardType.equalsIgnoreCase(Constants.ATTACH)) {
             String token = cardInfo[5];
@@ -116,6 +116,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             } else {
             	message = "Invalid token";
             }
+            activeMap.purgeExplore(cardID);
         }
 
         MapSaveLoadManager.saveMap(activeMap);

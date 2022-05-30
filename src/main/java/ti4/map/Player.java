@@ -41,7 +41,7 @@ public class Player {
     private int hrf = 0;
     private int irf = 0;
     private int vrf = 0;
-    private List<String> relics = new ArrayList<>();
+    private List<String> fragments = new ArrayList<>();
     private int SC = 0;
 
 
@@ -239,30 +239,30 @@ public class Player {
         this.vrf = vrf;
     }
     
-    public List<String> getRelics() {
-    	return relics;
+    public List<String> getFragments() {
+    	return fragments;
     }
     
-    public void setRelics(List<String> relicList) {
-    	this.relics = relicList;
+    public void setFragments(List<String> relicList) {
+    	this.fragments = relicList;
     	updateFragments();
     }
     
-    public void addRelic(String relicID) {
-    	this.relics.add(relicID);
+    public void addFragment(String relicID) {
+    	this.fragments.add(relicID);
     	updateFragments();
     }
     
-    public void removeRelic(String relicID) {
-    	this.relics.remove(relicID);
+    public void removeFragment(String relicID) {
+    	this.fragments.remove(relicID);
     	updateFragments();
     }
     
     private void updateFragments() {
     	crf = irf = hrf = vrf = 0;
-    	for (String cardID : relics) {
-    		String color = Mapper.getExplore(cardID).split(";")[1].toLowerCase();
-    		switch (color) {
+    	for (String cardID : fragments) {
+    		String trait = Mapper.getExplore(cardID).split(";")[1].toLowerCase();
+    		switch (trait) {
     		case Constants.CULTURAL:
     			crf++;
     			break;
