@@ -22,7 +22,7 @@ public class ExpInfo extends ExploreSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         ArrayList<String> types = new ArrayList<String>();
-        OptionMapping reqType = event.getOption(Constants.EXPLORE_TYPE);
+        OptionMapping reqType = event.getOption(Constants.TRAIT);
         if (reqType != null) {
             types.add(reqType.getAsString());
         } else {

@@ -26,7 +26,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 	public void execute(SlashCommandInteractionEvent event) {
 		Map activeMap = getActiveMap();
 		Player activePlayer = activeMap.getPlayer(getUser().getId());
-		String color = event.getOption(Constants.EXPLORE_TYPE).getAsString();
+		String color = event.getOption(Constants.TRAIT).getAsString();
 		OptionMapping countOption = event.getOption(Constants.COUNT);
 		int count = 3;
 		if (countOption != null) {
@@ -34,8 +34,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 		}
 		List<String> fragments = new ArrayList<String>();
 		List<String> unknowns = new ArrayList<String>();
-		List<String> relics = activePlayer.getRelics();
-		MessageHelper.sendMessageToChannel(event.getChannel(), relics.toString());
+		List<String> relics = activePlayer.getFragments();
 		for (String id : relics) {
 			String[] cardInfo = Mapper.getExplore(id).split(";");
 			if (cardInfo[1].equalsIgnoreCase(color)) {
@@ -43,6 +42,10 @@ public class PurgeFragments extends ExploreSubcommandData {
 			} else if (cardInfo[1].equalsIgnoreCase(Constants.FRONTIER)) {
 				unknowns.add(id);
 			}
+		}
+		
+		while (fragments.size() > count) {
+			fragments.remove(0);
 		}
 		
 		while (fragments.size() < count) {
@@ -54,10 +57,10 @@ public class PurgeFragments extends ExploreSubcommandData {
 		}
 		
 		for (String id : fragments) {
-			activePlayer.removeRelic(id);
+			activePlayer.removeFragment(id);
 		}
 		
-		MessageHelper.replyToMessage(event, "Fragments purged");
+		MessageHelper.replyToMessage(event, "Fragments purged: "+fragments.toString());
 		MapSaveLoadManager.saveMap(activeMap);
 	}
 	
