@@ -229,8 +229,10 @@ public class GenerateMap {
             graphics.setFont(Storage.getFont32());
             Graphics2D g2 = (Graphics2D) graphics;
             g2.setStroke(new BasicStroke(5));
+            int realX = x;
             for (Player player : players.values()) {
                 int baseY = y;
+                x = realX;
                 y += 34;
                 graphics.setFont(Storage.getFont32());
                 Color color = getColor(player.getColor());
@@ -272,9 +274,13 @@ public class GenerateMap {
                 } else {
                     graphics.drawString(scText, x + 90, y + 70 + yDelta);
                 }
-
                 graphics.setFont(Storage.getFont32());
                 graphics.setColor(Color.WHITE);
+                String ccCount = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
+                x += 120;
+                graphics.drawString(ccCount, x + 40, y + deltaY + 50);
+                graphics.drawString("T/F/S", x + 40, y + deltaY + 10);
+
                 String acImage = "pa_cardbacks_ac.png";
                 String soImage = "pa_cardbacks_so.png";
                 String pnImage = "pa_cardbacks_pn.png";
@@ -351,7 +357,7 @@ public class GenerateMap {
                 }
 
                 g2.setColor(color);
-                g2.drawRect(x - 5, baseY, x + widthOfLine, y - baseY);
+                g2.drawRect(realX - 5, baseY, x + widthOfLine, y - baseY);
                 y += 15;
 
             }

@@ -1,5 +1,7 @@
 package ti4.map;
 
+import net.dv8tion.jda.api.entities.User;
+import ti4.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -41,7 +43,7 @@ public class Player {
     private int hrf = 0;
     private int irf = 0;
     private int vrf = 0;
-    private List<String> fragments = new ArrayList<>();
+    private HashSet<String> fragments = new HashSet<>();
     private int SC = 0;
 
 
@@ -211,72 +213,48 @@ public class Player {
         return crf;
     }
 
-    public void setCrf(int crf) {
-        this.crf = crf;
-    }
-
     public int getIrf() {
         return irf;
-    }
-
-    public void setIrf(int irf) {
-        this.irf = irf;
     }
 
     public int getHrf() {
         return hrf;
     }
 
-    public void setHrf(int hrf) {
-        this.hrf = hrf;
-    }
-
     public int getVrf() {
         return vrf;
     }
 
-    public void setVrf(int vrf) {
-        this.vrf = vrf;
+    public HashSet<String> getFragments() {
+        return fragments;
     }
-    
-    public List<String> getFragments() {
-    	return fragments;
+
+    public void setFragments(HashSet<String> fragmentList) {
+        fragments = fragmentList;
+        updateFragments();
     }
-    
-    public void setFragments(List<String> relicList) {
-    	this.fragments = relicList;
-    	updateFragments();
+
+    public void addFragment(String fragmentID) {
+        fragments.add(fragmentID);
+        updateFragments();
     }
-    
-    public void addFragment(String relicID) {
-    	this.fragments.add(relicID);
-    	updateFragments();
+
+    public void removeFragment(String fragmentID) {
+        fragments.remove(fragmentID);
+        updateFragments();
     }
-    
-    public void removeFragment(String relicID) {
-    	this.fragments.remove(relicID);
-    	updateFragments();
-    }
-    
+
     private void updateFragments() {
-    	crf = irf = hrf = vrf = 0;
-    	for (String cardID : fragments) {
-    		String trait = Mapper.getExplore(cardID).split(";")[1].toLowerCase();
-    		switch (trait) {
-    		case Constants.CULTURAL:
-    			crf++;
-    			break;
-    		case Constants.INDUSTRIAL:
-    			irf++;
-    			break;
-    		case Constants.HAZARDOUS:
-    			hrf++;
-    			break;
-    		case Constants.FRONTIER:
-    			vrf++;
-    			break;
-    		}
-    	}
+        crf = irf = hrf = vrf = 0;
+        for (String cardID : fragments) {
+            String color = Mapper.getExplore(cardID).split(";")[1].toLowerCase();
+            switch (color) {
+                case Constants.CULTURAL -> crf++;
+                case Constants.INDUSTRIAL -> irf++;
+                case Constants.HAZARDOUS -> hrf++;
+                case Constants.FRONTIER -> vrf++;
+            }
+        }
     }
 
     public String getUserID() {
@@ -284,6 +262,10 @@ public class Player {
     }
 
     public String getUserName() {
+        User userById = MapGenerator.jda.getUserById(userID);
+        if (userById != null) {
+            userName = userById.getName();
+        }
         return userName;
     }
 
