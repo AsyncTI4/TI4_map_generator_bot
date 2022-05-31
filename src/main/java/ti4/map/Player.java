@@ -1,5 +1,7 @@
 package ti4.map;
 
+import net.dv8tion.jda.api.entities.User;
+import ti4.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -224,35 +226,35 @@ public class Player {
     }
 
     public HashSet<String> getFragments() {
-    	return fragments;
+        return fragments;
     }
-    
+
     public void setFragments(HashSet<String> fragmentList) {
-    	fragments = fragmentList;
-    	updateFragments();
+        fragments = fragmentList;
+        updateFragments();
     }
-    
+
     public void addFragment(String fragmentID) {
-    	fragments.add(fragmentID);
-    	updateFragments();
+        fragments.add(fragmentID);
+        updateFragments();
     }
-    
+
     public void removeFragment(String fragmentID) {
-    	fragments.remove(fragmentID);
-    	updateFragments();
+        fragments.remove(fragmentID);
+        updateFragments();
     }
-    
+
     private void updateFragments() {
-    	crf = irf = hrf = vrf = 0;
-    	for (String cardID : fragments) {
-    		String color = Mapper.getExplore(cardID).split(";")[1].toLowerCase();
+        crf = irf = hrf = vrf = 0;
+        for (String cardID : fragments) {
+            String color = Mapper.getExplore(cardID).split(";")[1].toLowerCase();
             switch (color) {
                 case Constants.CULTURAL -> crf++;
                 case Constants.INDUSTRIAL -> irf++;
                 case Constants.HAZARDOUS -> hrf++;
                 case Constants.FRONTIER -> vrf++;
             }
-    	}
+        }
     }
 
     public String getUserID() {
@@ -260,6 +262,10 @@ public class Player {
     }
 
     public String getUserName() {
+        User userById = MapGenerator.jda.getUserById(userID);
+        if (userById != null) {
+            userName = userById.getName();
+        }
         return userName;
     }
 
