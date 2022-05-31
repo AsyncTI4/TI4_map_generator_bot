@@ -167,13 +167,13 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
 
         writeCards(map.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
-        
+
         writer.write(Constants.EXPLORE + " " + String.join(",", map.getAllExplores()));
         writer.write(System.lineSeparator());
-        
+
         writer.write(Constants.DISCARDED_EXPLORES + " " + String.join(",", map.getAllExploreDiscard()));
         writer.write(System.lineSeparator());
-        
+
         writer.write(Constants.SPEAKER + " " + map.getSpeaker());
         writer.write(System.lineSeparator());
 
@@ -271,7 +271,7 @@ public class MapSaveLoadManager {
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
             writer.write(System.lineSeparator());
-            
+
             writer.write(Constants.FRAGMENTS + " " + String.join(",", player.getFragments()));
             writer.write(System.lineSeparator());
 
@@ -611,9 +611,9 @@ public class MapSaveLoadManager {
             } else if (Constants.LAW.equals(identification)) {
                 map.setLaws(getParsedCards(tokenizer[1]));
             } else if (Constants.EXPLORE.equals(identification)) {
-            	map.setExploreDeck(getCardList(tokenizer[1]));
+                map.setExploreDeck(getCardList(tokenizer[1]));
             } else if (Constants.DISCARDED_EXPLORES.equals(identification)) {
-            	map.setExploreDiscard(getCardList(tokenizer[1]));
+                map.setExploreDiscard(getCardList(tokenizer[1]));
             } else if (Constants.LAW_INFO.equals(identification)) {
                 StringTokenizer actionCardToken = new StringTokenizer(tokenizer[1], ";");
                 LinkedHashMap<String, String> cards = new LinkedHashMap<>();
@@ -678,7 +678,7 @@ public class MapSaveLoadManager {
                 try {
                     boolean value = Boolean.parseBoolean(tokenizer[1]);
                     map.setCommunityMode(value);
-                } catch (Exception e){
+                } catch (Exception e) {
                     //Do nothing
                 }
             } else if (Constants.CREATION_DATE.equals(identification)) {

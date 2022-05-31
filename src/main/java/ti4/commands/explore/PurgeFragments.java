@@ -1,6 +1,7 @@
 package ti4.commands.explore;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -32,35 +33,36 @@ public class PurgeFragments extends ExploreSubcommandData {
 		if (countOption != null) {
 			count = countOption.getAsInt();
 		}
-		List<String> fragments = new ArrayList<String>();
+		List<String> fragmentsToPurge = new ArrayList<String>();
 		List<String> unknowns = new ArrayList<String>();
-		List<String> relics = activePlayer.getFragments();
-		for (String id : relics) {
+		HashSet<String> playerFragments = activePlayer.getFragments();
+		MessageHelper.sendMessageToChannel(event.getChannel(), playerFragments.toString());
+		for (String id : playerFragments) {
 			String[] cardInfo = Mapper.getExplore(id).split(";");
 			if (cardInfo[1].equalsIgnoreCase(color)) {
-				fragments.add(id);
+				fragmentsToPurge.add(id);
 			} else if (cardInfo[1].equalsIgnoreCase(Constants.FRONTIER)) {
 				unknowns.add(id);
 			}
 		}
 		
-		while (fragments.size() > count) {
-			fragments.remove(0);
+		while (fragmentsToPurge.size() > count) {
+			fragmentsToPurge.remove(0);
 		}
 		
-		while (fragments.size() < count) {
+		while (fragmentsToPurge.size() < count) {
 			if (unknowns.size() == 0) {
 				MessageHelper.replyToMessage(event, "Not enough fragments");
 				return;
 			}
-			fragments.add(unknowns.remove(0));
+			fragmentsToPurge.add(unknowns.remove(0));
 		}
 		
-		for (String id : fragments) {
+		for (String id : fragmentsToPurge) {
 			activePlayer.removeFragment(id);
 		}
 		
-		MessageHelper.replyToMessage(event, "Fragments purged: "+fragments.toString());
+		MessageHelper.replyToMessage(event, "Fragments purged: "+fragmentsToPurge.toString());
 		MapSaveLoadManager.saveMap(activeMap);
 	}
 	
