@@ -290,7 +290,9 @@ public class GenerateMap {
                 graphics.drawString(Integer.toString(player.getSo()), x + 170, y + deltaY + 50);
 
                 drawPAImage(x + 215, y + yDelta, acImage);
-                graphics.drawString(Integer.toString(player.getAc()), x + 235, y + deltaY + 50);
+                int ac = player.getAc();
+                int acDelta = ac > 9 ? 0 : 10;
+                graphics.drawString(Integer.toString(ac), x + 225 + acDelta, y + deltaY + 50);
 
                 drawPAImage(x + 280, y + yDelta, pnImage);
                 graphics.drawString(Integer.toString(player.getPnCount()), x + 300, y + deltaY + 50);
