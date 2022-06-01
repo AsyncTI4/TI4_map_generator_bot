@@ -42,8 +42,11 @@ public class Cleanup extends StatusSubcommandData {
             sc.setValue(false);
         }
         LinkedHashMap<String, Player> players = activeMap.getPlayers();
+
         for (Player player : players.values()) {
             player.setPassed(false);
+            int sc = player.getSC();
+            activeMap.setScTradeGood(sc, 0);
             player.setSC(0);
             player.cleanExhaustedTechs();
             player.cleanExhaustedPlanets();
