@@ -30,15 +30,15 @@ public class SendFragments extends ExploreSubcommandData {
 	@Override
 	public void execute(SlashCommandInteractionEvent event) {
 		Map activeMap = getActiveMap();
-		User user = getUser();
+		User activeUser = getUser();
 		OptionMapping recieverOption = event.getOption(Constants.PLAYER);
-		String playerID = recieverOption.getAsUser().getId();
-        if (activeMap.getPlayer(playerID) == null) {
+		String recieverID = recieverOption.getAsUser().getId();
+		Player reciever = activeMap.getPlayers().get(recieverID);
+        Player sender = activeMap.getPlayers().get(activeUser.getId());
+        if (reciever == null) {
         	MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + recieverOption.getAsUser().getName() + " could not be found in map:" + activeMap.getName());
             return;
         }
-        Player reciever = activeMap.getPlayers().get(playerID);
-        Player sender = activeMap.getPlayers().get(user.getId());
         String trait = event.getOption(Constants.TRAIT).getAsString();
         OptionMapping countOption = event.getOption(Constants.COUNT);
         int count = 1;
@@ -61,7 +61,7 @@ public class SendFragments extends ExploreSubcommandData {
         		reciever.addFragment(fragID);
         	}
         } else {
-        	MessageHelper.replyToMessage(event, "Not enough fragments of the specified type");
+        	MessageHelper.replyToMessage(event, "Not enough fragments of the specified trait");
         	return;
         }
         
