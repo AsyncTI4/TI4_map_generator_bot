@@ -1,7 +1,6 @@
 package ti4.map;
 
 import ti4.generator.Mapper;
-import ti4.helpers.Constants;
 import ti4.helpers.LoggerHandler;
 
 import java.awt.*;
@@ -27,7 +26,7 @@ public class Planet extends UnitHolder {
             if (split.length > 4) {
                 originalTechSpeciality = split[4];
             }
-            if (split.length > 5){
+            if (split.length > 5) {
                 hasAbility = true;
             }
             try {
@@ -47,20 +46,26 @@ public class Planet extends UnitHolder {
         planetType.add(type);
     }
 
-    public boolean hasAttachment(){
-       return tokenList.stream().anyMatch(token -> !token.contains("sleeper") && !token.contains("dmz_large"));
+    public boolean hasAttachment() {
+        return tokenList.stream().anyMatch(token -> !token.contains("sleeper") && !token.contains("dmz_large"));
     }
 
     @Override
-    public void removeToken(String tokenFileName) {
-        super.removeToken(tokenFileName);
-        addRemoveTokenData(tokenFileName, true);
+    public boolean removeToken(String tokenFileName) {
+        boolean containedToken = super.removeToken(tokenFileName);
+        if (containedToken) {
+            addRemoveTokenData(tokenFileName, true);
+        }
+        return containedToken;
     }
 
     @Override
-    public void addToken(String tokenFileName) {
-        super.addToken(tokenFileName);
-        addRemoveTokenData(tokenFileName, false);
+    public boolean addToken(String tokenFileName) {
+        boolean newToken = super.addToken(tokenFileName);
+        if (newToken) {
+            addRemoveTokenData(tokenFileName, false);
+        }
+        return newToken;
     }
 
     private void addRemoveTokenData(String tokenFileName, boolean removeTokenData) {

@@ -57,11 +57,11 @@ abstract public class UnitHolder {
         controlList.remove(cc);
     }
 
-    public void addToken(String cc) {
-        tokenList.add(cc);
+    public boolean addToken(String cc) {
+        return tokenList.add(cc);
     }
-    public void removeToken(String cc) {
-        tokenList.remove(cc);
+    public boolean removeToken(String cc) {
+        return tokenList.remove(cc);
     }
 
     public void removeAllCC() {
