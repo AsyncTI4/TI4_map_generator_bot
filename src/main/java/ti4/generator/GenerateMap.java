@@ -36,7 +36,7 @@ public class GenerateMap {
     private int scoreTokenWidth;
     private int extraWidth = 200;
     private static Point tilePositionPoint = new Point(230, 295);
-    private static Point numberPositionPoint = new Point(45, 35);
+    private static Point numberPositionPoint = new Point(40, 27);
     private static HashMap<Player, Integer> userVPs = new HashMap<>();
 
     private final int width6 = 2000;
@@ -122,12 +122,16 @@ public class GenerateMap {
                         .findFirst()
                         .orElse(null);
                 if (setup != null) {
-                    addTile(tileMap.get(setup), map);
+                    addTile(tileMap.get(setup), map, false);
                     tileMap.remove(setup);
                 }
                 tileMap.keySet().stream()
                         .sorted()
-                        .forEach(key -> addTile(tileMap.get(key), map));
+                        .forEach(key -> addTile(tileMap.get(key), map, true));
+
+                tileMap.keySet().stream()
+                        .sorted()
+                        .forEach(key -> addTile(tileMap.get(key), map, false));
             }
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
@@ -966,7 +970,7 @@ public class GenerateMap {
     }
 
 
-    private void addTile(Tile tile, Map map) {
+    private void addTile(Tile tile, Map map, boolean justTile) {
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
             Point positionPoint = PositionMapper.getTilePosition(tile.getPosition(), map);
@@ -975,12 +979,14 @@ public class GenerateMap {
             }
             int tileX = positionPoint.x + extraWidth;
             int tileY = positionPoint.y;
-            graphics.drawImage(image, tileX, tileY, null);
+            if (justTile) {
+                graphics.drawImage(image, tileX, tileY, null);
 
-            graphics.setFont(Storage.getFont20());
-            graphics.setColor(Color.WHITE);
-            graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x, tileY + tilePositionPoint.y);
-
+                graphics.setFont(Storage.getFont20());
+                graphics.setColor(Color.WHITE);
+                graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x, tileY + tilePositionPoint.y);
+                return;
+            }
             ArrayList<Rectangle> rectangles = new ArrayList<>();
 
             Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
@@ -1065,6 +1071,11 @@ public class GenerateMap {
                     image = resizeImage(ImageIO.read(new File(controlPath)), scale);
                 } catch (Exception e) {
                     LoggerHandler.log("Could not parse control token file for: " + controlID, e);
+                }
+                boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
+                if (isMirage) {
+                    tileX += Constants.MIRAGE_POSITION.x;
+                    tileY += Constants.MIRAGE_POSITION.y;
                 }
                 Point position = planetTokenPosition.getPosition(controlID);
                 if (position != null) {
@@ -1253,11 +1264,16 @@ public class GenerateMap {
         }
         units.putAll(tempUnits);
         HashMap<String, Integer> unitDamage = unitHolder.getUnitDamage();
-        float scaleOfUnit = 0.80f;
+        float scaleOfUnit = 1.0f;
         PlanetTokenPosition planetTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
         BufferedImage dmgImage = null;
         try {
-            dmgImage = resizeImage(ImageIO.read(new File(Helper.getDamagePath())), scaleOfUnit);
+            BufferedImage read = ImageIO.read(new File(Helper.getDamagePath()));
+            if (scaleOfUnit != 1.0f) {
+                dmgImage = resizeImage(read, scaleOfUnit);
+            } else {
+                dmgImage = read;
+            }
         } catch (IOException e) {
             LoggerHandler.log("Could not parse damage token file.", e);
         }
@@ -1272,7 +1288,7 @@ public class GenerateMap {
 
             Color groupUnitColor = Color.WHITE;
             Integer bulkUnitCount = null;
-            if (unitID.startsWith("ylw")) {
+            if (unitID.startsWith("ylw") || unitID.startsWith("gry") || unitID.startsWith("org") || unitID.startsWith("pnk")) {
                 groupUnitColor = Color.BLACK;
             }
             if (unitID.endsWith(Constants.COLOR_FF)) {
@@ -1328,7 +1344,7 @@ public class GenerateMap {
                 }
                 graphics.drawImage(image, imageX, imageY, null);
                 if (bulkUnitCount != null) {
-                    graphics.setFont(Storage.getFont26());
+                    graphics.setFont(Storage.getFont24());
                     graphics.setColor(groupUnitColor);
                     int scaledNumberPositionX = (int) (numberPositionPoint.x * scaleOfUnit);
                     int scaledNumberPositionY = (int) (numberPositionPoint.y * scaleOfUnit);

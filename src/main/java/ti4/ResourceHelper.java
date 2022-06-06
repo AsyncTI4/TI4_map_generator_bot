@@ -96,7 +96,7 @@ public class ResourceHelper {
         if (unitPath != null) {
             return unitPath;
         }
-        String unit = getResourceFromFolder("units/", name, "Could not find unit file");
+        String unit = getResourceFromFolder("units/new_units/", name, "Could not find unit file");
         unitCache.put(name, unit);
         return unit;
     }
