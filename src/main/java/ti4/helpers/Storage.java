@@ -15,6 +15,7 @@ public class Storage {
     public static final String MAPS = "/maps/";
     public static final String DELETED_MAPS = "/deletedmaps/";
     private static Font TI_FONT_20 = null;
+    private static Font TI_FONT_24 = null;
     private static Font TI_FONT_26 = null;
     private static Font TI_FONT_32 = null;
     private static Font TI_FONT_50 = null;
@@ -34,6 +35,14 @@ public class Storage {
         }
         TI_FONT_26 = getFont(26f);
         return TI_FONT_26;
+    }
+
+    public static Font getFont24() {
+        if (TI_FONT_24 != null) {
+            return TI_FONT_24;
+        }
+        TI_FONT_24 = getFont(24f);
+        return TI_FONT_24;
     }
 
     public static Font getFont32() {
