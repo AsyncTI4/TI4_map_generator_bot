@@ -56,6 +56,11 @@ public class ListTurnOrder extends StatusSubcommandData {
             if (passed) {
                 text += "~~ - PASSED";
             }
+            
+            if(player.getUserName().equals(map.getSpeaker())) {
+            	text += " :Speakertoken: ";
+            }
+            
             order.put(sc, text);
         }
         StringBuilder msg = new StringBuilder();
