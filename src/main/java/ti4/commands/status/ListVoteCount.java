@@ -27,7 +27,16 @@ public class ListVoteCount extends StatusSubcommandData {
     public static void turnOrder(SlashCommandInteractionEvent event, Map map) {
         StringBuilder msg = new StringBuilder();
         int i = 1;
-        for (Player player : map.getPlayers().values()) {
+        List<Player> orderList = new ArrayList<Player>(map.getPlayers().size());
+        String speakerName = map.getSpeaker();
+        Optional<Player> optSpeaker = orderList.stream().filter(n -> n.getUserName().equals(speakerName)).findFirst();
+        
+        if(optSpeaker.isPresent()) {
+        	int rotationDistance = orderList.size() - orderList.indexOf(optSpeaker.get()) - 1;
+        	Collections.rotate(orderList, rotationDistance);
+        }
+        
+        for (Player player : orderList) {
             List<String> planets = new ArrayList<>(player.getPlanets());
             planets.removeAll(player.getExhaustedPlanets());
             String userName = player.getUserName();
@@ -46,6 +55,9 @@ public class ListVoteCount extends StatusSubcommandData {
                     .mapToInt(Planet::getInfluence)
                     .sum();
             text += " vote Count: **" + influenceCount + "**";
+            if(userName.equals(speakerName)) {
+            	text += " :Speakertoken: ";
+            }
             msg.append(i).append(". ").append(text).append("\n");
             i++;
         }
