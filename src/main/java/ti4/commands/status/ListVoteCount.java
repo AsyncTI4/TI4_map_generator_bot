@@ -27,15 +27,16 @@ public class ListVoteCount extends StatusSubcommandData {
     public static void turnOrder(SlashCommandInteractionEvent event, Map map) {
         StringBuilder msg = new StringBuilder();
         int i = 1;
-        List<Player> orderList = new ArrayList<Player>(map.getPlayers().size());
+        List<Player> orderList = map.getPlayers().values().stream().toList();
         String speakerName = map.getSpeaker();
-        Optional<Player> optSpeaker = orderList.stream().filter(n -> n.getUserName().equals(speakerName)).findFirst();
-        
-        if(optSpeaker.isPresent()) {
-        	int rotationDistance = orderList.size() - orderList.indexOf(optSpeaker.get()) - 1;
-        	Collections.rotate(orderList, rotationDistance);
+        Optional<Player> optSpeaker = orderList.stream().filter(player -> player.getUserName().equals(speakerName))
+                .findFirst();
+
+        if (optSpeaker.isPresent()) {
+            int rotationDistance = orderList.size() - orderList.indexOf(optSpeaker.get()) - 1;
+            Collections.rotate(orderList, rotationDistance);
         }
-        
+
         for (Player player : orderList) {
             List<String> planets = new ArrayList<>(player.getPlanets());
             planets.removeAll(player.getExhaustedPlanets());
@@ -49,14 +50,11 @@ public class ListVoteCount extends StatusSubcommandData {
                 text += " (" + color + ")";
             }
             HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
-            int influenceCount = planets.stream().map(planetsInfo::get)
-                    .filter(Objects::nonNull)
-                    .map(planet -> (Planet) planet)
-                    .mapToInt(Planet::getInfluence)
-                    .sum();
+            int influenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                    .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
             text += " vote Count: **" + influenceCount + "**";
-            if(userName.equals(speakerName)) {
-            	text += " :Speakertoken: ";
+            if (userName.equals(speakerName)) {
+                text += " <:Speakertoken:965363466821050389> ";
             }
             msg.append(i).append(". ").append(text).append("\n");
             i++;
@@ -66,6 +64,6 @@ public class ListVoteCount extends StatusSubcommandData {
 
     @Override
     public void reply(SlashCommandInteractionEvent event) {
-        //We reply in execute command
+        // We reply in execute command
     }
 }
