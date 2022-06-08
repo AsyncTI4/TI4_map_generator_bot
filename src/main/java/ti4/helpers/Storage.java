@@ -157,7 +157,7 @@ public class Storage {
     }
 
     private static String getPath(URL resource) {
-        String envPath = System.getenv("PATH");
+        String envPath = System.getenv("DB_PATH");
         return envPath != null ? envPath : resource.getPath();
     }
 }
