@@ -35,7 +35,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 		}
 		List<String> fragmentsToPurge = new ArrayList<String>();
 		List<String> unknowns = new ArrayList<String>();
-		HashSet<String> playerFragments = activePlayer.getFragments();
+		ArrayList<String> playerFragments = activePlayer.getFragments();
 		for (String id : playerFragments) {
 			String[] cardInfo = Mapper.getExplore(id).split(";");
 			if (cardInfo[1].equalsIgnoreCase(color)) {

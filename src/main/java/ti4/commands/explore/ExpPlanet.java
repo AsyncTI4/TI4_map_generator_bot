@@ -62,6 +62,9 @@ public class ExpPlanet extends ExploreSubcommandData {
         String[] planetInfo = planet.split(",");
         drawColor = planetInfo[1];
         String cardID = activeMap.drawExplore(drawColor);
+        if (cardID == null) {
+        	MessageHelper.replyToMessage(event, "Planet cannot be explored");
+        }
         MessageHelper.replyToMessage(event, displayExplore(cardID));
         
         resolveExplore(event, cardID, tile, planetName);

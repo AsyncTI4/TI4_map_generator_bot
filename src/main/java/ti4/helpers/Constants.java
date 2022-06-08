@@ -270,6 +270,10 @@ public class Constants {
     public static final String PURGE_FRAGMENTS = "purge_fragments";
     public static final String FRAGMENTS = "fragments";
     public static final String LIST_FRAGMENTS = "list_fragments";
+    public static final String RELIC = "relic";
+    public static final String RELICS = "relics";
+    public static final String PURGE = "purge";
+    public static final String RELIC_ID = "relic_id";
 
     public static final String WARFARE = "warfare";
     public static final String PROPULSION = "propulsion";

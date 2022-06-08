@@ -96,27 +96,27 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         } else if (cardType.equalsIgnoreCase(Constants.ATTACH)) {
             String token = cardInfo[5];
             String tokenFilename = Mapper.getAttachmentID(token);
-            if (tokenFilename != null) {
+            if (tokenFilename != null && tile != null && planetName != null) {
             	tile.addToken(tokenFilename, planetName);
                 activeMap.purgeExplore(cardID);
                 message = "Token added to planet";
             } else {
-            	message = "Invalid token";
+            	message = "Invalid token, tile, or planet";
             }
         } else if (cardType.equalsIgnoreCase(Constants.TOKEN)) {
             String token = cardInfo[5];
             String tokenFilename = Mapper.getTokenID(token);
-            if (tokenFilename != null) {
+            if (tokenFilename != null && tile != null) {
             	tile.addToken(tokenFilename, Constants.SPACE);
                 message = "Token added to map";
                 if (Constants.MIRAGE.equalsIgnoreCase(token)) {
                     Helper.addMirageToTile(tile);
                     message = "Mirage added to map!";
                 }
+                activeMap.purgeExplore(cardID);
             } else {
-            	message = "Invalid token";
+            	message = "Invalid token or tile";
             }
-            activeMap.purgeExplore(cardID);
         }
 
         MapSaveLoadManager.saveMap(activeMap);
