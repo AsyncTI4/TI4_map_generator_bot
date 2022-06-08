@@ -53,6 +53,7 @@ public class Map {
 
     private ArrayList<String> explore = new ArrayList<>();
     private ArrayList<String> discardExplore = new ArrayList<>();
+    private ArrayList<String> relics = new ArrayList<>();
 
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
@@ -79,8 +80,11 @@ public class Map {
         addCustomPO(Constants.CUSTODIAN, 1);
 
         Set<String> exp = Mapper.getExplores().keySet();
+        Set<String> rel = Mapper.getRelics().keySet();
         explore.addAll(exp);
+        relics.addAll(rel);
         Collections.shuffle(explore);
+        Collections.shuffle(relics);
 
         //Default SC initialization
         for (int i = 0; i < 8; i++) {
@@ -592,6 +596,10 @@ public class Map {
         explore.addAll(exp);
     }
 
+    public String drawRelic() {
+    	return relics.remove(0);
+    }
+    
     @CheckForNull
     public String drawActionCardAndDiscard() {
         if (!actionCards.isEmpty()) {
@@ -813,6 +821,14 @@ public class Map {
     		return id;
     	} 
     	return null;
+    }
+    
+    public List<String> getAllRelics() {
+    	return relics;
+    }
+    
+    public void setRelics(ArrayList<String> deck) {
+    	relics = deck;
     }
 
     public void setSecretObjectives(List<String> secretObjectives) {

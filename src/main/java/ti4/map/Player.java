@@ -43,7 +43,8 @@ public class Player {
     private int hrf = 0;
     private int irf = 0;
     private int vrf = 0;
-    private HashSet<String> fragments = new HashSet<>();
+    private ArrayList<String> fragments = new ArrayList<>();
+    private HashSet<String> relics = new HashSet<>();
     private int SC = 0;
 
 
@@ -225,11 +226,11 @@ public class Player {
         return vrf;
     }
 
-    public HashSet<String> getFragments() {
+    public ArrayList<String> getFragments() {
         return fragments;
     }
 
-    public void setFragments(HashSet<String> fragmentList) {
+    public void setFragments(ArrayList<String> fragmentList) {
         fragments = fragmentList;
         updateFragments();
     }
@@ -255,6 +256,18 @@ public class Player {
                 case Constants.FRONTIER -> vrf++;
             }
         }
+    }
+    
+    public void addRelic(String relicID) {
+    	relics.add(relicID);
+    }
+    
+    public void removeRelic(String relicID) {
+    	relics.remove(relicID);
+    }
+    
+    public HashSet<String> getRelics() {
+    	return relics;
     }
 
     public String getUserID() {

@@ -170,6 +170,8 @@ public class MapSaveLoadManager {
 
         writer.write(Constants.EXPLORE + " " + String.join(",", map.getAllExplores()));
         writer.write(System.lineSeparator());
+        
+        writer.write(Constants.RELICS + " " + String.join(",", map.getAllRelics()));
 
         writer.write(Constants.DISCARDED_EXPLORES + " " + String.join(",", map.getAllExploreDiscard()));
         writer.write(System.lineSeparator());
@@ -273,6 +275,9 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.FRAGMENTS + " " + String.join(",", player.getFragments()));
+            writer.write(System.lineSeparator());
+            
+            writer.write(Constants.RELICS + " " + String.join(",", player.getRelics()));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
@@ -612,6 +617,8 @@ public class MapSaveLoadManager {
                 map.setLaws(getParsedCards(tokenizer[1]));
             } else if (Constants.EXPLORE.equals(identification)) {
                 map.setExploreDeck(getCardList(tokenizer[1]));
+            } else if (Constants.RELICS.equals(identification)) {
+            	map.setRelics(getCardList(tokenizer[1]));
             } else if (Constants.DISCARDED_EXPLORES.equals(identification)) {
                 map.setExploreDiscard(getCardList(tokenizer[1]));
             } else if (Constants.LAW_INFO.equals(identification)) {
@@ -798,32 +805,14 @@ public class MapSaveLoadManager {
                 		player.addFragment(fragments.nextToken());
                 	}
                 }
-                //MIGRATION CODE
-                case Constants.CRF -> {
-                	int crf = Integer.parseInt(tokenizer.nextToken());
-                	for (int i=1; i<=crf; i++) {
-                		player.addFragment("crf" + Integer.toString(i));
+                
+                case Constants.RELICS -> {
+                	StringTokenizer relics = new StringTokenizer(tokenizer.nextToken(), ",");
+                	while (relics.hasMoreTokens()) {
+                		player.addRelic(relics.nextToken());
                 	}
                 }
-                case Constants.HRF -> {
-                	int hrf = Integer.parseInt(tokenizer.nextToken());
-                	for (int i=1; i<=hrf; i++) {
-                		player.addFragment("hrf" + Integer.toString(i));
-                	}
-                }
-                case Constants.IRF -> {
-                	int irf = Integer.parseInt(tokenizer.nextToken());
-                	for (int i=1; i<=irf; i++) {
-                		player.addFragment("irf" + Integer.toString(i));
-                	}
-                }
-                case Constants.VRF -> {
-                	int vrf = Integer.parseInt(tokenizer.nextToken());
-                	for (int i=1; i<=vrf; i++) {
-                		player.addFragment("urf" + Integer.toString(i));
-                	}
-                }
-                //END MIGRATION CODE
+                
                 case Constants.SC -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
             }
