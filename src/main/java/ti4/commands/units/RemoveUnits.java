@@ -26,6 +26,27 @@ public class RemoveUnits extends AddRemoveUnits {
 
         int countToRemove = 0;
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        
+        // Check for space unit holder when only single stack of unit is present anywhere on the tile
+        // This allows for removes like "2 infantry" when they are the only infantry on a planet
+        long nonEmptyUnitHolders = tile.getUnitHolders().values().stream()
+        		.filter(m -> m.getUnits().get(unitID) + m.getUnitDamage().get(unitID) > 0)
+        		.count();
+        
+        // These calcluations will let us know if we are in a scenario where we can remove all of a particular unit from
+        // the hex
+        // This allows for moves like "2 infantry" when there's a hex with 0 in space and 1 infantry on each of 2 planets
+        long totalUnitsOnHex = tile.getUnitHolders().values().stream()
+        		.mapToInt(x -> x.getUnits().get(unitID) + x.getUnitDamage().get(unitID)).sum();
+        
+        boolean otherUnitHoldersContainUnit = tile.getUnitHolders().values().stream().filter(x -> x.getName()!=planetName)
+        		.filter(x -> x.getUnits().get(unitID) + x.getUnitDamage().get(unitID) > 0).count() > 0;
+        
+        if(nonEmptyUnitHolders == 1) {
+        	unitHolder = tile.getUnitHolders().values().stream()
+            		.filter(m -> m.getUnits().get(unitID) + m.getUnitDamage().get(unitID) > 0).findFirst().get();
+        } 
+        
         if (!priorityDmg) {
             Integer unitCountInSystem = unitHolder.getUnits().get(unitID);
             if (unitCountInSystem != null) {
@@ -41,6 +62,18 @@ public class RemoveUnits extends AddRemoveUnits {
         tile.removeUnit(planetName, unitID, count);
         tile.removeUnitDamage(planetName, unitID, countToRemove);
 
+        // Check to see if we should remove from other unitHolders
+        if((totalUnitsOnHex == count) && otherUnitHoldersContainUnit) {
+        	for(String unitHolderName : tile.getUnitHolders().keySet()) {
+        		if(!unitHolderName.equals(planetName)) {
+        			int tempCount = tile.getUnitHolders().get(unitHolderName).getUnits().get(unitID);
+        			tile.removeUnit(unitHolderName, unitID, tempCount);
+        			tempCount = tile.getUnitHolders().get(unitHolderName).getUnitDamage().get(unitID);
+        			tile.removeUnitDamage(unitHolderName, unitID, tempCount);
+        		}
+        	}
+        }
+        
     }
 
     @Override
