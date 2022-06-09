@@ -29,7 +29,7 @@ public class ListVoteCount extends StatusSubcommandData {
         int i = 1;
         List<Player> orderList = map.getPlayers().values().stream().toList();
         String speakerName = map.getSpeaker();
-        Optional<Player> optSpeaker = orderList.stream().filter(player -> player.getUserName().equals(speakerName))
+        Optional<Player> optSpeaker = orderList.stream().filter(player -> player.getUserID().equals(speakerName))
                 .findFirst();
 
         if (optSpeaker.isPresent()) {
@@ -53,7 +53,7 @@ public class ListVoteCount extends StatusSubcommandData {
             int influenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                     .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
             text += " vote Count: **" + influenceCount + "**";
-            if (userName.equals(speakerName)) {
+            if (player.getUserID().equals(speakerName)) {
                 text += " <:Speakertoken:965363466821050389> ";
             }
             msg.append(i).append(". ").append(text).append("\n");
