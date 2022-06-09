@@ -280,6 +280,9 @@ public class MapSaveLoadManager {
             writer.write(Constants.RELICS + " " + String.join(",", player.getRelics()));
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.EXHAUSTED_RELICS + " " + String.join(",", player.getExhaustedRelics()));
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
             writer.write(System.lineSeparator());
             writer.write(Constants.TECH_EXHAUSTED + " " + String.join(",", player.getExhaustedTechs()));
@@ -780,6 +783,8 @@ public class MapSaveLoadManager {
                 case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
+                case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));
+                case Constants.EXHAUSTED_RELICS -> player.setExhaustedRelics(getCardList(tokenizer.nextToken()));
                 case Constants.SO_SCORED -> {
                     StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (secrets.hasMoreTokens()) {
@@ -805,14 +810,7 @@ public class MapSaveLoadManager {
                 		player.addFragment(fragments.nextToken());
                 	}
                 }
-                
-                case Constants.RELICS -> {
-                	StringTokenizer relics = new StringTokenizer(tokenizer.nextToken(), ",");
-                	while (relics.hasMoreTokens()) {
-                		player.addRelic(relics.nextToken());
-                	}
-                }
-                
+
                 case Constants.SC -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
             }

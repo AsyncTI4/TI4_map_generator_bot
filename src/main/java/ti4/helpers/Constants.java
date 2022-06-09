@@ -2,8 +2,6 @@ package ti4.helpers;
 
 import java.awt.*;
 
-import org.jetbrains.annotations.NotNull;
-
 public class Constants {
     public static final String SHOW_GAME = "show_game";
     public static final String SHOW_GAME_INFO = "show_game_info";
@@ -160,7 +158,12 @@ public class Constants {
     public static final String DISCARDED_AGENDAS = "discarded_agendas";
     public static final String AGENDAS = "agendas";
     public static final String AGENDA = "agenda";
+    public static final String RELIC_DRAW_SPECIFIC = "relic_draw_specific";
     public static final String DRAW = "draw";
+    public static final String RELIC_DRAW = "relic_draw";
+    public static final String RELIC_EXHAUST = "relic_exhaust";
+    public static final String RELIC_REFRESH = "relic_refresh";
+    public static final String RELIC_PURGE = "relic_purge";
     public static final String PUT_TOP = "put_top";
     public static final String PUT_BOTTOM = "put_bottom";
     public static final String LOOK_AT_TOP = "look_at_top";
@@ -272,6 +275,7 @@ public class Constants {
     public static final String LIST_FRAGMENTS = "list_fragments";
     public static final String RELIC = "relic";
     public static final String RELICS = "relics";
+    public static final String EXHAUSTED_RELICS = "exhausted_relics";
     public static final String PURGE = "purge";
     public static final String RELIC_ID = "relic_id";
 

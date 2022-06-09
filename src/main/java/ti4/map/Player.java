@@ -44,7 +44,8 @@ public class Player {
     private int irf = 0;
     private int vrf = 0;
     private ArrayList<String> fragments = new ArrayList<>();
-    private HashSet<String> relics = new HashSet<>();
+    private List<String> relics = new ArrayList<>();
+    private List<String> exhaustedRelics = new ArrayList<>();
     private int SC = 0;
 
 
@@ -257,17 +258,29 @@ public class Player {
             }
         }
     }
-    
+
     public void addRelic(String relicID) {
-    	relics.add(relicID);
+        relics.add(relicID);
     }
-    
+
+    public void addExhaustedRelic(String relicID) {
+        exhaustedRelics.add(relicID);
+    }
+
     public void removeRelic(String relicID) {
-    	relics.remove(relicID);
+        relics.remove(relicID);
     }
-    
-    public HashSet<String> getRelics() {
-    	return relics;
+
+    public void removeExhaustedRelic(String relicID) {
+        exhaustedRelics.remove(relicID);
+    }
+
+    public List<String> getRelics() {
+        return relics;
+    }
+
+    public List<String> getExhaustedRelics() {
+        return exhaustedRelics;
     }
 
     public String getUserID() {
@@ -406,6 +419,14 @@ public class Player {
         this.techs = techs;
     }
 
+    public void setRelics(List<String> relics) {
+        this.relics = relics;
+    }
+
+    public void setExhaustedRelics(List<String> exhaustedRelics) {
+        this.exhaustedRelics = exhaustedRelics;
+    }
+
     public List<String> getExhaustedTechs() {
         return exhaustedTechs;
     }
@@ -417,6 +438,10 @@ public class Player {
     public void cleanExhaustedPlanets() {
         exhaustedPlanets.clear();
         exhaustedPlanetsAbilities.clear();
+    }
+
+    public void cleanExhaustedRelics() {
+        exhaustedRelics.clear();
     }
 
     public void setExhaustedTechs(List<String> exhaustedTechs) {

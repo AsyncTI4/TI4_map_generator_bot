@@ -59,6 +59,11 @@ public class ExploreCommand implements Command {
         subcommands.add(new UseExplore());
         subcommands.add(new PurgeFragments());
         subcommands.add(new ListFragments());
+        subcommands.add(new DrawRelic());
+        subcommands.add(new PurgeRelic());
+        subcommands.add(new ExhaustRelic());
+        subcommands.add(new RefreshRelic());
+        subcommands.add(new DrawSpecificRelic());
         return subcommands;
     }
 

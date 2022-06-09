@@ -5,22 +5,16 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
-
-import java.io.File;
-
 import org.jetbrains.annotations.NotNull;
-
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
-import ti4.map.Player;
-import ti4.map.Tile;
+import ti4.map.*;
 import ti4.message.MessageHelper;
+
+import java.io.File;
 
 public abstract class ExploreSubcommandData extends SubcommandData {
 
@@ -56,12 +50,12 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         String card = Mapper.getExplore(cardID);
         StringBuilder sb = new StringBuilder();
         if (card != null) {
-	        String[] cardInfo = card.split(";");
-			String name = cardInfo[0];
-			String description = cardInfo[4];
-			sb.append("(").append(cardID).append(") ").append(name).append(" - ").append(description);
+            String[] cardInfo = card.split(";");
+            String name = cardInfo[0];
+            String description = cardInfo[4];
+            sb.append("(").append(cardID).append(") ").append(name).append(" - ").append(description);
         } else {
-        	sb.append("Invalid ID ").append(cardID);
+            sb.append("Invalid ID ").append(cardID);
         }
         return sb.toString();
     }
@@ -81,9 +75,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
         return tile;
     }
-    
+
     protected void resolveExplore(SlashCommandInteractionEvent event, String cardID, Tile tile, String planetName) {
-    	String message = "Card has been discarded. Resolve effects manually.";
+        String message = "Card has been discarded. Resolve effects manually.";
         String card = Mapper.getExplore(cardID);
         String[] cardInfo = card.split(";");
 
@@ -97,17 +91,17 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             String token = cardInfo[5];
             String tokenFilename = Mapper.getAttachmentID(token);
             if (tokenFilename != null && tile != null && planetName != null) {
-            	tile.addToken(tokenFilename, planetName);
+                tile.addToken(tokenFilename, planetName);
                 activeMap.purgeExplore(cardID);
                 message = "Token added to planet";
             } else {
-            	message = "Invalid token, tile, or planet";
+                message = "Invalid token, tile, or planet";
             }
         } else if (cardType.equalsIgnoreCase(Constants.TOKEN)) {
             String token = cardInfo[5];
             String tokenFilename = Mapper.getTokenID(token);
             if (tokenFilename != null && tile != null) {
-            	tile.addToken(tokenFilename, Constants.SPACE);
+                tile.addToken(tokenFilename, Constants.SPACE);
                 message = "Token added to map";
                 if (Constants.MIRAGE.equalsIgnoreCase(token)) {
                     Helper.addMirageToTile(tile);
@@ -115,7 +109,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 }
                 activeMap.purgeExplore(cardID);
             } else {
-            	message = "Invalid token or tile";
+                message = "Invalid token or tile";
             }
         }
 
@@ -124,5 +118,5 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         MessageHelper.replyToMessage(event, file);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
-    
+
 }
