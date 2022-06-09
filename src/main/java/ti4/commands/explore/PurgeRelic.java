@@ -13,7 +13,7 @@ public class PurgeRelic extends GenericRelicAction {
 
     public PurgeRelic() {
         super(Constants.PURGE, "Purge a relic");
-        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic ID sent between ()").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.RELIC_PURGE, "Relic ID sent between ()").setAutoComplete(true));
     }
 
     @Override
