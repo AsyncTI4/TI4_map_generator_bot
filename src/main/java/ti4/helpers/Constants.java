@@ -276,9 +276,7 @@ public class Constants {
     public static final String RELIC = "relic";
     public static final String RELICS = "relics";
     public static final String EXHAUSTED_RELICS = "exhausted_relics";
-    public static final String PURGE = "purge";
     public static final String ENIGMATIC_DEVICE = "enigmaticdevice";
-    public static final String RELIC_ID = "relic_id";
 
     public static final String WARFARE = "warfare";
     public static final String PROPULSION = "propulsion";
