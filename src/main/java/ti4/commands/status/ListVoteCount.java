@@ -27,7 +27,8 @@ public class ListVoteCount extends StatusSubcommandData {
     public static void turnOrder(SlashCommandInteractionEvent event, Map map) {
         StringBuilder msg = new StringBuilder();
         int i = 1;
-        List<Player> orderList = map.getPlayers().values().stream().toList();
+        List<Player> orderList = new ArrayList<>();
+        orderList.addAll(map.getPlayers().values().stream().toList());
         String speakerName = map.getSpeaker();
         Optional<Player> optSpeaker = orderList.stream().filter(player -> player.getUserID().equals(speakerName))
                 .findFirst();
