@@ -358,6 +358,9 @@ public class GenerateMap {
                 graphics.setColor(color);
                 y += 90 + (techY - techStartY);
 
+                if (!player.getRelics().isEmpty()) {
+                    xDelta = relicInfo(player, xDelta, yPlayArea);
+                }
                 if (!player.getPlanets().isEmpty()) {
                     planetInfo(player, map, xDelta, yPlayArea);
                 }
@@ -396,6 +399,31 @@ public class GenerateMap {
             xDelta += 15;
         }
         return xDelta;
+    }
+
+    private int relicInfo(Player player, int x, int y) {
+        int deltaX = 0;
+
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+
+        List<String> exhaustedRelics = player.getExhaustedRelics();
+        for (String relicID : player.getRelics()) {
+
+
+            boolean isExhausted = exhaustedRelics.contains(relicID);
+            if (isExhausted) {
+                graphics.setColor(Color.GRAY);
+            } else {
+                graphics.setColor(Color.WHITE);
+            }
+            String statusOfPlanet = isExhausted ? "_exh" : "_rdy";
+            String relicFileName = "pa_relics_" + relicID + statusOfPlanet + ".png";
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, relicFileName);
+            deltaX += 44;
+        }
+        return x + deltaX + 10;
     }
 
     private void planetInfo(Player player, Map map, int x, int y) {

@@ -70,7 +70,7 @@ public class Mapper {
         }
     }
 
-    public static List<String>  getPromissoryNotes(String color, String faction){
+    public static List<String> getPromissoryNotes(String color, String faction) {
         List<String> pnList = new ArrayList<>();
         color = AliasHandler.resolveColor(color);
         if (Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
@@ -79,26 +79,26 @@ public class Mapper {
                 String[] pns = value.split(";");
                 String id = pns[1].toLowerCase();
                 if (id.equals(color) || AliasHandler.resolveFaction(id).equals(faction)) {
-                    pnList.add((String)entry.getKey());
+                    pnList.add((String) entry.getKey());
                 }
             }
         }
         return pnList;
     }
 
-    public static boolean isColorValid(String color){
+    public static boolean isColorValid(String color) {
         return colors.getProperty(color) != null;
     }
 
-    public static boolean isFaction(String faction){
+    public static boolean isFaction(String faction) {
         return factions.getProperty(faction) != null;
     }
 
-    public static String getColorID(String color){
+    public static String getColorID(String color) {
         return colors.getProperty(color);
     }
 
-    public static String getSpecialCaseValues(String id){
+    public static String getSpecialCaseValues(String id) {
         String property = special_case.getProperty(id);
         return property != null ? property : "";
     }
@@ -161,16 +161,17 @@ public class Mapper {
                 .sorted()
                 .collect(Collectors.toList());
     }
+
     public static String getSecretObjective(String id) {
-        return (String)secretObjectives.get(id);
+        return (String) secretObjectives.get(id);
     }
 
     public static String getActionCard(String id) {
-        return (String)actionCards.get(id);
+        return (String) actionCards.get(id);
     }
 
     public static String getPromissoryNote(String id) {
-        return (String)promissoryNotes.get(id);
+        return (String) promissoryNotes.get(id);
     }
 
     public static String getPromissoryNoteOwner(String id) {
@@ -180,27 +181,27 @@ public class Mapper {
     }
 
     public static String getPublicObjective(String id) {
-        return (String)publicObjectives.get(id);
+        return (String) publicObjectives.get(id);
     }
 
     public static String getAgenda(String id) {
-        return (String)agendas.get(id);
+        return (String) agendas.get(id);
     }
-    
+
     public static String getExplore(String id) {
-    	return (String)explore.get(id);
+        return (String) explore.get(id);
     }
-    
+
     public static String getRelic(String id) {
-    	return (String)relics.get(id);
+        return (String) relics.get(id);
     }
-    
+
     public static String getPlanet(String id) {
-    	return (String)planets.get(id);
+        return (String) planets.get(id);
     }
 
     public static String getAttachmentInfo(String id) {
-    	return (String)attachmentInfo.get(id);
+        return (String) attachmentInfo.get(id);
     }
 
     public static List<String> getAttachmentInfoAll() {
@@ -218,24 +219,25 @@ public class Mapper {
             agenda = new StringBuilder();
             boolean justAddNext = false;
             for (String part : split) {
-                if ("For/Against".equals(part)){
+                if ("For/Against".equals(part)) {
                     justAddNext = true;
                     continue;
                 }
                 agenda.append(part).append(";");
-                if (justAddNext){
+                if (justAddNext) {
                     break;
                 }
             }
-        } catch (Exception e){
+        } catch (Exception e) {
             agenda = new StringBuilder((String) agendas.get(id));
         }
         return agenda.toString();
     }
-    public static  HashMap<String, String> getSecretObjectives() {
+
+    public static HashMap<String, String> getSecretObjectives() {
         HashMap<String, String> soList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : secretObjectives.entrySet()) {
-            soList.put((String)entry.getKey(), (String)entry.getValue());
+            soList.put((String) entry.getKey(), (String) entry.getValue());
         }
         return soList;
     }
@@ -243,16 +245,16 @@ public class Mapper {
     public static HashMap<String, String> getPlanetRepresentations() {
         HashMap<String, String> planets = new HashMap<>();
         for (Map.Entry<Object, Object> entry : planet_representation.entrySet()) {
-            planets.put((String)entry.getKey(), (String)entry.getValue());
+            planets.put((String) entry.getKey(), (String) entry.getValue());
         }
         return planets;
     }
 
-    public static  HashMap<String, String> getSecretObjectivesJustNames() {
+    public static HashMap<String, String> getSecretObjectivesJustNames() {
         HashMap<String, String> soList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : secretObjectives.entrySet()) {
             StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-            soList.put((String)entry.getKey(), tokenizer.nextToken());
+            soList.put((String) entry.getKey(), tokenizer.nextToken());
         }
         return soList;
     }
@@ -280,10 +282,10 @@ public class Mapper {
         return tokenPath;
     }
 
-    public static  HashMap<String, String> getActionCards() {
+    public static HashMap<String, String> getActionCards() {
         HashMap<String, String> acList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : actionCards.entrySet()) {
-            acList.put((String)entry.getKey(), (String)entry.getValue());
+            acList.put((String) entry.getKey(), (String) entry.getValue());
         }
         return acList;
     }
@@ -293,7 +295,7 @@ public class Mapper {
         return property.split(",")[1];
     }
 
-    public static  HashMap<String, String> getTechs() {
+    public static HashMap<String, String> getTechs() {
         if (techList.isEmpty()) {
             for (Map.Entry<Object, Object> entry : techs.entrySet()) {
                 String value = (String) entry.getValue();
@@ -304,21 +306,21 @@ public class Mapper {
         return techList;
     }
 
-    public static boolean isValidTech(String id){
+    public static boolean isValidTech(String id) {
         HashMap<String, String> techs = getTechs();
         return techs.get(id) != null;
     }
 
-    public static boolean isValidPlanet(String id){
-        return  AliasHandler.getPlanetList().contains(id);
+    public static boolean isValidPlanet(String id) {
+        return AliasHandler.getPlanetList().contains(id);
     }
 
 
-    public static  HashMap<String, String> getPublicObjectivesState1() {
+    public static HashMap<String, String> getPublicObjectivesState1() {
         return getPublicObjectives("1");
     }
 
-    public static  HashMap<String, String> getPublicObjectivesState2() {
+    public static HashMap<String, String> getPublicObjectivesState2() {
         return getPublicObjectives("2");
     }
 
@@ -327,7 +329,7 @@ public class Mapper {
         HashMap<String, String> poList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : publicObjectives.entrySet()) {
             StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-            if (tokenizer.countTokens() == 4){
+            if (tokenizer.countTokens() == 4) {
                 String name = tokenizer.nextToken();
                 String category = tokenizer.nextToken();
                 String description = tokenizer.nextToken();
@@ -340,29 +342,29 @@ public class Mapper {
         }
         return poList;
     }
-    
+
     public static HashMap<String, String> getExplores() {
-    	HashMap<String, String> expList = new HashMap<>();
-    	for (Map.Entry<Object, Object> entry : explore.entrySet()) {
-    		StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-    		expList.put((String) entry.getKey(), tokenizer.nextToken());
-    	}
-    	return expList;
-    }
-    
-    public static HashMap<String, String> getRelics() {
-    	HashMap<String, String> relicList = new HashMap<>();
-    	for (Map.Entry<Object, Object> entry : explore.entrySet()) {
-    		StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-    		relicList.put((String) entry.getKey(), tokenizer.nextToken());
-    	}
-    	return relicList;
+        HashMap<String, String> expList = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : explore.entrySet()) {
+            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
+            expList.put((String) entry.getKey(), tokenizer.nextToken());
+        }
+        return expList;
     }
 
-    public static  HashMap<String, String> getAgendas() {
+    public static HashMap<String, String> getRelics() {
+        HashMap<String, String> relicList = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : relics.entrySet()) {
+            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
+            relicList.put((String) entry.getKey(), tokenizer.nextToken());
+        }
+        return relicList;
+    }
+
+    public static HashMap<String, String> getAgendas() {
         HashMap<String, String> agendaList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : agendas.entrySet()) {
-            agendaList.put((String)entry.getKey(), (String)entry.getValue());
+            agendaList.put((String) entry.getKey(), (String) entry.getValue());
         }
         return agendaList;
     }
@@ -375,25 +377,23 @@ public class Mapper {
                 .collect(Collectors.toList());
     }
 
-    public static String getTilesList()
-    {
-        return  "Tiles: " +  tiles.values().stream()
+    public static String getTilesList() {
+        return "Tiles: " + tiles.values().stream()
                 .sorted()
                 .filter(value -> value instanceof String)
                 .map(value -> (String) value)
                 .collect(Collectors.joining(", "));
     }
-    public static String getPlanetList()
-    {
-        return  "Planets: " + AliasHandler.getPlanetList().stream()
+
+    public static String getPlanetList() {
+        return "Planets: " + AliasHandler.getPlanetList().stream()
                 .sorted()
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(", "));
     }
 
-    public static String getUnitList()
-    {
-        return  "Units: " +  AliasHandler.getUnitList().stream()
+    public static String getUnitList() {
+        return "Units: " + AliasHandler.getUnitList().stream()
                 .sorted()
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining("\n "));

@@ -8,8 +8,8 @@ import ti4.helpers.Helper;
 
 import javax.annotation.CheckForNull;
 import java.awt.*;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class Map {
 
@@ -597,9 +597,12 @@ public class Map {
     }
 
     public String drawRelic() {
-    	return relics.remove(0);
+        if (relics.isEmpty()) {
+            return "";
+        }
+        return relics.remove(0);
     }
-    
+
     @CheckForNull
     public String drawActionCardAndDiscard() {
         if (!actionCards.isEmpty()) {
@@ -812,23 +815,23 @@ public class Map {
     public void setExploreDiscard(ArrayList<String> discard) {
         discardExplore = discard;
     }
-    
+
     public String pickExplore(String id) {
-    	if (explore.contains(id)) {
-    		discardExplore(id);
-    		return id;
-    	} else if (discardExplore.contains(id)) {
-    		return id;
-    	} 
-    	return null;
+        if (explore.contains(id)) {
+            discardExplore(id);
+            return id;
+        } else if (discardExplore.contains(id)) {
+            return id;
+        }
+        return null;
     }
-    
+
     public List<String> getAllRelics() {
-    	return relics;
+        return relics;
     }
-    
+
     public void setRelics(ArrayList<String> deck) {
-    	relics = deck;
+        relics = deck;
     }
 
     public void setSecretObjectives(List<String> secretObjectives) {
@@ -964,11 +967,12 @@ public class Map {
     }
 
     public HashMap<String, UnitHolder> getPlanetsInfo() {
-        if (planets.isEmpty()){
+        if (planets.isEmpty()) {
             getPlanets();
         }
         return planets;
     }
+
     public Set<String> getPlanets() {
         if (planets.isEmpty()) {
             for (Tile tile : tileMap.values()) {
@@ -978,7 +982,7 @@ public class Map {
                     }
                 }
             }
-            planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0,0)));
+            planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
         }
         return planets.keySet();
     }

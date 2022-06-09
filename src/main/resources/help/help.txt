@@ -199,3 +199,8 @@ for single TG adding of TG
 /explore shuffle_back_into_deck ids <- adds explore cards (including purged) with given ids (comma separated) to the deck
 /explore send_fragment type player count(optional) <- sends a number of relic fragments (default 1) of the specified type to another player
 /explore reset confirmYES <- completely resets explore decks, adding all known cards to their decks and shuffling them. useful if you have a game that started before explores were added
+/explore relic_draw <- draws a relic
+/explore relic_exhaust relic <- exhaust specified relic
+/explore relic_refresh <- refreshes specified relic
+/explore relic_purge <- purges relic
+/explore relic_draw_specific relic <- draws a specific relic, can be used to draw relic you already have or variant

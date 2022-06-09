@@ -31,7 +31,7 @@ public class AutoCompleteProvider {
                     .map(token -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(token, token))
                     .collect(Collectors.toList());
             event.replyChoices(options).queue();
-        }else if (optionName.equals(Constants.FACTION_COLOR)) {
+        } else if (optionName.equals(Constants.FACTION_COLOR)) {
             String enteredValue = event.getFocusedOption().getValue();
             List<String> factionColors = new ArrayList<>(Mapper.getFactions());
             factionColors.addAll(Mapper.getColors());
@@ -63,6 +63,15 @@ public class AutoCompleteProvider {
                     .filter(value -> value.contains(enteredValue))
                     .limit(25)
                     .map(value -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(value, value))
+                    .collect(Collectors.toList());
+            event.replyChoices(options).queue();
+        } else if (optionName.equals(Constants.RELIC)) {
+            String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+            HashMap<String, String> relics = Mapper.getRelics();
+            List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = relics.entrySet().stream()
+                    .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                    .limit(25)
+                    .map(value -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(value.getValue(), value.getKey()))
                     .collect(Collectors.toList());
             event.replyChoices(options).queue();
         } else if (optionName.equals(Constants.TECH) || optionName.equals(Constants.TECH2) || optionName.equals(Constants.TECH3) || optionName.equals(Constants.TECH4)) {

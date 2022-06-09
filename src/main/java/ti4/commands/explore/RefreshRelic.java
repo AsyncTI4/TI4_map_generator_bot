@@ -1,0 +1,24 @@
+package ti4.commands.explore;
+
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.generator.Mapper;
+import ti4.helpers.Constants;
+import ti4.map.Player;
+import ti4.message.MessageHelper;
+
+public class RefreshRelic extends ExhaustRelic {
+
+    public RefreshRelic() {
+        super(Constants.RELIC_REFRESH, "Refresh a relic");
+    }
+
+    @Override
+    protected void subAction(Player player, SlashCommandInteractionEvent event, String relicId) {
+        player.removeExhaustedRelic(relicId);
+        String relicName = Mapper.getRelic(relicId).split(";")[0];
+        MessageHelper.replyToMessage(event, "Refreshed relic: " + relicName);
+    }
+}
