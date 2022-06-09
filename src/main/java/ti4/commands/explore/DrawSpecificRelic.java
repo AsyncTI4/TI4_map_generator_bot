@@ -16,7 +16,7 @@ public class DrawSpecificRelic extends GenericRelicAction {
     public DrawSpecificRelic() {
         super(Constants.RELIC_DRAW_SPECIFIC, "Draw a specific relic", true);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do edit\"").setRequired(false));
     }
 
     @Override
@@ -28,8 +28,10 @@ public class DrawSpecificRelic extends GenericRelicAction {
         }
         String relicId = option.getAsString();
         List<String> allRelics = getActiveMap().getAllRelics();
-        if (allRelics.contains(relicId)) {
-            allRelics.remove(relicId);
+        if (allRelics.contains(relicId) || Constants.ENIGMATIC_DEVICE.equals(relicId)) {
+            if (!Constants.ENIGMATIC_DEVICE.equals(relicId)) {
+                allRelics.remove(relicId);
+            }
             player.addRelic(relicId);
             String[] relicData = Mapper.getRelic(relicId).split(";");
             String relicString = "Relic: " + relicData[0] + " - " + relicData[1];

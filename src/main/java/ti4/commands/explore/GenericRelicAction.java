@@ -18,7 +18,7 @@ abstract class GenericRelicAction extends ExploreSubcommandData {
     public GenericRelicAction(String name, String description, boolean noOption) {
         super(name, description);
         if(!noOption) {
-            addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction").setRequired(false));
+            addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do edit\"").setRequired(false));
         }
     }
 
