@@ -12,13 +12,13 @@ import ti4.message.MessageHelper;
 public class ExhaustRelic extends GenericRelicAction {
 
     public ExhaustRelic() {
-        super(Constants.RELIC_EXHAUST, "Exhaust a relic");
-        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust"));
+        super(Constants.RELIC_EXHAUST, "Exhaust a relic", true);
+        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction").setRequired(false));
     }
 
 	public ExhaustRelic(String relicRefresh, String refresh_a_relic) {
-		super(relicRefresh, refresh_a_relic);
-		addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust"));
+		super(relicRefresh, refresh_a_relic, true);
 	}
 
 	@Override

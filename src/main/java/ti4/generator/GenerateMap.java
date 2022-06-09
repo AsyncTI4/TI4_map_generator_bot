@@ -420,8 +420,9 @@ public class GenerateMap {
             String statusOfPlanet = isExhausted ? "_exh" : "_rdy";
             String relicFileName = "pa_relics_" + relicID + statusOfPlanet + ".png";
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, "pa_relics_icon.png");
             drawPAImage(x + deltaX, y, relicFileName);
-            deltaX += 44;
+            deltaX += 48;
         }
         return x + deltaX + 10;
     }

@@ -260,7 +260,9 @@ public class Player {
     }
 
     public void addRelic(String relicID) {
-        relics.add(relicID);
+        if (!relics.contains(relicID)) {
+            relics.add(relicID);
+        }
     }
 
     public void addExhaustedRelic(String relicID) {
