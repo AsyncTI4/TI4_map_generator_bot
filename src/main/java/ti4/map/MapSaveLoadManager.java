@@ -172,6 +172,7 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         
         writer.write(Constants.RELICS + " " + String.join(",", map.getAllRelics()));
+        writer.write(System.lineSeparator());
 
         writer.write(Constants.DISCARDED_EXPLORES + " " + String.join(",", map.getAllExploreDiscard()));
         writer.write(System.lineSeparator());
