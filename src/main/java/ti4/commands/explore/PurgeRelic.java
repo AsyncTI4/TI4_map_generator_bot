@@ -12,8 +12,9 @@ import ti4.message.MessageHelper;
 public class PurgeRelic extends GenericRelicAction {
 
     public PurgeRelic() {
-        super(Constants.PURGE, "Purge a relic");
-        addOptions(new OptionData(OptionType.STRING, Constants.RELIC_PURGE, "Relic ID sent between ()").setAutoComplete(true));
+        super(Constants.RELIC_PURGE, "Purge a relic", true);
+        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do edit").setRequired(false));
     }
 
     @Override

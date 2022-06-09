@@ -597,10 +597,16 @@ public class Map {
     }
 
     public String drawRelic() {
-        if (relics.isEmpty()) {
+        ArrayList<String> relics_ = new ArrayList<>(relics);
+        relics_.remove(Constants.ENIGMATIC_DEVICE);
+
+
+        if (relics_.isEmpty()) {
             return "";
         }
-        return relics.remove(0);
+        String remove = relics_.remove(0);
+        relics.remove(remove);
+        return remove;
     }
 
     @CheckForNull
