@@ -33,6 +33,7 @@ public class CardsInfo extends CardsSubcommandData {
 
     public static void sentUserCardInfo(SlashCommandInteractionEvent event, Map activeMap, Player player) {
         checkAndAddPNs(activeMap, player);
+        boolean shortPNDisplay = true;
         LinkedHashMap<String, Integer> secretObjective = activeMap.getSecretObjective(player.getUserID());
         LinkedHashMap<String, Integer> scoredSecretObjective = activeMap.getScoredSecretObjective(player.getUserID());
         StringBuilder sb = new StringBuilder();
@@ -76,7 +77,8 @@ public class CardsInfo extends CardsSubcommandData {
         if (promissoryNotes != null) {
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    sb.append(index).append(". (").append(pn.getValue()).append(") - ").append(Mapper.getPromissoryNote(pn.getKey()));
+                    sb.append(index).append(". (").append(pn.getValue()).append(") - ")
+                    .append(shortPNDisplay ? Mapper.getShortPromissoryNote(pn.getKey()) :  Mapper.getPromissoryNote(pn.getKey()));
                     sb.append("\n");
                     index++;
                 }

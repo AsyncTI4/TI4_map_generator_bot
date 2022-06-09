@@ -173,6 +173,11 @@ public class Mapper {
         return (String)promissoryNotes.get(id);
     }
 
+    public static String getShortPromissoryNote(String id) { 
+        String[] pns = ((String)promissoryNotes.get(id)).split(";");
+        return pns[0] +";" + pns[1];
+    }
+    
     public static String getPromissoryNoteOwner(String id) {
         String pnInfo = (String) promissoryNotes.get(id);
         String[] pns = pnInfo.split(";");
