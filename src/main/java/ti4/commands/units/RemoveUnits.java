@@ -73,10 +73,14 @@ public class RemoveUnits extends AddRemoveUnits {
         if((totalUnitsOnHex == count) && otherUnitHoldersContainUnit) {
                for(String unitHolderName : tile.getUnitHolders().keySet()) {
                        if(!unitHolderName.equals(planetName)) {
-                               int tempCount = tile.getUnitHolders().get(unitHolderName).getUnits().get(unitID);
-                               tile.removeUnit(unitHolderName, unitID, tempCount);
-                               tempCount = tile.getUnitHolders().get(unitHolderName).getUnitDamage().get(unitID);
-                               tile.removeUnitDamage(unitHolderName, unitID, tempCount);
+                               int tempCount = tile.getUnitHolders().get(unitHolderName).getUnits().getOrDefault(unitID,0);
+                               if(tempCount != 0) {
+                                   tile.removeUnit(unitHolderName, unitID, tempCount);
+                               }
+                               tempCount = tile.getUnitHolders().get(unitHolderName).getUnitDamage().getOrDefault(unitID,0);
+                               if(tempCount != 0) {
+                                   tile.removeUnitDamage(unitHolderName, unitID, tempCount);
+                               }
                        }
                }
         }
