@@ -837,6 +837,7 @@ public class Map {
     }
 
     public void setRelics(ArrayList<String> deck) {
+        deck = new ArrayList<>(new HashSet<>(deck));
         relics = deck;
     }
 

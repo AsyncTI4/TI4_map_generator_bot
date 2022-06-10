@@ -158,6 +158,7 @@ public class Constants {
     public static final String DISCARDED_AGENDAS = "discarded_agendas";
     public static final String AGENDAS = "agendas";
     public static final String AGENDA = "agenda";
+    public static final String RELIC_SHOW_REMAINING = "relic_show_remaining";
     public static final String RELIC_DRAW_SPECIFIC = "relic_draw_specific";
     public static final String DRAW = "draw";
     public static final String RELIC_DRAW = "relic_draw";
