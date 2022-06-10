@@ -2,6 +2,9 @@ package ti4.commands.cards;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -17,6 +20,7 @@ import java.util.List;
 public class CardsInfo extends CardsSubcommandData {
     public CardsInfo() {
         super(Constants.INFO, "Resent all my cards in Private Message");
+        addOptions(new OptionData(OptionType.STRING, Constants.SHORT_PN_DISPLAY, "Short promissory display, y or yes to enable").setRequired(false));
     }
 
     @Override
@@ -33,7 +37,11 @@ public class CardsInfo extends CardsSubcommandData {
 
     public static void sentUserCardInfo(SlashCommandInteractionEvent event, Map activeMap, Player player) {
         checkAndAddPNs(activeMap, player);
-        boolean shortPNDisplay = true;
+        OptionMapping shortPNOption = event.getOption(Constants.SHORT_PN_DISPLAY);
+        boolean shortPNDisplay = false;
+        if(shortPNOption != null) {
+            shortPNDisplay = shortPNOption.getAsString().equalsIgnoreCase("y") || shortPNOption.getAsString().equalsIgnoreCase("yes");
+        }
         LinkedHashMap<String, Integer> secretObjective = activeMap.getSecretObjective(player.getUserID());
         LinkedHashMap<String, Integer> scoredSecretObjective = activeMap.getScoredSecretObjective(player.getUserID());
         StringBuilder sb = new StringBuilder();

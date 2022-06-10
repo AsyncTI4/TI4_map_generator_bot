@@ -210,6 +210,7 @@ public class Constants {
     public static final String DISCARD_SO = "so_discard";
     public static final String SCORE_SO = "so_score";
     public static final String UNSCORE_SO = "so_unscore";
+    public static final String SHORT_PN_DISPLAY = "short_pn_display";
     public static final String CUSTODIAN_VP = "token_custodianvp.png";
 
     public static final String ACTION_CARD_ID = "action_card_id";
