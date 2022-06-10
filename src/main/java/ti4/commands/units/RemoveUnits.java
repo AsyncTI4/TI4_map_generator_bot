@@ -39,15 +39,16 @@ public class RemoveUnits extends AddRemoveUnits {
         // the hex
         // This allows for moves like "2 infantry" when there's a hex with 0 in space and 1 infantry on each of 2 planets
         long totalUnitsOnHex = tile.getUnitHolders().values().stream()
-                .mapToInt(x -> x.getUnits().getOrDefault(unitID, 0) + x.getUnitDamage().getOrDefault(unitID, 0))
+                .mapToInt(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID, 0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID, 0))
                 .sum();
 
         boolean otherUnitHoldersContainUnit = tile.getUnitHolders().values().stream()
-                .filter(x -> !Objects.equals(x.getName(), planetName)).anyMatch(x -> x.getUnits().getOrDefault(unitID, 0) + x.getUnitDamage().getOrDefault(unitID, 0) > 0);
+                .filter(planetTemp -> !Objects.equals(planetTemp.getName(), planetName))
+                .anyMatch(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID, 0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID, 0) > 0);
 
         if (nonEmptyUnitHolders == 1) {
             unitHolder = tile.getUnitHolders().values().stream()
-                    .filter(m -> m.getUnits().getOrDefault(unitID, 0) + m.getUnitDamage().getOrDefault(unitID, 0) > 0).findFirst().orElse(null);
+                    .filter(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID, 0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID, 0) > 0).findFirst().orElse(null);
 
         }
         if (unitHolder == null) {
