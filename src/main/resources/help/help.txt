@@ -203,6 +203,7 @@ for single TG adding of TG
 /explore relic_exhaust relic <- exhaust specified relic
 /explore relic_refresh <- refreshes specified relic
 /explore relic_purge <- purges relic
+/explore relic_show_remaining <- shows remaining relics in deck
 /explore relic_draw_specific relic <- draws a specific relic, can be used to draw relic you already have or variant
 if need to add Enigmatic Device, please use
 /explore relic_draw_specific Enigmatic Device
