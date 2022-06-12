@@ -1298,11 +1298,7 @@ public class GenerateMap {
         BufferedImage dmgImage = null;
         try {
             BufferedImage read = ImageIO.read(new File(Helper.getDamagePath()));
-            if (scaleOfUnit != 1.0f) {
-                dmgImage = resizeImage(read, scaleOfUnit);
-            } else {
-                dmgImage = read;
-            }
+            dmgImage = resizeImage(read, 0.8f);
         } catch (IOException e) {
             LoggerHandler.log("Could not parse damage token file.", e);
         }
@@ -1383,6 +1379,10 @@ public class GenerateMap {
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
                     int imageDmgX = position != null ? tileX + position.x + (image.getWidth() / 2) - (dmgImage.getWidth() / 2) : xOriginal - (dmgImage.getWidth() / 2);
                     int imageDmgY = position != null ? tileY + position.y + (image.getHeight() / 2) - (dmgImage.getHeight() / 2) : yOriginal - (dmgImage.getHeight() / 2);
+                    if (isMirage){
+                        imageDmgX = imageX + (int) (numberPositionPoint.x * scaleOfUnit) - dmgImage.getWidth();
+                        imageDmgY = imageY + (int) (numberPositionPoint.y * scaleOfUnit) - dmgImage.getHeight();
+                    }
                     graphics.drawImage(dmgImage, imageDmgX, imageDmgY, null);
                     unitDamageCount--;
                 }
