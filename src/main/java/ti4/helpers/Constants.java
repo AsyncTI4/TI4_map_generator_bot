@@ -8,6 +8,8 @@ public class Constants {
     public static final String GAME_NAME = "game_name";
     public static final String GAME_CUSTOM_NAME = "game_custom_name";
     public static final String COMMUNITY_MODE = "community_mode";
+    public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
+    public static final String CHANNLE_FOR_COMMUNITY = "channelForCommunity";
     public static final String DISPLAY_TYPE = "display_type";
     public static final String GAME_STATUS = "game_status";
     public static final String CONFIRM = "confirm";
@@ -102,6 +104,22 @@ public class Constants {
     public static final String TURN = "turn_end";
     public static final String SPEAKER = "speaker";
 
+    public static final String CHANNEL1 = "channel1";
+    public static final String CHANNEL2 = "channel2";
+    public static final String CHANNEL3 = "channel3";
+    public static final String CHANNEL4 = "channel4";
+    public static final String CHANNEL5 = "channel5";
+    public static final String CHANNEL6 = "channel6";
+    public static final String CHANNEL7 = "channel7";
+    public static final String CHANNEL8 = "channel8";
+    public static final String ROLE1 = "role1";
+    public static final String ROLE2 = "role2";
+    public static final String ROLE3 = "role3";
+    public static final String ROLE4 = "role4";
+    public static final String ROLE5 = "role5";
+    public static final String ROLE6 = "role6";
+    public static final String ROLE7 = "role7";
+    public static final String ROLE8 = "role8";
     public static final String PLAYER1 = "player1";
     public static final String PLAYER2 = "player2";
     public static final String PLAYER3 = "player3";
@@ -114,6 +132,7 @@ public class Constants {
     public static final String FACTION_COLOR = "faction_or_color";
     public static final String STATS = "stats";
     public static final String SETUP = "setup";
+    public static final String COMMUNITY_SETUP = "community_setup";
     public static final String PLANETS = "planets";
     public static final String PLANETS_EXHAUSTED = "planets_exhausted";
     public static final String PLANETS_ABILITY_EXHAUSTED = "planets_ability_exhausted";

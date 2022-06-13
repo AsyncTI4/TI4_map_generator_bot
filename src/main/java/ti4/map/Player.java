@@ -1,11 +1,14 @@
 package ti4.map;
 
+import net.dv8tion.jda.api.entities.Channel;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import ti4.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 
+import javax.annotation.CheckForNull;
 import java.util.Map;
 import java.util.*;
 
@@ -38,6 +41,11 @@ public class Player {
     private List<String> exhaustedPlanets = new ArrayList<>();
     private List<String> exhaustedPlanetsAbilities = new ArrayList<>();
 
+    @CheckForNull
+    private Role roleForCommunity = null;
+    @CheckForNull
+    private Channel channelForCommunity = null;
+
 
     private int crf = 0;
     private int hrf = 0;
@@ -52,6 +60,24 @@ public class Player {
     public Player(String userID, String userName) {
         this.userID = userID;
         this.userName = userName;
+    }
+
+    @CheckForNull
+    public Role getRoleForCommunity() {
+        return roleForCommunity;
+    }
+
+    public void setRoleForCommunity(Role roleForCommunity) {
+        this.roleForCommunity = roleForCommunity;
+    }
+
+    @CheckForNull
+    public Channel getChannelForCommunity() {
+        return channelForCommunity;
+    }
+
+    public void setChannelForCommunity(Channel channelForCommunity) {
+        this.channelForCommunity = channelForCommunity;
     }
 
     public void setUserID(String userID) {

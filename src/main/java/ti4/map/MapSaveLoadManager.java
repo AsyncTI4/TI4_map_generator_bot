@@ -1,5 +1,10 @@
 package ti4.map;
 
+import net.dv8tion.jda.api.entities.Channel;
+import net.dv8tion.jda.api.entities.GuildChannel;
+import net.dv8tion.jda.api.entities.PrivateChannel;
+import net.dv8tion.jda.api.entities.Role;
+import ti4.MapGenerator;
 import ti4.helpers.*;
 
 import javax.annotation.CheckForNull;
@@ -266,6 +271,18 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.COLOR + " " + player.getColor());
             writer.write(System.lineSeparator());
+
+            Role roleForCommunity = player.getRoleForCommunity();
+            if (roleForCommunity != null) {
+                writer.write(Constants.ROLE_FOR_COMMUNITY + " " + roleForCommunity.getId());
+                writer.write(System.lineSeparator());
+            }
+
+            Channel channelForCommunity = player.getChannelForCommunity();
+            if (channelForCommunity != null) {
+                writer.write(Constants.CHANNLE_FOR_COMMUNITY + " " + channelForCommunity.getId());
+                writer.write(System.lineSeparator());
+            }
 
             writer.write(Constants.PASSED + " " + player.isPassed());
             writer.write(System.lineSeparator());
@@ -753,6 +770,8 @@ public class MapSaveLoadManager {
             switch (data) {
                 case Constants.FACTION -> player.setFaction(tokenizer.nextToken());
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
+                case Constants.ROLE_FOR_COMMUNITY -> setRole(player, tokenizer);
+                case Constants.CHANNLE_FOR_COMMUNITY -> setChannel(player, tokenizer);
                 case Constants.TACTICAL -> player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
@@ -816,6 +835,18 @@ public class MapSaveLoadManager {
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
             }
         }
+    }
+
+    private static void setChannel(Player player, StringTokenizer tokenizer) {
+        String id = tokenizer.nextToken();
+        GuildChannel guildChannelById = MapGenerator.jda.getGuildChannelById(id);
+        player.setChannelForCommunity(guildChannelById);
+    }
+
+    private static void setRole(Player player, StringTokenizer tokenizer) {
+        String id = tokenizer.nextToken();
+        Role roleById = MapGenerator.jda.getRoleById(id);
+        player.setRoleForCommunity(roleById);
     }
 
     private static Tile readTile(String tileData) {

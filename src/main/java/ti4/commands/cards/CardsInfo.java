@@ -1,5 +1,6 @@
 package ti4.commands.cards;
 
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -39,7 +40,7 @@ public class CardsInfo extends CardsSubcommandData {
         checkAndAddPNs(activeMap, player);
         OptionMapping shortPNOption = event.getOption(Constants.SHORT_PN_DISPLAY);
         boolean shortPNDisplay = false;
-        if(shortPNOption != null) {
+        if (shortPNOption != null) {
             shortPNDisplay = shortPNOption.getAsString().equalsIgnoreCase("y") || shortPNOption.getAsString().equalsIgnoreCase("yes");
         }
         LinkedHashMap<String, Integer> secretObjective = activeMap.getSecretObjective(player.getUserID());
@@ -50,7 +51,7 @@ public class CardsInfo extends CardsSubcommandData {
         String color = player.getColor();
         sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
         sb.append("(").append(player.getFaction()).append(")");
-        if (color != null){
+        if (color != null) {
             sb.append(" (").append(color).append(")");
         }
         sb.append("\n");
@@ -86,7 +87,7 @@ public class CardsInfo extends CardsSubcommandData {
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
                     sb.append(index).append(". (").append(pn.getValue()).append(") - ")
-                    .append(shortPNDisplay ? Mapper.getShortPromissoryNote(pn.getKey()) :  Mapper.getPromissoryNote(pn.getKey()));
+                            .append(shortPNDisplay ? Mapper.getShortPromissoryNote(pn.getKey()) : Mapper.getPromissoryNote(pn.getKey()));
                     sb.append("\n");
                     index++;
                 }
@@ -104,7 +105,11 @@ public class CardsInfo extends CardsSubcommandData {
         sb.append("--------------------\n");
         User userById = event.getJDA().getUserById(player.getUserID());
         if (userById != null) {
-        MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
+            if (activeMap.isCommunityMode() && player.getChannelForCommunity() instanceof MessageChannel){
+                MessageHelper.sendMessageToChannel((MessageChannel) player.getChannelForCommunity(), sb.toString());
+            } else {
+                MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
+            }
         } else {
             MessageHelper.sentToMessageToUser(event, "Player: " + player.getUserName() + " not found");
         }
@@ -113,15 +118,15 @@ public class CardsInfo extends CardsSubcommandData {
     private static void checkAndAddPNs(Map activeMap, Player player) {
         String playerColor = AliasHandler.resolveColor(player.getColor());
         String playerFaction = player.getFaction();
-        if (Mapper.isColorValid(playerColor) && Mapper.isFaction(playerFaction)){
+        if (Mapper.isColorValid(playerColor) && Mapper.isFaction(playerFaction)) {
             List<String> promissoryNotes = new ArrayList<>(Mapper.getPromissoryNotes(playerColor, playerFaction));
             for (Player player_ : activeMap.getPlayers().values()) {
-                    promissoryNotes.removeAll(player_.getPromissoryNotes().keySet());
-                    promissoryNotes.removeAll(player_.getPromissoryNotesInPlayArea());
-                }
+                promissoryNotes.removeAll(player_.getPromissoryNotes().keySet());
+                promissoryNotes.removeAll(player_.getPromissoryNotesInPlayArea());
+            }
             promissoryNotes.removeAll(player.getPromissoryNotes().keySet());
             promissoryNotes.removeAll(player.getPromissoryNotesInPlayArea());
-            if (!promissoryNotes.isEmpty()){
+            if (!promissoryNotes.isEmpty()) {
                 for (String promissoryNote : promissoryNotes) {
                     player.setPromissoryNote(promissoryNote);
                 }

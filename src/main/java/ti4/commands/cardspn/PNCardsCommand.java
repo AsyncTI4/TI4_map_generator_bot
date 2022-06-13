@@ -5,11 +5,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.MapGenerator;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.util.Collection;
@@ -40,7 +43,13 @@ public class PNCardsCommand implements Command {
                 return false;
             }
             Map userActiveMap = mapManager.getUserActiveMap(userID);
-            if (!userActiveMap.getPlayerIDs().contains(userID)) {
+            if (userActiveMap.isCommunityMode()){
+                Player player = Helper.getGamePlayer(userActiveMap, null, event, userID);
+                if (player == null || !userActiveMap.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(MapGenerator.userID)) {
+                    MessageHelper.replyToMessage(event, "Your not a player of the game, please call function /join gameName");
+                    return false;
+                }
+            } else if (!userActiveMap.getPlayerIDs().contains(userID)) {
                 MessageHelper.replyToMessage(event, "Your not a player of the game, please call function /join gameName");
                 return false;
             }
