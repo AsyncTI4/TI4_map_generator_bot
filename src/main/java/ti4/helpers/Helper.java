@@ -1,10 +1,12 @@
 package ti4.helpers;
 
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.map.*;
@@ -12,11 +14,35 @@ import ti4.map.*;
 import javax.annotation.CheckForNull;
 import java.awt.*;
 import java.text.SimpleDateFormat;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Objects;
 
 public class Helper {
+
+    @CheckForNull
+    public static Player getGamePlayer(Map map, Player initialPlayer, SlashCommandInteractionEvent event, String userID) {
+        Collection<Player> players = map.getPlayers().values();
+        if (!map.isCommunityMode()) {
+            Player player = map.getPlayer(userID);
+            if (player != null) return player;
+            return initialPlayer;
+        }
+        Member member = event.getMember();
+        if (member == null) {
+            Player player = map.getPlayer(userID);
+            if (player != null) return player;
+            return initialPlayer;
+        }
+        java.util.List<Role> roles = member.getRoles();
+        for (Player player : players) {
+            if (roles.contains(player.getRoleForCommunity())) {
+                return player;
+            }
+        }
+        return initialPlayer != null ? initialPlayer : map.getPlayer(userID);
+    }
 
     @CheckForNull
     public static Player getPlayer(Map activeMap, Player player, SlashCommandInteractionEvent event) {

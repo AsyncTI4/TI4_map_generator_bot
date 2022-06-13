@@ -10,9 +10,11 @@ import ti4.commands.Command;
 import ti4.commands.cardspn.*;
 import ti4.commands.explore.ShuffleExpBackIntoDeck;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.util.Collection;
@@ -43,7 +45,13 @@ public class CardsCommand implements Command {
                 return false;
             }
             Map userActiveMap = mapManager.getUserActiveMap(userID);
-            if (!userActiveMap.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(MapGenerator.userID)) {
+            if (userActiveMap.isCommunityMode()){
+                Player player = Helper.getGamePlayer(userActiveMap, null, event, userID);
+                if (player == null || !userActiveMap.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(MapGenerator.userID)) {
+                    MessageHelper.replyToMessage(event, "Your not a player of the game, please call function /join gameName");
+                    return false;
+                }
+            } else if (!userActiveMap.getPlayerIDs().contains(userID) && !event.getUser().getId().equals(MapGenerator.userID)) {
                 MessageHelper.replyToMessage(event, "Your not a player of the game, please call function /join gameName");
                 return false;
             }
