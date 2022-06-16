@@ -980,6 +980,10 @@ public class Map {
         return planets;
     }
 
+    public void clearPlanetsCache(){
+        planets.clear();
+    }
+
     public Set<String> getPlanets() {
         if (planets.isEmpty()) {
             for (Tile tile : tileMap.values()) {
