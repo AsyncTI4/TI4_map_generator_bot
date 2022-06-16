@@ -6,15 +6,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
-import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
-
-import java.io.File;
 
 public abstract class ExploreSubcommandData extends SubcommandData {
 
@@ -76,7 +73,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         return tile;
     }
 
-    protected void resolveExplore(SlashCommandInteractionEvent event, String cardID, Tile tile, String planetName) {
+    protected void resolveExplore(SlashCommandInteractionEvent event, String cardID, Tile tile, String planetName, String messageText) {
         String message = "Card has been discarded. Resolve effects manually.";
         String card = Mapper.getExplore(cardID);
         String[] cardInfo = card.split(";");
@@ -114,9 +111,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
 
         MapSaveLoadManager.saveMap(activeMap);
-        File file = GenerateMap.getInstance().saveImage(activeMap);
-        MessageHelper.replyToMessage(event, file);
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        MessageHelper.replyToMessage(event, messageText + "\n" + message);
     }
-
 }
