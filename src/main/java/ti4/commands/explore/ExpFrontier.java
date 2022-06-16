@@ -3,14 +3,10 @@ package ti4.commands.explore;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
-
-import java.io.File;
 
 public class ExpFrontier extends ExploreSubcommandData {
     public ExpFrontier() {
@@ -29,13 +25,11 @@ public class ExpFrontier extends ExploreSubcommandData {
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
             String cardID = activeMap.drawExplore(Constants.FRONTIER);
-            MessageHelper.replyToMessage(event, displayExplore(cardID));
-
-            resolveExplore(event, cardID, tile, null);
+            String messageText = displayExplore(cardID);
+            messageText += "\n" + "Explored: " + tile.getPosition() + " by player: " + activeMap.getPlayer(event.getUser().getId()).getUserName();
+            resolveExplore(event, cardID, tile, null, messageText);
         } else {
             MessageHelper.replyToMessage(event, "No frontier token in given system.");
         }
-
     }
-
 }

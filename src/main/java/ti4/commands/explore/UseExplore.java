@@ -35,7 +35,8 @@ public class UseExplore extends ExploreSubcommandData {
 				tile = getTile(event, tileOption.getAsString().toLowerCase(), activeMap);
 				if (tile == null) return;
 			}
-			resolveExplore(event, id, tile, planetName);
+			String messageText = "Used card: " + id + " by player: " + activeMap.getPlayer(event.getUser().getId()).getUserName();
+			resolveExplore(event, id, tile, planetName, messageText);
 		} else {
 			MessageHelper.replyToMessage(event, "Invalid card ID");
 		}
