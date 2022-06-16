@@ -2,14 +2,11 @@ package ti4.commands.tokens;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.Commands;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.map.Map;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
@@ -20,7 +17,7 @@ import java.util.StringTokenizer;
 
 public class AddControl extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile) {
+    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Map activeMap) {
         OptionMapping option = event.getOption(Constants.PLANET_NAME);
         if (option != null) {
             String planetInfo = option.getAsString().toLowerCase();

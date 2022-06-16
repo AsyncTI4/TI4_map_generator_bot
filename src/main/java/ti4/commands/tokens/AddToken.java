@@ -11,23 +11,22 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Planet;
+import ti4.map.Map;
 import ti4.map.Tile;
-import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
-import java.awt.*;
 import java.util.*;
 
 public class AddToken extends AddRemoveToken {
     @Override
-    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile) {
+    void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Map activeMap) {
 
         OptionMapping option = event.getOption(Constants.TOKEN);
         if (option != null) {
             String tokenName = option.getAsString().toLowerCase();
             tokenName = AliasHandler.resolveAttachment(tokenName);
             addToken(event, tile, tokenName);
+            activeMap.clearPlanetsCache();
         }
         else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Token not specified.");

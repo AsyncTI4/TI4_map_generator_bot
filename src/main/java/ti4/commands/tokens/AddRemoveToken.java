@@ -66,7 +66,7 @@ abstract public class AddRemoveToken implements Command {
                     return;
                 }
 
-                parsingForTile(event, colors, tile);
+                parsingForTile(event, colors, tile, activeMap);
                 MapSaveLoadManager.saveMap(activeMap);
 
                 File file = GenerateMap.getInstance().saveImage(activeMap);
@@ -77,7 +77,7 @@ abstract public class AddRemoveToken implements Command {
         }
     }
 
-    abstract void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> color, Tile tile);
+    abstract void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> color, Tile tile, Map activeMap);
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         return event.getName().equals(getActionID());
