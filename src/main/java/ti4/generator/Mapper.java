@@ -32,6 +32,7 @@ public class Mapper {
     private static final Properties explore = new Properties();
     private static final Properties relics = new Properties();
     private static final HashMap<String, String> techList = new HashMap<>();
+    private static final HashMap<String, String[]> techListInfo = new HashMap<>();
     private static final Properties planets = new Properties();
     private static final Properties planet_representation = new Properties();
     private static final Properties attachmentInfo = new Properties();
@@ -309,6 +310,17 @@ public class Mapper {
             }
         }
         return techList;
+    }
+
+    public static HashMap<String, String[]> getTechsInfo() {
+        if (techListInfo.isEmpty()) {
+            for (Map.Entry<Object, Object> entry : techs.entrySet()) {
+                String value = (String) entry.getValue();
+                String[] split = value.split(",");
+                techListInfo.put((String) entry.getKey(), split);
+            }
+        }
+        return techListInfo;
     }
 
     public static boolean isValidTech(String id) {

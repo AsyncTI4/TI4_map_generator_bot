@@ -33,6 +33,10 @@ public class AddCustomPO extends StatusSubcommandData {
 
         }
         String poName = poNameOption.getAsString();
+        if (poName.contains(",")){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Objective must not contain comma ,");
+            return;
+        }
         int vp = vpOption.getAsInt();
 
         Integer poIndex = activeMap.addCustomPO(poName, vp);
