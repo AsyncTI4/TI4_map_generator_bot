@@ -68,7 +68,6 @@ public class ExpPlanet extends ExploreSubcommandData {
         }
         String messageText = displayExplore(cardID);
         messageText += "\n" + "Explored: " + planetName + " by player: " + activeMap.getPlayer(event.getUser().getId()).getUserName();
-        MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
         resolveExplore(event, cardID, tile, planetName, messageText);
     }
 }
