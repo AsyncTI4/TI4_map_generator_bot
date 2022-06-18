@@ -303,4 +303,5 @@ public class Constants {
     public static final String PROPULSION = "propulsion";
     public static final String CYBERNETIC = "cybernetic";
     public static final String BIOTIC = "biotic";
+    public static final String UNIT_UPGRADE = "unitupgrade";
 }

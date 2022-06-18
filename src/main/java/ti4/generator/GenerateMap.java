@@ -361,6 +361,10 @@ public class GenerateMap {
                 if (!player.getRelics().isEmpty()) {
                     xDelta = relicInfo(player, xDelta, yPlayArea);
                 }
+
+                if (!player.getTechs().isEmpty()) {
+                    xDelta = techInfo(player, xDelta, yPlayArea);
+                }
                 if (!player.getPlanets().isEmpty()) {
                     planetInfo(player, map, xDelta, yPlayArea);
                 }
@@ -516,6 +520,102 @@ public class GenerateMap {
 
             deltaX += 56;
         }
+    }
+
+    private int techInfo(Player player, int x, int y) {
+        List<String> techs = player.getTechs();
+        List<String> exhaustedTechs = player.getExhaustedTechs();
+        if (techs.isEmpty()) {
+            return y;
+        }
+
+
+        HashMap<String, String[]> techInfo = Mapper.getTechsInfo();
+        java.util.Map<String, List<String>> techsFiltered = new HashMap<>();
+        for (String tech : techs) {
+            String techType = Mapper.getTechType(tech);
+            List<String> techList = techsFiltered.get(techType);
+            if (techList == null){
+                techList = new ArrayList<>();
+            }
+            techList.add(tech);
+            techsFiltered.put(techType, techList);
+        }
+        for (java.util.Map.Entry<String, List<String>> entry : techsFiltered.entrySet()) {
+            List<String> list = entry.getValue();
+            list.sort(new Comparator<String>() {
+                @Override
+                public int compare(String tech1, String tech2) {
+                    String[] tech1Info = techInfo.get(tech1);
+                    String[] tech2Info = techInfo.get(tech2);
+                    try {
+                        int t1 = tech1Info.length >= 3 ? tech1Info[2].length() : 0;
+                        int t2 = tech2Info.length >= 3 ? tech2Info[2].length() : 0;
+                        return (t1 < t2) ? 0: ((t1 == t2) ? (tech1Info[0].compareTo(tech2Info[0])) : -1);
+                    } catch (Exception e) {
+                        //do nothing
+                    }
+                    return 0;
+                }
+            });
+        }
+        int deltaX = 0;
+
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+
+
+        deltaX = techField(x, y, techsFiltered.get(Constants.BIOTIC), exhaustedTechs, techInfo, deltaX);
+        deltaX = techField(x, y, techsFiltered.get(Constants.PROPULSION), exhaustedTechs, techInfo, deltaX);
+        deltaX = techField(x, y, techsFiltered.get(Constants.CYBERNETIC), exhaustedTechs, techInfo, deltaX);
+        deltaX = techField(x, y, techsFiltered.get(Constants.WARFARE), exhaustedTechs, techInfo, deltaX);
+        deltaX = techField(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), exhaustedTechs, techInfo, deltaX);
+        return x + deltaX + 10;
+    }
+
+    private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, String[]> techInfo, int deltaX) {
+        if (techs == null){
+            return deltaX;
+        }
+        for (String tech : techs) {
+            boolean isExhausted = exhaustedTechs.contains(tech);
+            String techStatus;
+            if (isExhausted) {
+                graphics.setColor(Color.GRAY);
+                techStatus = "_exh.png";
+            } else {
+                graphics.setColor(Color.WHITE);
+                techStatus = "_rdy.png";
+            }
+
+            String[] techInformation = techInfo.get(tech);
+
+            String techIcon;
+            switch (techInformation[1]) {
+                case Constants.WARFARE -> techIcon = Constants.WARFARE;
+                case Constants.PROPULSION -> techIcon = Constants.PROPULSION;
+                case Constants.CYBERNETIC -> techIcon = Constants.CYBERNETIC;
+                case Constants.BIOTIC -> techIcon = Constants.BIOTIC;
+                default -> techIcon = "";
+            }
+
+            if (!techIcon.isEmpty()){
+                String techSpec = "pa_tech_techicons_" + techIcon + techStatus;
+                drawPAImage(x + deltaX, y, techSpec);
+            }
+
+            if (techInformation.length >= 4 && !techInformation[3].isEmpty()){
+                String techSpec = "pa_tech_factionicon_" + techInformation[3] + techStatus;
+                drawPAImage(x + deltaX, y, techSpec);
+            }
+
+            String techName = "pa_tech_techname_" + tech + techStatus;
+            drawPAImage(x + deltaX, y, techName);
+
+            graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
+            deltaX += 56;
+        }
+        return deltaX;
     }
 
     private void drawPlanetImage(int x, int y, String resourceName) {
@@ -993,7 +1093,7 @@ public class GenerateMap {
             case "propulsion" -> new Color(102, 153, 255);
             case "biotic" -> new Color(0, 204, 0);
             case "warfare" -> new Color(204, 0, 0);
-            case "cybernetics" -> new Color(230, 230, 0);
+            case "cybernetic" -> new Color(230, 230, 0);
             default -> Color.WHITE;
         };
     }
@@ -1379,7 +1479,7 @@ public class GenerateMap {
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
                     int imageDmgX = position != null ? tileX + position.x + (image.getWidth() / 2) - (dmgImage.getWidth() / 2) : xOriginal - (dmgImage.getWidth() / 2);
                     int imageDmgY = position != null ? tileY + position.y + (image.getHeight() / 2) - (dmgImage.getHeight() / 2) : yOriginal - (dmgImage.getHeight() / 2);
-                    if (isMirage){
+                    if (isMirage) {
                         imageDmgX = imageX + (int) (numberPositionPoint.x * scaleOfUnit) - dmgImage.getWidth();
                         imageDmgY = imageY + (int) (numberPositionPoint.y * scaleOfUnit) - dmgImage.getHeight();
                     }
