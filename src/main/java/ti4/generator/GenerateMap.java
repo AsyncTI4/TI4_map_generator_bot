@@ -551,7 +551,7 @@ public class GenerateMap {
                     try {
                         int t1 = tech1Info.length >= 3 ? tech1Info[2].length() : 0;
                         int t2 = tech2Info.length >= 3 ? tech2Info[2].length() : 0;
-                        return (t1 < t2) ? 0: ((t1 == t2) ? (tech1Info[0].compareTo(tech2Info[0])) : -1);
+                        return (t1 < t2) ? -1: ((t1 == t2) ? (tech1Info[0].compareTo(tech2Info[0])) : 1);
                     } catch (Exception e) {
                         //do nothing
                     }
@@ -612,8 +612,9 @@ public class GenerateMap {
             String techName = "pa_tech_techname_" + tech + techStatus;
             drawPAImage(x + deltaX, y, techName);
 
-            graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
-            deltaX += 56;
+
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            deltaX += 48;
         }
         return deltaX;
     }
