@@ -283,6 +283,9 @@ public class GenerateMap {
                 String ccCount = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
                 x += 120;
                 graphics.drawString(ccCount, x + 40, y + deltaY + 50);
+                if (!player.getMahactCC().isEmpty()) {
+                    graphics.drawString("+" + player.getMahactCC().size() + " FS", x + 40, y + deltaY + 90);
+                }
                 graphics.drawString("T/F/S", x + 40, y + deltaY + 10);
 
                 String acImage = "pa_cardbacks_ac.png";
@@ -756,10 +759,10 @@ public class GenerateMap {
             String fleetCCID = Mapper.getFleeCCID(player.getColor());
             int x = points.get(2).x;
             int y = points.get(2).y;
-            drawCCOfPlayer(ccID, x, y, player.getTacticalCC(), false);
+            drawCCOfPlayer(ccID, x, y, player.getTacticalCC(), false, null);
 //            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), "letnev".equals(player.getFaction()));
-            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), false);
-            drawCCOfPlayer(ccID, x, y + 130, player.getStrategicCC(), false);
+            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), false, player);
+            drawCCOfPlayer(ccID, x, y + 130, player.getStrategicCC(), false, null);
 
             if (player == speaker) {
                 String speakerID = Mapper.getTokenID(Constants.SPEAKER);
@@ -787,7 +790,7 @@ public class GenerateMap {
 
     }
 
-    private void drawCCOfPlayer(String ccID, int x, int y, int ccCount, boolean isLetnev) {
+    private void drawCCOfPlayer(String ccID, int x, int y, int ccCount, boolean isLetnev, Player player) {
         String ccPath = Mapper.getCCPath(ccID);
         try {
             BufferedImage ccImage = resizeImage(ImageIO.read(new File(ccPath)), 0.75f);
@@ -801,8 +804,19 @@ public class GenerateMap {
                     graphics.drawImage(ccImage, x + (delta * i), y, null);
                 }
             } else {
+                int lastCCPosition = -1;
                 for (int i = 0; i < ccCount; i++) {
                     graphics.drawImage(ccImage, x + (delta * i), y, null);
+                    lastCCPosition = i;
+                }
+                List<String> mahactCC = player.getMahactCC();
+                if (!mahactCC.isEmpty()) {
+                    for (String ccColor : mahactCC) {
+                        lastCCPosition++;
+                        String fleetCCID = Mapper.getCCPath(Mapper.getFleeCCID(ccColor));
+                        BufferedImage ccImageExtra = resizeImage(ImageIO.read(new File(fleetCCID)), 0.75f);
+                        graphics.drawImage(ccImageExtra, x + (delta * lastCCPosition), y, null);
+                    }
                 }
             }
         } catch (Exception e) {

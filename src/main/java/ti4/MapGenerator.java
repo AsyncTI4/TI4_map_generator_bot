@@ -18,6 +18,7 @@ import ti4.commands.game.GameCommand;
 import ti4.commands.info.*;
 import ti4.commands.map.*;
 import ti4.commands.player.PlayerCommand;
+import ti4.commands.special.SpecialCommand;
 import ti4.commands.status.StatusCommand;
 import ti4.commands.tokens.*;
 import ti4.commands.units.*;
@@ -104,6 +105,7 @@ public class MapGenerator {
         commandManager.addCommand(new PNCardsCommand());
         commandManager.addCommand(new StatusCommand());
         commandManager.addCommand(new AgendaCommand());
+        commandManager.addCommand(new SpecialCommand());
 
         Guild guild = jda.getGuildById(args[2]);
 
