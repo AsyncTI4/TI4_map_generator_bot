@@ -301,6 +301,9 @@ public class MapSaveLoadManager {
             writer.write(Constants.EXHAUSTED_RELICS + " " + String.join(",", player.getExhaustedRelics()));
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.MAHACT_CC + " " + String.join(",", player.getMahactCC()));
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.TECH + " " + String.join(",", player.getTechs()));
             writer.write(System.lineSeparator());
             writer.write(Constants.TECH_EXHAUSTED + " " + String.join(",", player.getExhaustedTechs()));
@@ -805,6 +808,7 @@ public class MapSaveLoadManager {
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));
                 case Constants.EXHAUSTED_RELICS -> player.setExhaustedRelics(getCardList(tokenizer.nextToken()));
+                case Constants.MAHACT_CC -> player.setMahactCC(getCardList(tokenizer.nextToken()));
                 case Constants.SO_SCORED -> {
                     StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (secrets.hasMoreTokens()) {

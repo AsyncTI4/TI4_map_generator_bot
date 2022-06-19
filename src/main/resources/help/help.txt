@@ -215,3 +215,6 @@ for single TG adding of TG
 if need to add Enigmatic Device, please use
 /explore relic_draw_specific Enigmatic Device
 Its workaround for that single explore
+
+/special mahact_cc_to_fs color <- add's any color CC to fleet supply
+/special mahact_cc_from_fs color <- removes any color CC from fleet supply

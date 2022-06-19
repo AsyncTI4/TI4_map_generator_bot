@@ -40,6 +40,7 @@ public class Player {
     private List<String> planets = new ArrayList<>();
     private List<String> exhaustedPlanets = new ArrayList<>();
     private List<String> exhaustedPlanetsAbilities = new ArrayList<>();
+    private List<String> mahactCC = new ArrayList<>();
 
     @CheckForNull
     private Role roleForCommunity = null;
@@ -60,6 +61,24 @@ public class Player {
     public Player(String userID, String userName) {
         this.userID = userID;
         this.userName = userName;
+    }
+
+    public List<String> getMahactCC() {
+        return mahactCC;
+    }
+
+    public void setMahactCC(List<String> mahactCC) {
+        this.mahactCC = mahactCC;
+    }
+
+    public void addMahactCC(String cc) {
+        if (!mahactCC.contains(cc)) {
+            mahactCC.add(cc);
+        }
+    }
+
+    public void removeMahactCC(String cc) {
+         mahactCC.remove(cc);
     }
 
     @CheckForNull

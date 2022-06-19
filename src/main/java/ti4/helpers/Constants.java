@@ -92,6 +92,11 @@ public class Constants {
     public static final String LAST_MODIFIED_DATE = "last_modified_date";
 
 
+    public static final String MAHACT_CC = "mahact_cc";
+    public static final String ADD_CC_TO_FS = "mahact_cc_to_fs";
+    public static final String REMOVE_CC_FROM_FS = "mahact_cc_from_fs";
+    public static final String SPECIAL = "special";
+
     public static final String GAME = "game";
     public static final String INFO = "info";
     public static final String UNDO = "undo";
