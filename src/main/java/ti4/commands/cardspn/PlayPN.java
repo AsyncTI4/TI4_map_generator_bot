@@ -16,6 +16,7 @@ public class PlayPN extends PNCardsSubcommandData {
     public PlayPN() {
         super(Constants.PLAY_PN, "Play Promissory Note");
         addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable").setRequired(false));
     }
 
     @Override
@@ -31,6 +32,11 @@ public class PlayPN extends PNCardsSubcommandData {
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Promissory Note to play");
             return;
+        }
+        OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
+        boolean longPNDisplay = false;
+        if (longPNOption != null) {
+            longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
         }
 
         int acIndex = option.getAsInt();
@@ -61,7 +67,8 @@ public class PlayPN extends PNCardsSubcommandData {
         sb.append("Game: ").append(activeMap.getName()).append(" ");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Played: ");
-        sb.append(Mapper.getPromissoryNote(acID)).append("\n");
+        sb.append(Mapper.getPromissoryNote(acID, longPNDisplay)).append("\n");
+        
         MessageHelper.sendMessageToChannel(event, sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }

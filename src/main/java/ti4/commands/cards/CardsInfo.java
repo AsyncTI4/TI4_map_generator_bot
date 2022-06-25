@@ -21,7 +21,7 @@ import java.util.List;
 public class CardsInfo extends CardsSubcommandData {
     public CardsInfo() {
         super(Constants.INFO, "Resent all my cards in Private Message");
-        addOptions(new OptionData(OptionType.STRING, Constants.SHORT_PN_DISPLAY, "Short promissory display, y or yes to enable").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable").setRequired(false));
     }
 
     @Override
@@ -38,10 +38,10 @@ public class CardsInfo extends CardsSubcommandData {
 
     public static void sentUserCardInfo(SlashCommandInteractionEvent event, Map activeMap, Player player) {
         checkAndAddPNs(activeMap, player);
-        OptionMapping shortPNOption = event.getOption(Constants.SHORT_PN_DISPLAY);
-        boolean shortPNDisplay = false;
-        if (shortPNOption != null) {
-            shortPNDisplay = shortPNOption.getAsString().equalsIgnoreCase("y") || shortPNOption.getAsString().equalsIgnoreCase("yes");
+        OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
+        boolean longPNDisplay = false;
+        if (longPNOption != null) {
+            longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
         }
         LinkedHashMap<String, Integer> secretObjective = activeMap.getSecretObjective(player.getUserID());
         LinkedHashMap<String, Integer> scoredSecretObjective = activeMap.getScoredSecretObjective(player.getUserID());
@@ -87,7 +87,7 @@ public class CardsInfo extends CardsSubcommandData {
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
                     sb.append(index).append(". (").append(pn.getValue()).append(") - ")
-                            .append(shortPNDisplay ? Mapper.getShortPromissoryNote(pn.getKey()) : Mapper.getPromissoryNote(pn.getKey()));
+                            .append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
                     sb.append("\n");
                     index++;
                 }
@@ -96,7 +96,7 @@ public class CardsInfo extends CardsSubcommandData {
             sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    sb.append(index).append(". (").append(pn.getValue()).append(") - ").append(Mapper.getPromissoryNote(pn.getKey()));
+                    sb.append(index).append(". (").append(pn.getValue()).append(") - ").append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
                     sb.append("\n");
                     index++;
                 }

@@ -19,6 +19,7 @@ public class ShowPN extends PNCardsSubcommandData {
         super(Constants.SHOW_PN, "Show Promissory Note to player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to show Action Card").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable").setRequired(false));
     }
 
     @Override
@@ -35,7 +36,12 @@ public class ShowPN extends PNCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Promissory Note to show");
             return;
         }
-
+        OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
+        boolean longPNDisplay = false;
+        if (longPNOption != null) {
+            longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
+        }
+        
         int acIndex = option.getAsInt();
         String acID = null;
         for (java.util.Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
@@ -61,7 +67,7 @@ public class ShowPN extends PNCardsSubcommandData {
             sb.append("Game: ").append(activeMap.getName()).append("\n");
             sb.append("Player: ").append(player.getUserName()).append("\n");
             sb.append("Showed Promissory Note:").append("\n");
-            sb.append(Mapper.getPromissoryNote(acID)).append("\n");
+            sb.append(Mapper.getPromissoryNote(acID, longPNDisplay)).append("\n");
             sb.append("---------\n");
             player.setPromissoryNote(acID);
 
