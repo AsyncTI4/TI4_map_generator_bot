@@ -2,7 +2,6 @@ package ti4.map;
 
 import net.dv8tion.jda.api.entities.Channel;
 import net.dv8tion.jda.api.entities.GuildChannel;
-import net.dv8tion.jda.api.entities.PrivateChannel;
 import net.dv8tion.jda.api.entities.Role;
 import ti4.MapGenerator;
 import ti4.helpers.*;
@@ -175,7 +174,7 @@ public class MapSaveLoadManager {
 
         writer.write(Constants.EXPLORE + " " + String.join(",", map.getAllExplores()));
         writer.write(System.lineSeparator());
-        
+
         writer.write(Constants.RELICS + " " + String.join(",", map.getAllRelics()));
         writer.write(System.lineSeparator());
 
@@ -294,7 +293,7 @@ public class MapSaveLoadManager {
 
             writer.write(Constants.FRAGMENTS + " " + String.join(",", player.getFragments()));
             writer.write(System.lineSeparator());
-            
+
             writer.write(Constants.RELICS + " " + String.join(",", player.getRelics()));
             writer.write(System.lineSeparator());
 
@@ -464,9 +463,13 @@ public class MapSaveLoadManager {
         if (files != null) {
             for (File file : files) {
                 if (isTxtExtention(file)) {
-                    Map map = loadMap(file);
-                    if (map != null) {
-                        mapList.put(map.getName(), map);
+                    try {
+                        Map map = loadMap(file);
+                        if (map != null) {
+                            mapList.put(map.getName(), map);
+                        }
+                    } catch (Exception e) {
+                        LoggerHandler.log("Could not load game:" + file, e);
                     }
                 }
             }
@@ -502,8 +505,7 @@ public class MapSaveLoadManager {
                         }
                         try {
                             readGameInfo(map, data);
-                        }
-                        catch (Exception e){
+                        } catch (Exception e) {
                             LoggerHandler.log("Data is bad", e);
                         }
                     }
@@ -647,7 +649,7 @@ public class MapSaveLoadManager {
             } else if (Constants.EXPLORE.equals(identification)) {
                 map.setExploreDeck(getCardList(tokenizer[1]));
             } else if (Constants.RELICS.equals(identification)) {
-            	map.setRelics(getCardList(tokenizer[1]));
+                map.setRelics(getCardList(tokenizer[1]));
             } else if (Constants.DISCARDED_EXPLORES.equals(identification)) {
                 map.setExploreDiscard(getCardList(tokenizer[1]));
             } else if (Constants.LAW_INFO.equals(identification)) {
@@ -832,12 +834,12 @@ public class MapSaveLoadManager {
                         player.setSecret(id, index);
                     }
                 }
-                
+
                 case Constants.FRAGMENTS -> {
-                	StringTokenizer fragments = new StringTokenizer(tokenizer.nextToken(), ",");
-                	while (fragments.hasMoreTokens()) {
-                		player.addFragment(fragments.nextToken());
-                	}
+                    StringTokenizer fragments = new StringTokenizer(tokenizer.nextToken(), ",");
+                    while (fragments.hasMoreTokens()) {
+                        player.addFragment(fragments.nextToken());
+                    }
                 }
 
                 case Constants.SC -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
