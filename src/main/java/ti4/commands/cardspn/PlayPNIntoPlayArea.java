@@ -53,7 +53,7 @@ public class PlayPNIntoPlayArea extends PNCardsSubcommandData {
         sb.append("Game: ").append(activeMap.getName()).append(" ");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Played: ");
-        sb.append(Mapper.getPromissoryNote(acID)).append("\n");
+        sb.append(Mapper.getShortPromissoryNote(acID)).append("\n");
         MessageHelper.sendMessageToChannel(event, sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);
 

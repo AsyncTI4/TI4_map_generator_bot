@@ -20,6 +20,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
     public ShowAllPN() {
         super(Constants.SHOW_ALL_PN, "Show Promissory Note to player");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to show Promissory Notes").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable").setRequired(false));
     }
 
     @Override
@@ -33,6 +34,12 @@ public class ShowAllPN extends PNCardsSubcommandData {
         }
 
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
+        OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
+        boolean longPNDisplay = false;
+        if (longPNOption != null) {
+            longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
+        }
+        
         if (playerOption != null) {
             User user = playerOption.getAsUser();
             StringBuilder sb = new StringBuilder();
@@ -42,7 +49,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
             LinkedHashMap<String, Integer> actionCards = player.getPromissoryNotes();
             int index = 1;
             for (String id : actionCards.keySet()) {
-                sb.append(index).append(". ").append(Mapper.getPromissoryNote(id)).append("\n");
+                sb.append(index).append(". ").append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
                 index++;
 
             }
