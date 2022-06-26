@@ -500,7 +500,12 @@ public class MapSaveLoadManager {
                         if (ENDGAMEINFO.equals(data)) {
                             break;
                         }
-                        readGameInfo(map, data);
+                        try {
+                            readGameInfo(map, data);
+                        }
+                        catch (Exception e){
+                            LoggerHandler.log("Data is bad", e);
+                        }
                     }
 
                     while (myReader.hasNextLine()) {

@@ -21,13 +21,12 @@ public class AddCustomPO extends StatusSubcommandData {
         Map activeMap = getActiveMap();
 
         OptionMapping poNameOption = event.getOption(Constants.PO_NAME);
-        if (poNameOption == null) {
+        if (poNameOption == null || poNameOption.getName().trim().isEmpty()) {
              MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Public Objective Name");
              return;
-
         }
         OptionMapping vpOption = event.getOption(Constants.PO_VP_WORTH);
-        if (vpOption == null) {
+        if (vpOption == null || vpOption.getName().trim().isEmpty()) {
              MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Public Objective Name");
              return;
 
