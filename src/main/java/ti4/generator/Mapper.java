@@ -171,6 +171,14 @@ public class Mapper {
         return (String) actionCards.get(id);
     }
 
+    public static String getPromissoryNote(String id, boolean longDisplay) {
+        if(longDisplay) {
+            return getPromissoryNote(id);
+        }else {
+            return getShortPromissoryNote(id);
+        }
+    }
+    
     public static String getPromissoryNote(String id) {
         return (String) promissoryNotes.get(id);
     }
