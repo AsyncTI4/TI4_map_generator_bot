@@ -189,6 +189,7 @@ public class Constants {
     public static final String RELIC_EXHAUST = "relic_exhaust";
     public static final String RELIC_REFRESH = "relic_refresh";
     public static final String RELIC_PURGE = "relic_purge";
+    public static final String SHUFFLE_BACK = "relic_shuffle_back";
     public static final String PUT_TOP = "put_top";
     public static final String PUT_BOTTOM = "put_bottom";
     public static final String LOOK_AT_TOP = "look_at_top";

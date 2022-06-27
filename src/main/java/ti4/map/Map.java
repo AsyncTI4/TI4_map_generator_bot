@@ -599,14 +599,22 @@ public class Map {
     public String drawRelic() {
         ArrayList<String> relics_ = new ArrayList<>(relics);
         relics_.remove(Constants.ENIGMATIC_DEVICE);
-
-
         if (relics_.isEmpty()) {
             return "";
         }
+        Collections.shuffle(relics_);
         String remove = relics_.remove(0);
         relics.remove(remove);
         return remove;
+    }
+
+    public boolean shuffleRelicBack(String relicID) {
+        if (!relics.contains(relicID)){
+            relics.add(relicID);
+            Collections.shuffle(relics);
+            return true;
+        }
+        return false;
     }
 
     @CheckForNull

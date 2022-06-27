@@ -9,11 +9,11 @@ import ti4.helpers.Constants;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PurgeRelic extends GenericRelicAction {
+public class ShuffleRelicBack extends GenericRelicAction {
 
-    public PurgeRelic() {
-        super(Constants.RELIC_PURGE, "Purge a relic", true);
-        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to purge").setAutoComplete(true).setRequired(true));
+    public ShuffleRelicBack() {
+        super(Constants.SHUFFLE_BACK, "Shuffle relic back into deck", true);
+        addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to shuffle back into deck").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do edit").setRequired(false));
     }
 
@@ -28,8 +28,13 @@ public class PurgeRelic extends GenericRelicAction {
         if (player.getRelics().contains(relicId)) {
             player.removeRelic(relicId);
             player.removeExhaustedRelic(relicId);
-            String relicName = Mapper.getRelic(relicId).split(";")[0];
-            MessageHelper.replyToMessage(event, "Purged relic: " + relicName);
+            boolean success = getActiveMap().shuffleRelicBack(relicId);
+            if (success) {
+                String relicName = Mapper.getRelic(relicId).split(";")[0];
+                MessageHelper.replyToMessage(event, "Shuffled relic back: " + relicName);
+            } else {
+                MessageHelper.replyToMessage(event, "Could not shuffle relic back into deck.");
+            }
         } else {
             MessageHelper.replyToMessage(event, "Invalid relic or player does not have specified relic");
         }
