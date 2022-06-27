@@ -506,7 +506,7 @@ public class MapSaveLoadManager {
                         try {
                             readGameInfo(map, data);
                         } catch (Exception e) {
-                            LoggerHandler.log("Data is bad", e);
+                            LoggerHandler.log("Data is bad: " + map.getName(), e);
                         }
                     }
 
