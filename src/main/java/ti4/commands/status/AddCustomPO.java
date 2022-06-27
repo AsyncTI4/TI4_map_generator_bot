@@ -25,6 +25,11 @@ public class AddCustomPO extends StatusSubcommandData {
              MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Public Objective Name");
              return;
         }
+
+        if (poNameOption.getName().contains(",") || poNameOption.getName().contains(";")) {
+             MessageHelper.sendMessageToChannel(event.getChannel(), "Symbol ; or , is not allowed");
+             return;
+        }
         OptionMapping vpOption = event.getOption(Constants.PO_VP_WORTH);
         if (vpOption == null || vpOption.getName().trim().isEmpty()) {
              MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Public Objective Name");
