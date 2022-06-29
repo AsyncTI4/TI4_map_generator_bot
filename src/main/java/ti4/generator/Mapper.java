@@ -3,6 +3,7 @@ package ti4.generator;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Constants;
 import ti4.helpers.LoggerHandler;
 
 import javax.annotation.CheckForNull;
@@ -36,6 +37,8 @@ public class Mapper {
     private static final Properties planets = new Properties();
     private static final Properties planet_representation = new Properties();
     private static final Properties attachmentInfo = new Properties();
+    private static final Properties leaders = new Properties();
+    private static final HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = new HashMap<>();
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
@@ -53,6 +56,7 @@ public class Mapper {
         readData("public_objective.properties", publicObjectives, "Could not read public objective file");
         readData("Promissory_Notes.properties", promissoryNotes, "Could not read promissory notes file");
         readData("exploration.properties", explore, "Could not read explore file");
+        readData("leaders.properties", leaders, "Could not read leaders file");
         readData("Relics.properties", relics, "Could not read relic file");
         readData("tech.properties", techs, "Could not read tech file");
         readData("planets.properties", planets, "Could not read planets file");
@@ -172,27 +176,27 @@ public class Mapper {
     }
 
     public static String getPromissoryNote(String id, boolean longDisplay) {
-        if(longDisplay) {
+        if (longDisplay) {
             return getPromissoryNote(id);
-        }else {
+        } else {
             return getShortPromissoryNote(id);
         }
     }
-    
+
     public static String getPromissoryNote(String id) {
         return (String) promissoryNotes.get(id);
     }
 
-    public static String getShortPromissoryNote(String id) { 
+    public static String getShortPromissoryNote(String id) {
         String promStr = promissoryNotes.getProperty(id);
         // if we would break trying to split the note, just return whatever is there
-        if((promStr == null) || !promStr.contains(";")){
+        if ((promStr == null) || !promStr.contains(";")) {
             return promStr;
         }
-        String[] pns = ((String)promissoryNotes.get(id)).split(";");
-        return pns[0] +";" + pns[1];
+        String[] pns = ((String) promissoryNotes.get(id)).split(";");
+        return pns[0] + ";" + pns[1];
     }
-    
+
     public static String getPromissoryNoteOwner(String id) {
         String pnInfo = (String) promissoryNotes.get(id);
         String[] pns = pnInfo.split(";");
@@ -334,6 +338,35 @@ public class Mapper {
             }
         }
         return techListInfo;
+    }
+
+    public static HashMap<String, HashMap<String, ArrayList<String>>> getLeadersInfo() {
+        if (leadersInfo.isEmpty()) {
+            for (Map.Entry<Object, Object> entry : leaders.entrySet()) {
+                String value = (String) entry.getValue();
+                String[] leaders = value.split(";");
+                HashMap<String, ArrayList<String>> leaderMap = new HashMap<>();
+                for (String leader : leaders) {
+                    ArrayList<String> filteredNames = new ArrayList<>();
+                    if (leader.contains(",")) {
+                        String[] names = value.split(",");
+                        if (names.length > 1) {
+                            for (String name : names) {
+                                if (!name.equals(Constants.AGENT) &&
+                                    !name.equals(Constants.COMMANDER) &&
+                                    !name.equals(Constants.HERO))
+                                {
+                                    filteredNames.add(name);
+                                }
+                            }
+                        }
+                    }
+                    leaderMap.put(leader, filteredNames);
+                }
+                leadersInfo.put((String)entry.getKey(), leaderMap);
+            }
+        }
+        return leadersInfo;
     }
 
     public static boolean isValidTech(String id) {

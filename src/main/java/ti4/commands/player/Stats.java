@@ -175,11 +175,11 @@ public class Stats extends PlayerSubcommandData {
         }
     }
 
-    private void setValue(SlashCommandInteractionEvent event, Player player, OptionMapping option, Consumer<Integer> consumer, Supplier<Integer> supplier) {
+    public static void setValue(SlashCommandInteractionEvent event, Player player, OptionMapping option, Consumer<Integer> consumer, Supplier<Integer> supplier) {
         setValue(event, option.getName(), consumer, supplier, option.getAsString());
     }
 
-    private void setValue(SlashCommandInteractionEvent event, String optionName, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
+    public static void setValue(SlashCommandInteractionEvent event, String optionName, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
         try {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             int number = Integer.parseInt(value);

@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands.special.AddFactionCCToFleetSupply;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -112,6 +111,11 @@ public class LeaderCommand implements Command {
         Collection<LeaderSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new UnlockLeader());
         subcommands.add(new LockLeader());
+        subcommands.add(new RefreshLeader());
+        subcommands.add(new ExhaustLeader());
+        subcommands.add(new TGLeader());
+        subcommands.add(new PurgeLeader());
+        subcommands.add(new ResetLeader());
 
         return subcommands;
     }

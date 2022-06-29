@@ -66,6 +66,7 @@ public class ExploreCommand implements Command {
         subcommands.add(new RefreshRelic());
         subcommands.add(new DrawSpecificRelic());
         subcommands.add(new ShowRemainingRelics());
+        subcommands.add(new AddRelicBackIntoDeck());
         return subcommands;
     }
 
