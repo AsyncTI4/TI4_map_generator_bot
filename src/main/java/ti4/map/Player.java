@@ -41,6 +41,7 @@ public class Player {
     private List<String> exhaustedPlanets = new ArrayList<>();
     private List<String> exhaustedPlanetsAbilities = new ArrayList<>();
     private List<String> mahactCC = new ArrayList<>();
+    private List<Leader> leaders = new ArrayList<>();
 
     @CheckForNull
     private Role roleForCommunity = null;
@@ -349,6 +350,67 @@ public class Player {
     public void setFaction(String faction) {
         this.faction = faction;
         initPNs();
+        initLeaders();
+    }
+
+    public void initLeaders() {
+        if (faction != null && Mapper.isFaction(faction)) {
+            leaders.clear();
+            HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = Mapper.getLeadersInfo();
+            HashMap<String, ArrayList<String>> factionLeaders = leadersInfo.get(faction);
+            if (factionLeaders != null) {
+                for (Map.Entry<String, ArrayList<String>> factionLeaderEntry : factionLeaders.entrySet()) {
+                    String leaderType = factionLeaderEntry.getKey();
+                    ArrayList<String> uniqueLeaders = factionLeaderEntry.getValue();
+                    if (uniqueLeaders.isEmpty()){
+                        Leader leader = new Leader(leaderType, "");
+                        leaders.add(leader);
+                    } else {
+                        for (String uniqueLeader : uniqueLeaders) {
+                            Leader leader = new Leader(leaderType, uniqueLeader);
+                            leaders.add(leader);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    @CheckForNull
+    public Leader getLeader(String leaderID) {
+        for (Leader leader : leaders) {
+            if (leader.getId().equals(leaderID) || leader.getName().equals(leaderID)){
+                return leader;
+            }
+        }
+        return null;
+    }
+
+    public boolean removeLeader(String leaderID) {
+        Leader leaderToPurge = null;
+        for (Leader leader : leaders) {
+            if (leader.getId().equals(leaderID) || leader.getName().equals(leaderID)){
+                leaderToPurge = leader;
+                break;
+            }
+        }
+        if (leaderToPurge == null){
+            return false;
+        }
+        return leaders.remove(leaderToPurge);
+    }
+
+    public boolean addLeader(String leaderID) {
+        Leader leaderToPurge = null;
+        for (Leader leader : leaders) {
+            if (leader.getId().equals(leaderID) || leader.getName().equals(leaderID)){
+                return false;
+            }
+        }
+        if (leaderToPurge == null){
+            return false;
+        }
+        return leaders.remove(leaderToPurge);
     }
 
     public String getColor() {

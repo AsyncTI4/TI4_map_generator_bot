@@ -13,6 +13,8 @@ import java.util.stream.Stream;
 
 public class AutoCompleteProvider {
 
+    private static ArrayList<String> leaders = new ArrayList<>();
+
     public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
         String optionName = event.getFocusedOption().getName();
         if (optionName.equals(Constants.COLOR)) {
@@ -72,6 +74,25 @@ public class AutoCompleteProvider {
                     .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                     .limit(25)
                     .map(value -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(value.getValue(), value.getKey()))
+                    .collect(Collectors.toList());
+            event.replyChoices(options).queue();
+        } else if (optionName.equals(Constants.LEADER)) {
+            String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+            if (leaders.isEmpty()) {
+                leaders = new ArrayList<>(Constants.leaderList);
+                HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = Mapper.getLeadersInfo();
+                for (HashMap<String, ArrayList<String>> value : leadersInfo.values()) {
+                    for (ArrayList<String> leaderNames : value.values()) {
+                        if (!leaderNames.isEmpty()) {
+                            leaders.addAll(leaderNames);
+                        }
+                    }
+                }
+            }
+            List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = leaders.stream()
+                    .filter(value -> value.toLowerCase().contains(enteredValue))
+                    .limit(25)
+                    .map(value -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(value, value))
                     .collect(Collectors.toList());
             event.replyChoices(options).queue();
         } else if (optionName.equals(Constants.TECH) || optionName.equals(Constants.TECH2) || optionName.equals(Constants.TECH3) || optionName.equals(Constants.TECH4)) {

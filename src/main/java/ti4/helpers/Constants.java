@@ -1,6 +1,8 @@
 package ti4.helpers;
 
 import java.awt.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 
 public class Constants {
     public static final String SHOW_GAME = "show_game";
@@ -97,8 +99,12 @@ public class Constants {
     public static final String REMOVE_CC_FROM_FS = "mahact_cc_from_fs";
     public static final String SPECIAL = "special";
 
-    public static final String UNLOCK_LEADER = "unlock_leader";
-    public static final String LOCK_LEADER = "lock_leader";
+    public static final String UNLOCK_LEADER = "unlock";
+    public static final String LOCK_LEADER = "lock";
+    public static final String EXHAUST_LEADER = "exhaust";
+    public static final String REFRESH_LEADER = "refresh";
+    public static final String PURGE_LEADER = "purge";
+    public static final String ADD_LEADER = "add";
     public static final String LEADERS = "leaders";
 
     public static final String GAME = "game";
@@ -194,6 +200,7 @@ public class Constants {
     public static final String RELIC_REFRESH = "relic_refresh";
     public static final String RELIC_PURGE = "relic_purge";
     public static final String SHUFFLE_BACK = "relic_shuffle_back";
+    public static final String ADD_BACK_INTO_DECK = "relic_add_back_into_deck";
     public static final String PUT_TOP = "put_top";
     public static final String PUT_BOTTOM = "put_bottom";
     public static final String LOOK_AT_TOP = "look_at_top";
@@ -315,4 +322,17 @@ public class Constants {
     public static final String CYBERNETIC = "cybernetic";
     public static final String BIOTIC = "biotic";
     public static final String UNIT_UPGRADE = "unitupgrade";
+
+
+    public static final String LEADER = "leader";
+    public static final String AGENT = "agent";
+    public static final String COMMANDER = "commander";
+    public static final String HERO = "hero";
+
+    public static final ArrayList<String> leaderList = new ArrayList<>();
+    static {
+        leaderList.add(AGENT);
+        leaderList.add(COMMANDER);
+        leaderList.add(HERO);
+    }
 }

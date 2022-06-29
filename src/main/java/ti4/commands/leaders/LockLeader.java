@@ -2,10 +2,10 @@ package ti4.commands.leaders;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
+import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
-
-import java.util.ArrayList;
+import ti4.message.MessageHelper;
 
 public class LockLeader extends LeaderAction {
     public LockLeader() {
@@ -13,9 +13,12 @@ public class LockLeader extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, ArrayList<String> colors, Map activeMap, Player player) {
-        for (String color : colors) {
-//            player.addMahactCC(color);
+    void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
+        Leader playerLeader = player.getLeader(leader);
+        if (playerLeader != null){
+            playerLeader.setLocked(true);
+        } else {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
         }
     }
 }

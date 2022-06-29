@@ -10,11 +10,9 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-abstract public class LeaderAction extends LeaderSubcommandData {
-    public LeaderAction(String id, String description) {
-        super(id, description);
-        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action")
-                .setRequired(true).setAutoComplete(true));
+public class ResetLeader extends LeaderSubcommandData {
+    public ResetLeader() {
+        super(Constants.RESET, "Reset all leaders");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats").setRequired(false));
     }
 
@@ -30,11 +28,10 @@ abstract public class LeaderAction extends LeaderSubcommandData {
 
         OptionMapping leader = event.getOption(Constants.LEADER);
         if (leader != null) {
-            action(event, leader.getAsString(), activeMap, player);
+            player.initLeaders();
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Leaders were reset");
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Need to specify CC's");
         }
     }
-
-    abstract void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player);
 }

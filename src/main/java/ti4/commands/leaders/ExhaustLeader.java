@@ -7,16 +7,16 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class UnlockLeader extends LeaderAction {
-    public UnlockLeader() {
-        super(Constants.UNLOCK_LEADER, "Unlock leader");
+public class ExhaustLeader extends LeaderAction {
+    public ExhaustLeader() {
+        super(Constants.EXHAUST_LEADER, "Exhaust leader");
     }
 
     @Override
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null){
-            playerLeader.setLocked(false);
+            playerLeader.setExhausted(true);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
         }
