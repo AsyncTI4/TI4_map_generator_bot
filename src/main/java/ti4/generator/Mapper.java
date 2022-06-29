@@ -184,7 +184,7 @@ public class Mapper {
     }
 
     public static String getShortPromissoryNote(String id) { 
-        String promStr = ((String)promissoryNotes.getProperty(id));
+        String promStr = promissoryNotes.getProperty(id);
         // if we would break trying to split the note, just return whatever is there
         if((promStr == null) || !promStr.contains(";")){
             return promStr;

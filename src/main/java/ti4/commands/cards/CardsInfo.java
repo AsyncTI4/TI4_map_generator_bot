@@ -131,6 +131,7 @@ public class CardsInfo extends CardsSubcommandData {
                     player.setPromissoryNote(promissoryNote);
                 }
             }
+
         }
     }
 }

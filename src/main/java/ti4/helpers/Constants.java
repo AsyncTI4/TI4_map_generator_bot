@@ -97,6 +97,10 @@ public class Constants {
     public static final String REMOVE_CC_FROM_FS = "mahact_cc_from_fs";
     public static final String SPECIAL = "special";
 
+    public static final String UNLOCK_LEADER = "unlock_leader";
+    public static final String LOCK_LEADER = "lock_leader";
+    public static final String LEADERS = "leaders";
+
     public static final String GAME = "game";
     public static final String INFO = "info";
     public static final String UNDO = "undo";
