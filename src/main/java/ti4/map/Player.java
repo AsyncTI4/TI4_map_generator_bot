@@ -390,6 +390,10 @@ public class Player {
         return leaders;
     }
 
+    public void setLeaders(List<Leader> leaders) {
+        this.leaders = leaders;
+    }
+
     public boolean removeLeader(String leaderID) {
         Leader leaderToPurge = null;
         for (Leader leader : leaders) {

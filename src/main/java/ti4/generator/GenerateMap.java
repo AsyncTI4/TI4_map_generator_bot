@@ -458,13 +458,11 @@ public class GenerateMap {
             String leaderFileName = "pa_leaders_factionicon_" + player.getFaction() + "_rdy.png";
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             drawPAImage(x + deltaX, y, leaderFileName);
-            String extraInfo = leader.getName().isEmpty() ? "" : leader.getName();
-            String leaderInfoFileName = "pa_leaders_" + leader.getId() + "_" + player.getFaction() + extraInfo + status +".png";
-            drawPAImage(x + deltaX, y, leaderInfoFileName);
+
             if (leader.getTgCount() != 0){
                 graphics.setColor(new Color(255, 234, 0));
-                graphics.setFont(Storage.getFont26());
-                graphics.drawString( Integer.toString(leader.getTgCount()), x + deltaX + 5, y + 28);
+                graphics.setFont(Storage.getFont32());
+                graphics.drawString( Integer.toString(leader.getTgCount()), x + deltaX + 3, y + 32);
             } else {
                 String pipID;
                 switch (leader.getId()) {
@@ -478,6 +476,11 @@ public class GenerateMap {
                     drawPAImage(x + deltaX, y, leaderPipInfo);
                 }
             }
+
+            String extraInfo = leader.getName().isEmpty() ? "" : "_" + leader.getName();
+            String leaderInfoFileName = "pa_leaders_" + leader.getId() + "_" + player.getFaction() + extraInfo + status +".png";
+            drawPAImage(x + deltaX, y, leaderInfoFileName);
+
             deltaX += 48;
         }
         return x + deltaX + 10;

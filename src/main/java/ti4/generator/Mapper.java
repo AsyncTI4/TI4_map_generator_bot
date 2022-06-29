@@ -349,7 +349,7 @@ public class Mapper {
                 for (String leader : leaders) {
                     ArrayList<String> filteredNames = new ArrayList<>();
                     if (leader.contains(",")) {
-                        String[] names = value.split(",");
+                        String[] names = leader.split(",");
                         if (names.length > 1) {
                             for (String name : names) {
                                 if (!name.equals(Constants.AGENT) &&
@@ -360,8 +360,10 @@ public class Mapper {
                                 }
                             }
                         }
+                        leaderMap.put(names[0], filteredNames);
+                    } else {
+                        leaderMap.put(leader, filteredNames);
                     }
-                    leaderMap.put(leader, filteredNames);
                 }
                 leadersInfo.put((String)entry.getKey(), leaderMap);
             }
