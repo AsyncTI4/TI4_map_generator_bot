@@ -223,8 +223,7 @@ Its workaround for that single explore
 
 /leader unlock leaderID <- unlock leader
 /leader lock leaderID <- lock leader
-/leader exhaust leaderID <- exhaust leader
+/leader exhaust leaderID trade_goods <- exhaust leader and can add trade good to leader (like arturo for nomad)
 /leader refresh leaderID <- refresh leader
-/leader trade_goods leaderID <- adds TG count to leader (example Nomad agent)
 /leader purge leaderID <- purges leader
 /leader reset <- resets all leaders for faction

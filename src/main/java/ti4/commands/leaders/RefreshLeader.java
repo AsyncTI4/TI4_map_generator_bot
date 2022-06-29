@@ -16,6 +16,10 @@ public class RefreshLeader extends LeaderAction {
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null){
+            if (playerLeader.isLocked()){
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Leader is locked");
+                return;
+            }
             refreshLeader(player, playerLeader);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
