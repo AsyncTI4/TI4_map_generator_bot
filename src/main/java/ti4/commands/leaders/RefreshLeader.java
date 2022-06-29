@@ -24,7 +24,7 @@ public class RefreshLeader extends LeaderAction {
 
     public static void refreshLeader(Player player, Leader playerLeader) {
         int tgCount = playerLeader.getTgCount();
-        playerLeader.setExhausted(true);
+        playerLeader.setExhausted(false);
         if (tgCount > 0) {
             int tg = player.getTg();
             tg += tgCount;

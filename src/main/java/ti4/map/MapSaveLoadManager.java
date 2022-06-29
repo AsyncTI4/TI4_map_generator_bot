@@ -336,6 +336,23 @@ public class MapSaveLoadManager {
             writer.write(Constants.SC + " " + player.getSC());
             writer.write(System.lineSeparator());
 
+            StringBuilder leaderInfo = new StringBuilder();
+            for (Leader leader : player.getLeaders()) {
+                leaderInfo.append(leader.getId());
+                leaderInfo.append(",");
+                String name = leader.getName();
+                leaderInfo.append(name.isEmpty() ? "." : name);
+                leaderInfo.append(",");
+                leaderInfo.append(leader.getTgCount());
+                leaderInfo.append(",");
+                leaderInfo.append(leader.isExhausted());
+                leaderInfo.append(",");
+                leaderInfo.append(leader.isLocked());
+                leaderInfo.append(";");
+            }
+            writer.write(Constants.LEADERS + " " + leaderInfo);
+            writer.write(System.lineSeparator());
+
             writer.write(ENDPLAYER);
             writer.write(System.lineSeparator());
         }
@@ -816,6 +833,23 @@ public class MapSaveLoadManager {
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));
                 case Constants.EXHAUSTED_RELICS -> player.setExhaustedRelics(getCardList(tokenizer.nextToken()));
                 case Constants.MAHACT_CC -> player.setMahactCC(getCardList(tokenizer.nextToken()));
+                case Constants.LEADERS -> {
+                    StringTokenizer leaderInfos = new StringTokenizer(tokenizer.nextToken(), ";");
+                    try {
+                        List<Leader> leaderList = new ArrayList<>();
+                        while (leaderInfos.hasMoreTokens()) {
+                            String[] split = leaderInfos.nextToken().split(",");
+                            Leader leader = new Leader(split[0], split[1]);
+                            leader.setTgCount(Integer.parseInt(split[2]));
+                            leader.setExhausted(Boolean.parseBoolean(split[3]));
+                            leader.setLocked(Boolean.parseBoolean(split[4]));
+                            leaderList.add(leader);
+                        }
+                        player.setLeaders(leaderList);
+                    } catch (Exception e){
+                        LoggerHandler.log("Could not parse leaders loading map", e);
+                    }
+                }
                 case Constants.SO_SCORED -> {
                     StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (secrets.hasMoreTokens()) {

@@ -14,7 +14,11 @@ public class Leader {
         if (Constants.AGENT.equals(id)){
             locked = false;
         }
-        this.name = name;
+        if (!name.equals(".")) {
+            this.name = name;
+        } else {
+            this.name = "";
+        }
     }
 
     public String getId() {
