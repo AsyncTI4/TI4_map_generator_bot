@@ -13,6 +13,10 @@ import ti4.message.MessageHelper;
 abstract public class LeaderAction extends LeaderSubcommandData {
     public LeaderAction(String id, String description) {
         super(id, description);
+        options();
+    }
+
+    protected void options() {
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action")
                 .setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats").setRequired(false));

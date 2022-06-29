@@ -357,9 +357,17 @@ public class GenerateMap {
                     }
                 }
                 int techStartY = y + deltaY + pnY;
-                int techY = techs(player, techStartY);
-                graphics.setColor(color);
-                y += 90 + (techY - techStartY);
+//                if (!map.getName().equals("test1")) {
+                    int techY = techs(player, techStartY);
+                    graphics.setColor(color);
+                    y += 90 + (techY - techStartY);
+//                } else {
+//                    y += 50;
+//                }
+
+                if (!player.getLeaders().isEmpty()) {
+                    xDelta = leaderInfo(player, xDelta, yPlayArea);
+                }
 
                 if (!player.getRelics().isEmpty()) {
                     xDelta = relicInfo(player, xDelta, yPlayArea);
@@ -429,6 +437,47 @@ public class GenerateMap {
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             drawPAImage(x + deltaX, y, "pa_relics_icon.png");
             drawPAImage(x + deltaX, y, relicFileName);
+            deltaX += 48;
+        }
+        return x + deltaX + 10;
+    }
+
+    private int leaderInfo(Player player, int x, int y) {
+        int deltaX = 0;
+
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+        for (Leader leader : player.getLeaders()) {
+            boolean isExhaustedLocked = leader.isExhausted() || leader.isLocked();
+            if (isExhaustedLocked) {
+                graphics.setColor(Color.GRAY);
+            } else {
+                graphics.setColor(Color.WHITE);
+            }
+            String status = isExhaustedLocked ? "_exh" : "_rdy";
+            String leaderFileName = "pa_leaders_factionicon_" + player.getFaction() + "_rdy.png";
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, leaderFileName);
+            String extraInfo = leader.getName().isEmpty() ? "" : leader.getName();
+            String leaderInfoFileName = "pa_leaders_" + leader.getId() + "_" + player.getFaction() + extraInfo + status +".png";
+            drawPAImage(x + deltaX, y, leaderInfoFileName);
+            if (leader.getTgCount() != 0){
+                graphics.setColor(new Color(255, 234, 0));
+                graphics.setFont(Storage.getFont26());
+                graphics.drawString( Integer.toString(leader.getTgCount()), x + deltaX + 5, y + 28);
+            } else {
+                String pipID;
+                switch (leader.getId()) {
+                    case Constants.AGENT -> pipID = "i";
+                    case Constants.COMMANDER -> pipID = "ii";
+                    case Constants.HERO -> pipID = "iii";
+                    default -> pipID = "";
+                }
+                if (!pipID.isEmpty()) {
+                    String leaderPipInfo = "pa_leaders_pips_" + pipID + status + ".png";
+                    drawPAImage(x + deltaX, y, leaderPipInfo);
+                }
+            }
             deltaX += 48;
         }
         return x + deltaX + 10;

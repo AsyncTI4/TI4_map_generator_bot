@@ -16,9 +16,20 @@ public class RefreshLeader extends LeaderAction {
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null){
-            playerLeader.setExhausted(true);
+            refreshLeader(player, playerLeader);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
+        }
+    }
+
+    public static void refreshLeader(Player player, Leader playerLeader) {
+        int tgCount = playerLeader.getTgCount();
+        playerLeader.setExhausted(true);
+        if (tgCount > 0) {
+            int tg = player.getTg();
+            tg += tgCount;
+            player.setTg(tg);
+            playerLeader.setTgCount(0);
         }
     }
 }

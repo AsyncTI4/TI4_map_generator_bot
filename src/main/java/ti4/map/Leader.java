@@ -1,5 +1,7 @@
 package ti4.map;
 
+import ti4.helpers.Constants;
+
 public class Leader {
     private final String id;
     private final String name;
@@ -9,6 +11,9 @@ public class Leader {
 
     public Leader(String id, String name) {
         this.id = id;
+        if (Constants.AGENT.equals(id)){
+            locked = false;
+        }
         this.name = name;
     }
 

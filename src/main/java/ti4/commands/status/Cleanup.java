@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.leaders.RefreshLeader;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.map.*;
@@ -51,6 +52,12 @@ public class Cleanup extends StatusSubcommandData {
             player.cleanExhaustedTechs();
             player.cleanExhaustedPlanets();
             player.cleanExhaustedRelics();
+
+            for (Leader leader : player.getLeaders()) {
+                if (!leader.isLocked()){
+                    RefreshLeader.refreshLeader(player, leader);
+                }
+            }
         }
     }
 }

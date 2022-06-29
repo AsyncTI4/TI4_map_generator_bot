@@ -386,6 +386,10 @@ public class Player {
         return null;
     }
 
+    public List<Leader> getLeaders() {
+        return leaders;
+    }
+
     public boolean removeLeader(String leaderID) {
         Leader leaderToPurge = null;
         for (Leader leader : leaders) {
