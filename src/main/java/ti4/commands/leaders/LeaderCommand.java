@@ -113,7 +113,6 @@ public class LeaderCommand implements Command {
         subcommands.add(new LockLeader());
         subcommands.add(new RefreshLeader());
         subcommands.add(new ExhaustLeader());
-        subcommands.add(new TGLeader());
         subcommands.add(new PurgeLeader());
         subcommands.add(new ResetLeader());
 
