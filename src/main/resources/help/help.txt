@@ -221,9 +221,9 @@ Its workaround for that single explore
 /special mahact_cc_to_fs color <- add's any color CC to fleet supply
 /special mahact_cc_from_fs color <- removes any color CC from fleet supply
 
-/leader unlock leaderID <- unlock leader
-/leader lock leaderID <- lock leader
-/leader exhaust leaderID trade_goods <- exhaust leader and can add trade good to leader (like arturo for nomad)
-/leader refresh leaderID <- refresh leader
-/leader purge leaderID <- purges leader
-/leader reset <- resets all leaders for faction
+/leaders unlock leaderID <- unlock leader
+/leaders lock leaderID <- lock leader
+/leaders exhaust leaderID trade_goods <- exhaust leader and can add trade good to leader (like arturo for nomad)
+/leaders refresh leaderID <- refresh leader
+/leaders purge leaderID <- purges leader
+/leaders reset <- resets all leaders for faction
