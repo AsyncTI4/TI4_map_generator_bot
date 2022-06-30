@@ -53,7 +53,7 @@ abstract public class AddRemoveUnits implements Command {
         }
     }
 
-    protected Tile getTile(SlashCommandInteractionEvent event, String tileID, Map activeMap) {
+    public static Tile getTile(SlashCommandInteractionEvent event, String tileID, Map activeMap) {
         if (activeMap.isTileDuplicated(tileID)) {
             MessageHelper.replyToMessage(event, "Duplicate tile name found, please use position coordinates");
             return null;

@@ -111,6 +111,7 @@ public class SpecialCommand implements Command {
         Collection<SpecialSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new AddFactionCCToFleetSupply());
         subcommands.add(new RemoveFactionCCFromFleetSupply());
+        subcommands.add(new DiploSystem());
 
         return subcommands;
     }
