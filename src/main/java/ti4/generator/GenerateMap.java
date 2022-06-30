@@ -42,7 +42,7 @@ public class GenerateMap {
     private final int width6 = 2000;
     private final int heght6 = 2100;
     private final int width8 = 2500;
-    private final int heght8 = 3050;
+    private final int heght8 = 3350;
 
     private static GenerateMap instance;
 
@@ -68,8 +68,8 @@ public class GenerateMap {
         width = mapWidth + (extraWidth * 2);
         heightForGameInfo = mapHeight;
         heightForGameInfoStorage = heightForGameInfo;
-        height = heightForGameInfo + mapHeight / 2 + 2000;
-        heightStats = mapHeight / 2 + 2000;
+        height = heightForGameInfo + mapHeight / 2 + 2200;
+        heightStats = mapHeight / 2 + 2200;
         heightStorage = height;
     }
 
@@ -335,36 +335,34 @@ public class GenerateMap {
                 y += 85;
                 int pnX = 0;
                 int pnY = 40;
-                List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
-                for (String id : promissoryNotesInPlayArea) {
-                    if (id.endsWith("_sftt")) {
-                        continue;
-                    }
-                    String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);
-                    for (Player player_ : players.values()) {
-                        if (player_ != player) {
-                            String playerColor = player_.getColor();
-                            String playerFaction = player_.getFaction();
-                            if (playerColor != null && playerColor.equals(promissoryNoteOwner) ||
-                                    playerFaction != null && playerFaction.equals(promissoryNoteOwner)) {
-                                graphics.setColor(getColor(player_.getColor()));
-                                String promissoryNote = Mapper.getPromissoryNote(id);
-                                String[] pnSplit = promissoryNote.split(";");
-                                graphics.drawString(pnSplit[0] + "(" + playerFaction + ")", x + 230 + pnX, y + deltaY + pnY);
-                                pnX = pnX + pnSplit[0].length() * 28;
-                            }
-                        }
-                    }
-                }
-                int techStartY = y + deltaY + pnY;
-//                if (!map.getName().equals("test1")) {
-                    int techY = techs(player, techStartY);
-                    graphics.setColor(color);
-                    y += 90 + (techY - techStartY);
-//                } else {
-//                    y += 50;
+//                List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
+//                for (String id : promissoryNotesInPlayArea) {
+//                    if (id.endsWith("_sftt")) {
+//                        continue;
+//                    }
+//                    String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);
+//                    for (Player player_ : players.values()) {
+//                        if (player_ != player) {
+//                            String playerColor = player_.getColor();
+//                            String playerFaction = player_.getFaction();
+//                            if (playerColor != null && playerColor.equals(promissoryNoteOwner) ||
+//                                    playerFaction != null && playerFaction.equals(promissoryNoteOwner)) {
+//                                graphics.setColor(getColor(player_.getColor()));
+//                                String promissoryNote = Mapper.getPromissoryNote(id);
+//                                String[] pnSplit = promissoryNote.split(";");
+//                                graphics.drawString(pnSplit[0] + "(" + playerFaction + ")", x + 230 + pnX, y + deltaY + pnY);
+//                                pnX = pnX + pnSplit[0].length() * 28;
+//                            }
+//                        }
+//                    }
 //                }
-
+//                int techStartY = y + deltaY + pnY;
+                y += 200;
+                int xDeltaSecondRow = xDelta;
+                int yPlayAreaSecondRow = yPlayArea + 160;
+                if (!player.getPlanets().isEmpty()) {
+                    xDeltaSecondRow = planetInfo(player, map, xDeltaSecondRow, yPlayAreaSecondRow);
+                }
                 if (!player.getLeaders().isEmpty()) {
                     xDelta = leaderInfo(player, xDelta, yPlayArea);
                 }
@@ -373,11 +371,12 @@ public class GenerateMap {
                     xDelta = relicInfo(player, xDelta, yPlayArea);
                 }
 
+                if (!player.getPromissoryNotesInPlayArea().isEmpty()) {
+                    xDelta = pnInfo(player, xDelta, yPlayArea, map);
+                }
+
                 if (!player.getTechs().isEmpty()) {
                     xDelta = techInfo(player, xDelta, yPlayArea);
-                }
-                if (!player.getPlanets().isEmpty()) {
-                    planetInfo(player, map, xDelta, yPlayArea);
                 }
 
                 g2.setColor(color);
@@ -406,6 +405,46 @@ public class GenerateMap {
                 graphics.drawString(text + Mapper.getAgendaForOnly(lawID), x, y);
             }
         }
+    }
+
+    private int pnInfo(Player player, int x, int y, Map map) {
+        int deltaX = 0;
+
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+        Collection<Player> players = map.getPlayers().values();
+        for (String pn : player.getPromissoryNotesInPlayArea()) {
+            graphics.setColor(Color.WHITE);
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+
+            String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(pn);
+            for (Player player_ : players) {
+                if (player_ != player) {
+                    String playerColor = player_.getColor();
+                    String playerFaction = player_.getFaction();
+                    if (playerColor != null && playerColor.equals(promissoryNoteOwner) ||
+                            playerFaction != null && playerFaction.equals(promissoryNoteOwner)) {
+                        String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
+                        drawPAImage(x + deltaX, y, pnColorFile);
+
+                        String pnFactionIcon = "pa_tech_factionicon_" + playerFaction + "_rdy.png";
+                        drawPAImage(x + deltaX, y, pnFactionIcon);
+                        break;
+                    }
+                }
+            }
+
+            if (pn.endsWith("_sftt")){
+                pn = "sftt";
+            } else if (pn.endsWith("_an")) {
+                pn = "alliance";
+            }
+
+            String pnName =  "pa_pn_name_" + pn + ".png";
+            drawPAImage(x + deltaX, y, pnName);
+            deltaX += 48;
+        }
+        return x + deltaX + 20;
     }
 
     private int drawFrags(int y, int x, int yDelta, int vrf, String vrfImage, int xDelta) {
@@ -439,7 +478,7 @@ public class GenerateMap {
             drawPAImage(x + deltaX, y, relicFileName);
             deltaX += 48;
         }
-        return x + deltaX + 10;
+        return x + deltaX + 20;
     }
 
     private int leaderInfo(Player player, int x, int y) {
@@ -483,10 +522,10 @@ public class GenerateMap {
 
             deltaX += 48;
         }
-        return x + deltaX + 10;
+        return x + deltaX + 20;
     }
 
-    private void planetInfo(Player player, Map map, int x, int y) {
+    private int planetInfo(Player player, Map map, int x, int y) {
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
         List<String> planets = player.getPlanets();
         List<String> exhaustedPlanets = player.getExhaustedPlanets();
@@ -575,6 +614,7 @@ public class GenerateMap {
 
             deltaX += 56;
         }
+        return x + deltaX + 20;
     }
 
     private int techInfo(Player player, int x, int y) {
@@ -625,7 +665,7 @@ public class GenerateMap {
         deltaX = techField(x, y, techsFiltered.get(Constants.CYBERNETIC), exhaustedTechs, techInfo, deltaX);
         deltaX = techField(x, y, techsFiltered.get(Constants.WARFARE), exhaustedTechs, techInfo, deltaX);
         deltaX = techField(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), exhaustedTechs, techInfo, deltaX);
-        return x + deltaX + 10;
+        return x + deltaX + 20;
     }
 
     private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, String[]> techInfo, int deltaX) {
@@ -660,7 +700,7 @@ public class GenerateMap {
             }
 
             if (techInformation.length >= 4 && !techInformation[3].isEmpty()){
-                String techSpec = "pa_tech_factionicon_" + techInformation[3] + techStatus;
+                String techSpec = "pa_tech_factionicon_" + techInformation[3] + "_rdy.png";
                 drawPAImage(x + deltaX, y, techSpec);
             }
 
@@ -963,8 +1003,8 @@ public class GenerateMap {
         graphics.setColor(Color.RED);
         y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret, 1, column, customPublicVP);
 
-        graphics.setColor(Color.green);
-        y = displaySftT(y, x, players, column);
+//        graphics.setColor(Color.green);
+//        y = displaySftT(y, x, players, column);
 
         if (column[0] != 0) {
             y += 40;
