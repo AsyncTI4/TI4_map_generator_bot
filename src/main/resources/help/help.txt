@@ -220,6 +220,7 @@ Its workaround for that single explore
 
 /special mahact_cc_to_fs color <- add's any color CC to fleet supply
 /special mahact_cc_from_fs color <- removes any color CC from fleet supply
+/special diplo_system tile <- add's cc for diplomacy SC
 
 /leaders unlock leaderID <- unlock leader
 /leaders lock leaderID <- lock leader
