@@ -7,27 +7,26 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.requests.restaction.interactions.ReplyCallbackAction;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
-import ti4.generator.Mapper;
-import ti4.helpers.Constants;
 import ti4.helpers.LoggerHandler;
 import ti4.map.Map;
 import ti4.map.MapFileDeleter;
 import ti4.map.MapManager;
 import ti4.message.MessageHelper;
 
-import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
-import java.util.stream.Collectors;
 
 public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
-        AutoCompleteProvider.autoCompleteListener(event);
+        try {
+            AutoCompleteProvider.autoCompleteListener(event);
+        } catch (Exception e) {
+            LoggerHandler.log("Auto complete issue in event: " + event.getName(), e);
+        }
     }
 
     @Override
@@ -65,10 +64,7 @@ public class MessageListener extends ListenerAdapter {
         MapFileDeleter.deleteFiles();
 
         String gameID = channelNameTokenizer.nextToken();
-        if (mapList.stream().anyMatch(map -> map.equals(gameID)) &&
-                (mapManager.getUserActiveMap(userID) == null || !mapManager.getUserActiveMap(userID).getName().equals(gameID) &&
-                (mapManager.getMap(gameID) != null && (mapManager.getMap(gameID).isMapOpen() ||
-                        mapManager.getMap(gameID).getPlayerIDs().contains(userID))))) {
+        if (mapList.stream().anyMatch(map -> map.equals(gameID)) && (mapManager.getUserActiveMap(userID) == null || !mapManager.getUserActiveMap(userID).getName().equals(gameID) && (mapManager.getMap(gameID) != null && (mapManager.getMap(gameID).isMapOpen() || mapManager.getMap(gameID).getPlayerIDs().contains(userID))))) {
             if (mapManager.getUserActiveMap(userID) != null && !mapManager.getUserActiveMap(userID).getName().equals(gameID)) {
 //                MessageHelper.sendMessageToChannel(event.getChannel(), "Active game set to: " + gameID);
             }
@@ -96,17 +92,11 @@ public class MessageListener extends ListenerAdapter {
         Message msg = event.getMessage();
         if (msg.getContentRaw().startsWith("map_log")) {
             if (event.isFromType(ChannelType.PRIVATE)) {
-                System.out.printf("[PM] %s: %s\n", event.getAuthor().getName(),
-                        event.getMessage().getContentDisplay());
-                System.out.printf("[PM] %s: %s\n", event.getAuthor().getId(),
-                        event.getMessage().getContentDisplay());
+                System.out.printf("[PM] %s: %s\n", event.getAuthor().getName(), event.getMessage().getContentDisplay());
+                System.out.printf("[PM] %s: %s\n", event.getAuthor().getId(), event.getMessage().getContentDisplay());
             } else {
-                System.out.printf("[%s][%s] %s: %s\n", event.getGuild().getName(),
-                        event.getTextChannel().getName(), event.getMember().getEffectiveName(),
-                        event.getMessage().getContentDisplay());
-                System.out.printf("[%s][%s] %s: %s\n", event.getGuild().getId(),
-                        event.getTextChannel().getId(), event.getAuthor().getId(),
-                        event.getMessage().getContentDisplay());
+                System.out.printf("[%s][%s] %s: %s\n", event.getGuild().getName(), event.getTextChannel().getName(), event.getMember().getEffectiveName(), event.getMessage().getContentDisplay());
+                System.out.printf("[%s][%s] %s: %s\n", event.getGuild().getId(), event.getTextChannel().getId(), event.getAuthor().getId(), event.getMessage().getContentDisplay());
             }
         }
     }

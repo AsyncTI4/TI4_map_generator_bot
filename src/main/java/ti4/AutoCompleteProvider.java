@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.interactions.commands.Command;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.LoggerHandler;
 import ti4.map.Map;
 import ti4.map.MapManager;
 
@@ -94,7 +95,11 @@ public class AutoCompleteProvider {
                     .limit(25)
                     .map(value -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(value, value))
                     .collect(Collectors.toList());
-            event.replyChoices(options).queue();
+            try {
+                event.replyChoices(options).queue();
+            }catch (Exception e){
+                LoggerHandler.logError("Could not suggest leaders", e);
+            }
         } else if (optionName.equals(Constants.TECH) || optionName.equals(Constants.TECH2) || optionName.equals(Constants.TECH3) || optionName.equals(Constants.TECH4)) {
             String enteredValue = event.getFocusedOption().getValue().toLowerCase();
             HashMap<String, String> techs = Mapper.getTechs();
