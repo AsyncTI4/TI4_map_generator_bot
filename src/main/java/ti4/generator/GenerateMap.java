@@ -460,7 +460,7 @@ public class GenerateMap {
             drawPAImage(x + deltaX, y, leaderFileName);
 
             if (leader.getTgCount() != 0){
-                graphics.setColor(new Color(255, 234, 0));
+                graphics.setColor(new Color(241,176,0));
                 graphics.setFont(Storage.getFont32());
                 graphics.drawString( Integer.toString(leader.getTgCount()), x + deltaX + 3, y + 32);
             } else {
