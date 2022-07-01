@@ -33,5 +33,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannel(event, text);
         MessageHelper.sendMessageToChannel(event, "<:nowhens:962921609671364658>");
         MessageHelper.sendMessageToChannel(event, "<:noafters:962923748938362931>");
+
+        ListVoteCount.turnOrder(event, activeMap);
     }
 }

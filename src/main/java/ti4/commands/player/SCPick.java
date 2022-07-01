@@ -3,6 +3,7 @@ package ti4.commands.player;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -10,6 +11,9 @@ import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayDeque;
+import java.util.Queue;
 
 public class SCPick extends PlayerSubcommandData {
     public SCPick() {
@@ -28,6 +32,7 @@ public class SCPick extends PlayerSubcommandData {
         Stats.pickSC(event, activeMap, player, event.getOption(Constants.SC));
         int sc = player.getSC();
         String msg = "";
+        String msgExtra = "";
         if (sc != 0) {
             msg += Helper.getFactionIconFromDiscord(player.getFaction());
             msg += " " + player.getUserName();
@@ -36,10 +41,54 @@ public class SCPick extends PlayerSubcommandData {
                 msg += " (" + color + ")";
             }
             msg += " Picked: " + Helper.getSCAsMention(sc);
+
+            boolean nextCorrectPing = false;
+            boolean allPicked = true;
+            Queue<Player> players = new ArrayDeque<>(activeMap.getPlayers().values());
+            while (players.iterator().hasNext()) {
+                Player player_ = players.poll();
+                if (nextCorrectPing) {
+                    msgExtra += Helper.getFactionIconFromDiscord(player_.getFaction());
+                    msgExtra += " " + Helper.getPlayerPing(event, player_) + " To Pick SC";
+                    allPicked = false;
+                    break;
+                }
+                if (player_ == player) {
+                    nextCorrectPing = true;
+                }
+                if (player_ != null && player_.getSC() != 0) {
+                    players.add(player_);
+                }
+            }
+            if (allPicked) {
+                msgExtra += Helper.getGamePing(event, activeMap) + "All Picked SC, Start round";
+
+                Player nextPlayer = null;
+                int lowestSC = 100;
+                for (Player player_ : activeMap.getPlayers().values()) {
+                    int scPicked = player.getSC();
+                    String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, activeMap, Integer.toString(sc));
+                    if (scNumberIfNaaluInPlay.startsWith("0/")) {
+                        nextPlayer = player_;
+                        break;
+                    }
+                    if (scPicked < lowestSC) {
+                        lowestSC = scPicked;
+                        nextPlayer = player_;
+                    }
+                }
+                if (nextPlayer != null) {
+                    msgExtra += " " + Helper.getPlayerPing(event, nextPlayer) + " To Star Round";
+                }
+            }
+
         } else {
             msg = "No SC picked.";
         }
         MessageHelper.replyToMessage(event, msg);
+        if (!msgExtra.isEmpty()){
+            MessageHelper.sendMessageToChannel(event.getChannel(), msgExtra);
+        }
     }
 
     @Override
