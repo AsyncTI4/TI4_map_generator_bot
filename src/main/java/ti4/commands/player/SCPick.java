@@ -56,7 +56,7 @@ public class SCPick extends PlayerSubcommandData {
                 if (player_ == player) {
                     nextCorrectPing = true;
                 }
-                if (player_ != null && player_.getSC() != 0) {
+                if (player_ != null && player_.getSC() == 0) {
                     players.add(player_);
                 }
             }
