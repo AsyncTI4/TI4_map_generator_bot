@@ -44,6 +44,9 @@ public class CardsCommand implements Command {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;
             }
+            if (event.getUser().getId().equals(MapGenerator.userID)) {
+                return true;
+            }
             Map userActiveMap = mapManager.getUserActiveMap(userID);
             if (userActiveMap.isCommunityMode()){
                 Player player = Helper.getGamePlayer(userActiveMap, null, event, userID);

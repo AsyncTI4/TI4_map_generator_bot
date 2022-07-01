@@ -71,7 +71,7 @@ public class ListVoteCount extends AgendaSubcommandData {
                             String playerFaction = player_.getFaction();
                             boolean isCorrectPlayer = playerColor != null && playerColor.equals(promissoryNoteOwner) ||
                                     playerFaction.equals(promissoryNoteOwner);
-                            if ("xxcha".equals(playerFaction)) {
+                            if ("xxcha".equals(playerFaction) && pn.endsWith("_an")) {
                                 if (isCorrectPlayer) {
                                     Leader leader = player.getLeader(Constants.COMMANDER);
                                     if (leader != null && !leader.isLocked()) {
