@@ -1006,6 +1006,10 @@ public class GenerateMap {
             y += 40;
         }
 
+        graphics.setColor(Color.green);
+        displaySftT(y, x, players, column);
+
+
         return y;
     }
 
@@ -1035,10 +1039,10 @@ public class GenerateMap {
                         }
                     }
 
-                    graphics.drawString(name + " - " + 1 + " VP", x, y + 23);
+//                    graphics.drawString(name + " - " + 1 + " VP", x, y + 23);
                     boolean multiScoring = false;
-                    drawScoreControlMarkers(x + 515, y, players, Collections.singletonList(player.getUserID()), multiScoring, 1);
-                    graphics.drawRect(x - 4, y - 5, 785, 38);
+                    drawScoreControlMarkers(x + 515, y, players, Collections.singletonList(player.getUserID()), multiScoring, 1, true);
+//                    graphics.drawRect(x - 4, y - 5, 785, 38);
                     column[0]++;
                     if (column[0] > 2) {
                         column[0] = 0;
@@ -1080,7 +1084,7 @@ public class GenerateMap {
             List<String> scoredPlayerID = scoredPublicObjectives.get(key);
             boolean multiScoring = Constants.CUSTODIAN.equals(key);
             if (scoredPlayerID != null) {
-                drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, multiScoring, objectiveWorth);
+                drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, multiScoring, objectiveWorth, false);
             }
             graphics.drawRect(x - 4, y - 5, 785, 38);
             column[0]++;
@@ -1094,7 +1098,7 @@ public class GenerateMap {
         return y;
     }
 
-    private void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID, boolean multiScoring, Integer objectiveWorth) {
+    private void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID, boolean multiScoring, Integer objectiveWorth, boolean justCalculate) {
         try {
             int tempX = 0;
             for (java.util.Map.Entry<String, Player> playerEntry : players.entrySet()) {
@@ -1114,12 +1118,16 @@ public class GenerateMap {
                         int frequency = Collections.frequency(scoredPlayerID, userID);
                         vpCount += frequency * objectiveWorth;
                         for (int i = 0; i < frequency; i++) {
-                            graphics.drawImage(bufferedImage, x + tempX, y, null);
+                            if (!justCalculate) {
+                                graphics.drawImage(bufferedImage, x + tempX, y, null);
+                            }
                             tempX += scoreTokenWidth;
                         }
                     } else {
                         vpCount += objectiveWorth;
-                        graphics.drawImage(bufferedImage, x + tempX, y, null);
+                        if (!justCalculate) {
+                            graphics.drawImage(bufferedImage, x + tempX, y, null);
+                        }
                     }
                     userVPs.put(player, vpCount);
                 }
