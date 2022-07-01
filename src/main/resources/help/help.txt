@@ -123,6 +123,8 @@ faction_or_color tag helps to define for which player you want to set stats. FOR
 /player setup faction color <- needs to set player faction and color
 /player sc_play <- plays your SC that you have in game
 /player sc_pick scNumber <- adds your pick to game. Does not generate map
+/player send_tg faction <- take tg from your existing ones and send(add) to target faction tg
+/player send_commodities faction <- take commodities from your existing ones and send(add) to target faction tg
 /player pass <- passes
 /player speaker player(optional) <- assigns speaker to player
 /player tech_add techName player(optional) <- adds selected tech to player area

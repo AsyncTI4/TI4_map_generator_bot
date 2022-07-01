@@ -148,6 +148,8 @@ public class Constants {
     public static final String PLAYER = "player";
     public static final String FACTION_COLOR = "faction_or_color";
     public static final String STATS = "stats";
+    public static final String SEND_TG = "send_tg";
+    public static final String SEND_COMMODITIES = "send_commodities";
     public static final String SETUP = "setup";
     public static final String COMMUNITY_SETUP = "community_setup";
     public static final String PLANETS = "planets";
