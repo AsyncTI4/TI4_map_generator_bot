@@ -4,18 +4,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapStatus;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.LinkedHashMap;
-import java.util.StringTokenizer;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 public class SendTG extends PlayerSubcommandData {
     public SendTG() {
@@ -51,6 +44,15 @@ public class SendTG extends PlayerSubcommandData {
             targetTG += sendTG;
             player_.setTg(targetTG);
 
+            MessageHelper.sendMessageToChannel(event.getChannel(), getPlayerRepresentation(player) + " send " + sendTG + " tg to: " + getPlayerRepresentation(player_));
         }
+    }
+
+    public static String getPlayerRepresentation(Player player) {
+        String text = "";
+        String playerFaction = player.getFaction();
+        text += Helper.getFactionIconFromDiscord(playerFaction);
+        text += " " + player.getUserName();
+        return text;
     }
 }
