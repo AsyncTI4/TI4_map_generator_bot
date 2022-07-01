@@ -180,6 +180,7 @@ Cards commands
 /agenda reveal <- reveals agenda to all with ID and automatically puts in discard pile
 /agenda add_law agendaID optionalTextForElected <- add's law to game map and optionalTextForElected is used to define player, or PO or anything, free text can be entered. AgendaID is used from discard pile or when revealed
 /agenda remove_law agendaID <- removes law from game and puts in discard, ID is showed in map
+/agenda vote_count <- lists vote count, only if planets are used in bot
 
 /status po_reveal_stage1 <- reveals stage 1 public objective
 /status po_reveal_stage2 <- reveals stage 2 public objective
@@ -195,7 +196,6 @@ you can also do
 /status sc_trade_goods SC TGCount
 for single TG adding of TG
 /status turn_order <- lists turn order with SC, player and passed status. SC is striked through if played
-/status vote_count <- lists vote count, only if planets are used in bot
 
 /explore planet tile planetName <- explores a planet, handling relic fragments and tokens automatically and discarding others
 /explore frontier tile <- explores a frontier token, handling relic fragments and tokens automatically, discarding others, and removing the frontier token

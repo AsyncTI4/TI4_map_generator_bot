@@ -1002,10 +1002,6 @@ public class GenerateMap {
 
         graphics.setColor(Color.RED);
         y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret, 1, column, customPublicVP);
-
-//        graphics.setColor(Color.green);
-//        y = displaySftT(y, x, players, column);
-
         if (column[0] != 0) {
             y += 40;
         }
