@@ -17,6 +17,9 @@ public class PlanetAdd extends PlanetAddRemove {
     public void doAction(Player player, String planet, Map map) {
         player.addPlanet(planet);
         player.exhaustPlanet(planet);
+        if (planet.equals("mirage")){
+            map.clearPlanetsCache();
+        }
         UnitHolder unitHolder = map.getPlanetsInfo().get(planet);
         String color = player.getColor();
         if (unitHolder != null && color != null && !"white".equals(color)) {
