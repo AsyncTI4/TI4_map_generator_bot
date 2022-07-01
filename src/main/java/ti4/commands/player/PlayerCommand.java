@@ -129,6 +129,8 @@ public class PlayerCommand implements Command {
         subcommands.add(new PlanetRefreshAbility());
         subcommands.add(new PlanetRefreshAll());
         subcommands.add(new Speaker());
+        subcommands.add(new SendTG());
+        subcommands.add(new SendCommodities());
         return subcommands;
     }
 
