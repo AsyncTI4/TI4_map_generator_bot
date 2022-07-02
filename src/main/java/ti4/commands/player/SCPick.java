@@ -13,7 +13,10 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.util.ArrayDeque;
+import java.util.LinkedHashMap;
 import java.util.Queue;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class SCPick extends PlayerSubcommandData {
     public SCPick() {
@@ -63,6 +66,16 @@ public class SCPick extends PlayerSubcommandData {
             if (allPicked) {
                 msgExtra += Helper.getGamePing(event, activeMap) + "All Picked SC, Start round";
 
+                LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
+                Set<Integer> scPickedList = activeMap.getPlayers().values().stream().map(Player::getSC).collect(Collectors.toSet());
+                for (Integer scNumber : scTradeGoods.keySet()) {
+                    if (!scPickedList.contains(scNumber) && scNumber != 0) {
+                        Integer tgCount = scTradeGoods.get(scNumber);
+                        tgCount = tgCount == null ? 1 : tgCount + 1;
+                        activeMap.setScTradeGood(scNumber, tgCount);
+                    }
+                }
+
                 Player nextPlayer = null;
                 int lowestSC = 100;
                 for (Player player_ : activeMap.getPlayers().values()) {
@@ -86,7 +99,7 @@ public class SCPick extends PlayerSubcommandData {
             msg = "No SC picked.";
         }
         MessageHelper.replyToMessage(event, msg);
-        if (!msgExtra.isEmpty()){
+        if (!msgExtra.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), msgExtra);
         }
     }
