@@ -66,8 +66,8 @@ public class SCPick extends PlayerSubcommandData {
                 Player nextPlayer = null;
                 int lowestSC = 100;
                 for (Player player_ : activeMap.getPlayers().values()) {
-                    int scPicked = player.getSC();
-                    String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, activeMap, Integer.toString(sc));
+                    int scPicked = player_.getSC();
+                    String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player_, activeMap, Integer.toString(sc));
                     if (scNumberIfNaaluInPlay.startsWith("0/")) {
                         nextPlayer = player_;
                         break;

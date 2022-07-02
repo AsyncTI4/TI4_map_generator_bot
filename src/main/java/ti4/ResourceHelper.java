@@ -4,6 +4,7 @@ import ti4.helpers.LoggerHandler;
 
 import javax.annotation.CheckForNull;
 import java.io.File;
+import java.io.InputStream;
 import java.net.URL;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -31,18 +32,21 @@ public class ResourceHelper {
     }
 
     public File getResource(String name) {
-        File resourceFile = null;
-        URL resource = getClass().getClassLoader().getResource(name);
-
-        try {
-            if (resource != null) {
-                resourceFile = Paths.get(resource.toURI()).toFile();
+        ClassLoader classLoader = getClass().getClassLoader();
+        InputStream stream = classLoader.getResourceAsStream(name);
+        try
+        {
+            if (stream == null)
+            {
+                throw new Exception("Cannot find file " + name);
             }
-
-        } catch (Exception e) {
-            LoggerHandler.log("Could not find asset", e);
+            return new File(stream.toString());
         }
-        return resourceFile;
+        catch (Exception e) {
+            e.printStackTrace();
+            System.exit(1);
+        }
+        return null;
     }
 
     @CheckForNull
@@ -178,6 +182,7 @@ public class ResourceHelper {
             LoggerHandler.log(errorDescription, e);
         }
         return resourceFile != null ? resourceFile.getAbsolutePath() : null;
+//        return getResource(folder + name).toString();
     }
 
     @CheckForNull
