@@ -93,7 +93,7 @@ public class Turn extends PlayerSubcommandData {
         }
         for (Player player : map.getPlayers().values()) {
             int sc = player.getSC();
-            if (sc == nextSCFound || nextSCFound == 0 && naaluSC == sc){
+            if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc){
                 String text = "";
                 text += Helper.getFactionIconFromDiscord(player.getFaction());
                 text += " " + Helper.getPlayerPing(event, player) + " UP NEXT";

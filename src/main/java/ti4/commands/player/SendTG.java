@@ -44,15 +44,15 @@ public class SendTG extends PlayerSubcommandData {
             targetTG += sendTG;
             player_.setTg(targetTG);
 
-            MessageHelper.sendMessageToChannel(event.getChannel(), getPlayerRepresentation(player) + " send " + sendTG + " tg to: " + getPlayerRepresentation(player_));
+            MessageHelper.sendMessageToChannel(event.getChannel(), getPlayerRepresentation(event, player) + " send " + sendTG + " tg to: " + getPlayerRepresentation(event, player_));
         }
     }
 
-    public static String getPlayerRepresentation(Player player) {
+    public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player) {
         String text = "";
         String playerFaction = player.getFaction();
         text += Helper.getFactionIconFromDiscord(playerFaction);
-        text += " " + player.getUserName();
+        text += " " + Helper.getPlayerPing(event, player);
         return text;
     }
 }
