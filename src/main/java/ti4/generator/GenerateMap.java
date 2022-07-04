@@ -376,7 +376,7 @@ public class GenerateMap {
                 }
 
                 if (!player.getTechs().isEmpty()) {
-                    xDelta = techInfo(player, xDelta, yPlayArea);
+                    xDelta = techInfo(player, xDelta, yPlayArea, map);
                 }
 
                 g2.setColor(color);
@@ -617,7 +617,7 @@ public class GenerateMap {
         return x + deltaX + 20;
     }
 
-    private int techInfo(Player player, int x, int y) {
+    private int techInfo(Player player, int x, int y, Map map) {
         List<String> techs = player.getTechs();
         List<String> exhaustedTechs = player.getExhaustedTechs();
         if (techs.isEmpty()) {
@@ -664,7 +664,7 @@ public class GenerateMap {
         deltaX = techField(x, y, techsFiltered.get(Constants.PROPULSION), exhaustedTechs, techInfo, deltaX);
         deltaX = techField(x, y, techsFiltered.get(Constants.CYBERNETIC), exhaustedTechs, techInfo, deltaX);
         deltaX = techField(x, y, techsFiltered.get(Constants.WARFARE), exhaustedTechs, techInfo, deltaX);
-        deltaX = techField(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), exhaustedTechs, techInfo, deltaX);
+        deltaX = techFieldUnit(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), exhaustedTechs, techInfo, deltaX, player, map);
         return x + deltaX + 20;
     }
 
@@ -711,6 +711,44 @@ public class GenerateMap {
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             deltaX += 48;
         }
+        return deltaX;
+    }
+
+    private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, String[]> techInfo, int deltaX, Player player, Map map) {
+        if (techs == null){
+            return deltaX;
+        }
+        String outline = "pa_tech_unitsnew_outlines_generic.png";
+        if ("nomad".equals(player.getFaction())){
+            outline = "pa_tech_unitsnew_outlines_nomad.png";
+        }
+        if ("nekro".equals(player.getFaction())){
+            for (Player player_ : map.getPlayers().values()) {
+                if ("nomad".equals(player_.getFaction())){
+                    outline = "pa_tech_unitsnew_outlines_nomad.png";
+                    break;
+                }
+            }
+        }
+        drawPAImage(x + deltaX, y, outline);
+        for (String tech : techs) {
+            String[] techInformation = techInfo.get(tech);
+
+            String unit = "pa_tech_unitsnew_" + Mapper.getColorID(player.getColor()) +"_";
+            if (techInformation.length >= 5) {
+                unit += techInformation[4] + ".png";
+            } else {
+                unit += tech + ".png";
+            }
+            drawPAImage(x + deltaX, y, unit);
+            if (techInformation.length >= 4 && !techInformation[3].isEmpty()){
+                String factionIcon = "pa_tech_unitsnew_" + techInformation[3] + "_" + tech + ".png";
+                drawPAImage(x + deltaX, y, factionIcon);
+            }
+        }
+        graphics.setColor(Color.WHITE);
+        graphics.drawRect(x + deltaX - 2, y - 2, 224, 152);
+        deltaX += 228;
         return deltaX;
     }
 
