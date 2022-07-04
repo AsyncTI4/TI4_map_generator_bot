@@ -1,12 +1,10 @@
 package ti4;
 
-import ti4.helpers.LoggerHandler;
+import ti4.helpers.Storage;
 
 import javax.annotation.CheckForNull;
 import java.io.File;
 import java.io.InputStream;
-import java.net.URL;
-import java.nio.file.Paths;
 import java.util.HashMap;
 
 public class ResourceHelper {
@@ -170,19 +168,8 @@ public class ResourceHelper {
     }
 
     public String getResourceFromFolder(String folder, String name, String errorDescription) {
-        File resourceFile = null;
-        URL resource = getClass().getClassLoader().getResource(folder + name);
-
-        try {
-            if (resource != null) {
-                resourceFile = Paths.get(resource.toURI()).toFile();
-            }
-
-        } catch (Exception e) {
-            LoggerHandler.log(errorDescription, e);
-        }
-        return resourceFile != null ? resourceFile.getAbsolutePath() : null;
-//        return getResource(folder + name).toString();
+        File resourceFile = new File(Storage.getResourcePath() + File.separator + folder + name);
+        return resourceFile.getAbsolutePath();
     }
 
     @CheckForNull
