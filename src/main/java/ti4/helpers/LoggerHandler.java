@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import ti4.ResourceHelper;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,15 +14,21 @@ public class LoggerHandler {
 
     private LoggerHandler() {
         //noinspection ConstantConditions
-        try (InputStream stream = new FileInputStream(ResourceHelper.getInstance().getInfoFile("logging.properties"))) {
+        String logFilePropertiesPath = ResourceHelper.getInstance().getInfoFile("logging.properties");
+        
+        try (InputStream stream = new FileInputStream(logFilePropertiesPath)) {
             LogManager.getLogManager().readConfiguration(stream);
             logger = Logger.getLogger(LoggerHandler.class.getName());
+            File logFilePath = Storage.getLoggerFile(); 
+            System.out.println("Initializing log file to  " + logFilePath.getAbsolutePath());
             @SuppressWarnings("ConstantConditions")
-            FileHandler fileHandler = new FileHandler(Storage.getLoggerFile().toPath().toString(), true);
+            FileHandler fileHandler = new FileHandler(logFilePath.getAbsolutePath(), true);
             fileHandler.setFormatter(new SimpleFormatter());
             logger.addHandler(fileHandler);
         } catch (IOException e) {
-            logger.log(Level.SEVERE, "Could not init log file");
+            // deliberately not using the logger here, b/c if we get here we likely don't have a functioning logger
+            System.err.println("Could not init log file");
+            e.printStackTrace();
         }
     }
 

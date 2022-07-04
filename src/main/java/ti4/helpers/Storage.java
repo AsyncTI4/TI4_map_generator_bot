@@ -7,7 +7,6 @@ import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
-import java.net.URL;
 
 public class Storage {
 
@@ -87,9 +86,9 @@ public class Storage {
 
     private static Font getFont(float size) {
         Font tiFont = null;
-        URL resource = getURL("Could not find temp directories");
+        String resource = getResourcePath();
         if (resource == null) return tiFont;
-        File file = new File(resource.getPath() + "/font/SLIDER.TTF");
+        File file = new File(resource + "/font/SLIDER.TTF");
         try (InputStream inputStream = new FileInputStream(file)) {
             tiFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
             tiFont = tiFont.deriveFont(size);
@@ -101,64 +100,52 @@ public class Storage {
 
     @CheckForNull
     public static File getMapUndoStorage(String mapName) {
-        URL resource = getURL("Could not find temp directories");
-        if (resource == null) return null;
-        return new File(getPath(resource) + MAPS_UNDO + mapName);
+        return new File(getStoragePath() + MAPS_UNDO + mapName);
     }
 
     @CheckForNull
     public static File getMapUndoDirectory() {
-        URL resource = getURL("Could not find temp directories");
-        if (resource == null) return null;
-        return new File(getPath(resource) + MAPS_UNDO);
+        return new File(getStoragePath() + MAPS_UNDO);
     }
 
     @CheckForNull
     public static File getMapImageStorage(String mapName) {
-        URL resource = getURL("Could not find temp directories");
-        if (resource == null) return null;
-        return new File(getPath(resource) + MAPS + mapName);
+        return new File(getStoragePath() + MAPS + mapName);
     }
 
     @CheckForNull
     public static File getMapImageDirectory() {
-        URL resource = getURL("Could not find temp directories");
-        if (resource == null) return null;
-        return new File(getPath(resource) + MAPS);
+        return new File(getStoragePath() + MAPS);
     }
 
     @Nullable
-    private static URL getURL(String Could_not_find_temp_directories) {
-        URL resource = ClassLoader.getSystemClassLoader().getResource(".");
-        if (resource == null) {
-            LoggerHandler.log(Could_not_find_temp_directories);
-            return null;
-        }
-        return resource;
+    public static String getResourcePath() {
+        String envPath = System.getenv("RESOURCE_PATH");
+        
+        return envPath;
+        
     }
 
     @CheckForNull
     public static File getMapStorage(String mapName) {
-        URL resource = getURL("Could not find temp directories for maps");
-        if (resource == null) return null;
-        return new File(getPath(resource) + MAPS + mapName);
+        return new File(getStoragePath() + MAPS + mapName);
     }
 
     @CheckForNull
     public static File getDeletedMapStorage(String mapName) {
-        URL resource = getURL("Could not find temp directories for maps");
-        if (resource == null) return null;
-        return new File(getPath(resource) + DELETED_MAPS + mapName);
+        return new File(getStoragePath() + DELETED_MAPS + mapName);
     }
 
     public static void init() {
-        URL resource = getURL("Could not find temp directories for maps");
-        createDirectory(resource, DELETED_MAPS);
-        createDirectory(resource, MAPS);
+        String resource = getStoragePath();
+        if(resource!=null) {
+            createDirectory(resource, DELETED_MAPS);
+            createDirectory(resource, MAPS);
+        }
     }
 
-    private static void createDirectory(URL resource, String directoryName) {
-        File directory = new File(getPath(resource) + directoryName);
+    private static void createDirectory(String resource, String directoryName) {
+        File directory = new File(getStoragePath() + directoryName);
         if (!directory.exists()) {
             directory.mkdir();
         }
@@ -167,13 +154,13 @@ public class Storage {
 
     @CheckForNull
     public static File getLoggerFile() {
-        URL resource = getURL("Could not find temp directories");
+        String resource = getStoragePath();
         if (resource == null) return null;
-        return new File(getPath(resource) + "/log.txt");
+        return new File(getStoragePath() + "/log.txt");
     }
 
-    private static String getPath(URL resource) {
+    private static String getStoragePath() {
         String envPath = System.getenv("DB_PATH");
-        return envPath != null ? envPath : resource.getPath();
+        return envPath;
     }
 }
