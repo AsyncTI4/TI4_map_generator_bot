@@ -109,8 +109,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 message = "Invalid token or tile";
             }
         }
-
-        MapSaveLoadManager.saveMap(activeMap);
         MessageHelper.replyToMessage(event, messageText + "\n" + message);
     }
 }
