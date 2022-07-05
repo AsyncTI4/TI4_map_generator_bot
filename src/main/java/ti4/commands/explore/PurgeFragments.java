@@ -62,7 +62,6 @@ public class PurgeFragments extends ExploreSubcommandData {
 		}
 		
 		MessageHelper.replyToMessage(event, "Fragments purged: "+fragmentsToPurge.toString());
-		MapSaveLoadManager.saveMap(activeMap);
 	}
 	
 }
