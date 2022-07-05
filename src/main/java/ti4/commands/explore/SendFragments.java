@@ -69,7 +69,6 @@ public class SendFragments extends ExploreSubcommandData {
         sb.append(count).append(" ").append(trait).append(" relic fragments sent to ").append(recieverOption.getAsUser().getName());
         MessageHelper.replyToMessage(event, sb.toString());
         
-        MapSaveLoadManager.saveMap(activeMap);
         File file = GenerateMap.getInstance().saveImage(activeMap);
         MessageHelper.replyToMessage(event, file);
 	}
