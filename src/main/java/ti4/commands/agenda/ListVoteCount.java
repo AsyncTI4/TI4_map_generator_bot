@@ -73,7 +73,7 @@ public class ListVoteCount extends AgendaSubcommandData {
                                     playerFaction.equals(promissoryNoteOwner);
                             if ("xxcha".equals(playerFaction) && pn.endsWith("_an")) {
                                 if (isCorrectPlayer) {
-                                    Leader leader = player.getLeader(Constants.COMMANDER);
+                                    Leader leader = player_.getLeader(Constants.COMMANDER);
                                     if (leader != null && !leader.isLocked()) {
                                         influenceCount += planets.size();
                                         break;
