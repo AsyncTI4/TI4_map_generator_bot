@@ -435,6 +435,9 @@ public class Player {
             promissoryNotes.clear();
             List<String> promissoryNotes = Mapper.getPromissoryNotes(color, faction);
             for (String promissoryNote : promissoryNotes) {
+                if ("mahact".equals(faction) && promissoryNote.endsWith("_an")){
+                    continue;
+                }
                 setPromissoryNote(promissoryNote);
             }
         }

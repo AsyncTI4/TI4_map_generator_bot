@@ -217,14 +217,12 @@ public class GenerateMap {
         int deltaY = 35;
         int yDelta = 0;
 
-        int tempY = y;
-        y += 200;
-        y = objectives(map, y);
-
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
-        graphics.drawString(map.getCustomName(), 0, tempY);
-        scoreTrack(map, tempY + 40);
+        graphics.drawString(map.getCustomName(), 0, y);
+        y = strategyCards(map, y);
+        y = scoreTrack(map, y + 20);
+        y = objectives(map, y);
         if (displayType != DisplayType.stats) {
             playerInfo(map);
         }
@@ -333,30 +331,6 @@ public class GenerateMap {
                 xDelta = x + 550 + Math.max(xDelta, xDelta2);
                 int yPlayArea = y - 30;
                 y += 85;
-                int pnX = 0;
-                int pnY = 40;
-//                List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
-//                for (String id : promissoryNotesInPlayArea) {
-//                    if (id.endsWith("_sftt")) {
-//                        continue;
-//                    }
-//                    String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);
-//                    for (Player player_ : players.values()) {
-//                        if (player_ != player) {
-//                            String playerColor = player_.getColor();
-//                            String playerFaction = player_.getFaction();
-//                            if (playerColor != null && playerColor.equals(promissoryNoteOwner) ||
-//                                    playerFaction != null && playerFaction.equals(promissoryNoteOwner)) {
-//                                graphics.setColor(getColor(player_.getColor()));
-//                                String promissoryNote = Mapper.getPromissoryNote(id);
-//                                String[] pnSplit = promissoryNote.split(";");
-//                                graphics.drawString(pnSplit[0] + "(" + playerFaction + ")", x + 230 + pnX, y + deltaY + pnY);
-//                                pnX = pnX + pnSplit[0].length() * 28;
-//                            }
-//                        }
-//                    }
-//                }
-//                int techStartY = y + deltaY + pnY;
                 y += 200;
                 int xDeltaSecondRow = xDelta;
                 int yPlayAreaSecondRow = yPlayArea + 160;
@@ -384,8 +358,6 @@ public class GenerateMap {
                 y += 15;
 
             }
-            y = strategyCards(map, y);
-
             y += 40;
             graphics.setColor(Color.WHITE);
             graphics.setFont(Storage.getFont32());
@@ -775,7 +747,7 @@ public class GenerateMap {
         }
     }
 
-    private void scoreTrack(Map map, int y) {
+    private int scoreTrack(Map map, int y) {
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(5));
@@ -814,6 +786,8 @@ public class GenerateMap {
                 tempX = tempWidth;
             }
         }
+        y += 180;
+        return y;
     }
 
     public static String getSCNumberIfNaaluInPlay(Player player, Map map, String scText) {
