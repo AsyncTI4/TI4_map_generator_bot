@@ -219,6 +219,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.PO2 + " " + String.join(",", map.getPublicObjectives2()));
         writer.write(System.lineSeparator());
+        writer.write(Constants.SO_TO_PO + " " + String.join(",", map.getSoToPoList()));
+        writer.write(System.lineSeparator());
 
         DisplayType displayTypeForced = map.getDisplayTypeForced();
         if (displayTypeForced != null) {
@@ -647,6 +649,8 @@ public class MapSaveLoadManager {
                 map.setPublicObjectives1(getCardList(tokenizer[1]));
             } else if (Constants.PO2.equals(identification)) {
                 map.setPublicObjectives2(getCardList(tokenizer[1]));
+            } else if (Constants.SO_TO_PO.equals(identification)) {
+                map.setSoToPoList(getCardList(tokenizer[1]));
             } else if (Constants.REVEALED_PO.equals(identification)) {
                 map.setRevealedPublicObjectives(getParsedCards(tokenizer[1]));
             } else if (Constants.CUSTOM_PO_VP.equals(identification)) {

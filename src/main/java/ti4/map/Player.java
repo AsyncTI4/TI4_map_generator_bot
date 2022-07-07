@@ -11,6 +11,7 @@ import ti4.helpers.Constants;
 import javax.annotation.CheckForNull;
 import java.util.Map;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Player {
 
@@ -232,10 +233,11 @@ public class Player {
         return secretsScored;
     }
 
-    public void setSecretScored(String id) {
+    public void setSecretScored(String id, ti4.map.Map map) {
         Collection<Integer> values = secretsScored.values();
+        List<Integer> allIDs = map.getPlayers().values().stream().flatMap(player -> player.getSecretsScored().values().stream()).toList();
         int identifier = new Random().nextInt(1000);
-        while (values.contains(identifier)) {
+        while (values.contains(identifier) || allIDs.contains(identifier)) {
             identifier = new Random().nextInt(1000);
         }
         secretsScored.put(id, identifier);
