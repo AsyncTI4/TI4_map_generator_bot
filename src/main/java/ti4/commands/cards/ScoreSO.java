@@ -32,7 +32,7 @@ public class ScoreSO extends CardsSubcommandData {
             return;
         }
 
-        boolean scored = activeMap.scoreSecretObjective(getUser().getId(), option.getAsInt());
+        boolean scored = activeMap.scoreSecretObjective(getUser().getId(), option.getAsInt(), activeMap);
         if (!scored) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Secret Objective ID found, please retry");
             return;

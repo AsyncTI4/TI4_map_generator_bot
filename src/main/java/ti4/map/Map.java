@@ -50,6 +50,7 @@ public class Map {
     private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
     private ArrayList<String> publicObjectives1 = new ArrayList<>();
     private ArrayList<String> publicObjectives2 = new ArrayList<>();
+    private ArrayList<String> soToPoList = new ArrayList<>();
 
     private ArrayList<String> explore = new ArrayList<>();
     private ArrayList<String> discardExplore = new ArrayList<>();
@@ -324,6 +325,7 @@ public class Map {
         }
         if (!id.isEmpty()) {
             revealedPublicObjectives.remove(id);
+            soToPoList.remove(id);
             customPublicVP.remove(id);
             return true;
         }
@@ -353,6 +355,24 @@ public class Map {
     public void setPublicObjectives2(ArrayList<String> publicObjectives2) {
         this.publicObjectives2 = publicObjectives2;
     }
+
+    public ArrayList<String> getSoToPoList() {
+        return soToPoList;
+    }
+
+    public void setSoToPoList(ArrayList<String> soToPoList) {
+        this.soToPoList = soToPoList;
+    }
+
+    public void addToSoToPoList(String id) {
+        soToPoList.add(id);
+    }
+
+    public void removeFromSoToPoList(String id) {
+        soToPoList.remove(id);
+    }
+
+
 
     public LinkedHashMap<String, List<String>> getScoredPublicObjectives() {
         return scoredPublicObjectives;
@@ -721,7 +741,7 @@ public class Map {
         return false;
     }
 
-    public boolean scoreSecretObjective(String userID, Integer soIDNumber) {
+    public boolean scoreSecretObjective(String userID, Integer soIDNumber, ti4.map.Map map) {
         Player player = getPlayer(userID);
         if (player != null) {
             LinkedHashMap<String, Integer> secrets = player.getSecrets();
@@ -734,7 +754,7 @@ public class Map {
             }
             if (!soID.isEmpty()) {
                 player.removeSecret(soIDNumber);
-                player.setSecretScored(soID);
+                player.setSecretScored(soID, map);
                 return true;
             }
         }

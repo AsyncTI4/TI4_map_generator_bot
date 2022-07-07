@@ -985,7 +985,11 @@ public class GenerateMap {
         HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
         HashMap<String, String> secretObjectives = Mapper.getSecretObjectivesJustNames();
         LinkedHashMap<String, Integer> customPublicVP = map.getCustomPublicVP();
-        LinkedHashMap<String, String> customPublics = customPublicVP.keySet().stream().collect(Collectors.toMap(key -> key, name -> name, (key1, key2) -> key1, LinkedHashMap::new));
+        LinkedHashMap<String, String> customPublics = customPublicVP.keySet().stream().collect(Collectors.toMap(key -> key, name -> {
+            if (map.getSoToPoList().contains(name)){
+                return Mapper.getSecretObjectivesJustNames().get(name);
+            }
+            return name;}, (key1, key2) -> key1, LinkedHashMap::new));
         Set<String> po1 = publicObjectivesState1.keySet();
         Set<String> po2 = publicObjectivesState2.keySet();
         Set<String> customVP = customPublicVP.keySet();
@@ -1007,7 +1011,10 @@ public class GenerateMap {
         scoredPublicObjectives = new LinkedHashMap<>();
         for (java.util.Map.Entry<String, Player> playerEntry : players.entrySet()) {
             Player player = playerEntry.getValue();
-            LinkedHashMap<String, Integer> secretsScored = player.getSecretsScored();
+            LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
+            for (String id : map.getSoToPoList()) {
+                secretsScored.remove(id);
+            }
             revealedPublicObjectives.putAll(secretsScored);
             for (String id : secretsScored.keySet()) {
                 scoredPublicObjectives.put(id, List.of(player.getUserID()));
@@ -1022,7 +1029,6 @@ public class GenerateMap {
 
         graphics.setColor(Color.green);
         displaySftT(y, x, players, column);
-
 
         return y;
     }
