@@ -6,7 +6,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.ResourceHelper;
 import ti4.commands.tokens.AddCC;
+import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.*;
@@ -44,6 +47,27 @@ public class MoveUnits extends AddRemoveUnits {
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Tile: " + tileID + " not found");
             return;
+        }
+
+        if ("82a".equals(tile.getTileID())){
+            String position = tile.getPosition();
+            activeMap.removeTile(position);
+
+
+            String planetTileName = AliasHandler.resolveTile("82b");
+            if (!PositionMapper.isTilePositionValid(position, activeMap)) {
+                MessageHelper.replyToMessage(event, "Position tile not allowed");
+                return;
+            }
+
+            String tileName = Mapper.getTileID(planetTileName);
+            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+            if (tilePath == null) {
+                MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
+                return;
+            }
+            tile = new Tile(planetTileName, position);
+            activeMap.setTile(tile);
         }
 
         toAction = true;
