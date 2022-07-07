@@ -187,9 +187,9 @@ public class Map {
 
     public void addRevealedPublicObjective(String id) {
         Collection<Integer> values = revealedPublicObjectives.values();
-        int identifier = new Random().nextInt(1000);
+        int identifier = 1;
         while (values.contains(identifier)) {
-            identifier = new Random().nextInt(1000);
+            identifier++;
         }
         revealedPublicObjectives.put(id, identifier);
     }
