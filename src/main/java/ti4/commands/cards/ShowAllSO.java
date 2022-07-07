@@ -37,10 +37,13 @@ public class ShowAllSO extends CardsSubcommandData {
             sb.append("Game: ").append(activeMap.getName()).append("\n");
             sb.append("Player: ").append(player.getUserName()).append("\n");
             sb.append("Showed Secret Objectives:").append("\n");
-            LinkedHashMap<String, Integer> secrets = player.getSecrets();
+            LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>(player.getSecrets());
+            LinkedHashMap<String, Integer> secretsScored = player.getSecretsScored();
             for (String id : secrets.keySet()) {
                 sb.append(Mapper.getSecretObjective(id)).append("\n");
-
+                if (!secretsScored.containsKey(id)) {
+                    player.setSecret(id);
+                }
             }
             MessageHelper.sentToMessageToUser(event, sb.toString(), user);
             CardsInfo.sentUserCardInfo(event, activeMap, player);
