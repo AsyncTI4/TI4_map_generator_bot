@@ -9,10 +9,7 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.tokens.AddCC;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.map.*;
 import ti4.message.MessageHelper;
 
 import java.util.HashMap;
@@ -60,6 +57,21 @@ public class MoveUnits extends AddRemoveUnits {
                 return;
             }
         }
+
+        for (Player player : activeMap.getPlayers().values()) {
+            if (color.equals(player.getColor())){
+                int cc = player.getTacticalCC();
+                if (cc == 0){
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have CC in Tactics");
+                    break;
+                } else if (!AddCC.hasCC(event, color, tile)){
+                    cc -= 1;
+                    player.setTacticalCC(cc);
+                    break;
+                }
+            }
+        }
+
         AddCC.addCC(event, color, tile);
     }
 

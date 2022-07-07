@@ -45,6 +45,10 @@ abstract public class UnitHolder {
         ccList.add(cc);
     }
 
+    public boolean hasCC(String cc) {
+        return ccList.contains(cc);
+    }
+
     public void addControl(String cc) {
         controlList.clear();
         controlList.add(cc);

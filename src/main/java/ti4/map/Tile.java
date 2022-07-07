@@ -104,6 +104,14 @@ public class Tile {
         }
     }
 
+    public boolean hasCC(String ccID) {
+        UnitHolder unitHolder = unitHolders.get(Constants.SPACE);
+        if (unitHolder != null) {
+            return unitHolder.hasCC(ccID);
+        }
+        return false;
+    }
+
     public void addControl(String ccID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {

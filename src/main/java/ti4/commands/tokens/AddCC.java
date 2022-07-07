@@ -26,6 +26,15 @@ public class AddCC extends AddRemoveToken {
         tile.addCC(ccID);
     }
 
+    public static boolean hasCC(SlashCommandInteractionEvent event, String color, Tile tile) {
+        String ccID = Mapper.getCCID(color);
+        String ccPath = tile.getCCPath(ccID);
+        if (ccPath == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+        }
+        return tile.hasCC(ccID);
+    }
+
     @Override
     protected String getActionDescription() {
         return "Add cc to tile/system";
