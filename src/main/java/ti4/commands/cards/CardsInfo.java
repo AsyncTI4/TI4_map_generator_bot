@@ -44,7 +44,10 @@ public class CardsInfo extends CardsSubcommandData {
             longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
         }
         LinkedHashMap<String, Integer> secretObjective = activeMap.getSecretObjective(player.getUserID());
-        LinkedHashMap<String, Integer> scoredSecretObjective = activeMap.getScoredSecretObjective(player.getUserID());
+        LinkedHashMap<String, Integer> scoredSecretObjective = new LinkedHashMap<>(activeMap.getScoredSecretObjective(player.getUserID()));
+        for (String id : activeMap.getSoToPoList()) {
+            scoredSecretObjective.remove(id);
+        }
         StringBuilder sb = new StringBuilder();
         sb.append("--------------------\n");
         sb.append("**Game: **").append(activeMap.getName()).append("\n");

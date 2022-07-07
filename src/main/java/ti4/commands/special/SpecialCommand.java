@@ -112,6 +112,7 @@ public class SpecialCommand implements Command {
         subcommands.add(new AddFactionCCToFleetSupply());
         subcommands.add(new RemoveFactionCCFromFleetSupply());
         subcommands.add(new DiploSystem());
+        subcommands.add(new MakeSecretIntoPO());
 
         return subcommands;
     }
