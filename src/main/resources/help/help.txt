@@ -148,6 +148,7 @@ Cards commands
 /cards so_show soUniqueID player <- sends given Secret Objective to player and changes soUniqueID
 /cards so_show_all player <- sends all Secret Objectives to player
 /cards so_show_to_all soUniqueID <- displays SO to table and changes soUniqueID
+/cards so_show_all <- displays all SO to table and changes soUniqueID
 /cards so_deal @player count(optional) <- draws a Secret objective for specified player, can specify count
 /cards so_deal_to_all count(optional) <- draws a Secret objective(s) for all game players
 
@@ -223,6 +224,7 @@ Its workaround for that single explore
 /special mahact_cc_to_fs color <- add's any color CC to fleet supply
 /special mahact_cc_from_fs color <- removes any color CC from fleet supply
 /special diplo_system tile <- add's cc for diplomacy SC
+/special make_secret_into_po soID <- makes scored Secret objective into public objective. To remove Secret as Public, use /status po_remove_custom poID
 
 /leaders unlock leaderID <- unlock leader
 /leaders lock leaderID <- lock leader
