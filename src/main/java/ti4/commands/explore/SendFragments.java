@@ -12,6 +12,7 @@ import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
+import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -69,8 +70,6 @@ public class SendFragments extends ExploreSubcommandData {
         sb.append(count).append(" ").append(trait).append(" relic fragments sent to ").append(recieverOption.getAsUser().getName());
         MessageHelper.replyToMessage(event, sb.toString());
         
-        File file = GenerateMap.getInstance().saveImage(activeMap);
-        MessageHelper.replyToMessage(event, file);
+		MessageHelper.replyToMessageTI4Logo(event);
 	}
-
 }

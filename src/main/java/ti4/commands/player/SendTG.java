@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
+import ti4.map.MapManager;
+import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -54,5 +56,13 @@ public class SendTG extends PlayerSubcommandData {
         text += Helper.getFactionIconFromDiscord(playerFaction);
         text += " " + Helper.getPlayerPing(event, player);
         return text;
+    }
+
+    @Override
+    public void reply(SlashCommandInteractionEvent event) {
+        String userID = event.getUser().getId();
+        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        MapSaveLoadManager.saveMap(activeMap);
+        MessageHelper.replyToMessageTI4Logo(event);
     }
 }
