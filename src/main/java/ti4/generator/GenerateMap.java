@@ -407,13 +407,13 @@ public class GenerateMap {
                 }
             }
 
-            if (pn.endsWith("_sftt")){
+            if (pn.endsWith("_sftt")) {
                 pn = "sftt";
             } else if (pn.endsWith("_an")) {
                 pn = "alliance";
             }
 
-            String pnName =  "pa_pn_name_" + pn + ".png";
+            String pnName = "pa_pn_name_" + pn + ".png";
             drawPAImage(x + deltaX, y, pnName);
             deltaX += 48;
         }
@@ -471,10 +471,10 @@ public class GenerateMap {
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             drawPAImage(x + deltaX, y, leaderFileName);
 
-            if (leader.getTgCount() != 0){
-                graphics.setColor(new Color(241,176,0));
+            if (leader.getTgCount() != 0) {
+                graphics.setColor(new Color(241, 176, 0));
                 graphics.setFont(Storage.getFont32());
-                graphics.drawString( Integer.toString(leader.getTgCount()), x + deltaX + 3, y + 32);
+                graphics.drawString(Integer.toString(leader.getTgCount()), x + deltaX + 3, y + 32);
             } else {
                 String pipID;
                 switch (leader.getId()) {
@@ -490,7 +490,7 @@ public class GenerateMap {
             }
 
             String extraInfo = leader.getName().isEmpty() ? "" : "_" + leader.getName();
-            String leaderInfoFileName = "pa_leaders_" + leader.getId() + "_" + player.getFaction() + extraInfo + status +".png";
+            String leaderInfoFileName = "pa_leaders_" + leader.getId() + "_" + player.getFaction() + extraInfo + status + ".png";
             drawPAImage(x + deltaX, y, leaderInfoFileName);
 
             deltaX += 48;
@@ -603,7 +603,7 @@ public class GenerateMap {
         for (String tech : techs) {
             String techType = Mapper.getTechType(tech);
             List<String> techList = techsFiltered.get(techType);
-            if (techList == null){
+            if (techList == null) {
                 techList = new ArrayList<>();
             }
             techList.add(tech);
@@ -619,7 +619,7 @@ public class GenerateMap {
                     try {
                         int t1 = tech1Info.length >= 3 ? tech1Info[2].length() : 0;
                         int t2 = tech2Info.length >= 3 ? tech2Info[2].length() : 0;
-                        return (t1 < t2) ? -1: ((t1 == t2) ? (tech1Info[0].compareTo(tech2Info[0])) : 1);
+                        return (t1 < t2) ? -1 : ((t1 == t2) ? (tech1Info[0].compareTo(tech2Info[0])) : 1);
                     } catch (Exception e) {
                         //do nothing
                     }
@@ -642,7 +642,7 @@ public class GenerateMap {
     }
 
     private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, String[]> techInfo, int deltaX) {
-        if (techs == null){
+        if (techs == null) {
             return deltaX;
         }
         for (String tech : techs) {
@@ -667,12 +667,12 @@ public class GenerateMap {
                 default -> techIcon = "";
             }
 
-            if (!techIcon.isEmpty()){
+            if (!techIcon.isEmpty()) {
                 String techSpec = "pa_tech_techicons_" + techIcon + techStatus;
                 drawPAImage(x + deltaX, y, techSpec);
             }
 
-            if (techInformation.length >= 4 && !techInformation[3].isEmpty()){
+            if (techInformation.length >= 4 && !techInformation[3].isEmpty()) {
                 String techSpec = "pa_tech_factionicon_" + techInformation[3] + "_rdy.png";
                 drawPAImage(x + deltaX, y, techSpec);
             }
@@ -690,12 +690,12 @@ public class GenerateMap {
     private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, String[]> techInfo, int deltaX, Player player, Map map) {
 
         String outline = "pa_tech_unitsnew_outlines_generic.png";
-        if ("nomad".equals(player.getFaction())){
+        if ("nomad".equals(player.getFaction())) {
             outline = "pa_tech_unitsnew_outlines_nomad.png";
         }
-        if ("nekro".equals(player.getFaction())){
+        if ("nekro".equals(player.getFaction())) {
             for (Player player_ : map.getPlayers().values()) {
-                if ("nomad".equals(player_.getFaction())){
+                if ("nomad".equals(player_.getFaction())) {
                     outline = "pa_tech_unitsnew_outlines_nomad.png";
                     break;
                 }
@@ -986,10 +986,9 @@ public class GenerateMap {
         HashMap<String, String> secretObjectives = Mapper.getSecretObjectivesJustNames();
         LinkedHashMap<String, Integer> customPublicVP = map.getCustomPublicVP();
         LinkedHashMap<String, String> customPublics = customPublicVP.keySet().stream().collect(Collectors.toMap(key -> key, name -> {
-            if (map.getSoToPoList().contains(name)){
-                return Mapper.getSecretObjectivesJustNames().get(name);
-            }
-            return name;}, (key1, key2) -> key1, LinkedHashMap::new));
+            String nameOfPO = Mapper.getSecretObjectivesJustNames().get(name);
+            return nameOfPO != null ? nameOfPO : name;
+        }, (key1, key2) -> key1, LinkedHashMap::new));
         Set<String> po1 = publicObjectivesState1.keySet();
         Set<String> po2 = publicObjectivesState2.keySet();
         Set<String> customVP = customPublicVP.keySet();

@@ -327,6 +327,7 @@ public class Map {
             revealedPublicObjectives.remove(id);
             soToPoList.remove(id);
             customPublicVP.remove(id);
+            scoredPublicObjectives.remove(id);
             return true;
         }
         return false;
