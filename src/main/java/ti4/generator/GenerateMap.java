@@ -221,8 +221,9 @@ public class GenerateMap {
         graphics.setColor(Color.WHITE);
         graphics.drawString(map.getCustomName(), 0, y);
         y = strategyCards(map, y);
-        y = scoreTrack(map, y + 20);
-        y = objectives(map, y);
+        int tempY = y;
+        y = objectives(map, y + 180);
+        tempY = scoreTrack(map, tempY + 20);
         if (displayType != DisplayType.stats) {
             playerInfo(map);
         }
