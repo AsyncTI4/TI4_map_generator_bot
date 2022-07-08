@@ -294,7 +294,7 @@ public class Mapper {
 
     @CheckForNull
     public static String getTokenPath(String tokenID) {
-        String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
+        String tokenPath = ResourceHelper.getInstance().getTokenFile(tokenID);
         if (tokenPath == null) {
             tokenPath = ResourceHelper.getInstance().getTokenFile(tokenID);
             if (tokenPath == null) {
