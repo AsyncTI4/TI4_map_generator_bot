@@ -7,6 +7,8 @@ import ti4.helpers.Constants;
 import ti4.helpers.LoggerHandler;
 
 import javax.annotation.CheckForNull;
+
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -294,8 +296,8 @@ public class Mapper {
 
     @CheckForNull
     public static String getTokenPath(String tokenID) {
-        String tokenPath = ResourceHelper.getInstance().getTokenFile(tokenID);
-        if (tokenPath == null) {
+        String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
+        if (tokenPath == null || !(new File(tokenPath).exists())) {
             tokenPath = ResourceHelper.getInstance().getTokenFile(tokenID);
             if (tokenPath == null) {
                 LoggerHandler.log("Could not find token: " + tokenID);
