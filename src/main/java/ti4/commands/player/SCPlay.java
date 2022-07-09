@@ -1,6 +1,8 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -12,6 +14,8 @@ import ti4.message.MessageHelper;
 public class SCPlay extends PlayerSubcommandData {
     public SCPlay() {
         super(Constants.SC_PLAY, "Play SC");
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     @Override
