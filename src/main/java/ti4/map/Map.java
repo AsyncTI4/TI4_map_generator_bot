@@ -34,6 +34,7 @@ public class Map {
     private String creationDate;
     private String customName = "";
     private long lastModifiedDate;
+    private int round = 1;
 
     private List<String> secretObjectives;
     private List<String> actionCards;
@@ -99,6 +100,18 @@ public class Map {
 
     public void setVp(int vp) {
         this.vp = vp;
+    }
+
+    public int getRound() {
+        return round;
+    }
+
+    public void setRound(int round) {
+        if (round <= 0) {
+            this.round = 1;
+        } else {
+            this.round = round;
+        }
     }
 
     public String getCreationDate() {

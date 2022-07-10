@@ -817,6 +817,9 @@ public class GenerateMap {
         int x = 20;
         for (java.util.Map.Entry<Integer, Integer> scTGs : scTradeGoods.entrySet()) {
             Integer sc = scTGs.getKey();
+            if (sc == 0){
+                continue;
+            }
             if (!scPicked.contains(sc)) {
                 graphics.setColor(getSCColor(sc));
                 graphics.setFont(Storage.getFont64());
@@ -830,6 +833,10 @@ public class GenerateMap {
             }
             x += 80;
         }
+        graphics.setColor(Color.WHITE);
+        graphics.setFont(Storage.getFont64());
+        graphics.drawString("ROUND: " + map.getRound(), x + 100, y);
+
         return y + 40;
     }
 
