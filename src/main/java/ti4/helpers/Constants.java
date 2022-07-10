@@ -92,8 +92,10 @@ public class Constants {
 
     public static final String CREATION_DATE = "creation_date";
     public static final String LAST_MODIFIED_DATE = "last_modified_date";
+    public static final String ROUND = "round";
 
     public static final String DIPLO_SYSTEM = "diplo_system";
+    public static final String ADJUST_ROUND_NUMBER = "adjust_round_number";
 
 
     public static final String MAHACT_CC = "mahact_cc";
