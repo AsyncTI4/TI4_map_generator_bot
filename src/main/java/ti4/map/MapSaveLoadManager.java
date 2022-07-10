@@ -246,6 +246,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.LAST_MODIFIED_DATE + " " + new Date().getTime());
         writer.write(System.lineSeparator());
+        writer.write(Constants.ROUND + " " + map.getRound());
+        writer.write(System.lineSeparator());
         writer.write(Constants.GAME_CUSTOM_NAME + " " + map.getCustomName());
         writer.write(System.lineSeparator());
         writer.write(Constants.COMMUNITY_MODE + " " + map.isCommunityMode());
@@ -653,6 +655,12 @@ public class MapSaveLoadManager {
                 map.setSoToPoList(getCardList(tokenizer[1]));
             } else if (Constants.REVEALED_PO.equals(identification)) {
                 map.setRevealedPublicObjectives(getParsedCards(tokenizer[1]));
+                //temp code to migrate round numbers
+//                Set<String> strings = new HashSet<>(map.getRevealedPublicObjectives().keySet());
+//                Set<String> strings2 = new HashSet<>(map.getRevealedPublicObjectives().keySet());
+//                strings.retainAll(map.getPublicObjectives1());
+//                strings2.retainAll(map.getPublicObjectives2());
+//                map.setRound((strings.size() + strings2.size())-1);
             } else if (Constants.CUSTOM_PO_VP.equals(identification)) {
                 map.setCustomPublicVP(getParsedCards(tokenizer[1]));
             } else if (Constants.SCORED_PO.equals(identification)) {
@@ -742,6 +750,13 @@ public class MapSaveLoadManager {
                 }
             } else if (Constants.CREATION_DATE.equals(identification)) {
                 map.setCreationDate(tokenizer[1]);
+            } else if (Constants.ROUND.equals(identification)) {
+                String roundNumber = tokenizer[1];
+                try {
+                    map.setRound(Integer.parseInt(roundNumber));
+                } catch (Exception exception) {
+                    LoggerHandler.log("Could not parse round number", exception);
+                }
             } else if (Constants.LAST_MODIFIED_DATE.equals(identification)) {
                 String lastModificationDate = tokenizer[1];
                 try {

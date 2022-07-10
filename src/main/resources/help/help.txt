@@ -192,7 +192,7 @@ Cards commands
 /status po_score id <- score existing objevtcive
 /status po_unscore id <- unscore if you scored by mistake
 /status po_shuffle_back id <- shuffles given objective back into deck, don't use for custom ones, just remove those
-/status cleanup confirmYES <- cleans up all CC's, all unit damage, resets passed status and SC played and SC player selection :)
+/status cleanup confirmYES <- cleans up all CC's, all unit damage, resets passed status and SC played and SC player selection :) Also increases round number
 /status sc_trade_goods scNumber(optional) tgCount(optional) <- add's Trade goods to unchoose strategy cards, tgCount is total how much it should be on card, when SC is picked, TG's automatically added to user Trade Goods
 if not specifying SC and TG, it auto adds +1TG to each unselected SC card
 you can also do
@@ -225,6 +225,7 @@ Its workaround for that single explore
 /special mahact_cc_from_fs color <- removes any color CC from fleet supply
 /special diplo_system tile <- add's cc for diplomacy SC
 /special make_secret_into_po soID <- makes scored Secret objective into public objective. To remove Secret as Public, use /status po_remove_custom poID
+/special adjust_round_number <- set round number for game (default increases when using /status cleanup command)
 
 /leaders unlock leaderID <- unlock leader
 /leaders lock leaderID <- lock leader

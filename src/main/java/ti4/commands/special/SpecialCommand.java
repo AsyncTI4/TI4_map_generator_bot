@@ -113,6 +113,7 @@ public class SpecialCommand implements Command {
         subcommands.add(new RemoveFactionCCFromFleetSupply());
         subcommands.add(new DiploSystem());
         subcommands.add(new MakeSecretIntoPO());
+        subcommands.add(new AdjustRoundNumber());
 
         return subcommands;
     }
