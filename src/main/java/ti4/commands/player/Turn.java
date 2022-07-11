@@ -65,6 +65,9 @@ public class Turn extends PlayerSubcommandData {
         }
         HashMap<Integer, Boolean> scPassed = new HashMap<>();
         for (Player player : map.getPlayers().values()) {
+            if (player.isPassed()){
+                continue;
+            }
             int sc = player.getSC();
             String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
@@ -73,7 +76,7 @@ public class Turn extends PlayerSubcommandData {
                 scPassed.put(sc, player.isPassed());
             }
         }
-        if (scPassed.values().stream().allMatch(value -> value)){
+        if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value)){
             MessageHelper.sendMessageToChannel(event.getChannel(), "All players passed. Please score objectives or react with your faction symbol for no scoring. " +Helper.getGamePing(event, map));
             MessageHelper.replyToMessageTI4Logo(event);
             return;
