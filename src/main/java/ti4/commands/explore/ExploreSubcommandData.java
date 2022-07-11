@@ -102,6 +102,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 message = "Token added to map";
                 if (Constants.MIRAGE.equalsIgnoreCase(token)) {
                     Helper.addMirageToTile(tile);
+                    activeMap.clearPlanetsCache();
                     message = "Mirage added to map!";
                 }
                 activeMap.purgeExplore(cardID);
