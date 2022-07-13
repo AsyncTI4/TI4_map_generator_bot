@@ -1,5 +1,9 @@
 name: Docker Image CI
 
+env:
+  REGISTRY: "registry.digitalocean.com/tibot"
+  IMAGE_NAME: "tibot"
+
 on:
   push:
     branches: [ "master" ]
@@ -15,7 +19,7 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Build the Docker image
-      run: docker build . --file Dockerfile --tag tibot:$(date +%s)
+      run: docker build -t $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7) .
 
     - name: Install doctl
       uses: digitalocean/action-doctl@v2
@@ -26,4 +30,4 @@ jobs:
       run: doctl registry login --expiry-seconds 600
 
     - name: Push image to DigitalOcean Container Registry
-      run: docker push registry.digitalocean.com/tibot/tibot
+      run: docker push $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
