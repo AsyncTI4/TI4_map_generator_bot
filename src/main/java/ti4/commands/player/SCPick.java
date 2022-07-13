@@ -50,7 +50,7 @@ public class SCPick extends PlayerSubcommandData {
             Queue<Player> players = new ArrayDeque<>(activeMap.getPlayers().values());
             while (players.iterator().hasNext()) {
                 Player player_ = players.poll();
-                if (nextCorrectPing && player_ != null && player_.getSC() == 0) {
+                if (nextCorrectPing) {
                     msgExtra += Helper.getFactionIconFromDiscord(player_.getFaction());
                     msgExtra += " " + Helper.getPlayerPing(event, player_) + " To Pick SC";
                     allPicked = false;
@@ -91,7 +91,7 @@ public class SCPick extends PlayerSubcommandData {
                     }
                 }
                 if (nextPlayer != null) {
-                    msgExtra += " " + Helper.getPlayerPing(event, nextPlayer) + " To Start Round";
+                    msgExtra += " " + Helper.getPlayerPing(event, nextPlayer) + " To Star Round";
                 }
             }
 
