@@ -688,7 +688,9 @@ public class GenerateMap {
     }
 
     private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, String[]> techInfo, int deltaX, Player player, Map map) {
-
+        if (techs == null){
+            return deltaX;
+        }
         String outline = "pa_tech_unitsnew_outlines_generic.png";
         if ("nomad".equals(player.getFaction())) {
             outline = "pa_tech_unitsnew_outlines_nomad.png";
@@ -702,22 +704,19 @@ public class GenerateMap {
             }
         }
         drawPAImage(x + deltaX, y, outline);
-        if (techs != null) {
+        for (String tech : techs) {
+            String[] techInformation = techInfo.get(tech);
 
-            for (String tech : techs) {
-                String[] techInformation = techInfo.get(tech);
-
-                String unit = "pa_tech_unitsnew_" + Mapper.getColorID(player.getColor()) + "_";
-                if (techInformation.length >= 5) {
-                    unit += techInformation[4] + ".png";
-                } else {
-                    unit += tech + ".png";
-                }
-                drawPAImage(x + deltaX, y, unit);
-                if (techInformation.length >= 4 && !techInformation[3].isEmpty()) {
-                    String factionIcon = "pa_tech_unitsnew_" + techInformation[3] + "_" + tech + ".png";
-                    drawPAImage(x + deltaX, y, factionIcon);
-                }
+            String unit = "pa_tech_unitsnew_" + Mapper.getColorID(player.getColor()) +"_";
+            if (techInformation.length >= 5) {
+                unit += techInformation[4] + ".png";
+            } else {
+                unit += tech + ".png";
+            }
+            drawPAImage(x + deltaX, y, unit);
+            if (techInformation.length >= 4 && !techInformation[3].isEmpty()){
+                String factionIcon = "pa_tech_unitsnew_" + techInformation[3] + "_" + tech + ".png";
+                drawPAImage(x + deltaX, y, factionIcon);
             }
         }
         graphics.setColor(Color.WHITE);

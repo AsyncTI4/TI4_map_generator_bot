@@ -36,7 +36,7 @@ public class AddToken extends AddRemoveToken {
     public static void addToken(SlashCommandInteractionEvent event, Tile tile, String tokenName) {
         String tokenFileName = Mapper.getAttachmentID(tokenName);
         String tokenPath = tile.getAttachmentPath(tokenFileName);
-        if (tokenPath != null) {
+        if (tokenFileName != null && tokenPath != null) {
             addToken(event, tile, tokenFileName, true);
         } else {
             tokenName = AliasHandler.resolveToken(tokenName);
