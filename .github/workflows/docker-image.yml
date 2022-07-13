@@ -27,7 +27,7 @@ jobs:
         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
-      run: docker save $(echo $IMAGE_NAME) | ssh -C root@my.remote.host.com docker load
+      run: doctl registry login --expiry-seconds 600
 
     - name: Push image to DigitalOcean Container Registry
       run: docker push $(echo $REGISTRY)/$(echo $IMAGE_NAME):$(echo $GITHUB_SHA | head -c7)
