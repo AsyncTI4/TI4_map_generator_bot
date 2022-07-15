@@ -1620,6 +1620,11 @@ public class GenerateMap {
                         imageDmgX = imageX + (int) (numberPositionPoint.x * scaleOfUnit) - dmgImage.getWidth();
                         imageDmgY = imageY + (int) (numberPositionPoint.y * scaleOfUnit) - dmgImage.getHeight();
                     }
+                    if (unitID.contains("_mf")){
+                        imageDmgX = position != null ? tileX + position.x : xOriginal + (dmgImage.getWidth() / 2);
+                        imageDmgY = position != null ? tileY + position.y : yOriginal - (dmgImage.getHeight() / 2);
+
+                    }
                     graphics.drawImage(dmgImage, imageDmgX, imageDmgY, null);
                     unitDamageCount--;
                 }
