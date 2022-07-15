@@ -6,7 +6,7 @@ on:
 name: BuildAndDeploy
 
 jobs:
-    build-and-deploy:
+    build:
         runs-on: ubuntu-latest
         steps:
         # checkout the repo
@@ -27,7 +27,9 @@ jobs:
         - run: |
             docker build . -t ${{ secrets.REGISTRY_LOGIN_SERVER }}/tibot:${{ github.sha }}
             docker push ${{ secrets.REGISTRY_LOGIN_SERVER }}/tibot:${{ github.sha }}
-
+    deploy:
+        runs-on: ubuntu-latest
+        steps:
         - name: 'Deploy to Azure Container Instances'
           uses: 'azure/aci-deploy@v1'
           with:
