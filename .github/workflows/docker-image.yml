@@ -44,5 +44,9 @@ jobs:
             registry-login-server: ${{ secrets.REGISTRY_LOGIN_SERVER }}
             registry-username: ${{ secrets.REGISTRY_USERNAME }}
             registry-password: ${{ secrets.REGISTRY_PASSWORD }}
+            azure-file-volume-share-name: tibot
+            azure-file-volume-account-name: tibot
+            azure-file-volume-account-key: ${{ secrets.AZURE_FILE_VOLUME_KEY }}
+            azure-file-volume-mount-path: /opt/STORAGE
             name: tibot
             location: 'east us'
