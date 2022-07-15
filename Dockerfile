@@ -12,4 +12,4 @@ RUN mvn clean compile assembly:single && \
 COPY ./src/main/resources /opt/resources
 ENV DB_PATH=/opt/STORAGE
 ENV RESOURCE_PATH=/opt/resources
-ENTRYPOINT java -jar tibot.jar "OTc4Mjk1ODgzMTUyMTA1NTUz.GyLGNo.H-cLoVqlfqHuGe4_r6mqWJ7lyFgI8SGky1Sjo4" "978295883152105553" "950413954327396362"
+ENTRYPOINT java -Xmx1400m -jar tibot.jar "OTc4Mjk1ODgzMTUyMTA1NTUz.GyLGNo.H-cLoVqlfqHuGe4_r6mqWJ7lyFgI8SGky1Sjo4" "978295883152105553" "950413954327396362"
