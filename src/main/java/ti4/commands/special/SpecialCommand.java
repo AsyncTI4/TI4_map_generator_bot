@@ -114,6 +114,7 @@ public class SpecialCommand implements Command {
         subcommands.add(new DiploSystem());
         subcommands.add(new MakeSecretIntoPO());
         subcommands.add(new AdjustRoundNumber());
+        subcommands.add(new SwapTwoSystems());
 
         return subcommands;
     }
