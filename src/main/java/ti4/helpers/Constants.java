@@ -95,6 +95,7 @@ public class Constants {
     public static final String ROUND = "round";
 
     public static final String DIPLO_SYSTEM = "diplo_system";
+    public static final String SWAP_SYSTEMS = "swap_systems";
     public static final String ADJUST_ROUND_NUMBER = "adjust_round_number";
 
 
