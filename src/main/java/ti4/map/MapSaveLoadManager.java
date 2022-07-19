@@ -337,7 +337,7 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.SO_SCORED + " " + getSecretList(player.getSecretsScored()));
             writer.write(System.lineSeparator());
-            writer.write(Constants.SC + " " + player.getSC());
+            writer.write(Constants.STRATEGY_CARD + " " + player.getSC());
             writer.write(System.lineSeparator());
 
             StringBuilder leaderInfo = new StringBuilder();
@@ -895,7 +895,7 @@ public class MapSaveLoadManager {
                     }
                 }
 
-                case Constants.SC -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.STRATEGY_CARD -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
             }
         }
