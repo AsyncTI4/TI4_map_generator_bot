@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Constants {
     public static final String SHOW_GAME = "show_game";
@@ -111,6 +110,27 @@ public class Constants {
     public static final String PURGE_LEADER = "purge";
     public static final String ADD_LEADER = "add";
     public static final String LEADERS = "leaders";
+    public static final String SC = "sc";
+
+    public static final String LEADERSHIP_PRIMARY = "leadership_primary";
+    public static final String DIPLOMACY_PRIMARY = "diplomacy_primary";
+    public static final String POLITICS_PRIMARY = "politics_primary";
+    public static final String CONSTRUCTION_PRIMARY = "construction_primary";
+    public static final String TRADE_PRIMARY = "trade_primary";
+    public static final String WARFARE_PRIMARY = "warfare_primary";
+    public static final String TECHNOLOGY_PRIMARY = "technology_primary";
+    public static final String IMPERIAL_PRIMARY = "imperial_primary";
+    public static final String CUSTOM_PRIMARY = "custom_primary";
+
+    public static final String LEADERSHIP_SECONDARY = "leadership_secondary";
+    public static final String DIPLOMACY_SECONDARY = "diplomacy_secondary";
+    public static final String POLITICS_SECONDARY = "politics_secondary";
+    public static final String CONSTRUCTION_SECONDARY = "construction_secondary";
+    public static final String TRADE_SECONDARY = "trade_secondary";
+    public static final String WARFARE_SECONDARY = "warfare_secondary";
+    public static final String TECHNOLOGY_SECONDARY = "technology_secondary";
+    public static final String IMPERIAL_SECONDARY = "imperial_secondary";
+    public static final String CUSTOM_SECONDARY = "custom_secondary";
 
     public static final String GAME = "game";
     public static final String INFO = "info";
@@ -184,7 +204,7 @@ public class Constants {
     public static final String HRF = "hazardous_relic_fragment";
     public static final String IRF = "industrial_relic_fragment";
     public static final String VRF = "void_relic_fragment";
-    public static final String SC = "strategy_card";
+    public static final String STRATEGY_CARD = "strategy_card";
 
     public static final String TXT = ".txt";
     public static final String JPG = ".jpg";

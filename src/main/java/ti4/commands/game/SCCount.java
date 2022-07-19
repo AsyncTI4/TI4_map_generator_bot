@@ -11,14 +11,14 @@ import ti4.message.MessageHelper;
 public class SCCount extends GameSubcommandData {
     public SCCount() {
         super(Constants.SC_COUNT, "Strategy Cards count in game");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Cards count").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Cards count").setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
 
-        OptionMapping scOption = event.getOption(Constants.SC);
+        OptionMapping scOption = event.getOption(Constants.STRATEGY_CARD);
         if (scOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify Strategy Card");
             return;
