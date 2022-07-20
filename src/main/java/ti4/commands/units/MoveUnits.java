@@ -72,7 +72,15 @@ public class MoveUnits extends AddRemoveUnits {
 
         toAction = true;
         unitList = event.getOptions().get(4).getAsString().toLowerCase();
-        unitParsing(event, color, tile, unitList);
+        switch (unitList) {
+            case "0":
+            case "none":
+                //Do nothing, as no unit was moved to
+                break;
+            default:
+                unitParsing(event, color, tile, unitList);
+                break;
+        }
 
         OptionMapping optionCC = event.getOption(Constants.CC);
         boolean retreat = false;
