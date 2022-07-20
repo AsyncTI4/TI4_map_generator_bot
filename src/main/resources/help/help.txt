@@ -100,8 +100,9 @@ dread <- same sinle dread into space
 3 dn, 2 dd, gf quann <- 3 dread and 2dd added into space, 1 gf added onto planet quann
 ws, 6 ff, sd quann, 3 inf quann, mech quann <- warsun and 6 fighters added into space, spacedock, 3 infantry and mech added into quann
 
-/move_units faction_or_color systemFrom unitList systemTo unitList cc (optional can be no or retreat)
+/move_units faction_or_color systemFrom unitList systemTo unitListTo cc (optional can be no or retreat)
 Standard fields to add tile/system, unit list same as add, remove, and we have optional field addCC, type anything in to not add cc into moved system
+unitListTo <- if you enter 0 or none into as a unit, no unit will spawn in target system :)
 Example:
 /move_units pink quann 2 dn, dd, gf, gf quann wellon 2 dn, dd, 2 gf wellon
 
