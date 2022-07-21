@@ -59,5 +59,8 @@ public class Cleanup extends StatusSubcommandData {
                 }
             }
         }
+        int round = activeMap.getRound();
+        round++;
+        activeMap.setRound(round);
     }
 }

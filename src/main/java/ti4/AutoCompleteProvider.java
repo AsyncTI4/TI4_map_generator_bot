@@ -44,7 +44,16 @@ public class AutoCompleteProvider {
                     .map(token -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(token, token))
                     .collect(Collectors.toList());
             event.replyChoices(options).queue();
-        } else if (optionName.equals(Constants.TOKEN)) {
+        } else if (optionName.equals(Constants.CC)) {
+            String enteredValue = event.getFocusedOption().getValue();
+            List<String> values = Arrays.asList("no", "retreat");
+            List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = values.stream()
+                    .filter(token -> token.contains(enteredValue))
+                    .limit(25)
+                    .map(token -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(token, token))
+                    .collect(Collectors.toList());
+            event.replyChoices(options).queue();
+        }else if (optionName.equals(Constants.TOKEN)) {
             String enteredValue = event.getFocusedOption().getValue();
             List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = Mapper.getTokens().stream()
                     .filter(token -> token.contains(enteredValue))

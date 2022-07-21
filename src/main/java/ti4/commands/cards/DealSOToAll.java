@@ -24,10 +24,12 @@ public class DealSOToAll extends CardsSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
         for (Player player : activeMap.getPlayers().values()) {
-            for (int i = 0; i < count; i++) {
-                activeMap.drawSecretObjective(player.getUserID());
+            if (player.getFaction() != null) {
+                for (int i = 0; i < count; i++) {
+                    activeMap.drawSecretObjective(player.getUserID());
+                }
+                CardsInfo.sentUserCardInfo(event, activeMap, player);
             }
-            CardsInfo.sentUserCardInfo(event, activeMap, player);
         }
     }
 }
