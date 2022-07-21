@@ -167,9 +167,13 @@ public class ResourceHelper {
         return token;
     }
 
+    @CheckForNull
     public String getResourceFromFolder(String folder, String name, String errorDescription) {
         File resourceFile = new File(Storage.getResourcePath() + File.separator + folder + name);
-        return resourceFile.getAbsolutePath();
+        if (resourceFile.exists()){
+            return resourceFile.getAbsolutePath();
+        }
+        return null;
     }
 
     @CheckForNull

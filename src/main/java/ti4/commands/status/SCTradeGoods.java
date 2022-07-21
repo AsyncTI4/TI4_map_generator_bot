@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 public class SCTradeGoods extends StatusSubcommandData {
     public SCTradeGoods() {
         super(Constants.SC_TRADE_GOODS, "Add Trade goods to Strategy Cards");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Cards number").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Cards number").setRequired(false));
         addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "Trade good count on card").setRequired(false));
     }
 
@@ -23,7 +23,7 @@ public class SCTradeGoods extends StatusSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
 
-        OptionMapping scOption = event.getOption(Constants.SC);
+        OptionMapping scOption = event.getOption(Constants.STRATEGY_CARD);
         OptionMapping tgOption = event.getOption(Constants.TG);
         if (scOption != null || tgOption != null) {
             if (scOption == null) {

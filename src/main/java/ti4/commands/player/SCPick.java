@@ -21,7 +21,7 @@ import java.util.stream.Collectors;
 public class SCPick extends PlayerSubcommandData {
     public SCPick() {
         super(Constants.SC_PICK, "Pick SC");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Card Number count").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number count").setRequired(true));
     }
 
     @Override
@@ -32,7 +32,7 @@ public class SCPick extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Your not a player of this game");
             return;
         }
-        Stats.pickSC(event, activeMap, player, event.getOption(Constants.SC));
+        Stats.pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
         int sc = player.getSC();
         String msg = "";
         String msgExtra = "";
