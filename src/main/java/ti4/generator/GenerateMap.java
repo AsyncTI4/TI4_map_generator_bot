@@ -25,6 +25,8 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class GenerateMap {
+    public static final int DELTA_X = 8;
+    public static final int DELTA_Y = 24;
     private Graphics graphics;
     private BufferedImage mainImage;
     private int width;
@@ -783,7 +785,7 @@ public class GenerateMap {
                 if (faction != null) {
                     String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
                     if (factionImagePath != null) {
-                        factionImage =  resizeImage(ImageIO.read(new File(factionImagePath)), scale);
+                        factionImage = resizeImage(ImageIO.read(new File(factionImagePath)), scale);
                     }
                 }
 
@@ -892,10 +894,10 @@ public class GenerateMap {
             String fleetCCID = Mapper.getFleeCCID(player.getColor());
             int x = points.get(2).x;
             int y = points.get(2).y;
-            drawCCOfPlayer(ccID, x, y, player.getTacticalCC(), false, null);
+            drawCCOfPlayer(ccID, x, y, player.getTacticalCC(), false, null, map);
 //            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), "letnev".equals(player.getFaction()));
-            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), false, player);
-            drawCCOfPlayer(ccID, x, y + 130, player.getStrategicCC(), false, null);
+            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), false, player, map);
+            drawCCOfPlayer(ccID, x, y + 130, player.getStrategicCC(), false, null, map);
 
             if (player == speaker) {
                 String speakerID = Mapper.getTokenID(Constants.SPEAKER);
@@ -923,23 +925,39 @@ public class GenerateMap {
 
     }
 
-    private void drawCCOfPlayer(String ccID, int x, int y, int ccCount, boolean isLetnev, Player player) {
+    private void drawCCOfPlayer(String ccID, int x, int y, int ccCount, boolean isLetnev, Player player, Map map) {
         String ccPath = Mapper.getCCPath(ccID);
         try {
-            BufferedImage ccImage = resizeImage(ImageIO.read(new File(ccPath)), 1.0f);
+            String faction = getFactionByControlMarker(map.getPlayers().values(), ccID);
+            BufferedImage factionImage = null;
+            if (faction != null) {
+                String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
+                if (factionImagePath != null) {
+                    factionImage = ImageIO.read(new File(factionImagePath));
+                }
+            }
+
+            BufferedImage ccImage = ImageIO.read(new File(ccPath));
             int delta = 20;
             if (isLetnev) {
                 for (int i = 0; i < 2; i++) {
                     graphics.drawImage(ccImage, x + (delta * i), y, null);
+                    if (factionImage != null) {
+                        graphics.drawImage(factionImage, x + (delta * i) + DELTA_X, y + DELTA_Y, null);
+                    }
                 }
                 x += 20;
                 for (int i = 2; i < ccCount + 2; i++) {
                     graphics.drawImage(ccImage, x + (delta * i), y, null);
+                    if (factionImage != null) {
+                        graphics.drawImage(factionImage, x + (delta * i) + DELTA_X, y + DELTA_Y, null);
+                    }
                 }
             } else {
                 int lastCCPosition = -1;
                 for (int i = 0; i < ccCount; i++) {
                     graphics.drawImage(ccImage, x + (delta * i), y, null);
+                    graphics.drawImage(factionImage, x + (delta * i) + DELTA_X, y + DELTA_Y, null);
                     lastCCPosition = i;
                 }
                 List<String> mahactCC = player.getMahactCC();
@@ -947,8 +965,21 @@ public class GenerateMap {
                     for (String ccColor : mahactCC) {
                         lastCCPosition++;
                         String fleetCCID = Mapper.getCCPath(Mapper.getFleeCCID(ccColor));
+
+                        faction = getFactionByControlMarker(map.getPlayers().values(), fleetCCID);
+                        factionImage = null;
+                        if (faction != null) {
+                            String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
+                            if (factionImagePath != null) {
+                                factionImage = ImageIO.read(new File(factionImagePath));
+                            }
+                        }
+
                         BufferedImage ccImageExtra = resizeImage(ImageIO.read(new File(fleetCCID)), 1.0f);
                         graphics.drawImage(ccImageExtra, x + (delta * lastCCPosition), y, null);
+                        if (factionImage != null) {
+                            graphics.drawImage(factionImage, x + (delta * lastCCPosition) + DELTA_X, y + DELTA_Y, null);
+                        }
                     }
                 }
             }
@@ -1159,7 +1190,7 @@ public class GenerateMap {
                     if (faction != null) {
                         String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
                         if (factionImagePath != null) {
-                            factionImage =  resizeImage(ImageIO.read(new File(factionImagePath)), scale);
+                            factionImage = resizeImage(ImageIO.read(new File(factionImagePath)), scale);
                         }
                     }
 
@@ -1201,7 +1232,8 @@ public class GenerateMap {
         for (Player player_ : players) {
             if (player_.getColor() != null && player_.getFaction() != null) {
                 String playerControlMarker = Mapper.getControlID(player_.getColor());
-                if (controlID.equals(playerControlMarker)) {
+                String playerCC = Mapper.getCCID(player_.getColor());
+                if (controlID.equals(playerControlMarker) || controlID.equals(playerCC)) {
                     faction = player_.getFaction();
                     break;
                 }
@@ -1313,7 +1345,7 @@ public class GenerateMap {
                 image = addControl(tile, image, tileX, tileY, unitHolder, rectangles, map);
             }
             if (spaceUnitHolder != null) {
-                image = addCC(tile, image, tileX, tileY, spaceUnitHolder);
+                image = addCC(tile, image, tileX, tileY, spaceUnitHolder, map);
             }
             for (UnitHolder unitHolder : unitHolders) {
                 degree = 180;
@@ -1338,7 +1370,7 @@ public class GenerateMap {
         return outputImage;
     }
 
-    private BufferedImage addCC(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
+    private BufferedImage addCC(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, Map map) {
         HashSet<String> ccList = unitHolder.getCCList();
         int deltaX = 0;
         int deltaY = 0;
@@ -1350,11 +1382,27 @@ public class GenerateMap {
             }
             try {
                 image = ImageIO.read(new File(ccPath));
+
+                Point centerPosition = unitHolder.getHolderCenterPosition();
+
+                String faction = getFactionByControlMarker(map.getPlayers().values(), ccID);
+                BufferedImage factionImage = null;
+                if (faction != null) {
+                    String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
+                    if (factionImagePath != null) {
+                        factionImage = ImageIO.read(new File(factionImagePath));
+                    }
+                }
+                graphics.drawImage(image, tileX + 10 + deltaX, tileY + centerPosition.y - 40 + deltaY, null);
+                if (factionImage != null) {
+                    graphics.drawImage(factionImage, tileX + 10 + deltaX + DELTA_X, tileY + centerPosition.y - 40 + deltaY + DELTA_Y, null);
+                }
             } catch (Exception e) {
 //                LoggerHandler.log("Could not parse cc file for: " + ccID, e);
             }
-            Point centerPosition = unitHolder.getHolderCenterPosition();
-            graphics.drawImage(image, tileX + 10 + deltaX, tileY + centerPosition.y - 40 + deltaY, null);
+
+
+
             deltaX += image.getWidth() / 5;
             deltaY += image.getHeight() / 4;
         }

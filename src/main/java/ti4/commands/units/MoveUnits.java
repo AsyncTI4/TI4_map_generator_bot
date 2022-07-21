@@ -94,26 +94,30 @@ public class MoveUnits extends AddRemoveUnits {
             }
         }
         if (!retreat) {
-            for (Player player : activeMap.getPlayers().values()) {
-                if (color.equals(player.getColor())) {
-                    int cc = player.getTacticalCC();
-                    if (cc == 0) {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have CC in Tactics");
-                        break;
-                    } else if (!AddCC.hasCC(event, color, tile)) {
-                        cc -= 1;
-                        player.setTacticalCC(cc);
-                        break;
-                    }
-                }
-            }
+            removeTacticsCC(event, color, tile, activeMap);
         }
 
         AddCC.addCC(event, color, tile);
     }
 
+    public static void removeTacticsCC(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
+        for (Player player : activeMap.getPlayers().values()) {
+            if (color.equals(player.getColor())) {
+                int cc = player.getTacticalCC();
+                if (cc == 0) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have CC in Tactics");
+                    break;
+                } else if (!AddCC.hasCC(event, color, tile)) {
+                    cc -= 1;
+                    player.setTacticalCC(cc);
+                    break;
+                }
+            }
+        }
+    }
+
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID) {
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color) {
         if (toAction) {
             tile.addUnit(planetName, unitID, count);
             tile.addUnitDamage(planetName, unitID, unitsDamage.get(unitID));

@@ -48,6 +48,7 @@ public class Constants {
     public static final String COLOR = "color";
     public static final String ADD_TILE = "add_tile";
     public static final String ADD_CC = "add_cc";
+    public static final String ADD_CC_FROM_TACTICS = "add_cc_from_tactics";
     public static final String CC = "cc";
     public static final String ADD_CONTROL = "add_control";
     public static final String ADD_TOKEN = "add_token";

@@ -106,7 +106,7 @@ abstract public class AddRemoveUnits implements Command {
                 planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
             }
             planetName = getPlanet(event, tile, planetName);
-            unitAction(event, tile, count, planetName, unitID);
+            unitAction(event, tile, count, planetName, unitID, color);
         }
     }
 
@@ -126,7 +126,7 @@ abstract public class AddRemoveUnits implements Command {
         return planetName;
     }
 
-    abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID);
+    abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color);
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {

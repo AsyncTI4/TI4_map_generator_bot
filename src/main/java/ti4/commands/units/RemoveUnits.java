@@ -15,7 +15,7 @@ import java.util.Objects;
 public class RemoveUnits extends AddRemoveUnits {
 
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID) {
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color) {
         OptionMapping option = event.getOption(Constants.PRIORITY_NO_DAMAGE);
         boolean priorityDmg = true;
         if (option != null) {
