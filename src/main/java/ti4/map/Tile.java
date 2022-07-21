@@ -13,7 +13,7 @@ import java.util.StringTokenizer;
 
 public class Tile {
     private final String tileID;
-    private final String position;
+    private String position;
     private HashMap<String, UnitHolder> unitHolders = new HashMap();
 
     public Tile(String tileID, String position) {
@@ -203,6 +203,10 @@ public class Tile {
 
     public String getPosition() {
         return position != null ? position.toLowerCase() : null;
+    }
+
+    public void setPosition(String position) {
+        this.position = position;
     }
 
     public String getTilePath() {

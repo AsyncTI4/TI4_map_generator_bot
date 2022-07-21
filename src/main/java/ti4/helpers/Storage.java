@@ -120,10 +120,7 @@ public class Storage {
 
     @Nullable
     public static String getResourcePath() {
-        String envPath = System.getenv("RESOURCE_PATH");
-        
-        return envPath;
-        
+        return System.getenv("RESOURCE_PATH");
     }
 
     @CheckForNull
@@ -160,7 +157,6 @@ public class Storage {
     }
 
     private static String getStoragePath() {
-        String envPath = System.getenv("DB_PATH");
-        return envPath;
+        return System.getenv("DB_PATH");
     }
 }

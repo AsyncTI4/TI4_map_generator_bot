@@ -72,26 +72,39 @@ public class MoveUnits extends AddRemoveUnits {
 
         toAction = true;
         unitList = event.getOptions().get(4).getAsString().toLowerCase();
-        unitParsing(event, color, tile, unitList);
+        switch (unitList) {
+            case "0":
+            case "none":
+                //Do nothing, as no unit was moved to
+                break;
+            default:
+                unitParsing(event, color, tile, unitList);
+                break;
+        }
 
         OptionMapping optionCC = event.getOption(Constants.CC);
+        boolean retreat = false;
         if (optionCC != null) {
             String value = optionCC.getAsString().toLowerCase();
             if ("no".equals(value) || "n".equals(value)) {
                 return;
             }
+            if ("r".equals(value) || "retreat".equals(value)) {
+                retreat = true;
+            }
         }
-
-        for (Player player : activeMap.getPlayers().values()) {
-            if (color.equals(player.getColor())){
-                int cc = player.getTacticalCC();
-                if (cc == 0){
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have CC in Tactics");
-                    break;
-                } else if (!AddCC.hasCC(event, color, tile)){
-                    cc -= 1;
-                    player.setTacticalCC(cc);
-                    break;
+        if (!retreat) {
+            for (Player player : activeMap.getPlayers().values()) {
+                if (color.equals(player.getColor())) {
+                    int cc = player.getTacticalCC();
+                    if (cc == 0) {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have CC in Tactics");
+                        break;
+                    } else if (!AddCC.hasCC(event, color, tile)) {
+                        cc -= 1;
+                        player.setTacticalCC(cc);
+                        break;
+                    }
                 }
             }
         }
@@ -195,7 +208,7 @@ public class MoveUnits extends AddRemoveUnits {
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Unit name/s. Example: Dread, 2 Warsuns")
                                 .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.CC, "Type no or n to not add CC"))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.CC, "Type no or n to not add CC").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units. Type in yes or y"))
         );
     }
