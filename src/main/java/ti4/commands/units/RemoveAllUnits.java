@@ -16,7 +16,7 @@ public class RemoveAllUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID) {
+    protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color) {
         //No need for this action
     }
 

@@ -58,7 +58,7 @@ If you have active game set, it shows your active game if no game name is define
 /add_control faction_or_color tile planetList <- need to specify tile and planetList, example /add_control pink 3a arnor,lor
 /remove_control faction_or_color tile planet
 and most interesting is
-/add_units faction_or_color tile unitList
+/add_units faction_or_color tile unitList add_cc_from_tactics(optional) <- add_cc_from_tactics if types yes or y, will remove cc from tactics and add to tile
 /remove_units faction_or_color tile unitList
 /remove_all_units faction_or_color tile
 /add_damage_unit faction_or_color tile unitList
