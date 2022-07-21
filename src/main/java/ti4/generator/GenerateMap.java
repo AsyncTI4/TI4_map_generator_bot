@@ -765,10 +765,29 @@ public class GenerateMap {
         int tempCounter = 0;
         int tempX = 0;
         int tempWidth = 0;
+        BufferedImage factionImage = null;
         for (Player player : players) {
             try {
                 String controlID = Mapper.getControlID(player.getColor());
-                BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.7f);
+                String faction = null;
+                if (player.getColor() != null && player.getFaction() != null) {
+                    String playerControlMarker = Mapper.getControlID(player.getColor());
+                    if (controlID.equals(playerControlMarker)) {
+                        faction = player.getFaction();
+                    }
+                }
+
+                factionImage = null;
+                float scale = 0.7f;
+                if (faction != null) {
+                    String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
+                    if (factionImagePath != null) {
+                        factionImage =  resizeImage(ImageIO.read(new File(factionImagePath)), scale);
+                    }
+                }
+
+
+                BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), scale);
                 tempWidth = bufferedImage.getWidth();
                 Integer vpCount = userVPs.get(player);
                 if (vpCount == null) {
@@ -776,6 +795,7 @@ public class GenerateMap {
                 }
                 int x = vpCount * width + 5 + tempX;
                 graphics.drawImage(bufferedImage, x, y + (tempCounter * bufferedImage.getHeight()), null);
+                graphics.drawImage(factionImage, x, y + (tempCounter * bufferedImage.getHeight()), null);
             } catch (Exception e) {
                 //nothing
 //                LoggerHandler.log("Could not display player: " + player.getUserName() + " VP count", e);
@@ -816,7 +836,7 @@ public class GenerateMap {
         int x = 20;
         for (java.util.Map.Entry<Integer, Integer> scTGs : scTradeGoods.entrySet()) {
             Integer sc = scTGs.getKey();
-            if (sc == 0){
+            if (sc == 0) {
                 continue;
             }
             if (!scPicked.contains(sc)) {
@@ -905,7 +925,7 @@ public class GenerateMap {
     private void drawCCOfPlayer(String ccID, int x, int y, int ccCount, boolean isLetnev, Player player) {
         String ccPath = Mapper.getCCPath(ccID);
         try {
-            BufferedImage ccImage = resizeImage(ImageIO.read(new File(ccPath)), 0.75f);
+            BufferedImage ccImage = resizeImage(ImageIO.read(new File(ccPath)), 1.0f);
             int delta = 20;
             if (isLetnev) {
                 for (int i = 0; i < 2; i++) {
@@ -926,7 +946,7 @@ public class GenerateMap {
                     for (String ccColor : mahactCC) {
                         lastCCPosition++;
                         String fleetCCID = Mapper.getCCPath(Mapper.getFleeCCID(ccColor));
-                        BufferedImage ccImageExtra = resizeImage(ImageIO.read(new File(fleetCCID)), 0.75f);
+                        BufferedImage ccImageExtra = resizeImage(ImageIO.read(new File(fleetCCID)), 1.0f);
                         graphics.drawImage(ccImageExtra, x + (delta * lastCCPosition), y, null);
                     }
                 }
@@ -1063,11 +1083,8 @@ public class GenerateMap {
                             }
                         }
                     }
-
-//                    graphics.drawString(name + " - " + 1 + " VP", x, y + 23);
                     boolean multiScoring = false;
                     drawScoreControlMarkers(x + 515, y, players, Collections.singletonList(player.getUserID()), multiScoring, 1, true);
-//                    graphics.drawRect(x - 4, y - 5, 785, 38);
                     column[0]++;
                     if (column[0] > 2) {
                         column[0] = 0;
@@ -1126,6 +1143,7 @@ public class GenerateMap {
     private void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID, boolean multiScoring, Integer objectiveWorth, boolean justCalculate) {
         try {
             int tempX = 0;
+            BufferedImage factionImage = null;
             for (java.util.Map.Entry<String, Player> playerEntry : players.entrySet()) {
                 Player player = playerEntry.getValue();
                 String userID = player.getUserID();
@@ -1134,7 +1152,17 @@ public class GenerateMap {
                     if (controlID.contains("null")) {
                         continue;
                     }
-                    BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), 0.55f);
+                    String faction = getFactionByControlMarker(players.values(), controlID);
+                    factionImage = null;
+                    float scale = 0.55f;
+                    if (faction != null) {
+                        String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
+                        if (factionImagePath != null) {
+                            factionImage =  resizeImage(ImageIO.read(new File(factionImagePath)), scale);
+                        }
+                    }
+
+                    BufferedImage bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), scale);
                     Integer vpCount = userVPs.get(player);
                     if (vpCount == null) {
                         vpCount = 0;
@@ -1145,6 +1173,7 @@ public class GenerateMap {
                         for (int i = 0; i < frequency; i++) {
                             if (!justCalculate) {
                                 graphics.drawImage(bufferedImage, x + tempX, y, null);
+                                graphics.drawImage(factionImage, x + tempX, y, null);
                             }
                             tempX += scoreTokenWidth;
                         }
@@ -1152,6 +1181,7 @@ public class GenerateMap {
                         vpCount += objectiveWorth;
                         if (!justCalculate) {
                             graphics.drawImage(bufferedImage, x + tempX, y, null);
+                            graphics.drawImage(factionImage, x + tempX, y, null);
                         }
                     }
                     userVPs.put(player, vpCount);
@@ -1163,6 +1193,20 @@ public class GenerateMap {
         } catch (Exception e) {
             LoggerHandler.log("Could not parse custodian CV token file", e);
         }
+    }
+
+    private String getFactionByControlMarker(Collection<Player> players, String controlID) {
+        String faction = "";
+        for (Player player_ : players) {
+            if (player_.getColor() != null && player_.getFaction() != null) {
+                String playerControlMarker = Mapper.getControlID(player_.getColor());
+                if (controlID.equals(playerControlMarker)) {
+                    faction = player_.getFaction();
+                    break;
+                }
+            }
+        }
+        return faction;
     }
 
     private Color getSCColor(int sc, Map map) {
@@ -1265,7 +1309,7 @@ public class GenerateMap {
             int degreeChange = 5;
             for (UnitHolder unitHolder : unitHolders) {
                 image = addSleeperToken(tile, image, tileX, tileY, unitHolder);
-                image = addControl(tile, image, tileX, tileY, unitHolder, rectangles);
+                image = addControl(tile, image, tileX, tileY, unitHolder, rectangles, map);
             }
             if (spaceUnitHolder != null) {
                 image = addCC(tile, image, tileX, tileY, spaceUnitHolder);
@@ -1295,8 +1339,8 @@ public class GenerateMap {
 
     private BufferedImage addCC(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
         HashSet<String> ccList = unitHolder.getCCList();
-        int deltaX = 0;//ccList.size() * 20;
-        int deltaY = 0;//ccList.size() * 20;
+        int deltaX = 0;
+        int deltaY = 0;
         for (String ccID : ccList) {
             String ccPath = tile.getCCPath(ccID);
             if (ccPath == null) {
@@ -1304,7 +1348,7 @@ public class GenerateMap {
                 continue;
             }
             try {
-                image = resizeImage(ImageIO.read(new File(ccPath)), 0.85f);
+                image = ImageIO.read(new File(ccPath));
             } catch (Exception e) {
 //                LoggerHandler.log("Could not parse cc file for: " + ccID, e);
             }
@@ -1316,9 +1360,10 @@ public class GenerateMap {
         return image;
     }
 
-    private BufferedImage addControl(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, ArrayList<Rectangle> rectangles) {
+    private BufferedImage addControl(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, ArrayList<Rectangle> rectangles, Map map) {
         ArrayList<String> controlList = new ArrayList<>(unitHolder.getControlList());
         PlanetTokenPosition planetTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
+        BufferedImage factionImage = null;
         if (planetTokenPosition != null) {
             Point centerPosition = unitHolder.getHolderCenterPosition();
             int xDelta = 0;
@@ -1326,14 +1371,22 @@ public class GenerateMap {
                 if (controlID.contains(Constants.SLEEPER)) {
                     continue;
                 }
+                String faction = getFactionByControlMarker(map.getPlayers().values(), controlID);
+
                 String controlPath = tile.getCCPath(controlID);
                 if (controlPath == null) {
                     LoggerHandler.log("Could not parse control token file for: " + controlID);
                     continue;
                 }
-                float scale = 1.00f;
                 try {
-                    image = resizeImage(ImageIO.read(new File(controlPath)), scale);
+                    factionImage = null;
+                    if (faction != null) {
+                        String factionImagePath = tile.getCCPath("control_faction_" + faction + ".png");
+                        if (factionImagePath != null) {
+                            factionImage = ImageIO.read(new File(factionImagePath));
+                        }
+                    }
+                    image = ImageIO.read(new File(controlPath));
                 } catch (Exception e) {
                     LoggerHandler.log("Could not parse control token file for: " + controlID, e);
                 }
@@ -1345,9 +1398,15 @@ public class GenerateMap {
                 Point position = planetTokenPosition.getPosition(controlID);
                 if (position != null) {
                     graphics.drawImage(image, tileX + position.x, tileY + position.y, null);
+                    if (factionImage != null) {
+                        graphics.drawImage(factionImage, tileX + position.x, tileY + position.y, null);
+                    }
                     rectangles.add(new Rectangle(tileX + position.x, tileY + position.y, image.getWidth(), image.getHeight()));
                 } else {
                     graphics.drawImage(image, tileX + centerPosition.x + xDelta, tileY + centerPosition.y, null);
+                    if (factionImage != null) {
+                        graphics.drawImage(factionImage, tileX + centerPosition.x + xDelta, tileY + centerPosition.y, null);
+                    }
                     rectangles.add(new Rectangle(tileX + centerPosition.x + xDelta, tileY + centerPosition.y, image.getWidth(), image.getHeight()));
                     xDelta += 10;
                 }
@@ -1618,6 +1677,11 @@ public class GenerateMap {
                     if (isMirage) {
                         imageDmgX = imageX + (int) (numberPositionPoint.x * scaleOfUnit) - dmgImage.getWidth();
                         imageDmgY = imageY + (int) (numberPositionPoint.y * scaleOfUnit) - dmgImage.getHeight();
+                    }
+                    if (unitID.contains("_mf")) {
+                        imageDmgX = position != null ? tileX + position.x : xOriginal + (dmgImage.getWidth() / 2);
+                        imageDmgY = position != null ? tileY + position.y : yOriginal - (dmgImage.getHeight() / 2);
+
                     }
                     graphics.drawImage(dmgImage, imageDmgX, imageDmgY, null);
                     unitDamageCount--;

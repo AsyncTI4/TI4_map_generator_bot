@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.jetbrains.annotations.Nullable;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -13,9 +12,7 @@ import ti4.map.MapStatus;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import javax.annotation.CheckForNull;
 import java.util.LinkedHashMap;
-import java.util.Objects;
 import java.util.StringTokenizer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -30,7 +27,7 @@ public class Stats extends PlayerSubcommandData {
                 .addOptions(new OptionData(OptionType.STRING, Constants.TG, "Trade goods count"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count"))
                 .addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
-                .addOptions(new OptionData(OptionType.INTEGER, Constants.SC, "Strategy Card Number count"))
+                .addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number count"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.SC_PLAYED, "Strategy Card played y/n"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player passed y/n"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
@@ -69,9 +66,6 @@ public class Stats extends PlayerSubcommandData {
                         setValue(event, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken());
                         setValue(event, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken());
                         setValue(event, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken());
-//                        player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
-//                        player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
-//                        player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
                     } catch (Exception e) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "Not number entered, check CC count again");
                     }
@@ -117,7 +111,7 @@ public class Stats extends PlayerSubcommandData {
                 player.setPassed(false);
             }
         }
-        pickSC(event, activeMap, player, event.getOption(Constants.SC));
+        pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
 
         OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
         if (optionSCPlayed != null) {
