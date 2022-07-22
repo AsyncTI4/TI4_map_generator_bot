@@ -21,3 +21,6 @@ jobs:
           cd /root/TI4_map_generator_bot
           git pull
           docker build -t tibot .
+          docker stop tibot
+          docker rm tibot
+          docker run --name tibot -v /root/savefiles:/opt/STORAGE -d --restart unless-stopped tibot
