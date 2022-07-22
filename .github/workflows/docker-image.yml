@@ -17,7 +17,7 @@ jobs:
         username: root
         password: ${{ secrets.SSH_PASSWORD }}
         port: 22
-          script: |
-            cd /root/TI4_map_generator_bot
-            git pull
-            docker build -t tibot .
+        script: |
+          cd /root/TI4_map_generator_bot
+          git pull
+          docker build -t tibot .
