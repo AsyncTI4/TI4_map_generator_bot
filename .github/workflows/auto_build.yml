@@ -1,13 +1,10 @@
 on:
   push:
     branches: [ "master" ]
-  pull_request:
-    branches: [ "master" ]
-name: BuildAndDeploy
 
 jobs:
-  build:
-    name: Build
+  deploy:
+    name: Deploy
     runs-on: ubuntu-latest
     steps:
     - name: executing remote ssh commands using password
