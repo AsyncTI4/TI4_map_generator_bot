@@ -157,10 +157,6 @@ public class Storage {
     }
 
     private static String getStoragePath() {
-        String db_path = System.getenv("DB_PATH");
-
-        System.out.println("db_path: " + db_path );
-        System.out.println("db_path2: " + System.getProperty("DB_PATH") );
-        return db_path;
+        return System.getenv("DB_PATH");
     }
 }
