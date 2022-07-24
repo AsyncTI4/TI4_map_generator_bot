@@ -17,9 +17,10 @@ public class MapFileDeleter {
 
         File mapImageDirectory = Storage.getMapImageDirectory();
 
-        System.out.println("FILE1: " + new File(Storage.getResourcePath(), Storage.MAPS).toString());
-        System.out.println("FILE2: " + new File(Storage.getResourcePath()  + Storage.MAPS).toString());
-        System.out.println("FILE3: " + new File(Storage.getResourcePath(), "maps/").toString());
+        System.out.println("FILE0: " + mapImageDirectory.toString());
+        System.out.println("FILE1: " + new File(Storage.getStoragePath(), Storage.MAPS).toString());
+        System.out.println("FILE2: " + new File(Storage.getStoragePath()  + Storage.MAPS).toString());
+        System.out.println("FILE3: " + new File(Storage.getStoragePath(), "maps/").toString());
 
         for (File file : mapImageDirectory.listFiles()) {
             String absolutePath = file.getAbsolutePath();

@@ -156,7 +156,7 @@ public class Storage {
         return new File(getStoragePath() + "/log.txt");
     }
 
-    private static String getStoragePath() {
+    public static String getStoragePath() {
         return System.getenv("DB_PATH");
     }
 }
