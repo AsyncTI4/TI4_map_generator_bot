@@ -17,4 +17,4 @@ jobs:
         script: |
           cd /root
           ./caller.sh
-          exit N
+          exit 1
