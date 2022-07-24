@@ -18,7 +18,8 @@ public class MapFileDeleter {
         File mapImageDirectory = Storage.getMapImageDirectory();
 
         System.out.println("FILE0: " + mapImageDirectory.exists());
-        System.out.println("FILE1: " + new File(Storage.getStoragePath()).getAbsolutePath());
+        System.out.println("FILE1: " + Storage.getStoragePath());
+        System.out.println("FILE2: " + new File(Storage.getStoragePath()).getAbsolutePath());
         System.out.println("----------------------");
         System.out.println("VAR1: " + new File("/ti4bot/ti4bot_saves" + Storage.MAPS).exists());
         System.out.println("VAR2: " + new File("./ti4bot/ti4bot_saves" + Storage.MAPS).exists());
