@@ -157,6 +157,11 @@ public class Storage {
     }
 
     public static String getStoragePath() {
-        return System.getenv("DB_PATH");
+        String db_path = System.getenv("DB_PATH");
+        if (!new File(db_path).exists())
+        {
+            return "."+db_path;
+        }
+        return db_path;
     }
 }
