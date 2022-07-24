@@ -18,5 +18,5 @@ jobs:
         password: ${{ secrets.SSH_PASSWORD }}
         port: 22
         script: |
-          cd /root/ti4bot
+          cd /root
           ./run.sh
