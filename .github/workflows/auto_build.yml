@@ -16,5 +16,5 @@ jobs:
         port: 22
         script: |
           cd /root
-          ./caller.sh
-          exit 1
+          nohup bash -c ./caller.sh > /dev/null &
+      
