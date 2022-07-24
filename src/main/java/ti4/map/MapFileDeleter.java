@@ -23,6 +23,9 @@ public class MapFileDeleter {
         System.out.println("----------------------");
         System.out.println("VAR2: " + new File("./ti4bot/ti4bot_saves" + Storage.MAPS).exists());
         System.out.println("VAR3: " + new File("./ti4bot/ti4bot_saves", Storage.MAPS).exists());
+        System.out.println("VAR3: " + new File("./ti4bot/ti4bot_saves", Storage.MAPS).getAbsolutePath());
+        System.out.println("VAR3: " + new File("./ti4bot/ti4bot_saves", Storage.MAPS).toString());
+        System.out.println("VAR3: " + new File("./ti4bot/ti4bot_saves", Storage.MAPS).toPath());
 
 
         for (File file : mapImageDirectory.listFiles()) {
