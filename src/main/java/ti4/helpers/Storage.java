@@ -157,6 +157,8 @@ public class Storage {
     }
 
     private static String getStoragePath() {
-        return System.getenv("DB_PATH");
+        String db_path = System.getenv("DB_PATH");
+        LoggerHandler.log("db_path: " + db_path );
+        return db_path;
     }
 }
