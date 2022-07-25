@@ -1,0 +1,26 @@
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+name: BuildAndDeploy
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+    - name: executing remote ssh commands using password
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SSH_HOST }}
+        username: root
+        password: ${{ secrets.SSH_PASSWORD }}
+        port: 22
+        script: |
+          cd /root/TI4_map_generator_bot
+          git pull
+          docker build -t tibot .
+          docker stop tibot
+          docker rm tibot
+          docker run --name tibot -v /root/savefiles:/opt/STORAGE -d --restart unless-stopped tibot
