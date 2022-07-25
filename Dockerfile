@@ -21,4 +21,4 @@ ENV SERVER=$DISCORD_SERVER
 # ENTRYPOINT java -Xmx1400m -jar tibot.jar $DISCORD_BOT_KEY $DISCORD_USER $DISCORD_SERVER
 # ENTRYPOINT ["tibot.jar"]
 ENTRYPOINT ["java", "-Xmx1400m", "-jar", "tibot.jar"]
-CMD ["no_config_specified"]
+CMD ["no_args"]
