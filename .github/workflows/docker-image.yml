@@ -21,6 +21,4 @@ jobs:
           cd /root/ti4bot/TI4_map_generator_bot
           git pull
           docker build -t tibot .
-          docker stop tibot || true && docker rm tibot || true
-          cd /root
-          ./docker_run.sh
+          
