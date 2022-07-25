@@ -20,5 +20,8 @@ jobs:
         script: |
           cd /root/ti4bot/TI4_map_generator_bot
           git pull
+          docker kill $(docker ps -q)
+          docker rm $(docker ps -a -q)
+          docker rmi $(docker images -q)
           docker build -t tibot .
           
