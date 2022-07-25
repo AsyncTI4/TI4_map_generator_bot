@@ -24,3 +24,4 @@ jobs:
           docker stop tibot
           docker rm tibot
           cd /root
+          ./docker_run.sh
