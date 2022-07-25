@@ -12,6 +12,6 @@ RUN mvn clean compile assembly:single && \
 COPY ./src/main/resources /opt/resources
 ENV DB_PATH=/opt/STORAGE
 ENV RESOURCE_PATH=/opt/resources
-# ENTRYPOINT java -Xmx1400m -jar tibot.jar
-ENTRYPOINT ["tibot.jar"]
-CMD ["java", "-Xmx1400m", "-jar", "tibot.jar"]
+ENTRYPOINT java -Xmx1400m -jar tibot.jar
+# ENTRYPOINT ["tibot.jar"]
+# CMD ["java", "-Xmx1400m", "-jar", "tibot.jar"]
