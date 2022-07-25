@@ -16,17 +16,6 @@ public class MapFileDeleter {
         }
 
         File mapImageDirectory = Storage.getMapImageDirectory();
-
-        System.out.println("FILE0: " + mapImageDirectory.exists());
-        System.out.println("FILE1: " + Storage.getStoragePath());
-        System.out.println("FILE2: " + new File(Storage.getStoragePath()).getAbsolutePath());
-        System.out.println("----------------------");
-        System.out.println("VAR1: " + new File("/opt/STORAGE" + Storage.MAPS).exists());
-        System.out.println("VAR2: " + new File("./opt/STORAGE" + Storage.MAPS).exists());
-        System.out.println("VAR3: " + new File("../opt/STORAGE" + Storage.MAPS).exists());
-        System.out.println("VAR4: " + new File("../..//opt/STORAGE" + Storage.MAPS).exists());
-        System.out.println("VAR5: " + new File("../../STORAGE" + Storage.MAPS).exists());
-
         for (File file : mapImageDirectory.listFiles()) {
             String absolutePath = file.getAbsolutePath();
             if (absolutePath.endsWith(Constants.JPG) ||
