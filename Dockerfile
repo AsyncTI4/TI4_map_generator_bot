@@ -18,6 +18,7 @@ ARG DISCORD_SERVER
 ENV BOT_KEY=$DISCORD_BOT_KEY
 ENV USER=$DISCORD_USER
 ENV SERVER=$DISCORD_SERVER
-ENTRYPOINT java -Xmx1400m -jar tibot.jar $DISCORD_BOT_KEY $DISCORD_USER $DISCORD_SERVER
+# ENTRYPOINT java -Xmx1400m -jar tibot.jar $DISCORD_BOT_KEY $DISCORD_USER $DISCORD_SERVER
 # ENTRYPOINT ["tibot.jar"]
-# CMD ["java", "-Xmx1400m", "-jar", "tibot.jar", "arg1", "arg2", "arg3"]
+ENTRYPOINT ["java", "-Xmx1400m", "-jar", "tibot.jar"]
+CMD ["no_config_specified"]
