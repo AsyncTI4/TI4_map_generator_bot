@@ -24,4 +24,6 @@ jobs:
           docker rm $(docker ps -a -q)
           docker rmi $(docker images -q)
           docker build -t tibot .
+          cd /root
+          ./docker_run.sh
           
