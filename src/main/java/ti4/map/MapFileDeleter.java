@@ -14,7 +14,6 @@ public class MapFileDeleter {
         for (File file : filesToDelete) {
             file.delete();
         }
-
         File mapImageDirectory = Storage.getMapImageDirectory();
         for (File file : mapImageDirectory.listFiles()) {
             String absolutePath = file.getAbsolutePath();
