@@ -23,7 +23,7 @@ jobs:
           docker kill $(docker ps -q)
           docker rm $(docker ps -a -q)
           docker rmi $(docker images -q)
-          docker build -t tibot .
+          docker build --build-arg DISCORD_BOT_KEY=$DISCORD_BOT_KEY --build-arg DISCORD_USER=$DISCORD_USER --build-arg DISCORD_SERVER=$DISCORD_SERVER -t tibot .
           cd /root
           ./docker_run.sh
           
