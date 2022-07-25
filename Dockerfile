@@ -12,6 +12,12 @@ RUN mvn clean compile assembly:single && \
 COPY ./src/main/resources /opt/resources
 ENV DB_PATH=/opt/STORAGE
 ENV RESOURCE_PATH=/opt/resources
-# ENTRYPOINT java -Xmx1400m -jar tibot.jar
+ARG DISCORD_BOT_KEY
+ARG DISCORD_USER
+ARG DISCORD_SERVER
+ENV DISCORD_BOT_KEY=$DISCORD_BOT_KEY
+ENV DISCORD_USER=$DISCORD_USER
+ENV DISCORD_SERVER=$DISCORD_SERVER
+ENTRYPOINT java -Xmx1400m -jar tibot.jar $DISCORD_BOT_KEY $DISCORD_USER $DISCORD_SERVER
 # ENTRYPOINT ["tibot.jar"]
 # CMD ["java", "-Xmx1400m", "-jar", "tibot.jar", "arg1", "arg2", "arg3"]
