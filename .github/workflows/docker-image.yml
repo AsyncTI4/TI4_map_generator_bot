@@ -23,4 +23,4 @@ jobs:
           docker build -t tibot .
           docker stop tibot
           docker rm tibot
-          docker run --name tibot -v /root/savefiles:/opt/STORAGE -d --restart unless-stopped tibot
+          docker run --name tibot -v /root/ti4bot/ti4bot_saves:/opt/STORAGE -d --restart unless-stopped tibot
