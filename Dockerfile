@@ -14,4 +14,4 @@ ENV DB_PATH=/opt/STORAGE
 ENV RESOURCE_PATH=/opt/resources
 # ENTRYPOINT java -Xmx1400m -jar tibot.jar
 ENTRYPOINT ["tibot.jar"]
-CMD ["my", "java", "default", "args"]
+CMD ["java", "-Xmx1400m", "-jar", "tibot.jar"]
