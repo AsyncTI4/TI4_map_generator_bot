@@ -46,10 +46,6 @@ public class MapGenerator {
                 .setChunkingFilter(ChunkingFilter.ALL)
 //                .enableIntents(Arrays.asList(GatewayIntent.values()))
                 .build();
-//        jda = JDABuilder.createLight(args[0], Collections.emptyList())
-//                .addEventListeners(new Bot())
-//                .setActivity(Activity.playing("Type /ping"))
-//                .build();
 
 
         jda.addEventListener(new MessageListener());
