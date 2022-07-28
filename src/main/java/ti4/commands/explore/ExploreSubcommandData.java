@@ -10,7 +10,10 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.*;
+import ti4.map.Map;
+import ti4.map.MapManager;
+import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 public abstract class ExploreSubcommandData extends SubcommandData {
@@ -88,6 +91,18 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             String token = cardInfo[5];
             String tokenFilename = Mapper.getAttachmentID(token);
             if (tokenFilename != null && tile != null && planetName != null) {
+
+                String planetInfo = Mapper.getPlanet(planetName);
+                if (planetInfo != null) {
+                    String[] split = planetInfo.split(",");
+                    if (split.length > 4) {
+                        String techSpec = split[4];
+                        if (!techSpec.isEmpty()) {
+                            tokenFilename = Mapper.getAttachmentID(token + "stat");
+                        }
+                    }
+                }
+
                 tile.addToken(tokenFilename, planetName);
                 activeMap.purgeExplore(cardID);
                 message = "Token added to planet";

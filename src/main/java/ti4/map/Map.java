@@ -598,7 +598,7 @@ public class Map {
             if (!deck.isEmpty()) {
                 explore.addAll(deck);
                 Collections.shuffle(explore);
-                discardExplore.clear();
+                discardExplore.removeAll(deck);
                 return drawExplore(reqType);
             }
         }
