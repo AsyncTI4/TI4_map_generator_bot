@@ -230,6 +230,7 @@ Its workaround for that single explore
 /special make_secret_into_po soID <- makes scored Secret objective into public objective. To remove Secret as Public, use /status po_remove_custom poID
 /special adjust_round_number <- set round number for game (default increases when using /status cleanup command)
 /special swap_systems tileID tileIDTo <- swaps two tiles (ghost hero)
+/special search_warrant <- execute command to enable/disable visible Secret objectives
 
 /leaders unlock leaderID <- unlock leader
 /leaders lock leaderID <- lock leader

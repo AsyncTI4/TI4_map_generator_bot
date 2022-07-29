@@ -19,6 +19,7 @@ public class Player {
     private String userName;
 
     private boolean passed = false;
+    private boolean searchWarrant = false;
 
     private String faction;
     private String color;
@@ -630,5 +631,17 @@ public class Player {
 
     public void setCommoditiesTotal(int commoditiesTotal) {
         this.commoditiesTotal = commoditiesTotal;
+    }
+
+    public void setSearchWarrant() {
+        searchWarrant = !searchWarrant;
+    }
+
+    public void setSearchWarrant(boolean value) {
+        searchWarrant = value;
+    }
+
+    public boolean isSearchWarrant() {
+        return searchWarrant;
     }
 }

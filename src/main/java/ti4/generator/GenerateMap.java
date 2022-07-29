@@ -283,11 +283,11 @@ public class GenerateMap {
                 graphics.setColor(Color.WHITE);
                 String ccCount = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
                 x += 120;
-                graphics.drawString(ccCount, x + 40, y + deltaY + 50);
+                graphics.drawString(ccCount, x + 40, y + deltaY + 40);
                 if (!player.getMahactCC().isEmpty()) {
-                    graphics.drawString("+" + player.getMahactCC().size() + " FS", x + 40, y + deltaY + 90);
+                    graphics.drawString("+" + player.getMahactCC().size() + " FS", x + 40, y + deltaY + 70);
                 }
-                graphics.drawString("T/F/S", x + 40, y + deltaY + 10);
+                graphics.drawString("T/F/S", x + 40, y + deltaY);
 
                 String acImage = "pa_cardbacks_ac.png";
                 String soImage = "pa_cardbacks_so.png";
@@ -335,6 +335,9 @@ public class GenerateMap {
                 int yPlayArea = y - 30;
                 y += 85;
                 y += 200;
+
+                int soCount = objectivesSO(map, yPlayArea + 150, player);
+
                 int xDeltaSecondRow = xDelta;
                 int yPlayAreaSecondRow = yPlayArea + 160;
                 if (!player.getPlanets().isEmpty()) {
@@ -357,6 +360,9 @@ public class GenerateMap {
                 }
 
                 g2.setColor(color);
+                if (soCount > 4) {
+                    y += (soCount - 4) * 43;
+                }
                 g2.drawRect(realX - 5, baseY, x + widthOfLine, y - baseY);
                 y += 15;
 
@@ -690,7 +696,7 @@ public class GenerateMap {
     }
 
     private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, String[]> techInfo, int deltaX, Player player, Map map) {
-        if (techs == null){
+        if (techs == null) {
             return deltaX;
         }
         String outline = "pa_tech_unitsnew_outlines_generic.png";
@@ -709,14 +715,14 @@ public class GenerateMap {
         for (String tech : techs) {
             String[] techInformation = techInfo.get(tech);
 
-            String unit = "pa_tech_unitsnew_" + Mapper.getColorID(player.getColor()) +"_";
+            String unit = "pa_tech_unitsnew_" + Mapper.getColorID(player.getColor()) + "_";
             if (techInformation.length >= 5) {
                 unit += techInformation[4] + ".png";
             } else {
                 unit += tech + ".png";
             }
             drawPAImage(x + deltaX, y, unit);
-            if (techInformation.length >= 4 && !techInformation[3].isEmpty()){
+            if (techInformation.length >= 4 && !techInformation[3].isEmpty()) {
                 String factionIcon = "pa_tech_unitsnew_" + techInformation[3] + "_" + tech + ".png";
                 drawPAImage(x + deltaX, y, factionIcon);
             }
@@ -1078,7 +1084,7 @@ public class GenerateMap {
         }
 
         graphics.setColor(Color.RED);
-        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret, 1, column, customPublicVP);
+        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret, 1, column, customPublicVP, true, false);
         if (column[0] != 0) {
             y += 40;
         }
@@ -1087,6 +1093,52 @@ public class GenerateMap {
         displaySftT(y, x, players, column);
 
         return y;
+    }
+
+    private int objectivesSO(Map map, int y, Player player) {
+        int x = 5;
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(3));
+        userVPs = new HashMap<>();
+
+        LinkedHashMap<String, Player> players = map.getPlayers();
+        HashMap<String, String> secretObjectives = Mapper.getSecretObjectivesJustNames();
+        LinkedHashMap<String, Integer> customPublicVP = map.getCustomPublicVP();
+        Set<String> secret = secretObjectives.keySet();
+        graphics.setFont(Storage.getFont26());
+        graphics.setColor(new Color(230, 126, 34));
+        Integer[] column = new Integer[1];
+        column[0] = 0;
+
+        LinkedHashMap<String, Integer> revealedPublicObjectives = new LinkedHashMap<>();
+        LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
+        LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>(player.getSecrets());
+
+
+        for (String id : secrets.keySet()) {
+            scoredPublicObjectives.put(id, List.of(player.getUserID()));
+        }
+        if (player.isSearchWarrant()) {
+            LinkedHashMap<String, Integer> revealedSecrets = new LinkedHashMap<>();
+            graphics.setColor(Color.LIGHT_GRAY);
+            revealedSecrets.putAll(secrets);
+            y = displayObjectives(y, x, new LinkedHashMap<>(), revealedSecrets, players, secretObjectives, secret, 0, column, customPublicVP, false, true);
+        }
+        LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
+        for (String id : map.getSoToPoList()) {
+            secretsScored.remove(id);
+        }
+        revealedPublicObjectives.putAll(secretsScored);
+        for (String id : secretsScored.keySet()) {
+            scoredPublicObjectives.put(id, List.of(player.getUserID()));
+        }
+        graphics.setColor(Color.RED);
+        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret, 1, column, customPublicVP, false, true);
+        if (player.isSearchWarrant()) {
+            return secretsScored.keySet().size() + player.getSecrets().keySet().size();
+        } else {
+            return secretsScored.keySet().size();
+        }
     }
 
     private int displaySftT(int y, int x, LinkedHashMap<String, Player> players, Integer[] column) {
@@ -1128,13 +1180,23 @@ public class GenerateMap {
     }
 
     private int displayObjectives(int y, int x, LinkedHashMap<String, List<String>> scoredPublicObjectives, LinkedHashMap<String, Integer> revealedPublicObjectives,
-                                  LinkedHashMap<String, Player> players, HashMap<String, String> publicObjectivesState, Set<String> po, Integer objectiveWorth, Integer[] column, LinkedHashMap<String, Integer> customPublicVP) {
+                                  LinkedHashMap<String, Player> players, HashMap<String, String> publicObjectivesState, Set<String> po, Integer objectiveWorth,
+                                  Integer[] column, LinkedHashMap<String, Integer> customPublicVP) {
+        return displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState, po, objectiveWorth, column, customPublicVP, false, false);
+    }
+
+    private int displayObjectives(int y, int x, LinkedHashMap<String, List<String>> scoredPublicObjectives, LinkedHashMap<String, Integer> revealedPublicObjectives,
+                                  LinkedHashMap<String, Player> players, HashMap<String, String> publicObjectivesState, Set<String> po, Integer objectiveWorth,
+                                  Integer[] column, LinkedHashMap<String, Integer> customPublicVP, boolean justCalculate, boolean fixedColumn) {
         Set<String> keysToRemove = new HashSet<>();
         for (java.util.Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
             switch (column[0]) {
                 case 0 -> x = 5;
                 case 1 -> x = 801;
                 case 2 -> x = 1598;
+            }
+            if (fixedColumn) {
+                x = 50;
             }
 
             String key = revealed.getKey();
@@ -1153,17 +1215,34 @@ public class GenerateMap {
                     objectiveWorth = 1;
                 }
             }
-            graphics.drawString("(" + index + ") " + name + " - " + objectiveWorth + " VP", x, y + 23);
+            if (!justCalculate) {
+                if (fixedColumn) {
+                    graphics.drawString("(" + index + ") " + name, x, y + 23);
+                } else {
+                    graphics.drawString("(" + index + ") " + name + " - " + objectiveWorth + " VP", x, y + 23);
+                }
+            }
             List<String> scoredPlayerID = scoredPublicObjectives.get(key);
             boolean multiScoring = Constants.CUSTODIAN.equals(key);
             if (scoredPlayerID != null) {
-                drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, multiScoring, objectiveWorth, false);
+                if (fixedColumn) {
+                    drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, false, objectiveWorth, justCalculate, true);
+                } else {
+                    drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, multiScoring, objectiveWorth, justCalculate);
+                }
             }
-            graphics.drawRect(x - 4, y - 5, 785, 38);
-            column[0]++;
-            if (column[0] > 2) {
-                column[0] = 0;
-                y += 43;
+            if (!justCalculate) {
+                if (fixedColumn) {
+                    graphics.drawRect(x - 4, y - 5, 600, 38);
+                    y += 43;
+                } else {
+                    graphics.drawRect(x - 4, y - 5, 785, 38);
+                    column[0]++;
+                    if (column[0] > 2) {
+                        column[0] = 0;
+                        y += 43;
+                    }
+                }
             }
         }
         keysToRemove.forEach(revealedPublicObjectives::remove);
@@ -1171,7 +1250,13 @@ public class GenerateMap {
         return y;
     }
 
-    private void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID, boolean multiScoring, Integer objectiveWorth, boolean justCalculate) {
+    private void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID,
+                                         boolean multiScoring, Integer objectiveWorth, boolean justCalculate) {
+        drawScoreControlMarkers(x, y, players, scoredPlayerID, multiScoring, objectiveWorth, justCalculate, false);
+    }
+
+    private void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID,
+                                         boolean multiScoring, Integer objectiveWorth, boolean justCalculate, boolean fixedColumn) {
         try {
             int tempX = 0;
             BufferedImage factionImage = null;
@@ -1217,7 +1302,7 @@ public class GenerateMap {
                     }
                     userVPs.put(player, vpCount);
                 }
-                if (!multiScoring) {
+                if (!multiScoring && !fixedColumn) {
                     tempX += scoreTokenWidth;
                 }
             }
@@ -1399,7 +1484,6 @@ public class GenerateMap {
             } catch (Exception e) {
 //                LoggerHandler.log("Could not parse cc file for: " + ccID, e);
             }
-
 
 
             deltaX += image.getWidth() / 5;

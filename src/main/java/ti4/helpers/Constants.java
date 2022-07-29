@@ -46,6 +46,7 @@ public class Constants {
     public static final String PRIORITY_NO_DAMAGE = "priority_no_damage";
     public static final String UNIT_NAMES_TO = "unit_names_to";
     public static final String COLOR = "color";
+    public static final String SEARCH_WARRANT = "search_warrant";
     public static final String ADD_TILE = "add_tile";
     public static final String ADD_CC = "add_cc";
     public static final String ADD_CC_FROM_TACTICS = "add_cc_from_tactics";

@@ -290,6 +290,9 @@ public class MapSaveLoadManager {
             writer.write(Constants.PASSED + " " + player.isPassed());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.SEARCH_WARRANT + " " + player.isSearchWarrant());
+            writer.write(System.lineSeparator());
+
             writeCards(player.getActionCards(), writer, Constants.AC);
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
@@ -897,6 +900,7 @@ public class MapSaveLoadManager {
 
                 case Constants.STRATEGY_CARD -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
             }
         }
     }
