@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
@@ -49,25 +50,10 @@ public class MoveUnits extends AddRemoveUnits {
             return;
         }
 
-        if ("82a".equals(tile.getTileID())){
-            String position = tile.getPosition();
-            activeMap.removeTile(position);
-
-
-            String planetTileName = AliasHandler.resolveTile("82b");
-            if (!PositionMapper.isTilePositionValid(position, activeMap)) {
-                MessageHelper.replyToMessage(event, "Position tile not allowed");
-                return;
-            }
-
-            String tileName = Mapper.getTileID(planetTileName);
-            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
-            if (tilePath == null) {
-                MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
-                return;
-            }
-            tile = new Tile(planetTileName, position);
-            activeMap.setTile(tile);
+        tile = flipMallice(event, tile, activeMap);
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice");
+            return;
         }
 
         toAction = true;
@@ -98,6 +84,30 @@ public class MoveUnits extends AddRemoveUnits {
         }
 
         AddCC.addCC(event, color, tile);
+    }
+
+    public static Tile flipMallice(SlashCommandInteractionEvent event, Tile tile, Map activeMap) {
+        if ("82a".equals(tile.getTileID())){
+            String position = tile.getPosition();
+            activeMap.removeTile(position);
+
+
+            String planetTileName = AliasHandler.resolveTile("82b");
+            if (!PositionMapper.isTilePositionValid(position, activeMap)) {
+                MessageHelper.replyToMessage(event, "Position tile not allowed");
+                return null;
+            }
+
+            String tileName = Mapper.getTileID(planetTileName);
+            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+            if (tilePath == null) {
+                MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
+                return null;
+            }
+            tile = new Tile(planetTileName, position);
+            activeMap.setTile(tile);
+        }
+        return tile;
     }
 
     public static void removeTacticsCC(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
