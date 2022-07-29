@@ -274,6 +274,7 @@ public class Constants {
     public static final String DEAL_SO_TO_ALL = "so_deal_to_all";
     public static final String SHOW_SO = "so_show";
     public static final String SHOW_ALL_SO = "so_show_all";
+    public static final String SHOW_ALL_SO_TO_ALL = "so_show_all_to_all";
     public static final String SHOW_SO_TO_ALL = "so_show_to_all";
     public static final String CARDS = "cards";
     public static final String PN = "pn";
