@@ -8,10 +8,7 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.map.Map;
-import ti4.map.Planet;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.map.*;
 import ti4.message.MessageHelper;
 
 public class ExpPlanet extends ExploreSubcommandData {
@@ -61,7 +58,8 @@ public class ExpPlanet extends ExploreSubcommandData {
             return;
         }
         String messageText = displayExplore(cardID);
-        messageText += "\n" + "Explored: " + planetName + " by player: " + activeMap.getPlayer(event.getUser().getId()).getUserName();
+        Player player = activeMap.getPlayer(event.getUser().getId());
+        messageText += "\n" + "Explored: " + planetName + " by player: " + (player != null ? player.getUserName() : event.getUser().getName());
         resolveExplore(event, cardID, tile, planetName, messageText);
     }
 }
