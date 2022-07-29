@@ -7,11 +7,13 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.tokens.AddCC;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Tile;
+import ti4.message.MessageHelper;
 
 public class AddUnits extends AddRemoveUnits {
     @Override
@@ -24,6 +26,20 @@ public class AddUnits extends AddRemoveUnits {
             }
         }
         tile.addUnit(planetName, unitID, count);
+    }
+
+    @Override
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
+        String userID = event.getUser().getId();
+        MapManager mapManager = MapManager.getInstance();
+        Map activeMap = mapManager.getUserActiveMap(userID);
+
+        tile = MoveUnits.flipMallice(event, tile, activeMap);
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice");
+            return;
+        }
+        super.unitParsingForTile(event, color, tile);
     }
 
     @Override
