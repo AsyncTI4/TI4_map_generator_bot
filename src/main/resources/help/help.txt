@@ -148,6 +148,7 @@ Cards commands
 /cards info <- sents player all private cards for given game
 /cards so_show soUniqueID player <- sends given Secret Objective to player and changes soUniqueID
 /cards so_show_all player <- sends all Secret Objectives to player
+/cards so_show_all_to_add <- shows all Secret Objectives to all players
 /cards so_show_to_all soUniqueID <- displays SO to table and changes soUniqueID
 /cards so_show_all <- displays all SO to table and changes soUniqueID
 /cards so_deal @player count(optional) <- draws a Secret objective for specified player, can specify count
@@ -201,11 +202,12 @@ you can also do
 for single TG adding of TG
 /status turn_order <- lists turn order with SC, player and passed status. SC is striked through if played
 
-/explore planet tile planetName <- explores a planet, handling relic fragments and tokens automatically and discarding others
+/explore planet planetName <- explores a planet, handling relic fragments and tokens automatically and discarding others
 /explore frontier tile <- explores a frontier token, handling relic fragments and tokens automatically, discarding others, and removing the frontier token
 /explore draw_and_discard deck count(optional) <- draws a number of explore cards (default 1) from the given deck, and immediately discards them all
 /explore info deck(optional) <- sends list of all cards still in the given explore deck, or in all explore decks if none is given
 /explore discard ids <- discards explore cards with given ids (comma separated)
+/explore use id <- use discarded explore card
 /explore remove ids <- removes explore cards with given ids (comma separated) from the game
 /explore shuffle_back_into_deck ids <- adds explore cards (including purged) with given ids (comma separated) to the deck
 /explore send_fragment type player count(optional) <- sends a number of relic fragments (default 1) of the specified type to another player
