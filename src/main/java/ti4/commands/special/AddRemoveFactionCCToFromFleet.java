@@ -18,7 +18,7 @@ abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandDat
         super(id, description);
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Faction or Color for CC")
                 .setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.FACTION_COLOR, "Color/Faction for which we set CC's").setRequired(false));
     }
 
     @Override

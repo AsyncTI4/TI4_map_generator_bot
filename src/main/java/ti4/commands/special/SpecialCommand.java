@@ -115,6 +115,7 @@ public class SpecialCommand implements Command {
         subcommands.add(new MakeSecretIntoPO());
         subcommands.add(new AdjustRoundNumber());
         subcommands.add(new SwapTwoSystems());
+        subcommands.add(new SearchWarrant());
 
         return subcommands;
     }
