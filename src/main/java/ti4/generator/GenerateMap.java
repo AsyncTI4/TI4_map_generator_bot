@@ -1468,6 +1468,7 @@ public class GenerateMap {
     private BufferedImage addSleeperToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
         Point centerPosition = unitHolder.getHolderCenterPosition();
         ArrayList<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
+        tokenList.remove(null);
         tokenList.sort((o1, o2) -> {
             if ((o1.contains(Constants.SLEEPER) || o2.contains(Constants.SLEEPER))) {
                 return -1;

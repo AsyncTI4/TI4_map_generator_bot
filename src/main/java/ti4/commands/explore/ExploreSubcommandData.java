@@ -97,8 +97,15 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     String[] split = planetInfo.split(",");
                     if (split.length > 4) {
                         String techSpec = split[4];
-                        if (!techSpec.isEmpty()) {
-                            tokenFilename = Mapper.getAttachmentID(token + "stat");
+                        if (!techSpec.isEmpty() &&
+                                (token.equals(Constants.WARFARE) ||
+                                 token.equals(Constants.PROPULSION) ||
+                                 token.equals(Constants.CYBERNETIC) ||
+                                 token.equals(Constants.BIOTIC))) {
+                            String attachmentID = Mapper.getAttachmentID(token + "stat");
+                            if (attachmentID != null){
+                                tokenFilename = attachmentID;
+                            }
                         }
                     }
                 }
