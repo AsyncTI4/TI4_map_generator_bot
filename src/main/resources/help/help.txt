@@ -232,6 +232,7 @@ Its workaround for that single explore
 /special swap_systems tileID tileIDTo <- swaps two tiles (ghost hero)
 /special search_warrant <- execute command to enable/disable visible Secret objectives
 /special sleeper_token planet... <- adds or removes sleeper token on planet. If no sleeper is present adds, if exists, removes token
+/special ion_token_flip tile <- flip existing ION wormhole token in system/tile
 
 /leaders unlock leaderID <- unlock leader
 /leaders lock leaderID <- lock leader
