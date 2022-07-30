@@ -696,9 +696,6 @@ public class GenerateMap {
     }
 
     private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, String[]> techInfo, int deltaX, Player player, Map map) {
-        if (techs == null) {
-            return deltaX;
-        }
         String outline = "pa_tech_unitsnew_outlines_generic.png";
         if ("nomad".equals(player.getFaction())) {
             outline = "pa_tech_unitsnew_outlines_nomad.png";
@@ -712,6 +709,12 @@ public class GenerateMap {
             }
         }
         drawPAImage(x + deltaX, y, outline);
+        if (techs == null) {
+            graphics.setColor(Color.WHITE);
+            graphics.drawRect(x + deltaX - 2, y - 2, 224, 152);
+            deltaX += 228;
+            return deltaX;
+        }
         for (String tech : techs) {
             String[] techInformation = techInfo.get(tech);
 
