@@ -11,6 +11,8 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
+import java.util.Set;
+
 public class ScoreSO extends CardsSubcommandData {
     public ScoreSO() {
         super(Constants.SCORE_SO, "Score Secret Objective");
@@ -33,6 +35,7 @@ public class ScoreSO extends CardsSubcommandData {
         }
 
         int soID = option.getAsInt();
+        Set<String> alreadyScoredSO = player.getSecretsScored().keySet();
         boolean scored = activeMap.scoreSecretObjective(getUser().getId(), soID, activeMap);
         if (!scored) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Secret Objective ID found, please retry");
@@ -43,9 +46,10 @@ public class ScoreSO extends CardsSubcommandData {
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Scored Secret Objective:").append("\n");
         for (java.util.Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
-            if (soID == entry.getValue()){
-                sb.append(Mapper.getSecretObjective(entry.getKey())).append("\n");
+            if (alreadyScoredSO.contains(entry.getKey())) {
+                continue;
             }
+            sb.append(Mapper.getSecretObjective(entry.getKey())).append("\n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);
