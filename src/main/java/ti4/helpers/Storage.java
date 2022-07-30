@@ -153,7 +153,7 @@ public class Storage {
     public static File getLoggerFile() {
         String resource = getStoragePath();
         if (resource == null) return null;
-        return new File(getStoragePath() + "/log.txt");
+        return new File(getStoragePath() + "/log/log.txt");
     }
 
     public static String getStoragePath() {

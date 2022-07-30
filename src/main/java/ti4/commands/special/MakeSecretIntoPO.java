@@ -62,7 +62,7 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
         }
         activeMap.addToSoToPoList(soName);
         Integer poIndex = activeMap.addCustomPO(soName, 1);
-        activeMap.scorePublicObjective(event.getUser().getId(), poIndex);
+        activeMap.scorePublicObjective(playerWithSO.getUserID(), poIndex);
 
         String sb = "**Public Objective added from Secret:**" + "\n" +
                 "(" + poIndex + ") " + "\n" +

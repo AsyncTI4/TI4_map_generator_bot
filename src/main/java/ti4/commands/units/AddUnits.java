@@ -66,7 +66,7 @@ public class AddUnits extends AddRemoveUnits {
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")
                                 .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.ADD_CC_FROM_TACTICS, "Add CC to tile from tactics"))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.ADD_CC_FROM_TACTICS, "Add CC to tile from tactics. Type yes"))
         );
     }
 }
