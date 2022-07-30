@@ -32,7 +32,8 @@ public class ScoreSO extends CardsSubcommandData {
             return;
         }
 
-        boolean scored = activeMap.scoreSecretObjective(getUser().getId(), option.getAsInt(), activeMap);
+        int soID = option.getAsInt();
+        boolean scored = activeMap.scoreSecretObjective(getUser().getId(), soID, activeMap);
         if (!scored) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Secret Objective ID found, please retry");
             return;
@@ -40,10 +41,11 @@ public class ScoreSO extends CardsSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(activeMap.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Scored Secret Objectives:").append("\n");
-        for (String id : player.getSecretsScored().keySet()) {
-            sb.append(Mapper.getSecretObjective(id)).append("\n");
-
+        sb.append("Scored Secret Objective:").append("\n");
+        for (java.util.Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
+            if (soID == entry.getValue()){
+                sb.append(Mapper.getSecretObjective(entry.getKey())).append("\n");
+            }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);
