@@ -116,6 +116,7 @@ public class SpecialCommand implements Command {
         subcommands.add(new AdjustRoundNumber());
         subcommands.add(new SwapTwoSystems());
         subcommands.add(new SearchWarrant());
+        subcommands.add(new SleeperToken());
 
         return subcommands;
     }
