@@ -12,10 +12,7 @@ import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayDeque;
-import java.util.LinkedHashMap;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class SCPick extends PlayerSubcommandData {
@@ -47,7 +44,10 @@ public class SCPick extends PlayerSubcommandData {
 
             boolean nextCorrectPing = false;
             boolean allPicked = true;
-            Queue<Player> players = new ArrayDeque<>(activeMap.getPlayers().values());
+            Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
+                    .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty())
+                    .collect(Collectors.toList());
+            Queue<Player> players = new ArrayDeque<>(activePlayers);
             while (players.iterator().hasNext()) {
                 Player player_ = players.poll();
                 if (nextCorrectPing && player_ != null && player_.getSC() == 0 && player_.getFaction() != null) {
@@ -67,7 +67,7 @@ public class SCPick extends PlayerSubcommandData {
                 msgExtra += Helper.getGamePing(event, activeMap) + "All Picked SC, Start round";
 
                 LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
-                Set<Integer> scPickedList = activeMap.getPlayers().values().stream().map(Player::getSC).collect(Collectors.toSet());
+                Set<Integer> scPickedList = activePlayers.stream().map(Player::getSC).collect(Collectors.toSet());
                 for (Integer scNumber : scTradeGoods.keySet()) {
                     if (!scPickedList.contains(scNumber) && scNumber != 0) {
                         Integer tgCount = scTradeGoods.get(scNumber);
@@ -78,7 +78,7 @@ public class SCPick extends PlayerSubcommandData {
 
                 Player nextPlayer = null;
                 int lowestSC = 100;
-                for (Player player_ : activeMap.getPlayers().values()) {
+                for (Player player_ : activePlayers) {
                     int scPicked = player_.getSC();
                     String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player_, activeMap, Integer.toString(sc));
                     if (scNumberIfNaaluInPlay.startsWith("0/")) {
