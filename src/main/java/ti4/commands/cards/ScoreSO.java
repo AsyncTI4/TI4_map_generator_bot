@@ -11,6 +11,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class ScoreSO extends CardsSubcommandData {
@@ -35,7 +36,7 @@ public class ScoreSO extends CardsSubcommandData {
         }
 
         int soID = option.getAsInt();
-        Set<String> alreadyScoredSO = player.getSecretsScored().keySet();
+        Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
         boolean scored = activeMap.scoreSecretObjective(getUser().getId(), soID, activeMap);
         if (!scored) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Secret Objective ID found, please retry");
