@@ -8,6 +8,7 @@ public class Leader {
     private int tgCount = 0;
     private boolean exhausted = false;
     private boolean locked = true;
+    private boolean active = false;
 
     public Leader(String id, String name) {
         this.id = id;
@@ -51,5 +52,13 @@ public class Leader {
 
     public void setLocked(boolean locked) {
         this.locked = locked;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

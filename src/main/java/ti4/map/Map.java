@@ -201,7 +201,7 @@ public class Map {
 
     public void addRevealedPublicObjective(String id) {
         Collection<Integer> values = revealedPublicObjectives.values();
-        int identifier = 1;
+        int identifier = 0;
         while (values.contains(identifier)) {
             identifier++;
         }
