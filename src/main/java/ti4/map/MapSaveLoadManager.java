@@ -355,6 +355,8 @@ public class MapSaveLoadManager {
                 leaderInfo.append(leader.isExhausted());
                 leaderInfo.append(",");
                 leaderInfo.append(leader.isLocked());
+                leaderInfo.append(",");
+                leaderInfo.append(leader.isActive());
                 leaderInfo.append(";");
             }
             writer.write(Constants.LEADERS + " " + leaderInfo);
@@ -865,6 +867,9 @@ public class MapSaveLoadManager {
                             leader.setTgCount(Integer.parseInt(split[2]));
                             leader.setExhausted(Boolean.parseBoolean(split[3]));
                             leader.setLocked(Boolean.parseBoolean(split[4]));
+                            if (split.length == 6){
+                                leader.setActive(Boolean.parseBoolean(split[5]));
+                            }
                             leaderList.add(leader);
                         }
                         player.setLeaders(leaderList);

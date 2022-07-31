@@ -55,7 +55,11 @@ public class Cleanup extends StatusSubcommandData {
 
             for (Leader leader : player.getLeaders()) {
                 if (!leader.isLocked()){
-                    RefreshLeader.refreshLeader(player, leader);
+                    if (leader.isActive()){
+                        player.removeLeader(leader.getId());
+                    } else {
+                        RefreshLeader.refreshLeader(player, leader);
+                    }
                 }
             }
         }

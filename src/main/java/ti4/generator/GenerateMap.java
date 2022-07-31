@@ -491,8 +491,14 @@ public class GenerateMap {
                     case Constants.HERO -> pipID = "iii";
                     default -> pipID = "";
                 }
+
                 if (!pipID.isEmpty()) {
-                    String leaderPipInfo = "pa_leaders_pips_" + pipID + status + ".png";
+                    String leaderPipInfo = "pa_leaders_pips_" + pipID;
+                    if (!isExhaustedLocked && leader.isActive()){
+                        leaderPipInfo += "_active" + ".png";
+                    } else {
+                        leaderPipInfo += status + ".png";
+                    }
                     drawPAImage(x + deltaX, y, leaderPipInfo);
                 }
             }
@@ -1064,13 +1070,18 @@ public class GenerateMap {
         graphics.setColor(new Color(230, 126, 34));
         Integer[] column = new Integer[1];
         column[0] = 0;
-        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState1, po1, 1, column, null);
+        x = 5;
+        int y1 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState1, po1, 1, column, null);
 
+        column[0] = 1;
+        x = 801;
         graphics.setColor(new Color(93, 173, 226));
-        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState2, po2, 2, column, null);
+        int y2 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState2, po2, 2, column, null);
 
+        column[0] = 2;
+        x = 1598;
         graphics.setColor(Color.WHITE);
-        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, customPublics, customVP, null, column, customPublicVP);
+        int y3 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, customPublics, customVP, null, column, customPublicVP);
 
         revealedPublicObjectives = new LinkedHashMap<>();
         scoredPublicObjectives = new LinkedHashMap<>();
@@ -1095,7 +1106,7 @@ public class GenerateMap {
         graphics.setColor(Color.green);
         displaySftT(y, x, players, column);
 
-        return y;
+        return Math.max(y3, Math.max(y1, y2)) + 15;
     }
 
     private int objectivesSO(Map map, int y, Player player) {
@@ -1193,11 +1204,11 @@ public class GenerateMap {
                                   Integer[] column, LinkedHashMap<String, Integer> customPublicVP, boolean justCalculate, boolean fixedColumn) {
         Set<String> keysToRemove = new HashSet<>();
         for (java.util.Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
-            switch (column[0]) {
-                case 0 -> x = 5;
-                case 1 -> x = 801;
-                case 2 -> x = 1598;
-            }
+//            switch (column[0]) {
+//                case 0 -> x = 5;
+//                case 1 -> x = 801;
+//                case 2 -> x = 1598;
+//            }
             if (fixedColumn) {
                 x = 50;
             }
@@ -1237,15 +1248,11 @@ public class GenerateMap {
             if (!justCalculate) {
                 if (fixedColumn) {
                     graphics.drawRect(x - 4, y - 5, 600, 38);
-                    y += 43;
+
                 } else {
                     graphics.drawRect(x - 4, y - 5, 785, 38);
-                    column[0]++;
-                    if (column[0] > 2) {
-                        column[0] = 0;
-                        y += 43;
-                    }
                 }
+                y += 43;
             }
         }
         keysToRemove.forEach(revealedPublicObjectives::remove);
