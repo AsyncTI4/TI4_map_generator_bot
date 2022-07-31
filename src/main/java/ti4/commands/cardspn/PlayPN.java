@@ -51,15 +51,22 @@ public class PlayPN extends PNCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Promissory Note ID found, please retry");
             return;
         }
-        player.removePromissoryNote(acID);
-        String pnOwner = Mapper.getPromissoryNoteOwner(acID);
-        for (Player player_ : activeMap.getPlayers().values()) {
-            String playerColor = player_.getColor();
-            String playerFaction = player_.getFaction();
-            if (playerColor != null && playerColor.equals(pnOwner) || playerFaction != null && playerFaction.equals(pnOwner)) {
-                player_.setPromissoryNote(acID);
-                CardsInfo.sentUserCardInfo(event, activeMap, player_);
-                break;
+
+        String promissoryNote = Mapper.getPromissoryNote(acID, true);
+        String[] pn = promissoryNote.split(";");
+        if (pn.length > 3 && pn[3].equals("playarea")) {
+            player.setPromissoryNotesInPlayArea(acID);
+        } else {
+            player.removePromissoryNote(acID);
+            String pnOwner = Mapper.getPromissoryNoteOwner(acID);
+            for (Player player_ : activeMap.getPlayers().values()) {
+                String playerColor = player_.getColor();
+                String playerFaction = player_.getFaction();
+                if (playerColor != null && playerColor.equals(pnOwner) || playerFaction != null && playerFaction.equals(pnOwner)) {
+                    player_.setPromissoryNote(acID);
+                    CardsInfo.sentUserCardInfo(event, activeMap, player_);
+                    break;
+                }
             }
         }
 

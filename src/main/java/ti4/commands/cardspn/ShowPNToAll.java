@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 public class ShowPNToAll extends PNCardsSubcommandData {
     public ShowPNToAll() {
         super(Constants.SHOW_PN_TO_ALL, "Show Promissory Note to table");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Action Card ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "PN ID that is sent between ()").setRequired(true));
     }
 
     @Override
