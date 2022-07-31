@@ -18,7 +18,7 @@ public class ShowPN extends PNCardsSubcommandData {
     public ShowPN() {
         super(Constants.SHOW_PN, "Show Promissory Note to player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to show Action Card").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to show PN").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable").setRequired(false));
     }
 

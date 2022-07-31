@@ -173,7 +173,6 @@ Cards commands
 /pn show_all player <- shows all PNs to player and changes pnIDs
 /pn show_to_all  pnID <- shows PNs to all
 /pn play  pnID <- plays PN, it showed to all and sent back to owner
-/pn play_into_play_area  pnID <- plays PN and puts it into player area
 /pn send  pnID player <- send PN to selected player. If Alliance or SftT automatically is played into target players play area
 
 /agenda draw countOptional <- draw top agendas from deck. Agendas "remain" in deck till you place them. Meaning if you forget to use commands put_top or put_bottom and try reveal agenda, the sent to you will be in deck still :)
@@ -181,7 +180,7 @@ Cards commands
 /agenda put_bottom agendaID <- puts agenda bottom
 /agenda look_at_top <- shows top agenda, no action possible
 /agenda look_at_bottom <- shows bottom agenda, no action possible
-/agenda show_discarded <- shows discarded agendas and the id's
+/agenda show_discarded <- shows discarded agendas /pnand the id's
 /agenda reveal <- reveals agenda to all with ID and automatically puts in discard pile
 /agenda add_law agendaID optionalTextForElected <- add's law to game map and optionalTextForElected is used to define player, or PO or anything, free text can be entered. AgendaID is used from discard pile or when revealed
 /agenda remove_law agendaID <- removes law from game and puts in discard, ID is showed in map

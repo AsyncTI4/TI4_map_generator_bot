@@ -20,7 +20,7 @@ public class SentPN extends PNCardsSubcommandData {
     public SentPN() {
         super(Constants.SEND_PN, "Send Promissory Note to player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to send the Action Card").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to send the PN").setRequired(true));
     }
 
     @Override
