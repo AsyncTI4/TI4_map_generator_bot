@@ -94,16 +94,20 @@ public class ListVoteCount extends AgendaSubcommandData {
                     .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
             influenceCount += influenceCountFromPlanets;
 
-            text += " vote Count: **" + influenceCount;
-            if ("argent".equals(player.getFaction())) {
-                text += "(+" + map.getPlayers().keySet().size() + ")";
-            }
-            if (bloodPactPn) {
-                text += "(Blood Pact +4 votes)";
-            }
-            //Predictive Intelligence
-            if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")){
-                text += "(+3 votes for Predictive Intelligence)";
+            if (player.getFaction().equals("nekro")) {
+                text += " NOT VOTING.: ** 0";
+            } else {
+                text += " vote Count: **" + influenceCount;
+                if ("argent".equals(player.getFaction())) {
+                    text += "(+" + map.getPlayers().keySet().size() + ")";
+                }
+                if (bloodPactPn) {
+                    text += "(Blood Pact +4 votes)";
+                }
+                //Predictive Intelligence
+                if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
+                    text += "(+3 votes for Predictive Intelligence)";
+                }
             }
 
             if (player.getUserID().equals(speakerName)) {
