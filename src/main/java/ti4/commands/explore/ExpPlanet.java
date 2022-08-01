@@ -16,6 +16,7 @@ public class ExpPlanet extends ExploreSubcommandData {
     public ExpPlanet() {
         super(Constants.PLANET, "Explore a specific planet.");
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Planet trait to explore").setRequired(false).setAutoComplete(true));
     }
 
     @Override
@@ -52,6 +53,10 @@ public class ExpPlanet extends ExploreSubcommandData {
         }
         String[] planetInfo = planet.split(",");
         String drawColor = planetInfo[1];
+        OptionMapping traitOption = event.getOption(Constants.TRAIT);
+        if (traitOption != null){
+            drawColor = traitOption.getAsString();
+        }
         String cardID = activeMap.drawExplore(drawColor);
         if (cardID == null) {
             MessageHelper.replyToMessage(event, "Planet cannot be explored");

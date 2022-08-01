@@ -40,6 +40,7 @@ public class Mapper {
     private static final Properties planet_representation = new Properties();
     private static final Properties attachmentInfo = new Properties();
     private static final Properties leaders = new Properties();
+    private static final Properties playerSetup = new Properties();
     private static final HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = new HashMap<>();
 
     public static void init() {
@@ -64,6 +65,7 @@ public class Mapper {
         readData("planets.properties", planets, "Could not read planets file");
         readData("attachments_info.properties", attachmentInfo, "Could not read attachment info file");
         readData("planets_representation.properties", planet_representation, "Could not read planet representation file");
+        readData("faction_setup.properties", playerSetup, "Could not read player setup file");
     }
 
     private static void readData(String propertyFileName, Properties colors, String s) {
@@ -147,6 +149,10 @@ public class Mapper {
 
     public static String getTokenID(String tokenID) {
         return tokens.getProperty(tokenID);
+    }
+
+    public static String getPlayerSetup(String factionID) {
+        return playerSetup.getProperty(factionID);
     }
 
     public static String getControlID(String color) {

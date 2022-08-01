@@ -374,4 +374,26 @@ public class Constants {
         leaderList.add(COMMANDER);
         leaderList.add(HERO);
     }
+
+    public static final ArrayList<String> setup6p = new ArrayList<>();
+    static {
+        setup6p.add("3a");
+        setup6p.add("3d");
+        setup6p.add("3g");
+        setup6p.add("3j");
+        setup6p.add("3m");
+        setup6p.add("3p");
+    }
+
+    public static final ArrayList<String> setup8p = new ArrayList<>();
+    static {
+        setup6p.add("4a");
+        setup6p.add("4d");
+        setup6p.add("4g");
+        setup6p.add("4j");
+        setup6p.add("4m");
+        setup6p.add("4p");
+        setup6p.add("4s");
+        setup6p.add("4w");
+    }
 }
