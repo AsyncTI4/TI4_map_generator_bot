@@ -64,7 +64,7 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
             if (allPicked) {
-                msgExtra += Helper.getGamePing(event, activeMap) + "All Picked SC, Start round";
+                msgExtra += Helper.getGamePing(event, activeMap) + "All players picked SC";
 
                 LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
                 Set<Integer> scPickedList = activePlayers.stream().map(Player::getSC).collect(Collectors.toSet());
@@ -91,7 +91,7 @@ public class SCPick extends PlayerSubcommandData {
                     }
                 }
                 if (nextPlayer != null) {
-                    msgExtra += " " + Helper.getPlayerPing(event, nextPlayer) + " To Star Round";
+                    msgExtra += " " + Helper.getPlayerPing(event, nextPlayer) + " is up for an action";
                 }
             }
 
