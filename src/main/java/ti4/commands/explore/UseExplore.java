@@ -16,7 +16,7 @@ public class UseExplore extends ExploreSubcommandData {
     public UseExplore() {
         super(Constants.USE, "Draw and activate an explore card from the deck or discard");
         addOptions(idOption.setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setRequired(false).setAutoComplete(true));
     }
 
     @Override
