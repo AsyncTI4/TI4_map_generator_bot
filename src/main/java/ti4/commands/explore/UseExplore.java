@@ -30,25 +30,23 @@ public class UseExplore extends ExploreSubcommandData {
             if (planetOption != null) {
                 planetName = planetOption.getAsString();
             }
-            if (!activeMap.getPlanets().contains(planetName)) {
-                MessageHelper.replyToMessage(event, "Planet not found in map");
-                return;
-            }
             Tile tile = null;
-            for (Tile tile_ : activeMap.getTileMap().values()) {
-                if (tile != null) {
-                    break;
-                }
-                for (java.util.Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
-                    if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
-                        tile = tile_;
+            if (activeMap.getPlanets().contains(planetName)) {
+                for (Tile tile_ : activeMap.getTileMap().values()) {
+                    if (tile != null) {
                         break;
                     }
+                    for (java.util.Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
+                        if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
+                            tile = tile_;
+                            break;
+                        }
+                    }
                 }
-            }
-            if (tile == null) {
-                MessageHelper.replyToMessage(event, "System not found that contains planet");
-                return;
+                if (tile == null) {
+                    MessageHelper.replyToMessage(event, "System not found that contains planet");
+                    return;
+                }
             }
             String messageText = "Used card: " + id + " by player: " + activeMap.getPlayer(event.getUser().getId()).getUserName();
             resolveExplore(event, id, tile, planetName, messageText);
