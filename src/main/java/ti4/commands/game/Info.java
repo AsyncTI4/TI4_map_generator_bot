@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
@@ -51,8 +52,10 @@ public class Info extends GameSubcommandData{
         int index = 1;
         ArrayList<Player> playerNames = new ArrayList<>(players.values());
         for (Player value : playerNames) {
-            sb.append(index).append(". ").append(value.getUserName()).append(NEW_LINE);
-            index++;
+            if (value.getFaction() != null) {
+                sb.append(index).append(". ").append(value.getUserName()).append(Helper.getFactionIconFromDiscord(value.getFaction())).append(NEW_LINE);
+                index++;
+            }
         }
         return sb;
     }
