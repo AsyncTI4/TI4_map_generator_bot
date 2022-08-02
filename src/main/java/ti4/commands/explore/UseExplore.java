@@ -26,8 +26,10 @@ public class UseExplore extends ExploreSubcommandData {
         String id = event.getOption(Constants.EXPLORE_CARD_ID).getAsString();
         if (activeMap.pickExplore(id) != null) {
             OptionMapping planetOption = event.getOption(Constants.PLANET);
-            @SuppressWarnings("ConstantConditions")
-            String planetName = planetOption.getAsString();
+            String planetName = null;
+            if (planetOption != null) {
+                planetName = planetOption.getAsString();
+            }
             if (!activeMap.getPlanets().contains(planetName)) {
                 MessageHelper.replyToMessage(event, "Planet not found in map");
                 return;
