@@ -147,6 +147,7 @@ public class Constants {
     public static final String SET_ORDER = "set_order";
     public static final String PASSED = "passed";
     public static final String SC_PLAYED = "sc_played";
+    public static final String SC_FOLLOW = "sc_follow";
     public static final String SC_PLAY = "sc_play";
     public static final String SC_PICK = "sc_pick";
     public static final String PASS = "pass";
@@ -318,6 +319,8 @@ public class Constants {
     public static final String PLAY_PN = "play";
     public static final String PLAY_PN_INTO_PLAY_AREA = "play_into_play_area";
     public static final String SEND_PN = "send";
+    public static final String PURGE_PN = "purge";
+    public static final String PURGED_PN = "purged_pn";
 
     public static final String TECH_ADD = "tech_add";
     public static final String TECH_REMOVE = "tech_remove";

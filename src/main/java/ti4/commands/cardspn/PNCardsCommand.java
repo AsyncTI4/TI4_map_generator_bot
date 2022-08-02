@@ -115,6 +115,7 @@ public class PNCardsCommand implements Command {
         subcommands.add(new ShowPNToAll());
         subcommands.add(new PlayPN());
         subcommands.add(new SentPN());
+        subcommands.add(new PurgePN());
         return subcommands;
     }
 

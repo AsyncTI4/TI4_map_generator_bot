@@ -124,6 +124,7 @@ faction_or_color tag helps to define for which player you want to set stats. FOR
 /player setup faction color <- needs to set player faction and color
 /player sc_play faction_color(optional) <- plays your SC that you have in game
 /player sc_pick scNumber <- adds your pick to game. Does not generate map
+/player sc_follow <- removes 1 cc from strategy tokens
 /player send_tg faction <- take tg from your existing ones and send(add) to target faction tg
 /player send_commodities faction <- take commodities from your existing ones and send(add) to target faction tg
 /player pass <- passes
@@ -172,8 +173,9 @@ Cards commands
 /pn show pnID player <- shows given PN to player and changes pnID
 /pn show_all player <- shows all PNs to player and changes pnIDs
 /pn show_to_all  pnID <- shows PNs to all
-/pn play  pnID <- plays PN, it showed to all and sent back to owner
-/pn send  pnID player <- send PN to selected player. If Alliance or SftT automatically is played into target players play area
+/pn play pnID <- plays PN, it showed to all and sent back to owner
+/pn send pnID player <- send PN to selected player. If Alliance or SftT automatically is played into target players play area
+/pn purge pnID <- purge Selected PN from game
 
 /agenda draw countOptional <- draw top agendas from deck. Agendas "remain" in deck till you place them. Meaning if you forget to use commands put_top or put_bottom and try reveal agenda, the sent to you will be in deck still :)
 /agenda put_top agendaID <- put given agenda at top. Example you draw A and B agenda. And put A at top, then B at top. You end up with order B, A, to reveal. It's like physically you would do top and next top covers previous one

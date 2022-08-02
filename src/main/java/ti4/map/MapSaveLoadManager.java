@@ -221,6 +221,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.SO_TO_PO + " " + String.join(",", map.getSoToPoList()));
         writer.write(System.lineSeparator());
+        writer.write(Constants.PURGED_PN + " " + String.join(",", map.getPurgedPN()));
+        writer.write(System.lineSeparator());
 
         DisplayType displayTypeForced = map.getDisplayTypeForced();
         if (displayTypeForced != null) {
@@ -658,6 +660,8 @@ public class MapSaveLoadManager {
                 map.setPublicObjectives2(getCardList(tokenizer[1]));
             } else if (Constants.SO_TO_PO.equals(identification)) {
                 map.setSoToPoList(getCardList(tokenizer[1]));
+            } else if (Constants.PURGED_PN.equals(identification)) {
+                map.setPurgedPNs(getCardList(tokenizer[1]));
             } else if (Constants.REVEALED_PO.equals(identification)) {
                 map.setRevealedPublicObjectives(getParsedCards(tokenizer[1]));
                 //temp code to migrate round numbers
