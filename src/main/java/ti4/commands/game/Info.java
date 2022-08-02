@@ -42,11 +42,11 @@ public class Info extends GameSubcommandData{
         }
         sb.append("Game Info:").append(NEW_LINE);
         sb.append("Game name: " + map.getName()).append(NEW_LINE);
-
         sb.append("Game owner: " + map.getOwnerName()).append(NEW_LINE);
         sb.append("Game status: " + map.getMapStatus()).append(NEW_LINE);
+        sb.append("Created: " + map.getCreationDate()).append(NEW_LINE);
+        sb.append("Last Modified: " + Helper.getDateRepresentation(map.getLastModifiedDate())).append(NEW_LINE);
         sb.append("Game player count: " + map.getPlayerCountForMap()).append(NEW_LINE);
-        sb.append("Game Display type count: " + (map.getDisplayTypeForced() != null ? map.getDisplayTypeForced().getValue() : DisplayType.all.getValue())).append(NEW_LINE);
         sb.append("Players: ").append(NEW_LINE);
         HashMap<String, Player> players = map.getPlayers();
         int index = 1;
