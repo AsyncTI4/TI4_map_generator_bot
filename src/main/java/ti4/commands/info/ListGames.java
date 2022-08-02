@@ -8,6 +8,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.text.SimpleDateFormat;
@@ -39,10 +40,16 @@ public class ListGames implements Command {
 
     private String getRepresentationText(HashMap<String, Map> mapList, String mapName) {
         Map map = mapList.get(mapName);
-        String representationText = mapName + ": " + map.getMapStatus();
-        representationText += "        Created:" + map.getCreationDate();
-        representationText += "     Last Modified: " + Helper.getDateRepresentation(map.getLastModifiedDate());
-        return representationText;
+        StringBuilder representationText = new StringBuilder(mapName);
+        for (Player player : map.getPlayers().values()) {
+            if (player.getFaction() != null) {
+                representationText.append(Helper.getFactionIconFromDiscord(player.getFaction())).append(" ");
+            }
+        }
+        representationText.append(": ").append(map.getMapStatus());
+        representationText.append("        Created:").append(map.getCreationDate());
+        representationText.append("     Last Modified: ").append(Helper.getDateRepresentation(map.getLastModifiedDate()));
+        return representationText.toString();
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
