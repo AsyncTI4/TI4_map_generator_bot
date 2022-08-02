@@ -52,6 +52,7 @@ public class Map {
     private ArrayList<String> publicObjectives1 = new ArrayList<>();
     private ArrayList<String> publicObjectives2 = new ArrayList<>();
     private ArrayList<String> soToPoList = new ArrayList<>();
+    private ArrayList<String> purgedPN = new ArrayList<>();
 
     private ArrayList<String> explore = new ArrayList<>();
     private ArrayList<String> discardExplore = new ArrayList<>();
@@ -92,6 +93,18 @@ public class Map {
         for (int i = 0; i < 8; i++) {
             scTradeGoods.put(i + 1, 0);
         }
+    }
+
+    public void setPurgedPN(String purgedPN) {
+        this.purgedPN.add(purgedPN);
+    }
+
+    public void setPurgedPNs(ArrayList<String> purgedPN) {
+        this.purgedPN = purgedPN;
+    }
+
+    public ArrayList<String> getPurgedPN() {
+        return purgedPN;
     }
 
     public int getVp() {

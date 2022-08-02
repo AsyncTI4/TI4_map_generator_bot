@@ -129,6 +129,7 @@ public class CardsInfo extends CardsSubcommandData {
             }
             promissoryNotes.removeAll(player.getPromissoryNotes().keySet());
             promissoryNotes.removeAll(player.getPromissoryNotesInPlayArea());
+            promissoryNotes.removeAll(activeMap.getPurgedPN());
             if (!promissoryNotes.isEmpty()) {
                 for (String promissoryNote : promissoryNotes) {
                     player.setPromissoryNote(promissoryNote);
