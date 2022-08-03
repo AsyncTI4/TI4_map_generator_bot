@@ -32,6 +32,8 @@ public class SCFollow extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Have 0 CC in Strategy, can't follow");
             return;
         }
+        strategicCC--;
+        player.setStrategicCC(strategicCC);
         String message = Helper.getPlayerPing(event, player) + " following SC, deducted 1 CC from Strategy Tokens";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
