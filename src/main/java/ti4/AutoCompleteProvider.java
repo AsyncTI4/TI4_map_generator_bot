@@ -86,6 +86,15 @@ public class AutoCompleteProvider {
                     .map(value -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(value.getValue(), value.getKey()))
                     .collect(Collectors.toList());
             event.replyChoices(options).queue();
+        } else if (optionName.equals(Constants.KELERES_HS)) {
+            String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+            HashMap<String, String> keleres = Constants.KELERES_CHOICES;
+            List<net.dv8tion.jda.api.interactions.commands.Command.Choice> options = keleres.entrySet().stream()
+                    .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                    .limit(25)
+                    .map(value -> new net.dv8tion.jda.api.interactions.commands.Command.Choice(value.getValue(), value.getKey()))
+                    .collect(Collectors.toList());
+            event.replyChoices(options).queue();
         } else if (optionName.equals(Constants.LEADER)) {
             String enteredValue = event.getFocusedOption().getValue().toLowerCase();
             if (leaders.isEmpty()) {

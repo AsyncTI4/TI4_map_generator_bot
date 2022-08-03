@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Constants {
     public static final String SHOW_GAME = "show_game";
@@ -378,6 +379,8 @@ public class Constants {
         leaderList.add(HERO);
     }
 
+    public static final String KELERES_HS = "keleres_hs";
+    public static final String HS_TILE_POSITION = "hs_tile_position";
     public static final ArrayList<String> setup6p = new ArrayList<>();
     static {
         setup6p.add("3a");
@@ -390,13 +393,20 @@ public class Constants {
 
     public static final ArrayList<String> setup8p = new ArrayList<>();
     static {
-        setup6p.add("4a");
-        setup6p.add("4d");
-        setup6p.add("4g");
-        setup6p.add("4j");
-        setup6p.add("4m");
-        setup6p.add("4p");
-        setup6p.add("4s");
-        setup6p.add("4w");
+        setup8p.add("4a");
+        setup8p.add("4d");
+        setup8p.add("4g");
+        setup8p.add("4j");
+        setup8p.add("4m");
+        setup8p.add("4p");
+        setup8p.add("4s");
+        setup8p.add("4w");
     }
+    public static final HashMap<String, String> KELERES_CHOICES = new HashMap<>();
+    static {
+        KELERES_CHOICES.put("keleresm", "Mentak");
+        KELERES_CHOICES.put("keleresx", "Xxcha");
+        KELERES_CHOICES.put("keleresa", "Argent");
+    }
+
 }
