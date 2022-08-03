@@ -133,6 +133,20 @@ public class Helper {
         };
     }
 
+    public static String getSCName(int sc) {
+        return switch (sc) {
+            case 1 -> "leadership";
+            case 2 -> "diplomacy";
+            case 3 -> "politics";
+            case 4 -> "construction";
+            case 5 -> "trade";
+            case 6 -> "warfare";
+            case 7 -> "technology";
+            case 8 -> "imperial";
+            default -> "" + sc;
+        };
+    }
+
     public static String getFactionIconFromDiscord(String faction) {
         return switch (faction) {
             case "arborec" -> "<:Arborec:946891797567799356>";

@@ -1,8 +1,13 @@
 package ti4.commands.player;
 
+import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import net.dv8tion.jda.internal.entities.TextChannelImpl;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -23,18 +28,19 @@ public class SCPlay extends PlayerSubcommandData {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getPlayer(activeMap, player, event);
+        MessageChannel channel = event.getChannel();
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Your not a player of this game");
+            MessageHelper.sendMessageToChannel(channel, "Your not a player of this game");
             return;
         }
         int sc = player.getSC();
         if (sc == 0) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No SC selected by player");
+            MessageHelper.sendMessageToChannel(channel, "No SC selected by player");
             return;
         }
         Boolean isSCPlayed = activeMap.getScPlayed().get(sc);
         if (isSCPlayed != null && isSCPlayed) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "SC already played");
+            MessageHelper.sendMessageToChannel(channel, "SC already played");
             return;
         }
         activeMap.setSCPlayed(sc, true);
@@ -44,7 +50,16 @@ public class SCPlay extends PlayerSubcommandData {
             message += categoryForPlayers + "\n";
         }
         message += "Strategy card " + Helper.getSCAsMention(sc) + " played. Please react with your faction symbol to pass on the secondary or post to follow.";
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        String name = channel.getName();
+        if (name.contains("-")){
+            String threadName = name.substring(0, name.indexOf("-")) +"-round-" + activeMap.getRound() +"-" + Helper.getSCName(sc);
+            TextChannel textChannel = event.getTextChannel();
+            channel.sendMessage(message).queue(message_ -> {
+
+                ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
+                threadChannel.queue();
+            });
+        }
     }
 
     @Override
