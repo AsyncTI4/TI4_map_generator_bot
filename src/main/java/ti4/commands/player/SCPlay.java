@@ -49,7 +49,7 @@ public class SCPlay extends PlayerSubcommandData {
         if (!categoryForPlayers.isEmpty()) {
             message += categoryForPlayers + "\n";
         }
-        message += "Strategy card " + Helper.getSCAsMention(sc) + " played. Please react with your faction symbol to pass on the secondary or post to follow.";
+        message += "Strategy card " + Helper.getSCAsMention(sc) + " played. Please react with your faction symbol to pass or post in thread for secondaries.";
         String name = channel.getName();
         if (name.contains("-")){
             String threadName = name.substring(0, name.indexOf("-")) +"-round-" + activeMap.getRound() +"-" + Helper.getSCName(sc);
