@@ -16,9 +16,9 @@ import java.util.StringTokenizer;
 abstract public class AddRemoveFactionCCToFromFleet extends SpecialSubcommandData {
     public AddRemoveFactionCCToFromFleet(String id, String description) {
         super(id, description);
-        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Faction or Color for CC")
+        addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Faction Color for CC")
                 .setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.USER, Constants.FACTION_COLOR, "Color/Faction for which we set CC's").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Color/Faction for which we set CC's").setRequired(false));
     }
 
     @Override
