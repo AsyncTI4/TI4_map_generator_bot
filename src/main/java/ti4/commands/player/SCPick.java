@@ -45,12 +45,15 @@ public class SCPick extends PlayerSubcommandData {
             boolean nextCorrectPing = false;
             boolean allPicked = true;
             Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
-                    .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty())
+                    .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player.getColor().equals("white"))
                     .collect(Collectors.toList());
             Queue<Player> players = new ArrayDeque<>(activePlayers);
             while (players.iterator().hasNext()) {
                 Player player_ = players.poll();
-                if (nextCorrectPing && player_ != null && player_.getSC() == 0 && player_.getFaction() != null) {
+                if (player_ == null || player_.getFaction() == null || "white".equals(player_.getFaction())){
+                    continue;
+                }
+                if (nextCorrectPing && player_.getSC() == 0 && player_.getFaction() != null) {
                     msgExtra += Helper.getFactionIconFromDiscord(player_.getFaction());
                     msgExtra += " " + Helper.getPlayerPing(event, player_) + " To Pick SC";
                     allPicked = false;
@@ -59,7 +62,7 @@ public class SCPick extends PlayerSubcommandData {
                 if (player_ == player) {
                     nextCorrectPing = true;
                 }
-                if (player_ != null && player_.getSC() == 0 && player_.getFaction() != null) {
+                if (player_.getSC() == 0 && player_.getFaction() != null) {
                     players.add(player_);
                 }
             }
