@@ -10,6 +10,7 @@ public class Constants {
     public static final String GAME_NAME = "game_name";
     public static final String GAME_CUSTOM_NAME = "game_custom_name";
     public static final String COMMUNITY_MODE = "community_mode";
+    public static final String ALLIANCE_MODE = "alliance_mode";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String CHANNLE_FOR_COMMUNITY = "channelForCommunity";
     public static final String DISPLAY_TYPE = "display_type";

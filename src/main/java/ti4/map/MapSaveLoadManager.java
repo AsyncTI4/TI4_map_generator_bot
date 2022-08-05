@@ -254,6 +254,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.COMMUNITY_MODE + " " + map.isCommunityMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.ALLIANCE_MODE + " " + map.isAllianceMode());
+        writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
@@ -754,6 +756,13 @@ public class MapSaveLoadManager {
                 try {
                     boolean value = Boolean.parseBoolean(tokenizer[1]);
                     map.setCommunityMode(value);
+                } catch (Exception e) {
+                    //Do nothing
+                }
+            } else if (Constants.ALLIANCE_MODE.equals(identification)) {
+                try {
+                    boolean value = Boolean.parseBoolean(tokenizer[1]);
+                    map.setAllianceMode(value);
                 } catch (Exception e) {
                     //Do nothing
                 }
