@@ -17,6 +17,9 @@ public class UnlockLeader extends LeaderAction {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null){
             playerLeader.setLocked(false);
+            if (playerLeader.isExhausted()){
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Leader is also exhausted");
+            }
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
         }
