@@ -6,15 +6,13 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
+import ti4.commands.player.PlanetAdd;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
-import ti4.map.Tile;
+import ti4.map.*;
 import ti4.message.MessageHelper;
 
 import java.io.File;
@@ -107,6 +105,33 @@ abstract public class AddRemoveUnits implements Command {
             }
             planetName = getPlanet(event, tile, planetName);
             unitAction(event, tile, count, planetName, unitID, color);
+
+            String userID = event.getUser().getId();
+            MapManager mapManager = MapManager.getInstance();
+            Map activeMap = mapManager.getUserActiveMap(userID);
+            if (!activeMap.isAllianceMode() && !Constants.SPACE.equals(planetName)){
+                UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+                if (unitHolder != null){
+                    Set<String> allUnitsOnPlanet = unitHolder.getUnits().keySet();
+                    Set<String> unitColors = new HashSet<>();
+                    for (String unit_ : allUnitsOnPlanet) {
+                        String unitColor = unit_.substring(0, unit_.indexOf("_"));
+                        unitColors.add(unitColor);
+                    }
+                   if (unitColors.size() == 1){
+                       String unitColor = unitColors.iterator().next();
+                       for (Player player : activeMap.getPlayers().values()) {
+                           if (player.getFaction() != null && player.getColor() != null) {
+                               String colorID = Mapper.getColorID(player.getColor());
+                               if (unitColor.equals(colorID)){
+                                   new PlanetAdd().doAction(player, planetName, activeMap);
+                                   break;
+                               }
+                           }
+                       }
+                   }
+                }
+            }
         }
     }
 
