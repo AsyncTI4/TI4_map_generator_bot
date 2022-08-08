@@ -110,6 +110,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                 }
 
+                if (token.equals(Constants.DMZ)) {
+                    String dmzLargeFilename = Mapper.getTokenID(Constants.DMZ_LARGE);
+                    tile.addToken(dmzLargeFilename, planetName);
+                }
                 tile.addToken(tokenFilename, planetName);
                 activeMap.purgeExplore(cardID);
                 message = "Token added to planet";
