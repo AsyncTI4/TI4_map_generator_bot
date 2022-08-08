@@ -18,6 +18,11 @@ import ti4.message.MessageHelper;
 public class AddUnits extends AddRemoveUnits {
     @Override
     protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color) {
+        tile.addUnit(planetName, unitID, count);
+    }
+
+    @Override
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color) {
         OptionMapping option = event.getOption(Constants.ADD_CC_FROM_TACTICS);
         if (option != null){
             if (option.getAsString().equals("yes") || option.getAsString().equals("y")) {
@@ -25,7 +30,6 @@ public class AddUnits extends AddRemoveUnits {
                 AddCC.addCC(event, color, tile);
             }
         }
-        tile.addUnit(planetName, unitID, count);
     }
 
     @Override

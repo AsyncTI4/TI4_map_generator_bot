@@ -135,6 +135,7 @@ abstract public class AddRemoveUnits implements Command {
                 }
             }
         }
+        actionAfterAll(event, tile, color);
     }
 
     public static String getPlanet(SlashCommandInteractionEvent event, Tile tile, String planetName) {
@@ -154,6 +155,10 @@ abstract public class AddRemoveUnits implements Command {
     }
 
     abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color);
+
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color){
+        //do nothing, overriden by child classes
+    }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
