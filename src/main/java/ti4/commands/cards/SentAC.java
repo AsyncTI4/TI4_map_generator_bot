@@ -16,7 +16,7 @@ public class SentAC extends CardsSubcommandData {
     public SentAC() {
         super(Constants.SEND_AC, "Send Action Card to player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to send the Action Card").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setRequired(true).setAutoComplete(true));
     }
 
     @Override

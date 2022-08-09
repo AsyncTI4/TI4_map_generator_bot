@@ -77,6 +77,12 @@ public class Helper {
             if (Mapper.isColorValid(colorFromString)) {
                 return colorFromString;
             }
+        } else {
+            String userID = event.getUser().getId();
+            Player foundPlayer = activeMap.getPlayers().values().stream().filter(player -> player.getUserID().equals(userID)).findFirst().orElse(null);
+            if (foundPlayer != null){
+                return foundPlayer.getColor();
+            }
         }
         return null;
     }

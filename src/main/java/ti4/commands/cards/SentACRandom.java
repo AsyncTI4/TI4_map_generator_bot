@@ -20,7 +20,7 @@ import java.util.List;
 public class SentACRandom extends CardsSubcommandData {
     public SentACRandom() {
         super(Constants.SEND_AC_RANDOM, "Send Action Card to player");
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to senb the Action Card").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setRequired(true).setAutoComplete(true));
     }
 
     @Override

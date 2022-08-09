@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 public class ShowAllSO extends CardsSubcommandData {
     public ShowAllSO() {
         super(Constants.SHOW_ALL_SO, "Show Secret Objective to player");
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to show Secret Objective").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setRequired(true).setAutoComplete(true));
     }
 
     @Override

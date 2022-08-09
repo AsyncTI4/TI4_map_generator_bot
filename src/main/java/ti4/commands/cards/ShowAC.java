@@ -18,7 +18,7 @@ public class ShowAC extends CardsSubcommandData {
     public ShowAC() {
         super(Constants.SHOW_AC, "Show Action Card to player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to show Action Card").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setRequired(true).setAutoComplete(true));
     }
 
     @Override
