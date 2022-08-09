@@ -25,6 +25,7 @@ public class SCPick extends PlayerSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Your not a player of this game");
             return;
@@ -44,8 +45,9 @@ public class SCPick extends PlayerSubcommandData {
 
             boolean nextCorrectPing = false;
             boolean allPicked = true;
+            Player finalPlayer = player;
             Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
-                    .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player.getColor().equals("white"))
+                    .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !finalPlayer.getColor().equals("white"))
                     .collect(Collectors.toList());
             Queue<Player> players = new ArrayDeque<>(activePlayers);
             while (players.iterator().hasNext()) {
