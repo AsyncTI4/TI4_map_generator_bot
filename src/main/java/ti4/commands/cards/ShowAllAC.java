@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 public class ShowAllAC extends CardsSubcommandData {
     public ShowAllAC() {
         super(Constants.SHOW_ALL_AC, "Show Action Cards to player");
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to show Action Cards").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setRequired(true).setAutoComplete(true));
     }
 
     @Override

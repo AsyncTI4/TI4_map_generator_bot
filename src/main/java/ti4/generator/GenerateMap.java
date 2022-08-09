@@ -1822,8 +1822,8 @@ public class GenerateMap {
                         imageDmgY = imageY + (int) (numberPositionPoint.y * scaleOfUnit) - dmgImage.getHeight();
                     }
                     if (unitID.contains("_mf")) {
-                        imageDmgX = position != null ? tileX + position.x : xOriginal + (dmgImage.getWidth() / 2);
-                        imageDmgY = position != null ? tileY + position.y : yOriginal - (dmgImage.getHeight() / 2);
+                        imageDmgX = position != null ? tileX + position.x : xOriginal - (dmgImage.getWidth());
+                        imageDmgY = position != null ? tileY + position.y : yOriginal - (dmgImage.getHeight());
 
                     }
                     graphics.drawImage(dmgImage, imageDmgX, imageDmgY, null);

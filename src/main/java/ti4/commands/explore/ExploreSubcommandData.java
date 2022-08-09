@@ -80,10 +80,15 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         String message = "Card has been discarded. Resolve effects manually.";
         String card = Mapper.getExplore(cardID);
         String[] cardInfo = card.split(";");
+        Player player = activeMap.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeMap, player, event, null);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            return;
+        }
 
         String cardType = cardInfo[3];
         if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
-            Player player = activeMap.getPlayer(getUser().getId());
             message = "Gained relic fragment";
             player.addFragment(cardID);
             activeMap.purgeExplore(cardID);

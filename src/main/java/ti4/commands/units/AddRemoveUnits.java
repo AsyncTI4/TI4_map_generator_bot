@@ -39,7 +39,7 @@ abstract public class AddRemoveUnits implements Command {
                 return;
             }
 
-            String tileID = AliasHandler.resolveTile(event.getOptions().get(1).getAsString().toLowerCase());
+            String tileID = AliasHandler.resolveTile(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());
             Tile tile = getTile(event, tileID, activeMap);
             if (tile == null) return;
 
@@ -68,7 +68,7 @@ abstract public class AddRemoveUnits implements Command {
     }
 
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
-        String unitList = event.getOptions().get(2).getAsString().toLowerCase();
+        String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
         unitParsing(event, color, tile, unitList);
     }
 
@@ -106,36 +106,40 @@ abstract public class AddRemoveUnits implements Command {
             planetName = getPlanet(event, tile, planetName);
             unitAction(event, tile, count, planetName, unitID, color);
 
-            String userID = event.getUser().getId();
-            MapManager mapManager = MapManager.getInstance();
-            Map activeMap = mapManager.getUserActiveMap(userID);
-            if (!activeMap.isAllianceMode() && !Constants.SPACE.equals(planetName)){
-                UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-                if (unitHolder != null){
-                    Set<String> allUnitsOnPlanet = unitHolder.getUnits().keySet();
-                    Set<String> unitColors = new HashSet<>();
-                    for (String unit_ : allUnitsOnPlanet) {
-                        String unitColor = unit_.substring(0, unit_.indexOf("_"));
-                        unitColors.add(unitColor);
-                    }
-                   if (unitColors.size() == 1){
-                       String unitColor = unitColors.iterator().next();
-                       for (Player player : activeMap.getPlayers().values()) {
-                           if (player.getFaction() != null && player.getColor() != null) {
-                               String colorID = Mapper.getColorID(player.getColor());
-                               if (unitColor.equals(colorID)){
-                                   if (!player.getPlanets().contains(planetName)) {
-                                       new PlanetAdd().doAction(player, planetName, activeMap);
-                                   }
-                                   break;
+            addPlanetToPlayArea(event, tile, planetName);
+        }
+        actionAfterAll(event, tile, color);
+    }
+
+    public void addPlanetToPlayArea(SlashCommandInteractionEvent event, Tile tile, String planetName) {
+        String userID = event.getUser().getId();
+        MapManager mapManager = MapManager.getInstance();
+        Map activeMap = mapManager.getUserActiveMap(userID);
+        if (!activeMap.isAllianceMode() && !Constants.SPACE.equals(planetName)){
+            UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+            if (unitHolder != null){
+                Set<String> allUnitsOnPlanet = unitHolder.getUnits().keySet();
+                Set<String> unitColors = new HashSet<>();
+                for (String unit_ : allUnitsOnPlanet) {
+                    String unitColor = unit_.substring(0, unit_.indexOf("_"));
+                    unitColors.add(unitColor);
+                }
+               if (unitColors.size() == 1){
+                   String unitColor = unitColors.iterator().next();
+                   for (Player player : activeMap.getPlayers().values()) {
+                       if (player.getFaction() != null && player.getColor() != null) {
+                           String colorID = Mapper.getColorID(player.getColor());
+                           if (unitColor.equals(colorID)){
+                               if (!player.getPlanets().contains(planetName)) {
+                                   new PlanetAdd().doAction(player, planetName, activeMap);
                                }
+                               break;
                            }
                        }
                    }
-                }
+               }
             }
         }
-        actionAfterAll(event, tile, color);
     }
 
     public static String getPlanet(SlashCommandInteractionEvent event, Tile tile, String planetName) {
@@ -171,12 +175,12 @@ abstract public class AddRemoveUnits implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                                .setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")
                                 .setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
+                                .setAutoComplete(true))
         );
     }
 

@@ -26,6 +26,7 @@ public class MoveUnits extends AddRemoveUnits {
 
     @Override
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
+        unitsDamage = new HashMap<>();
         toAction = false;
         OptionMapping optionDmg = event.getOption(Constants.PRIORITY_NO_DAMAGE);
         priorityDmg = true;
@@ -36,13 +37,13 @@ public class MoveUnits extends AddRemoveUnits {
             }
         }
 
-        String unitList = event.getOptions().get(2).getAsString().toLowerCase();
+        String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
         unitParsing(event, color, tile, unitList);
 
         String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
 
-        String tileID = AliasHandler.resolveTile(event.getOptions().get(3).getAsString().toLowerCase());
+        String tileID = AliasHandler.resolveTile(event.getOption(Constants.TILE_NAME_TO).getAsString().toLowerCase());
         Map activeMap = mapManager.getUserActiveMap(userID);
         tile = getTile(event, tileID, activeMap);
         if (tile == null) {
@@ -57,7 +58,7 @@ public class MoveUnits extends AddRemoveUnits {
         }
 
         toAction = true;
-        unitList = event.getOptions().get(4).getAsString().toLowerCase();
+        unitList = event.getOption(Constants.UNIT_NAMES_TO).getAsString().toLowerCase();
         switch (unitList) {
             case "0":
             case "none":
@@ -151,28 +152,30 @@ public class MoveUnits extends AddRemoveUnits {
                            .sum();
             
             boolean otherUnitHoldersContainUnit = tile.getUnitHolders().values().stream()
-                           .filter(planetTemp -> planetTemp.getName()!=planetName)
-                           .filter(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID,0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID,0) > 0)
-                           .count() > 0;
+                    .filter(planetTemp -> !planetTemp.getName().equals(planetName)).anyMatch(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID, 0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID, 0) > 0);
             
             if(nonEmptyUnitHolders == 1) {
                    unitHolder = tile.getUnitHolders().values().stream()
                            .filter(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID,0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID,0) > 0).findFirst().get();
                    
-            } 
-            
-            
+            }
+
             if (!priorityDmg) {
                 Integer unitCountInSystem = unitHolder.getUnits().get(unitID);
                 if (unitCountInSystem != null) {
                     Integer unitDamageCountInSystem = unitHolder.getUnitDamage().get(unitID);
                     if (unitDamageCountInSystem != null) {
                         countToRemove = unitDamageCountInSystem - (unitCountInSystem - count);
-
+                        unitsDamage.put(unitID, countToRemove);
                     }
                 }
             } else {
                 countToRemove = count;
+                Integer unitDamageCountInSystem = unitHolder.getUnitDamage().get(unitID);
+                if (unitDamageCountInSystem != null) {
+                    unitsDamage.put(unitID, Math.min(unitDamageCountInSystem, countToRemove));
+                }
+
             }
             
             tile.removeUnit(unitHolder.getName(), unitID, count);
@@ -212,8 +215,6 @@ public class MoveUnits extends AddRemoveUnits {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                                .setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "From System/Tile name")
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")
@@ -222,6 +223,8 @@ public class MoveUnits extends AddRemoveUnits {
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Unit name/s. Example: Dread, 2 Warsuns")
                                 .setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
+                                .setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.CC, "Type no or n to not add CC, r or retreat to add a CC without taking it from tactics").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units. Type in yes or y"))
         );
