@@ -24,6 +24,7 @@ public class ShowAllAC extends CardsSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -40,7 +41,7 @@ public class ShowAllAC extends CardsSubcommandData {
             index++;
 
         }
-        Player player_ = Helper.getGamePlayer(activeMap, null, event, null);
+        Player player_ = Helper.getPlayer(activeMap, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;

@@ -29,7 +29,7 @@ public class DealSO extends CardsSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
 
-        Player player_ = Helper.getGamePlayer(activeMap, null, event, null);
+        Player player_ = Helper.getPlayer(activeMap, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
