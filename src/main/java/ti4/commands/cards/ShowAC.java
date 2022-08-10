@@ -5,14 +5,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.LinkedHashMap;
 
 public class ShowAC extends CardsSubcommandData {
     public ShowAC() {
@@ -25,7 +24,6 @@ public class ShowAC extends CardsSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -49,31 +47,36 @@ public class ShowAC extends CardsSubcommandData {
             return;
         }
 
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        if (playerOption != null) {
-            User user = playerOption.getAsUser();
-            StringBuilder sb = new StringBuilder();
-            sb.append("---------\n");
-            sb.append("Game: ").append(activeMap.getName()).append("\n");
-            sb.append("Player: ").append(player.getUserName()).append("\n");
-            String color = player.getColor();
-            sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
-            sb.append("(").append(player.getFaction()).append(")");
-            if (color != null){
-                sb.append(" (").append(color).append(")");
-            }
-            sb.append("\n");
-            sb.append("Showed Action Cards:").append("\n");
-            sb.append(Mapper.getActionCard(acID)).append("\n");
-            sb.append("---------\n");
-            player.setActionCard(acID);
 
-            MessageHelper.sentToMessageToUser(event, sb.toString(), user);
-            CardsInfo.sentUserCardInfo(event, activeMap, player);
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Need to specify player");
+        StringBuilder sb = new StringBuilder();
+        sb.append("---------\n");
+        sb.append("Game: ").append(activeMap.getName()).append("\n");
+        sb.append("Player: ").append(player.getUserName()).append("\n");
+        String color = player.getColor();
+        sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
+        sb.append("(").append(player.getFaction()).append(")");
+        if (color != null) {
+            sb.append(" (").append(color).append(")");
+        }
+        sb.append("\n");
+        sb.append("Showed Action Cards:").append("\n");
+        sb.append(Mapper.getActionCard(acID)).append("\n");
+        sb.append("---------\n");
+        player.setActionCard(acID);
+
+        Player player_ = Helper.getGamePlayer(activeMap, null, event, null);
+        if (player_ == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
         }
+        User user = MapGenerator.jda.getUserById(player_.getUserID());
+        if (user == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
+            return;
+        }
+        MessageHelper.sentToMessageToUser(event, sb.toString(), user);
+        CardsInfo.sentUserCardInfo(event, activeMap, player);
+
 
     }
 }

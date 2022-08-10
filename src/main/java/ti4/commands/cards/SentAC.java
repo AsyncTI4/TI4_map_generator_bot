@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.Mapper;
+import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -23,7 +23,6 @@ public class SentAC extends CardsSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -47,23 +46,22 @@ public class SentAC extends CardsSubcommandData {
             return;
         }
 
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        if (playerOption != null) {
-            User user = playerOption.getAsUser();
-            Player targetPlayer = activeMap.getPlayer(user.getId());
-            if (targetPlayer == null){
-                MessageHelper.sendMessageToChannel(event.getChannel(), "No such Player in game");
-                return;
-            }
-
-            player.removeActionCard(acIndex);
-            targetPlayer.setActionCard(acID);
-            CardsInfo.sentUserCardInfo(event, activeMap, targetPlayer);
-            CardsInfo.sentUserCardInfo(event, activeMap, player);
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Need to specify player");
+        Player player_ = Helper.getGamePlayer(activeMap, null, event, null);
+        if (player_ == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
         }
+        User user = MapGenerator.jda.getUserById(player_.getUserID());
+        if (user == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
+            return;
+        }
+
+        player.removeActionCard(acIndex);
+        player_.setActionCard(acID);
+        CardsInfo.sentUserCardInfo(event, activeMap, player_);
+        CardsInfo.sentUserCardInfo(event, activeMap, player);
+
 
     }
 }
