@@ -50,6 +50,7 @@ public class ListVoteCount extends AgendaSubcommandData {
             HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
 
             boolean bloodPactPn = false;
+            boolean hasXxchaAlliance = false;
             int influenceCount = 0;
             if ("xxcha".equals(player.getFaction())) {
                 Leader leader = player.getLeader(Constants.COMMANDER);
@@ -76,6 +77,7 @@ public class ListVoteCount extends AgendaSubcommandData {
                                     Leader leader = player_.getLeader(Constants.COMMANDER);
                                     if (leader != null && !leader.isLocked()) {
                                         influenceCount += planets.size();
+                                        hasXxchaAlliance = true;
                                         break;
                                     }
                                 }
@@ -94,7 +96,7 @@ public class ListVoteCount extends AgendaSubcommandData {
                     .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
             influenceCount += influenceCountFromPlanets;
 
-            if (player.getFaction().equals("nekro")) {
+            if (player.getFaction().equals("nekro") && !hasXxchaAlliance) {
                 text += " NOT VOTING.: ** 0";
             } else {
                 text += " vote Count: **" + influenceCount;
