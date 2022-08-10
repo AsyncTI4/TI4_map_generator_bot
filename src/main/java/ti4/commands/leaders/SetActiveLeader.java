@@ -17,6 +17,7 @@ public class SetActiveLeader extends LeaderAction {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null){
             playerLeader.setActive(true);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Leader will be PURGED after status cleanup");
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
         }
