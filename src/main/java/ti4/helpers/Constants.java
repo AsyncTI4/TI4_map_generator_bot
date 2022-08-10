@@ -113,8 +113,8 @@ public class Constants {
     public static final String REMOVE_CC_FROM_FS = "mahact_cc_from_fs";
     public static final String SPECIAL = "special";
 
-    public static final String INACTIVE_LEADER = "inactive";
-    public static final String ACTIVE_LEADER = "active";
+    public static final String INACTIVE_LEADER = "hero_inactivate";
+    public static final String ACTIVE_LEADER = "hero_activate";
     public static final String UNLOCK_LEADER = "unlock";
     public static final String LOCK_LEADER = "lock";
     public static final String EXHAUST_LEADER = "exhaust";
