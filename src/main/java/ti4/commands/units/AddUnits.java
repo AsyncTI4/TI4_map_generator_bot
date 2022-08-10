@@ -25,7 +25,8 @@ public class AddUnits extends AddRemoveUnits {
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color) {
         OptionMapping option = event.getOption(Constants.ADD_CC_FROM_TACTICS);
         if (option != null){
-            if (option.getAsString().equals("yes") || option.getAsString().equals("y")) {
+            String value = option.getAsString().toLowerCase();
+            if (value.equals("yes") || value.equals("y")) {
                 MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
                 AddCC.addCC(event, color, tile);
             }
