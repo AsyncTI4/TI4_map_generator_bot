@@ -240,6 +240,6 @@ Its workaround for that single explore
 /leaders exhaust leaderID trade_goods <- exhaust leader and can add trade good to leader (like arturo for nomad)
 /leaders refresh leaderID <- refresh leader
 /leaders purge leaderID <- purges leader
-/leaders active <- set leader as active. Will be purged after executing /status cleanup
-/leaders inactive <- set leader as inactive if you made active by mistake
+/leaders hero_activate <- set leader as active. Will be purged after executing /status cleanup
+/leaders hero_inactivate <- set leader as inactive if you made active by mistake
 /leaders reset <- resets all leaders for faction

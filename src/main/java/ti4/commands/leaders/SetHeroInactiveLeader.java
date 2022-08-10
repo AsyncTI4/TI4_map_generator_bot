@@ -7,17 +7,16 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SetActiveLeader extends LeaderAction {
-    public SetActiveLeader() {
-        super(Constants.ACTIVE_LEADER, "Set leader as active");
+public class SetHeroInactiveLeader extends LeaderAction {
+    public SetHeroInactiveLeader() {
+        super(Constants.INACTIVE_LEADER, "Set leader as inactive");
     }
 
     @Override
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null){
-            playerLeader.setActive(true);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Leader will be PURGED after status cleanup");
+            playerLeader.setActive(false);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
         }
