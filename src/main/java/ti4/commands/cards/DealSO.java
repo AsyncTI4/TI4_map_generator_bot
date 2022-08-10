@@ -5,7 +5,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.MapGenerator;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -27,16 +29,20 @@ public class DealSO extends CardsSubcommandData {
             count = providedCount > 0 ? providedCount : 1;
         }
 
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        if (playerOption != null) {
-            User user = playerOption.getAsUser();
-            Player player = activeMap.getPlayer(user.getId());
-            for (int i = 0; i < count; i++) {
-                activeMap.drawSecretObjective(player.getUserID());
-            }
-            CardsInfo.sentUserCardInfo(event, activeMap, player);
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+        Player player_ = Helper.getGamePlayer(activeMap, null, event, null);
+        if (player_ == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
+            return;
         }
+        User user = MapGenerator.jda.getUserById(player_.getUserID());
+        if (user == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
+            return;
+        }
+
+        for (int i = 0; i < count; i++) {
+            activeMap.drawSecretObjective(player_.getUserID());
+        }
+        CardsInfo.sentUserCardInfo(event, activeMap, player_);
     }
 }
