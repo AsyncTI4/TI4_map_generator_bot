@@ -1,7 +1,6 @@
 package ti4.commands.leaders;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
@@ -26,13 +25,7 @@ public class ResetLeader extends LeaderSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-
-        OptionMapping leader = event.getOption(Constants.LEADER);
-        if (leader != null) {
-            player.initLeaders();
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Leaders were reset");
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Need to specify CC's");
-        }
+        player.initLeaders();
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Leaders were reset");
     }
 }
