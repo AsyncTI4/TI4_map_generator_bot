@@ -12,10 +12,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
-import ti4.map.Tile;
+import ti4.map.*;
 import ti4.message.MessageHelper;
 
 import java.io.File;
@@ -48,6 +45,15 @@ abstract public class AddRemoveToken implements Command {
                         }
                     }
                 }
+            } else {
+                Player player = activeMap.getPlayer(userID);
+                player = Helper.getGamePlayer(activeMap, player, event, null);
+                if (player == null) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+                    return;
+                }
+                colors.add(player.getColor());
+
             }
             OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
             if (tileOption != null) {
@@ -89,11 +95,11 @@ abstract public class AddRemoveToken implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                                .setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PLANET_NAME, "Planet name"))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
+                                .setAutoComplete(true))
         );
     }
 
