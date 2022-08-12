@@ -25,7 +25,7 @@ public class SendFragments extends ExploreSubcommandData {
 		super(Constants.SEND_FRAGMENT, "Send a number of relic fragments (default 1) to another player");
 		addOptions(
 			typeOption.setRequired(true),
-			new OptionData(OptionType.USER, Constants.PLAYER, "Player to send fragments to").setRequired(true),
+			new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true),
 			new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments (default 1)")
 		);
 	}
@@ -34,19 +34,17 @@ public class SendFragments extends ExploreSubcommandData {
 	public void execute(SlashCommandInteractionEvent event) {
 		Map activeMap = getActiveMap();
 		User activeUser = getUser();
-		OptionMapping recieverOption = event.getOption(Constants.PLAYER);
-		String recieverID = recieverOption.getAsUser().getId();
-		Player reciever = activeMap.getPlayers().get(recieverID);
+		Player reciever = Helper.getPlayer(activeMap, null, event);
         Player sender = activeMap.getPlayers().get(activeUser.getId());
         if (reciever == null) {
-        	MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + recieverOption.getAsUser().getName() + " could not be found in map:" + activeMap.getName());
+        	MessageHelper.sendMessageToChannel(event.getChannel(), "Target player could not be found in game:" + activeMap.getName());
             return;
         }
         String trait = event.getOption(Constants.TRAIT).getAsString();
         OptionMapping countOption = event.getOption(Constants.COUNT);
         int count = 1;
         if (countOption != null) {
-        	count = event.getOption(Constants.COUNT).getAsInt();
+        	count = countOption.getAsInt();
         } 
         
         ArrayList<String> fragments = new ArrayList<>();
@@ -67,9 +65,6 @@ public class SendFragments extends ExploreSubcommandData {
         	MessageHelper.replyToMessage(event, "Not enough fragments of the specified trait");
         	return;
         }
-        
-        StringBuilder sb = new StringBuilder();
-        sb.append(count).append(" ").append(trait).append(" relic fragments sent to ").append(recieverOption.getAsUser().getName());
 		MessageHelper.replyToMessageTI4Logo(event);
 		MessageHelper.sendMessageToChannel(event.getChannel(), SendTG.getPlayerRepresentation(event, sender) + " sent " + trait + " relic fragments to: " + SendTG.getPlayerRepresentation(event, reciever));
 	}

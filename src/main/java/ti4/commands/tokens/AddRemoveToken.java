@@ -98,7 +98,7 @@ abstract public class AddRemoveToken implements Command {
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PLANET_NAME, "Planet name"))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
+                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
                                 .setAutoComplete(true))
         );
     }
