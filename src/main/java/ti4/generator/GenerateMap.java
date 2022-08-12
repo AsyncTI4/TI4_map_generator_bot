@@ -830,7 +830,9 @@ public class GenerateMap {
     public static String getSCNumberIfNaaluInPlay(Player player, Map map, String scText) {
         if (Constants.NAALU.equals(player.getFaction())) {
             boolean giftPlayed = false;
-            for (Player player_ : map.getPlayers().values()) {
+            Collection<Player> activePlayers = map.getPlayers().values().stream()
+                    .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("white")).toList();
+            for (Player player_ : activePlayers) {
                 if (player != player_ && player_.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
                     giftPlayed = true;
                     break;
