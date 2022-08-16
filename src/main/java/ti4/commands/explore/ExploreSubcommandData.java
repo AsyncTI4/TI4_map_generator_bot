@@ -141,6 +141,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 message = "Invalid token or tile";
             }
         }
-        MessageHelper.replyToMessage(event, messageText + "\n" + message);
+        MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+        MessageHelper.replyToMessageTI4Logo(event);
     }
 }
