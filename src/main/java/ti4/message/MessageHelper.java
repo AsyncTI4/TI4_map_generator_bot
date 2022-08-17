@@ -31,12 +31,14 @@ public class MessageHelper {
             splitAndSent(messageText, event.getChannel());
             event.getHook().sendMessage("Message to long for replay, sent all information in base messages").queue();
         } else {
-            event.getHook().sendMessage(messageText).queue();
+            splitAndSent(messageText, event.getChannel());
+            event.getHook().sendMessage(".").queue();
         }
     }
 
     public static void replyToMessage(SlashCommandInteractionEvent event, File file) {
-        event.getHook().sendFile(file).queue();
+        sendFileToChannel(event.getChannel(), file);
+        replyToMessageTI4Logo(event);
     }
 
     public static void sentToMessageToUser(SlashCommandInteractionEvent event, String messageText) {
