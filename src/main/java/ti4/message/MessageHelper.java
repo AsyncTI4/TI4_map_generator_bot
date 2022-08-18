@@ -32,12 +32,13 @@ public class MessageHelper {
             event.getHook().sendMessage("Message to long for replay, sent all information in base messages").queue();
         } else {
             splitAndSent(messageText, event.getChannel());
-            event.getHook().sendMessage("<:asyncti4:959703535258333264>").queue();
+            event.getHook().sendMessage(".").queue();
         }
     }
 
     public static void replyToMessage(SlashCommandInteractionEvent event, File file) {
         sendFileToChannel(event.getChannel(), file);
+        replyToMessageTI4Logo(event);
     }
 
     public static void sentToMessageToUser(SlashCommandInteractionEvent event, String messageText) {
