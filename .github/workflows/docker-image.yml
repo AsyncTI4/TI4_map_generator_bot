@@ -18,10 +18,10 @@ jobs:
         script: |
           cd /root/ti4bot/TI4_map_generator_bot
           git pull
-          docker kill $(docker ps -q)
-          docker rm $(docker ps -a -q)
-          docker rmi $(docker images -q)
           docker build --build-arg BOT_KEY=$DISCORD_BOT_KEY --build-arg USER=$DISCORD_USER --build-arg SERVER=$DISCORD_SERVER --build-arg SERVER2=$DISCORD_SERVER2 -t tibot .
+          docker kill $(docker ps -q)
           cd /root
           ./docker_run.sh
-          
+          docker rm $(docker ps --filter status=exited -q)
+          docker rmi $(docker images --filter "dangling=true" -q)
+
