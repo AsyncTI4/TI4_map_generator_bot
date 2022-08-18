@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
+import ti4.helpers.Constants;
 import ti4.helpers.LoggerHandler;
 import ti4.map.Map;
 import ti4.map.MapFileDeleter;
@@ -33,8 +34,12 @@ public class MessageListener extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         event.getInteraction().deferReply().queue();
         String userID = event.getUser().getId();
-        setActiveGame(event.getChannel(), userID);
-
+        boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName());
+        if (!isChannelOK){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Command canceled. Execute command in correct channel, as game name.");
+            MessageHelper.replyToMessageTI4Logo(event);
+            return;
+        }
 
         //noinspection ResultOfMethodCallIgnored
 //        event.deferReply();
@@ -53,7 +58,7 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    public static void setActiveGame(MessageChannel channel, String userID) {
+    public static boolean setActiveGame(MessageChannel channel, String userID, String eventName) {
         String channelName = channel.getName();
         MapManager mapManager = MapManager.getInstance();
         Map userActiveMap = mapManager.getUserActiveMap(userID);
@@ -64,17 +69,22 @@ public class MessageListener extends ListenerAdapter {
         MapFileDeleter.deleteFiles();
 
         String gameID = channelNameTokenizer.nextToken();
-        if (mapList.stream().anyMatch(map -> map.equals(gameID)) && (mapManager.getUserActiveMap(userID) == null || !mapManager.getUserActiveMap(userID).getName().equals(gameID) && (mapManager.getMap(gameID) != null && (mapManager.getMap(gameID).isMapOpen() || mapManager.getMap(gameID).getPlayerIDs().contains(userID))))) {
+        boolean anyMatchGameExists = mapList.stream().anyMatch(map -> map.equals(gameID));
+        if (!anyMatchGameExists && !eventName.contains(Constants.CREATE_GAME)) {
+            return false;
+        }
+        if (anyMatchGameExists && (mapManager.getUserActiveMap(userID) == null || !mapManager.getUserActiveMap(userID).getName().equals(gameID) && (mapManager.getMap(gameID) != null && (mapManager.getMap(gameID).isMapOpen() || mapManager.getMap(gameID).getPlayerIDs().contains(userID))))) {
             if (mapManager.getUserActiveMap(userID) != null && !mapManager.getUserActiveMap(userID).getName().equals(gameID)) {
 //                MessageHelper.sendMessageToChannel(event.getChannel(), "Active game set to: " + gameID);
             }
             mapManager.setMapForUser(userID, gameID);
         } else if (mapManager.isUserWithActiveMap(userID)) {
-            if (mapList.stream().anyMatch(map -> map.equals(gameID)) && !channelName.startsWith(userActiveMap.getName())) {
+            if (anyMatchGameExists && !channelName.startsWith(userActiveMap.getName())) {
                 MessageHelper.sendMessageToChannel(channel, "Active game reset. Channel name indicates to have map associated with it. Please select correct active game or do action in neutral channel");
                 mapManager.resetMapForUser(userID);
             }
         }
+        return true;
     }
 
     @Override

@@ -19,7 +19,7 @@ public class AutoCompleteProvider {
 
     public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
         String optionName = event.getFocusedOption().getName();
-        MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId());
+        MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName());
         String id = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(id);
 
@@ -152,7 +152,7 @@ public class AutoCompleteProvider {
                 event.replyChoices(options).queue();
             }
             case Constants.PLANET, Constants.PLANET2, Constants.PLANET3, Constants.PLANET4, Constants.PLANET5, Constants.PLANET6 -> {
-                MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId());
+                MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName());
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Set<String> planetIDs;
                 if (activeMap != null) {
