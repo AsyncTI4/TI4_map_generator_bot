@@ -22,12 +22,18 @@ public class MessageHelper {
         channel.sendFile(file).queue();
     }
 
+
     public static void replyToMessageTI4Logo(SlashCommandInteractionEvent event) {
-        event.getHook().sendMessage("<:asyncti4:959703535258333264>").queue();
+        replyToMessage(event, "<:asyncti4:959703535258333264>");
     }
     public static void replyToMessage(SlashCommandInteractionEvent event, String messageText) {
-        splitAndSent(messageText, event.getChannel());
-        event.getHook().sendMessage("<:asyncti4:959703535258333264>").queue();
+        if (messageText.length() > 1500) {
+            splitAndSent(messageText, event.getChannel());
+            event.getHook().sendMessage("Message to long for replay, sent all information in base messages").queue();
+        } else {
+            splitAndSent(messageText, event.getChannel());
+            event.getHook().sendMessage("<:asyncti4:959703535258333264>").queue();
+        }
     }
 
     public static void replyToMessage(SlashCommandInteractionEvent event, File file) {
