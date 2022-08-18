@@ -1,4 +1,7 @@
 # Project exclude paths
 /target/
+/storage/
 .idea/
 /log/*
+localtesting.sh
+tibot.jar
