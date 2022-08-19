@@ -24,15 +24,17 @@ public class MessageHelper {
 
 
     public static void replyToMessageTI4Logo(SlashCommandInteractionEvent event) {
-        replyToMessage(event, "<:asyncti4:959703535258333264>");
+        replyToMessage(event, "");
     }
     public static void replyToMessage(SlashCommandInteractionEvent event, String messageText) {
         if (messageText.length() > 1500) {
             splitAndSent(messageText, event.getChannel());
             event.getHook().sendMessage("Message to long for replay, sent all information in base messages").queue();
         } else {
-            splitAndSent(messageText, event.getChannel());
-            event.getHook().sendMessage(".").queue();
+            if (!messageText.isEmpty()) {
+                splitAndSent(messageText, event.getChannel());
+            }
+            event.getHook().sendMessage("-").queue();
         }
     }
 
