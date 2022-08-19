@@ -47,7 +47,6 @@ public class MapGenerator {
 //                .enableIntents(Arrays.asList(GatewayIntent.values()))
                 .build();
 
-
         jda.addEventListener(new MessageListener());
 
         try {
@@ -56,7 +55,6 @@ public class MapGenerator {
             LoggerHandler.log("Error waiting for bot to get ready");
         }
 //        User user = event.getJDA().getUserById();
-//            user.getName()
         userID = args[1];
         PositionMapper.init();
         Mapper.init();
