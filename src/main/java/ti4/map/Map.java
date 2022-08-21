@@ -430,6 +430,13 @@ public class Map {
         Collections.shuffle(agendas);
     }
 
+    public void resetAgendas() {
+        HashMap<String, String> agendas = Mapper.getAgendas();
+        this.agendas = new ArrayList<>(agendas.keySet());
+        Collections.shuffle(this.agendas);
+        discardAgendas = new LinkedHashMap<>();
+    }
+
     public void setDiscardAgendas(LinkedHashMap<String, Integer> discardAgendas) {
         this.discardAgendas = discardAgendas;
     }
