@@ -426,6 +426,10 @@ public class Map {
         this.agendas = agendas;
     }
 
+    public void shuffleAgendas() {
+        Collections.shuffle(agendas);
+    }
+
     public void setDiscardAgendas(LinkedHashMap<String, Integer> discardAgendas) {
         this.discardAgendas = discardAgendas;
     }
