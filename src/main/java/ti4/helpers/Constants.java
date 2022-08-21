@@ -244,6 +244,7 @@ public class Constants {
     public static final String PUT_TOP = "put_top";
     public static final String PUT_BOTTOM = "put_bottom";
     public static final String SHUFFLE_AGENDAS = "shuffle_deck";
+    public static final String RESET_AGENDAS = "reset_deck";
     public static final String LOOK_AT_TOP = "look_at_top";
     public static final String LOOK_AT_BOTTOM = "look_at_bottom";
     public static final String REVEAL = "reveal";
