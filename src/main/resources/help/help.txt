@@ -139,6 +139,7 @@ faction_or_color tag helps to define for which player you want to set stats. FOR
 /player planet_exhaust planetName1 planetName2..6(optional) <- exhaust planet
 /player planet_refresh planetName1 planetName2..6(optional) <- refreshes planet
 /player planet_refresh_all <- refreshes all planets
+/player planet_exhaust_all <- exhaust all planets
 /player legendary_exhaust_ability planetName1 planetName2..6(optional) <- exhaust planet ability (legendary)
 /player legendary_refresh_ability planetName1 planetName2..6(optional) <- refreshes planet ability (legendary)
 Also if you add a planet that another player has it, it auto removes that planet from other player also transfers ability status, if exhausted, you get exhausted
@@ -189,6 +190,7 @@ Cards commands
 /agenda vote_count <- lists vote count, only if planets are used in bot
 /agenda shuffle_deck <- shuffles agenda deck
 /agenda reset_deck <- reset agenda deck and discards to new state
+/agenda cleanup confirm:YES <- refresh all player planets after agenda phase
 
 /status po_reveal_stage1 <- reveals stage 1 public objective
 /status po_reveal_stage2 <- reveals stage 2 public objective
@@ -236,6 +238,7 @@ Its workaround for that single explore
 /special search_warrant <- execute command to enable/disable visible Secret objectives
 /special sleeper_token planet... <- adds or removes sleeper token on planet. If no sleeper is present adds, if exists, removes token
 /special ion_token_flip tile <- flip existing ION wormhole token in system/tile
+/special system_info tile <- Shows unit info in given tile
 
 /leaders unlock leaderID <- unlock leader
 /leaders lock leaderID <- lock leader

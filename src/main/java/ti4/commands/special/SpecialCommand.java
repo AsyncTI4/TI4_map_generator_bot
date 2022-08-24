@@ -118,6 +118,7 @@ public class SpecialCommand implements Command {
         subcommands.add(new SearchWarrant());
         subcommands.add(new SleeperToken());
         subcommands.add(new IonFlip());
+        subcommands.add(new SystemInfo());
 
         return subcommands;
     }

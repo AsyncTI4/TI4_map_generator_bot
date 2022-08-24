@@ -98,6 +98,7 @@ public class Constants {
     public static final String LAST_MODIFIED_DATE = "last_modified_date";
     public static final String ROUND = "round";
 
+    public static final String SYSTEM_INFO = "system_info";
     public static final String DIPLO_SYSTEM = "diplo_system";
     public static final String SLEEPER_TOKEN = "sleeper_token";
     public static final String ION_TOKEN_FLIP = "ion_token_flip";
@@ -337,6 +338,7 @@ public class Constants {
     public static final String PLANET_EXHAUST = "planet_exhaust";
     public static final String PLANET_REFRESH = "planet_refresh";
     public static final String PLANET_REFRESH_ALL = "planet_refresh_all";
+    public static final String PLANET_EXHAUST_ALL = "planet_exhaust_all";
     public static final String PLANET_EXHAUST_ABILITY = "legendary_exhaust_ability";
     public static final String PLANET_REFRESH_ABILITY = "legendary_refresh_ability";
 

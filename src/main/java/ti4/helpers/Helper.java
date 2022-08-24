@@ -56,7 +56,7 @@ public class Helper {
                 player = null;
             }
         } else if (factionColorOption != null) {
-            String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString());
+            String factionColor = AliasHandler.resolveColor(factionColorOption.getAsString().toLowerCase());
             factionColor = AliasHandler.resolveFaction(factionColor);
             for (Player player_ : activeMap.getPlayers().values()) {
                 if (Objects.equals(factionColor, player_.getFaction()) ||
