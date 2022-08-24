@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.MapGenerator;
 import ti4.commands.cards.CardsInfo;
-import ti4.commands.cards.CardsSubcommandData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -18,7 +18,7 @@ public class ShowPN extends PNCardsSubcommandData {
     public ShowPN() {
         super(Constants.SHOW_PN, "Show Promissory Note to player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player to which to show PN").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable").setRequired(false));
     }
 
@@ -41,7 +41,7 @@ public class ShowPN extends PNCardsSubcommandData {
         if (longPNOption != null) {
             longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
         }
-        
+
         int acIndex = option.getAsInt();
         String acID = null;
         for (java.util.Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
@@ -55,28 +55,28 @@ public class ShowPN extends PNCardsSubcommandData {
             return;
         }
 
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
-
-
-
-
-        if (playerOption != null) {
-            User user = playerOption.getAsUser();
-            StringBuilder sb = new StringBuilder();
-            sb.append("---------\n");
-            sb.append("Game: ").append(activeMap.getName()).append("\n");
-            sb.append("Player: ").append(player.getUserName()).append("\n");
-            sb.append("Showed Promissory Note:").append("\n");
-            sb.append(Mapper.getPromissoryNote(acID, longPNDisplay)).append("\n");
-            sb.append("---------\n");
-            player.setPromissoryNote(acID);
-
-            MessageHelper.sentToMessageToUser(event, sb.toString(), user);
-            CardsInfo.sentUserCardInfo(event, activeMap, player);
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Need to specify player");
+        Player targetPlayer = Helper.getPlayer(activeMap, null, event);
+        if (targetPlayer == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Target player not found");
             return;
         }
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("---------\n");
+        sb.append("Game: ").append(activeMap.getName()).append("\n");
+        sb.append("Player: ").append(player.getUserName()).append("\n");
+        sb.append("Showed Promissory Note:").append("\n");
+        sb.append(Mapper.getPromissoryNote(acID, longPNDisplay)).append("\n");
+        sb.append("---------\n");
+        player.setPromissoryNote(acID);
+        User user = MapGenerator.jda.getUserById(targetPlayer.getUserID());
+        if (user == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
+            return;
+        }
+        MessageHelper.sentToMessageToUser(event, sb.toString(), user);
+        CardsInfo.sentUserCardInfo(event, activeMap, player);
+
 
     }
 }
