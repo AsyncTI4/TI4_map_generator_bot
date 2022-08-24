@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 public class Cleanup extends StatusSubcommandData {
     public Cleanup() {
         super(Constants.CLEANUP, "Status phase cleanup");
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm command with YES").setRequired(true));
     }
 
     @Override
