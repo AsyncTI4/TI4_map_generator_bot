@@ -38,6 +38,7 @@ public class Mapper {
     private static final HashMap<String, String[]> techListInfo = new HashMap<>();
     private static final Properties planets = new Properties();
     private static final Properties planet_representation = new Properties();
+    private static final Properties unit_representation = new Properties();
     private static final Properties attachmentInfo = new Properties();
     private static final Properties leaders = new Properties();
     private static final Properties playerSetup = new Properties();
@@ -65,6 +66,7 @@ public class Mapper {
         readData("planets.properties", planets, "Could not read planets file");
         readData("attachments_info.properties", attachmentInfo, "Could not read attachment info file");
         readData("planets_representation.properties", planet_representation, "Could not read planet representation file");
+        readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
         readData("faction_setup.properties", playerSetup, "Could not read player setup file");
     }
 
@@ -124,8 +126,21 @@ public class Mapper {
         return general.getProperty(id);
     }
 
-    public static boolean isUnitIDValid(String unitID) {
-        return units.getProperty(unitID) != null;
+    public static Map<String, String> getUnits() {
+        Map<String, String> unitMap = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : units.entrySet()) {
+            String representation = (String)unit_representation.get(entry.getKey());
+            unitMap.put((String)entry.getValue(), representation);
+        }
+        return unitMap;
+    }
+
+    public static Map<String, String> getColorToId() {
+        Map<String, String> unitMap = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : colors.entrySet()) {
+            unitMap.put((String)entry.getValue(), (String)entry.getKey());
+        }
+        return unitMap;
     }
 
     public static String getUnitID(String unitID, String color) {
@@ -279,6 +294,14 @@ public class Mapper {
             planets.put((String) entry.getKey(), (String) entry.getValue());
         }
         return planets;
+    }
+
+    public static HashMap<String, String> getUnitRepresentations() {
+        HashMap<String, String> units = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : unit_representation.entrySet()) {
+            units.put((String) entry.getKey(), (String) entry.getValue());
+        }
+        return units;
     }
 
     public static HashMap<String, String> getSecretObjectivesJustNames() {
