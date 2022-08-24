@@ -100,6 +100,7 @@ public class AgendaCommand implements Command {
         subcommands.add(new ListVoteCount());
         subcommands.add(new ShuffleAgendas());
         subcommands.add(new ResetAgendas());
+        subcommands.add(new Cleanup());
         return subcommands;
     }
 
