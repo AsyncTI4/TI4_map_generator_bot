@@ -279,6 +279,12 @@ public class GenerateMap {
                 } else {
                     graphics.drawString(scText, x + 90, y + 70 + yDelta);
                 }
+                if (player.isPassed()) {
+                    graphics.setFont(Storage.getFont20());
+                    graphics.setColor(new Color(238, 58, 80));
+                    graphics.drawString("PASSED", x + 5, y + 95 + yDelta);
+                }
+
                 graphics.setFont(Storage.getFont32());
                 graphics.setColor(Color.WHITE);
                 String ccCount = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
