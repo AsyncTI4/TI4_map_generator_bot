@@ -48,7 +48,14 @@ public class MessageListener extends ListenerAdapter {
             if (command.accept(event)) {
 //                command.logBack(event);
                 try {
-                    command.execute(event);
+                    if(command.inAcceptableChannel(event.getChannel())) {
+                        command.execute(event);
+                    }
+                    else {
+                        MessageHelper.sendMessageToChannel(event.getChannel(),
+                                "Please use a different channel. Acceptable channels contain "+
+                                        String.join(", ", command.limitChannelsKeywords()));
+                    }
                 } catch (Exception e) {
                     String messageText = "Error trying to execute command: " + command.getActionID();
                     MessageHelper.sendMessageToChannel(event.getChannel(), messageText);

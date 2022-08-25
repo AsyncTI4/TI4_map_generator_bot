@@ -13,16 +13,19 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.*;
+import ti4.map.Map;
 import ti4.message.MessageHelper;
 
 import java.io.File;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
+import java.util.*;
 import java.util.stream.Collectors;
 
 abstract public class AddRemoveUnits implements Command {
+
+    @Override
+    public List<String> limitChannelsKeywords() {
+        return Arrays.asList("actions", "action");
+    }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
