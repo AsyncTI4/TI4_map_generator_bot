@@ -324,6 +324,17 @@ public class Map {
         return false;
     }
 
+    public String getPublicObjectiveFromId(Integer idNumber) {
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(idNumber)) {
+                id = po.getKey();
+                break;
+            }
+        }
+        return id;
+    }
+
     public boolean unscorePublicObjective(String userID, Integer idNumber) {
         String id = "";
         for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {

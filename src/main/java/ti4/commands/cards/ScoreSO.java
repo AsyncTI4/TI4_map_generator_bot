@@ -55,4 +55,8 @@ public class ScoreSO extends CardsSubcommandData {
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
+
+    @Override
+    public void reply(SlashCommandInteractionEvent event) {
+    }
 }
