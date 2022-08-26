@@ -8,6 +8,7 @@ import ti4.helpers.LoggerHandler;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -138,7 +139,7 @@ public class AutoCompleteProvider {
                 try {
                     event.replyChoices(options).queue();
                 } catch (Exception e) {
-                    LoggerHandler.logError("Could not suggest leaders", e);
+                    BotLogger.log("Could not suggest leaders");
                 }
             }
             case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {

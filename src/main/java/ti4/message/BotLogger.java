@@ -19,11 +19,18 @@ public class BotLogger {
         }
     }
 
+    public static void log(String msg) {
+        log(null, msg);
+    }
     public static void log(SlashCommandInteractionEvent event, String msg) {
         if (channel != null) {
-            String channelName = event.getChannel().getName();
-            String commandString = event.getCommandString();
-            channel.sendMessage(channelName + " [" + commandString +" ] "+ msg).queue();
+            if (event != null) {
+                String channelName = event.getChannel().getName();
+                String commandString = event.getCommandString();
+                channel.sendMessage(channelName + " [" + commandString + " ] " + msg).queue();
+            } else {
+                channel.sendMessage(msg).queue();
+            }
         }
     }
 }

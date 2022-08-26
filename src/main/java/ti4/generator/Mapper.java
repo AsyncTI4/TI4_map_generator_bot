@@ -5,6 +5,7 @@ import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.LoggerHandler;
+import ti4.message.BotLogger;
 
 import javax.annotation.CheckForNull;
 
@@ -76,7 +77,7 @@ public class Mapper {
             try (InputStream input = new FileInputStream(colorFile)) {
                 colors.load(input);
             } catch (IOException e) {
-                LoggerHandler.log(s, e);
+                BotLogger.log(s);
             }
         }
     }
@@ -329,7 +330,7 @@ public class Mapper {
         if (tokenPath == null || !(new File(tokenPath).exists())) {
             tokenPath = ResourceHelper.getInstance().getTokenFile(tokenID);
             if (tokenPath == null) {
-                LoggerHandler.log("Could not find token: " + tokenID);
+                BotLogger.log("Could not find token: " + tokenID);
                 return null;
             }
         }

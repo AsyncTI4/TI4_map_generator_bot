@@ -14,6 +14,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.LoggerHandler;
 import ti4.map.*;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import java.io.File;
@@ -79,7 +80,7 @@ public class AddTileList implements Command {
                 tile = new Tile(AliasHandler.resolveTile(Constants.MR), "0a");
                 userActiveMap.setTile(tile);
             }catch (Exception e){
-                LoggerHandler.log("Could not add setup and Mallice tiles", e);
+                BotLogger.log("Could not add setup and Mallice tiles");
             }
 
             MapSaveLoadManager.saveMap(userActiveMap);

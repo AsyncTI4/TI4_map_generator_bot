@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import ti4.ResourceHelper;
+import ti4.message.BotLogger;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -57,7 +58,7 @@ public class AliasHandler {
                     }
                 }
             } catch (IOException e) {
-                LoggerHandler.log("Could not read alias file", e);
+                BotLogger.log("Could not read alias file");
             }
         }
     }
@@ -79,7 +80,7 @@ public class AliasHandler {
                     }
                 }
             } catch (IOException e) {
-                LoggerHandler.log(errorMessage, e);
+                BotLogger.log(errorMessage);
             }
         }
     }

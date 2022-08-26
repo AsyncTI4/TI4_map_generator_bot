@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.helpers.LoggerHandler;
+import ti4.message.BotLogger;
 
 public class LogMessage implements Command {
 
@@ -21,7 +22,7 @@ public class LogMessage implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        LoggerHandler.log("UserID: " + event.getUser().getId() + " UserName: " + event.getUser().getName());
+        BotLogger.log("UserID: " + event.getUser().getId() + " UserName: " + event.getUser().getName());
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
