@@ -10,6 +10,7 @@ import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.map.*;
+import ti4.message.BotLogger;
 
 import javax.annotation.CheckForNull;
 import java.awt.*;
@@ -104,7 +105,7 @@ public class Helper {
     public static String getDamagePath() {
         String tokenPath = ResourceHelper.getInstance().getResourceFromFolder("extra/", "marker_damage.png", "Could not find damage token file");
         if (tokenPath == null) {
-            LoggerHandler.log("Could not find token: marker_damage");
+            BotLogger.log("Could not find token: marker_damage");
             return null;
         }
         return tokenPath;

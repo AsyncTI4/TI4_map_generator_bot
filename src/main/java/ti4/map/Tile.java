@@ -5,6 +5,7 @@ import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.LoggerHandler;
+import ti4.message.BotLogger;
 
 import javax.annotation.CheckForNull;
 import java.awt.*;
@@ -46,7 +47,7 @@ public class Tile {
     public String getUnitPath(String unitID) {
         String unitPath = ResourceHelper.getInstance().getUnitFile(unitID);
         if (unitPath == null) {
-            LoggerHandler.log("Could not find unit: " + unitID);
+            BotLogger.log("Could not find unit: " + unitID);
             return null;
         }
         return unitPath;
@@ -184,7 +185,7 @@ public class Tile {
             int unitCount = Integer.parseInt(count);
             addUnit(spaceHolder, unitID, unitCount);
         } catch (Exception e) {
-            LoggerHandler.log("Could not parse unit count", e);
+            BotLogger.log("Could not parse unit count");
         }
     }
 
@@ -193,7 +194,7 @@ public class Tile {
             int unitCount = Integer.parseInt(count);
             addUnitDamage(spaceHolder, unitID, unitCount);
         } catch (Exception e) {
-            LoggerHandler.log("Could not parse unit count", e);
+            BotLogger.log("Could not parse unit count");
         }
     }
 
@@ -213,7 +214,7 @@ public class Tile {
         String tileName = Mapper.getTileID(tileID);
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
-            LoggerHandler.log("Could not find tile: " + tileID);
+            BotLogger.log("Could not find tile: " + tileID);
         }
         return tilePath;
     }

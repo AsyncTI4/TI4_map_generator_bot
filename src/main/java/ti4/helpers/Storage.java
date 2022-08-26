@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import org.jetbrains.annotations.Nullable;
+import ti4.message.BotLogger;
 
 import javax.annotation.CheckForNull;
 import java.awt.*;
@@ -93,7 +94,7 @@ public class Storage {
             tiFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
             tiFont = tiFont.deriveFont(size);
         } catch (Exception e) {
-            LoggerHandler.log("Could not load font", e);
+            BotLogger.log("Could not load font");
         }
         return tiFont;
     }

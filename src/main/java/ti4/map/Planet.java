@@ -2,6 +2,7 @@ package ti4.map;
 
 import ti4.generator.Mapper;
 import ti4.helpers.LoggerHandler;
+import ti4.message.BotLogger;
 
 import java.awt.*;
 import java.util.ArrayList;
@@ -33,7 +34,7 @@ public class Planet extends UnitHolder {
                 resources = Integer.parseInt(split[2]);
                 influence = Integer.parseInt(split[3]);
             } catch (Exception e) {
-                LoggerHandler.log("Could not parse res/inf of unitHolder " + name, e);
+                BotLogger.log("Could not parse res/inf of unitHolder " + name);
             }
         }
     }
@@ -84,7 +85,7 @@ public class Planet extends UnitHolder {
                         influence += Integer.parseInt(split[1]);
                     }
                 } catch (Exception e) {
-                    LoggerHandler.log("Could not parse res/inf in token of unitHolder " + getName(), e);
+                    BotLogger.log("Could not parse res/inf in token of unitHolder " + getName());
                 }
 
                 if (split.length > 2) {

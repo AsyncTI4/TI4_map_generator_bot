@@ -29,6 +29,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.LoggerHandler;
 import ti4.helpers.Storage;
 import ti4.map.MapSaveLoadManager;
+import ti4.message.BotLogger;
 
 import javax.security.auth.login.LoginException;
 
@@ -52,7 +53,7 @@ public class MapGenerator {
         try {
             jda.awaitReady();
         } catch (InterruptedException e) {
-            LoggerHandler.log("Error waiting for bot to get ready");
+            BotLogger.log("Error waiting for bot to get ready");
         }
 //        User user = event.getJDA().getUserById();
         userID = args[1];

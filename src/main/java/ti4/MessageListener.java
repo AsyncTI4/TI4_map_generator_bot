@@ -14,6 +14,7 @@ import ti4.helpers.LoggerHandler;
 import ti4.map.Map;
 import ti4.map.MapFileDeleter;
 import ti4.map.MapManager;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import java.util.Set;
@@ -26,7 +27,7 @@ public class MessageListener extends ListenerAdapter {
         try {
             AutoCompleteProvider.autoCompleteListener(event);
         } catch (Exception e) {
-            LoggerHandler.log("Auto complete issue in event: " + event.getName(), e);
+            BotLogger.log("Auto complete issue in event: " + event.getName());
         }
     }
 
@@ -52,7 +53,7 @@ public class MessageListener extends ListenerAdapter {
                 } catch (Exception e) {
                     String messageText = "Error trying to execute command: " + command.getActionID();
                     MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
-                    LoggerHandler.log(messageText, e);
+                    BotLogger.log(messageText);
                 }
             }
         }

@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.Role;
 import ti4.MapGenerator;
 import ti4.helpers.*;
+import ti4.message.BotLogger;
 
 import javax.annotation.CheckForNull;
 import java.io.*;
@@ -65,10 +66,10 @@ public class MapSaveLoadManager {
                     saveTile(writer, tile);
                 }
             } catch (IOException e) {
-                LoggerHandler.log("Could not save map: " + map.getName(), e);
+                BotLogger.log("Could not save map: " + map.getName());
             }
         } else {
-            LoggerHandler.log("Could not save map, error creating save file");
+            BotLogger.log("Could not save map, error creating save file");
         }
     }
 
@@ -103,7 +104,7 @@ public class MapSaveLoadManager {
                     MapManager.getInstance().deleteMap(map.getName());
                     MapManager.getInstance().addMap(loadedMap);
                 } catch (Exception e) {
-                    LoggerHandler.log("Error trying to make undo copy for map: " + mapName, e);
+                    BotLogger.log("Error trying to make undo copy for map: " + mapName);
                 }
             }
         }
@@ -149,7 +150,7 @@ public class MapSaveLoadManager {
                 CopyOption[] options = {StandardCopyOption.REPLACE_EXISTING};
                 Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), options);
             } catch (Exception e) {
-                LoggerHandler.log("Error trying to make undo copy for map: " + mapName, e);
+                BotLogger.log("Error trying to make undo copy for map: " + mapName);
             }
         }
     }
@@ -466,7 +467,7 @@ public class MapSaveLoadManager {
                     folder = Storage.getMapImageDirectory();
                 }
             } catch (IOException e) {
-                LoggerHandler.log("Could not create folder for maps");
+                BotLogger.log("Could not create folder for maps");
             }
 
         }
@@ -499,7 +500,7 @@ public class MapSaveLoadManager {
                             mapList.put(map.getName(), map);
                         }
                     } catch (Exception e) {
-                        LoggerHandler.log("Could not load game:" + file, e);
+                        BotLogger.log("Could not load game:" + file);
                     }
                 }
             }
@@ -536,7 +537,7 @@ public class MapSaveLoadManager {
                         try {
                             readGameInfo(map, data);
                         } catch (Exception e) {
-                            LoggerHandler.log("Data is bad: " + map.getName(), e);
+                            BotLogger.log("Data is bad: " + map.getName());
                         }
                     }
 
@@ -593,7 +594,7 @@ public class MapSaveLoadManager {
                                 if (Constants.MIRAGE.equals(spaceHolder)) {
                                     Helper.addMirageToTile(tile);
                                 } else if (!tile.isSpaceHolderValid(spaceHolder)) {
-                                    LoggerHandler.log("Not valid space holder detected: " + spaceHolder);
+                                    BotLogger.log(map.getName() + ": Not valid space holder detected: " + spaceHolder);
                                 }
                                 continue;
                             }
@@ -639,11 +640,11 @@ public class MapSaveLoadManager {
                 }
                 map.setTileMap(tileMap);
             } catch (FileNotFoundException e) {
-                LoggerHandler.log("File not found to read map data: " + mapFile.getName(), e);
+                BotLogger.log("File not found to read map data: " + mapFile.getName());
             }
             return map;
         } else {
-            LoggerHandler.log("Could not save map, error creating save file");
+            BotLogger.log("Could not save map, error creating save file");
         }
         return null;
     }
@@ -773,14 +774,14 @@ public class MapSaveLoadManager {
                 try {
                     map.setRound(Integer.parseInt(roundNumber));
                 } catch (Exception exception) {
-                    LoggerHandler.log("Could not parse round number", exception);
+                    BotLogger.log("Could not parse round number");
                 }
             } else if (Constants.LAST_MODIFIED_DATE.equals(identification)) {
                 String lastModificationDate = tokenizer[1];
                 try {
                     map.setLastModifiedDate(Long.parseLong(lastModificationDate));
                 } catch (Exception exception) {
-                    LoggerHandler.log("Could not parse last modified date", exception);
+                    BotLogger.log("Could not parse last modified date");
                 }
             }
 
@@ -887,7 +888,7 @@ public class MapSaveLoadManager {
                         }
                         player.setLeaders(leaderList);
                     } catch (Exception e){
-                        LoggerHandler.log("Could not parse leaders loading map", e);
+                        BotLogger.log("Could not parse leaders loading map");
                     }
                 }
                 case Constants.SO_SCORED -> {

@@ -3,6 +3,7 @@ package ti4.generator;
 import ti4.ResourceHelper;
 import ti4.helpers.LoggerHandler;
 import ti4.map.Map;
+import ti4.message.BotLogger;
 
 import javax.annotation.CheckForNull;
 import java.awt.*;
@@ -55,7 +56,7 @@ public class PositionMapper {
                     points.add(new Point(x, y));
                 }
             } catch (Exception e) {
-                LoggerHandler.log("Could not parse position", e);
+                BotLogger.log("Could not parse position");
             }
         }
         return points;
@@ -67,7 +68,7 @@ public class PositionMapper {
             try (InputStream input = new FileInputStream(positionFile)) {
                 positionMap.load(input);
             } catch (IOException e) {
-                LoggerHandler.log(errorMessage, e);
+                BotLogger.log(errorMessage);
             }
         }
     }
@@ -100,7 +101,7 @@ public class PositionMapper {
                 int y = Integer.parseInt(tokenizer.nextToken());
                 return new Point(x, y);
             } catch (Exception e) {
-                LoggerHandler.log("Could not parse position coordinates", e);
+                BotLogger.log("Could not parse position coordinates");
             }
         }
         return null;
@@ -127,7 +128,7 @@ public class PositionMapper {
                 positions.add(new Point(Integer.parseInt(x), Integer.parseInt(y)));
             }
         } catch (Exception e) {
-            LoggerHandler.log("Could not parse player positions", e);
+            BotLogger.log("Could not parse player positions");
         }
 
         return positions;
