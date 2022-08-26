@@ -6,6 +6,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.*;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import java.util.*;
@@ -48,7 +49,7 @@ public class ListVoteCount extends AgendaSubcommandData {
                 text += " (" + color + ")";
             }
             HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
-
+            BotLogger.log(event, player.getFaction());
             boolean bloodPactPn = false;
             boolean hasXxchaAlliance = false;
             int influenceCount = 0;
@@ -90,12 +91,10 @@ public class ListVoteCount extends AgendaSubcommandData {
                     }
                 }
             }
-
-
             int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                     .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
             influenceCount += influenceCountFromPlanets;
-
+            BotLogger.log(event, "influence");
             if (player.getFaction().equals("nekro") && !hasXxchaAlliance) {
                 text += " NOT VOTING.: ** 0";
             } else {
