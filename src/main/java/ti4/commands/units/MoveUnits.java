@@ -127,6 +127,22 @@ public class MoveUnits extends AddRemoveUnits {
         }
     }
 
+    public static void removeStrategyCC(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
+        for (Player player : activeMap.getPlayers().values()) {
+            if (color.equals(player.getColor())) {
+                int cc = player.getStrategicCC();
+                if (cc == 0) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have CC in Strategy");
+                    break;
+                } else {
+                    cc -= 1;
+                    player.setStrategicCC(cc);
+                    break;
+                }
+            }
+        }
+    }
+
     @Override
     protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color) {
         if (toAction) {

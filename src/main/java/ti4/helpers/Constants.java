@@ -53,6 +53,7 @@ public class Constants {
     public static final String ADD_CC = "add_cc";
     public static final String ADD_CC_FROM_TACTICS = "add_cc_from_tactics";
     public static final String CC = "cc";
+    public static final String CC_USE = "cc_use";
     public static final String ADD_CONTROL = "add_control";
     public static final String ADD_TOKEN = "add_token";
     public static final String REMOVE_TOKEN = "remove_token";
