@@ -23,12 +23,19 @@ public class AddUnits extends AddRemoveUnits {
 
     @Override
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color) {
-        OptionMapping option = event.getOption(Constants.ADD_CC_FROM_TACTICS);
+        OptionMapping option = event.getOption(Constants.CC_USE);
         if (option != null){
             String value = option.getAsString().toLowerCase();
-            if (value.equals("yes") || value.equals("y")) {
-                MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
-                AddCC.addCC(event, color, tile);
+            switch (value) {
+                case "t", "tactics" -> {
+                    MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
+                    AddCC.addCC(event, color, tile);
+                }
+                case "c", "construction" -> {
+                    MoveUnits.removeStrategyCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
+                    AddCC.addCC(event, color, tile);
+                }
+                case "w", "warfare" -> MoveUnits.removeStrategyCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
             }
         }
     }
@@ -61,17 +68,15 @@ public class AddUnits extends AddRemoveUnits {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
-
-        // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")
                                 .setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type tactics or t, warfare or w, c or construction").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                                 .setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.ADD_CC_FROM_TACTICS, "Add CC to tile from tactics. Type yes"))
         );
     }
 }
