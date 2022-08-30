@@ -118,8 +118,10 @@ public class Constants {
     public static final String CUSTOM = "custom";
     public static final String SO_REMOVE_FROM_GAME = "so_remove_from_game";
     public static final String AGENDA_REMOVE_FROM_GAME = "agenda_remove_from_game";
+    public static final String AC_REMOVE_FROM_GAME = "ac_remove_from_game";
     public static final String SO_ID = "so_id";
     public static final String AEGNDA_ID = "agenda_id";
+    public static final String AC_ID = "ac_id";
 
     public static final String INACTIVE_LEADER = "hero_inactivate";
     public static final String ACTIVE_LEADER = "hero_activate";
