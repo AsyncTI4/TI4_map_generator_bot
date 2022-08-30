@@ -248,3 +248,6 @@ Its workaround for that single explore
 /leaders hero_activate <- set leader as active. Will be purged after executing /status cleanup
 /leaders hero_inactivate <- set leader as inactive if you made active by mistake
 /leaders reset <- resets all leaders for faction
+
+/custom agenda_remove_from_game id <- remove agenda from game deck (before game start)
+/custom so_remove_from_game id <- remove SO from game deck (before game start)

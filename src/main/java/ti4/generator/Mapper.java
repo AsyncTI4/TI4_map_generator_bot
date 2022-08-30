@@ -314,6 +314,18 @@ public class Mapper {
         return soList;
     }
 
+    public static HashMap<String, String> getAgendaJustNames() {
+        HashMap<String, String> agendaList = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : agendas.entrySet()) {
+            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
+            String value = tokenizer.nextToken();
+            value = value.replace("_", "");
+            value = value.replace("*", "");
+            agendaList.put((String) entry.getKey(), value);
+        }
+        return agendaList;
+    }
+
     @CheckForNull
     public static String getCCPath(String ccID) {
         String ccPath = ResourceHelper.getInstance().getCCFile(ccID);

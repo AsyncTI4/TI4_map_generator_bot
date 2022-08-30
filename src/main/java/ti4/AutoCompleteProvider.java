@@ -128,6 +128,26 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.SO_ID -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, String> secretObjectives = Mapper.getSecretObjectivesJustNames();
+                List<Command.Choice> options = secretObjectives.entrySet().stream()
+                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.AGENDA_ID -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, String> secretObjectives = Mapper.getAgendaJustNames();
+                List<Command.Choice> options = secretObjectives.entrySet().stream()
+                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
             case Constants.LEADER -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 if (leaders.isEmpty()) {

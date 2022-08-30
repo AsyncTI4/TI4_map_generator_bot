@@ -368,6 +368,14 @@ public class Map {
         return false;
     }
 
+    public boolean removeSOFromGame(String soID) {
+        return secretObjectives.remove(soID);
+    }
+
+    public boolean removeAgendaFromGame(String soID) {
+        return agendas.remove(soID);
+    }
+
     public LinkedHashMap<String, Integer> getCustomPublicVP() {
         return customPublicVP;
     }
