@@ -357,6 +357,16 @@ public class Mapper {
         return acList;
     }
 
+    public static HashMap<String, String> getACJustNames() {
+        HashMap<String, String> agendaList = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : actionCards.entrySet()) {
+            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
+            String value = tokenizer.nextToken();
+            agendaList.put((String) entry.getKey(), value);
+        }
+        return agendaList;
+    }
+
     public static String getTechType(String id) {
         String property = techs.getProperty(id);
         return property.split(",")[1];
