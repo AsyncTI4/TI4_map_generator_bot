@@ -251,3 +251,4 @@ Its workaround for that single explore
 
 /custom agenda_remove_from_game id <- remove agenda from game deck (before game start)
 /custom so_remove_from_game id <- remove SO from game deck (before game start)
+/custom ac_remove_from_game id <- remove AC from game deck (before game start)
