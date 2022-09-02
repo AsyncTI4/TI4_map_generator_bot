@@ -309,7 +309,7 @@ public class Player {
     }
 
     public void addRelic(String relicID) {
-        if (!relics.contains(relicID)) {
+        if (!relics.contains(relicID) || Constants.ENIGMATIC_DEVICE.equals(relicID)) {
             relics.add(relicID);
         }
     }
