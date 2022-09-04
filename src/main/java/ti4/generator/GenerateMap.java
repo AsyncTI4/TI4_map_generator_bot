@@ -577,7 +577,7 @@ public class GenerateMap {
                 drawPlanetImage(x + deltaX + 26, y + 40, planetTypeName);
             }
 
-            boolean hasAbility = planetHolder.isHasAbility();
+            boolean hasAbility = planetHolder.isHasAbility() || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge"));
             if (hasAbility) {
                 String statusOfAbility = exhaustedPlanetsAbilities.contains(planet) ? "_exh" : "_rdy";
                 String planetTypeName = "pc_legendary" + statusOfAbility + ".png";
