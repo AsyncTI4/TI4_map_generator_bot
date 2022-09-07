@@ -41,7 +41,10 @@ public class Constants {
     public static final String POSITION = "position";
     public static final String TILE_NAME = "tile_name";
     public static final String TILE_NAME_TO = "tile_name_to";
+
     public static final String HELP = "help";
+    public static final String HELP_DOCUMENTATION = "documentation";
+
     public static final String PLANET_NAME = "planet_name";
     public static final String TOKEN = "token";
     public static final String TILE_LIST = "tile_list";
@@ -124,8 +127,8 @@ public class Constants {
     public static final String AEGNDA_ID = "agenda_id";
     public static final String AC_ID = "ac_id";
 
-    public static final String INACTIVE_LEADER = "hero_inactivate";
-    public static final String ACTIVE_LEADER = "hero_activate";
+    public static final String INACTIVE_LEADER = "hero_unplay";
+    public static final String ACTIVE_LEADER = "hero_play";
     public static final String UNLOCK_LEADER = "unlock";
     public static final String LOCK_LEADER = "lock";
     public static final String EXHAUST_LEADER = "exhaust";
@@ -301,7 +304,7 @@ public class Constants {
     public static final String SHOW_ALL_SO = "show_all";
     public static final String SHOW_ALL_SO_TO_ALL = "show_all_to_all";
     public static final String SHOW_SO_TO_ALL = "show_to_all";
-    public static final String CARDS = "cards";
+    public static final String CARDS = "ac";
     public static final String CARDS_SO = "so";
     public static final String PN = "pn";
     public static final String DISCARD_SO = "discard";

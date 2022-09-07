@@ -15,11 +15,16 @@ public class SetHeroActiveLeader extends LeaderAction {
     @Override
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(leader);
-        if (playerLeader != null){
-            playerLeader.setActive(true);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Leader will be PURGED after status cleanup");
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
+        if ("letnev".equals(player.getFaction()) || "nomad".equals(player.getFaction())) {
+            if (playerLeader != null && Constants.HERO.equals(playerLeader.getName())) {
+                playerLeader.setActive(true);
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Leader will be PURGED after status cleanup");
+                return;
+            } else {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
+                return;
+            }
         }
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Just Letnev and Nomad can activate Hero. To unlock hero use unlock subcommand");
     }
 }

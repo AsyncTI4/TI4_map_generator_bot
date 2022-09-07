@@ -31,4 +31,12 @@ public class RevealStage2 extends StatusSubcommandData {
         sb.append(Mapper.getPublicObjective(objective.getKey())).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
+
+    @Override
+    public void reply(SlashCommandInteractionEvent event) {
+        String userID = event.getUser().getId();
+        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        MapSaveLoadManager.saveMap(activeMap);
+        MessageHelper.replyToMessageTI4Logo(event);
+    }
 }

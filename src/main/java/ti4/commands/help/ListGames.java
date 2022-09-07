@@ -1,8 +1,9 @@
-package ti4.commands.info;
+package ti4.commands.help;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import org.jetbrains.annotations.NotNull;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -16,16 +17,10 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
-public class ListGames implements Command {
+public class ListGames extends HelpSubcommandData {
 
-    @Override
-    public String getActionID() {
-        return Constants.LIST_GAMES;
-    }
-
-    @Override
-    public boolean accept(SlashCommandInteractionEvent event) {
-        return event.getName().equals(getActionID());
+    public ListGames() {
+        super(Constants.LIST_GAMES, "List all games");
     }
 
     @Override
@@ -50,15 +45,5 @@ public class ListGames implements Command {
         representationText.append("        Created:").append(map.getCreationDate());
         representationText.append("     Last Modified: ").append(Helper.getDateRepresentation(map.getLastModifiedDate()));
         return representationText.toString();
-    }
-
-    @SuppressWarnings("ResultOfMethodCallIgnored")
-    @Override
-    public void registerCommands(CommandListUpdateAction commands) {
-        // Moderation commands with required options
-        commands.addCommands(
-                Commands.slash(getActionID(), "Shows selected map")
-
-        );
     }
 }

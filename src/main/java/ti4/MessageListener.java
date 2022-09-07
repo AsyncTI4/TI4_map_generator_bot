@@ -35,11 +35,13 @@ public class MessageListener extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         event.getInteraction().deferReply().queue();
         String userID = event.getUser().getId();
-        boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName());
-        if (!isChannelOK){
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Command canceled. Execute command in correct channel, as game name.");
-            MessageHelper.replyToMessageTI4Logo(event);
-            return;
+        if (!event.getInteraction().getName().equals("help")) {
+            boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName());
+            if (!isChannelOK) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Command canceled. Execute command in correct channel, as game name.");
+                MessageHelper.replyToMessageTI4Logo(event);
+                return;
+            }
         }
 
         //noinspection ResultOfMethodCallIgnored

@@ -206,4 +206,9 @@ public class Helper {
         }
         return userById.getAsMention();
     }
+
+    public static boolean isCCCountCorrect(Map map, String color){
+//        map.
+        return true;
+    }
 }
