@@ -22,7 +22,7 @@ public class AddUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color) {
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map) {
         OptionMapping option = event.getOption(Constants.CC_USE);
         if (option != null){
             String value = option.getAsString().toLowerCase();
@@ -30,10 +30,12 @@ public class AddUnits extends AddRemoveUnits {
                 case "t", "tactics" -> {
                     MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
                     AddCC.addCC(event, color, tile);
+                    Helper.isCCCountCorrect(event, map, color);
                 }
                 case "c", "construction" -> {
                     MoveUnits.removeStrategyCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
                     AddCC.addCC(event, color, tile);
+                    Helper.isCCCountCorrect(event, map, color);
                 }
                 case "w", "warfare" -> MoveUnits.removeStrategyCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
             }
@@ -41,7 +43,7 @@ public class AddUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map map) {
         String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
         Map activeMap = mapManager.getUserActiveMap(userID);
@@ -51,7 +53,7 @@ public class AddUnits extends AddRemoveUnits {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice");
             return;
         }
-        super.unitParsingForTile(event, color, tile);
+        super.unitParsingForTile(event, color, tile, map);
     }
 
     @Override

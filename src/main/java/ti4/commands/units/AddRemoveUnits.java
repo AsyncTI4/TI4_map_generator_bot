@@ -43,7 +43,7 @@ abstract public class AddRemoveUnits implements Command {
             Tile tile = getTile(event, tileID, activeMap);
             if (tile == null) return;
 
-            unitParsingForTile(event, color, tile);
+            unitParsingForTile(event, color, tile, activeMap);
             MapSaveLoadManager.saveMap(activeMap);
 
             File file = GenerateMap.getInstance().saveImage(activeMap);
@@ -67,12 +67,12 @@ abstract public class AddRemoveUnits implements Command {
         return tile;
     }
 
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map map) {
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
-        unitParsing(event, color, tile, unitList);
+        unitParsing(event, color, tile, unitList, map);
     }
 
-    protected void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList) {
+    protected void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Map map) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer tokenizer = new StringTokenizer(unitList, ",");
         while (tokenizer.hasMoreTokens()) {
@@ -108,7 +108,7 @@ abstract public class AddRemoveUnits implements Command {
 
             addPlanetToPlayArea(event, tile, planetName);
         }
-        actionAfterAll(event, tile, color);
+        actionAfterAll(event, tile, color, map);
     }
 
     public void addPlanetToPlayArea(SlashCommandInteractionEvent event, Tile tile, String planetName) {
@@ -160,7 +160,7 @@ abstract public class AddRemoveUnits implements Command {
 
     abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color);
 
-    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color){
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map){
         //do nothing, overriden by child classes
     }
 

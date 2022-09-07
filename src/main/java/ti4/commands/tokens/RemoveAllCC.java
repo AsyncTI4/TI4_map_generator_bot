@@ -9,6 +9,7 @@ import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
