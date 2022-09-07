@@ -17,6 +17,7 @@ public class Constants {
     public static final String GAME_STATUS = "game_status";
     public static final String CONFIRM = "confirm";
     public static final String SHUTDOWN = "shutdown";
+    public static final String TESTING = "testing";
     public static final String LOG_MESSAGE = "log_message";
     public static final String SET_GAME = "set_game";
     public static final String SET_STATUS = "set_status";
@@ -324,6 +325,7 @@ public class Constants {
     public static final String SEND_AC = "ac_send";
     public static final String SEND_AC_RANDOM = "ac_send_random";
     public static final String SHOW_AC_DISCARD_LIST = "ac_show_discard_list";
+    public static final String SHOW_AC_REMAINING_CARD_COUNT = "ac_show_remaining_card_count";
 
     public static final String PROMISSORY_NOTE_ID = "promissory_note_id";
     public static final String PROMISSORY_NOTES = "promissory_notes";

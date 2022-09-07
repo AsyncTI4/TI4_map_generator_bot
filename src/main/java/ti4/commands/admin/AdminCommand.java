@@ -10,7 +10,6 @@ import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
 import java.util.Collection;
@@ -86,7 +85,7 @@ public class AdminCommand implements Command {
     private Collection<AdminSubcommandData> getSubcommands() {
         Collection<AdminSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new SaveMaps());
-        subcommands.add(new Shutdown());
+        subcommands.add(new Testing());
         subcommands.add(new ReloadMap());
         subcommands.add(new CardsInfoForPlayer());
         return subcommands;

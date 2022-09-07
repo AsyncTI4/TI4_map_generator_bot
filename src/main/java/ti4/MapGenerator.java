@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
 import net.dv8tion.jda.api.utils.MemberCachePolicy;
+import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
 import ti4.commands.HelpAction;
 import ti4.commands.admin.AdminCommand;
@@ -49,7 +50,7 @@ public class MapGenerator {
 //                .enableIntents(Arrays.asList(GatewayIntent.values()))
                 .build();
 
-        jda.addEventListener(new MessageListener());
+        jda.addEventListener(new MessageListener(), new ButtonListener());
 
         try {
             jda.awaitReady();
