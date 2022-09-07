@@ -51,7 +51,7 @@ public class Stats extends PlayerSubcommandData {
         OptionMapping optionT = event.getOption(Constants.TACTICAL);
         OptionMapping optionF = event.getOption(Constants.FLEET);
         OptionMapping optionS = event.getOption(Constants.STRATEGY);
-        if (optionCC != null && (optionT != null || optionF != null && optionS != null)) {
+        if (optionCC != null && (optionT != null || optionF != null || optionS != null)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Use format 3/3/3 for command counters or individual values, not both");
         } else {
 
@@ -70,6 +70,7 @@ public class Stats extends PlayerSubcommandData {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "Not number entered, check CC count again");
                     }
                 }
+                Helper.isCCCountCorrect(event, activeMap, player.getColor());
             }
             if (optionT != null) {
                 setValue(event, player, optionT, player::setTacticalCC, player::getTacticalCC);
@@ -79,6 +80,9 @@ public class Stats extends PlayerSubcommandData {
             }
             if (optionS != null) {
                 setValue(event, player, optionS, player::setStrategicCC, player::getStrategicCC);
+            }
+            if (optionT != null || optionF != null || optionS != null) {
+                Helper.isCCCountCorrect(event, activeMap, player.getColor());
             }
         }
         OptionMapping optionTG = event.getOption(Constants.TG);

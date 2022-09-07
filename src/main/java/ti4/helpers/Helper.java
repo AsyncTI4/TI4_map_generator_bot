@@ -6,11 +6,12 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
+import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
 import ti4.map.*;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 
 import javax.annotation.CheckForNull;
 import java.awt.*;
@@ -81,7 +82,7 @@ public class Helper {
         } else {
             String userID = event.getUser().getId();
             Player foundPlayer = activeMap.getPlayers().values().stream().filter(player -> player.getUserID().equals(userID)).findFirst().orElse(null);
-            if (foundPlayer != null){
+            if (foundPlayer != null) {
                 return foundPlayer.getColor();
             }
         }
@@ -207,8 +208,38 @@ public class Helper {
         return userById.getAsMention();
     }
 
-    public static boolean isCCCountCorrect(Map map, String color){
-//        map.
-        return true;
+    public static void isCCCountCorrect(SlashCommandInteractionEvent event, Map map, String color) {
+        int ccCount = 0;
+        HashMap<String, Tile> tileMap = map.getTileMap();
+        for (java.util.Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
+            Tile tile = tileEntry.getValue();
+            boolean hasCC = AddCC.hasCC(null, color, tile);
+            if (hasCC) {
+                ccCount++;
+            }
+        }
+        String factionColor = AliasHandler.resolveColor(color.toLowerCase());
+        factionColor = AliasHandler.resolveFaction(factionColor);
+        Player player = null;
+        for (Player player_ : map.getPlayers().values()) {
+            if (Objects.equals(factionColor, player_.getFaction()) ||
+                    Objects.equals(factionColor, player_.getColor())) {
+                player = player_;
+                ccCount += player_.getStrategicCC();
+                ccCount += player_.getTacticalCC();
+                ccCount += player_.getFleetCC();
+                break;
+            }
+        }
+        boolean ccCountIsOver = ccCount > 16;
+        if (ccCountIsOver) {
+            String msg = getGamePing(event, map) + " ";
+            if (player != null){
+                msg += getFactionIconFromDiscord(player.getFaction()) + " " + player.getFaction() + " ";
+                msg += getPlayerPing(event, player) + " ";
+            }
+            msg += "(" + color + ") is over CC limit. CC used: " + ccCount;
+            MessageHelper.replyToMessage(event, msg);
+        }
     }
 }

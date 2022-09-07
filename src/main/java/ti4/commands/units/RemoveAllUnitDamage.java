@@ -6,12 +6,13 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.helpers.Constants;
+import ti4.map.Map;
 import ti4.map.Tile;
 
 public class RemoveAllUnitDamage extends RemoveAllUnits {
 
     @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map map) {
         tile.removeAllUnitDamage(color);
     }
 

@@ -13,6 +13,7 @@ import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
@@ -25,7 +26,7 @@ public class MoveUnits extends AddRemoveUnits {
     private boolean priorityDmg = true;
 
     @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile) {
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map map) {
         unitsDamage = new HashMap<>();
         toAction = false;
         OptionMapping optionDmg = event.getOption(Constants.PRIORITY_NO_DAMAGE);
@@ -38,7 +39,7 @@ public class MoveUnits extends AddRemoveUnits {
         }
 
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
-        unitParsing(event, color, tile, unitList);
+        unitParsing(event, color, tile, unitList, map);
 
         String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
@@ -65,7 +66,7 @@ public class MoveUnits extends AddRemoveUnits {
                 //Do nothing, as no unit was moved to
                 break;
             default:
-                unitParsing(event, color, tile, unitList);
+                unitParsing(event, color, tile, unitList, map);
                 break;
         }
 
@@ -85,6 +86,7 @@ public class MoveUnits extends AddRemoveUnits {
         }
 
         AddCC.addCC(event, color, tile);
+        Helper.isCCCountCorrect(event, activeMap, color);
     }
 
     public static Tile flipMallice(SlashCommandInteractionEvent event, Tile tile, Map activeMap) {
