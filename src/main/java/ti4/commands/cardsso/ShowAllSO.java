@@ -1,10 +1,11 @@
-package ti4.commands.cards;
+package ti4.commands.cardsso;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.MapGenerator;
+import ti4.commands.cards.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -14,7 +15,7 @@ import ti4.message.MessageHelper;
 
 import java.util.LinkedHashMap;
 
-public class ShowAllSO extends CardsSubcommandData {
+public class ShowAllSO extends SOCardsSubcommandData {
     public ShowAllSO() {
         super(Constants.SHOW_ALL_SO, "Show Secret Objective to player");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
