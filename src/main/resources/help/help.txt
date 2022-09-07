@@ -44,14 +44,10 @@ Also we support TopLeft, TopRight, BottomLeft and BottomRight positions corespon
 Mecatol position is MR)
 /add_tile_list tileList <- tile list is code from map Generators like TTS uses, example: https://ti4-map-generator.derekpeterson.ca/
 You can use also tileID, so liek TI4 marks tiles 01 is Jord for example
-/list_tiles <- lists all tiles, use starting number id to add to map
 /remove_tile tileName or position
-/list_games <- lists all available maps that are created
-/list_planets <- lists all available planets
 /delete_game <-deletes your game, only can delete the map you created
 /show_game gameName(optional) display_type(optional) <- displays the game map, display_type can be set to all, map, stats. Displays map + player stats, just map or just player stats
 If you have active game set, it shows your active game if no game name is defines
-/list_units <- lists all possible units
 /add_cc colorList(factionList) tile or position <- add's cc to system: colorList can be pink,red,black as example/
 /remove_cc colorList(FactionList) tile or position <- remove's cc from system: colorList can be pink,red,black as example/
 /remove_all_cc confirmation(YES) <- need to type in YES, will remove all CC's from active game
@@ -156,22 +152,22 @@ Cards commands
 /so deal @player count(optional) <- draws a Secret objective for specified player, can specify count
 /so deal_to_all count(optional) <- draws a Secret objective(s) for all game players
 
-/cards info <- sents player all private cards for given game
-/cards draw count(optional) <- draws a secret or specified number of secrets
-/cards discard acUniqueID <- discards given ID action card and shuffles the ac deck. acUniqueID is generated just for player and are unique each time
-/cards show acUniqueID player <- sends given action card to player and changes acUniqueID
-/cards show_all player <- sends all action cards to player
-/cards show_to_all acUniqueID <- displays ac to table and changes acUniqueID
-/cards play acUniqueID <- displays ac to table that was played and discards
-/cards shuffle_deck <- shuffles Action card deck
-/cards pick_from_discard acUniqueIDFromDiscardPile <- Pick a Action card from discard pile and put in your hand
-/cards shuffle_back_into_deck acUniqueIDFromDiscardPile <- Shuffle Action card from discard pile back into Action card Deck
-/cards reveal_and_put_into_discard <- Reveal top Action card from deck and put into discard pile
-/cards show_discard_list <- Show all discarded Action cards
-/cards send acUniqueID player <- Sends selected AC from your hand to player hand
-/cards send_random player <- Sends random AC from your hand to player hand
-/cards discard_random <- Discards random AC from hand
-/cards show_remaining_card_count <- shows how many AC are left in deck
+/ac info <- sents player all private cards for given game
+/ac draw count(optional) <- draws a secret or specified number of secrets
+/ac discard acUniqueID <- discards given ID action card and shuffles the ac deck. acUniqueID is generated just for player and are unique each time
+/ac show acUniqueID player <- sends given action card to player and changes acUniqueID
+/ac show_all player <- sends all action cards to player
+/ac show_to_all acUniqueID <- displays ac to table and changes acUniqueID
+/ac play acUniqueID <- displays ac to table that was played and discards
+/ac shuffle_deck <- shuffles Action card deck
+/ac pick_from_discard acUniqueIDFromDiscardPile <- Pick a Action card from discard pile and put in your hand
+/ac shuffle_back_into_deck acUniqueIDFromDiscardPile <- Shuffle Action card from discard pile back into Action card Deck
+/ac reveal_and_put_into_discard <- Reveal top Action card from deck and put into discard pile
+/ac show_discard_list <- Show all discarded Action cards
+/ac send acUniqueID player <- Sends selected AC from your hand to player hand
+/ac send_random player <- Sends random AC from your hand to player hand
+/ac discard_random <- Discards random AC from hand
+/ac show_remaining_card_count <- shows how many AC are left in deck
 
 /pn show pnID player <- shows given PN to player and changes pnID
 /pn show_all player <- shows all PNs to player and changes pnIDs
@@ -247,10 +243,16 @@ Its workaround for that single explore
 /leaders exhaust leaderID trade_goods <- exhaust leader and can add trade good to leader (like arturo for nomad)
 /leaders refresh leaderID <- refresh leader
 /leaders purge leaderID <- purges leader
-/leaders hero_activate <- set leader as active. Will be purged after executing /status cleanup
-/leaders hero_inactivate <- set leader as inactive if you made active by mistake
+/leaders hero_play <- set leader as active. Will be purged after executing /status cleanup. Just for letnev and nomad
+/leaders hero_unplay <- set leader as inactive if you made active by mistake
 /leaders reset <- resets all leaders for faction
 
 /custom agenda_remove_from_game id <- remove agenda from game deck (before game start)
 /custom so_remove_from_game id <- remove SO from game deck (before game start)
 /custom ac_remove_from_game id <- remove AC from game deck (before game start)
+
+/help documentation <- show documentation file
+/help list_tiles <- lists all tiles, use starting number id to add to map
+/help list_games <- lists all available maps that are created
+/help list_planets <- lists all available planets
+/help list_units <- lists all possible units

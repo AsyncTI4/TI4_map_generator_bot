@@ -110,7 +110,7 @@ public class CardsCommand implements Command {
 
 
     protected String getActionDescription() {
-        return "Cards";
+        return "Action Cards";
     }
 
     private Collection<CardsSubcommandData> getSubcommands() {
