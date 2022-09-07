@@ -1,21 +1,20 @@
-package ti4.commands.cards;
+package ti4.commands.cardsso;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.cards.CardsInfo;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.LinkedHashMap;
-
-public class DiscardSO extends CardsSubcommandData {
-    public DiscardSO() {
-        super(Constants.DISCARD_SO, "Discard Secret Objective");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
+public class DrawSO extends SOCardsSubcommandData {
+    public DrawSO() {
+        super(Constants.DRAW_SO, "Draw Secret Objective");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
     }
 
     @Override
@@ -27,15 +26,14 @@ public class DiscardSO extends CardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Secret Objective to discard");
-            return;
+        OptionMapping option = event.getOption(Constants.COUNT);
+        int count = 1;
+        if (option != null) {
+            int providedCount = option.getAsInt();
+            count = providedCount > 0 ? providedCount : 1;
         }
-        boolean removed = activeMap.discardSecretObjective(player.getUserID(), option.getAsInt());
-        if (!removed) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Secret Objective ID found, please retry");
-            return;
+        for (int i = 0; i < count; i++) {
+            activeMap.drawSecretObjective(player.getUserID());
         }
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }

@@ -1,4 +1,4 @@
-package ti4.commands.cards;
+package ti4.commands.cardsso;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -7,8 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.MapGenerator;
 import ti4.commands.Command;
-import ti4.commands.cardspn.*;
-import ti4.commands.explore.ShuffleExpBackIntoDeck;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -22,13 +20,13 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class CardsCommand implements Command {
+public class SOCardsCommand implements Command {
 
-    private final Collection<CardsSubcommandData> subcommandData = getSubcommands();
+    private final Collection<SOCardsSubcommandData> subcommandData = getSubcommands();
 
     @Override
     public String getActionID() {
-        return Constants.CARDS;
+        return Constants.CARDS_SO;
     }
 
     @Override
@@ -93,9 +91,9 @@ public class CardsCommand implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        CardsSubcommandData subCommandExecuted = null;
+        SOCardsSubcommandData subCommandExecuted = null;
         String subcommandName = event.getInteraction().getSubcommandName();
-        for (CardsSubcommandData subcommand : subcommandData) {
+        for (SOCardsSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
@@ -110,27 +108,22 @@ public class CardsCommand implements Command {
 
 
     protected String getActionDescription() {
-        return "Cards";
+        return "Secret Objectives";
     }
 
-    private Collection<CardsSubcommandData> getSubcommands() {
-        Collection<CardsSubcommandData> subcommands = new HashSet<>();
+    private Collection<SOCardsSubcommandData> getSubcommands() {
+        Collection<SOCardsSubcommandData> subcommands = new HashSet<>();
+        subcommands.add(new DrawSO());
+        subcommands.add(new DiscardSO());
         subcommands.add(new CardsInfo());
-        subcommands.add(new DrawAC());
-        subcommands.add(new DiscardAC());
-        subcommands.add(new DiscardACRandom());
-        subcommands.add(new ShowAC());
-        subcommands.add(new ShowACToAll());
-        subcommands.add(new PlayAC());
-        subcommands.add(new ShuffleACDeck());
-        subcommands.add(new ShowAllAC());
-        subcommands.add(new ShowACRemainingCardCount());
-        subcommands.add(new PickACFromDiscard());
-        subcommands.add(new ShowDiscardActionCards());
-        subcommands.add(new ShuffleACBackIntoDeck());
-        subcommands.add(new RevealAndPutACIntoDiscard());
-        subcommands.add(new SentAC());
-        subcommands.add(new SentACRandom());
+        subcommands.add(new ShowSO());
+        subcommands.add(new ShowSOToAll());
+        subcommands.add(new ScoreSO());
+        subcommands.add(new DealSO());
+        subcommands.add(new UnscoreSO());
+        subcommands.add(new ShowAllSO());
+        subcommands.add(new ShowAllSOToAll());
+        subcommands.add(new DealSOToAll());
         return subcommands;
     }
 

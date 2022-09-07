@@ -1,10 +1,7 @@
-package ti4.commands.cards;
+package ti4.commands.cardsso;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.cards.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -14,7 +11,7 @@ import ti4.message.MessageHelper;
 
 import java.util.LinkedHashMap;
 
-public class ShowAllSOToAll extends CardsSubcommandData {
+public class ShowAllSOToAll extends SOCardsSubcommandData {
     public ShowAllSOToAll() {
         super(Constants.SHOW_ALL_SO_TO_ALL, "Show Secret Objective to player");
     }

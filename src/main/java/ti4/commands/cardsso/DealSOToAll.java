@@ -1,14 +1,15 @@
-package ti4.commands.cards;
+package ti4.commands.cardsso;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.cards.CardsInfo;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.Player;
 
-public class DealSOToAll extends CardsSubcommandData {
+public class DealSOToAll extends SOCardsSubcommandData {
     public DealSOToAll() {
         super(Constants.DEAL_SO_TO_ALL, "Deal Secret Objective (count) to all game players");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));

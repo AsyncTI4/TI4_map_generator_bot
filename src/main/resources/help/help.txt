@@ -145,32 +145,33 @@ faction_or_color tag helps to define for which player you want to set stats. FOR
 Also if you add a planet that another player has it, it auto removes that planet from other player also transfers ability status, if exhausted, you get exhausted
 
 Cards commands
-/cards so_draw count(optional) <- draws a secret or specified number of secrets
-/cards discard soUniqueID <- discards given ID Secret objective and shuffles the SO deck. soUniqueID is generated just for player and are unique each time
-/cards info <- sents player all private cards for given game
-/cards so_show soUniqueID player <- sends given Secret Objective to player and changes soUniqueID
-/cards so_show_all player <- sends all Secret Objectives to player
-/cards so_show_all_to_add <- shows all Secret Objectives to all players
-/cards so_show_to_all soUniqueID <- displays SO to table and changes soUniqueID
-/cards so_show_all <- displays all SO to table and changes soUniqueID
-/cards so_deal @player count(optional) <- draws a Secret objective for specified player, can specify count
-/cards so_deal_to_all count(optional) <- draws a Secret objective(s) for all game players
+/so draw count(optional) <- draws a secret or specified number of secrets
+/so discard soUniqueID <- discards given ID Secret objective and shuffles the SO deck. soUniqueID is generated just for player and are unique each time
+/so info <- sents player all private cards for given game
+/so show soUniqueID player <- sends given Secret Objective to player and changes soUniqueID
+/so show_all player <- sends all Secret Objectives to player
+/so show_all_to_add <- shows all Secret Objectives to all players
+/so show_to_all soUniqueID <- displays SO to table and changes soUniqueID
+/so show_all <- displays all SO to table and changes soUniqueID
+/so deal @player count(optional) <- draws a Secret objective for specified player, can specify count
+/so deal_to_all count(optional) <- draws a Secret objective(s) for all game players
 
-/cards ac_draw count(optional) <- draws a secret or specified number of secrets
-/cards ac_discard acUniqueID <- discards given ID action card and shuffles the ac deck. acUniqueID is generated just for player and are unique each time
-/cards ac_show acUniqueID player <- sends given action card to player and changes acUniqueID
-/cards ac_show_all player <- sends all action cards to player
-/cards ac_show_to_all acUniqueID <- displays ac to table and changes acUniqueID
-/cards ac_play acUniqueID <- displays ac to table that was played and discards
-/cards ac_shuffle_deck <- shuffles Action card deck
-/cards ac_pick_from_discard acUniqueIDFromDiscardPile <- Pick a Action card from discard pile and put in your hand
-/cards ac_shuffle_back_into_deck acUniqueIDFromDiscardPile <- Shuffle Action card from discard pile back into Action card Deck
-/cards ac_reveal_and_put_into_discard <- Reveal top Action card from deck and put into discard pile
-/cards ac_show_discard_list <- Show all discarded Action cards
-/cards ac_send acUniqueID player <- Sends selected AC from your hand to player hand
-/cards ac_send_random player <- Sends random AC from your hand to player hand
-/cards ac_discard_random <- Discards random AC from hand
-/cards ac_show_remaining_card_count <- shows how many AC are left in deck
+/cards info <- sents player all private cards for given game
+/cards draw count(optional) <- draws a secret or specified number of secrets
+/cards discard acUniqueID <- discards given ID action card and shuffles the ac deck. acUniqueID is generated just for player and are unique each time
+/cards show acUniqueID player <- sends given action card to player and changes acUniqueID
+/cards show_all player <- sends all action cards to player
+/cards show_to_all acUniqueID <- displays ac to table and changes acUniqueID
+/cards play acUniqueID <- displays ac to table that was played and discards
+/cards shuffle_deck <- shuffles Action card deck
+/cards pick_from_discard acUniqueIDFromDiscardPile <- Pick a Action card from discard pile and put in your hand
+/cards shuffle_back_into_deck acUniqueIDFromDiscardPile <- Shuffle Action card from discard pile back into Action card Deck
+/cards reveal_and_put_into_discard <- Reveal top Action card from deck and put into discard pile
+/cards show_discard_list <- Show all discarded Action cards
+/cards send acUniqueID player <- Sends selected AC from your hand to player hand
+/cards send_random player <- Sends random AC from your hand to player hand
+/cards discard_random <- Discards random AC from hand
+/cards show_remaining_card_count <- shows how many AC are left in deck
 
 /pn show pnID player <- shows given PN to player and changes pnID
 /pn show_all player <- shows all PNs to player and changes pnIDs

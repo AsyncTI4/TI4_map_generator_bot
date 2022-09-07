@@ -1,9 +1,10 @@
-package ti4.commands.cards;
+package ti4.commands.cardsso;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.cards.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -14,7 +15,7 @@ import ti4.message.MessageHelper;
 import java.util.HashSet;
 import java.util.Set;
 
-public class ScoreSO extends CardsSubcommandData {
+public class ScoreSO extends SOCardsSubcommandData {
     public ScoreSO() {
         super(Constants.SCORE_SO, "Score Secret Objective");
         addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));

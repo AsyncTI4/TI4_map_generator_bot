@@ -1,9 +1,12 @@
-package ti4.commands.cards;
+package ti4.commands.cardsso;
 
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.MapGenerator;
+import ti4.commands.cards.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -11,12 +14,11 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.LinkedHashMap;
-
-public class ShowSOToAll extends CardsSubcommandData {
-    public ShowSOToAll() {
-        super(Constants.SHOW_SO_TO_ALL, "Show Secret Objective to table");
+public class ShowSO extends SOCardsSubcommandData {
+    public ShowSO() {
+        super(Constants.SHOW_SO, "Show Secret Objective to player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -30,26 +32,15 @@ public class ShowSOToAll extends CardsSubcommandData {
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Secret Objective to show to All");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Secret Objective to show");
             return;
         }
 
         int soIndex = option.getAsInt();
         String soID = null;
-        boolean scored = false;
         for (java.util.Map.Entry<String, Integer> so : player.getSecrets().entrySet()) {
             if (so.getValue().equals(soIndex)) {
                 soID = so.getKey();
-                break;
-            }
-        }
-        if (soID == null){
-            for (java.util.Map.Entry<String, Integer> so : player.getSecretsScored().entrySet()) {
-                if (so.getValue().equals(soIndex)) {
-                    soID = so.getKey();
-                    scored = true;
-                    break;
-                }
             }
         }
 
@@ -61,16 +52,24 @@ public class ShowSOToAll extends CardsSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(activeMap.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
-        if (scored){
-            sb.append("Showed Scored Secret Objectives:").append("\n");
-        }else {
-            sb.append("Showed Secret Objectives:").append("\n");
-        }
+        sb.append("Showed Secret Objectives:").append("\n");
         sb.append(Mapper.getSecretObjective(soID)).append("\n");
-        if (!scored) {
-            player.setSecret(soID);
+        player.setSecret(soID);
+
+        Player player_ = Helper.getPlayer(activeMap, null, event);
+        if (player_ == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
+            return;
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        User user = MapGenerator.jda.getUserById(player_.getUserID());
+        if (user == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
+            return;
+        }
+
+        MessageHelper.sentToMessageToUser(event, sb.toString(), user);
         CardsInfo.sentUserCardInfo(event, activeMap, player);
+
+
     }
 }
