@@ -1,7 +1,6 @@
 package ti4.commands.admin;
 
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Activity;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;

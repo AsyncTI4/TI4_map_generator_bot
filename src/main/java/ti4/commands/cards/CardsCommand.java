@@ -133,7 +133,7 @@ public class CardsCommand implements Command {
         subcommands.add(new PlayAC());
         subcommands.add(new ShuffleACDeck());
         subcommands.add(new ShowAllAC());
-        subcommands.add(new ShowACRemainingCardCount());
+//        subcommands.add(new ShowACRemainingCardCount());
         subcommands.add(new PickACFromDiscard());
         subcommands.add(new ShowDiscardActionCards());
         subcommands.add(new ShuffleACBackIntoDeck());
