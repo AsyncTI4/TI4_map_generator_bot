@@ -170,6 +170,7 @@ Cards commands
 /cards ac_send acUniqueID player <- Sends selected AC from your hand to player hand
 /cards ac_send_random player <- Sends random AC from your hand to player hand
 /cards ac_discard_random <- Discards random AC from hand
+/cards ac_show_remaining_card_count <- shows how many AC are left in deck
 
 /pn show pnID player <- shows given PN to player and changes pnID
 /pn show_all player <- shows all PNs to player and changes pnIDs
