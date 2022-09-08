@@ -119,6 +119,11 @@ public class Constants {
     public static final String REMOVE_CC_FROM_FS = "mahact_cc_from_fs";
     public static final String SPECIAL = "special";
 
+    public static final String MILTY = "milty";
+    public static final String START = "start";
+    public static final String SLICE_COUNT = "slice_count";
+
+
     public static final String CUSTOM = "custom";
     public static final String SO_REMOVE_FROM_GAME = "so_remove_from_game";
     public static final String AGENDA_REMOVE_FROM_GAME = "agenda_remove_from_game";

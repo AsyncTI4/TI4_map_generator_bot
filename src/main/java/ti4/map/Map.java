@@ -1,6 +1,7 @@
 package ti4.map;
 
 
+import ti4.commands.milty.MiltyDraftManager;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -16,6 +17,8 @@ public class Map {
     private String ownerID;
     private String ownerName = "";
     private String name;
+
+    private MiltyDraftManager miltyDraftManager;
 
     private HashMap<String, UnitHolder> planets = new HashMap<>();
 
@@ -62,6 +65,7 @@ public class Map {
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
         lastModifiedDate = new Date().getTime();
+        miltyDraftManager = new MiltyDraftManager();
 
         HashMap<String, String> secretObjectives = Mapper.getSecretObjectives();
         this.secretObjectives = new ArrayList<>(secretObjectives.keySet());
@@ -94,6 +98,10 @@ public class Map {
         for (int i = 0; i < 8; i++) {
             scTradeGoods.put(i + 1, 0);
         }
+    }
+
+    public MiltyDraftManager getMiltyDraftManager() {
+        return miltyDraftManager;
     }
 
     public void setPurgedPN(String purgedPN) {
