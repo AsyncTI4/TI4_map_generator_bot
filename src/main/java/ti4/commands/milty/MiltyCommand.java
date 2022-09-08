@@ -31,6 +31,9 @@ public class MiltyCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
+        if (true){
+            return true;
+        }
         if (event.getName().equals(getActionID())) {
             String userID = event.getUser().getId();
             MapManager mapManager = MapManager.getInstance();
