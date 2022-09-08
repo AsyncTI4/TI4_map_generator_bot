@@ -40,11 +40,10 @@ public class StartMilty extends MiltySubcommandData {
         Map activeMap = getActiveMap();
 
         OptionMapping sliceOption = event.getOption(Constants.SLICE_COUNT);
-        if (sliceOption == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Slice Count");
-            return;
+        int sliceCount = activeMap.getPlayerCountForMap() + 2;
+        if (sliceOption != null) {
+             sliceCount = sliceOption.getAsInt();
         }
-        int sliceCount = sliceOption.getAsInt();
 
         HashMap<String, String> miltyDraftTiles = Mapper.getMiltyDraftTiles();
         MiltyDraftManager draftManager = activeMap.getMiltyDraftManager();
