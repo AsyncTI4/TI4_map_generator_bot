@@ -14,7 +14,7 @@ public class ExhaustRelic extends GenericRelicAction {
     public ExhaustRelic() {
         super(Constants.RELIC_EXHAUST, "Exhaust a relic", true);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
 	public ExhaustRelic(String relicRefresh, String refresh_a_relic) {

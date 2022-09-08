@@ -20,6 +20,7 @@ import ti4.commands.game.GameCommand;
 import ti4.commands.help.*;
 import ti4.commands.leaders.LeaderCommand;
 import ti4.commands.map.*;
+import ti4.commands.milty.MiltyCommand;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.special.SpecialCommand;
 import ti4.commands.status.StatusCommand;
@@ -101,6 +102,7 @@ public class MapGenerator {
         commandManager.addCommand(new SpecialCommand());
         commandManager.addCommand(new LeaderCommand());
         commandManager.addCommand(new CustomCommand());
+        commandManager.addCommand(new MiltyCommand());
 
         Guild guild = jda.getGuildById(args[2]);
 

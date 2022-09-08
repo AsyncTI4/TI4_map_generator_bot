@@ -43,6 +43,7 @@ public class Mapper {
     private static final Properties attachmentInfo = new Properties();
     private static final Properties leaders = new Properties();
     private static final Properties playerSetup = new Properties();
+    private static final Properties miltyDraft = new Properties();
     private static final HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = new HashMap<>();
 
     public static void init() {
@@ -69,6 +70,7 @@ public class Mapper {
         readData("planets_representation.properties", planet_representation, "Could not read planet representation file");
         readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
         readData("faction_setup.properties", playerSetup, "Could not read player setup file");
+        readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
     }
 
     private static void readData(String propertyFileName, Properties colors, String s) {
@@ -295,6 +297,14 @@ public class Mapper {
             planets.put((String) entry.getKey(), (String) entry.getValue());
         }
         return planets;
+    }
+
+    public static HashMap<String, String> getMiltyDraftTiles() {
+        HashMap<String, String> tiles = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : miltyDraft.entrySet()) {
+            tiles.put((String) entry.getKey(), (String) entry.getValue());
+        }
+        return tiles;
     }
 
     public static HashMap<String, String> getUnitRepresentations() {
