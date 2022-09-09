@@ -327,15 +327,17 @@ public class StartMilty extends MiltySubcommandData {
                 if (unitHolder instanceof Planet planet) {
                     int influence = planet.getInfluence();
                     int resources = planet.getResources();
+                    draftTile.setResources(resources);
+                    draftTile.setInfluence(influence);
                     if (resources > influence) {
-                        draftTile.setResources(resources);
+                        draftTile.setMilty_resources(resources);
                     }
                     if (influence > resources) {
-                        draftTile.setInfluence(influence);
+                        draftTile.setMilty_influence(influence);
                     }
                     if (resources == influence) {
-                        draftTile.setResources(resources / 2);
-                        draftTile.setInfluence(influence / 2);
+                        draftTile.setMilty_resources((double)resources / 2);
+                        draftTile.setMilty_influence((double)influence / 2);
                     }
                 }
             }
