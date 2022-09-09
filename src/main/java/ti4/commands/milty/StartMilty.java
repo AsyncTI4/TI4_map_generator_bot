@@ -208,10 +208,15 @@ public class StartMilty extends MiltySubcommandData {
                 miltyDraftSlice.setEquadistant(tiles.remove(0));
                 miltyDraftSlice.setFarFront(tiles.remove(0));
 
+                //CHECK IF SLICES ARE OK HERE -------------------------------
+
+
+
+
                 draftManager.addSlice(miltyDraftSlice);
             }
 
-            //CHECK IF SLICES ARE OK HERE -------------------------------
+
             if (draftManager.getSlices().size() == sliceCount) {
                 slicesCreated = true;
             }
