@@ -65,8 +65,10 @@ public class StartMilty extends MiltySubcommandData {
     private File generateImage(MiltyDraftManager draftManager) {
         List<MiltyDraftSlice> slices = draftManager.getSlices();
         int sliceCount = slices.size();
-        int width = 450 * 5;
-        int height = 450 * (sliceCount > 5 ? sliceCount > 10 ? 3 : 2 : 1);
+        float scale = 1.0f;
+        int scaled = (int)(900 * scale);
+        int width = scaled * 5;
+        int height = scaled * (sliceCount > 5 ? sliceCount > 10 ? 3 : 2 : 1);
         BufferedImage mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
         Graphics graphicsMain = mainImage.getGraphics();
         BufferedImage sliceImage = new BufferedImage(900, 900, BufferedImage.TYPE_INT_ARGB);
@@ -111,7 +113,8 @@ public class StartMilty extends MiltySubcommandData {
                     graphics.drawImage(image, hs.x, hs.y, null);
                 }
 
-                BufferedImage resizedSlice = GenerateMap.resizeImage(sliceImage, 0.5f);
+
+                BufferedImage resizedSlice = GenerateMap.resizeImage(sliceImage, scale);
 
 
                 graphicsMain.drawImage(resizedSlice, deltaX, deltaY, null);
