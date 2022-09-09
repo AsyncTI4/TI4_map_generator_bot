@@ -258,6 +258,6 @@ Its workaround for that single explore
 /help list_units <- lists all possible units
 
 /milty start sliceCount factionCount anomalies_can_touch < initializes milty draft
-sliceCount - slice count to generate
-factionCount - faction count to randomize
+sliceCount - slice count to generate (default is player count + 2, max 9)
+factionCount - faction count to randomize (default is player count + 2, max 25)
 anomalies_can_touch - if set to true, red boarder tiles can touch in slice
