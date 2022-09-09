@@ -33,32 +33,32 @@ public class MiltyDraftTile {
         return resources;
     }
 
-    public void setResources(int resources) {
-        this.resources = resources;
+    public void addResources(int resources) {
+        this.resources += resources;
     }
 
     public int getInfluence() {
         return influence;
     }
 
-    public void setInfluence(int influence) {
-        this.influence = influence;
+    public void addInfluence(int influence) {
+        this.influence += influence;
     }
 
     public double getMilty_resources() {
         return milty_resources;
     }
 
-    public void setMilty_resources(double milty_resources) {
-        this.milty_resources = milty_resources;
+    public void addMilty_resources(double milty_resources) {
+        this.milty_resources += milty_resources;
     }
 
     public double getMilty_influence() {
         return milty_influence;
     }
 
-    public void setMilty_influence(double milty_influence) {
-        this.milty_influence = milty_influence;
+    public void addMilty_influence(double milty_influence) {
+        this.milty_influence += milty_influence;
     }
 
     public boolean isHasAlphaWH() {

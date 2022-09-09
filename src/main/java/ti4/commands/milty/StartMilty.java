@@ -325,19 +325,19 @@ public class StartMilty extends MiltySubcommandData {
             HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {
                 if (unitHolder instanceof Planet planet) {
-                    int influence = planet.getInfluence();
                     int resources = planet.getResources();
-                    draftTile.setResources(resources);
-                    draftTile.setInfluence(influence);
+                    int influence = planet.getInfluence();
+                    draftTile.addResources(resources);
+                    draftTile.addInfluence(influence);
                     if (resources > influence) {
-                        draftTile.setMilty_resources(resources);
+                        draftTile.addMilty_resources(resources);
                     }
                     if (influence > resources) {
-                        draftTile.setMilty_influence(influence);
+                        draftTile.addMilty_influence(influence);
                     }
                     if (resources == influence) {
-                        draftTile.setMilty_resources((double)resources / 2);
-                        draftTile.setMilty_influence((double)influence / 2);
+                        draftTile.addMilty_resources((double)resources / 2);
+                        draftTile.addMilty_influence((double)influence / 2);
                     }
                 }
             }
