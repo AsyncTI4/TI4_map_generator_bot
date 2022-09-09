@@ -4,6 +4,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.ResourceHelper;
+import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -32,7 +34,7 @@ public class StartMilty extends MiltySubcommandData {
 
     public StartMilty() {
         super(Constants.START, "Start Milty Draft");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count").setRequired(true));
     }
 
     @Override
@@ -54,7 +56,6 @@ public class StartMilty extends MiltySubcommandData {
         if (!slicesCreated) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Did not find correct slices, check settings");
         } else {
-            List<MiltyDraftSlice> slices = draftManager.getSlices();
             File file = generateImage(draftManager);
 
             MessageHelper.sendFileToChannel(event.getChannel(), file);
@@ -62,11 +63,14 @@ public class StartMilty extends MiltySubcommandData {
     }
 
     private File generateImage(MiltyDraftManager draftManager) {
-        int width = 1000;
-        int height = 900;
-        BufferedImage mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics graphics = mainImage.getGraphics();
         List<MiltyDraftSlice> slices = draftManager.getSlices();
+        int sliceCount = slices.size();
+        int width = 450 * 5;
+        int height = 450 * (sliceCount > 5 ? sliceCount > 10 ? 3 : 2 : 1);
+        BufferedImage mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics graphicsMain = mainImage.getGraphics();
+        BufferedImage sliceImage = new BufferedImage(900, 900, BufferedImage.TYPE_INT_ARGB);
+        Graphics graphics = sliceImage.getGraphics();
 
         Point equadistant = new Point(0, 150);
         Point left = new Point(0, 450);
@@ -76,9 +80,10 @@ public class StartMilty extends MiltySubcommandData {
         Point right = new Point(520, 450);
 
 
-        File file = Storage.getMapImageStorage("temp.png");
+        File file = Storage.getMapImageStorage("temp_slice.png");
         try {
             int index = 0;
+            int deltaX = 0;
             int deltaY = 0;
             for (MiltyDraftSlice slice : slices) {
                 MiltyDraftTile leftSlice = slice.getLeft();
@@ -100,29 +105,41 @@ public class StartMilty extends MiltySubcommandData {
                 MiltyDraftTile rightSlice = slice.getRight();
                 image = ImageIO.read(new File(rightSlice.getTile().getTilePath()));
                 graphics.drawImage(image, right.x, right.y, null);
+                String tileFile = ResourceHelper.getInstance().getTileFile("00_green.png");
+                if (tileFile != null) {
+                    image = ImageIO.read(new File(tileFile));
+                    graphics.drawImage(image, hs.x, hs.y, null);
+                }
+
+                BufferedImage resizedSlice = GenerateMap.resizeImage(sliceImage, 0.5f);
 
 
+                graphicsMain.drawImage(resizedSlice, deltaX, deltaY, null);
 
 //                graphics.setFont(Storage.getFont32());
 //                graphics.setColor(Color.WHITE);
 //                String timeStamp = getTimeStamp();
 //                graphics.drawString(map.getName() + " " + timeStamp, 0, 34);
-
-                ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
-                imageWriter.setOutput(ImageIO.createImageOutputStream(file));
-                ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
-                if (defaultWriteParam.canWriteCompressed()) {
-                    defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                    defaultWriteParam.setCompressionQuality(0.01f);
-                }
-
-                imageWriter.write(null, new IIOImage(mainImage, null, null), defaultWriteParam);
                 index++;
+
+                int heightSlice = resizedSlice.getHeight();
+                int widthSlice = resizedSlice.getWidth();
+
+                deltaX += widthSlice;
                 if (index % 5 == 0) {
-                    deltaY += 450;
+                    deltaY += heightSlice;
+                    deltaX = 0;
                 }
-                break;
             }
+            ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
+            imageWriter.setOutput(ImageIO.createImageOutputStream(file));
+            ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
+            if (defaultWriteParam.canWriteCompressed()) {
+                defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+                defaultWriteParam.setCompressionQuality(0.01f);
+            }
+
+            imageWriter.write(null, new IIOImage(mainImage, null, null), defaultWriteParam);
         } catch (IOException e) {
             BotLogger.log("Could not save generated slice image");
         }

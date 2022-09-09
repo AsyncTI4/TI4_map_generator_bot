@@ -1464,7 +1464,7 @@ public class GenerateMap {
         }
     }
 
-    private BufferedImage resizeImage(BufferedImage originalImage, float percent) throws IOException {
+    public static BufferedImage resizeImage(BufferedImage originalImage, float percent) throws IOException {
         int scaledWidth = (int) (originalImage.getWidth() * percent);
         int scaledHeight = (int) (originalImage.getHeight() * percent);
         Image resultingImage = originalImage.getScaledInstance(scaledWidth, scaledHeight, Image.SCALE_DEFAULT);
