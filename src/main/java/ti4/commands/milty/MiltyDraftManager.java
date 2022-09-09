@@ -54,4 +54,12 @@ public class MiltyDraftManager {
     public void clearSlices(){
         slices.clear();
     }
+
+    public void clear() {
+        clearSlices();
+        high.clear();
+        mid.clear();
+        low.clear();
+        red.clear();
+    }
 }

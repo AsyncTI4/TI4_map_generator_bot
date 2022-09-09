@@ -8,8 +8,10 @@ import ti4.ResourceHelper;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.map.*;
+import ti4.map.Map;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -23,18 +25,21 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
 
 public class StartMilty extends MiltySubcommandData {
 
     public static final int SLICE_GENERATION_CYCLES = 100;
+    private static List<String> sliceNames = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I");
+
+    private boolean anomalies_can_touch = false;
 
     public StartMilty() {
         super(Constants.START, "Start Milty Draft");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SLICE_COUNT, "Slice Count").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.FACTION_COUNT, "Faction Count").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ANOMALIES_CAN_TOUCH, "Anomalies can touch"));
     }
 
     @Override
@@ -44,11 +49,31 @@ public class StartMilty extends MiltySubcommandData {
         OptionMapping sliceOption = event.getOption(Constants.SLICE_COUNT);
         int sliceCount = activeMap.getPlayerCountForMap() + 2;
         if (sliceOption != null) {
-             sliceCount = sliceOption.getAsInt();
+            sliceCount = sliceOption.getAsInt();
+        }
+        if (sliceCount > 9) {
+            sliceCount = 9;
+        }
+        int factionCount = activeMap.getPlayerCountForMap() + 2;
+        OptionMapping factionOption = event.getOption(Constants.FACTION_COUNT);
+        if (factionOption != null) {
+            factionCount = factionOption.getAsInt();
+        }
+        if (factionCount > 25) {
+            factionCount = 25;
+        }
+
+        List<String> factions = new ArrayList<>(Mapper.getFactions());
+        List<String> factionDraft = createFactionDraft(factionCount, factions);
+
+        OptionMapping anomaliesCanTouchOption = event.getOption(Constants.ANOMALIES_CAN_TOUCH);
+        if (anomaliesCanTouchOption != null) {
+            anomalies_can_touch = anomaliesCanTouchOption.getAsBoolean();
         }
 
         HashMap<String, String> miltyDraftTiles = Mapper.getMiltyDraftTiles();
         MiltyDraftManager draftManager = activeMap.getMiltyDraftManager();
+        draftManager.clear();
         initDraftTiles(miltyDraftTiles, draftManager);
 
 
@@ -59,14 +84,33 @@ public class StartMilty extends MiltySubcommandData {
             File file = generateImage(draftManager);
 
             MessageHelper.sendFileToChannel(event.getChannel(), file);
+
+            StringBuilder factionMsg = new StringBuilder();
+            for (String faction : factionDraft) {
+                factionMsg.append(Helper.getFactionIconFromDiscord(faction)).append(" ");
+            }
+
+            MessageHelper.sendMessageToChannel(event.getChannel(), factionMsg.toString());
         }
+    }
+
+    private List<String> createFactionDraft(int factionCount, List<String> factions) {
+        factions.remove("lazax");
+        Collections.shuffle(factions);
+        Collections.shuffle(factions);
+        Collections.shuffle(factions);
+        List<String> factionDraft = new ArrayList<>();
+        for (int i = 0; i < factionCount; i++) {
+            factionDraft.add(factions.get(i));
+        }
+        return factionDraft;
     }
 
     private File generateImage(MiltyDraftManager draftManager) {
         List<MiltyDraftSlice> slices = draftManager.getSlices();
         int sliceCount = slices.size();
         float scale = 1.0f;
-        int scaled = (int)(900 * scale);
+        int scaled = (int) (900 * scale);
         int width = scaled * 5;
         int height = scaled * (sliceCount > 5 ? sliceCount > 10 ? 3 : 2 : 1);
         BufferedImage mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
@@ -112,6 +156,20 @@ public class StartMilty extends MiltySubcommandData {
                     image = ImageIO.read(new File(tileFile));
                     graphics.drawImage(image, hs.x, hs.y, null);
                 }
+
+                graphics.setColor(Color.WHITE);
+                graphics.setFont(Storage.getFont64());
+                graphics.drawString(slice.getName(), hs.x + 150 , hs.y + 60);
+
+                graphics.setFont(Storage.getFont50());
+                int resources = leftSlice.getResources() + rightSlice.getResources() + equadistantSlice.getResources() + farFrontSlice.getResources() + frontSlice.getResources();
+                int influence = leftSlice.getInfluence() + rightSlice.getInfluence() + equadistantSlice.getInfluence() + farFrontSlice.getInfluence() + frontSlice.getInfluence();
+                double resourcesMilty = leftSlice.getMilty_resources() + rightSlice.getMilty_resources() + equadistantSlice.getMilty_resources() + farFrontSlice.getMilty_resources() + frontSlice.getMilty_resources();
+                double influenceMilty = leftSlice.getMilty_influence() + rightSlice.getMilty_influence() + equadistantSlice.getMilty_influence() + farFrontSlice.getMilty_influence() + frontSlice.getMilty_influence();
+
+                graphics.drawString(resources + "/" +influence, hs.x + 130 , hs.y + 130);
+                graphics.drawString("("+resourcesMilty + "/" +influenceMilty+")", hs.x + 70 , hs.y + 190);
+
 
 
                 BufferedImage resizedSlice = GenerateMap.resizeImage(sliceImage, scale);
@@ -197,11 +255,31 @@ public class StartMilty extends MiltySubcommandData {
                 tiles.add(high.remove(0));
                 tiles.add(mid.remove(0));
                 tiles.add(low.remove(0));
-                tiles.add(red.remove(0));
-                tiles.add(red.remove(0));
+                MiltyDraftTile red1 = red.remove(0);
+                MiltyDraftTile red2 = red.remove(0);
+                tiles.add(red1);
+                tiles.add(red2);
+                boolean needToCheckAnomalies = red1.getTierList() == TierList.anomaly && red2.getTierList() == TierList.anomaly;
                 Collections.shuffle(tiles);
                 Collections.shuffle(tiles);
                 Collections.shuffle(tiles);
+                if (!anomalies_can_touch && needToCheckAnomalies) {
+                    int emergencyIndex = 0;
+                    while (emergencyIndex < 100) {
+
+                        MiltyDraftTile draftLeft = tiles.get(0);
+                        MiltyDraftTile draftFront = tiles.get(1);
+                        MiltyDraftTile draftRight = tiles.get(2);
+                        MiltyDraftTile draftEquadistant = tiles.get(3);
+                        MiltyDraftTile draftFarFront = tiles.get(4);
+                        if (draftLeft.getTierList() == TierList.anomaly && (draftFarFront.getTierList() == TierList.anomaly || draftRight.getTierList() == TierList.anomaly) ||
+                                draftRight.getTierList() == TierList.anomaly && (draftFarFront.getTierList() == TierList.anomaly || draftEquadistant.getTierList() == TierList.anomaly)) {
+                            break;
+                        }
+                        Collections.shuffle(tiles);
+                        emergencyIndex++;
+                    }
+                }
                 miltyDraftSlice.setLeft(tiles.remove(0));
                 miltyDraftSlice.setFront(tiles.remove(0));
                 miltyDraftSlice.setRight(tiles.remove(0));
@@ -209,10 +287,7 @@ public class StartMilty extends MiltySubcommandData {
                 miltyDraftSlice.setFarFront(tiles.remove(0));
 
                 //CHECK IF SLICES ARE OK HERE -------------------------------
-
-
-
-
+                miltyDraftSlice.setName(sliceNames.get(j));
                 draftManager.addSlice(miltyDraftSlice);
             }
 

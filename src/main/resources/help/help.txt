@@ -256,3 +256,8 @@ Its workaround for that single explore
 /help list_games <- lists all available maps that are created
 /help list_planets <- lists all available planets
 /help list_units <- lists all possible units
+
+/milty start sliceCount factionCount anomalies_can_touch < initializes milty draft
+sliceCount - slice count to generate
+factionCount - faction count to randomize
+anomalies_can_touch - if set to true, red boarder tiles can touch in slice

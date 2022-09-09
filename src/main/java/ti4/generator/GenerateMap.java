@@ -254,13 +254,7 @@ public class GenerateMap {
                 if (faction != null) {
                     String factionPath = getFactionPath(faction);
                     if (factionPath != null) {
-                        BufferedImage bufferedImage;
-//                        if ("keleres".equals(faction)) {
-//                            bufferedImage = resizeImage(ImageIO.read(new File(factionPath)), 0.7f);
-//                        } else {
-//                            bufferedImage = resizeImage(ImageIO.read(new File(factionPath)), percent);
-//                        }
-                        bufferedImage = ImageIO.read(new File(factionPath));
+                        BufferedImage bufferedImage = ImageIO.read(new File(factionPath));
                         graphics.drawImage(bufferedImage, x, y, null);
                     }
                 }
