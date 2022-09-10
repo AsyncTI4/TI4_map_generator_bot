@@ -81,6 +81,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         String card = Mapper.getExplore(cardID);
         String[] cardInfo = card.split(";");
         Player player = activeMap.getPlayer(getUser().getId());
+        player = Helper.getPlayer(activeMap, player, event);
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
