@@ -1456,6 +1456,8 @@ public class GenerateMap {
 
         } catch (IOException e) {
             BotLogger.log("Error drawing tile: " + tile.getTileID());
+        } catch (Exception exception){
+            BotLogger.log("Tile Error, when building map: " + tile.getTileID());
         }
     }
 
