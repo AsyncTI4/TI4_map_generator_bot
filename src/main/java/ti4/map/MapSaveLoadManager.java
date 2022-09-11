@@ -940,9 +940,9 @@ public class MapSaveLoadManager {
         StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
         String tileID = tokenizer.nextToken();
         String position = tokenizer.nextToken();
-//        if (position.equals("mr")){
-//            position = "0a";
-//        }
+        if (position.equals("mr")){
+            position = "0a";
+        }
         return new Tile(tileID, position);
     }
 
