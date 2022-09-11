@@ -111,12 +111,12 @@ public class MapGenerator {
         commands.queue();
 
        //TI Community game
-//       if (args.length == 4) {
-//	       Guild guild2 = jda.getGuildById(args[3]);
-//	       CommandListUpdateAction commandsC = guild2.updateCommands();
-//	       commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
-//	       commandsC.queue();
-//       }
+       if (args.length == 4) {
+	       Guild guild2 = jda.getGuildById(args[3]);
+	       CommandListUpdateAction commandsC = guild2.updateCommands();
+	       commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
+	       commandsC.queue();
+       }
         //------------------------------------------------
 
 //        CommandListUpdateAction commands_ = jda.updateCommands();

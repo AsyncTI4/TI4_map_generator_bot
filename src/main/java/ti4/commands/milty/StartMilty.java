@@ -311,11 +311,13 @@ public class StartMilty extends MiltySubcommandData {
             draftTile.setTierList(TierList.valueOf(tierList));
 
             if (values.length > 1) {
-                String wormhole = values[1];
-                if ("alpha".equals(wormhole)) {
+                String additionalInfo = values[1];
+                if ("alpha".equals(additionalInfo)) {
                     draftTile.setHasAlphaWH(true);
-                } else if ("beta".equals(wormhole)) {
+                } else if ("beta".equals(additionalInfo)) {
                     draftTile.setHasBetaWH(true);
+                } else if ("legendary".equals(additionalInfo)){
+                    draftTile.setLegendary(true);
                 }
             }
 
