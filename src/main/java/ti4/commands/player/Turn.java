@@ -27,6 +27,7 @@ public class Turn extends PlayerSubcommandData {
         Player mainPlayer = map.getPlayer(getUser().getId());
 
         mainPlayer = Helper.getPlayer(map, mainPlayer, event);
+        mainPlayer = Helper.getGamePlayer(map, mainPlayer, event, null);
         if (mainPlayer == null){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player/Faction/Color could not be found in map:" + map.getName());
             return;
