@@ -938,7 +938,12 @@ public class MapSaveLoadManager {
 
     private static Tile readTile(String tileData) {
         StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
-        return new Tile(tokenizer.nextToken(), tokenizer.nextToken());
+        String tileID = tokenizer.nextToken();
+        String position = tokenizer.nextToken();
+        if (position.equals("mr")){
+            position = "0a";
+        }
+        return new Tile(tileID, position);
     }
 
     private static void readUnit(Tile tile, String data, String spaceHolder) {
