@@ -82,6 +82,7 @@ public class Helper {
         } else {
             String userID = event.getUser().getId();
             Player foundPlayer = activeMap.getPlayers().values().stream().filter(player -> player.getUserID().equals(userID)).findFirst().orElse(null);
+            foundPlayer = Helper.getGamePlayer(activeMap, foundPlayer, event, null);
             if (foundPlayer != null) {
                 return foundPlayer.getColor();
             }
