@@ -27,8 +27,8 @@ public class SCPlay extends PlayerSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getPlayer(activeMap, player, event);
         player = Helper.getGamePlayer(activeMap, player, event, null);
+        player = Helper.getPlayer(activeMap, player, event);
         MessageChannel channel = event.getChannel();
         if (player == null) {
             MessageHelper.sendMessageToChannel(channel, "Your not a player of this game");
