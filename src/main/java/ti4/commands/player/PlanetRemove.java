@@ -15,6 +15,10 @@ public class PlanetRemove extends PlanetAddRemove {
     public void doAction(Player player, String planet, Map map) {
         player.removePlanet(planet);
         UnitHolder unitHolder = map.getPlanetsInfo().get(planet);
+        removePlayerControlToken(player, unitHolder);
+    }
+
+    public static void removePlayerControlToken(Player player, UnitHolder unitHolder) {
         String color = player.getColor();
         if (unitHolder != null && color != null && !"white".equals(color)) {
             String ccID = Mapper.getControlID(color);
