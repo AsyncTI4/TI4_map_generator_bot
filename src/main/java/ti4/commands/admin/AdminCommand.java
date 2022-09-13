@@ -88,6 +88,7 @@ public class AdminCommand implements Command {
         subcommands.add(new Testing());
         subcommands.add(new ReloadMap());
         subcommands.add(new CardsInfoForPlayer());
+        subcommands.add(new DrawSpecificSOForPlayer());
         return subcommands;
     }
 

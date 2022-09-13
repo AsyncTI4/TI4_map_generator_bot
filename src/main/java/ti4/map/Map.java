@@ -734,6 +734,21 @@ public class Map {
         return null;
     }
 
+    @CheckForNull
+    public LinkedHashMap<String, Integer> drawSpecificSecretObjective(String soID, String userID) {
+        if (!secretObjectives.isEmpty()) {
+            boolean remove = secretObjectives.remove(soID);
+            if (remove) {
+                Player player = getPlayer(userID);
+                if (player != null) {
+                    player.setSecret(soID);
+                    return player.getSecrets();
+                }
+            }
+        }
+        return null;
+    }
+
     private void setDiscardActionCard(String id) {
         Collection<Integer> values = discardActionCards.values();
         int identifier = new Random().nextInt(1000);
