@@ -16,7 +16,7 @@ public class DrawSpecificRelic extends GenericRelicAction {
     public DrawSpecificRelic() {
         super(Constants.RELIC_DRAW_SPECIFIC, "Draw a specific relic", true);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to exhaust").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do edit\"").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do edit").setRequired(false));
     }
 
     @Override
