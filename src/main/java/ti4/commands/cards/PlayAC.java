@@ -1,9 +1,15 @@
 package ti4.commands.cards;
 
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.ButtonListener;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -48,15 +54,29 @@ public class PlayAC extends CardsSubcommandData {
 
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeMap.getName()).append(" ");
+        sb.append(Helper.getGamePing(event, activeMap)).append(" ").append(activeMap.getName()).append(" ");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Played: ");
         sb.append(Mapper.getActionCard(acID)).append("\n");
 
-        MessageHelper.sendMessageToChannel(event, sb.toString());
-        String text = Helper.getGamePing(event, activeMap) + " Please react to the following image <:nosabo:962783456541171712> with your faction symbol to note no sabotage";
-        MessageHelper.sendMessageToChannel(event, text);
-        MessageHelper.sendMessageToChannel(event, "<:nosabo:962783456541171712>");
+
+        Emoji emoji = Emoji.fromMarkdown("\uD83D\uDEAB");
+        Emoji sabotage = Emoji.fromMarkdown(":sabotage:");
+        Emoji noSabo = Emoji.fromMarkdown(":nosabo:");
+
+
+        if (System.getenv("TESTING").equals("true")){
+            sabotage = emoji;
+            noSabo = emoji;
+        }
+
+        Button sabotageButton = Button.danger("sabotage", "Sabotage").withEmoji(sabotage);
+        Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(noSabo);
+
+        MessageHelper.sendMessageToChannelWithButtons(event, sb.toString(), sabotageButton, noSabotageButton);
+//        String text = Helper.getGamePing(event, activeMap) + " Please react to the following image <:nosabo:962783456541171712> with your faction symbol to note no sabotage";
+//        MessageHelper.sendMessageToChannel(event, text);
+//        MessageHelper.sendMessageToChannel(event, "<:nosabo:962783456541171712>");
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
 }
