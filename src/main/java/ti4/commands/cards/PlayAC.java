@@ -73,18 +73,24 @@ public class PlayAC extends CardsSubcommandData {
             }
         }
 
-        if (System.getenv("TESTING").equals("true")){
-            sabotage = emoji;
-            noSabo = emoji;
-        }
+//        if (System.getenv("TESTING").equals("true")){
+//            sabotage = emoji;
+//            noSabo = emoji;
+//        }
 
         Button sabotageButton = Button.danger("sabotage", "Sabotage").withEmoji(sabotage);
         Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(noSabo);
 
-        MessageHelper.sendMessageToChannelWithButtons(event, sb.toString(), sabotageButton, noSabotageButton);
-//        String text = Helper.getGamePing(event, activeMap) + " Please react to the following image <:nosabo:962783456541171712> with your faction symbol to note no sabotage";
-//        MessageHelper.sendMessageToChannel(event, text);
-//        MessageHelper.sendMessageToChannel(event, "<:nosabo:962783456541171712>");
+//        MessageHelper.sendMessageToChannelWithButtons(event, sb.toString(), sabotageButton, noSabotageButton);
+////        String text = Helper.getGamePing(event, activeMap) + " Please react to the following image <:nosabo:962783456541171712> with your faction symbol to note no sabotage";
+////        MessageHelper.sendMessageToChannel(event, text);
+////        MessageHelper.sendMessageToChannel(event, "<:nosabo:962783456541171712>");
+//        CardsInfo.sentUserCardInfo(event, activeMap, player);
+
+        MessageHelper.sendMessageToChannel(event, sb.toString());
+        String text = Helper.getGamePing(event, activeMap) + " Please react to the following image <:nosabo:962783456541171712> with your faction symbol to note no sabotage";
+        MessageHelper.sendMessageToChannel(event, text);
+        MessageHelper.sendMessageToChannel(event, "<:nosabo:962783456541171712>");
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
 }
