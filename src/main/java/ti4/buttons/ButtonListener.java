@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import org.jetbrains.annotations.NotNull;
+import ti4.MessageListener;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -22,6 +23,8 @@ public class ButtonListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         event.deferEdit().queue();
+        MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), "button");
+
         String buttonID = event.getButton().getId();
         if (buttonID == null){
             return;
