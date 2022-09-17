@@ -1,7 +1,6 @@
 package ti4.buttons;
 
 import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -42,7 +41,7 @@ public class ButtonListener extends ListenerAdapter {
             }
         }
         if (emoteToUse == null) {
-            event.reply("Could not find faction symbol for reaction").queue();
+            event.reply("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
             return;
         }
         event.getChannel().addReactionById(event.getInteraction().getMessage().getId(), emoteToUse).queue();
