@@ -1,8 +1,12 @@
 package ti4.message;
 
+import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.buttons.ButtonListener;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -12,6 +16,10 @@ public class MessageHelper {
 
     public static void sendMessageToChannel(SlashCommandInteractionEvent event, String messageText, String... reaction) {
         splitAndSent(messageText, event.getChannel(), event, reaction);
+    }
+
+    public static void sendMessageToChannelWithButtons(SlashCommandInteractionEvent event, String messageText, Button... buttons) {
+        splitAndSent(messageText, event.getChannel(), event, buttons);
     }
 
     public static void sendMessageToChannel(MessageChannel channel, String messageText) {
@@ -64,7 +72,7 @@ public class MessageHelper {
                 channel.sendMessage(text).queue();
             }
         } else {
-            if (event == null || reaction.length == 0) {
+            if (event == null || reaction == null || reaction.length == 0) {
                 channel.sendMessage(messageText).queue();
             } else {
                 Guild guild = event.getGuild();
@@ -77,6 +85,34 @@ public class MessageHelper {
                         }
                         complete.addReaction(emoteById).queue();
                     }
+                    return;
+                }
+                channel.sendMessage(messageText).queue();
+            }
+        }
+    }
+
+    private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, Button... buttons) {
+        if (messageText.length() > 1500) {
+            List<String> texts = new ArrayList<>();
+            int index = 0;
+            while (index < messageText.length()) {
+                texts.add(messageText.substring(index, Math.min(index + 1500, messageText.length())));
+                index += 1500;
+            }
+            for (String text : texts) {
+                channel.sendMessage(text).queue();
+            }
+        } else {
+            if (event == null || buttons == null || buttons.length == 0) {
+                channel.sendMessage(messageText).queue();
+            } else {
+                Guild guild = event.getGuild();
+                if (guild != null) {
+                    Message message = new MessageBuilder()
+                            .append(messageText)
+                            .setActionRows(ActionRow.of(buttons)).build();
+                    channel.sendMessage(message).queue();
                     return;
                 }
                 channel.sendMessage(messageText).queue();

@@ -25,13 +25,17 @@ public class Helper {
 
     @CheckForNull
     public static Player getGamePlayer(Map map, Player initialPlayer, SlashCommandInteractionEvent event, String userID) {
+        return getGamePlayer(map, initialPlayer, event.getMember(), userID);
+    }
+
+    @CheckForNull
+    public static Player getGamePlayer(Map map, Player initialPlayer, Member member, String userID) {
         Collection<Player> players = map.getPlayers().values();
         if (!map.isCommunityMode()) {
             Player player = map.getPlayer(userID);
             if (player != null) return player;
             return initialPlayer;
         }
-        Member member = event.getMember();
         if (member == null) {
             Player player = map.getPlayer(userID);
             if (player != null) return player;
@@ -189,8 +193,11 @@ public class Helper {
     }
 
     public static String getGamePing(SlashCommandInteractionEvent event, Map activeMap) {
+        return getGamePing(event.getGuild(), activeMap);
+    }
+
+    public static String getGamePing(Guild guild, Map activeMap) {
         String categoryForPlayers = "";
-        Guild guild = event.getGuild();
         if (guild != null) {
             for (Role role : guild.getRoles()) {
                 if (activeMap.getName().equals(role.getName().toLowerCase())) {
@@ -235,7 +242,7 @@ public class Helper {
         boolean ccCountIsOver = ccCount > 16;
         if (ccCountIsOver) {
             String msg = getGamePing(event, map) + " ";
-            if (player != null){
+            if (player != null) {
                 msg += getFactionIconFromDiscord(player.getFaction()) + " " + player.getFaction() + " ";
                 msg += getPlayerPing(event, player) + " ";
             }
