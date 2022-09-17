@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import org.jetbrains.annotations.NotNull;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -15,11 +16,15 @@ public class ButtonListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         String buttonID = event.getButton().getId();
-
+        if (buttonID == null){
+            return;
+        }
+        ButtonInteraction interaction = event.getInteraction();
+        interaction.deferReply().queue();
         switch (buttonID) {
             case "sabotage" -> addReactionForSabo(event, true);
             case "no_sabotage" -> addReactionForSabo(event, false);
-            default -> event.reply("Button " + buttonID + " pressed.").queue();
+            default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
         }
     }
 
@@ -29,7 +34,7 @@ public class ButtonListener extends ListenerAdapter {
         Map activeMap = MapManager.getInstance().getUserActiveMap(id);
         Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
         if (player == null) {
-            event.reply("Your not a player of the game").queue();
+            event.getHook().sendMessage("Your not a player of the game").queue();
             return;
         }
         String playerFaction = player.getFaction();
@@ -42,18 +47,18 @@ public class ButtonListener extends ListenerAdapter {
         }
         if (!sabotage) {
             if (emoteToUse == null) {
-                event.reply("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
+                event.getHook().sendMessage("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
                 return;
             }
             event.getChannel().addReactionById(event.getInteraction().getMessage().getId(), emoteToUse).queue();
         }
         if (sabotage) {
-            String text = Helper.getGamePing(event.getGuild(), activeMap);
-            text += " " + Helper.getFactionIconFromDiscord(playerFaction) + " Sabotaging Action Card Play";
-            event.reply(text).queue();
+            String text = Helper.getFactionIconFromDiscord(playerFaction) + " Sabotaging Action Card Play";
+            event.getHook().sendMessage(text).queue();
+            event.getChannel().sendMessage(Helper.getGamePing(event.getGuild(), activeMap) + ".").queue();
         } else {
             String text = Helper.getFactionIconFromDiscord(playerFaction) + " No Sabotage";
-            event.reply(text).queue();
+            event.getHook().sendMessage(text).queue();
         }
     }
 }
