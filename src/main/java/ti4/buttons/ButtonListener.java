@@ -21,6 +21,7 @@ public class ButtonListener extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+        event.deferEdit().queue();
         String buttonID = event.getButton().getId();
         if (buttonID == null){
             return;
@@ -28,7 +29,7 @@ public class ButtonListener extends ListenerAdapter {
         switch (buttonID) {
             case "sabotage" -> addReactionForSabo(event, true);
             case "no_sabotage" -> addReactionForSabo(event, false);
-            default -> event.reply("Button " + buttonID + " pressed.").queue();
+            default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
         }
     }
 
@@ -37,13 +38,13 @@ public class ButtonListener extends ListenerAdapter {
         Map activeMap = MapManager.getInstance().getUserActiveMap(id);
         Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
         if (player == null) {
-            event.reply("Your not a player of the game").queue();
+            event.getChannel().sendMessage("Your not a player of the game").queue();
             return;
         }
         String playerFaction = player.getFaction();
         Guild guild = event.getGuild();
         if (guild == null){
-            event.reply("Could not find server Emojis").queue();
+            event.getChannel().sendMessage("Could not find server Emojis").queue();
             return;
         }
         HashMap<String, Emote> emojiMap = emoteMap.get(guild);
@@ -68,11 +69,11 @@ public class ButtonListener extends ListenerAdapter {
         }
         if (sabotage) {
             String text = Helper.getFactionIconFromDiscord(playerFaction) + " Sabotaging Action Card Play";
-            event.reply(text).queue();
+            event.getChannel().sendMessage(text).queue();
             event.getChannel().sendMessage(Helper.getGamePing(event.getGuild(), activeMap) + " Sabotage played").queue();
         } else {
             String text = Helper.getFactionIconFromDiscord(playerFaction) + " No Sabotage";
-            event.reply(text).queue();
+            event.getChannel().sendMessage(text).queue();
         }
     }
 }
