@@ -40,11 +40,13 @@ public class ButtonListener extends ListenerAdapter {
                 break;
             }
         }
-        if (emoteToUse == null) {
-            event.reply("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
-            return;
+        if (!sabotage) {
+            if (emoteToUse == null) {
+                event.reply("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
+                return;
+            }
+            event.getChannel().addReactionById(event.getInteraction().getMessage().getId(), emoteToUse).queue();
         }
-        event.getChannel().addReactionById(event.getInteraction().getMessage().getId(), emoteToUse).queue();
         if (sabotage) {
             String text = Helper.getGamePing(event.getGuild(), activeMap);
             text += " " + Helper.getFactionIconFromDiscord(playerFaction) + " Sabotaging Action Card Play";
