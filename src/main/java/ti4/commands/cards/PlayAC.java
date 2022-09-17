@@ -2,6 +2,7 @@ package ti4.commands.cards;
 
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
+import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -64,6 +65,13 @@ public class PlayAC extends CardsSubcommandData {
         Emoji sabotage = Emoji.fromMarkdown(":sabotage:");
         Emoji noSabo = Emoji.fromMarkdown(":nosabo:");
 
+        for (Emote emote : event.getJDA().getEmotes()) {
+            if (emote.getName().toLowerCase().contains("sabotage")) {
+                sabotage = Emoji.fromEmote(emote);
+            } else if (emote.getName().toLowerCase().contains("nosabo")) {
+                noSabo = Emoji.fromEmote(emote);
+            }
+        }
 
         if (System.getenv("TESTING").equals("true")){
             sabotage = emoji;
