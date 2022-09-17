@@ -55,7 +55,7 @@ public class ButtonListener extends ListenerAdapter {
         if (sabotage) {
             String text = Helper.getFactionIconFromDiscord(playerFaction) + " Sabotaging Action Card Play";
             event.getHook().sendMessage(text).queue();
-            event.getChannel().sendMessage(Helper.getGamePing(event.getGuild(), activeMap) + ".").queue();
+            event.getChannel().sendMessage(Helper.getGamePing(event.getGuild(), activeMap) + " Sabotage played").queue();
         } else {
             String text = Helper.getFactionIconFromDiscord(playerFaction) + " No Sabotage";
             event.getHook().sendMessage(text).queue();
