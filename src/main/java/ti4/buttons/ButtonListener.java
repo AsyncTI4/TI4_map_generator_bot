@@ -36,7 +36,7 @@ public class ButtonListener extends ListenerAdapter {
         String playerFaction = player.getFaction();
         Emote emoteToUse = null;
         for (Emote emote : jda.getEmotes()) {
-            if (emote.getName().contains(playerFaction)) {
+            if (emote.getName().toLowerCase().contains(playerFaction.toLowerCase())) {
                 emoteToUse = emote;
                 break;
             }
