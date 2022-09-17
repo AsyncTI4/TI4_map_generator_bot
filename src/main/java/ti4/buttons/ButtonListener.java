@@ -20,11 +20,11 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
         ButtonInteraction interaction = event.getInteraction();
-        interaction.deferReply().queue();
+//        interaction.deferReply().queue();
         switch (buttonID) {
             case "sabotage" -> addReactionForSabo(event, true);
             case "no_sabotage" -> addReactionForSabo(event, false);
-            default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
+            default -> event.reply("Button " + buttonID + " pressed.").queue();
         }
     }
 
@@ -34,7 +34,7 @@ public class ButtonListener extends ListenerAdapter {
         Map activeMap = MapManager.getInstance().getUserActiveMap(id);
         Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
         if (player == null) {
-            event.getHook().sendMessage("Your not a player of the game").queue();
+            event.reply("Your not a player of the game").queue();
             return;
         }
         String playerFaction = player.getFaction();
@@ -47,18 +47,18 @@ public class ButtonListener extends ListenerAdapter {
         }
         if (!sabotage) {
             if (emoteToUse == null) {
-                event.getHook().sendMessage("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
+                event.reply("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
                 return;
             }
             event.getChannel().addReactionById(event.getInteraction().getMessage().getId(), emoteToUse).queue();
         }
         if (sabotage) {
             String text = Helper.getFactionIconFromDiscord(playerFaction) + " Sabotaging Action Card Play";
-            event.getHook().sendMessage(text).queue();
+            event.reply(text).queue();
             event.getChannel().sendMessage(Helper.getGamePing(event.getGuild(), activeMap) + " Sabotage played").queue();
         } else {
             String text = Helper.getFactionIconFromDiscord(playerFaction) + " No Sabotage";
-            event.getHook().sendMessage(text).queue();
+            event.reply(text).queue();
         }
     }
 }
