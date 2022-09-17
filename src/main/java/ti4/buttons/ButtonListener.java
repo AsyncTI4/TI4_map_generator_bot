@@ -2,6 +2,7 @@ package ti4.buttons;
 
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
@@ -11,7 +12,12 @@ import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
 
+import java.util.HashMap;
+import java.util.List;
+
 public class ButtonListener extends ListenerAdapter {
+
+    private static HashMap<Guild, HashMap<String, Emote>> emoteMap = new HashMap<>();
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
@@ -19,8 +25,6 @@ public class ButtonListener extends ListenerAdapter {
         if (buttonID == null){
             return;
         }
-        ButtonInteraction interaction = event.getInteraction();
-//        interaction.deferReply().queue();
         switch (buttonID) {
             case "sabotage" -> addReactionForSabo(event, true);
             case "no_sabotage" -> addReactionForSabo(event, false);
@@ -29,7 +33,6 @@ public class ButtonListener extends ListenerAdapter {
     }
 
     private void addReactionForSabo(@NotNull ButtonInteractionEvent event, boolean sabotage) {
-        JDA jda = event.getJDA();
         String id = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(id);
         Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
@@ -38,13 +41,24 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
         String playerFaction = player.getFaction();
-        Emote emoteToUse = null;
-        for (Emote emote : jda.getEmotes()) {
-            if (emote.getName().toLowerCase().contains(playerFaction.toLowerCase())) {
-                emoteToUse = emote;
-                break;
+        Guild guild = event.getGuild();
+        if (guild == null){
+            event.reply("Could not find server Emojis").queue();
+            return;
+        }
+        HashMap<String, Emote> emojiMap = emoteMap.get(guild);
+        List<Emote> emotes = guild.getEmotes();
+        if (emojiMap != null && emojiMap.size() != emotes.size()){
+            emojiMap.clear();
+        }
+        if (emojiMap == null || emojiMap.isEmpty()){
+            emojiMap = new HashMap<>();
+            for (Emote emote : emotes) {
+                emojiMap.put(emote.getName().toLowerCase(), emote);
             }
         }
+        Emote emoteToUse = emojiMap.get(playerFaction.toLowerCase());
+
         if (!sabotage) {
             if (emoteToUse == null) {
                 event.reply("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
