@@ -85,7 +85,7 @@ public class AdminCommand implements Command {
     private Collection<AdminSubcommandData> getSubcommands() {
         Collection<AdminSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new SaveMaps());
-        subcommands.add(new Testing());
+        subcommands.add(new ResetEmojiCache());
         subcommands.add(new ReloadMap());
         subcommands.add(new CardsInfoForPlayer());
         subcommands.add(new DrawSpecificSOForPlayer());
