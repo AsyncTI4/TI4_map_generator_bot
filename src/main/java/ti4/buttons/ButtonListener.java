@@ -52,6 +52,9 @@ public class ButtonListener extends ListenerAdapter {
                     message = Helper.getPlayerPing(event, player) + " following SC, deducted 1 CC from Strategy Tokens";
                 }
                 addReactionForSabo(event, true, message, "");
+            } case "sc_follow_leadership" -> {
+                String message = Helper.getPlayerPing(event, player) + " following SC.";
+                addReactionForSabo(event, true, message, "");
             }
             case "sc_no_follow" -> addReactionForSabo(event, false, "Not Following SC", "");
             default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
