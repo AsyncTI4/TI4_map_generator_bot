@@ -1,7 +1,6 @@
 package ti4.generator;
 
 import ti4.ResourceHelper;
-import ti4.helpers.LoggerHandler;
 import ti4.map.Map;
 import ti4.message.BotLogger;
 
@@ -11,6 +10,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Properties;
 import java.util.StringTokenizer;
 
@@ -22,6 +22,11 @@ public class PositionMapper {
     private static final Properties planetPositions = new Properties();
     private static final Properties spaceTokenPositions = new Properties();
     private static final Properties planetTokenPositions = new Properties();
+
+    private static final Properties tileType = new Properties();
+    private static final HashMap<String, String> tileTypeList = new HashMap<>();
+    private static final Properties shipPosition = new Properties();
+
     private static final Properties playerInfo = new Properties();
     private static final Properties playerInfo8 = new Properties();
 
@@ -29,6 +34,8 @@ public class PositionMapper {
         readData("6player.properties", positionTileMap6Player, "Could not read position file");
         readData("8player.properties", positionTileMap8Player, "Could not read position file");
         readData("planet.properties", planetPositions, "Could not read planet position file");
+        readData("ship_position_tilesbytype.properties", tileType, "Could not read tile type file");
+        readData("ship_position.properties", shipPosition, "Could not read ship position file");
         readData("space_token.properties", spaceTokenPositions, "Could not read space token position file");
         readData("planet_token.properties", planetTokenPositions, "Could not read planet token position file");
         readData("6player_info.properties", playerInfo, "Could not read player info position file");
@@ -135,12 +142,12 @@ public class PositionMapper {
     }
 
 
-    public static PlanetTokenPosition getPlanetTokenPosition(String planetName) {
+    public static UnitTokenPosition getPlanetTokenPosition(String planetName) {
         Object value = planetTokenPositions.get(planetName);
         if (value == null) {
             return null;
         }
-        PlanetTokenPosition planetTokenPosition = new PlanetTokenPosition(planetName);
+        UnitTokenPosition unitTokenPosition = new UnitTokenPosition(planetName);
         String valuePosition = (String) value;
         StringTokenizer tokenizer = new StringTokenizer(valuePosition, ";");
         while (tokenizer.hasMoreTokens()) {
@@ -156,12 +163,56 @@ public class PositionMapper {
                         int x = Integer.parseInt(positionTokenizer.nextToken());
                         int y = Integer.parseInt(positionTokenizer.nextToken());
                         Point point = new Point(x, y);
-                        planetTokenPosition.addPosition(id, point);
+                        unitTokenPosition.addPosition(id, point);
                     }
                 }
             }
         }
-        return planetTokenPosition;
+        return unitTokenPosition;
+    }
+
+    public static UnitTokenPosition getSpaceUnitPosition(String planetName, String tileID) {
+        if (tileTypeList.isEmpty()){
+            for (java.util.Map.Entry<Object, Object> tileTypeEntry : tileType.entrySet()) {
+                String tileTypeKey = (String)tileTypeEntry.getKey();
+                String values = (String) tileTypeEntry.getValue();
+                values = values.replaceAll(" ", "");
+                String[] split = values.split(",");
+                for (String tileID_ : split) {
+                    tileTypeList.put(tileID_, tileTypeKey);
+                }
+            }
+        }
+        String tileType = tileTypeList.get(tileID);
+        if (tileType == null){
+            return null;
+        }
+        Object value = shipPosition.get(tileType);
+        if (value == null) {
+            return null;
+        }
+        UnitTokenPosition unitTokenPosition = new UnitTokenPosition(planetName, false);
+        String valuePosition = (String) value;
+        StringTokenizer tokenizer = new StringTokenizer(valuePosition, ";");
+        while (tokenizer.hasMoreTokens()) {
+            String positionTemp = tokenizer.nextToken();
+            String position = positionTemp.stripLeading();
+            if (!position.isEmpty()) {
+                StringTokenizer tokenPositionTokenizer = new StringTokenizer(position, " ");
+                if (tokenPositionTokenizer.countTokens() == 2) {
+                    String id = tokenPositionTokenizer.nextToken();
+                    String pointValue = tokenPositionTokenizer.nextToken();
+                    StringTokenizer positionTokenizer = new StringTokenizer(pointValue, ",");
+                    if (positionTokenizer.countTokens() == 2) {
+                        int x = Integer.parseInt(positionTokenizer.nextToken());
+                        int y = Integer.parseInt(positionTokenizer.nextToken());
+                        Point point = new Point(x, y);
+                        unitTokenPosition.addPosition(id, point);
+                    }
+                }
+            }
+        }
+        return unitTokenPosition;
     }
 
 }

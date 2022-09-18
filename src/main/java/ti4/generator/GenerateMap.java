@@ -47,6 +47,8 @@ public class GenerateMap {
     private final int width8 = 2500;
     private final int heght8 = 3350;
 
+    private static HashMap<String, String> unitIDToID = new HashMap<>();
+
     private static GenerateMap instance;
 
     private GenerateMap() {
@@ -1510,9 +1512,9 @@ public class GenerateMap {
 
     private BufferedImage addControl(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, ArrayList<Rectangle> rectangles, Map map) {
         ArrayList<String> controlList = new ArrayList<>(unitHolder.getControlList());
-        PlanetTokenPosition planetTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
+        UnitTokenPosition unitTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
         BufferedImage factionImage = null;
-        if (planetTokenPosition != null) {
+        if (unitTokenPosition != null) {
             Point centerPosition = unitHolder.getHolderCenterPosition();
             int xDelta = 0;
             for (String controlID : controlList) {
@@ -1543,7 +1545,7 @@ public class GenerateMap {
                     tileX += Constants.MIRAGE_POSITION.x;
                     tileY += Constants.MIRAGE_POSITION.y;
                 }
-                Point position = planetTokenPosition.getPosition(controlID);
+                Point position = unitTokenPosition.getPosition(controlID);
                 if (position != null) {
                     graphics.drawImage(image, tileX + position.x, tileY + position.y, null);
                     if (factionImage != null) {
@@ -1614,8 +1616,8 @@ public class GenerateMap {
             }
             return o1.compareTo(o2);
         });
-        PlanetTokenPosition planetTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
-        if (planetTokenPosition != null) {
+        UnitTokenPosition unitTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
+        if (unitTokenPosition != null) {
             Point centerPosition = unitHolder.getHolderCenterPosition();
             int xDelta = 0;
             for (String tokenID : tokenList) {
@@ -1636,7 +1638,7 @@ public class GenerateMap {
                 if (tokenPath.contains(Constants.DMZ_LARGE) || tokenPath.contains(Constants.WORLD_DESTROYED)) {
                     graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - (image.getHeight() / 2), null);
                 } else {
-                    Point position = planetTokenPosition.getPosition(tokenID);
+                    Point position = unitTokenPosition.getPosition(tokenID);
                     if (position != null) {
                         graphics.drawImage(image, tileX + position.x, tileY + position.y, null);
                         rectangles.add(new Rectangle(tileX + position.x, tileY + position.y, image.getWidth(), image.getHeight()));
@@ -1724,7 +1726,10 @@ public class GenerateMap {
     private BufferedImage addUnits(Tile tile, BufferedImage image, int tileX, int tileY, ArrayList<Rectangle> rectangles, int degree, int degreeChange, UnitHolder unitHolder, int radius) {
         HashMap<String, Integer> tempUnits = new HashMap<>(unitHolder.getUnits());
         LinkedHashMap<String, Integer> units = new LinkedHashMap<>();
-
+        HashMap<String, Point> unitOffset = new HashMap<>();
+        boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
+        int spaceX = 10;
+        int spaceY = -7;
         for (java.util.Map.Entry<String, Integer> entry : tempUnits.entrySet()) {
             String id = entry.getKey();
             //contains mech image
@@ -1738,7 +1743,10 @@ public class GenerateMap {
         units.putAll(tempUnits);
         HashMap<String, Integer> unitDamage = unitHolder.getUnitDamage();
         float scaleOfUnit = 1.0f;
-        PlanetTokenPosition planetTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
+        UnitTokenPosition unitTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
+        if (unitTokenPosition == null){
+            unitTokenPosition = PositionMapper.getSpaceUnitPosition(unitHolder.getName(), tile.getTileID());
+        }
         BufferedImage dmgImage = null;
         try {
             BufferedImage read = ImageIO.read(new File(Helper.getDamagePath()));
@@ -1782,7 +1790,22 @@ public class GenerateMap {
             Point centerPosition = unitHolder.getHolderCenterPosition();
 
             for (int i = 0; i < unitCount; i++) {
-                Point position = planetTokenPosition != null ? planetTokenPosition.getPosition(unitID) : null;
+                Point position = unitTokenPosition != null ? unitTokenPosition.getPosition(unitID) : null;
+                if (isSpace && position != null) {
+                    String id = unitIDToID.get(unitID);
+                    if (id == null){
+                        id = unitID.substring(unitID.indexOf("_"));
+                    }
+                    Point point = unitOffset.get(id);
+                    if (point == null){
+                        point = new Point(0, 0);
+                    }
+                    position.x = position.x + point.x;
+                    position.y = position.y + point.y;
+                    point.x += spaceX;
+                    point.y += spaceY;
+                    unitOffset.put(id, point);
+                }
                 boolean searchPosition = true;
                 int x = 0;
                 int y = 0;
@@ -1821,6 +1844,9 @@ public class GenerateMap {
                 }
 
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
+                    if (isSpace && position != null){
+                        position.x = position.x - 7;
+                    }
                     int imageDmgX = position != null ? tileX + position.x + (image.getWidth() / 2) - (dmgImage.getWidth() / 2) : xOriginal - (dmgImage.getWidth() / 2);
                     int imageDmgY = position != null ? tileY + position.y + (image.getHeight() / 2) - (dmgImage.getHeight() / 2) : yOriginal - (dmgImage.getHeight() / 2);
                     if (isMirage) {
