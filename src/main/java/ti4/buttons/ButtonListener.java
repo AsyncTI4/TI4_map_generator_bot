@@ -79,11 +79,13 @@ public class ButtonListener extends ListenerAdapter {
             event.getChannel().sendMessage("Could not find server Emojis").queue();
             return;
         }
+        BotLogger.log(player.getUserName() + " server emojis: ");
         HashMap<String, Emote> emojiMap = emoteMap.get(guild);
         List<Emote> emotes = guild.getEmotes();
         if (emojiMap != null && emojiMap.size() != emotes.size()) {
             emojiMap.clear();
         }
+        BotLogger.log(player.getUserName() + " clear server emojis: ");
         if (emojiMap == null || emojiMap.isEmpty()) {
             emojiMap = new HashMap<>();
             for (Emote emote : emotes) {
@@ -91,10 +93,11 @@ public class ButtonListener extends ListenerAdapter {
             }
         }
         Emote emoteToUse = emojiMap.get(playerFaction.toLowerCase());
-
+        BotLogger.log(player.getUserName() + "faction" + playerFaction.toLowerCase() + " emoji: " + (emoteToUse != null));
         String messageId = event.getInteraction().getMessage().getId();
         if (!skipReaction) {
             if (emoteToUse == null) {
+                BotLogger.log(player.getUserName() + " emoji empty: ");
                 event.reply("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
                 return;
             }
