@@ -2,18 +2,24 @@ package ti4.generator;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-public class PlanetTokenPosition {
+public class UnitTokenPosition {
     private String unitHolderName;
     LinkedHashMap<String, ArrayList<Point>> coordinateMap = new LinkedHashMap<>();
-    public PlanetTokenPosition(String unitHolderName) {
-        this.unitHolderName = unitHolderName;
+    private boolean removeUnitCoordinate = true;
+
+    public UnitTokenPosition(String unitHolderName) {
+        this(unitHolderName, true);
     }
 
-    public ArrayList<String> getUnitOrder(){
+    public UnitTokenPosition(String unitHolderName, boolean removeUnitCoordinate) {
+        this.unitHolderName = unitHolderName;
+        this.removeUnitCoordinate = removeUnitCoordinate;
+    }
+
+    public ArrayList<String> getUnitOrder() {
         ArrayList<String> unitOrder = new ArrayList<>();
         for (Map.Entry<String, ArrayList<Point>> entry : coordinateMap.entrySet()) {
             unitOrder.add(entry.getKey());
@@ -27,7 +33,7 @@ public class PlanetTokenPosition {
         coordinateMap.put(id, points);
     }
 
-    public Point getPosition(String id){
+    public Point getPosition(String id) {
         ArrayList<Point> points = coordinateMap.get(id);
         if (points == null) {
             id = coordinateMap.keySet().stream().filter(id::contains).findFirst().orElse(null);
@@ -36,16 +42,20 @@ public class PlanetTokenPosition {
             }
         }
         points = coordinateMap.get(id);
-        if (points == null || points.isEmpty()){
+        if (points == null || points.isEmpty()) {
             return null;
         }
         Point point = points.get(0);
-        points.remove(0);
-        if (points.isEmpty()){
+        if (removeUnitCoordinate) {
+            points.remove(0);
+        } else if (points.size() > 1) {
+            points.remove(0);
+        }
+        if (points.isEmpty()) {
             coordinateMap.remove(id);
         } else {
             coordinateMap.put(id, points);
         }
-        return point;
+        return new Point(point);
     }
 }
