@@ -1,20 +1,20 @@
 package ti4.buttons;
 
-import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import org.jetbrains.annotations.NotNull;
 import ti4.MessageListener;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 import java.util.HashMap;
 import java.util.List;
+import java.util.function.Consumer;
 
 public class ButtonListener extends ListenerAdapter {
 
@@ -26,17 +26,39 @@ public class ButtonListener extends ListenerAdapter {
         MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), "button");
 
         String buttonID = event.getButton().getId();
-        if (buttonID == null){
+        if (buttonID == null) {
             return;
         }
+
+        String id = event.getUser().getId();
+        Map activeMap = MapManager.getInstance().getUserActiveMap(id);
+        Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
+        if (player == null) {
+            event.getChannel().sendMessage("Your not a player of the game").queue();
+            return;
+        }
+
         switch (buttonID) {
-            case "sabotage" -> addReactionForSabo(event, true);
-            case "no_sabotage" -> addReactionForSabo(event, false);
+            case "sabotage" -> addReactionForSabo(event, true, "Sabotaging Action Card Play", " Sabotage played");
+            case "no_sabotage" -> addReactionForSabo(event, false, "No Sabotage", "");
+            case "sc_follow" -> {
+                int strategicCC = player.getStrategicCC();
+                String message;
+                if (strategicCC == 0){
+                    message = "Have 0 CC in Strategy, can't follow";
+                } else {
+                    strategicCC--;
+                    player.setStrategicCC(strategicCC);
+                    message = Helper.getPlayerPing(event, player) + " following SC, deducted 1 CC from Strategy Tokens";
+                }
+                addReactionForSabo(event, true, message, "");
+            }
+            case "sc_no_follow" -> addReactionForSabo(event, false, "Not Following SC", "");
             default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
         }
     }
 
-    private void addReactionForSabo(@NotNull ButtonInteractionEvent event, boolean sabotage) {
+    private void addReactionForSabo(@NotNull ButtonInteractionEvent event, boolean skipReaction, String message, String additionalMessage) {
         String id = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(id);
         Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
@@ -46,16 +68,16 @@ public class ButtonListener extends ListenerAdapter {
         }
         String playerFaction = player.getFaction();
         Guild guild = event.getGuild();
-        if (guild == null){
+        if (guild == null) {
             event.getChannel().sendMessage("Could not find server Emojis").queue();
             return;
         }
         HashMap<String, Emote> emojiMap = emoteMap.get(guild);
         List<Emote> emotes = guild.getEmotes();
-        if (emojiMap != null && emojiMap.size() != emotes.size()){
+        if (emojiMap != null && emojiMap.size() != emotes.size()) {
             emojiMap.clear();
         }
-        if (emojiMap == null || emojiMap.isEmpty()){
+        if (emojiMap == null || emojiMap.isEmpty()) {
             emojiMap = new HashMap<>();
             for (Emote emote : emotes) {
                 emojiMap.put(emote.getName().toLowerCase(), emote);
@@ -63,19 +85,21 @@ public class ButtonListener extends ListenerAdapter {
         }
         Emote emoteToUse = emojiMap.get(playerFaction.toLowerCase());
 
-        if (!sabotage) {
+        if (!skipReaction) {
             if (emoteToUse == null) {
                 event.reply("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
                 return;
             }
             event.getChannel().addReactionById(event.getInteraction().getMessage().getId(), emoteToUse).queue();
         }
-        if (sabotage) {
-            String text = Helper.getFactionIconFromDiscord(playerFaction) + " Sabotaging Action Card Play";
+        if (skipReaction) {
+            String text = Helper.getFactionIconFromDiscord(playerFaction) + " " + message;
             event.getChannel().sendMessage(text).queue();
-            event.getChannel().sendMessage(Helper.getGamePing(event.getGuild(), activeMap) + " Sabotage played").queue();
+            if (!additionalMessage.isEmpty()) {
+                event.getChannel().sendMessage(Helper.getGamePing(event.getGuild(), activeMap) + " " + additionalMessage).queue();
+            }
         } else {
-            String text = Helper.getFactionIconFromDiscord(playerFaction) + " No Sabotage";
+            String text = Helper.getFactionIconFromDiscord(playerFaction) + " " + message;
             event.getChannel().sendMessage(text).queue();
         }
     }

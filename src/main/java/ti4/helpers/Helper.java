@@ -4,7 +4,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.ResourceHelper;
 import ti4.commands.tokens.AddCC;
@@ -208,7 +210,7 @@ public class Helper {
         return categoryForPlayers;
     }
 
-    public static String getPlayerPing(SlashCommandInteractionEvent event, Player player) {
+    public static String getPlayerPing(Event event, Player player) {
         User userById = event.getJDA().getUserById(player.getUserID());
         if (userById == null) {
             return "";
