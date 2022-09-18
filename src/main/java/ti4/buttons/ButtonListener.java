@@ -11,6 +11,7 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import java.util.HashMap;
@@ -25,9 +26,10 @@ public class ButtonListener extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         event.deferEdit().queue();
         MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), "button");
-
+        BotLogger.log(event.getUser().getName() + " button clicked");
         String buttonID = event.getButton().getId();
         if (buttonID == null) {
+            event.getChannel().sendMessage("Button command not found").queue();
             return;
         }
 
@@ -38,7 +40,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getChannel().sendMessage("Your not a player of the game").queue();
             return;
         }
-
+        BotLogger.log(event.getUser().getName() + " select action for button");
         switch (buttonID) {
             case "sabotage" -> addReactionForSabo(event, true, "Sabotaging Action Card Play", " Sabotage played");
             case "no_sabotage" -> addReactionForSabo(event, false, "No Sabotage", "");
@@ -70,6 +72,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getChannel().sendMessage("Your not a player of the game").queue();
             return;
         }
+        BotLogger.log(player.getUserName() + " reaction commands: " + event.getButton().getId());
         String playerFaction = player.getFaction();
         Guild guild = event.getGuild();
         if (guild == null) {
@@ -95,6 +98,7 @@ public class ButtonListener extends ListenerAdapter {
                 event.reply("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
                 return;
             }
+            BotLogger.log(player.getUserName() + " add reaction");
             event.getChannel().addReactionById(messageId, emoteToUse).queue();
         }
         if (skipReaction) {
@@ -104,6 +108,7 @@ public class ButtonListener extends ListenerAdapter {
                 event.getChannel().sendMessage(Helper.getGamePing(event.getGuild(), activeMap) + " " + additionalMessage).queue();
             }
         } else {
+            BotLogger.log(player.getUserName() + " format message");
             String text = Helper.getFactionIconFromDiscord(playerFaction) + " " + message;
             event.getChannel().sendMessage(text).queue();
             List<ThreadChannel> threadChannels = guild.getThreadChannels();
