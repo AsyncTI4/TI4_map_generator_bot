@@ -26,7 +26,6 @@ public class ButtonListener extends ListenerAdapter {
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         event.deferEdit().queue();
         MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), "button");
-        BotLogger.log(event.getUser().getName() + " button clicked");
         String buttonID = event.getButton().getId();
         if (buttonID == null) {
             event.getChannel().sendMessage("Button command not found").queue();
@@ -40,7 +39,6 @@ public class ButtonListener extends ListenerAdapter {
             event.getChannel().sendMessage("Your not a player of the game").queue();
             return;
         }
-        BotLogger.log(event.getUser().getName() + " select action for button");
         switch (buttonID) {
             case "sabotage" -> addReactionForSabo(event, true, "Sabotaging Action Card Play", " Sabotage played");
             case "no_sabotage" -> addReactionForSabo(event, false, "No Sabotage", "");
@@ -72,20 +70,17 @@ public class ButtonListener extends ListenerAdapter {
             event.getChannel().sendMessage("Your not a player of the game").queue();
             return;
         }
-        BotLogger.log(player.getUserName() + " reaction commands: " + event.getButton().getId());
         String playerFaction = player.getFaction();
         Guild guild = event.getGuild();
         if (guild == null) {
             event.getChannel().sendMessage("Could not find server Emojis").queue();
             return;
         }
-        BotLogger.log(player.getUserName() + " server emojis: ");
         HashMap<String, Emote> emojiMap = emoteMap.get(guild);
         List<Emote> emotes = guild.getEmotes();
         if (emojiMap != null && emojiMap.size() != emotes.size()) {
             emojiMap.clear();
         }
-        BotLogger.log(player.getUserName() + " clear server emojis: ");
         if (emojiMap == null || emojiMap.isEmpty()) {
             emojiMap = new HashMap<>();
             for (Emote emote : emotes) {
@@ -93,15 +88,12 @@ public class ButtonListener extends ListenerAdapter {
             }
         }
         Emote emoteToUse = emojiMap.get(playerFaction.toLowerCase());
-        BotLogger.log(player.getUserName() + "faction" + playerFaction.toLowerCase() + " emoji: " + (emoteToUse != null));
         String messageId = event.getInteraction().getMessage().getId();
         if (!skipReaction) {
             if (emoteToUse == null) {
-                BotLogger.log(player.getUserName() + " emoji empty: ");
-                event.reply("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
+                event.getChannel().sendMessage("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
                 return;
             }
-            BotLogger.log(player.getUserName() + " add reaction");
             event.getChannel().addReactionById(messageId, emoteToUse).queue();
         }
         if (skipReaction) {
@@ -111,7 +103,6 @@ public class ButtonListener extends ListenerAdapter {
                 event.getChannel().sendMessage(Helper.getGamePing(event.getGuild(), activeMap) + " " + additionalMessage).queue();
             }
         } else {
-            BotLogger.log(player.getUserName() + " format message");
             String text = Helper.getFactionIconFromDiscord(playerFaction) + " " + message;
             event.getChannel().sendMessage(text).queue();
             List<ThreadChannel> threadChannels = guild.getThreadChannels();
