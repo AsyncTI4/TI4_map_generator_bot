@@ -20,7 +20,7 @@ import java.util.function.Consumer;
 
 public class ButtonListener extends ListenerAdapter {
 
-    private static HashMap<Guild, HashMap<String, Emote>> emoteMap = new HashMap<>();
+    public static HashMap<Guild, HashMap<String, Emote>> emoteMap = new HashMap<>();
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {

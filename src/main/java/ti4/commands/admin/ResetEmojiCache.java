@@ -1,22 +1,17 @@
 package ti4.commands.admin;
 
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Emote;
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.buttons.ButtonListener;
 import ti4.helpers.Constants;
 import ti4.message.BotLogger;
 
 import java.util.List;
 
-public class Testing extends AdminSubcommandData {
+public class ResetEmojiCache extends AdminSubcommandData {
 
-    public Testing() {
-        super(Constants.TESTING, "Testing new stuff");
+    public ResetEmojiCache() {
+        super(Constants.RESET_EMOJI_CACHE, "Reset Emoji Cache for Button reactions");
     }
 
     @Override
@@ -26,6 +21,7 @@ public class Testing extends AdminSubcommandData {
         for (Emote emote : emotes) {
             BotLogger.log(emote.getName() + " " + emote.getIdLong());
         }
+        ButtonListener.emoteMap.clear();
 
 //        Emoji emoji = Emoji.fromMarkdown("\uD83D\uDEAB");
 //        Emoji sabotage = Emoji.fromMarkdown(":sabotage:");
