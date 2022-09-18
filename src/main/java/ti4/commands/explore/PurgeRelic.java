@@ -14,7 +14,7 @@ public class PurgeRelic extends GenericRelicAction {
     public PurgeRelic() {
         super(Constants.RELIC_PURGE, "Purge a relic", true);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to purge").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do edit").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
     }
 
     @Override
