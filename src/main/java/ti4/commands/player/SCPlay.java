@@ -1,13 +1,15 @@
 package ti4.commands.player;
 
-import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import net.dv8tion.jda.internal.entities.TextChannelImpl;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -52,11 +54,16 @@ public class SCPlay extends PlayerSubcommandData {
         }
         message += "Strategy card " + Helper.getSCAsMention(sc) + " played. Please react with your faction symbol to pass or post in thread for secondaries.";
         String name = channel.getName();
-        if (name.contains("-")){
-            String threadName = name.substring(0, name.indexOf("-")) +"-round-" + activeMap.getRound() +"-" + Helper.getSCName(sc);
+        if (name.contains("-")) {
+            String threadName = name.substring(0, name.indexOf("-")) + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
             TextChannel textChannel = event.getTextChannel();
-            channel.sendMessage(message).queue(message_ -> {
+            Button followButton = Button.danger("sc_follow", "SC Follow");
+            Button noFollowButton = Button.primary("sc_no_follow", "Not Following");
 
+            Message messageObject = new MessageBuilder()
+                    .append(message)
+                    .setActionRows(ActionRow.of(followButton, noFollowButton)).build();
+            channel.sendMessage(messageObject).queue(message_ -> {
                 ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
                 threadChannel.queue();
             });
