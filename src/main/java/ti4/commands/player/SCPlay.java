@@ -57,7 +57,12 @@ public class SCPlay extends PlayerSubcommandData {
         if (name.contains("-")) {
             String threadName = name.substring(0, name.indexOf("-")) + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
             TextChannel textChannel = event.getTextChannel();
-            Button followButton = Button.danger("sc_follow", "SC Follow");
+            Button followButton;
+            if (sc == 1){
+                followButton = Button.success("sc_follow_leadership", "SC Follow");
+            } else {
+                followButton = Button.success("sc_follow", "SC Follow");
+            }
             Button noFollowButton = Button.primary("sc_no_follow", "Not Following");
 
             Message messageObject = new MessageBuilder()
