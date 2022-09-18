@@ -2,6 +2,7 @@ package ti4.buttons;
 
 import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -88,12 +89,13 @@ public class ButtonListener extends ListenerAdapter {
         }
         Emote emoteToUse = emojiMap.get(playerFaction.toLowerCase());
 
+        String messageId = event.getInteraction().getMessage().getId();
         if (!skipReaction) {
             if (emoteToUse == null) {
                 event.reply("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
                 return;
             }
-            event.getChannel().addReactionById(event.getInteraction().getMessage().getId(), emoteToUse).queue();
+            event.getChannel().addReactionById(messageId, emoteToUse).queue();
         }
         if (skipReaction) {
             String text = Helper.getFactionIconFromDiscord(playerFaction) + " " + message;
@@ -104,6 +106,12 @@ public class ButtonListener extends ListenerAdapter {
         } else {
             String text = Helper.getFactionIconFromDiscord(playerFaction) + " " + message;
             event.getChannel().sendMessage(text).queue();
+            List<ThreadChannel> threadChannels = guild.getThreadChannels();
+            for (ThreadChannel threadChannel : threadChannels) {
+                if (threadChannel.getId().equals(messageId)){
+                    threadChannel.sendMessage(text).queue();
+                }
+            }
         }
     }
 }
