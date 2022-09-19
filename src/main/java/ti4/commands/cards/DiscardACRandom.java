@@ -16,7 +16,7 @@ import java.util.*;
 public class DiscardACRandom extends CardsSubcommandData {
     public DiscardACRandom() {
         super(Constants.DISCARD_AC_RANDOM, "Discard Random Action Card");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to discard, default 1"));
     }
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -37,8 +37,9 @@ public class DiscardACRandom extends CardsSubcommandData {
 
         LinkedHashMap<String, Integer> actionCardsMap = player.getActionCards();
         List<String> actionCards = new ArrayList<>(actionCardsMap.keySet());
-        if (actionCards.isEmpty()){
+        if (actionCardsMap.isEmpty()){
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Action Cards in hand");
+            return;
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Player: ").append(player.getUserName()).append(" - ");
