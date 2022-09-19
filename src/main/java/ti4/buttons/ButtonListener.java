@@ -1,8 +1,6 @@
 package ti4.buttons;
 
-import net.dv8tion.jda.api.entities.Emote;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.ThreadChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -11,12 +9,9 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
-import ti4.message.BotLogger;
-import ti4.message.MessageHelper;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.function.Consumer;
 
 public class ButtonListener extends ListenerAdapter {
 
@@ -40,8 +35,8 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
         switch (buttonID) {
-            case "sabotage" -> addReactionForSabo(event, true, "Sabotaging Action Card Play", " Sabotage played");
-            case "no_sabotage" -> addReactionForSabo(event, false, "No Sabotage", "");
+            case "sabotage" -> addReaction(event, true, "Sabotaging Action Card Play", " Sabotage played");
+            case "no_sabotage" -> addReaction(event, false, "No Sabotage", "");
             case "sc_follow" -> {
                 int strategicCC = player.getStrategicCC();
                 String message;
@@ -52,17 +47,17 @@ public class ButtonListener extends ListenerAdapter {
                     player.setStrategicCC(strategicCC);
                     message = Helper.getPlayerPing(event, player) + " following SC, deducted 1 CC from Strategy Tokens";
                 }
-                addReactionForSabo(event, true, message, "");
+                addReaction(event, true, message, "");
             } case "sc_follow_leadership" -> {
                 String message = Helper.getPlayerPing(event, player) + " following SC.";
-                addReactionForSabo(event, true, message, "");
+                addReaction(event, true, message, "");
             }
-            case "sc_no_follow" -> addReactionForSabo(event, false, "Not Following SC", "");
+            case "sc_no_follow" -> addReaction(event, false, "Not Following SC", "");
             default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
         }
     }
 
-    private void addReactionForSabo(@NotNull ButtonInteractionEvent event, boolean skipReaction, String message, String additionalMessage) {
+    private void addReaction(@NotNull ButtonInteractionEvent event, boolean skipReaction, String message, String additionalMessage) {
         String id = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(id);
         Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
@@ -88,7 +83,12 @@ public class ButtonListener extends ListenerAdapter {
             }
         }
         Emote emoteToUse = emojiMap.get(playerFaction.toLowerCase());
-        String messageId = event.getInteraction().getMessage().getId();
+        Message mainMessage = event.getInteraction().getMessage();
+//        List<MessageReaction> reactions = mainMessage.getReactions();
+//        for (MessageReaction reaction : reactions) {
+////            if (reaction.getReactionEmote().getEmoji())
+//        }
+        String messageId = mainMessage.getId();
         if (!skipReaction) {
             if (emoteToUse == null) {
                 event.getChannel().sendMessage("Could not find faction (" + playerFaction + ") symbol for reaction").queue();

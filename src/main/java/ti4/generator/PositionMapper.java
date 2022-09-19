@@ -81,7 +81,7 @@ public class PositionMapper {
     }
 
     public static boolean isTilePositionValid(String position, Map userActiveMap) {
-        if (userActiveMap != null && userActiveMap.getPlayerCountForMap() == 8){
+        if (userActiveMap != null && userActiveMap.getPlayerCountForMap() == 8) {
             return positionTileMap8Player.getProperty(position) != null;
         }
         return positionTileMap6Player.getProperty(position) != null;
@@ -89,7 +89,7 @@ public class PositionMapper {
 
     @CheckForNull
     public static Point getTilePosition(String position, Map map) {
-        if (map != null && map.getPlayerCountForMap() == 8){
+        if (map != null && map.getPlayerCountForMap() == 8) {
             return getPosition(position, positionTileMap8Player);
         }
         return getPosition(position, positionTileMap6Player);
@@ -117,7 +117,7 @@ public class PositionMapper {
     public static ArrayList<Point> getPlayerPosition(int playerPosition, Map map) {
         ArrayList<Point> positions = new ArrayList<>();
         String info;
-        if (map != null && map.getPlayerCountForMap() == 8){
+        if (map != null && map.getPlayerCountForMap() == 8) {
             info = (String) playerInfo8.get(Integer.toString(playerPosition));
         } else {
             info = (String) playerInfo.get(Integer.toString(playerPosition));
@@ -171,10 +171,21 @@ public class PositionMapper {
         return unitTokenPosition;
     }
 
+    public static Point getUnitOffset() {
+        String offset = (String) shipPosition.get("offset");
+        StringTokenizer positionTokenizer = new StringTokenizer(offset, ",");
+        if (positionTokenizer.countTokens() == 2) {
+            int x = Integer.parseInt(positionTokenizer.nextToken());
+            int y = Integer.parseInt(positionTokenizer.nextToken());
+            return new Point(x, y);
+        }
+        return null;
+    }
+
     public static UnitTokenPosition getSpaceUnitPosition(String planetName, String tileID) {
-        if (tileTypeList.isEmpty()){
+        if (tileTypeList.isEmpty()) {
             for (java.util.Map.Entry<Object, Object> tileTypeEntry : tileType.entrySet()) {
-                String tileTypeKey = (String)tileTypeEntry.getKey();
+                String tileTypeKey = (String) tileTypeEntry.getKey();
                 String values = (String) tileTypeEntry.getValue();
                 values = values.replaceAll(" ", "");
                 String[] split = values.split(",");
@@ -184,7 +195,7 @@ public class PositionMapper {
             }
         }
         String tileType = tileTypeList.get(tileID);
-        if (tileType == null){
+        if (tileType == null) {
             return null;
         }
         Object value = shipPosition.get(tileType);

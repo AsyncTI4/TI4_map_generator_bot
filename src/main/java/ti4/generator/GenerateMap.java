@@ -1728,8 +1728,9 @@ public class GenerateMap {
         LinkedHashMap<String, Integer> units = new LinkedHashMap<>();
         HashMap<String, Point> unitOffset = new HashMap<>();
         boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
-        int spaceX = 10;
-        int spaceY = -7;
+        Point unitOffsetValue = PositionMapper.getUnitOffset();
+        int spaceX = unitOffsetValue != null ? unitOffsetValue.x : 10;
+        int spaceY = unitOffsetValue != null ? unitOffsetValue.y :-7;
         for (java.util.Map.Entry<String, Integer> entry : tempUnits.entrySet()) {
             String id = entry.getKey();
             //contains mech image
