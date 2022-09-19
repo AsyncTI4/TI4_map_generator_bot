@@ -1453,7 +1453,7 @@ public class GenerateMap {
                 if (unitHolder != spaceUnitHolder) {
                     image = addPlanetToken(tile, image, tileX, tileY, unitHolder, rectangles);
                 }
-                image = addUnits(tile, image, tileX, tileY, rectangles, degree, degreeChange, unitHolder, radius);
+                image = addUnits(tile, image, tileX, tileY, rectangles, degree, degreeChange, unitHolder, radius, map);
             }
 
         } catch (IOException e) {
@@ -1723,12 +1723,13 @@ public class GenerateMap {
         return image;
     }
 
-    private BufferedImage addUnits(Tile tile, BufferedImage image, int tileX, int tileY, ArrayList<Rectangle> rectangles, int degree, int degreeChange, UnitHolder unitHolder, int radius) {
+    private BufferedImage addUnits(Tile tile, BufferedImage image, int tileX, int tileY, ArrayList<Rectangle> rectangles, int degree, int degreeChange, UnitHolder unitHolder, int radius, Map map) {
         HashMap<String, Integer> tempUnits = new HashMap<>(unitHolder.getUnits());
         LinkedHashMap<String, Integer> units = new LinkedHashMap<>();
         HashMap<String, Point> unitOffset = new HashMap<>();
         boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
-        Point unitOffsetValue = PositionMapper.getUnitOffset();
+
+        Point unitOffsetValue = map.isAllianceMode() ? PositionMapper.getAllianceUnitOffset() : PositionMapper.getUnitOffset();
         int spaceX = unitOffsetValue != null ? unitOffsetValue.x : 10;
         int spaceY = unitOffsetValue != null ? unitOffsetValue.y :-7;
         for (java.util.Map.Entry<String, Integer> entry : tempUnits.entrySet()) {
