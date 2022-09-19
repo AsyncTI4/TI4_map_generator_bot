@@ -182,6 +182,17 @@ public class PositionMapper {
         return null;
     }
 
+    public static Point getAllianceUnitOffset() {
+        String offset = (String) shipPosition.get("alliance_offset");
+        StringTokenizer positionTokenizer = new StringTokenizer(offset, ",");
+        if (positionTokenizer.countTokens() == 2) {
+            int x = Integer.parseInt(positionTokenizer.nextToken());
+            int y = Integer.parseInt(positionTokenizer.nextToken());
+            return new Point(x, y);
+        }
+        return null;
+    }
+
     public static UnitTokenPosition getSpaceUnitPosition(String planetName, String tileID) {
         if (tileTypeList.isEmpty()) {
             for (java.util.Map.Entry<Object, Object> tileTypeEntry : tileType.entrySet()) {
