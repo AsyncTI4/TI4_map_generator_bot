@@ -103,6 +103,9 @@ public class MessageListener extends ListenerAdapter {
 //        }
 
         Message msg = event.getMessage();
+        if (msg.getContentRaw().startsWith("[DELETE]")) {
+            msg.delete().queue();
+        }
         if (msg.getContentRaw().startsWith("map_log")) {
             if (event.isFromType(ChannelType.PRIVATE)) {
                 System.out.printf("[PM] %s: %s\n", event.getAuthor().getName(), event.getMessage().getContentDisplay());

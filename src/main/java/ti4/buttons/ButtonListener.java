@@ -1,6 +1,9 @@
 package ti4.buttons;
 
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.jetbrains.annotations.NotNull;
@@ -11,7 +14,9 @@ import ti4.map.MapManager;
 import ti4.map.Player;
 
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ButtonListener extends ListenerAdapter {
 
@@ -49,10 +54,10 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 addReaction(event, true, message, "");
             } case "sc_follow_leadership" -> {
-                String message = Helper.getPlayerPing(event, player) + " following SC.";
+                String message = Helper.getPlayerPing(event, player) + " following.";
                 addReaction(event, true, message, "");
             }
-            case "sc_no_follow" -> addReaction(event, false, "Not Following SC", "");
+            case "sc_no_follow" -> addReaction(event, false, "Not Following", "");
             default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
         }
     }
@@ -84,10 +89,6 @@ public class ButtonListener extends ListenerAdapter {
         }
         Emote emoteToUse = emojiMap.get(playerFaction.toLowerCase());
         Message mainMessage = event.getInteraction().getMessage();
-//        List<MessageReaction> reactions = mainMessage.getReactions();
-//        for (MessageReaction reaction : reactions) {
-////            if (reaction.getReactionEmote().getEmoji())
-//        }
         String messageId = mainMessage.getId();
         if (!skipReaction) {
             if (emoteToUse == null) {
@@ -95,22 +96,24 @@ public class ButtonListener extends ListenerAdapter {
                 return;
             }
             event.getChannel().addReactionById(messageId, emoteToUse).queue();
+            return;
         }
-        if (skipReaction) {
-            String text = Helper.getFactionIconFromDiscord(playerFaction) + " " + message;
-            event.getChannel().sendMessage(text).queue();
-            if (!additionalMessage.isEmpty()) {
-                event.getChannel().sendMessage(Helper.getGamePing(event.getGuild(), activeMap) + " " + additionalMessage).queue();
+        boolean foundThread = false;
+        String text = Helper.getFactionIconFromDiscord(playerFaction) + " " + message;
+        if (!additionalMessage.isEmpty()) {
+            text += Helper.getGamePing(event.getGuild(), activeMap) + " " + additionalMessage;
+        }
+        List<ThreadChannel> threadChannels = guild.getThreadChannels();
+        for (ThreadChannel threadChannel : threadChannels) {
+            if (threadChannel.getId().equals(messageId)) {
+                threadChannel.sendMessage(text).queue();
+                foundThread = true;
+                break;
             }
-        } else {
-            String text = Helper.getFactionIconFromDiscord(playerFaction) + " " + message;
+        }
+
+        if (!foundThread){
             event.getChannel().sendMessage(text).queue();
-            List<ThreadChannel> threadChannels = guild.getThreadChannels();
-            for (ThreadChannel threadChannel : threadChannels) {
-                if (threadChannel.getId().equals(messageId)){
-                    threadChannel.sendMessage(text).queue();
-                }
-            }
         }
     }
 }
