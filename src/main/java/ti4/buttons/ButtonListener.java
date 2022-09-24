@@ -1,11 +1,9 @@
 package ti4.buttons;
 
-import net.dv8tion.jda.api.entities.Emote;
-import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.ThreadChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.requests.RestAction;
 import org.jetbrains.annotations.NotNull;
 import ti4.MessageListener;
 import ti4.helpers.Helper;
@@ -14,9 +12,7 @@ import ti4.map.MapManager;
 import ti4.map.Player;
 
 import java.util.HashMap;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 public class ButtonListener extends ListenerAdapter {
 
@@ -90,6 +86,13 @@ public class ButtonListener extends ListenerAdapter {
         Emote emoteToUse = emojiMap.get(playerFaction.toLowerCase());
         Message mainMessage = event.getInteraction().getMessage();
         String messageId = mainMessage.getId();
+
+//        RestAction<Message> messageRestAction = event.getChannel().retrieveMessageById(messageId);
+//        messageRestAction.queue(m -> {
+//            List<MessageReaction> reactions = m.getReactions();
+//            // rest of your code in here (you cannot have it outside the { } scope
+//            // ...
+//        });
         if (!skipReaction) {
             if (emoteToUse == null) {
                 event.getChannel().sendMessage("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
