@@ -1793,7 +1793,11 @@ public class GenerateMap {
 
             for (int i = 0; i < unitCount; i++) {
                 Point position = unitTokenPosition != null ? unitTokenPosition.getPosition(unitID) : null;
-                if (isSpace && position != null) {
+                boolean fighterOrInfantry = false;
+                if (unitID.contains("_tkn_ff.png") || unitID.contains("_tkn_gf.png")){
+                    fighterOrInfantry = true;
+                }
+                if (isSpace && position != null && !fighterOrInfantry) {
                     String id = unitIDToID.get(unitID);
                     if (id == null){
                         id = unitID.substring(unitID.indexOf("_"));
