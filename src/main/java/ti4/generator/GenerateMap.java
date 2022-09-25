@@ -536,6 +536,11 @@ public class GenerateMap {
                         if (count == null) {
                             count = 0;
                         }
+                        if (key.contains("gf") || key.contains("ff")){
+                            count++;
+                        } else {
+                            count += unitEntry.getValue();
+                        }
                         count++;
                         unitCount.put(key, count);
                     }
