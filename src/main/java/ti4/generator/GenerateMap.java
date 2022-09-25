@@ -558,8 +558,15 @@ public class GenerateMap {
 
             Integer count = unitCount.get(unitColorID);
             if (unitID.equals("csd")) {
+                if (!player.getFaction().equals("cabal")){
+                   continue;
+                }
                 unitColorID = Mapper.getUnitID("sd", player.getColor());
             }
+            if (player.getFaction().equals("cabal") && unitID.equals("sd")){
+                continue;
+            }
+
             if (count == null) {
                 count = 0;
             }
