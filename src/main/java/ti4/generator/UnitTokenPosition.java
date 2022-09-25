@@ -27,6 +27,11 @@ public class UnitTokenPosition {
         return unitOrder;
     }
 
+    public int getPositionCount(String id) {
+        return coordinateMap.get(id).size();
+    }
+
+
     public void addPosition(String id, Point point) {
         ArrayList<Point> points = coordinateMap.computeIfAbsent(id, key -> new ArrayList<>());
         points.add(point);

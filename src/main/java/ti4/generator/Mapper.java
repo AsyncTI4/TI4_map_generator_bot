@@ -4,7 +4,6 @@ import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.LoggerHandler;
 import ti4.message.BotLogger;
 
 import javax.annotation.CheckForNull;
@@ -73,11 +72,11 @@ public class Mapper {
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
     }
 
-    private static void readData(String propertyFileName, Properties colors, String s) {
-        String colorFile = ResourceHelper.getInstance().getInfoFile(propertyFileName);
-        if (colorFile != null) {
-            try (InputStream input = new FileInputStream(colorFile)) {
-                colors.load(input);
+    private static void readData(String propertyFileName, Properties properties, String s) {
+        String propFile = ResourceHelper.getInstance().getInfoFile(propertyFileName);
+        if (propFile != null) {
+            try (InputStream input = new FileInputStream(propFile)) {
+                properties.load(input);
             } catch (IOException e) {
                 BotLogger.log(s);
             }
@@ -149,6 +148,13 @@ public class Mapper {
     public static String getUnitID(String unitID, String color) {
         String property = colors.getProperty(color);
         return property + units.getProperty(unitID);
+    }
+
+    public static List<String> getUnitIDList() {
+        return units.keySet().stream().filter(unit -> unit instanceof String)
+                .map(unit -> (String) unit)
+                .sorted()
+                .collect(Collectors.toList());
     }
 
     public static String getCCID(String color) {

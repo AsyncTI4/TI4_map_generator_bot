@@ -2,7 +2,10 @@ package ti4.generator;
 
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
-import ti4.helpers.*;
+import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
+import ti4.helpers.Helper;
+import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.BotLogger;
@@ -238,6 +241,7 @@ public class GenerateMap {
             Graphics2D g2 = (Graphics2D) graphics;
             g2.setStroke(new BasicStroke(5));
             int realX = x;
+            HashMap<String, Integer> unitCount = new HashMap<>();
             for (Player player : players.values()) {
                 int baseY = y;
                 x = realX;
@@ -347,6 +351,9 @@ public class GenerateMap {
                 if (!player.getPlanets().isEmpty()) {
                     xDeltaSecondRow = planetInfo(player, map, xDeltaSecondRow, yPlayAreaSecondRow);
                 }
+
+                reinforcements(player, map, width - 450, yPlayAreaSecondRow, unitCount);
+
                 if (!player.getLeaders().isEmpty()) {
                     xDelta = leaderInfo(player, xDelta, yPlayArea);
                 }
@@ -498,7 +505,7 @@ public class GenerateMap {
 
                 if (!pipID.isEmpty()) {
                     String leaderPipInfo = "pa_leaders_pips_" + pipID;
-                    if (!isExhaustedLocked && leader.isActive()){
+                    if (!isExhaustedLocked && leader.isActive()) {
                         leaderPipInfo += "_active" + ".png";
                     } else {
                         leaderPipInfo += status + ".png";
@@ -514,6 +521,81 @@ public class GenerateMap {
             deltaX += 48;
         }
         return x + deltaX + 20;
+    }
+
+    private void reinforcements(Player player, Map map, int x, int y, HashMap<String, Integer> unitCount) {
+        HashMap<String, Tile> tileMap = map.getTileMap();
+        drawPAImage(x, y, "pa_reinforcements.png");
+        if (unitCount.isEmpty()) {
+            for (Tile tile : tileMap.values()) {
+                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                    HashMap<String, Integer> units = unitHolder.getUnits();
+                    for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                        String key = unitEntry.getKey();
+                        Integer count = unitCount.get(key);
+                        if (count == null) {
+                            count = 0;
+                        }
+                        count++;
+                        unitCount.put(key, count);
+                    }
+                }
+            }
+        }
+
+        for (String unitID : Mapper.getUnitIDList()) {
+            String unitColorID = Mapper.getUnitID(unitID, player.getColor());
+            if (unitID.equals("cff")) {
+                unitColorID = Mapper.getUnitID("ff", player.getColor());
+            }
+            if (unitID.equals("cgf")) {
+                unitColorID = Mapper.getUnitID("gf", player.getColor());
+            }
+
+            Integer count = unitCount.get(unitColorID);
+            if (unitID.equals("csd")) {
+                unitColorID = Mapper.getUnitID("sd", player.getColor());
+            }
+            if (count == null) {
+                count = 0;
+            }
+            UnitTokenPosition reinforcementsPosition = PositionMapper.getReinforcementsPosition(unitID);
+            if (reinforcementsPosition != null) {
+                int positionCount = reinforcementsPosition.getPositionCount(unitID);
+                int remainingReinforcements = positionCount - count;
+                if (remainingReinforcements > 0) {
+                    for (int i = 0; i < remainingReinforcements; i++) {
+                        try {
+                            String unitPath = ResourceHelper.getInstance().getUnitFile(unitColorID);
+                            BufferedImage image = ImageIO.read(new File(unitPath));
+                            Point position = reinforcementsPosition.getPosition(unitID);
+                            graphics.drawImage(image, x + position.x, y + position.y, null);
+                        } catch (Exception e) {
+                            BotLogger.log("Could not parse unit file for reinforcements: " + unitID);
+                        }
+                    }
+                    paintNumber(unitID, x, y, remainingReinforcements, player.getColor());
+                }
+            }
+        }
+    }
+
+    private void paintNumber(String unitID, int x, int y, int reinforcementsCount, String color) {
+        String id = "number_" + unitID;
+        UnitTokenPosition textPosition = PositionMapper.getReinforcementsPosition(id);
+        String text = "pa_reinforcements_numbers_" + reinforcementsCount;
+        String colorID = Mapper.getColorID(color);
+        if (colorID.startsWith("ylw") || colorID.startsWith("gry") || colorID.startsWith("org") || colorID.startsWith("pnk")) {
+            text += "_blk.png";
+        } else {
+            text += "_wht.png";
+
+        }
+        if (textPosition == null){
+            return;
+        }
+        Point position = textPosition.getPosition(id);
+        drawPAImage(x + position.x, y + position.y, text);
     }
 
     private int planetInfo(Player player, Map map, int x, int y) {
@@ -1458,7 +1540,7 @@ public class GenerateMap {
 
         } catch (IOException e) {
             BotLogger.log("Error drawing tile: " + tile.getTileID());
-        } catch (Exception exception){
+        } catch (Exception exception) {
             BotLogger.log("Tile Error, when building map: " + tile.getTileID());
         }
     }
@@ -1731,7 +1813,7 @@ public class GenerateMap {
 
         Point unitOffsetValue = map.isAllianceMode() ? PositionMapper.getAllianceUnitOffset() : PositionMapper.getUnitOffset();
         int spaceX = unitOffsetValue != null ? unitOffsetValue.x : 10;
-        int spaceY = unitOffsetValue != null ? unitOffsetValue.y :-7;
+        int spaceY = unitOffsetValue != null ? unitOffsetValue.y : -7;
         for (java.util.Map.Entry<String, Integer> entry : tempUnits.entrySet()) {
             String id = entry.getKey();
             //contains mech image
@@ -1746,7 +1828,7 @@ public class GenerateMap {
         HashMap<String, Integer> unitDamage = unitHolder.getUnitDamage();
         float scaleOfUnit = 1.0f;
         UnitTokenPosition unitTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
-        if (unitTokenPosition == null){
+        if (unitTokenPosition == null) {
             unitTokenPosition = PositionMapper.getSpaceUnitPosition(unitHolder.getName(), tile.getTileID());
         }
         BufferedImage dmgImage = null;
@@ -1794,16 +1876,16 @@ public class GenerateMap {
             for (int i = 0; i < unitCount; i++) {
                 Point position = unitTokenPosition != null ? unitTokenPosition.getPosition(unitID) : null;
                 boolean fighterOrInfantry = false;
-                if (unitID.contains("_tkn_ff.png") || unitID.contains("_tkn_gf.png")){
+                if (unitID.contains("_tkn_ff.png") || unitID.contains("_tkn_gf.png")) {
                     fighterOrInfantry = true;
                 }
                 if (isSpace && position != null && !fighterOrInfantry) {
                     String id = unitIDToID.get(unitID);
-                    if (id == null){
+                    if (id == null) {
                         id = unitID.substring(unitID.indexOf("_"));
                     }
                     Point point = unitOffset.get(id);
-                    if (point == null){
+                    if (point == null) {
                         point = new Point(0, 0);
                     }
                     position.x = position.x + point.x;
@@ -1850,7 +1932,7 @@ public class GenerateMap {
                 }
 
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
-                    if (isSpace && position != null){
+                    if (isSpace && position != null) {
                         position.x = position.x - 7;
                     }
                     int imageDmgX = position != null ? tileX + position.x + (image.getWidth() / 2) - (dmgImage.getWidth() / 2) : xOriginal - (dmgImage.getWidth() / 2);

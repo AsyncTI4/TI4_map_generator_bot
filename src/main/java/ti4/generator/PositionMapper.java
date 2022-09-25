@@ -29,6 +29,7 @@ public class PositionMapper {
 
     private static final Properties playerInfo = new Properties();
     private static final Properties playerInfo8 = new Properties();
+    private static final Properties reinforcements = new Properties();
 
     public static void init() {
         readData("6player.properties", positionTileMap6Player, "Could not read position file");
@@ -40,6 +41,7 @@ public class PositionMapper {
         readData("planet_token.properties", planetTokenPositions, "Could not read planet token position file");
         readData("6player_info.properties", playerInfo, "Could not read player info position file");
         readData("8player_info.properties", playerInfo8, "Could not read player info position file");
+        readData("reinforcements.properties", reinforcements, "Could not read reinforcements position file");
     }
 
     public static String getTilePlanetPositions(String tileID) {
@@ -166,6 +168,28 @@ public class PositionMapper {
                         unitTokenPosition.addPosition(id, point);
                     }
                 }
+            }
+        }
+        return unitTokenPosition;
+    }
+
+    public static UnitTokenPosition getReinforcementsPosition(String unitId) {
+        Object value = reinforcements.get(unitId);
+        if (value == null) {
+            return null;
+        }
+        UnitTokenPosition unitTokenPosition = new UnitTokenPosition(unitId);
+        String valuePosition = (String) value;
+        StringTokenizer tokenizer = new StringTokenizer(valuePosition, ";");
+        while (tokenizer.hasMoreTokens()) {
+
+            String nextPoint = tokenizer.nextToken();
+            StringTokenizer positionTokenizer = new StringTokenizer(nextPoint, ",");
+            if (positionTokenizer.countTokens() == 2) {
+                int x = Integer.parseInt(positionTokenizer.nextToken());
+                int y = Integer.parseInt(positionTokenizer.nextToken());
+                Point point = new Point(x, y);
+                unitTokenPosition.addPosition(unitId, point);
             }
         }
         return unitTokenPosition;
