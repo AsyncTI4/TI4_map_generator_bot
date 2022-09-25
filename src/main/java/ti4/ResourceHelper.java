@@ -183,6 +183,12 @@ public class ResourceHelper {
     }
 
     @CheckForNull
+    public String getWebFile(String name)
+    {
+        return getResourceFromFolder("web/", name, "Could not find web file");
+    }
+
+    @CheckForNull
     public String getAliasFile(String name)
     {
         return getResourceFromFolder("alias/", name, "Could not find alias file");

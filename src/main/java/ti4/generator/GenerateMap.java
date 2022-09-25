@@ -2,10 +2,7 @@ package ti4.generator;
 
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
-import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
-import ti4.helpers.Helper;
-import ti4.helpers.Storage;
+import ti4.helpers.*;
 import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.BotLogger;
@@ -147,6 +144,8 @@ public class GenerateMap {
             graphics.drawString(map.getName() + " " + timeStamp, 0, 34);
 
             gameInfo(map, displayType);
+
+            WebHelper.putMap(map.getName(), mainImage);
 
             ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
             imageWriter.setOutput(ImageIO.createImageOutputStream(file));
