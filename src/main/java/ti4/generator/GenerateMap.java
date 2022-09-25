@@ -541,7 +541,6 @@ public class GenerateMap {
                         } else {
                             count += unitEntry.getValue();
                         }
-                        count++;
                         unitCount.put(key, count);
                     }
                 }
