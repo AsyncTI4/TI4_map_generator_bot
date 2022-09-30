@@ -37,6 +37,9 @@ public class ListVoteCount extends AgendaSubcommandData {
         }
 
         for (Player player : orderList) {
+            if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("white")) {
+                continue;
+            }
             List<String> planets = new ArrayList<>(player.getPlanets());
             planets.removeAll(player.getExhaustedPlanets());
             String userName = player.getUserName();
