@@ -54,8 +54,28 @@ public class ButtonListener extends ListenerAdapter {
                 addReaction(event, true, message, "");
             }
             case "sc_no_follow" -> addReaction(event, false, "Not Following", "");
+            case "play_when" -> {
+                clearAllReactions(event);
+                addReaction(event, true, "Playing When", "When Played");
+            }
+            case "no_when" -> addReaction(event, false, "No Whens", "");
+            case "play_after" -> {
+                clearAllReactions(event);
+                addReaction(event, true, "Playing After", "After Played");
+            }
+            case "no_after" -> addReaction(event, false, "No Afters", "");
             default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
         }
+    }
+
+    private void clearAllReactions(@NotNull ButtonInteractionEvent event) {
+        Message mainMessage = event.getInteraction().getMessage();
+        String messageId = mainMessage.getId();
+        RestAction<Message> messageRestAction = event.getChannel().retrieveMessageById(messageId);
+        messageRestAction.queue(m -> {
+            RestAction<Void> voidRestAction = m.clearReactions();
+            voidRestAction.queue();
+        });
     }
 
     private void addReaction(@NotNull ButtonInteractionEvent event, boolean skipReaction, String message, String additionalMessage) {
