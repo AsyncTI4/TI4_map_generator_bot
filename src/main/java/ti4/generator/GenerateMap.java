@@ -9,6 +9,7 @@ import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 
 import javax.annotation.CheckForNull;
 import javax.imageio.IIOImage;
