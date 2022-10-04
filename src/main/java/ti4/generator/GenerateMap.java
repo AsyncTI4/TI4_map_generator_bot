@@ -869,6 +869,9 @@ public class GenerateMap {
         graphics.setFont(Storage.getFont50());
         int height = 140;
         int width = 150;
+        if (14 < map.getVp()) {
+            width = 120;
+        }
         for (int i = 0; i <= map.getVp(); i++) {
             graphics.setColor(Color.WHITE);
             graphics.drawString(Integer.toString(i), i * width + 55, y + (height / 2) + 25);
