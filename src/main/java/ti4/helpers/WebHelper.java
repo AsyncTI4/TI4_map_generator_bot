@@ -68,9 +68,7 @@ public class WebHelper {
 
             s3.putObject(request, RequestBody.fromBytes(out.toByteArray()));
         } catch (Exception e) {
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-
+            BotLogger.log("Could not add image to web server");
         }
     }
 
