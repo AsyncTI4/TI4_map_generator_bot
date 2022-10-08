@@ -71,5 +71,4 @@ public class WebHelper {
             BotLogger.log("Could not add image to web server");
         }
     }
-
 }
