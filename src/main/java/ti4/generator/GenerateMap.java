@@ -146,7 +146,11 @@ public class GenerateMap {
 
             gameInfo(map, displayType);
 
-            WebHelper.putMap(map.getName(), mainImage);
+
+            new Thread(() -> {
+                WebHelper.putMap(map.getName(), mainImage);
+            }).start();
+
 
             ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
             imageWriter.setOutput(ImageIO.createImageOutputStream(file));
