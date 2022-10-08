@@ -10,17 +10,21 @@ jobs:
     steps:
     - name: executing remote ssh commands using password
       uses: appleboy/ssh-action@master
+      env:
+        AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
+        AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
       with:
         host: ${{ secrets.SSH_HOST }}
         username: root
         password: ${{ secrets.SSH_PASSWORD }}
         port: 22
+        envs: AWS_KEY, AWS_SECRET
         script: |
           cd /root/ti4bot
           ./scheduled_upload.sh
           cd /root/ti4bot/TI4_map_generator_bot
           git pull
-          docker build --build-arg BOT_KEY=$DISCORD_BOT_KEY --build-arg USER=$DISCORD_USER --build-arg SERVER=$DISCORD_SERVER --build-arg SERVER2=$DISCORD_SERVER2 -t tibot .
+          docker build --build-arg BOT_KEY=$DISCORD_BOT_KEY --build-arg USER=$DISCORD_USER --build-arg SERVER=$DISCORD_SERVER --build-arg SERVER2=$DISCORD_SERVER2 --build-arg AWS_SECRET=$AWS_SECRET --build-arg AWS_KEY=$AWS_KEY -t tibot .
           docker kill $(docker ps -q)
           cd /root
           ./docker_run.sh
