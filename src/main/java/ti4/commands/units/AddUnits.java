@@ -33,11 +33,9 @@ public class AddUnits extends AddRemoveUnits {
                     Helper.isCCCountCorrect(event, map, color);
                 }
                 case "c", "construction" -> {
-                    MoveUnits.removeStrategyCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
                     AddCC.addCC(event, color, tile);
                     Helper.isCCCountCorrect(event, map, color);
                 }
-                case "w", "warfare" -> MoveUnits.removeStrategyCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
             }
         }
     }
@@ -76,7 +74,7 @@ public class AddUnits extends AddRemoveUnits {
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")
                                 .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type tactics or t, warfare or w, c or construction").setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type tactics or t, construction or c").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                                 .setAutoComplete(true))
         );
