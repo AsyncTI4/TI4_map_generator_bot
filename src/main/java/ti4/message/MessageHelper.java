@@ -11,6 +11,7 @@ import ti4.buttons.ButtonListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class MessageHelper {
 
@@ -43,6 +44,10 @@ public class MessageHelper {
                 splitAndSent(messageText, event.getChannel());
             }
             event.getHook().sendMessage("-").queue();
+            //Deletes slash command
+//            event.getHook().sendMessage("-").queue(msg -> {
+//                msg.delete().queueAfter(1, TimeUnit.SECONDS);
+//            });
         }
     }
 

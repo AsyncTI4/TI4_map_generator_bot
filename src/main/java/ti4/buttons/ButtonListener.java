@@ -49,7 +49,22 @@ public class ButtonListener extends ListenerAdapter {
                     message = Helper.getPlayerPing(event, player) + " following SC, deducted 1 CC from Strategy Tokens";
                 }
                 addReaction(event, true, message, "");
-            } case "sc_follow_leadership" -> {
+            }
+            case "sc_follow_trade" -> {
+                int strategicCC = player.getStrategicCC();
+                String message;
+                if (strategicCC == 0){
+                    message = "Have 0 CC in Strategy, can't follow";
+                } else {
+                    strategicCC--;
+                    player.setStrategicCC(strategicCC);
+                    message = Helper.getPlayerPing(event, player) + " following SC, deducted 1 CC from Strategy Tokens";
+                }
+                player.setCommodities(player.getCommoditiesTotal());
+                addReaction(event, true, message, "");
+                addReaction(event, true, "Refreshing Commodities", "");
+            }
+            case "sc_follow_leadership" -> {
                 String message = Helper.getPlayerPing(event, player) + " following.";
                 addReaction(event, true, message, "");
             }
@@ -64,9 +79,22 @@ public class ButtonListener extends ListenerAdapter {
                 addReaction(event, true, "Playing After", "After Played");
             }
             case "no_after" -> addReaction(event, false, "No Afters", "");
+            case "sc_refresh" -> {
+                player.setCommodities(player.getCommoditiesTotal());
+                addReaction(event, true, "Refreshing Commodities", "");
+            }
+            case "sc_refresh_and_wash" -> {
+                int commoditiesTotal = player.getCommoditiesTotal();
+                int tg = player.getTg();
+                player.setTg(tg + commoditiesTotal);
+                player.setCommodities(0);
+                addReaction(event, true, "Refreshing and washing", "");
+            }
             default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
         }
     }
+
+
 
     private void clearAllReactions(@NotNull ButtonInteractionEvent event) {
         Message mainMessage = event.getInteraction().getMessage();

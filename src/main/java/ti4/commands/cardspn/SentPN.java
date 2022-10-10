@@ -79,7 +79,8 @@ public class SentPN extends PNCardsSubcommandData {
         CardsInfo.sentUserCardInfo(event, activeMap, targetPlayer);
         CardsInfo.sentUserCardInfo(event, activeMap, player);
 
-        if (areaPN) {
+        //Turned off, as we might change back
+        if (areaPN && false) {
             File file = GenerateMap.getInstance().saveImage(activeMap);
             MessageHelper.sendFileToChannel(event.getChannel(), file);
         }
