@@ -61,13 +61,26 @@ public class SCPlay extends PlayerSubcommandData {
             if (sc == 1){
                 followButton = Button.success("sc_follow_leadership", "SC Follow");
             } else {
-                followButton = Button.success("sc_follow", "SC Follow");
+                if (sc == 5){
+                    followButton = Button.success("sc_follow_trade", "SC Follow");
+                } else {
+                    followButton = Button.success("sc_follow", "SC Follow");
+                }
             }
             Button noFollowButton = Button.primary("sc_no_follow", "Not Following");
 
+            Button refresh = Button.secondary("sc_refresh", "Refresh Commodities");
+            Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Refresh and Wash");
+            ActionRow of;
+            if (sc == 5){
+                of = ActionRow.of(followButton, noFollowButton, refresh, refresh_and_wash);
+            } else {
+                of = ActionRow.of(followButton, noFollowButton);
+            }
+
             Message messageObject = new MessageBuilder()
                     .append(message)
-                    .setActionRows(ActionRow.of(followButton, noFollowButton)).build();
+                    .setActionRows(of).build();
             channel.sendMessage(messageObject).queue(message_ -> {
                 ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
                 threadChannel.queue();

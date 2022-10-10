@@ -63,6 +63,7 @@ public class WebHelper {
             try {
                 imageWriter.write(null, new IIOImage(img, null, null), defaultWriteParam);
             } catch (IOException e) {
+                BotLogger.log("Could not write image to web server");
                 throw new RuntimeException(e);
             }
 
