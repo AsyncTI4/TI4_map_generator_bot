@@ -70,14 +70,27 @@ public class SentPN extends PNCardsSubcommandData {
 
         player.removePromissoryNote(id);
         targetPlayer.setPromissoryNote(id);
+        boolean sendSftT = false;
+        boolean sendAlliance = false;
         if ((id.endsWith("_sftt") || id.endsWith("_an")) &&
                 !promissoryNoteOwner.equals(targetPlayer.getFaction()) &&
                 !promissoryNoteOwner.equals(targetPlayer.getColor())) {
             targetPlayer.setPromissoryNotesInPlayArea(id);
+            if (id.endsWith("_sftt")){
+                sendSftT = true;
+            } else {
+                sendAlliance = true;
+            }
             areaPN = true;
         }
         CardsInfo.sentUserCardInfo(event, activeMap, targetPlayer);
         CardsInfo.sentUserCardInfo(event, activeMap, player);
+        String playerPing = Helper.getPlayerPing(event, player);
+        String targetPlayerPing = Helper.getPlayerPing(event, targetPlayer);
+        String playerFaction = Helper.getFactionIconFromDiscord(player.getFaction());
+        String targetPlayerFaction = Helper.getFactionIconFromDiscord(targetPlayer.getFaction());
+        String text = sendSftT ? "SfTt " : (sendAlliance ? "Alliance " : "");
+        MessageHelper.sendMessageToChannel(event.getChannel(), playerFaction + " " + playerPing + " send PN to " + text + targetPlayerFaction + " " + targetPlayerPing);
 
         //Turned off, as we might change back
         if (areaPN && false) {

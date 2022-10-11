@@ -6,17 +6,22 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
 import org.jetbrains.annotations.NotNull;
 import ti4.MessageListener;
+import ti4.commands.cards.CardsInfo;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 public class ButtonListener extends ListenerAdapter {
 
     public static HashMap<Guild, HashMap<String, Emote>> emoteMap = new HashMap<>();
+
+    private static HashMap<String, Set<Player>> playerUsedSC = new HashMap<>();
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
@@ -27,7 +32,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getChannel().sendMessage("Button command not found").queue();
             return;
         }
-
+        String messageID = event.getMessage().getId();
         String id = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(id);
         Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
@@ -39,27 +44,32 @@ public class ButtonListener extends ListenerAdapter {
             case "sabotage" -> addReaction(event, true, "Sabotaging Action Card Play", " Sabotage played");
             case "no_sabotage" -> addReaction(event, false, "No Sabotage", "");
             case "sc_follow" -> {
-                int strategicCC = player.getStrategicCC();
-                String message;
-                if (strategicCC == 0){
-                    message = "Have 0 CC in Strategy, can't follow";
-                } else {
-                    strategicCC--;
-                    player.setStrategicCC(strategicCC);
-                    message = Helper.getPlayerPing(event, player) + " following SC, deducted 1 CC from Strategy Tokens";
+                boolean used = addUsedSCPlayer(messageID, player, event, "");
+                if (used){
+                    break;
                 }
+                String message = deductCC(player, event);
+                addReaction(event, true, message, "");
+            }
+            case "sc_follow_politics" -> {
+                boolean used = addUsedSCPlayer(messageID, player, event, "");
+                if (used){
+                    break;
+                }
+                String message = deductCC(player, event);
+                int count = player.getFaction().equals("yssaril") ? 3 : 2;
+                for (int i = 0; i < count; i++) {
+                    activeMap.drawActionCard(player.getUserID());
+                }
+                CardsInfo.sentUserCardInfo(null, activeMap, player, event);
                 addReaction(event, true, message, "");
             }
             case "sc_follow_trade" -> {
-                int strategicCC = player.getStrategicCC();
-                String message;
-                if (strategicCC == 0){
-                    message = "Have 0 CC in Strategy, can't follow";
-                } else {
-                    strategicCC--;
-                    player.setStrategicCC(strategicCC);
-                    message = Helper.getPlayerPing(event, player) + " following SC, deducted 1 CC from Strategy Tokens";
+                boolean used = addUsedSCPlayer(messageID, player, event, "");
+                if (used){
+                    break;
                 }
+                String message = deductCC(player, event);
                 player.setCommodities(player.getCommoditiesTotal());
                 addReaction(event, true, message, "");
                 addReaction(event, true, "Refreshing Commodities", "");
@@ -80,10 +90,18 @@ public class ButtonListener extends ListenerAdapter {
             }
             case "no_after" -> addReaction(event, false, "No Afters", "");
             case "sc_refresh" -> {
+                boolean used = addUsedSCPlayer(messageID, player, event, "Refresh");
+                if (used){
+                    break;
+                }
                 player.setCommodities(player.getCommoditiesTotal());
                 addReaction(event, true, "Refreshing Commodities", "");
             }
             case "sc_refresh_and_wash" -> {
+                boolean used = addUsedSCPlayer(messageID, player, event, "Refresh and Wash");
+                if (used){
+                    break;
+                }
                 int commoditiesTotal = player.getCommoditiesTotal();
                 int tg = player.getTg();
                 player.setTg(tg + commoditiesTotal);
@@ -94,6 +112,34 @@ public class ButtonListener extends ListenerAdapter {
         }
     }
 
+    private boolean addUsedSCPlayer(String messageID, Player player, @NotNull ButtonInteractionEvent event, String text) {
+        Set<Player> players = playerUsedSC.get(messageID);
+        if (players == null){
+            players = new HashSet<>();
+        }
+        boolean contains = players.contains(player);
+        players.add(player);
+        playerUsedSC.put(messageID, players);
+        if (contains){
+            String defaultText = text.isEmpty() ? "Primary of Strategy Card" : text;
+            event.getChannel().sendMessage("Player: " + Helper.getPlayerPing(event, player) + " already used " + defaultText).queue();
+        }
+        return contains;
+    }
+
+    @NotNull
+    private String deductCC(Player player, @NotNull ButtonInteractionEvent event) {
+        int strategicCC = player.getStrategicCC();
+        String message;
+        if (strategicCC == 0){
+            message = "Have 0 CC in Strategy, can't follow";
+        } else {
+            strategicCC--;
+            player.setStrategicCC(strategicCC);
+            message = Helper.getPlayerPing(event, player) + " following SC, deducted 1 CC from Strategy Tokens";
+        }
+        return message;
+    }
 
 
     private void clearAllReactions(@NotNull ButtonInteractionEvent event) {

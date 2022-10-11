@@ -61,7 +61,9 @@ public class SCPlay extends PlayerSubcommandData {
             if (sc == 1){
                 followButton = Button.success("sc_follow_leadership", "SC Follow");
             } else {
-                if (sc == 5){
+                if (sc == 3){
+                    followButton = Button.success("sc_follow_politics", "SC Follow");
+                } else if (sc == 5){
                     followButton = Button.success("sc_follow_trade", "SC Follow");
                 } else {
                     followButton = Button.success("sc_follow", "SC Follow");

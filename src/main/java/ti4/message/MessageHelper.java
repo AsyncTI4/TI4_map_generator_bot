@@ -3,6 +3,8 @@ package ti4.message;
 import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.Event;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -56,7 +58,7 @@ public class MessageHelper {
         replyToMessageTI4Logo(event);
     }
 
-    public static void sentToMessageToUser(SlashCommandInteractionEvent event, String messageText) {
+    public static void sentToMessageToUser(GenericInteractionCreateEvent event, String messageText) {
         event.getUser().openPrivateChannel().queue(channel -> {
             splitAndSent(messageText, channel);
         });
@@ -125,7 +127,7 @@ public class MessageHelper {
         }
     }
 
-    public static void sentToMessageToUser(SlashCommandInteractionEvent event, String messageText, User user) {
+    public static void sentToMessageToUser(GenericCommandInteractionEvent event, String messageText, User user) {
         user.openPrivateChannel().queue(channel -> {
             splitAndSent(messageText, channel);
         });
