@@ -9,8 +9,8 @@ import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.message.MessageHelper;
 
-public class ExpDeck extends ExploreSubcommandData {
-    public ExpDeck() {
+public class ExploreAndDiscard extends ExploreSubcommandData {
+    public ExploreAndDiscard() {
         super(Constants.DRAW_AND_DISCARD, "Draw from a specified Exploration Deck.");
         addOptions(
                 typeOption.setRequired(true),

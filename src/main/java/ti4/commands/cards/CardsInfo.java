@@ -3,7 +3,9 @@ package ti4.commands.cards;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -17,6 +19,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
+import javax.annotation.CheckForNull;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -39,9 +42,12 @@ public class CardsInfo extends CardsSubcommandData {
         sentUserCardInfo(event, activeMap, player);
     }
 
-    public static void sentUserCardInfo(SlashCommandInteractionEvent event, Map activeMap, Player player) {
+    public static void sentUserCardInfo(GenericCommandInteractionEvent event, Map activeMap, Player player) {
+        sentUserCardInfo(event, activeMap, player, null);
+    }
+    public static void sentUserCardInfo(@CheckForNull GenericCommandInteractionEvent event, Map activeMap, Player player, @CheckForNull ButtonInteractionEvent buttonEvent) {
         checkAndAddPNs(activeMap, player);
-        OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
+        OptionMapping longPNOption = event != null ? event.getOption(Constants.LONG_PN_DISPLAY) : null;
         boolean longPNDisplay = false;
         if (longPNOption != null) {
             longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
@@ -70,11 +76,9 @@ public class CardsInfo extends CardsSubcommandData {
             }
         }
         sb.append("\n").append("**Scored Secret Objectives:**").append("\n");
-        if (scoredSecretObjective != null) {
-            for (java.util.Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
-                sb.append(index).append(". (").append(so.getValue()).append(") - ").append(Mapper.getSecretObjective(so.getKey())).append("\n");
-                index++;
-            }
+        for (java.util.Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
+            sb.append(index).append(". (").append(so.getValue()).append(") - ").append(Mapper.getSecretObjective(so.getKey())).append("\n");
+            index++;
         }
         sb.append("\n").append("**Action Cards:**").append("\n");
         index = 1;
@@ -109,7 +113,7 @@ public class CardsInfo extends CardsSubcommandData {
             }
         }
         sb.append("--------------------\n");
-        User userById = event.getJDA().getUserById(player.getUserID());
+        User userById = event != null ? event.getJDA().getUserById(player.getUserID()) : (buttonEvent != null ? buttonEvent.getJDA().getUserById(player.getUserID()) : null);
         if (userById != null) {
             if (activeMap.isCommunityMode() && player.getChannelForCommunity() instanceof MessageChannel){
                 MessageHelper.sendMessageToChannel((MessageChannel) player.getChannelForCommunity(), sb.toString());
@@ -128,7 +132,7 @@ public class CardsInfo extends CardsSubcommandData {
 
             }
         } else {
-            MessageHelper.sentToMessageToUser(event, "Player: " + player.getUserName() + " not found");
+            MessageHelper.sentToMessageToUser(event != null ? event : buttonEvent, "Player: " + player.getUserName() + " not found");
         }
     }
 
