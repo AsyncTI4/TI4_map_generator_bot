@@ -1,17 +1,20 @@
 package ti4.commands.cards;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
@@ -112,6 +115,17 @@ public class CardsInfo extends CardsSubcommandData {
                 MessageHelper.sendMessageToChannel((MessageChannel) player.getChannelForCommunity(), sb.toString());
             } else {
                 MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
+                try {
+                    TextChannel textChannel = event.getTextChannel();
+                    ThreadChannelAction threadChannel = textChannel.createThreadChannel("AC Info", true);
+                    threadChannel.queue(msg -> {
+                        msg.sendMessage("hello i private thread: " + Helper.getPlayerPing(event, player)).queue();
+                    });
+                }
+                catch (Exception e){
+                    BotLogger.log("Could not create Private Thread");
+                }
+
             }
         } else {
             MessageHelper.sentToMessageToUser(event, "Player: " + player.getUserName() + " not found");
