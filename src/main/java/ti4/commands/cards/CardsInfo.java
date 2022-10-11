@@ -115,16 +115,16 @@ public class CardsInfo extends CardsSubcommandData {
                 MessageHelper.sendMessageToChannel((MessageChannel) player.getChannelForCommunity(), sb.toString());
             } else {
                 MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
-                try {
-                    TextChannel textChannel = event.getTextChannel();
-                    ThreadChannelAction threadChannel = textChannel.createThreadChannel("AC Info", true);
-                    threadChannel.queue(msg -> {
-                        msg.sendMessage("hello i private thread: " + Helper.getPlayerPing(event, player)).queue();
-                    });
-                }
-                catch (Exception e){
-                    BotLogger.log("Could not create Private Thread");
-                }
+//                try {
+//                    TextChannel textChannel = event.getTextChannel();
+//                    ThreadChannelAction threadChannel = textChannel.createThreadChannel("AC Info", true);
+//                    threadChannel.queue(msg -> {
+//                        msg.sendMessage("hello i private thread: " + Helper.getPlayerPing(event, player)).queue();
+//                    });
+//                }
+//                catch (Exception e){
+//                    BotLogger.log("Could not create Private Thread");
+//                }
 
             }
         } else {
