@@ -40,7 +40,7 @@ public class MiltyCommand implements Command {
             }
             Map userActiveMap = mapManager.getUserActiveMap(userID);
             if (!userActiveMap.getPlayerIDs().contains(userID) && !userActiveMap.isCommunityMode()) {
-                MessageHelper.replyToMessage(event, "Your not a player of the game, please call function /join gameName");
+                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                 return false;
             }
             return true;

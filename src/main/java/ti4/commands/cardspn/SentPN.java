@@ -89,7 +89,7 @@ public class SentPN extends PNCardsSubcommandData {
         String targetPlayerPing = Helper.getPlayerPing(event, targetPlayer);
         String playerFaction = Helper.getFactionIconFromDiscord(player.getFaction());
         String targetPlayerFaction = Helper.getFactionIconFromDiscord(targetPlayer.getFaction());
-        String text = sendSftT ? "SfTt " : (sendAlliance ? "Alliance " : "");
+        String text = sendSftT ? "SftT " : (sendAlliance ? "Alliance " : "");
         MessageHelper.sendMessageToChannel(event.getChannel(), playerFaction + " " + playerPing + " send PN to " + text + targetPlayerFaction + " " + targetPlayerPing);
 
         //Turned off, as we might change back

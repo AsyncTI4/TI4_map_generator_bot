@@ -19,7 +19,7 @@ public class Pass extends PlayerSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.replyToMessage(event, "Your not a player of this game");
+            MessageHelper.replyToMessage(event, "You're not a player of this game");
             return;
         }
         player.setPassed(true);

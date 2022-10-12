@@ -33,7 +33,7 @@ public class SCPlay extends PlayerSubcommandData {
         player = Helper.getPlayer(activeMap, player, event);
         MessageChannel channel = event.getChannel();
         if (player == null) {
-            MessageHelper.sendMessageToChannel(channel, "Your not a player of this game");
+            MessageHelper.sendMessageToChannel(channel, "You're not a player of this game");
             return;
         }
         int sc = player.getSC();
