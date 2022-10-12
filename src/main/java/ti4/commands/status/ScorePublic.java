@@ -62,7 +62,7 @@ public class ScorePublic extends StatusSubcommandData {
             } else if (poName2 != null){
                 poName = poName2;
             }
-            String message = Helper.getPlayerPing(event, player) + "(" + player.getColor() + ") scored: " + poName;
+            String message = Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(event, player) + "(" + player.getColor() + ") scored: " + poName;
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }
     }
