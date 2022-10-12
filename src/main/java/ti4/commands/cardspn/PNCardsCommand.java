@@ -46,11 +46,11 @@ public class PNCardsCommand implements Command {
             if (userActiveMap.isCommunityMode()){
                 Player player = Helper.getGamePlayer(userActiveMap, null, event, userID);
                 if (player == null || !userActiveMap.getPlayerIDs().contains(player.getUserID()) && !event.getUser().getId().equals(MapGenerator.userID)) {
-                    MessageHelper.replyToMessage(event, "Your not a player of the game, please call function /join gameName");
+                    MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                     return false;
                 }
             } else if (!userActiveMap.getPlayerIDs().contains(userID)) {
-                MessageHelper.replyToMessage(event, "Your not a player of the game, please call function /join gameName");
+                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
                 return false;
             }
             if (!event.getChannel().getName().startsWith(userActiveMap.getName() + "-")) {

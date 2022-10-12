@@ -37,7 +37,7 @@ public class ButtonListener extends ListenerAdapter {
         Map activeMap = MapManager.getInstance().getUserActiveMap(id);
         Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
         if (player == null) {
-            event.getChannel().sendMessage("Your not a player of the game").queue();
+            event.getChannel().sendMessage("You're not a player of the game").queue();
             return;
         }
         switch (buttonID) {
@@ -157,7 +157,7 @@ public class ButtonListener extends ListenerAdapter {
         Map activeMap = MapManager.getInstance().getUserActiveMap(id);
         Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
         if (player == null) {
-            event.getChannel().sendMessage("Your not a player of the game").queue();
+            event.getChannel().sendMessage("You're not a player of the game").queue();
             return;
         }
         String playerFaction = player.getFaction();

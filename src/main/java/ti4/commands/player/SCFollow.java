@@ -25,7 +25,7 @@ public class SCFollow extends PlayerSubcommandData {
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Your not a player of this game");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "You're not a player of this game");
             return;
         }
         int strategicCC = player.getStrategicCC();
