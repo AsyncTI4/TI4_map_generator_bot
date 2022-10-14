@@ -27,10 +27,58 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class GenerateMap {
+    private class MapImage {
+        private BufferedImage image;
+        private Thread executionThread;
+
+        Graphics getGraphics() {
+            return image.getGraphics();
+        }
+
+        void reset(int width, int height) {
+            image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        }
+
+        void run(Runnable r) {
+            executionThread = new Thread(r);
+            executionThread.start();
+        }
+
+        void join() throws InterruptedException {
+            if(executionThread.isAlive()){
+                executionThread.join();
+            }
+        }
+    }
+
+    private enum MapTypes {
+        MAP_MAP (-1),
+        MAP_PLAYER1 (1),
+        MAP_PLAYER2 (2),
+        MAP_PLAYER3 (3),
+        MAP_PLAYER4 (4),
+        MAP_PLAYER5 (5),
+        MAP_PLAYER6 (6),
+        MAP_PLAYER7 (7),
+        MAP_PLAYER8 (8);
+
+        int playernum;
+        MapTypes(int m) {
+            this.playernum = m;
+        }
+
+        static MapTypes getMapTypeByPlayer(int player) {
+            return Arrays.stream(values())
+                    .filter(legNo -> legNo.playernum == player)
+                    .findFirst().get();
+        }
+
+    }
     public static final int DELTA_X = 8;
     public static final int DELTA_Y = 24;
     private Graphics graphics;
     private BufferedImage mainImage;
+    private EnumMap<MapTypes, MapImage> images;
     private int width;
     private int height;
     private int heightStorage;
@@ -61,6 +109,11 @@ public class GenerateMap {
             BotLogger.log("Could read file data for setup file");
         }
         init(null);
+        images = new EnumMap<MapTypes, MapImage>(MapTypes.class);
+        for (MapTypes m: MapTypes.values()) {
+            images.put(m, new MapImage());
+        }
+
         resetImage();
     }
 
@@ -81,6 +134,11 @@ public class GenerateMap {
 
     private void resetImage() {
         mainImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+
+        for (MapTypes m: images.keySet()) {
+            images.get(m).reset(width, height);
+        }
+        
         graphics = mainImage.getGraphics();
     }
 
@@ -120,35 +178,26 @@ public class GenerateMap {
         }
         resetImage();
         File file = Storage.getMapImageStorage("temp.png");
-        try {
-            if (displayType == DisplayType.all || displayType == DisplayType.map) {
-                HashMap<String, Tile> tileMap = new HashMap<>(map.getTileMap());
-                String setup = tileMap.keySet().stream()
-                        .filter(key -> key.startsWith("setup"))
-                        .findFirst()
-                        .orElse(null);
-                if (setup != null) {
-                    addTile(tileMap.get(setup), map, false);
-                    tileMap.remove(setup);
-                }
-                tileMap.keySet().stream()
-                        .sorted()
-                        .forEach(key -> addTile(tileMap.get(key), map, true));
 
-                tileMap.keySet().stream()
-                        .sorted()
-                        .forEach(key -> addTile(tileMap.get(key), map, false));
+        try {
+            MapImage mtt = images.get(MapTypes.MAP_MAP);
+            if (displayType == DisplayType.all || displayType == DisplayType.map) {
+                mtt.run( () -> {drawMap(map, mtt.image);});
             }
+
+            mtt.join();
+            graphics.drawImage(mtt.image, 0,0, null);
+
+            gameInfo(map, displayType);
             graphics.setFont(Storage.getFont32());
             graphics.setColor(Color.WHITE);
             String timeStamp = getTimeStamp();
             graphics.drawString(map.getName() + " " + timeStamp, 0, 34);
 
-            gameInfo(map, displayType);
-
 
             new Thread(() -> {
                 WebHelper.putMap(map.getName(), mainImage);
+                WebHelper.putData(map.getName(), map);
             }).start();
 
 
@@ -163,6 +212,8 @@ public class GenerateMap {
             imageWriter.write(null, new IIOImage(mainImage, null, null), defaultWriteParam);
         } catch (IOException e) {
             BotLogger.log(map.getName() + ": Could not save generated map");
+        } catch (InterruptedException e) {
+            BotLogger.log(map.getName() + ": Map Thread terminated abnormally.");
         }
 
         String timeStamp = getTimeStamp();
@@ -189,6 +240,26 @@ public class GenerateMap {
         File jpgFile = new File(absolutePath);
         MapFileDeleter.addFileToDelete(jpgFile);
         return jpgFile;
+    }
+
+    private void drawMap(Map map, BufferedImage img) {
+        Graphics graphics = img.getGraphics();
+        HashMap<String, Tile> tileMap = new HashMap<>(map.getTileMap());
+        String setup = tileMap.keySet().stream()
+                .filter(key -> key.startsWith("setup"))
+                .findFirst()
+                .orElse(null);
+        if (setup != null) {
+            addTile(tileMap.get(setup), map, false, graphics);
+            tileMap.remove(setup);
+        }
+        tileMap.keySet().stream()
+                .sorted()
+                .forEach(key -> addTile(tileMap.get(key), map, true, graphics));
+
+        tileMap.keySet().stream()
+                .sorted()
+                .forEach(key -> addTile(tileMap.get(key), map, false, graphics));
     }
 
     @NotNull
@@ -1512,7 +1583,7 @@ public class GenerateMap {
     }
 
 
-    private void addTile(Tile tile, Map map, boolean justTile) {
+    private void addTile(Tile tile, Map map, boolean justTile, Graphics graphics) {
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
             Point positionPoint = PositionMapper.getTilePosition(tile.getPosition(), map);

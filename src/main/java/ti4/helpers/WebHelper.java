@@ -1,10 +1,13 @@
 package ti4.helpers;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.ResourceHelper;
+import ti4.map.Map;
 import ti4.message.BotLogger;
 
 import javax.imageio.IIOImage;
@@ -16,6 +19,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Objects;
@@ -32,6 +39,27 @@ public class WebHelper {
         } catch (IOException e) {
             BotLogger.log("Could not load web properties.");
         }
+
+    }
+
+    public static void putData(String gameId, Map map) {
+
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            String json = mapper.writeValueAsString( map );
+            HttpClient client = HttpClient.newHttpClient();
+            HttpRequest request = HttpRequest.newBuilder()
+                    .uri(URI.create(String.format("https://bbg9uiqewd.execute-api.us-east-1.amazonaws.com/Prod/map/%s",gameId)))
+                    .POST(HttpRequest.BodyPublishers.ofString(json))
+                    .build();
+
+            HttpResponse<String> response = client.send(request,
+                    HttpResponse.BodyHandlers.ofString());
+
+        } catch (IOException | InterruptedException e) {
+            BotLogger.log("Could not put data to web server");
+        }
+
 
     }
 
