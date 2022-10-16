@@ -44,27 +44,31 @@ public class ScorePublic extends StatusSubcommandData {
         if (!scored) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Public Objective ID found, please retry");
         } else {
-            LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
-            String id = "";
-            for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
-                if (po.getValue().equals(poID)) {
-                    id = po.getKey();
-                    break;
-                }
-            }
-            HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
-            HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
-            String poName1 = publicObjectivesState1.get(id);
-            String poName2 = publicObjectivesState2.get(id);
-            String poName = id;
-            if (poName1 != null) {
-                poName = poName1;
-            } else if (poName2 != null){
-                poName = poName2;
-            }
-            String message = Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(event, player) + "(" + player.getColor() + ") scored: " + poName;
-            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            informAboutScoring(event, activeMap, player, poID);
         }
+    }
+
+    public static void informAboutScoring(SlashCommandInteractionEvent event, Map activeMap, Player player, int poID) {
+        LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(poID)) {
+                id = po.getKey();
+                break;
+            }
+        }
+        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
+        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
+        String poName1 = publicObjectivesState1.get(id);
+        String poName2 = publicObjectivesState2.get(id);
+        String poName = id;
+        if (poName1 != null) {
+            poName = poName1;
+        } else if (poName2 != null){
+            poName = poName2;
+        }
+        String message = Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(event, player) + "(" + player.getColor() + ") scored: " + poName;
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 
     @Override

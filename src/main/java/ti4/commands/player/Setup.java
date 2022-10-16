@@ -118,13 +118,16 @@ public class Setup extends PlayerSubcommandData {
         boolean useSpecified = false;
         OptionMapping option = event.getOption(Constants.HS_TILE_POSITION);
         String positionHS = option != null ? option.getAsString().toLowerCase() : "";
+        boolean is6playerMap = true;
         if (activeMap.getPlayerCountForMap() == 6){
             setup = Constants.setup6p;
+            is6playerMap = true;
             if (MapStringMapper.mapFor6Player.contains(positionHS)){
                 useSpecified = true;
             }
         } else {
             setup = Constants.setup8p;
+            is6playerMap = false;
             if (MapStringMapper.mapFor8Player.contains(positionHS)){
                 useSpecified = true;
             }
@@ -136,6 +139,53 @@ public class Setup extends PlayerSubcommandData {
         String position = useSpecified && !positionHS.isEmpty() ? positionHS : setup.get(index);
         Tile tile = new Tile(hsTile, position);
         activeMap.setTile(tile);
+
+        if ("ghost".equals(faction)){
+            if (useSpecified){
+                position = "tr";
+            } else {
+                int positionNumber = 1;
+                for (Player playerInfo : players.values()) {
+                    if (playerInfo.equals(player)) {
+                        break;
+                    }
+                    positionNumber++;
+                }
+
+
+                if (is6playerMap) {
+                   if (positionNumber == 1 || positionNumber == 2){
+                       position = "tr";
+                   } else if (positionNumber == 3 || positionNumber == 4) {
+                       position = "br";
+                   } else if (positionNumber == 5){
+                       position = "bl";
+                   } else {
+                       position = "tl";
+                       Tile mallice = activeMap.getTile(position);
+                       mallice.setPosition("tr");
+                       activeMap.removeTile("tl");
+                       activeMap.setTile(mallice);
+                   }
+                }else{
+                    if (positionNumber == 1 || positionNumber == 2 || positionNumber == 3 ){
+                        position = "tr";
+                    } else if (positionNumber == 4 || positionNumber == 5) {
+                        position = "br";
+                    } else if (positionNumber == 6 || positionNumber == 7){
+                        position = "bl";
+                    } else {
+                        position = "tl";
+                        Tile mallice = activeMap.getTile(position);
+                        mallice.setPosition("tr");
+                        activeMap.removeTile("tl");
+                        activeMap.setTile(mallice);
+                    }
+                }
+            }
+            tile = new Tile("51", position);
+            activeMap.setTile(tile);
+        }
 
 
         player.setCommoditiesTotal(Integer.parseInt(setupInfo[3]));

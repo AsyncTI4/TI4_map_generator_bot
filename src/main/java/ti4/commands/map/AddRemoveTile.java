@@ -63,6 +63,9 @@ abstract public class AddRemoveTile implements Command {
         }
 
         Tile tile = new Tile(planetTileName, position);
+        if (planetTileName.equals("18")){
+            tile.addToken("token_custodian.png", "mr");
+        }
         Map userActiveMap = mapManager.getUserActiveMap(userID);
         tileAction(tile, position, userActiveMap);
         return userActiveMap;
