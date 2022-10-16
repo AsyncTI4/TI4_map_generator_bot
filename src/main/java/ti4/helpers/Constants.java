@@ -442,4 +442,9 @@ public class Constants {
         KELERES_CHOICES.put("keleresa", "Argent");
     }
 
+    public static final String ATTACHMENT_TITANSPN_PNG = "attachment_titanspn.png";
+    public static final String TERRAFORM = "terraform";
+    public static final String CUSTODIAN_TOKEN = "custodian";
+    public static final String CUSTODIAN_TOKEN_PNG = "token_custodian.png";
+
 }

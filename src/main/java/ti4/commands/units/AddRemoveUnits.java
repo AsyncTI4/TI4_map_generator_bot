@@ -131,7 +131,7 @@ abstract public class AddRemoveUnits implements Command {
                            String colorID = Mapper.getColorID(player.getColor());
                            if (unitColor.equals(colorID)){
                                if (!player.getPlanets().contains(planetName)) {
-                                   new PlanetAdd().doAction(player, planetName, activeMap);
+                                   new PlanetAdd().doAction(player, planetName, activeMap, event);
                                }
                                break;
                            }

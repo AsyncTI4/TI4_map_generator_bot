@@ -1,10 +1,13 @@
 package ti4.commands.player;
 
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.status.ScorePublic;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
+import ti4.message.MessageHelper;
 
 import java.util.List;
 
@@ -15,6 +18,10 @@ public class PlanetAdd extends PlanetAddRemove {
 
     @Override
     public void doAction(Player player, String planet, Map map) {
+      doAction(player, planet, map, null);
+    }
+
+    public void doAction(Player player, String planet, Map map, SlashCommandInteractionEvent event) {
         player.addPlanet(planet);
         player.exhaustPlanet(planet);
         if (planet.equals("mirage")){
@@ -22,11 +29,21 @@ public class PlanetAdd extends PlanetAddRemove {
         }
         UnitHolder unitHolder = map.getPlanetsInfo().get(planet);
         String color = player.getColor();
+        boolean moveTitanPN = false;
         if (unitHolder != null && color != null && !"white".equals(color)) {
             String ccID = Mapper.getControlID(color);
             String ccPath = Mapper.getCCPath(ccID);
             if (ccPath != null) {
                 unitHolder.addControl(ccID);
+            }
+            if (unitHolder.getTokenList().contains(Constants.ATTACHMENT_TITANSPN_PNG)) {
+                moveTitanPN = true;
+            } else if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
+                unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
+                map.scorePublicObjective(player.getUserID(), 0);
+                if (event != null){
+                    ScorePublic.informAboutScoring(event, map, player, 0);
+                }
             }
         }
         for (Player player_ : map.getPlayers().values()) {
@@ -37,6 +54,13 @@ public class PlanetAdd extends PlanetAddRemove {
                         player.exhaustPlanetAbility(planet);
                     }
                     player_.removePlanet(planet);
+                    if (moveTitanPN){
+                       if (player_.getPromissoryNotesInPlayArea().contains(Constants.TERRAFORM)){
+                           player_.removePromissoryNote(Constants.TERRAFORM);
+                           player.setPromissoryNote(Constants.TERRAFORM);
+                           player.setPromissoryNotesInPlayArea(Constants.TERRAFORM);
+                       }
+                    }
                 }
             }
         }

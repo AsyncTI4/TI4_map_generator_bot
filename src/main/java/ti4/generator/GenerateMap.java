@@ -147,10 +147,12 @@ public class GenerateMap {
             gameInfo(map, displayType);
 
 
-            new Thread(() -> {
-                WebHelper.putMap(map.getName(), mainImage);
-            }).start();
-
+            String testing = System.getenv("TESTING");
+            if (testing == null){
+                new Thread(() -> {
+                    WebHelper.putMap(map.getName(), mainImage);
+                }).start();
+             }
 
             ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
             imageWriter.setOutput(ImageIO.createImageOutputStream(file));
@@ -648,7 +650,7 @@ public class GenerateMap {
 
             graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
 
-            if (unitHolder.getTokenList().contains("attachment_titanspn.png")) {
+            if (unitHolder.getTokenList().contains(Constants.ATTACHMENT_TITANSPN_PNG)) {
                 String planetTypeName = "pc_attribute_titanspn.png";
                 drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName);
             } else {
@@ -1737,6 +1739,8 @@ public class GenerateMap {
                 }
                 if (tokenPath.contains(Constants.DMZ_LARGE) || tokenPath.contains(Constants.WORLD_DESTROYED)) {
                     graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - (image.getHeight() / 2), null);
+                } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
+                    graphics.drawImage(image, tileX + 70, tileY + 45, null);
                 } else {
                     Point position = unitTokenPosition.getPosition(tokenID);
                     if (position != null) {
