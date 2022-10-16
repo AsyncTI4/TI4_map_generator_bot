@@ -40,11 +40,11 @@ public class Map {
     @ExportableField
     private String speaker = "";
     @ExportableField
-    String creationDate;
+    private String creationDate;
     @ExportableField
-    String customName = "";
+    private String customName = "";
     @ExportableField
-    long lastModifiedDate;
+    private long lastModifiedDate;
 
     @ExportableField
     private int round = 1;
