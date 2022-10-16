@@ -149,6 +149,7 @@ public class GenerateMap {
 
             new Thread(() -> {
                 WebHelper.putMap(map.getName(), mainImage);
+                WebHelper.putData(map.getName(), map);
             }).start();
 
 

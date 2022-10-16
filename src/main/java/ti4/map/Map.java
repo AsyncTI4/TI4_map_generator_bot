@@ -6,9 +6,11 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
+import ti4.message.BotLogger;
 
 import javax.annotation.CheckForNull;
 import java.awt.*;
+import java.lang.reflect.Field;
 import java.util.List;
 import java.util.*;
 
@@ -24,6 +26,7 @@ public class Map {
 
     @CheckForNull
     private DisplayType displayTypeForced = null;
+    @ExportableField
     private int playerCountForMap = 6;
     private int vp = 10;
     private boolean communityMode = false;
@@ -34,10 +37,16 @@ public class Map {
     private MapStatus mapStatus = MapStatus.open;
 
     private HashMap<Integer, Boolean> scPlayed = new HashMap<>();
+    @ExportableField
     private String speaker = "";
-    private String creationDate;
-    private String customName = "";
-    private long lastModifiedDate;
+    @ExportableField
+    String creationDate;
+    @ExportableField
+    String customName = "";
+    @ExportableField
+    long lastModifiedDate;
+
+    @ExportableField
     private int round = 1;
 
     private List<String> secretObjectives;
@@ -98,6 +107,25 @@ public class Map {
         for (int i = 0; i < 8; i++) {
             scTradeGoods.put(i + 1, 0);
         }
+    }
+
+    public HashMap<String, String> getExportableFieldMap() {
+        Class<? extends Map> aClass = this.getClass();
+        Field[] fields = aClass.getDeclaredFields();
+        HashMap<String, String> returnValue = new HashMap<>();
+
+        for (Field f : fields) {
+            if(f.getDeclaredAnnotation(ExportableField.class) != null) {
+                try {
+                    returnValue.put(f.getName(), f.get(this).toString());
+                } catch (IllegalAccessException e) {
+                    // This shouldn't really happen since we
+                    // can even see private fields.
+                    BotLogger.log("Unknown error exporting fields from map.");
+                }
+            }
+        }
+        return returnValue;
     }
 
     public MiltyDraftManager getMiltyDraftManager() {
