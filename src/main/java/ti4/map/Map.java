@@ -114,10 +114,10 @@ public class Map {
         Field[] fields = aClass.getDeclaredFields();
         HashMap<String, String> returnValue = new HashMap<>();
 
-        for (Field f : fields) {
-            if(f.getDeclaredAnnotation(ExportableField.class) != null) {
+        for (Field field : fields) {
+            if(field.getDeclaredAnnotation(ExportableField.class) != null) {
                 try {
-                    returnValue.put(f.getName(), f.get(this).toString());
+                    returnValue.put(field.getName(), field.get(this).toString());
                 } catch (IllegalAccessException e) {
                     // This shouldn't really happen since we
                     // can even see private fields.

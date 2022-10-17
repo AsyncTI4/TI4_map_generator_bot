@@ -46,8 +46,8 @@ public class WebHelper {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            HashMap<String, String> mm = map.getExportableFieldMap();
-            String json = mapper.writeValueAsString( mm );
+            HashMap<String, String> exportableFieldMap = map.getExportableFieldMap();
+            String json = mapper.writeValueAsString( exportableFieldMap );
 
             HttpClient client = HttpClient.newHttpClient();
             HttpRequest request = HttpRequest.newBuilder()
