@@ -1,6 +1,7 @@
 package ti4.commands.map;
 
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -53,7 +54,15 @@ public class DeleteGame implements Command {
             MessageHelper.replyToMessage(event, "Map: " + mapName + " was not found.");
             return;
         }
-        if (!map.getOwnerID().equals(member.getId()) && !member.getId().equals(MapGenerator.userID)){
+        Member member_ = event.getMember();
+        boolean isAdmin = false;
+        if (member_ != null) {
+            java.util.List<Role> roles = member_.getRoles();
+            if (roles.contains(MapGenerator.adminRole)) {
+                isAdmin = true;
+            }
+        }
+        if (!map.getOwnerID().equals(member.getId()) && !isAdmin){
             MessageHelper.replyToMessage(event, "Map: " + mapName + " can be deleted by it's creator or admin.");
             return;
         }

@@ -1,5 +1,7 @@
 package ti4.commands.map;
 
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
@@ -34,8 +36,12 @@ public class SetGame implements Command {
         if (map.isMapOpen()){
             return true;
         }
-        if (MapGenerator.userID.equals(userID)){
-            return true;
+        Member member = event.getMember();
+        if (member != null) {
+            java.util.List<Role> roles = member.getRoles();
+            if (roles.contains(MapGenerator.adminRole)) {
+                return true;
+            }
         }
         if (!map.getPlayerIDs().contains(userID) && !userID.equals(map.getOwnerID())){
             MessageHelper.replyToMessage(event, "Your are not a player of selected map.");

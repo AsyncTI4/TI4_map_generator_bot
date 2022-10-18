@@ -1,5 +1,7 @@
 package ti4.commands.game;
 
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -49,7 +51,15 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
         }
         MapManager mapManager = MapManager.getInstance();
         Map map = mapManager.getMap(mapName);
-        if (!map.getOwnerID().equals(callerUser.getId()) && !event.getUser().getId().equals(MapGenerator.userID)){
+        Member member = event.getMember();
+        boolean isAdmin = false;
+        if (member != null) {
+            java.util.List<Role> roles = member.getRoles();
+            if (roles.contains(MapGenerator.adminRole)) {
+                isAdmin = true;
+            }
+        }
+        if (!map.getOwnerID().equals(callerUser.getId()) && !isAdmin){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game owner can add/remove players.");
             return;
         }
