@@ -3,6 +3,7 @@ package ti4;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.JDABuilder;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.requests.GatewayIntent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import net.dv8tion.jda.api.utils.ChunkingFilter;
@@ -39,6 +40,8 @@ public class MapGenerator {
 
     public static JDA jda;
     public static String userID;
+    public static String adminID;
+    public static Role adminRole;
 
     public static void main(String[] args)
             throws LoginException {
@@ -64,6 +67,7 @@ public class MapGenerator {
         AliasHandler.init();
         Storage.init();
 
+        adminRole = jda.getRoleById("943596173896323072");
 
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddTile());

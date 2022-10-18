@@ -1,5 +1,7 @@
 package ti4.commands.cardsso;
 
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -42,8 +44,12 @@ public class SOCardsCommand implements Command {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
                 return false;
             }
-            if (event.getUser().getId().equals(MapGenerator.userID)) {
-                return true;
+            Member member = event.getMember();
+            if (member != null) {
+                java.util.List<Role> roles = member.getRoles();
+                if (roles.contains(MapGenerator.adminRole)) {
+                    return true;
+                }
             }
             Map userActiveMap = mapManager.getUserActiveMap(userID);
             if (userActiveMap.isCommunityMode()){

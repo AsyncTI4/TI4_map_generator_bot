@@ -1,5 +1,7 @@
 package ti4.commands.admin;
 
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -7,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.MapGenerator;
 import ti4.commands.Command;
+import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -29,12 +32,15 @@ public class AdminCommand implements Command {
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         if (event.getName().equals(getActionID())) {
-            String userID = event.getUser().getId();
-            if (userID.equals(MapGenerator.userID)) {
-                return true;
-            } else {
-                MessageHelper.replyToMessage(event, "Not Authorized save attempt");
-                return false;
+            Member member = event.getMember();
+            if (member != null) {
+                java.util.List<Role> roles = member.getRoles();
+                if (roles.contains(MapGenerator.adminRole)) {
+                    return true;
+                } else {
+                    MessageHelper.replyToMessage(event, "Not Authorized command attempt");
+                    return false;
+                }
             }
         }
         return false;
