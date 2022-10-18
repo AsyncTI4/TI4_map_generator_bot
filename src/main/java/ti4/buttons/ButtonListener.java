@@ -121,7 +121,7 @@ public class ButtonListener extends ListenerAdapter {
         players.add(player);
         playerUsedSC.put(messageID, players);
         if (contains){
-            String defaultText = text.isEmpty() ? "Primary of Strategy Card" : text;
+            String defaultText = text.isEmpty() ? "Secondary of Strategy Card" : text;
             event.getChannel().sendMessage("Player: " + Helper.getPlayerPing(event, player) + " already used " + defaultText).queue();
         }
         return contains;
