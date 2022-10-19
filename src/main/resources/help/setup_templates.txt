@@ -1,0 +1,18 @@
+3-ring maps (player count 6 during setup)
+5-Player
+Standard 5p setup (PoK Hyperlane setup):
+0b 0b 0b 0b 0b 86a2 0b 0b 0b 0b 0b 0b 0b 0b 0b 87a4 0b 88a0 0g 0b 0b 0g 0b 0b 0g 0b 0b 0g 0b 0b 0g 0b 83a2 86a2 84a2 0b
+
+6-Player
+Standard 6p setup:
+0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0g 0b 0b 0g 0b 0b 0g 0b 0b 0g 0b 0b 0g 0b 0b 0g 0b 0b
+
+3-ring map with home systems moved one step clockwise
+0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0g 0b 0b 0g 0b 0b 0g 0b 0b 0g 0b 0b 0g 0b 0b 0g 0b
+
+Small world variant (home systems moved one step towards MR)
+0b 0b 0b 0b 0b 0b 0g 0b 0g 0b 0g 0b 0g 0b 0g 0b 0g 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b
+
+Small equidistant screwy'all (home systems one inwards and clockwise)
+0b 0b 0b 0b 0b 0b 0b 0g 0b 0g 0b 0g 0b 0g 0b 0g 0b 0g 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b
+
