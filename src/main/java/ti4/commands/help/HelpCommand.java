@@ -96,6 +96,7 @@ public class HelpCommand implements Command {
     private Collection<HelpSubcommandData> getSubcommands() {
         Collection<HelpSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new HelpAction());
+        subcommands.add(new SetupTemplatesAction());
         subcommands.add(new ListGames());
         subcommands.add(new ListPlanets());
         subcommands.add(new ListTiles());

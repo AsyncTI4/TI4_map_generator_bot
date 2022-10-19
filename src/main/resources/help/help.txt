@@ -128,16 +128,16 @@ faction_or_color tag helps to define for which player you want to set stats. FOR
 /player tech_add techName player(optional) <- adds selected tech to player area
 /player tech_remove techName player(optional) <- removes selected tech to player area
 /player tech_exhaust techName player(optional) <- exhausts selected tech to player area
-/player tech_refresh techName player(optional) <- refreshes selected tech to player area
+/player tech_ready techName player(optional) <- refreshes selected tech to player area
 /player turn player(optional)  <- pings next player in line. Can do turn for any player
 /player planet_add planetName1 planetName2..6(optional) <- adds planet
 /player planet_remove planetName1 planetName2..6(optional) <- removes planet
 /player planet_exhaust planetName1 planetName2..6(optional) <- exhaust planet
-/player planet_refresh planetName1 planetName2..6(optional) <- refreshes planet
-/player planet_refresh_all <- refreshes all planets
+/player planet_ready planetName1 planetName2..6(optional) <- refreshes planet
+/player planet_ready_all <- refreshes all planets
 /player planet_exhaust_all <- exhaust all planets
 /player legendary_exhaust_ability planetName1 planetName2..6(optional) <- exhaust planet ability (legendary)
-/player legendary_refresh_ability planetName1 planetName2..6(optional) <- refreshes planet ability (legendary)
+/player legendary_ready_ability planetName1 planetName2..6(optional) <- refreshes planet ability (legendary)
 Also if you add a planet that another player has it, it auto removes that planet from other player also transfers ability status, if exhausted, you get exhausted
 
 Cards commands
@@ -217,7 +217,7 @@ for single TG adding of TG
 /explore reset confirmYES <- completely resets explore decks, adding all known cards to their decks and shuffling them. useful if you have a game that started before explores were added
 /explore relic_draw <- draws a relic
 /explore relic_exhaust relic <- exhaust specified relic
-/explore relic_refresh <- refreshes specified relic
+/explore relic_ready <- refreshes specified relic
 /explore relic_purge <- purges relic
 /explore relic_show_remaining <- shows remaining relics in deck
 /explore relic_shuffle_back relicID <- shuffle relic back into deck
@@ -242,7 +242,7 @@ Its workaround for that single explore
 /leaders unlock leaderID <- unlock leader
 /leaders lock leaderID <- lock leader
 /leaders exhaust leaderID trade_goods <- exhaust leader and can add trade good to leader (like arturo for nomad)
-/leaders refresh leaderID <- refresh leader
+/leaders ready leaderID <- refresh leader
 /leaders purge leaderID <- purges leader
 /leaders hero_play <- set leader as active. Will be purged after executing /status cleanup. Just for letnev and nomad
 /leaders hero_unplay <- set leader as inactive if you made active by mistake
@@ -253,6 +253,7 @@ Its workaround for that single explore
 /custom ac_remove_from_game id <- remove AC from game deck (before game start)
 
 /help documentation <- show documentation file
+/help setup_templates <- show setup_templates file
 /help list_tiles <- lists all tiles, use starting number id to add to map
 /help list_games <- lists all available maps that are created
 /help list_planets <- lists all available planets

@@ -47,6 +47,7 @@ public class Constants {
 
     public static final String HELP = "help";
     public static final String HELP_DOCUMENTATION = "documentation";
+    public static final String SETUP_TEMPLATES = "setup_templates";
 
     public static final String PLANET_NAME = "planet_name";
     public static final String TOKEN = "token";
@@ -263,7 +264,7 @@ public class Constants {
     public static final String DRAW = "draw";
     public static final String RELIC_DRAW = "relic_draw";
     public static final String RELIC_EXHAUST = "relic_exhaust";
-    public static final String RELIC_REFRESH = "relic_refresh";
+    public static final String RELIC_REFRESH = "relic_ready";
     public static final String RELIC_PURGE = "relic_purge";
     public static final String SHUFFLE_BACK = "relic_shuffle_back";
     public static final String ADD_BACK_INTO_DECK = "relic_add_back_into_deck";
