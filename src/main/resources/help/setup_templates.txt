@@ -16,3 +16,7 @@ Small world variant (home systems moved one step towards MR)
 Small equidistant screwy'all (home systems one inwards and clockwise)
 0b 0b 0b 0b 0b 0b 0b 0g 0b 0g 0b 0g 0b 0g 0b 0g 0b 0g 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b
 
+4,5-ring maps (player count 8 during setup)
+8-Player
+Standard 8p setup (PoK Hyperlane setup):
+87a1 89b3 0b 87a4 89b0 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 0b 85b2 0b 0b 0b 0b 0b 0b 0b 0b 85b2 0b 0b 0b 0g 0b 0b 0g 0 0 0g 0b 0 0g 0b 0b 0g 0b 0b 0g 0 0 0g 0b 0 0g 0b 0b 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0
