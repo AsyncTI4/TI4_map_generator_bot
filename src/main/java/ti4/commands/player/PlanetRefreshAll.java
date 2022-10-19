@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 
 public class PlanetRefreshAll extends PlayerSubcommandData {
     public PlanetRefreshAll() {
-        super(Constants.PLANET_REFRESH_ALL, "Refresh All Planets");
+        super(Constants.PLANET_REFRESH_ALL, "Ready All Planets");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }

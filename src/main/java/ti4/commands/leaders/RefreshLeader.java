@@ -9,7 +9,7 @@ import ti4.message.MessageHelper;
 
 public class RefreshLeader extends LeaderAction {
     public RefreshLeader() {
-        super(Constants.REFRESH_LEADER, "Refresh leader");
+        super(Constants.REFRESH_LEADER, "Ready leader");
     }
 
     @Override
