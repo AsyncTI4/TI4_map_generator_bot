@@ -71,8 +71,8 @@ public class SCPlay extends PlayerSubcommandData {
             }
             Button noFollowButton = Button.primary("sc_no_follow", "Not Following");
 
-            Button refresh = Button.secondary("sc_refresh", "Refresh Commodities");
-            Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Refresh and Wash");
+            Button refresh = Button.secondary("sc_refresh", "Replenish Commodities");
+            Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash");
             ActionRow of;
             if (sc == 5){
                 of = ActionRow.of(followButton, noFollowButton, refresh, refresh_and_wash);

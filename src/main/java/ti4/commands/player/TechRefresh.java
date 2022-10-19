@@ -5,7 +5,7 @@ import ti4.map.Player;
 
 public class TechRefresh extends TechAddRemove {
     public TechRefresh() {
-        super(Constants.TECH_REFRESH, "Refresh Tech");
+        super(Constants.TECH_REFRESH, "Ready Tech");
     }
 
     @Override

@@ -6,7 +6,7 @@ import ti4.map.Player;
 
 public class PlanetRefresh extends PlanetAddRemove {
     public PlanetRefresh() {
-        super(Constants.PLANET_REFRESH, "Refresh Planet");
+        super(Constants.PLANET_REFRESH, "Ready Planet");
     }
 
     @Override

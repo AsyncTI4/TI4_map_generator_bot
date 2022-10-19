@@ -144,7 +144,7 @@ public class Constants {
     public static final String UNLOCK_LEADER = "unlock";
     public static final String LOCK_LEADER = "lock";
     public static final String EXHAUST_LEADER = "exhaust";
-    public static final String REFRESH_LEADER = "refresh";
+    public static final String REFRESH_LEADER = "ready";
     public static final String PURGE_LEADER = "purge";
     public static final String ADD_LEADER = "add";
     public static final String LEADERS = "leaders";
@@ -358,16 +358,16 @@ public class Constants {
     public static final String TECH_ADD = "tech_add";
     public static final String TECH_REMOVE = "tech_remove";
     public static final String TECH_EXHAUST = "tech_exhaust";
-    public static final String TECH_REFRESH = "tech_refresh";
+    public static final String TECH_REFRESH = "tech_ready";
 
     public static final String PLANET_ADD = "planet_add";
     public static final String PLANET_REMOVE = "planet_remove";
     public static final String PLANET_EXHAUST = "planet_exhaust";
-    public static final String PLANET_REFRESH = "planet_refresh";
-    public static final String PLANET_REFRESH_ALL = "planet_refresh_all";
+    public static final String PLANET_REFRESH = "planet_ready";
+    public static final String PLANET_REFRESH_ALL = "planet_ready_all";
     public static final String PLANET_EXHAUST_ALL = "planet_exhaust_all";
     public static final String PLANET_EXHAUST_ABILITY = "legendary_exhaust_ability";
-    public static final String PLANET_REFRESH_ABILITY = "legendary_refresh_ability";
+    public static final String PLANET_REFRESH_ABILITY = "legendary_ready_ability";
 
     public static final String EXPLORE = "explore";
     public static final String CULTURAL = "cultural";
