@@ -72,7 +72,7 @@ public class ButtonListener extends ListenerAdapter {
                 String message = deductCC(player, event);
                 player.setCommodities(player.getCommoditiesTotal());
                 addReaction(event, true, message, "");
-                addReaction(event, true, "Refreshing Commodities", "");
+                addReaction(event, true, "Replenishing Commodities", "");
             }
             case "sc_follow_leadership" -> {
                 String message = Helper.getPlayerPing(event, player) + " following.";
@@ -95,7 +95,7 @@ public class ButtonListener extends ListenerAdapter {
                     break;
                 }
                 player.setCommodities(player.getCommoditiesTotal());
-                addReaction(event, true, "Refreshing Commodities", "");
+                addReaction(event, true, "Replenishing Commodities", "");
             }
             case "sc_refresh_and_wash" -> {
                 boolean used = addUsedSCPlayer(messageID, player, event, "Refresh and Wash");
@@ -106,7 +106,7 @@ public class ButtonListener extends ListenerAdapter {
                 int tg = player.getTg();
                 player.setTg(tg + commoditiesTotal);
                 player.setCommodities(0);
-                addReaction(event, true, "Refreshing and washing", "");
+                addReaction(event, true, "Replenishing and washing", "");
             }
             default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
         }
