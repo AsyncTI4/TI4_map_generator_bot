@@ -90,7 +90,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             case "no_after" -> addReaction(event, false, "No Afters", "");
             case "sc_refresh" -> {
-                boolean used = addUsedSCPlayer(messageID, player, event, "Refresh");
+                boolean used = addUsedSCPlayer(messageID, player, event, "Replenish");
                 if (used){
                     break;
                 }
@@ -98,7 +98,7 @@ public class ButtonListener extends ListenerAdapter {
                 addReaction(event, true, "Replenishing Commodities", "");
             }
             case "sc_refresh_and_wash" -> {
-                boolean used = addUsedSCPlayer(messageID, player, event, "Refresh and Wash");
+                boolean used = addUsedSCPlayer(messageID, player, event, "Replenish and Wash");
                 if (used){
                     break;
                 }
