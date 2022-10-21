@@ -34,6 +34,7 @@ public class Map {
 
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
+    @ExportableField
     private MapStatus mapStatus = MapStatus.open;
 
     private HashMap<Integer, Boolean> scPlayed = new HashMap<>();
@@ -45,7 +46,6 @@ public class Map {
     private String customName = "";
     @ExportableField
     private long lastModifiedDate;
-
     @ExportableField
     private int round = 1;
 

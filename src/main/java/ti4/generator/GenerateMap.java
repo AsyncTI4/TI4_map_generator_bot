@@ -148,7 +148,7 @@ public class GenerateMap {
 
 
             String testing = System.getenv("TESTING");
-            if (testing == null){
+            if ((testing == null) && (displayType == DisplayType.all)){
                 new Thread(() -> {
                     WebHelper.putMap(map.getName(), mainImage);
                     WebHelper.putData(map.getName(), map);
