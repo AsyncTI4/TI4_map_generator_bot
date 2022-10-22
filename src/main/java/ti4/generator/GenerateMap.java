@@ -1,5 +1,6 @@
 package ti4.generator;
 
+import com.pngencoder.PngEncoder;
 import org.jetbrains.annotations.NotNull;
 import ti4.ResourceHelper;
 import ti4.helpers.*;
@@ -153,16 +154,11 @@ public class GenerateMap {
                     WebHelper.putData(map.getName(), map);
                 }).start();
             }
-            ImageIO.setUseCache(false);
-            ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
-            imageWriter.setOutput(ImageIO.createImageOutputStream(file));
-            ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
-            if (defaultWriteParam.canWriteCompressed()) {
-                defaultWriteParam.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-                defaultWriteParam.setCompressionQuality(0.01f);
-            }
 
-            imageWriter.write(null, new IIOImage(mainImage, null, null), defaultWriteParam);
+            new PngEncoder()
+                .withBufferedImage(mainImage)
+                .withCompressionLevel(1)
+                .toFile(file);
         } catch (IOException e) {
             BotLogger.log(map.getName() + ": Could not save generated map");
         }
