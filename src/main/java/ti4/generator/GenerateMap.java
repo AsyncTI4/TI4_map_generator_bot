@@ -153,7 +153,7 @@ public class GenerateMap {
                     WebHelper.putData(map.getName(), map);
                 }).start();
             }
-
+            ImageIO.setUseCache(false);
             ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
             imageWriter.setOutput(ImageIO.createImageOutputStream(file));
             ImageWriteParam defaultWriteParam = imageWriter.getDefaultWriteParam();
