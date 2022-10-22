@@ -6,7 +6,6 @@ import ti4.helpers.*;
 import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.BotLogger;
-import ti4.message.MessageHelper;
 
 import javax.annotation.CheckForNull;
 import javax.imageio.IIOImage;
@@ -148,12 +147,12 @@ public class GenerateMap {
 
 
             String testing = System.getenv("TESTING");
-            if ((testing == null) && (displayType == DisplayType.all)){
+            if ((testing == null) && (displayType == DisplayType.all)) {
                 new Thread(() -> {
                     WebHelper.putMap(map.getName(), mainImage);
                     WebHelper.putData(map.getName(), map);
                 }).start();
-             }
+            }
 
             ImageWriter imageWriter = ImageIO.getImageWritersByFormatName("png").next();
             imageWriter.setOutput(ImageIO.createImageOutputStream(file));
@@ -543,7 +542,7 @@ public class GenerateMap {
                         if (count == null) {
                             count = 0;
                         }
-                        if (key.contains("gf") || key.contains("ff")){
+                        if (key.contains("gf") || key.contains("ff")) {
                             count++;
                         } else {
                             count += unitEntry.getValue();
@@ -565,12 +564,12 @@ public class GenerateMap {
 
             Integer count = unitCount.get(unitColorID);
             if (unitID.equals("csd")) {
-                if (!player.getFaction().equals("cabal")){
-                   continue;
+                if (!player.getFaction().equals("cabal")) {
+                    continue;
                 }
                 unitColorID = Mapper.getUnitID("sd", player.getColor());
             }
-            if (player.getFaction().equals("cabal") && unitID.equals("sd")){
+            if (player.getFaction().equals("cabal") && unitID.equals("sd")) {
                 continue;
             }
 
@@ -609,7 +608,7 @@ public class GenerateMap {
             text += "_wht.png";
 
         }
-        if (textPosition == null){
+        if (textPosition == null) {
             return;
         }
         Point position = textPosition.getPosition(id);
@@ -628,82 +627,85 @@ public class GenerateMap {
         g2.setStroke(new BasicStroke(2));
 
         for (String planet : planets) {
+            try {
+                UnitHolder unitHolder = planetsInfo.get(planet);
+                if (!(unitHolder instanceof Planet planetHolder)) {
+                    BotLogger.log(map.getName() + ": Planet unitHolder not found: " + planet);
+                    continue;
+                }
 
-            UnitHolder unitHolder = planetsInfo.get(planet);
-            if (!(unitHolder instanceof Planet planetHolder)) {
-                BotLogger.log(map.getName() + ": Planet unitHolder not found: " + planet);
-                continue;
-            }
+                boolean isExhausted = exhaustedPlanets.contains(planet);
+                if (isExhausted) {
+                    graphics.setColor(Color.GRAY);
+                } else {
+                    graphics.setColor(Color.WHITE);
+                }
 
-            boolean isExhausted = exhaustedPlanets.contains(planet);
-            if (isExhausted) {
-                graphics.setColor(Color.GRAY);
-            } else {
-                graphics.setColor(Color.WHITE);
-            }
+                int resources = planetHolder.getResources();
+                int influence = planetHolder.getInfluence();
+                String statusOfPlanet = isExhausted ? "_exh" : "_rdy";
+                String planetFileName = "pc_planetname_" + planet + statusOfPlanet + ".png";
+                String resFileName = "pc_res_" + resources + statusOfPlanet + ".png";
+                String infFileName = "pc_inf_" + influence + statusOfPlanet + ".png";
 
-            int resources = planetHolder.getResources();
-            int influence = planetHolder.getInfluence();
-            String statusOfPlanet = isExhausted ? "_exh" : "_rdy";
-            String planetFileName = "pc_planetname_" + planet + statusOfPlanet + ".png";
-            String resFileName = "pc_res_" + resources + statusOfPlanet + ".png";
-            String infFileName = "pc_inf_" + influence + statusOfPlanet + ".png";
+                graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
 
-            graphics.drawRect(x + deltaX - 2, y - 2, 52, 152);
-
-            if (unitHolder.getTokenList().contains(Constants.ATTACHMENT_TITANSPN_PNG)) {
-                String planetTypeName = "pc_attribute_titanspn.png";
-                drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName);
-            } else {
-                String originalPlanetType = planetHolder.getOriginalPlanetType();
-                if (!originalPlanetType.isEmpty()) {
-                    if ("keleres".equals(player.getFaction()) && ("mentak".equals(originalPlanetType) ||
-                            "xxcha".equals(originalPlanetType) ||
-                            "argent".equals(originalPlanetType))) {
-                        originalPlanetType = "keleres";
-                    }
-
-                    String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
+                if (unitHolder.getTokenList().contains(Constants.ATTACHMENT_TITANSPN_PNG)) {
+                    String planetTypeName = "pc_attribute_titanspn.png";
                     drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName);
-                }
-            }
+                } else {
+                    String originalPlanetType = planetHolder.getOriginalPlanetType();
+                    if (!originalPlanetType.isEmpty()) {
+                        if ("keleres".equals(player.getFaction()) && ("mentak".equals(originalPlanetType) ||
+                                "xxcha".equals(originalPlanetType) ||
+                                "argent".equals(originalPlanetType))) {
+                            originalPlanetType = "keleres";
+                        }
 
-            boolean hasAttachment = planetHolder.hasAttachment();
-            if (hasAttachment) {
-                String planetTypeName = "pc_upgrade.png";
-                drawPlanetImage(x + deltaX + 26, y + 40, planetTypeName);
-            }
-
-            boolean hasAbility = planetHolder.isHasAbility() || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge"));
-            if (hasAbility) {
-                String statusOfAbility = exhaustedPlanetsAbilities.contains(planet) ? "_exh" : "_rdy";
-                String planetTypeName = "pc_legendary" + statusOfAbility + ".png";
-                drawPlanetImage(x + deltaX + 26, y + 60, planetTypeName);
-            }
-            String originalTechSpeciality = planetHolder.getOriginalTechSpeciality();
-            int deltaY = 175;
-            if (!originalTechSpeciality.isEmpty()) {
-                String planetTypeName = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
-                drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName);
-            } else {
-                ArrayList<String> techSpeciality = planetHolder.getTechSpeciality();
-                for (String techSpec : techSpeciality) {
-                    if (techSpec.isEmpty()) {
-                        continue;
+                        String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
+                        drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName);
                     }
-                    String planetTypeName = "pc_tech_" + techSpec + statusOfPlanet + ".png";
-                    drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName);
-                    deltaY -= 20;
                 }
+
+                boolean hasAttachment = planetHolder.hasAttachment();
+                if (hasAttachment) {
+                    String planetTypeName = "pc_upgrade.png";
+                    drawPlanetImage(x + deltaX + 26, y + 40, planetTypeName);
+                }
+
+                boolean hasAbility = planetHolder.isHasAbility() || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge"));
+                if (hasAbility) {
+                    String statusOfAbility = exhaustedPlanetsAbilities.contains(planet) ? "_exh" : "_rdy";
+                    String planetTypeName = "pc_legendary" + statusOfAbility + ".png";
+                    drawPlanetImage(x + deltaX + 26, y + 60, planetTypeName);
+                }
+                String originalTechSpeciality = planetHolder.getOriginalTechSpeciality();
+                int deltaY = 175;
+                if (!originalTechSpeciality.isEmpty()) {
+                    String planetTypeName = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
+                    drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName);
+                } else {
+                    ArrayList<String> techSpeciality = planetHolder.getTechSpeciality();
+                    for (String techSpec : techSpeciality) {
+                        if (techSpec.isEmpty()) {
+                            continue;
+                        }
+                        String planetTypeName = "pc_tech_" + techSpec + statusOfPlanet + ".png";
+                        drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName);
+                        deltaY -= 20;
+                    }
+                }
+
+
+                drawPlanetImage(x + deltaX + 26, y + 103, resFileName);
+                drawPlanetImage(x + deltaX + 26, y + 125, infFileName);
+                drawPlanetImage(x + deltaX, y, planetFileName);
+
+
+                deltaX += 56;
+            } catch (Exception e) {
+                BotLogger.log("could not print out planet: " + planet.toLowerCase());
             }
-
-
-            drawPlanetImage(x + deltaX + 26, y + 103, resFileName);
-            drawPlanetImage(x + deltaX + 26, y + 125, infFileName);
-            drawPlanetImage(x + deltaX, y, planetFileName);
-
-
-            deltaX += 56;
         }
         return x + deltaX + 20;
     }
