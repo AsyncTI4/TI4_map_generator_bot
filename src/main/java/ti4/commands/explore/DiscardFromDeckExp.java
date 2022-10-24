@@ -6,10 +6,10 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
 
-public class DiscardExp extends ExploreSubcommandData {
+public class DiscardFromDeckExp extends ExploreSubcommandData {
 
-    public DiscardExp() {
-        super(Constants.DISCARD, "Discard an Exploration Card from the deck.");
+    public DiscardFromDeckExp() {
+        super(Constants.DISCARD_FROM_DECK, "Discard an Exploration Card from the deck.");
         addOptions(idOption.setRequired(true));
     }
 
