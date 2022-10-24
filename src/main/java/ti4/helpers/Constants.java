@@ -376,7 +376,8 @@ public class Constants {
     public static final String HAZARDOUS = "hazardous";
     public static final String EXPLORE_CARD_ID = "explore_card_id";
     public static final String SHUFFLE_BACK_INTO_DECK = "shuffle_back_into_deck";
-    public static final String DISCARD = "discard";
+    public static final String DISCARD_FROM_DECK = "discard_from_deck";
+    public static final String DISCARD_FROM_HAND = "discard_from_hand";
     public static final String DRAW_AND_DISCARD = "draw_and_discard";
     public static final String TRAIT = "trait";
     public static final String RESET = "reset";

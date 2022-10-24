@@ -51,16 +51,25 @@ public class ButtonListener extends ListenerAdapter {
                 String message = deductCC(player, event);
                 addReaction(event, true, message, "");
             }
-            case "sc_follow_politics" -> {
-                boolean used = addUsedSCPlayer(messageID, player, event, "");
+            case "sc_ac_draw" -> {
+                boolean used = addUsedSCPlayer(messageID+"ac", player, event, "");
                 if (used){
                     break;
                 }
-                String message = deductCC(player, event);
+                String message =  "Drew 2 Actions cards";
                 int count = player.getFaction().equals("yssaril") ? 3 : 2;
                 for (int i = 0; i < count; i++) {
                     activeMap.drawActionCard(player.getUserID());
                 }
+                CardsInfo.sentUserCardInfo(null, activeMap, player, event);
+                addReaction(event, true, message, "");
+            } case "sc_draw_so" -> {
+                boolean used = addUsedSCPlayer(messageID+"so", player, event, "");
+                if (used){
+                    break;
+                }
+                String message = "Drew Secret Objective";
+                activeMap.drawSecretObjective(player.getUserID());
                 CardsInfo.sentUserCardInfo(null, activeMap, player, event);
                 addReaction(event, true, message, "");
             }
@@ -78,7 +87,14 @@ public class ButtonListener extends ListenerAdapter {
                 String message = Helper.getPlayerPing(event, player) + " following.";
                 addReaction(event, true, message, "");
             }
-            case "sc_no_follow" -> addReaction(event, false, "Not Following", "");
+            case "sc_no_follow" -> { addReaction(event, false, "Not Following", "");
+                Set<Player> players = playerUsedSC.get(messageID);
+                if (players == null){
+                    players = new HashSet<>();
+                }
+                players.remove(player);
+                playerUsedSC.put(messageID, players);
+            }
             case "play_when" -> {
                 clearAllReactions(event);
                 addReaction(event, true, "Playing When", "When Played");

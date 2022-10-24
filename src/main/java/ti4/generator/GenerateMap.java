@@ -15,6 +15,8 @@ import javax.imageio.ImageWriteParam;
 import javax.imageio.ImageWriter;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.awt.image.DataBufferByte;
+import java.awt.image.DataBufferInt;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -120,7 +122,7 @@ public class GenerateMap {
         }
         resetImage();
         File file = Storage.getMapImageStorage("temp.png");
-        try {
+        try (FileOutputStream outputStream = new FileOutputStream(file)) {
             if (displayType == DisplayType.all || displayType == DisplayType.map) {
                 HashMap<String, Tile> tileMap = new HashMap<>(map.getTileMap());
                 String setup = tileMap.keySet().stream()
