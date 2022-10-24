@@ -48,7 +48,7 @@ public class ExploreCommand implements Command {
     private Collection<ExploreSubcommandData> getSubcommands() {
         Collection<ExploreSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new DiscardFromDeckExp());
-        subcommands.add(new DiscardFromHandExp());
+        subcommands.add(new ShuffleIntoDeckFromHandExp());
         subcommands.add(new ExploreAndDiscard());
         subcommands.add(new RemoveExplore());
         subcommands.add(new ShuffleExpBackIntoDeck());
