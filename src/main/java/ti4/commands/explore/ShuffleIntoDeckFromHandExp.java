@@ -8,10 +8,10 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DiscardFromHandExp extends ExploreSubcommandData {
+public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
 
-    public DiscardFromHandExp() {
-        super(Constants.DISCARD_FROM_HAND, "Discard an Exploration Card from the hand to deck.");
+    public ShuffleIntoDeckFromHandExp() {
+        super(Constants.SHUFFLE_INTO_DECK_FROM_HAND, "Discard an Exploration Card from the hand to deck.");
         addOptions(idOption.setRequired(true));
     }
 
