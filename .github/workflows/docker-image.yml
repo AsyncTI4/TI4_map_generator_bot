@@ -29,5 +29,5 @@ jobs:
           cd /root
           ./docker_run.sh
           docker rm $(docker ps --filter status=exited -q)
-          docker rmi $(docker images --filter "dangling=true" -q)
+          # docker rmi $(docker images --filter "dangling=true" -q)
 
