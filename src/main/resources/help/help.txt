@@ -188,6 +188,8 @@ Cards commands
 /agenda vote_count <- lists vote count, only if planets are used in bot
 /agenda shuffle_deck <- shuffles agenda deck
 /agenda reset_deck <- reset agenda deck and discards to new state
+/agenda reset_draw_state_for_deck <- resets player agenda draw state, when player drew cards but did not put top or bottom, it resets draw
+/agenda shuffle_discard_back_into_deck id <- takes discard agenda and shufles back into deck
 /agenda cleanup confirm:YES <- refresh all player planets after agenda phase
 
 /status po_reveal_stage1 <- reveals stage 1 public objective
