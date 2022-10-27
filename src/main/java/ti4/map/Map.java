@@ -542,6 +542,23 @@ public class Map {
         return false;
     }
 
+    public boolean shuffleBackIntoDeck(Integer idNumber) {
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
+            if (agendas.getValue().equals(idNumber)) {
+                id = agendas.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            discardAgendas.remove(id);
+            agendas.add(id);
+            shuffleAgendas();
+            return true;
+        }
+        return false;
+    }
+
     public boolean removeLaw(Integer idNumber) {
         String id = "";
         for (java.util.Map.Entry<String, Integer> ac : laws.entrySet()) {
