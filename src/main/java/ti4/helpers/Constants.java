@@ -272,6 +272,8 @@ public class Constants {
     public static final String PUT_BOTTOM = "put_bottom";
     public static final String SHUFFLE_AGENDAS = "shuffle_deck";
     public static final String RESET_AGENDAS = "reset_deck";
+    public static final String RESET_DRAW_STATE_FOR_AGENDAS = "reset_draw_state_for_deck";
+    public static final String SHUFFLE_DISCARD_BACK_INTO_DECK = "shuffle_discard_back_into_deck";
     public static final String LOOK_AT_TOP = "look_at_top";
     public static final String LOOK_AT_BOTTOM = "look_at_bottom";
     public static final String REVEAL = "reveal";
