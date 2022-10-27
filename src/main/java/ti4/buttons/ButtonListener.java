@@ -10,6 +10,7 @@ import ti4.commands.cards.CardsInfo;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 
 import java.util.HashMap;
@@ -126,6 +127,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
         }
+        MapSaveLoadManager.saveMap(activeMap);
     }
 
     private boolean addUsedSCPlayer(String messageID, Player player, @NotNull ButtonInteractionEvent event, String text) {
