@@ -485,6 +485,10 @@ public class Map {
         discardAgendas = new LinkedHashMap<>();
     }
 
+    public void resetDrawStateAgendas() {
+        sentAgendas.clear();
+    }
+
     public void setDiscardAgendas(LinkedHashMap<String, Integer> discardAgendas) {
         this.discardAgendas = discardAgendas;
     }
