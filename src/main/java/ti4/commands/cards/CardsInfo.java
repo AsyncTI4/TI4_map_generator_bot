@@ -1,9 +1,6 @@
 package ti4.commands.cards;
 
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.ThreadChannel;
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -123,7 +120,28 @@ public class CardsInfo extends CardsSubcommandData {
                 MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
                 if (event != null) {
                     try {
-                        TextChannel textChannel = event.getTextChannel();
+                        Channel channel = event.getChannel();
+                        if (channel == null){
+                            MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
+                            BotLogger.log("Could not find channel");
+                            return;
+                        }
+                        ChannelType type = channel.getType();
+
+                        TextChannel textChannel;
+                        if (ChannelType.GUILD_PUBLIC_THREAD.equals(type) || ChannelType.GUILD_PRIVATE_THREAD.equals(type)){
+                            IThreadContainer parentChannel = event.getThreadChannel().getParentChannel();
+                            if (parentChannel instanceof TextChannel) {
+                                textChannel = (TextChannel) parentChannel;
+                            } else {
+                                MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
+                                MessageHelper.sentToMessageToUser(event, "Please Execute info command in non thread channel", userById);
+                                return;
+                            }
+                        }
+                        else {
+                            textChannel = event.getTextChannel();
+                        }
                         List<ThreadChannel> threadChannels = textChannel.getThreadChannels();
                         boolean threadFound = false;
                         String threadName = "Cards Info-" + activeMap.getName() + "-" + player.getUserName();
