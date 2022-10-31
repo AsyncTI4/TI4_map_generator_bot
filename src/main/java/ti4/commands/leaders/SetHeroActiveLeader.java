@@ -16,7 +16,8 @@ public class SetHeroActiveLeader extends LeaderAction {
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(leader);
         if ("letnev".equals(player.getFaction()) || "nomad".equals(player.getFaction())) {
-            if (playerLeader != null && Constants.HERO.equals(playerLeader.getName())) {
+            if (playerLeader != null && Constants.HERO.equals(playerLeader.getId())) {
+                playerLeader.setLocked(false);
                 playerLeader.setActive(true);
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Leader will be PURGED after status cleanup");
                 return;
