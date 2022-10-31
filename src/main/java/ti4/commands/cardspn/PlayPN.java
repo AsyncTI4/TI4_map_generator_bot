@@ -40,13 +40,13 @@ public class PlayPN extends PNCardsSubcommandData {
         }
 
         String value = option.getAsString().toLowerCase();
-        String acID = null;
-        int acIndex;
+        String id = null;
+        int pnIndex;
         try {
-            acIndex = Integer.parseInt(value);
+            pnIndex = Integer.parseInt(value);
             for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
-                if (so.getValue().equals(acIndex)) {
-                    acID = so.getKey();
+                if (so.getValue().equals(pnIndex)) {
+                    id = so.getKey();
                 }
             }
         } catch (Exception e) {
@@ -61,7 +61,7 @@ public class PlayPN extends PNCardsSubcommandData {
                             MessageHelper.sendMessageToChannel(event.getChannel(), "Multiple cards with similar name founds, please use ID");
                             return;
                         }
-                        acID = pn.getKey();
+                        id = pn.getKey();
                         foundSimilarName = true;
                         cardName = pnName;
                     }
@@ -69,23 +69,23 @@ public class PlayPN extends PNCardsSubcommandData {
             }
         }
 
-        if (acID == null) {
+        if (id == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Promissory Note ID found, please retry");
             return;
         }
 
-        String promissoryNote = Mapper.getPromissoryNote(acID, true);
+        String promissoryNote = Mapper.getPromissoryNote(id, true);
         String[] pn = promissoryNote.split(";");
         if (pn.length > 3 && pn[3].equals("playarea")) {
-            player.setPromissoryNotesInPlayArea(acID);
+            player.setPromissoryNotesInPlayArea(id);
         } else {
-            player.removePromissoryNote(acID);
-            String pnOwner = Mapper.getPromissoryNoteOwner(acID);
+            player.removePromissoryNote(id);
+            String pnOwner = Mapper.getPromissoryNoteOwner(id);
             for (Player player_ : activeMap.getPlayers().values()) {
                 String playerColor = player_.getColor();
                 String playerFaction = player_.getFaction();
                 if (playerColor != null && playerColor.equals(pnOwner) || playerFaction != null && playerFaction.equals(pnOwner)) {
-                    player_.setPromissoryNote(acID);
+                    player_.setPromissoryNote(id);
                     CardsInfo.sentUserCardInfo(event, activeMap, player_);
                     break;
                 }
@@ -96,7 +96,7 @@ public class PlayPN extends PNCardsSubcommandData {
         sb.append("Game: ").append(activeMap.getName()).append(" ");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Played: ");
-        sb.append(Mapper.getPromissoryNote(acID, longPNDisplay)).append("\n");
+        sb.append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
         
         MessageHelper.sendMessageToChannel(event, sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);
