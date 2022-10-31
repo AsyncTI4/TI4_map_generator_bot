@@ -2,6 +2,7 @@ package ti4.commands.cards;
 
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.ThreadChannel;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -45,6 +46,7 @@ public class CardsInfo extends CardsSubcommandData {
     public static void sentUserCardInfo(GenericCommandInteractionEvent event, Map activeMap, Player player) {
         sentUserCardInfo(event, activeMap, player, null);
     }
+
     public static void sentUserCardInfo(@CheckForNull GenericCommandInteractionEvent event, Map activeMap, Player player, @CheckForNull ButtonInteractionEvent buttonEvent) {
         checkAndAddPNs(activeMap, player);
         OptionMapping longPNOption = event != null ? event.getOption(Constants.LONG_PN_DISPLAY) : null;
@@ -115,21 +117,35 @@ public class CardsInfo extends CardsSubcommandData {
         sb.append("--------------------\n");
         User userById = event != null ? event.getJDA().getUserById(player.getUserID()) : (buttonEvent != null ? buttonEvent.getJDA().getUserById(player.getUserID()) : null);
         if (userById != null) {
-            if (activeMap.isCommunityMode() && player.getChannelForCommunity() instanceof MessageChannel){
+            if (activeMap.isCommunityMode() && player.getChannelForCommunity() instanceof MessageChannel) {
                 MessageHelper.sendMessageToChannel((MessageChannel) player.getChannelForCommunity(), sb.toString());
             } else {
                 MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
-//                try {
-//                    TextChannel textChannel = event.getTextChannel();
-//                    ThreadChannelAction threadChannel = textChannel.createThreadChannel("AC Info", true);
-//                    threadChannel.queue(msg -> {
-//                        msg.sendMessage("hello i private thread: " + Helper.getPlayerPing(event, player)).queue();
-//                    });
-//                }
-//                catch (Exception e){
-//                    BotLogger.log("Could not create Private Thread");
-//                }
-
+                if (event != null) {
+                    try {
+                        TextChannel textChannel = event.getTextChannel();
+                        List<ThreadChannel> threadChannels = textChannel.getThreadChannels();
+                        boolean threadFound = false;
+                        String threadName = "Card Info - " + activeMap.getName();
+                        String playerPing = threadName + " " + Helper.getPlayerPing(event, player);
+                        for (ThreadChannel threadChannel : threadChannels) {
+                            if (threadChannel.getName().equals(threadName) && !threadChannel.isArchived()) {
+                                MessageHelper.sendMessageToChannel(threadChannel, playerPing);
+                                threadChannel.getManager().setInvitable(false);
+                                threadFound = true;
+                            }
+                        }
+                        if (!threadFound) {
+                            ThreadChannelAction threadChannel_ = textChannel.createThreadChannel(threadName, true);
+                            threadChannel_.queue(msg -> {
+                                msg.sendMessage(playerPing).queue();
+                                ThreadChannelAction threadChannelAction = threadChannel_.setInvitable(false);
+                            });
+                        }
+                    } catch (Exception e) {
+                        BotLogger.log("Could not create Private Thread");
+                    }
+                }
             }
         } else {
             MessageHelper.sentToMessageToUser(event != null ? event : buttonEvent, "Player: " + player.getUserName() + " not found");
@@ -153,7 +169,6 @@ public class CardsInfo extends CardsSubcommandData {
                     player.setPromissoryNote(promissoryNote);
                 }
             }
-
         }
     }
 }
