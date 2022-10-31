@@ -97,7 +97,7 @@ public class AddToken extends AddRemoveToken {
                     HashMap<String, Integer> spaceUnits = spaceUnitHolder.getUnits();
                     for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
                         String key = unitEntry.getKey();
-                        if (key.contains("ff") || key.contains("gf")){
+                        if (key.contains("ff") || key.contains("gf") || key.contains("mf")){
                             Integer count = spaceUnits.get(key);
                             if (count == null){
                                 count = unitEntry.getValue();
