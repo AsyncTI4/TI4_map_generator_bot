@@ -37,7 +37,7 @@ abstract public class LeaderAction extends LeaderSubcommandData {
         if (leader != null) {
             action(event, leader.getAsString(), activeMap, player);
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Need to specify CC's");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Need to specify leader");
         }
     }
 

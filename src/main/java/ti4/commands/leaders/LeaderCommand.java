@@ -98,8 +98,7 @@ public class LeaderCommand implements Command {
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
 
-        File file = GenerateMap.getInstance().saveImage(activeMap);
-        MessageHelper.replyToMessage(event, file);
+        MessageHelper.replyToMessageTI4Logo(event);
     }
 
 
