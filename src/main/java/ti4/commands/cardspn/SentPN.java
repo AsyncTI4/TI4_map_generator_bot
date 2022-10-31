@@ -18,7 +18,7 @@ import java.io.File;
 public class SentPN extends PNCardsSubcommandData {
     public SentPN() {
         super(Constants.SEND_PN, "Send Promissory Note to player");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
@@ -37,11 +37,33 @@ public class SentPN extends PNCardsSubcommandData {
             return;
         }
 
-        int acIndex = option.getAsInt();
+        String value = option.getAsString().toLowerCase();
         String id = null;
-        for (java.util.Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
-            if (so.getValue().equals(acIndex)) {
-                id = so.getKey();
+        int pnIndex;
+        try {
+            pnIndex = Integer.parseInt(value);
+            for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
+                if (so.getValue().equals(pnIndex)) {
+                    id = so.getKey();
+                }
+            }
+        } catch (Exception e) {
+            boolean foundSimilarName = false;
+            String cardName = "";
+            for (java.util.Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
+                String pnName = Mapper.getPromissoryNote(pn.getKey(), false);
+                if (pnName != null) {
+                    pnName = pnName.toLowerCase();
+                    if (pnName.contains(value) || pn.getKey().contains(value)) {
+                        if (foundSimilarName && !cardName.equals(pnName)) {
+                            MessageHelper.sendMessageToChannel(event.getChannel(), "Multiple cards with similar name founds, please use ID");
+                            return;
+                        }
+                        id = pn.getKey();
+                        foundSimilarName = true;
+                        cardName = pnName;
+                    }
+                }
             }
         }
 
