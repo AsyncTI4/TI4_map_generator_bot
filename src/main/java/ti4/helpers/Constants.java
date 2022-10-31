@@ -109,6 +109,7 @@ public class Constants {
 
     public static final String SYSTEM_INFO = "system_info";
     public static final String DIPLO_SYSTEM = "diplo_system";
+    public static final String RISE_OF_A_MESSIAH = "rise_of_a_messiah";
     public static final String SLEEPER_TOKEN = "sleeper_token";
     public static final String STELLAR_CONVERTER = "stellar_converter";
     public static final String ION_TOKEN_FLIP = "ion_token_flip";

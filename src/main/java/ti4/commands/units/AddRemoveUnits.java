@@ -72,7 +72,7 @@ abstract public class AddRemoveUnits implements Command {
         unitParsing(event, color, tile, unitList, map);
     }
 
-    protected void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Map map) {
+    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Map map) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer tokenizer = new StringTokenizer(unitList, ",");
         while (tokenizer.hasMoreTokens()) {
