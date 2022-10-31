@@ -241,6 +241,7 @@ Its workaround for that single explore
 /special ion_token_flip tile <- flip existing ION wormhole token in system/tile
 /special system_info tile <- Shows unit info in given tile
 /special stellar_converter tile <- Use Stellar Converter on it. Add token and remove all units and planet from player area
+/special rise_of_a_messiah <- Adds one infantry to each planet you control, except DMZ and Stellar Converted ones
 
 /leaders unlock leaderID <- unlock leader
 /leaders lock leaderID <- lock leader
