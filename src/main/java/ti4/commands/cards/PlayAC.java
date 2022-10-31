@@ -52,7 +52,7 @@ public class PlayAC extends CardsSubcommandData {
                 String actionCardName = Mapper.getActionCardName(ac.getKey());
                 if (actionCardName != null) {
                     actionCardName = actionCardName.toLowerCase();
-                    if (actionCardName.contains(value) || ac.getKey().contains(value)) {
+                    if (actionCardName.contains(value)) {
                         if (foundSimilarName && !cardName.equals(actionCardName)) {
                             MessageHelper.sendMessageToChannel(event.getChannel(), "Multiple cards with similar name founds, please use ID");
                             return;
