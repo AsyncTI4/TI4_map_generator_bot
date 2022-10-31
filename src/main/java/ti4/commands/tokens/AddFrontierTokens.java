@@ -37,7 +37,7 @@ public class AddFrontierTokens implements Command {
         String frontierTileList = Mapper.getSpecialCaseValues(Constants.FRONTIER);
         for (Tile tile : tileList) {
             if (frontierTileList.contains(tile.getTileID())){
-                AddToken.addToken(event, tile, Constants.FRONTIER);
+                AddToken.addToken(event, tile, Constants.FRONTIER, map);
             }
         }
     }

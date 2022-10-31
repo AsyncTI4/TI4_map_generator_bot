@@ -120,6 +120,7 @@ public class SpecialCommand implements Command {
         subcommands.add(new IonFlip());
         subcommands.add(new SystemInfo());
         subcommands.add(new StellarConverter());
+        subcommands.add(new RiseOfMessiah());
 
         return subcommands;
     }
