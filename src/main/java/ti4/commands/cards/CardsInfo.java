@@ -128,6 +128,7 @@ public class CardsInfo extends CardsSubcommandData {
                         boolean threadFound = false;
                         String threadName = "Cards Info-" + activeMap.getName() + "-" + player.getUserName();
                         String playerPing = threadName + " " + Helper.getPlayerPing(event, player);
+
                         for (ThreadChannel threadChannel : threadChannels) {
                             if (threadChannel.getName().equals(threadName) && !threadChannel.isArchived()) {
                                 MessageHelper.sendMessageToChannel(threadChannel, playerPing);
