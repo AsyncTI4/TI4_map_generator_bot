@@ -42,7 +42,7 @@ public class ScorePublic extends StatusSubcommandData {
         int poID = option.getAsInt();
         boolean scored = activeMap.scorePublicObjective(player.getUserID(), poID);
         if (!scored) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Public Objective ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Public Objective ID found or already scored, please retry");
         } else {
             informAboutScoring(event, activeMap, player, poID);
         }
