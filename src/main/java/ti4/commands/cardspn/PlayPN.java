@@ -44,7 +44,7 @@ public class PlayPN extends PNCardsSubcommandData {
         int pnIndex;
         try {
             pnIndex = Integer.parseInt(value);
-            for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
+            for (java.util.Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
                 if (so.getValue().equals(pnIndex)) {
                     id = so.getKey();
                 }
