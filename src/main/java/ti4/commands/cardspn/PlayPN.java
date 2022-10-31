@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 public class PlayPN extends PNCardsSubcommandData {
     public PlayPN() {
         super(Constants.PLAY_PN, "Play Promissory Note");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID, "Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable").setRequired(false));
     }
 
@@ -39,11 +39,33 @@ public class PlayPN extends PNCardsSubcommandData {
             longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
         }
 
-        int acIndex = option.getAsInt();
+        String value = option.getAsString().toLowerCase();
         String acID = null;
-        for (java.util.Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
-            if (so.getValue().equals(acIndex)) {
-                acID = so.getKey();
+        int acIndex;
+        try {
+            acIndex = Integer.parseInt(value);
+            for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
+                if (so.getValue().equals(acIndex)) {
+                    acID = so.getKey();
+                }
+            }
+        } catch (Exception e) {
+            boolean foundSimilarName = false;
+            String cardName = "";
+            for (java.util.Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
+                String pnName = Mapper.getPromissoryNote(pn.getKey(), false);
+                if (pnName != null) {
+                    pnName = pnName.toLowerCase();
+                    if (pnName.contains(value) || pn.getKey().contains(value)) {
+                        if (foundSimilarName && !cardName.equals(pnName)) {
+                            MessageHelper.sendMessageToChannel(event.getChannel(), "Multiple cards with similar name founds, please use ID");
+                            return;
+                        }
+                        acID = pn.getKey();
+                        foundSimilarName = true;
+                        cardName = pnName;
+                    }
+                }
             }
         }
 

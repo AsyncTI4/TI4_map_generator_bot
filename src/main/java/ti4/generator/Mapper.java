@@ -207,6 +207,17 @@ public class Mapper {
         return (String) actionCards.get(id);
     }
 
+    @CheckForNull
+    public static String getActionCardName(String id) {
+        String info = (String) actionCards.get(id);
+        // if we would break trying to split the note, just return whatever is there
+        if ((info == null) || !info.contains(";")) {
+            return info;
+        }
+        String[] split = info.split(";");
+        return split[0];
+    }
+
     public static String getPromissoryNote(String id, boolean longDisplay) {
         if (longDisplay) {
             return getPromissoryNote(id);
