@@ -17,7 +17,7 @@ import ti4.message.MessageHelper;
 public class PlayAC extends CardsSubcommandData {
     public PlayAC() {
         super(Constants.PLAY_AC, "Play Action Card");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ACTION_CARD_ID, "Action Card ID that is sent between () or Name/Part of Name").setRequired(true));
     }
 
     @Override
@@ -35,14 +35,35 @@ public class PlayAC extends CardsSubcommandData {
             return;
         }
 
-        int acIndex = option.getAsInt();
+        String value = option.getAsString().toLowerCase();
         String acID = null;
-        for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
-            if (so.getValue().equals(acIndex)) {
-                acID = so.getKey();
+        int acIndex = -1;
+        try {
+            acIndex = Integer.parseInt(value);
+            for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
+                if (so.getValue().equals(acIndex)) {
+                    acID = so.getKey();
+                }
+            }
+        } catch (Exception e) {
+            boolean foundSimilarName = false;
+            String cardName = "";
+            for (java.util.Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+                String actionCardName = Mapper.getActionCardName(ac.getKey());
+                if (actionCardName != null) {
+                    actionCardName = actionCardName.toLowerCase();
+                    if (actionCardName.contains(value) || ac.getKey().contains(value)) {
+                        if (foundSimilarName && !cardName.equals(actionCardName)) {
+                            MessageHelper.sendMessageToChannel(event.getChannel(), "Multiple cards with similar name founds, please use ID");
+                            return;
+                        }
+                        acID = ac.getKey();
+                        foundSimilarName = true;
+                        cardName = actionCardName;
+                    }
+                }
             }
         }
-
         if (acID == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
