@@ -167,17 +167,18 @@ public class CardsInfo extends CardsSubcommandData {
 
                         for (ThreadChannel threadChannel : threadChannels) {
                             if (threadChannel.getName().equals(threadName) && !threadChannel.isArchived()) {
-                                MessageHelper.sendMessageToChannel(threadChannel, playerPing);
-                                MessageHelper.sendMessageToChannel(threadChannel, sb.toString());
+                                String text = playerPing + "\n" + sb;
+                                MessageHelper.sendMessageToChannel(threadChannel, text);
                                 threadChannel.getManager().setInvitable(false);
                                 threadFound = true;
+                                break;
                             }
                         }
                         if (!threadFound) {
                             ThreadChannelAction threadChannel_ = textChannel.createThreadChannel(threadName, true);
                             threadChannel_.queue(msg -> {
-                                msg.sendMessage(playerPing).queue();
-                                msg.sendMessage(sb.toString()).queue();
+                                String text = playerPing + "\n" + sb;
+                                msg.sendMessage(text).queue();
                                 ThreadChannelAction threadChannelAction = threadChannel_.setInvitable(false);
                             });
                         }
