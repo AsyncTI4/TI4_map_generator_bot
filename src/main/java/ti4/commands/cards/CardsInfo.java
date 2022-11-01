@@ -122,7 +122,6 @@ public class CardsInfo extends CardsSubcommandData {
             if (activeMap.isCommunityMode() && player.getChannelForCommunity() instanceof MessageChannel) {
                 MessageHelper.sendMessageToChannel((MessageChannel) player.getChannelForCommunity(), sb.toString());
             } else {
-                MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
                 if (event != null) {
                     try {
                         Channel channel = event.getChannel();
@@ -169,6 +168,7 @@ public class CardsInfo extends CardsSubcommandData {
                         for (ThreadChannel threadChannel : threadChannels) {
                             if (threadChannel.getName().equals(threadName) && !threadChannel.isArchived()) {
                                 MessageHelper.sendMessageToChannel(threadChannel, playerPing);
+                                MessageHelper.sendMessageToChannel(threadChannel, sb.toString());
                                 threadChannel.getManager().setInvitable(false);
                                 threadFound = true;
                             }
@@ -177,6 +177,7 @@ public class CardsInfo extends CardsSubcommandData {
                             ThreadChannelAction threadChannel_ = textChannel.createThreadChannel(threadName, true);
                             threadChannel_.queue(msg -> {
                                 msg.sendMessage(playerPing).queue();
+                                msg.sendMessage(sb.toString()).queue();
                                 ThreadChannelAction threadChannelAction = threadChannel_.setInvitable(false);
                             });
                         }
