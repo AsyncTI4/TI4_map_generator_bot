@@ -58,6 +58,7 @@ public class PlayAC extends CardsSubcommandData {
                             return;
                         }
                         acID = ac.getKey();
+                        acIndex = ac.getValue();
                         foundSimilarName = true;
                         cardName = actionCardName;
                     }
