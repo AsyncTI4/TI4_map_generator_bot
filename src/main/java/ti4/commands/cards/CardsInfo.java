@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import ti4.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -19,10 +20,14 @@ import ti4.message.MessageHelper;
 
 import javax.annotation.CheckForNull;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 public class CardsInfo extends CardsSubcommandData {
+
+    private static HashMap<Map, TextChannel> threadTextChannels = new HashMap<>();
+
     public CardsInfo() {
         super(Constants.INFO, "Resent all my cards in Private Message");
         addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable").setRequired(false));
@@ -128,19 +133,33 @@ public class CardsInfo extends CardsSubcommandData {
                         }
                         ChannelType type = channel.getType();
 
-                        TextChannel textChannel;
-                        if (ChannelType.GUILD_PUBLIC_THREAD.equals(type) || ChannelType.GUILD_PRIVATE_THREAD.equals(type)){
-                            IThreadContainer parentChannel = event.getThreadChannel().getParentChannel();
-                            if (parentChannel instanceof TextChannel) {
-                                textChannel = (TextChannel) parentChannel;
-                            } else {
-                                MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
-                                MessageHelper.sentToMessageToUser(event, "Please Execute info command in non thread channel", userById);
-                                return;
+
+                        TextChannel textChannel = threadTextChannels.get(activeMap);
+                        if (textChannel == null) {
+                            String mainChannelName = activeMap.getName() + "-actions";
+                            for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
+
+                                if (textChannel_.getName().equals(mainChannelName)){
+                                    textChannel = textChannel_;
+                                    threadTextChannels.put(activeMap, textChannel);
+                                    break;
+                                }
                             }
-                        }
-                        else {
-                            textChannel = event.getTextChannel();
+
+                            if (textChannel == null) {
+                                if (ChannelType.GUILD_PUBLIC_THREAD.equals(type) || ChannelType.GUILD_PRIVATE_THREAD.equals(type)) {
+                                    IThreadContainer parentChannel = event.getThreadChannel().getParentChannel();
+                                    if (parentChannel instanceof TextChannel) {
+                                        textChannel = (TextChannel) parentChannel;
+                                    } else {
+                                        MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
+                                        MessageHelper.sentToMessageToUser(event, "Please Execute info command in non thread channel", userById);
+                                        return;
+                                    }
+                                } else {
+                                    textChannel = event.getTextChannel();
+                                }
+                            }
                         }
                         List<ThreadChannel> threadChannels = textChannel.getThreadChannels();
                         boolean threadFound = false;

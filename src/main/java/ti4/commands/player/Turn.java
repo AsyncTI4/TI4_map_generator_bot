@@ -1,7 +1,6 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.GenerateMap;
@@ -28,7 +27,7 @@ public class Turn extends PlayerSubcommandData {
 
         mainPlayer = Helper.getGamePlayer(map, mainPlayer, event, null);
         mainPlayer = Helper.getPlayer(map, mainPlayer, event);
-        if (mainPlayer == null){
+        if (mainPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player/Faction/Color could not be found in map:" + map.getName());
             return;
         }
@@ -66,7 +65,7 @@ public class Turn extends PlayerSubcommandData {
         }
         HashMap<Integer, Boolean> scPassed = new HashMap<>();
         for (Player player : map.getPlayers().values()) {
-            if (player.isPassed()){
+            if (player.isPassed()) {
                 continue;
             }
             int sc = player.getSC();
@@ -77,17 +76,17 @@ public class Turn extends PlayerSubcommandData {
                 scPassed.put(sc, player.isPassed());
             }
         }
-        if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value)){
-            MessageHelper.sendMessageToChannel(event.getChannel(), "All players passed. Please score objectives or react with your faction symbol for no scoring. " +Helper.getGamePing(event, map));
+        if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value)) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "All players passed. Please score objectives or react with your faction symbol for no scoring. " + Helper.getGamePing(event, map));
             MessageHelper.replyToMessageTI4Logo(event);
             return;
         }
 
         int tempProtection = 0;
         int nextSCFound = -1;
-        while (tempProtection < 20){
+        while (tempProtection < 20) {
             Boolean isPassed = scPassed.get(scNext);
-            if (isPassed != null && !isPassed){
+            if (isPassed != null && !isPassed) {
                 nextSCFound = scNext;
                 break;
             } else {
@@ -97,7 +96,7 @@ public class Turn extends PlayerSubcommandData {
         }
         for (Player player : map.getPlayers().values()) {
             int sc = player.getSC();
-            if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc){
+            if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
                 String text = "";
                 text += Helper.getFactionIconFromDiscord(player.getFaction());
                 text += " " + Helper.getPlayerPing(event, player) + " UP NEXT";

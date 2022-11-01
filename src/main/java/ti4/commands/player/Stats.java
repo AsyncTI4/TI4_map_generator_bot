@@ -112,6 +112,7 @@ public class Stats extends PlayerSubcommandData {
             String value = optionPassed.getAsString().toLowerCase();
             if ("y".equals(value) || "yes".equals(value)) {
                 player.setPassed(true);
+                Turn.pingNextPlayer(event, activeMap, player);
             } else if ("n".equals(value) || "no".equals(value)) {
                 player.setPassed(false);
             }
