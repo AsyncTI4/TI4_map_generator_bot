@@ -122,7 +122,6 @@ public class CardsInfo extends CardsSubcommandData {
             if (activeMap.isCommunityMode() && player.getChannelForCommunity() instanceof MessageChannel) {
                 MessageHelper.sendMessageToChannel((MessageChannel) player.getChannelForCommunity(), sb.toString());
             } else {
-                MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
                 if (event != null) {
                     try {
                         Channel channel = event.getChannel();
