@@ -4,10 +4,9 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.MapGenerator;
 import ti4.ResourceHelper;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
@@ -210,8 +209,8 @@ public class Helper {
         return categoryForPlayers;
     }
 
-    public static String getPlayerPing(Event event, Player player) {
-        User userById = event.getJDA().getUserById(player.getUserID());
+    public static String getPlayerPing(Player player) {
+        User userById = MapGenerator.jda.getUserById(player.getUserID());
         if (userById == null) {
             return "";
         }
@@ -252,7 +251,7 @@ public class Helper {
             String msg = getGamePing(event, map) + " ";
             if (player != null) {
                 msg += getFactionIconFromDiscord(player.getFaction()) + " " + player.getFaction() + " ";
-                msg += getPlayerPing(event, player) + " ";
+                msg += getPlayerPing(player) + " ";
             }
             msg += "(" + color + ") is over CC limit. CC used: " + ccCount;
             MessageHelper.replyToMessage(event, msg);

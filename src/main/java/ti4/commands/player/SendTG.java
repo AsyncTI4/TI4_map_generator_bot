@@ -55,7 +55,7 @@ public class SendTG extends PlayerSubcommandData {
         String text = "";
         String playerFaction = player.getFaction();
         text += Helper.getFactionIconFromDiscord(playerFaction);
-        text += " " + Helper.getPlayerPing(event, player);
+        text += " " + Helper.getPlayerPing(player);
         return text;
     }
 
