@@ -107,8 +107,8 @@ public class SentPN extends PNCardsSubcommandData {
         }
         CardsInfo.sentUserCardInfo(event, activeMap, targetPlayer);
         CardsInfo.sentUserCardInfo(event, activeMap, player);
-        String playerPing = Helper.getPlayerPing(event, player);
-        String targetPlayerPing = Helper.getPlayerPing(event, targetPlayer);
+        String playerPing = Helper.getPlayerPing(player);
+        String targetPlayerPing = Helper.getPlayerPing(targetPlayer);
         String playerFaction = Helper.getFactionIconFromDiscord(player.getFaction());
         String targetPlayerFaction = Helper.getFactionIconFromDiscord(targetPlayer.getFaction());
         String text = sendSftT ? "SftT " : (sendAlliance ? "Alliance " : "");

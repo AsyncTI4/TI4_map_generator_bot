@@ -56,7 +56,7 @@ public class SCPick extends PlayerSubcommandData {
                 }
                 if (nextCorrectPing && player_.getSC() == 0 && player_.getFaction() != null) {
                     msgExtra += Helper.getFactionIconFromDiscord(player_.getFaction());
-                    msgExtra += " " + Helper.getPlayerPing(event, player_) + " To Pick SC";
+                    msgExtra += " " + Helper.getPlayerPing(player_) + " To Pick SC";
                     allPicked = false;
                     break;
                 }
@@ -95,7 +95,7 @@ public class SCPick extends PlayerSubcommandData {
                     }
                 }
                 if (nextPlayer != null) {
-                    msgExtra += " " + Helper.getPlayerPing(event, nextPlayer) + " is up for an action";
+                    msgExtra += " " + Helper.getPlayerPing(nextPlayer) + " is up for an action";
                 }
             }
 

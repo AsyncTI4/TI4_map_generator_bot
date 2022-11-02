@@ -85,7 +85,7 @@ public class ButtonListener extends ListenerAdapter {
                 addReaction(event, true, "Replenishing Commodities", "");
             }
             case "sc_follow_leadership" -> {
-                String message = Helper.getPlayerPing(event, player) + " following.";
+                String message = Helper.getPlayerPing(player) + " following.";
                 addReaction(event, true, message, "");
             }
             case "sc_no_follow" -> { addReaction(event, false, "Not Following", "");
@@ -140,7 +140,7 @@ public class ButtonListener extends ListenerAdapter {
         playerUsedSC.put(messageID, players);
         if (contains){
             String defaultText = text.isEmpty() ? "Secondary of Strategy Card" : text;
-            event.getChannel().sendMessage("Player: " + Helper.getPlayerPing(event, player) + " already used " + defaultText).queue();
+            event.getChannel().sendMessage("Player: " + Helper.getPlayerPing(player) + " already used " + defaultText).queue();
         }
         return contains;
     }
@@ -154,7 +154,7 @@ public class ButtonListener extends ListenerAdapter {
         } else {
             strategicCC--;
             player.setStrategicCC(strategicCC);
-            message = Helper.getPlayerPing(event, player) + " following SC, deducted 1 CC from Strategy Tokens";
+            message = Helper.getPlayerPing(player) + " following SC, deducted 1 CC from Strategy Tokens";
         }
         return message;
     }

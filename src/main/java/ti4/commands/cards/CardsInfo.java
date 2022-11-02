@@ -122,69 +122,66 @@ public class CardsInfo extends CardsSubcommandData {
             if (activeMap.isCommunityMode() && player.getChannelForCommunity() instanceof MessageChannel) {
                 MessageHelper.sendMessageToChannel((MessageChannel) player.getChannelForCommunity(), sb.toString());
             } else {
-                if (event != null) {
-                    try {
-                        Channel channel = event.getChannel();
-                        if (channel == null){
-                            MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
-                            BotLogger.log("Could not find channel");
-                            return;
-                        }
-                        ChannelType type = channel.getType();
+                try {
+                    Channel channel = event != null ? event.getChannel() : buttonEvent.getChannel();
+                    if (channel == null){
+                        MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
+                        BotLogger.log("Could not find channel");
+                        return;
+                    }
+                    ChannelType type = channel.getType();
 
+                    TextChannel textChannel = threadTextChannels.get(activeMap);
+                    if (textChannel == null) {
+                        String mainChannelName = activeMap.getName() + "-actions";
+                        for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
 
-                        TextChannel textChannel = threadTextChannels.get(activeMap);
-                        if (textChannel == null) {
-                            String mainChannelName = activeMap.getName() + "-actions";
-                            for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
-
-                                if (textChannel_.getName().equals(mainChannelName)){
-                                    textChannel = textChannel_;
-                                    threadTextChannels.put(activeMap, textChannel);
-                                    break;
-                                }
-                            }
-
-                            if (textChannel == null) {
-                                if (ChannelType.GUILD_PUBLIC_THREAD.equals(type) || ChannelType.GUILD_PRIVATE_THREAD.equals(type)) {
-                                    IThreadContainer parentChannel = event.getThreadChannel().getParentChannel();
-                                    if (parentChannel instanceof TextChannel) {
-                                        textChannel = (TextChannel) parentChannel;
-                                    } else {
-                                        MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
-                                        MessageHelper.sentToMessageToUser(event, "Please Execute info command in non thread channel", userById);
-                                        return;
-                                    }
-                                } else {
-                                    textChannel = event.getTextChannel();
-                                }
-                            }
-                        }
-                        List<ThreadChannel> threadChannels = textChannel.getThreadChannels();
-                        boolean threadFound = false;
-                        String threadName = "Cards Info-" + activeMap.getName() + "-" + player.getUserName();
-                        String playerPing = threadName + " " + Helper.getPlayerPing(event, player);
-
-                        for (ThreadChannel threadChannel : threadChannels) {
-                            if (threadChannel.getName().equals(threadName) && !threadChannel.isArchived()) {
-                                String text = playerPing + "\n" + sb;
-                                MessageHelper.sendMessageToChannel(threadChannel, text);
-                                threadChannel.getManager().setInvitable(false);
-                                threadFound = true;
+                            if (textChannel_.getName().equals(mainChannelName)){
+                                textChannel = textChannel_;
+                                threadTextChannels.put(activeMap, textChannel);
                                 break;
                             }
                         }
-                        if (!threadFound) {
-                            ThreadChannelAction threadChannel_ = textChannel.createThreadChannel(threadName, true);
-                            threadChannel_.queue(msg -> {
-                                String text = playerPing + "\n" + sb;
-                                msg.sendMessage(text).queue();
-                                ThreadChannelAction threadChannelAction = threadChannel_.setInvitable(false);
-                            });
+
+                        if (textChannel == null) {
+                            if (ChannelType.GUILD_PUBLIC_THREAD.equals(type) || ChannelType.GUILD_PRIVATE_THREAD.equals(type)) {
+                                IThreadContainer parentChannel = event != null ? event.getThreadChannel().getParentChannel() : buttonEvent.getThreadChannel().getParentChannel();
+                                if (parentChannel instanceof TextChannel) {
+                                    textChannel = (TextChannel) parentChannel;
+                                } else {
+                                    MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
+                                    MessageHelper.sentToMessageToUser(event, "Please Execute info command in non thread channel", userById);
+                                    return;
+                                }
+                            } else {
+                                textChannel = event != null ? event.getTextChannel() : buttonEvent.getTextChannel();
+                            }
                         }
-                    } catch (Exception e) {
-                        BotLogger.log("Could not create Private Thread");
                     }
+                    List<ThreadChannel> threadChannels = textChannel.getThreadChannels();
+                    boolean threadFound = false;
+                    String threadName = "Cards Info-" + activeMap.getName() + "-" + player.getUserName();
+                    String playerPing = threadName + " " + Helper.getPlayerPing(player);
+
+                    for (ThreadChannel threadChannel : threadChannels) {
+                        if (threadChannel.getName().equals(threadName) && !threadChannel.isArchived()) {
+                            String text = playerPing + "\n" + sb;
+                            MessageHelper.sendMessageToChannel(threadChannel, text);
+                            threadChannel.getManager().setInvitable(false);
+                            threadFound = true;
+                            break;
+                        }
+                    }
+                    if (!threadFound) {
+                        ThreadChannelAction threadChannel_ = textChannel.createThreadChannel(threadName, true);
+                        threadChannel_.queue(msg -> {
+                            String text = playerPing + "\n" + sb;
+                            msg.sendMessage(text).queue();
+                            ThreadChannelAction threadChannelAction = threadChannel_.setInvitable(false);
+                        });
+                    }
+                } catch (Exception e) {
+                    BotLogger.log("Could not create Private Thread");
                 }
             }
         } else {
