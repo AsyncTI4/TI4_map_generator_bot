@@ -36,7 +36,7 @@ public class DrawSpecificSOForPlayer extends AdminSubcommandData {
         }
         if (playerOption != null) {
             User user = playerOption.getAsUser();
-            LinkedHashMap<String, Integer> secrets = activeMap.drawSpecificSecretObjective(option.toString(), user.getId());
+            LinkedHashMap<String, Integer> secrets = activeMap.drawSpecificSecretObjective(option.getAsString(), user.getId());
             if (secrets == null){
                 MessageHelper.replyToMessage(event, "SO not retrieved");
                 return;
