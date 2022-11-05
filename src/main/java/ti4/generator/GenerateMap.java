@@ -832,7 +832,11 @@ public class GenerateMap {
             if (techInformation.length >= 5) {
                 unit += techInformation[4] + ".png";
             } else {
-                unit += tech + ".png";
+                if (tech.equals("dt2")){
+                    unit += "sd2.png";
+                } else {
+                    unit += tech + ".png";
+                }
             }
             drawPAImage(x + deltaX, y, unit);
             if (techInformation.length >= 4 && !techInformation[3].isEmpty()) {
