@@ -27,7 +27,7 @@ public class AddUnits extends AddRemoveUnits {
         if (option != null){
             String value = option.getAsString().toLowerCase();
             switch (value) {
-                case "r", "retreat" -> {
+                case "r", "retreat", "reinforcements" -> {
                     AddCC.addCC(event, color, tile);
                     Helper.isCCCountCorrect(event, map, color);
                 }
@@ -76,7 +76,7 @@ public class AddUnits extends AddRemoveUnits {
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")
                                 .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.CC, "Type no or n to not add CC, r or retreat to add a CC without taking it from tactics").setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.CC, "Type no or n to not add CC, reinforcements to add a CC without taking it from tactics").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                                 .setAutoComplete(true))
         );
