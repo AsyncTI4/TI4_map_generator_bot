@@ -77,7 +77,7 @@ public class MoveUnits extends AddRemoveUnits {
             if ("no".equals(value) || "n".equals(value)) {
                 return;
             }
-            if ("r".equals(value) || "retreat".equals(value)) {
+            if ("r".equals(value) || "retreat".equals(value) || "reinforcements".equals(value)) {
                 retreat = true;
             }
         }
