@@ -73,6 +73,10 @@ abstract public class AddRemoveUnits implements Command {
     }
 
     public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Map map) {
+        unitParsing(event, color, tile, unitList, map, true);
+    }
+
+    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Map map, boolean useCounter) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer tokenizer = new StringTokenizer(unitList, ",");
         while (tokenizer.hasMoreTokens()) {
@@ -108,7 +112,7 @@ abstract public class AddRemoveUnits implements Command {
 
             addPlanetToPlayArea(event, tile, planetName);
         }
-        actionAfterAll(event, tile, color, map);
+        actionAfterAll(event, tile, color, map, useCounter);
     }
 
     public void addPlanetToPlayArea(SlashCommandInteractionEvent event, Tile tile, String planetName) {
@@ -161,8 +165,14 @@ abstract public class AddRemoveUnits implements Command {
     abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color);
 
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map){
+
+        actionAfterAll(event, tile, color, map, true);
+    }
+
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map, boolean addCounter){
         //do nothing, overriden by child classes
     }
+
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
