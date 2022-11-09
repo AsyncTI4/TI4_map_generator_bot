@@ -24,8 +24,14 @@ public class AddUnits extends AddRemoveUnits {
     @Override
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map, boolean addCounter) {
         OptionMapping option = event.getOption(Constants.CC);
-        if (option != null && !addCounter){
+
+        if (option == null || addCounter) {
+            MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
+            AddCC.addCC(event, color, tile);
+            Helper.isCCCountCorrect(event, map, color);
+        } else {
             String value = option.getAsString().toLowerCase();
+
             switch (value) {
                 case "r", "retreat", "reinforcements" -> {
                     AddCC.addCC(event, color, tile);
@@ -35,10 +41,6 @@ public class AddUnits extends AddRemoveUnits {
                     // Do Nothing with CCs
                 }
             }
-        } else {
-            MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
-            AddCC.addCC(event, color, tile);
-            Helper.isCCCountCorrect(event, map, color);
         }
     }
 
