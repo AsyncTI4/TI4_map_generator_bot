@@ -31,7 +31,6 @@ public class AddUnits extends AddRemoveUnits {
             Helper.isCCCountCorrect(event, map, color);
         } else {
             if (option == null) {
-                MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
                 AddCC.addCC(event, color, tile);
                 Helper.isCCCountCorrect(event, map, color);
             }
