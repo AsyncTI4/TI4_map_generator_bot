@@ -1257,7 +1257,7 @@ public class GenerateMap {
                 } else if (agendaType.equals("0")) {
                     String faction = null;
                     for (Player player : map.getPlayers().values()) {
-                        if (optionalText.equals(player.getFaction())) {
+                        if (optionalText.equals(player.getFaction()) || optionalText.equals(player.getColor())) {
                             faction = player.getFaction();
                             break;
                         }
