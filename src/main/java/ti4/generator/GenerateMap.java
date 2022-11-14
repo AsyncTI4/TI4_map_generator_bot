@@ -9,18 +9,18 @@ import ti4.map.*;
 import ti4.message.BotLogger;
 
 import javax.annotation.CheckForNull;
-import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
-import javax.imageio.ImageWriteParam;
-import javax.imageio.ImageWriter;
 import java.awt.*;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineBreakMeasurer;
+import java.awt.font.TextLayout;
+import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
-import java.awt.image.DataBufferByte;
-import java.awt.image.DataBufferInt;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.text.AttributedString;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -158,9 +158,9 @@ public class GenerateMap {
             }
 
             new PngEncoder()
-                .withBufferedImage(mainImage)
-                .withCompressionLevel(1)
-                .toFile(file);
+                    .withBufferedImage(mainImage)
+                    .withCompressionLevel(1)
+                    .toFile(file);
         } catch (IOException e) {
             BotLogger.log(map.getName() + ": Could not save generated map");
         }
@@ -235,6 +235,7 @@ public class GenerateMap {
         y = strategyCards(map, y);
         int tempY = y;
         y = objectives(map, y + 180);
+        y = laws(map, y);
         tempY = scoreTrack(map, tempY + 20);
         if (displayType != DisplayType.stats) {
             playerInfo(map);
@@ -383,23 +384,6 @@ public class GenerateMap {
 
             }
             y += 40;
-            graphics.setColor(Color.WHITE);
-            graphics.setFont(Storage.getFont32());
-            graphics.drawString("LAWS", x, y);
-
-            graphics.setFont(Storage.getFont26());
-            LinkedHashMap<String, Integer> laws = map.getLaws();
-            LinkedHashMap<String, String> lawsInfo = map.getLawsInfo();
-            for (java.util.Map.Entry<String, Integer> lawEntry : laws.entrySet()) {
-                y += 30;
-                String lawID = lawEntry.getKey();
-                String text = "(" + lawEntry.getValue() + ") ";
-                String optionalText = lawsInfo.get(lawID);
-                if (optionalText != null) {
-                    text += "Elected: " + optionalText + " - ";
-                }
-                graphics.drawString(text + Mapper.getAgendaForOnly(lawID), x, y);
-            }
         }
     }
 
@@ -751,10 +735,10 @@ public class GenerateMap {
         g2.setStroke(new BasicStroke(2));
 
 
-        deltaX = techField(x, y, techsFiltered.get(Constants.BIOTIC), exhaustedTechs, techInfo, deltaX);
         deltaX = techField(x, y, techsFiltered.get(Constants.PROPULSION), exhaustedTechs, techInfo, deltaX);
-        deltaX = techField(x, y, techsFiltered.get(Constants.CYBERNETIC), exhaustedTechs, techInfo, deltaX);
         deltaX = techField(x, y, techsFiltered.get(Constants.WARFARE), exhaustedTechs, techInfo, deltaX);
+        deltaX = techField(x, y, techsFiltered.get(Constants.CYBERNETIC), exhaustedTechs, techInfo, deltaX);
+        deltaX = techField(x, y, techsFiltered.get(Constants.BIOTIC), exhaustedTechs, techInfo, deltaX);
         deltaX = techFieldUnit(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), exhaustedTechs, techInfo, deltaX, player, map);
         return x + deltaX + 20;
     }
@@ -832,7 +816,7 @@ public class GenerateMap {
             if (techInformation.length >= 5) {
                 unit += techInformation[4] + ".png";
             } else {
-                if (tech.equals("dt2")){
+                if (tech.equals("dt2")) {
                     unit += "sd2.png";
                 } else {
                     unit += tech + ".png";
@@ -1220,6 +1204,97 @@ public class GenerateMap {
         displaySftT(y, x, players, column);
 
         return Math.max(y3, Math.max(y1, y2)) + 15;
+    }
+
+    private int laws(Map map, int y) {
+        int x = 5;
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+
+
+        LinkedHashMap<String, Integer> laws = map.getLaws();
+        LinkedHashMap<String, String> lawsInfo = map.getLawsInfo();
+        boolean secondColumn = false;
+        for (java.util.Map.Entry<String, Integer> lawEntry : laws.entrySet()) {
+            String lawID = lawEntry.getKey();
+            String optionalText = lawsInfo.get(lawID);
+            graphics.setFont(Storage.getFont35());
+            graphics.setColor(new Color(228, 255, 0));
+
+            graphics.drawRect(x, y, 1178, 110);
+            String agendaTitle = Mapper.getAgendaTitle(lawID);
+            if (agendaTitle == null){
+                agendaTitle = Mapper.getAgendaJustNames().get(lawID);
+            }
+            graphics.drawString(agendaTitle, x + 95, y + 30);
+            graphics.setFont(Storage.getFont26());
+            graphics.setColor(Color.WHITE);
+
+            String agendaText = Mapper.getAgendaText(lawID);
+            if (agendaText == null){
+                agendaText = Mapper.getAgendaForOnly(lawID);
+            }
+            int width = g2.getFontMetrics().stringWidth(agendaText);
+
+            int index = 0;
+            int agendaTextLength = agendaText.length();
+            while (width > 1076){
+                index++;
+                String substringText = agendaText.substring(0, agendaTextLength - index);
+                width = g2.getFontMetrics().stringWidth(substringText);
+            }
+            if (index > 0){
+                graphics.drawString(agendaText.substring(0, agendaTextLength - index), x + 95, y + 70);
+                graphics.drawString(agendaText.substring(agendaTextLength - index), x + 95, y + 96);
+            } else {
+                graphics.drawString(agendaText, x + 95, y + 70);
+            }
+            try {
+                String agendaType = Mapper.getAgendaType(lawID);
+
+                if (agendaType.equals("1") || optionalText == null || optionalText.isEmpty()) {
+                    paintAgendaIcon(y, x);
+                } else if (agendaType.equals("0")) {
+                    String faction = null;
+                    for (Player player : map.getPlayers().values()) {
+                        if (optionalText.equals(player.getFaction())) {
+                            faction = player.getFaction();
+                            break;
+                        }
+                    }
+                    if (faction == null){
+                        paintAgendaIcon(y, x);
+                    } else {
+                        String factionPath = getFactionPath(faction);
+                        if (factionPath != null) {
+                            BufferedImage bufferedImage = ImageIO.read(new File(factionPath));
+                            graphics.drawImage(bufferedImage, x + 2, y + 2, null);
+                        }
+                    }
+                }
+
+            } catch (Exception e) {
+                BotLogger.log("Could not paint agenda icon");
+            }
+
+            if (!secondColumn) {
+                secondColumn = true;
+                x += 1178 + 5;
+            } else {
+                secondColumn = false;
+                y += 112;
+                x = 5;
+            }
+        }
+        return secondColumn ? y + 115 : y + 3;
+    }
+
+    private void paintAgendaIcon(int y, int x) throws IOException {
+        String factionFile = ResourceHelper.getInstance().getFactionFile("agenda.png");
+        if (factionFile != null) {
+            BufferedImage bufferedImage = ImageIO.read(new File(factionFile));
+            graphics.drawImage(bufferedImage, x + 2, y + 2, null);
+        }
     }
 
     private int objectivesSO(Map map, int y, Player player) {
