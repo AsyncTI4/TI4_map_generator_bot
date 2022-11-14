@@ -43,6 +43,7 @@ public class Mapper {
     private static final Properties leaders = new Properties();
     private static final Properties playerSetup = new Properties();
     private static final Properties miltyDraft = new Properties();
+    private static final Properties agendaRepresentation = new Properties();
     private static final HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = new HashMap<>();
 
     public static void init() {
@@ -70,6 +71,7 @@ public class Mapper {
         readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
         readData("faction_setup.properties", playerSetup, "Could not read player setup file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
+        readData("agenda_representation.properties", agendaRepresentation, "Could not read agenda representaion file");
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -298,6 +300,35 @@ public class Mapper {
             agenda = new StringBuilder((String) agendas.get(id));
         }
         return agenda.toString();
+    }
+
+    @CheckForNull
+    public static String getAgendaTitle(String id) {
+        String agendaInfo = (String)agendaRepresentation.get(id);
+        if (agendaInfo == null){
+            return null;
+        }
+        String[] split = agendaInfo.split(";");
+        return split[1];
+    }
+
+    public static String getAgendaType(String id) {
+        String agendaInfo = (String)agendaRepresentation.get(id);
+        if (agendaInfo == null){
+            return "1";
+        }
+        String[] split = agendaInfo.split(";");
+        return split[0];
+    }
+
+    @CheckForNull
+    public static String getAgendaText(String id) {
+        String agendaInfo = (String)agendaRepresentation.get(id);
+        if (agendaInfo == null){
+            return null;
+        }
+        String[] split = agendaInfo.split(";");
+        return split[2];
     }
 
     public static HashMap<String, String> getSecretObjectives() {
