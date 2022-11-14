@@ -1217,6 +1217,7 @@ public class GenerateMap {
         boolean secondColumn = false;
         for (java.util.Map.Entry<String, Integer> lawEntry : laws.entrySet()) {
             String lawID = lawEntry.getKey();
+            String lawNumberID = " (" + lawEntry.getValue() + ")";
             String optionalText = lawsInfo.get(lawID);
             graphics.setFont(Storage.getFont35());
             graphics.setColor(new Color(228, 255, 0));
@@ -1234,6 +1235,7 @@ public class GenerateMap {
             if (agendaText == null){
                 agendaText = Mapper.getAgendaForOnly(lawID);
             }
+            agendaText += lawNumberID;
             int width = g2.getFontMetrics().stringWidth(agendaText);
 
             int index = 0;
