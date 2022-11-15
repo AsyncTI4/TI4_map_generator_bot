@@ -16,7 +16,7 @@ public class AddLaw extends AgendaSubcommandData {
         super(Constants.ADD_LAW, "Add Agenda as Law");
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ELECTED, "Elected PO or anything").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Elected faction").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Elected faction").setRequired(false).setAutoComplete(true));
     }
 
     @Override
