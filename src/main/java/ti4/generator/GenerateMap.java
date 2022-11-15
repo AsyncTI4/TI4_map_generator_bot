@@ -1209,7 +1209,7 @@ public class GenerateMap {
     private int laws(Map map, int y) {
         int x = 5;
         Graphics2D g2 = (Graphics2D) graphics;
-        g2.setStroke(new BasicStroke(2));
+        g2.setStroke(new BasicStroke(3));
 
 
         LinkedHashMap<String, Integer> laws = map.getLaws();
@@ -1281,7 +1281,7 @@ public class GenerateMap {
 
             if (!secondColumn) {
                 secondColumn = true;
-                x += 1178 + 5;
+                x += 1178 + 8;
             } else {
                 secondColumn = false;
                 y += 112;
