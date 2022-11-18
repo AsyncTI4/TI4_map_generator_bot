@@ -31,6 +31,7 @@ public class CardsInfo extends CardsSubcommandData {
     public CardsInfo() {
         super(Constants.INFO, "Resent all my cards in Private Message");
         addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false));
     }
 
     @Override
@@ -128,6 +129,12 @@ public class CardsInfo extends CardsSubcommandData {
                         MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
                         BotLogger.log("Could not find channel");
                         return;
+                    }
+                    if (event != null) {
+                        OptionMapping option = event.getOption(Constants.DM_CARD_INFO);
+                        if (option != null && option.getAsBoolean()) {
+                            MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
+                        }
                     }
                     ChannelType type = channel.getType();
 

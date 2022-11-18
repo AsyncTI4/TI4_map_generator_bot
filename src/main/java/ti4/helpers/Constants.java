@@ -328,6 +328,7 @@ public class Constants {
     public static final String UNSCORE_SO = "unscore";
     public static final String SHORT_PN_DISPLAY = "short_pn_display";
     public static final String LONG_PN_DISPLAY = "long_pn_display";
+    public static final String DM_CARD_INFO = "dm_card_info";
     public static final String CUSTODIAN_VP = "token_custodianvp.png";
 
     public static final String ACTION_CARD_ID = "action_card_id";
