@@ -27,18 +27,16 @@ public class AddUnits extends AddRemoveUnits {
         if (option != null){
             String value = option.getAsString().toLowerCase();
             switch (value) {
-                case "r", "retreat" -> {
+                case "t", "tactics" -> {
+                    MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
                     AddCC.addCC(event, color, tile);
                     Helper.isCCCountCorrect(event, map, color);
                 }
-                case "n", "none", "no" -> {
-                    // Do Nothing with CCs
+                case "r", "reinforcements" -> {
+                    AddCC.addCC(event, color, tile);
+                    Helper.isCCCountCorrect(event, map, color);
                 }
             }
-        } else {
-            MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
-            AddCC.addCC(event, color, tile);
-            Helper.isCCCountCorrect(event, map, color);
         }
     }
 
@@ -50,7 +48,7 @@ public class AddUnits extends AddRemoveUnits {
 
         tile = MoveUnits.flipMallice(event, tile, activeMap);
         if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Malice");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice");
             return;
         }
         super.unitParsingForTile(event, color, tile, map);
@@ -76,7 +74,7 @@ public class AddUnits extends AddRemoveUnits {
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")
                                 .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type no or n to not add CC, r or retreat to add a CC without taking it from tactics").setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type tactics or t, reinforcements or r").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                                 .setAutoComplete(true))
         );
