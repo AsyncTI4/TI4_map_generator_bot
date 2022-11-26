@@ -22,9 +22,9 @@ public class AddUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map, boolean addCounter) {
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map) {
         OptionMapping option = event.getOption(Constants.CC);
-        if (option != null && !addCounter){
+        if (option != null){
             String value = option.getAsString().toLowerCase();
             switch (value) {
                 case "r", "retreat", "reinforcements" -> {
