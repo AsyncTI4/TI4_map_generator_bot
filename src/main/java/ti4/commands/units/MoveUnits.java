@@ -70,14 +70,14 @@ public class MoveUnits extends AddRemoveUnits {
                 break;
         }
 
-        OptionMapping optionCC = event.getOption(Constants.CC);
+        OptionMapping optionCC = event.getOption(Constants.CC_USE);
         boolean retreat = false;
         if (optionCC != null) {
             String value = optionCC.getAsString().toLowerCase();
             if ("no".equals(value) || "n".equals(value)) {
                 return;
             }
-            if ("r".equals(value) || "retreat".equals(value)) {
+            if ("r".equals(value) || "retreat".equals(value) || "reinforcements".equals(value)) {
                 retreat = true;
             }
         }
@@ -243,7 +243,7 @@ public class MoveUnits extends AddRemoveUnits {
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                                 .setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.CC, "Type no or n to not add CC, r or retreat to add a CC without taking it from tactics").setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type no or n to not add CC, r or retreat to add a CC without taking it from tactics").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units. Type in yes or y"))
         );
     }
