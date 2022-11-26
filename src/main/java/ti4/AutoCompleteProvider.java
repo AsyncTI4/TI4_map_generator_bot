@@ -63,7 +63,7 @@ public class AutoCompleteProvider {
             }
             case Constants.CC -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<String> values = Arrays.asList("no", "retreat", "reinforcements");
+                List<String> values = Arrays.asList("no", "retreat");
                 List<Command.Choice> options = values.stream()
                         .filter(token -> token.contains(enteredValue))
                         .limit(25)
