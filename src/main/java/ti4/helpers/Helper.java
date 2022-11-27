@@ -218,7 +218,15 @@ public class Helper {
     }
 
     public static void isCCCountCorrect(SlashCommandInteractionEvent event, Map map, String color) {
+        int ccCount = getCCCount(map, color);
+        informUserCCOverLimit(event, map, color, ccCount);
+    }
+
+    public static int getCCCount(Map map, String color) {
         int ccCount = 0;
+        if (color == null){
+            return 0;
+        }
         HashMap<String, Tile> tileMap = map.getTileMap();
         for (java.util.Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
             Tile tile = tileEntry.getValue();
@@ -229,11 +237,9 @@ public class Helper {
         }
         String factionColor = AliasHandler.resolveColor(color.toLowerCase());
         factionColor = AliasHandler.resolveFaction(factionColor);
-        Player player = null;
         for (Player player_ : map.getPlayers().values()) {
             if (Objects.equals(factionColor, player_.getFaction()) ||
                     Objects.equals(factionColor, player_.getColor())) {
-                player = player_;
                 ccCount += player_.getStrategicCC();
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
@@ -246,8 +252,21 @@ public class Helper {
                 }
             }
         }
+        return ccCount;
+    }
+
+    private static void informUserCCOverLimit(SlashCommandInteractionEvent event, Map map, String color, int ccCount) {
         boolean ccCountIsOver = ccCount > 16;
         if (ccCountIsOver) {
+            Player player = null;
+            String factionColor = AliasHandler.resolveColor(color.toLowerCase());
+            factionColor = AliasHandler.resolveFaction(factionColor);
+            for (Player player_ : map.getPlayers().values()) {
+                if (Objects.equals(factionColor, player_.getFaction()) ||
+                        Objects.equals(factionColor, player_.getColor())) {
+                    player = player_;
+                }
+            }
             String msg = getGamePing(event, map) + " ";
             if (player != null) {
                 msg += getFactionIconFromDiscord(player.getFaction()) + " " + player.getFaction() + " ";

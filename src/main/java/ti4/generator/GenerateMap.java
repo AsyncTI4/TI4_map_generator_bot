@@ -11,16 +11,11 @@ import ti4.message.BotLogger;
 import javax.annotation.CheckForNull;
 import javax.imageio.ImageIO;
 import java.awt.*;
-import java.awt.font.FontRenderContext;
-import java.awt.font.LineBreakMeasurer;
-import java.awt.font.TextLayout;
-import java.awt.geom.Point2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.AttributedString;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -535,13 +530,14 @@ public class GenerateMap {
             }
         }
 
+        String playerColor = player.getColor();
         for (String unitID : Mapper.getUnitIDList()) {
-            String unitColorID = Mapper.getUnitID(unitID, player.getColor());
+            String unitColorID = Mapper.getUnitID(unitID, playerColor);
             if (unitID.equals("cff")) {
-                unitColorID = Mapper.getUnitID("ff", player.getColor());
+                unitColorID = Mapper.getUnitID("ff", playerColor);
             }
             if (unitID.equals("cgf")) {
-                unitColorID = Mapper.getUnitID("gf", player.getColor());
+                unitColorID = Mapper.getUnitID("gf", playerColor);
             }
 
             Integer count = unitCount.get(unitColorID);
@@ -549,7 +545,7 @@ public class GenerateMap {
                 if (!player.getFaction().equals("cabal")) {
                     continue;
                 }
-                unitColorID = Mapper.getUnitID("sd", player.getColor());
+                unitColorID = Mapper.getUnitID("sd", playerColor);
             }
             if (player.getFaction().equals("cabal") && unitID.equals("sd")) {
                 continue;
@@ -573,10 +569,36 @@ public class GenerateMap {
                             BotLogger.log("Could not parse unit file for reinforcements: " + unitID);
                         }
                     }
-                    paintNumber(unitID, x, y, remainingReinforcements, player.getColor());
+                    paintNumber(unitID, x, y, remainingReinforcements, playerColor);
                 }
             }
         }
+
+        int ccCount = Helper.getCCCount(map, playerColor);
+        String CC_TAG = "cc";
+        if (playerColor == null){
+            return;
+        }
+        UnitTokenPosition reinforcementsPosition = PositionMapper.getReinforcementsPosition(CC_TAG);
+        if (reinforcementsPosition != null) {
+            int positionCount = reinforcementsPosition.getPositionCount(CC_TAG);
+            int remainingReinforcements = positionCount - ccCount;
+            if (remainingReinforcements > 0) {
+                for (int i = 0; i < remainingReinforcements; i++) {
+                    try {
+                        String ccID = Mapper.getCCID(playerColor);
+                        String ccPath = Mapper.getCCPath(ccID);
+                        BufferedImage image = ImageIO.read(new File(ccPath));
+                        Point position = reinforcementsPosition.getPosition(CC_TAG);
+                        graphics.drawImage(image, x + position.x, y + position.y, null);
+                    } catch (Exception e) {
+                        BotLogger.log("Could not parse file for CC: " + playerColor);
+                    }
+                }
+                paintNumber(CC_TAG, x, y, remainingReinforcements, playerColor);
+            }
+        }
+
     }
 
     private void paintNumber(String unitID, int x, int y, int reinforcementsCount, String color) {
@@ -991,6 +1013,22 @@ public class GenerateMap {
             vpCount = vpCount == null ? 0 : vpCount;
             graphics.drawString("VP - " + vpCount, points.get(1).x, points.get(1).y);
 
+            int totalSecrets = player.getSecrets().keySet().size();
+            int scoredSecrets = player.getSecretsScored().keySet().size();
+            int soOffset = 0;
+
+            String soHand = "pa_so-icon_hand.png";
+            String soScored = "pa_so-icon_scored.png";
+            for (int i = 0; i < totalSecrets; i++) {
+                drawPAImage((points.get(6).x + soOffset), points.get(6).y, soHand);
+                soOffset += 25;
+            }
+            for (int i = 0; i < scoredSecrets; i++) {
+                drawPAImage((points.get(6).x + soOffset), points.get(6).y, soScored);
+                soOffset += 25;
+            }
+
+
             int sc = player.getSC();
             String scText = sc == 0 ? " " : Integer.toString(sc);
             scText = getSCNumberIfNaaluInPlay(player, map, scText);
@@ -1224,7 +1262,7 @@ public class GenerateMap {
 
             graphics.drawRect(x, y, 1178, 110);
             String agendaTitle = Mapper.getAgendaTitle(lawID);
-            if (agendaTitle == null){
+            if (agendaTitle == null) {
                 agendaTitle = Mapper.getAgendaJustNames().get(lawID);
             }
             graphics.drawString(agendaTitle, x + 95, y + 30);
@@ -1232,7 +1270,7 @@ public class GenerateMap {
             graphics.setColor(Color.WHITE);
 
             String agendaText = Mapper.getAgendaText(lawID);
-            if (agendaText == null){
+            if (agendaText == null) {
                 agendaText = Mapper.getAgendaForOnly(lawID);
             }
             agendaText += lawNumberID;
@@ -1240,12 +1278,12 @@ public class GenerateMap {
 
             int index = 0;
             int agendaTextLength = agendaText.length();
-            while (width > 1076){
+            while (width > 1076) {
                 index++;
                 String substringText = agendaText.substring(0, agendaTextLength - index);
                 width = g2.getFontMetrics().stringWidth(substringText);
             }
-            if (index > 0){
+            if (index > 0) {
                 graphics.drawString(agendaText.substring(0, agendaTextLength - index), x + 95, y + 70);
                 graphics.drawString(agendaText.substring(agendaTextLength - index), x + 95, y + 96);
             } else {
@@ -1264,7 +1302,7 @@ public class GenerateMap {
                             break;
                         }
                     }
-                    if (faction == null){
+                    if (faction == null) {
                         paintAgendaIcon(y, x);
                     } else {
                         String factionPath = getFactionPath(faction);
