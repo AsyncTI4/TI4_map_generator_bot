@@ -244,7 +244,7 @@ public class Helper {
                 ccCount += player_.getTacticalCC();
                 ccCount += player_.getFleetCC();
                 break;
-            } else if (player_.getFaction().equals("mahact")){
+            } else if ("mahact".equals(player_.getFaction())){
                 for (String color_ : player_.getMahactCC()) {
                     if (factionColor.equals(color_)){
                         ccCount++;
