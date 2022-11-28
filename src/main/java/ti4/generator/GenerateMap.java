@@ -1014,7 +1014,7 @@ public class GenerateMap {
             graphics.drawString("VP - " + vpCount, points.get(1).x, points.get(1).y);
 
             int totalSecrets = player.getSecrets().keySet().size();
-            int scoredSecrets = player.getSecretsScored().keySet().size();
+            Set<String> soSet = player.getSecretsScored().keySet();
             int soOffset = 0;
 
             String soHand = "pa_so-icon_hand.png";
@@ -1023,9 +1023,12 @@ public class GenerateMap {
                 drawPAImage((points.get(6).x + soOffset), points.get(6).y, soHand);
                 soOffset += 25;
             }
-            for (int i = 0; i < scoredSecrets; i++) {
-                drawPAImage((points.get(6).x + soOffset), points.get(6).y, soScored);
-                soOffset += 25;
+            ArrayList<String> soToPoList = map.getSoToPoList();
+            for (String soID : soSet) {
+                if (!soToPoList.contains(soID)) {
+                    drawPAImage((points.get(6).x + soOffset), points.get(6).y, soScored);
+                    soOffset += 25;
+                }
             }
 
 
