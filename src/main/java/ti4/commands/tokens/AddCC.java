@@ -1,10 +1,17 @@
 package ti4.commands.tokens;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import ti4.commands.units.MoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
+import ti4.map.MapManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
@@ -14,7 +21,18 @@ import java.util.ArrayList;
 public class AddCC extends AddRemoveToken {
     @Override
     void parsingForTile(SlashCommandInteractionEvent event, ArrayList<String> colors, Tile tile, Map activeMap) {
+        boolean usedTactics = false;
         for (String color : colors) {
+            OptionMapping option = event.getOption(Constants.CC_USE);
+            if (option != null && !usedTactics) {
+                usedTactics = true;
+                String value = option.getAsString().toLowerCase();
+                switch (value) {
+                    case "t", "tactics" -> {
+                        MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
+                    }
+                }
+            }
             addCC(event, color, tile);
             Helper.isCCCountCorrect(event, activeMap, color);
         }
@@ -46,5 +64,18 @@ public class AddCC extends AddRemoveToken {
     @Override
     public String getActionID() {
         return Constants.ADD_CC;
+    }
+
+    @Override
+    public void registerCommands(CommandListUpdateAction commands) {
+        // Moderation commands with required options
+        commands.addCommands(
+                Commands.slash(getActionID(), getActionDescription())
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
+                                .setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type tactics or t, retreat, reinforcements or r").setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color")
+                                .setAutoComplete(true))
+        );
     }
 }
