@@ -314,7 +314,7 @@ public class GenerateMap {
                 graphics.drawString(Integer.toString(player.getPnCount()), x + 300, y + deltaY + 50);
 
                 drawPAImage(x + 345, y + yDelta, tradeGoodImage);
-                graphics.drawString(Integer.toString(player.getTg()), x + 365, y + deltaY + 50);
+                graphics.drawString(Integer.toString(player.getTg()), x + 360, y + deltaY + 50);
 
                 drawPAImage(x + 410, y + yDelta, commoditiesImage);
                 String comms = player.getCommodities() + "/" + player.getCommoditiesTotal();
