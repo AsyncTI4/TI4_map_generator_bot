@@ -57,8 +57,9 @@ public class ButtonListener extends ListenerAdapter {
                 if (used){
                     break;
                 }
-                String message =  "Drew 2 Actions cards";
-                int count = player.getFaction().equals("yssaril") ? 3 : 2;
+                boolean isYssaril = player.getFaction().equals("yssaril");
+                String message =  isYssaril ? "Drew 3 Actions cards" : "Drew 2 Actions cards";
+                int count = isYssaril ? 3 : 2;
                 for (int i = 0; i < count; i++) {
                     activeMap.drawActionCard(player.getUserID());
                 }
