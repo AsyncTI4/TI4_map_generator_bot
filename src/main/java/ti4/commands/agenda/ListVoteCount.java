@@ -6,7 +6,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.*;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import java.util.*;
@@ -84,7 +83,8 @@ public class ListVoteCount extends AgendaSubcommandData {
                                         break;
                                     }
                                 }
-                            } else if ("empyrean".equals(playerFaction) && "blood_pact".equals(pn)) {
+                            }
+                            if ("empyrean".equals(playerFaction) && "blood_pact".equals(pn)) {
                                 if (isCorrectPlayer) {
                                     bloodPactPn = true;
                                 }
