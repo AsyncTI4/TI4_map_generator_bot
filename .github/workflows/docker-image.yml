@@ -28,6 +28,6 @@ jobs:
           docker kill $(docker ps -q)
           cd /root
           ./docker_run.sh
-          [ -z "$(docker ps --filter status=exited -q)" ] && docker rm $(docker ps --filter status=exited -q)
-          [ -z "$(docker images --filter dangling=true -q)" ] && docker rmi $(docker images --filter "dangling=true" -q)
+          docker rm $(docker ps --filter status=exited -q)
+          docker rmi $(docker images --filter "dangling=true" -q)
 
