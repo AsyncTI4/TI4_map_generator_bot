@@ -19,7 +19,6 @@ import java.util.List;
 import java.util.Set;
 
 public class ButtonListener extends ListenerAdapter {
-
     public static HashMap<Guild, HashMap<String, Emote>> emoteMap = new HashMap<>();
     private static HashMap<String, Set<Player>> playerUsedSC = new HashMap<>();
 
