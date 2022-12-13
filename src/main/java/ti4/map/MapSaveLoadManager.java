@@ -574,6 +574,9 @@ public class MapSaveLoadManager {
                     if (ENDTILE.equals(tileData)) {
                         continue;
                     }
+                    if (tileData.isEmpty()){
+                        continue;
+                    }
                     Tile tile = readTile(tileData);
                     tileMap.put(tile.getPosition(), tile);
 
