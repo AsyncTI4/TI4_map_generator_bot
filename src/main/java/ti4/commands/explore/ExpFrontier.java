@@ -26,16 +26,18 @@ public class ExpFrontier extends ExploreSubcommandData {
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
             String cardID = activeMap.drawExplore(Constants.FRONTIER);
+            boolean isEnigmatic = false;
             if ("ed1".equals(cardID) || "ed2".equals(cardID)){
                 Player player = activeMap.getPlayer(getUser().getId());
                 player = Helper.getPlayer(activeMap, player, event);
                 if (player != null){
                     player.addRelic(Constants.ENIGMATIC_DEVICE);
+                    isEnigmatic = true;
                 }
             }
             String messageText = displayExplore(cardID);
             messageText += "\n" + "Explored: " + tile.getPosition() + " by player: " + activeMap.getPlayer(event.getUser().getId()).getUserName();
-            resolveExplore(event, cardID, tile, null, messageText);
+            resolveExplore(event, cardID, tile, null, messageText, isEnigmatic);
         } else {
             MessageHelper.replyToMessage(event, "No frontier token in given system.");
         }
