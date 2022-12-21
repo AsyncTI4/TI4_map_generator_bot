@@ -76,8 +76,12 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         return tile;
     }
 
-    protected void resolveExplore(SlashCommandInteractionEvent event, String cardID, Tile tile, String planetName, String messageText) {
+    protected void resolveExplore(SlashCommandInteractionEvent event, String cardID, Tile tile, String planetName, String messageText, boolean enigmatic) {
         String message = "Card has been discarded. Resolve effects manually.";
+        if (enigmatic){
+            message = "Card has been added to play area.";
+            activeMap.purgeExplore(cardID);
+        }
         String card = Mapper.getExplore(cardID);
         String[] cardInfo = card.split(";");
         Player player = activeMap.getPlayer(getUser().getId());
