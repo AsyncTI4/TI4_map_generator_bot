@@ -72,6 +72,7 @@ public class Turn extends PlayerSubcommandData {
             String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 scPassed.put(0, player.isPassed());
+                scPassed.put(sc, player.isPassed());
             } else {
                 scPassed.put(sc, player.isPassed());
             }

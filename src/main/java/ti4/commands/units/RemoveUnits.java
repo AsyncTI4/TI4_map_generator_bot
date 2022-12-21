@@ -86,7 +86,9 @@ public class RemoveUnits extends AddRemoveUnits {
                 }
             }
         }
-
+        for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
+            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+        }
     }
 
     @Override
