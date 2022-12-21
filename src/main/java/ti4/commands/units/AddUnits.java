@@ -13,6 +13,7 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
 public class AddUnits extends AddRemoveUnits {
@@ -52,6 +53,9 @@ public class AddUnits extends AddRemoveUnits {
             return;
         }
         super.unitParsingForTile(event, color, tile, map);
+        for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
+            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+        }
     }
 
     @Override

@@ -87,6 +87,9 @@ public class MoveUnits extends AddRemoveUnits {
 
         AddCC.addCC(event, color, tile);
         Helper.isCCCountCorrect(event, activeMap, color);
+        for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
+            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+        }
     }
 
     public static Tile flipMallice(SlashCommandInteractionEvent event, Tile tile, Map activeMap) {
@@ -123,22 +126,6 @@ public class MoveUnits extends AddRemoveUnits {
                 } else if (!AddCC.hasCC(event, color, tile)) {
                     cc -= 1;
                     player.setTacticalCC(cc);
-                    break;
-                }
-            }
-        }
-    }
-
-    public static void removeStrategyCC(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
-        for (Player player : activeMap.getPlayers().values()) {
-            if (color.equals(player.getColor())) {
-                int cc = player.getStrategicCC();
-                if (cc == 0) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "You don't have CC in Strategy");
-                    break;
-                } else {
-                    cc -= 1;
-                    player.setStrategicCC(cc);
                     break;
                 }
             }
