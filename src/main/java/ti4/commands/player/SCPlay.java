@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -89,6 +90,7 @@ public class SCPlay extends PlayerSubcommandData {
                     .setActionRows(of).build();
             channel.sendMessage(messageObject).queue(message_ -> {
                 ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
+                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
                 threadChannel.queue();
             });
         }
