@@ -44,6 +44,9 @@ abstract public class AddRemoveUnits implements Command {
             if (tile == null) return;
 
             unitParsingForTile(event, color, tile, activeMap);
+            for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
+                addPlanetToPlayArea(event, tile, unitHolder_.getName());
+            }
             MapSaveLoadManager.saveMap(activeMap);
 
             File file = GenerateMap.getInstance().saveImage(activeMap);
