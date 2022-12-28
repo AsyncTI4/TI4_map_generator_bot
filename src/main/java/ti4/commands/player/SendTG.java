@@ -47,7 +47,7 @@ public class SendTG extends PlayerSubcommandData {
             targetTG += sendTG;
             player_.setTg(targetTG);
 
-            MessageHelper.sendMessageToChannel(event.getChannel(), getPlayerRepresentation(event, player) + " send " + sendTG + " tg to: " + getPlayerRepresentation(event, player_));
+            MessageHelper.sendMessageToChannel(event.getChannel(), getPlayerRepresentation(event, player) + " sent " + sendTG + Helper.getEmojiFromDiscord("tg") + " trade goods to: " + getPlayerRepresentation(event, player_));
         }
     }
 

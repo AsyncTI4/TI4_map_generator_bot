@@ -34,6 +34,7 @@ public class SCPick extends PlayerSubcommandData {
         int sc = player.getSC();
         String msg = "";
         String msgExtra = "";
+        String emojiName = "SC" + String.valueOf(sc);
         if (sc != 0) {
             msg += Helper.getFactionIconFromDiscord(player.getFaction());
             msg += " " + player.getUserName();
@@ -41,7 +42,7 @@ public class SCPick extends PlayerSubcommandData {
             if (color != null) {
                 msg += " (" + color + ")";
             }
-            msg += " Picked: " + Helper.getSCAsMention(sc);
+            msg += " Picked: " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(sc);
 
             boolean nextCorrectPing = false;
             boolean allPicked = true;
