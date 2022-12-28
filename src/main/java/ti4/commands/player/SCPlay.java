@@ -38,6 +38,7 @@ public class SCPlay extends PlayerSubcommandData {
             return;
         }
         int sc = player.getSC();
+        String emojiName = "SC" + String.valueOf(sc);
         if (sc == 0) {
             MessageHelper.sendMessageToChannel(channel, "No SC selected by player");
             return;
@@ -53,7 +54,7 @@ public class SCPlay extends PlayerSubcommandData {
         if (!categoryForPlayers.isEmpty()) {
             message += categoryForPlayers + "\n";
         }
-        message += "Strategy card " + Helper.getSCAsMention(sc) + " played. Please react with your faction symbol to pass or post in thread for secondaries.";
+        message += "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(sc) + " played. Please react with your faction symbol to pass or post in thread for secondaries.";
         String name = channel.getName();
         if (name.contains("-")) {
             String threadName = name.substring(0, name.indexOf("-")) + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
