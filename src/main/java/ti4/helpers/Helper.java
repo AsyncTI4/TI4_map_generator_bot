@@ -196,7 +196,7 @@ public class Helper {
     /**
      * Takes an emoji's name string and returns its full name including ID.
      * @emojiName the name of the emoji as entered on the Emoji section of the server
-     * @return The square root of the given number.
+     * @return the name of the emoji including ID
      */
     public static String getEmojiFromDiscord(String emojiName) {
         return switch (emojiName) {
@@ -209,7 +209,7 @@ public class Helper {
             case "Cultural" -> "<:Cultural:947250123333836801>";
             case "Industrial" -> "<:Industrial:946892033031819305>";
             case "Hazardous" -> "<:Hazardous:946892033006645318>";
-            case "Frontier" -> "";
+            case "Frontier" -> "<:Frontier:966025493805678632>";
 
             //CARDS
             case "SC1" -> "<:SC1:1056594715673366548>";
