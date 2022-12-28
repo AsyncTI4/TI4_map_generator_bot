@@ -10,10 +10,7 @@ import ti4.commands.tokens.AddCC;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.map.*;
 import ti4.message.MessageHelper;
 
 public class AddUnits extends AddRemoveUnits {
@@ -36,6 +33,19 @@ public class AddUnits extends AddRemoveUnits {
                 case "r", "retreat", "reinforcements" -> {
                     AddCC.addCC(event, color, tile);
                     Helper.isCCCountCorrect(event, map, color);
+                }
+            }
+        }
+        OptionMapping optionSlingRelay = event.getOption(Constants.SLING_RELAY);
+        if (optionSlingRelay != null){
+            boolean useSlingRelay = optionSlingRelay.getAsBoolean();
+            if (useSlingRelay) {
+                String userID = event.getUser().getId();
+                MapManager mapManager = MapManager.getInstance();
+                Map activeMap = mapManager.getUserActiveMap(userID);
+                Player player = activeMap.getPlayer(userID);
+                if (player != null) {
+                    player.exhaustTech("sr");
                 }
             }
         }
@@ -82,6 +92,7 @@ public class AddUnits extends AddRemoveUnits {
                         .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                                 .setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.NO_MAPGEN, "'yes' to not generate a map update with this command").setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.BOOLEAN, Constants.SLING_RELAY, "Sling Relay Tech"))
         );
     }
 }
