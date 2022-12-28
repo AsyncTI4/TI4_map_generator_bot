@@ -81,6 +81,7 @@ public class AddUnits extends AddRemoveUnits {
                         .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type tactics or t, retreat, reinforcements or r").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                                 .setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.NO_MAPGEN, "'yes' to not generate a map update with this command").setAutoComplete(true))
         );
     }
 }

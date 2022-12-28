@@ -49,8 +49,14 @@ abstract public class AddRemoveUnits implements Command {
             }
             MapSaveLoadManager.saveMap(activeMap);
 
-            File file = GenerateMap.getInstance().saveImage(activeMap);
-            MessageHelper.replyToMessage(event, file);
+            String no_mapgen = event.getOption(Constants.NO_MAPGEN).getAsString().toLowerCase();
+
+            if (no_mapgen == "yes") {
+                File file = GenerateMap.getInstance().saveImage(activeMap);
+                MessageHelper.replyToMessage(event, file);
+            } else {
+                MessageHelper.replyToMessage(event, "completed");
+            }
         }
     }
 
