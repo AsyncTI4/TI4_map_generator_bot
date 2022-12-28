@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -29,7 +30,7 @@ public class PurgeRelic extends GenericRelicAction {
             player.removeRelic(relicId);
             player.removeExhaustedRelic(relicId);
             String relicName = Mapper.getRelic(relicId).split(";")[0];
-            MessageHelper.replyToMessage(event, "Purged relic: " + relicName);
+            MessageHelper.replyToMessage(event, "Purged " + Helper.getEmojiFromDiscord("Relic") + " relic: " + relicName);
         } else {
             MessageHelper.replyToMessage(event, "Invalid relic or player does not have specified relic");
         }
