@@ -42,7 +42,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
                 map.scorePublicObjective(player.getUserID(), 0);
                 if (event != null){
-                    ScorePublic.informAboutScoring(event, map, player, 0);
+                    ScorePublic.informAboutScoring(event.getChannel(), map, player, 0);
                 }
             }
         }

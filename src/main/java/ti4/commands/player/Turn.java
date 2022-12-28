@@ -1,17 +1,23 @@
 package ti4.commands.player;
 
+import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import org.apache.commons.collections4.ListUtils;
 import ti4.generator.GenerateMap;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 
 public class Turn extends PlayerSubcommandData {
     public Turn() {
@@ -80,7 +86,68 @@ public class Turn extends PlayerSubcommandData {
             }
         }
         if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "All players passed. Please score objectives or react with your faction symbol for no scoring. " + Helper.getGamePing(event, map));
+            String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, map);
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+
+            LinkedHashMap<String, Integer> revealedPublicObjectives = map.getRevealedPublicObjectives();
+
+            HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
+            HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
+            LinkedHashMap<String, Integer> customPublicVP = map.getCustomPublicVP();
+            List<Button> poButtons = new ArrayList<>();
+            List<Button> poButtons1 = new ArrayList<>();
+            List<Button> poButtons2 = new ArrayList<>();
+            List<Button> poButtonsCustom = new ArrayList<>();
+            int poStatus = 0;
+            for (java.util.Map.Entry<String, Integer> objective : revealedPublicObjectives.entrySet()) {
+                String key = objective.getKey();
+                String po_name = publicObjectivesState1.get(key);
+                poStatus = 0;
+                if (po_name == null) {
+                    po_name = publicObjectivesState2.get(key);
+                    poStatus = 1;
+                }
+                if (po_name == null) {
+                    Integer integer = customPublicVP.get(key);
+                    if (integer != null) {
+                        po_name = key;
+                        poStatus = 2;
+                    }
+                }
+                if (po_name != null) {
+                    Integer value = objective.getValue();
+                    Button objectiveButton;
+                    if (poStatus == 0) {
+                        objectiveButton = Button.success(Constants.PO_SCORING + value, "(" + value + ") " + po_name);
+                        poButtons1.add(objectiveButton);
+                    } else if (poStatus == 1) {
+                        objectiveButton = Button.primary(Constants.PO_SCORING + value, "(" + value + ") " + po_name);
+                        poButtons2.add(objectiveButton);
+                    } else {
+                        objectiveButton = Button.secondary(Constants.PO_SCORING + value, "(" + value + ") " + po_name);
+                        poButtonsCustom.add(objectiveButton);
+                    }
+                }
+            }
+
+            Button noScoring = Button.danger(Constants.PO_NO_SCORING, "No Scoring");
+            poButtons.addAll(poButtons1);
+            poButtons.addAll(poButtons2);
+            poButtons.addAll(poButtonsCustom);
+            poButtons.add(noScoring);
+            poButtons.removeIf(Objects::isNull);
+            List<List<Button>> partitions = ListUtils.partition(poButtons, 5);
+            List<ActionRow> actionRows = new ArrayList<>();
+            for (List<Button> partition : partitions) {
+                actionRows.add(ActionRow.of(partition));
+            }
+            Message messageObject = new MessageBuilder()
+                    .append(message)
+                    .setActionRows(actionRows).build();
+            MessageChannel channel = event.getChannel();
+            channel.sendMessage(messageObject).queue();
+
+
             MessageHelper.replyToMessageTI4Logo(event);
             return;
         }
