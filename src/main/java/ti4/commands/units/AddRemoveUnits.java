@@ -49,14 +49,8 @@ abstract public class AddRemoveUnits implements Command {
             }
             MapSaveLoadManager.saveMap(activeMap);
 
-            String no_mapgen = event.getOption(Constants.NO_MAPGEN).getAsString().toLowerCase();
-
-            if (no_mapgen == "yes") {
-                File file = GenerateMap.getInstance().saveImage(activeMap);
-                MessageHelper.replyToMessage(event, file);
-            } else {
-                MessageHelper.replyToMessage(event, "completed");
-            }
+            File file = GenerateMap.getInstance().saveImage(activeMap);
+            MessageHelper.replyToMessage(event, file);
         }
     }
 
@@ -190,7 +184,6 @@ abstract public class AddRemoveUnits implements Command {
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                                 .setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.NO_MAPGEN, "'yes' to not generate a map update with this command").setAutoComplete(true))
         );
     }
 
