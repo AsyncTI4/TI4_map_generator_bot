@@ -1,5 +1,6 @@
 package ti4.commands.status;
 
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -38,15 +39,19 @@ public class ScorePublic extends StatusSubcommandData {
         }
 
         int poID = option.getAsInt();
+        scorePO(event.getChannel(), activeMap, player, poID);
+    }
+
+    public static void scorePO(MessageChannel channel, Map activeMap, Player player, int poID) {
         boolean scored = activeMap.scorePublicObjective(player.getUserID(), poID);
         if (!scored) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Public Objective ID found or already scored, please retry");
+            MessageHelper.sendMessageToChannel(channel, "No such Public Objective ID found or already scored, please retry");
         } else {
-            informAboutScoring(event, activeMap, player, poID);
+            informAboutScoring(channel, activeMap, player, poID);
         }
     }
 
-    public static void informAboutScoring(SlashCommandInteractionEvent event, Map activeMap, Player player, int poID) {
+    public static void informAboutScoring(MessageChannel channel, Map activeMap, Player player, int poID) {
         LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
         String id = "";
         for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
@@ -60,13 +65,16 @@ public class ScorePublic extends StatusSubcommandData {
         String poName1 = publicObjectivesState1.get(id);
         String poName2 = publicObjectivesState2.get(id);
         String poName = id;
+        String emojiName = "";
         if (poName1 != null) {
             poName = poName1;
+            emojiName = "Public1";
         } else if (poName2 != null){
             poName = poName2;
+            emojiName = "Public2";
         }
-        String message = Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(player) + " (" + player.getColor() + ") scored: " + poName;
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        String message = Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(player) + " (" + player.getColor() + ") scored " + Helper.getEmojiFromDiscord(emojiName) + " " + poName;
+        MessageHelper.sendMessageToChannel(channel, message);
     }
 
     @Override

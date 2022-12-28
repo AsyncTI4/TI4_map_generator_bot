@@ -46,7 +46,7 @@ public class SendCommodities extends PlayerSubcommandData {
             int targetTG = player_.getTg();
             targetTG += sendCommodities;
             player_.setTg(targetTG);
-            MessageHelper.sendMessageToChannel(event.getChannel(), SendTG.getPlayerRepresentation(event, player) + " send " + sendCommodities + " commodities to: " + SendTG.getPlayerRepresentation(event, player_));
+            MessageHelper.sendMessageToChannel(event.getChannel(), SendTG.getPlayerRepresentation(event, player) + " sent " + sendCommodities + Helper.getEmojiFromDiscord("comm") + " commodities to: " + SendTG.getPlayerRepresentation(event, player_));
         }
     }
 
