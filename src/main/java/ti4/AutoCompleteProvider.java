@@ -219,6 +219,15 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.NO_MAPGEN -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of("yes")
+                        .filter(value -> value.contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
         }
     }
 }
