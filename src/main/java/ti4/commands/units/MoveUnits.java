@@ -232,6 +232,7 @@ public class MoveUnits extends AddRemoveUnits {
                                 .setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type no or n to not add CC, r or retreat to add a CC without taking it from tactics").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units. Type in yes or y"))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.NO_MAPGEN, "'yes' to not generate a map update with this command").setAutoComplete(true))
         );
     }
 }
