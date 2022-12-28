@@ -32,7 +32,7 @@ public class ScoreSO extends SOCardsSubcommandData {
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Secret Objective to score");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select which Secret Objective to score");
             return;
         }
 
@@ -43,17 +43,14 @@ public class ScoreSO extends SOCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Secret Objective ID found, please retry");
             return;
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeMap.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Scored Secret Objective:").append("\n");
+        String message = Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(player) + " (" + player.getColor() + ") scored Secret Objective: \n" + Helper.getEmojiFromDiscord("Secretobjective");
         for (java.util.Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }
-            sb.append(Mapper.getSecretObjective(entry.getKey())).append("\n");
+            message += Mapper.getSecretObjective(entry.getKey()) + "\n";
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
 }
