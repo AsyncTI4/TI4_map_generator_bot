@@ -210,6 +210,9 @@ public class Constants {
     public static final String PLAYER7 = "player7";
     public static final String PLAYER8 = "player8";
     public static final String PLAYER = "player";
+    public static final String SLING_RELAY = "sling_relay";
+    public static final String PO_SCORING = "po_scoring_";
+    public static final String PO_NO_SCORING = "no_scoring";
     public static final String FACTION_COLOR = "faction_or_color";
     public static final String STATS = "stats";
     public static final String SEND_TG = "send_tg";

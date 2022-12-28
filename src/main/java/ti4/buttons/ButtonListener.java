@@ -7,11 +7,15 @@ import net.dv8tion.jda.api.requests.RestAction;
 import org.jetbrains.annotations.NotNull;
 import ti4.MessageListener;
 import ti4.commands.cards.CardsInfo;
+import ti4.commands.status.ScorePublic;
+import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
+import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -39,92 +43,113 @@ public class ButtonListener extends ListenerAdapter {
             event.getChannel().sendMessage("You're not a player of the game").queue();
             return;
         }
-        switch (buttonID) {
-            case "sabotage" -> addReaction(event, true, "Sabotaging Action Card Play", " Sabotage played");
-            case "no_sabotage" -> addReaction(event, false, "No Sabotage", "");
-            case "sc_follow" -> {
-                boolean used = addUsedSCPlayer(messageID, player, event, "");
-                if (used){
-                    break;
+
+        if (buttonID.startsWith(Constants.PO_SCORING))
+        {
+            String poID = buttonID.replace(Constants.PO_SCORING, "");
+            try{
+                int poIndex = Integer.parseInt(poID);
+                ScorePublic.scorePO(event.getChannel(), activeMap, player, poIndex);
+            }
+            catch (Exception e) {
+                BotLogger.log("Could not parse PO ID: " + poID);
+                event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.").queue();
+                return;
+            }
+        } else {
+            switch (buttonID) {
+                case Constants.PO_NO_SCORING -> {
+                    String message = Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(player) + " (" + player.getColor() + ") No scoring.";
+                    MessageHelper.sendMessageToChannel(event.getChannel(), message);
                 }
-                String message = deductCC(player, event);
-                addReaction(event, true, message, "");
-            }
-            case "sc_ac_draw" -> {
-                boolean used = addUsedSCPlayer(messageID+"ac", player, event, "");
-                if (used){
-                    break;
+                case "sabotage" -> addReaction(event, true, "Sabotaging Action Card Play", " Sabotage played");
+                case "no_sabotage" -> addReaction(event, false, "No Sabotage", "");
+                case "sc_follow" -> {
+                    boolean used = addUsedSCPlayer(messageID, player, event, "");
+                    if (used) {
+                        break;
+                    }
+                    String message = deductCC(player, event);
+                    addReaction(event, true, message, "");
                 }
-                boolean isYssaril = player.getFaction().equals("yssaril");
-                String message =  isYssaril ? "Drew 3 Actions cards" : "Drew 2 Actions cards";
-                int count = isYssaril ? 3 : 2;
-                for (int i = 0; i < count; i++) {
-                    activeMap.drawActionCard(player.getUserID());
+                case "sc_ac_draw" -> {
+                    boolean used = addUsedSCPlayer(messageID + "ac", player, event, "");
+                    if (used) {
+                        break;
+                    }
+                    boolean isYssaril = player.getFaction().equals("yssaril");
+                    String message = isYssaril ? "Drew 3 Actions cards" : "Drew 2 Actions cards";
+                    int count = isYssaril ? 3 : 2;
+                    for (int i = 0; i < count; i++) {
+                        activeMap.drawActionCard(player.getUserID());
+                    }
+                    CardsInfo.sentUserCardInfo(null, activeMap, player, event);
+                    addReaction(event, true, message, "");
                 }
-                CardsInfo.sentUserCardInfo(null, activeMap, player, event);
-                addReaction(event, true, message, "");
-            } case "sc_draw_so" -> {
-                boolean used = addUsedSCPlayer(messageID+"so", player, event, "");
-                if (used){
-                    break;
+                case "sc_draw_so" -> {
+                    boolean used = addUsedSCPlayer(messageID + "so", player, event, "");
+                    if (used) {
+                        break;
+                    }
+                    String message = "Drew Secret Objective";
+                    activeMap.drawSecretObjective(player.getUserID());
+                    CardsInfo.sentUserCardInfo(null, activeMap, player, event);
+                    addReaction(event, true, message, "");
                 }
-                String message = "Drew Secret Objective";
-                activeMap.drawSecretObjective(player.getUserID());
-                CardsInfo.sentUserCardInfo(null, activeMap, player, event);
-                addReaction(event, true, message, "");
-            }
-            case "sc_follow_trade" -> {
-                boolean used = addUsedSCPlayer(messageID, player, event, "");
-                if (used){
-                    break;
+                case "sc_follow_trade" -> {
+                    boolean used = addUsedSCPlayer(messageID, player, event, "");
+                    if (used) {
+                        break;
+                    }
+                    String message = deductCC(player, event);
+                    player.setCommodities(player.getCommoditiesTotal());
+                    addReaction(event, true, message, "");
+                    addReaction(event, true, "Replenishing Commodities", "");
                 }
-                String message = deductCC(player, event);
-                player.setCommodities(player.getCommoditiesTotal());
-                addReaction(event, true, message, "");
-                addReaction(event, true, "Replenishing Commodities", "");
-            }
-            case "sc_follow_leadership" -> {
-                String message = Helper.getPlayerPing(player) + " following.";
-                addReaction(event, true, message, "");
-            }
-            case "sc_no_follow" -> { addReaction(event, false, "Not Following", "");
-                Set<Player> players = playerUsedSC.get(messageID);
-                if (players == null){
-                    players = new HashSet<>();
+                case "sc_follow_leadership" -> {
+                    String message = Helper.getPlayerPing(player) + " following.";
+                    addReaction(event, true, message, "");
                 }
-                players.remove(player);
-                playerUsedSC.put(messageID, players);
-            }
-            case "play_when" -> {
-                clearAllReactions(event);
-                addReaction(event, true, "Playing When", "When Played");
-            }
-            case "no_when" -> addReaction(event, false, "No Whens", "");
-            case "play_after" -> {
-                clearAllReactions(event);
-                addReaction(event, true, "Playing After", "After Played");
-            }
-            case "no_after" -> addReaction(event, false, "No Afters", "");
-            case "sc_refresh" -> {
-                boolean used = addUsedSCPlayer(messageID, player, event, "Replenish");
-                if (used){
-                    break;
+                case "sc_no_follow" -> {
+                    addReaction(event, false, "Not Following", "");
+                    Set<Player> players = playerUsedSC.get(messageID);
+                    if (players == null) {
+                        players = new HashSet<>();
+                    }
+                    players.remove(player);
+                    playerUsedSC.put(messageID, players);
                 }
-                player.setCommodities(player.getCommoditiesTotal());
-                addReaction(event, true, "Replenishing Commodities", "");
-            }
-            case "sc_refresh_and_wash" -> {
-                boolean used = addUsedSCPlayer(messageID, player, event, "Replenish and Wash");
-                if (used){
-                    break;
+                case "play_when" -> {
+                    clearAllReactions(event);
+                    addReaction(event, true, "Playing When", "When Played");
                 }
-                int commoditiesTotal = player.getCommoditiesTotal();
-                int tg = player.getTg();
-                player.setTg(tg + commoditiesTotal);
-                player.setCommodities(0);
-                addReaction(event, true, "Replenishing and washing", "");
+                case "no_when" -> addReaction(event, false, "No Whens", "");
+                case "play_after" -> {
+                    clearAllReactions(event);
+                    addReaction(event, true, "Playing After", "After Played");
+                }
+                case "no_after" -> addReaction(event, false, "No Afters", "");
+                case "sc_refresh" -> {
+                    boolean used = addUsedSCPlayer(messageID, player, event, "Replenish");
+                    if (used) {
+                        break;
+                    }
+                    player.setCommodities(player.getCommoditiesTotal());
+                    addReaction(event, true, "Replenishing Commodities", "");
+                }
+                case "sc_refresh_and_wash" -> {
+                    boolean used = addUsedSCPlayer(messageID, player, event, "Replenish and Wash");
+                    if (used) {
+                        break;
+                    }
+                    int commoditiesTotal = player.getCommoditiesTotal();
+                    int tg = player.getTg();
+                    player.setTg(tg + commoditiesTotal);
+                    player.setCommodities(0);
+                    addReaction(event, true, "Replenishing and washing", "");
+                }
+                default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
-            default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
         }
         MapSaveLoadManager.saveMap(activeMap);
     }

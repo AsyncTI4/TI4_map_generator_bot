@@ -1,5 +1,6 @@
 package ti4.commands.status;
 
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -38,15 +39,19 @@ public class ScorePublic extends StatusSubcommandData {
         }
 
         int poID = option.getAsInt();
+        scorePO(event.getChannel(), activeMap, player, poID);
+    }
+
+    public static void scorePO(MessageChannel channel, Map activeMap, Player player, int poID) {
         boolean scored = activeMap.scorePublicObjective(player.getUserID(), poID);
         if (!scored) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Public Objective ID found or already scored, please retry");
+            MessageHelper.sendMessageToChannel(channel, "No such Public Objective ID found or already scored, please retry");
         } else {
-            informAboutScoring(event, activeMap, player, poID);
+            informAboutScoring(channel, activeMap, player, poID);
         }
     }
 
-    public static void informAboutScoring(SlashCommandInteractionEvent event, Map activeMap, Player player, int poID) {
+    public static void informAboutScoring(MessageChannel channel, Map activeMap, Player player, int poID) {
         LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
         String id = "";
         for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
@@ -69,7 +74,7 @@ public class ScorePublic extends StatusSubcommandData {
             emojiName = "Public2";
         }
         String message = Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(player) + " (" + player.getColor() + ") scored " + Helper.getEmojiFromDiscord(emojiName) + " " + poName;
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        MessageHelper.sendMessageToChannel(channel, message);
     }
 
     @Override
