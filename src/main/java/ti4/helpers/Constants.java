@@ -211,6 +211,8 @@ public class Constants {
     public static final String PLAYER7 = "player7";
     public static final String PLAYER8 = "player8";
     public static final String PLAYER = "player";
+    public static final String SO_SCORE_FROM_HAND = "so_score_hand_";
+    public static final String AC_PLAY_FROM_HAND = "ac_play_from_hand_";
     public static final String SLING_RELAY = "sling_relay";
     public static final String PO_SCORING = "po_scoring_";
     public static final String PO_NO_SCORING = "no_scoring";

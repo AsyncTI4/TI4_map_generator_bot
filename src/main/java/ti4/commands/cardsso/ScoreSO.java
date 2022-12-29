@@ -1,6 +1,8 @@
 package ti4.commands.cardsso;
 
+import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -37,20 +39,24 @@ public class ScoreSO extends SOCardsSubcommandData {
         }
 
         int soID = option.getAsInt();
+        scoreSO(event, activeMap, player, soID, event.getChannel(), null);
+    }
+
+    public static void scoreSO(SlashCommandInteractionEvent event, Map activeMap, Player player, int soID, MessageChannel channel, ButtonInteractionEvent buttonInteractionEvent) {
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
-        boolean scored = activeMap.scoreSecretObjective(getUser().getId(), soID, activeMap);
+        boolean scored = activeMap.scoreSecretObjective(player.getUserID(), soID, activeMap);
         if (!scored) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToChannel(channel, "No such Secret Objective ID found, please retry");
             return;
         }
-        String message = Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(player) + " (" + player.getColor() + ") scored Secret Objective: \n" + Helper.getEmojiFromDiscord("Secretobjective");
+        StringBuilder message = new StringBuilder(Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(player) + " (" + player.getColor() + ") scored Secret Objective: \n" + Helper.getEmojiFromDiscord("Secretobjective"));
         for (java.util.Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }
-            message += Mapper.getSecretObjective(entry.getKey()) + "\n";
+            message.append(Mapper.getSecretObjective(entry.getKey())).append("\n");
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        MessageHelper.sendMessageToChannel(channel, message.toString());
+        CardsInfo.sentUserCardInfo(event, activeMap, player, buttonInteractionEvent);
     }
 }

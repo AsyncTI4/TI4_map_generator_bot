@@ -22,7 +22,11 @@ public class MessageHelper {
     }
 
     public static void sendMessageToChannelWithButtons(SlashCommandInteractionEvent event, String messageText, Button... buttons) {
-        splitAndSent(messageText, event.getChannel(), event, buttons);
+        splitAndSent(messageText, event.getChannel(), event, null, buttons);
+    }
+
+    public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, Guild guild, Button... buttons) {
+        splitAndSent(messageText, channel, null, guild, buttons);
     }
 
     public static void sendMessageToChannel(MessageChannel channel, String messageText) {
@@ -65,7 +69,7 @@ public class MessageHelper {
     }
 
     private static void splitAndSent(String messageText, MessageChannel channel) {
-        splitAndSent(messageText, channel, null, "");
+        splitAndSent(messageText, channel, null, null, "");
     }
     private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, String... reaction) {
         if (messageText.length() > 1500) {
@@ -99,7 +103,7 @@ public class MessageHelper {
         }
     }
 
-    private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, Button... buttons) {
+    private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, Guild guild, Button... buttons) {
         if (messageText.length() > 1500) {
             List<String> texts = new ArrayList<>();
             int index = 0;
@@ -111,11 +115,11 @@ public class MessageHelper {
                 channel.sendMessage(text).queue();
             }
         } else {
-            if (event == null || buttons == null || buttons.length == 0) {
+            if (event == null && guild == null || buttons == null || buttons.length == 0) {
                 channel.sendMessage(messageText).queue();
             } else {
-                Guild guild = event.getGuild();
-                if (guild != null) {
+                Guild guild_ = guild == null ? event.getGuild() : guild;
+                if (guild_ != null) {
                     Message message = new MessageBuilder()
                             .append(messageText)
                             .setActionRows(ActionRow.of(buttons)).build();

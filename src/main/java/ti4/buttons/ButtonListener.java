@@ -5,8 +5,11 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
 import org.jetbrains.annotations.NotNull;
+import ti4.MapGenerator;
 import ti4.MessageListener;
 import ti4.commands.cards.CardsInfo;
+import ti4.commands.cards.PlayAC;
+import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.status.ScorePublic;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -44,14 +47,38 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
 
-        if (buttonID.startsWith(Constants.PO_SCORING))
-        {
+        if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
+            String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
+            String gameName = activeMap.getName();
+            for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
+                if (textChannel_.getName().equals(gameName + "-actions")) {
+                    PlayAC.playAC(null, activeMap, player, acID, textChannel_, event.getGuild(), event);
+                    break;
+                }
+            }
+        } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
+            String soID = buttonID.replace(Constants.SO_SCORE_FROM_HAND, "");
+            String gameName = activeMap.getName();
+            for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
+                if (textChannel_.getName().equals(gameName + "-actions")) {
+                    try {
+                        int soIndex = Integer.parseInt(soID);
+                        ScoreSO.scoreSO(null, activeMap, player, soIndex, textChannel_, event);
+                    } catch (Exception e) {
+                        BotLogger.log("Could not parse SO ID: " + soID);
+                        event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.").queue();
+                        return;
+                    }
+
+                    break;
+                }
+            }
+        } else if (buttonID.startsWith(Constants.PO_SCORING)) {
             String poID = buttonID.replace(Constants.PO_SCORING, "");
-            try{
+            try {
                 int poIndex = Integer.parseInt(poID);
                 ScorePublic.scorePO(event.getChannel(), activeMap, player, poIndex);
-            }
-            catch (Exception e) {
+            } catch (Exception e) {
                 BotLogger.log("Could not parse PO ID: " + poID);
                 event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.").queue();
                 return;
@@ -156,13 +183,13 @@ public class ButtonListener extends ListenerAdapter {
 
     private boolean addUsedSCPlayer(String messageID, Player player, @NotNull ButtonInteractionEvent event, String text) {
         Set<Player> players = playerUsedSC.get(messageID);
-        if (players == null){
+        if (players == null) {
             players = new HashSet<>();
         }
         boolean contains = players.contains(player);
         players.add(player);
         playerUsedSC.put(messageID, players);
-        if (contains){
+        if (contains) {
             String defaultText = text.isEmpty() ? "Secondary of Strategy Card" : text;
             event.getChannel().sendMessage("Player: " + Helper.getPlayerPing(player) + " already used " + defaultText).queue();
         }
@@ -173,7 +200,7 @@ public class ButtonListener extends ListenerAdapter {
     private String deductCC(Player player, @NotNull ButtonInteractionEvent event) {
         int strategicCC = player.getStrategicCC();
         String message;
-        if (strategicCC == 0){
+        if (strategicCC == 0) {
             message = "Have 0 CC in Strategy, can't follow";
         } else {
             strategicCC--;
@@ -251,7 +278,7 @@ public class ButtonListener extends ListenerAdapter {
             }
         }
 
-        if (!foundThread){
+        if (!foundThread) {
             event.getChannel().sendMessage(text).queue();
         }
     }
