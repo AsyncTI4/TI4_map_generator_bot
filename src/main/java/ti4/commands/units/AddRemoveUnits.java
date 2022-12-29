@@ -2,6 +2,7 @@ package ti4.commands.units;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
@@ -49,8 +50,13 @@ abstract public class AddRemoveUnits implements Command {
             }
             MapSaveLoadManager.saveMap(activeMap);
 
-            File file = GenerateMap.getInstance().saveImage(activeMap);
-            MessageHelper.replyToMessage(event, file);
+            OptionMapping optionMapGen = event.getOption(Constants.NO_MAPGEN);
+            if (optionMapGen == null) {
+                File file = GenerateMap.getInstance().saveImage(activeMap);
+                MessageHelper.replyToMessage(event, file);
+            } else {
+                MessageHelper.replyToMessage(event, "Map update completed");
+            }
         }
     }
 
@@ -184,6 +190,7 @@ abstract public class AddRemoveUnits implements Command {
                                 .setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
                                 .setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.NO_MAPGEN, "'True' to not generate a map update with this command").setAutoComplete(true))
         );
     }
 
