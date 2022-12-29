@@ -27,6 +27,7 @@ import java.util.*;
 
 public class CardsInfo extends CardsSubcommandData {
 
+    public static final String CARDS_INFO = "Cards Info-";
     private static HashMap<Map, TextChannel> threadTextChannels = new HashMap<>();
 
     public CardsInfo() {
@@ -194,7 +195,7 @@ public class CardsInfo extends CardsSubcommandData {
                     }
                     List<ThreadChannel> threadChannels = textChannel.getThreadChannels();
                     boolean threadFound = false;
-                    String threadName = "Cards Info-" + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
+                    String threadName = CARDS_INFO + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
                     String playerPing = threadName + " " + Helper.getPlayerPing(player);
 
                     String secretScoreMsg = "Your Secrets to Score";
