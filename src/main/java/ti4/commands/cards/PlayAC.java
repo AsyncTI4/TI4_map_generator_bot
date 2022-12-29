@@ -1,8 +1,13 @@
 package ti4.commands.cards;
 
+import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -35,7 +40,10 @@ public class PlayAC extends CardsSubcommandData {
             return;
         }
 
-        String value = option.getAsString().toLowerCase();
+        playAC(event, activeMap, player, option.getAsString().toLowerCase(), event.getChannel(), event.getGuild(), null);
+    }
+
+    public static void playAC(GenericCommandInteractionEvent event, Map activeMap, Player player, String value, MessageChannel channel, Guild guild, ButtonInteractionEvent buttonInteractionEvent) {
         String acID = null;
         int acIndex = -1;
         try {
@@ -54,7 +62,7 @@ public class PlayAC extends CardsSubcommandData {
                     actionCardName = actionCardName.toLowerCase();
                     if (actionCardName.contains(value)) {
                         if (foundSimilarName && !cardName.equals(actionCardName)) {
-                            MessageHelper.sendMessageToChannel(event.getChannel(), "Multiple cards with similar name founds, please use ID");
+                            MessageHelper.sendMessageToChannel(channel, "Multiple cards with similar name founds, please use ID");
                             return;
                         }
                         acID = ac.getKey();
@@ -66,12 +74,12 @@ public class PlayAC extends CardsSubcommandData {
             }
         }
         if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            MessageHelper.sendMessageToChannel(channel, "No such Action Card ID found, please retry");
             return;
         }
         activeMap.discardActionCard(player.getUserID(), acIndex);
         StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getGamePing(event, activeMap)).append(" ").append(activeMap.getName()).append(" ");
+        sb.append(Helper.getGamePing(guild, activeMap)).append(" ").append(activeMap.getName()).append(" ");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Played: ");
         sb.append(Mapper.getActionCard(acID)).append("\n");
@@ -79,7 +87,8 @@ public class PlayAC extends CardsSubcommandData {
         Emoji sabotage = Emoji.fromMarkdown(":sabotage:");
         Emoji noSabo = Emoji.fromMarkdown(":nosabo:");
 
-        for (Emote emote : event.getJDA().getEmotes()) {
+        JDA jda = event != null ? event.getJDA() : buttonInteractionEvent.getJDA();
+        for (Emote emote : jda.getEmotes()) {
             if (emote.getName().toLowerCase().contains("sabotage")) {
                 sabotage = Emoji.fromEmote(emote);
             } else if (emote.getName().toLowerCase().contains("nosabo")) {
@@ -89,10 +98,10 @@ public class PlayAC extends CardsSubcommandData {
         Button sabotageButton = Button.danger("sabotage", "Sabotage").withEmoji(sabotage);
         Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(noSabo);
         if (acID.contains("sabo")) {
-            MessageHelper.sendMessageToChannelWithButtons(event, sb.toString());
+            MessageHelper.sendMessageToChannelWithButtons(channel, sb.toString(), null);
         } else {
-            MessageHelper.sendMessageToChannelWithButtons(event, sb.toString(), sabotageButton, noSabotageButton);
+            MessageHelper.sendMessageToChannelWithButtons(channel, sb.toString(), guild, sabotageButton, noSabotageButton);
         }
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        CardsInfo.sentUserCardInfo(event, activeMap, player, buttonInteractionEvent);
     }
 }
