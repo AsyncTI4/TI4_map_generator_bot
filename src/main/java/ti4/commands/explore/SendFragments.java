@@ -65,7 +65,16 @@ public class SendFragments extends ExploreSubcommandData {
         	MessageHelper.replyToMessage(event, "Not enough fragments of the specified trait");
         	return;
         }
+
+		String emojiName = 	switch (trait){
+			case "cultural" -> "CFrag";
+			case "hazardous" -> "HFrag";
+			case "industrial" -> "IFrag";
+			case "frontier" -> "UFrag";
+			default -> "";	
+		};
+
 		MessageHelper.replyToMessageTI4Logo(event);
-		MessageHelper.sendMessageToChannel(event.getChannel(), SendTG.getPlayerRepresentation(event, sender) + " sent " + trait + " relic fragments to: " + SendTG.getPlayerRepresentation(event, reciever));
+		MessageHelper.sendMessageToChannel(event.getChannel(), SendTG.getPlayerRepresentation(event, sender) + " sent " + trait + " " + Helper.getEmojiFromDiscord(emojiName) + " relic fragments to: " + SendTG.getPlayerRepresentation(event, reciever));
 	}
 }
