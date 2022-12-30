@@ -4,10 +4,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.player.SendTG;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
@@ -63,9 +65,11 @@ public class ExpPlanet extends ExploreSubcommandData {
             MessageHelper.replyToMessage(event, "Planet cannot be explored");
             return;
         }
-        String messageText = displayExplore(cardID);
         Player player = activeMap.getPlayer(event.getUser().getId());
-        messageText += "\n" + "Explored: " + planetName + " by player: " + (player != null ? player.getUserName() : event.getUser().getName());
-        resolveExplore(event, cardID, tile, planetName, messageText, false);
+
+        StringBuilder messageText = new StringBuilder(Helper.getEmojiFromDiscord(drawColor));
+        messageText.append("Planet "+ planetName +" (*tile: "+ tile.getPosition() + "*) explored by " + SendTG.getPlayerRepresentation(event, player)).append(":\n");
+        messageText.append(displayExplore(cardID));
+        resolveExplore(event, cardID, tile, planetName, messageText.toString(), false);
     }
 }
