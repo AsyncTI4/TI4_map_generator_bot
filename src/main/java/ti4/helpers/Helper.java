@@ -199,39 +199,39 @@ public class Helper {
      * @return the name of the emoji including ID
      */
     public static String getEmojiFromDiscord(String emojiName) {
-        return switch (emojiName) {
+        return switch (emojiName.toLowerCase()) {
             //EXPLORATION
-            case "HFrag" -> "<:HFrag:1053857012766752788>";
-            case "CFrag" -> "<:CFrag:1053856733849722880>";
-            case "IFrag" -> "<:IFrag:1053857037131460648>";
-            case "UFrag" -> "<:UFrag:1053857056991490119>";
-            case "Relic" -> "<:Relic:1054075788711964784>";
-            case "Cultural" -> "<:Cultural:947250123333836801>";
-            case "Industrial" -> "<:Industrial:946892033031819305>";
-            case "Hazardous" -> "<:Hazardous:946892033006645318>";
-            case "Frontier" -> "<:Frontier:966025493805678632>";
+            case "hfrag" -> "<:HFrag:1053857012766752788>";
+            case "cfrag" -> "<:CFrag:1053856733849722880>";
+            case "ifrag" -> "<:IFrag:1053857037131460648>";
+            case "ufrag" -> "<:UFrag:1053857056991490119>";
+            case "relic" -> "<:Relic:1054075788711964784>";
+            case "cultural" -> "<:Cultural:947250123333836801>";
+            case "industrial" -> "<:Industrial:946892033031819305>";
+            case "hazardous" -> "<:Hazardous:946892033006645318>";
+            case "frontier" -> "<:Frontier:966025493805678632>";
 
             //CARDS
-            case "SC1" -> "<:SC1:1056594715673366548>";
-            case "SC2" -> "<:SC2:1056594746023366716>";
-            case "SC3" -> "<:SC3:1056594774620110879>";
-            case "SC4" -> "<:SC4:1056594795193172009>";
-            case "SC5" -> "<:SC5:1056594816454107187>";
-            case "SC6" -> "<:SC6:1056594839778623599>";
-            case "SC7" -> "<:SC7:1056594860360073236>";
-            case "SC8" -> "<:SC8:1056594882141098055>";
-            case "Actioncard" -> "<:Actioncard:1054660449515352114>";
-            case "Secretobjective" -> "<:Secretobjective:1054660535544729670>";
-            case "Public1" -> "<:Public1:1054075764510826539>";
-            case "Public2" -> "<:Public2:1054075738602622986>";
-            case "Agenda" -> "<:Agenda:1054660476874792990> ";
-            case "PN" -> "<:PN:1054660504175521882>";
+            case "sc1" -> "<:SC1:1056594715673366548>";
+            case "sc2" -> "<:SC2:1056594746023366716>";
+            case "sc3" -> "<:SC3:1056594774620110879>";
+            case "sc4" -> "<:SC4:1056594795193172009>";
+            case "sc5" -> "<:SC5:1056594816454107187>";
+            case "sc6" -> "<:SC6:1056594839778623599>";
+            case "sc7" -> "<:SC7:1056594860360073236>";
+            case "sc8" -> "<:SC8:1056594882141098055>";
+            case "actioncard" -> "<:Actioncard:1054660449515352114>";
+            case "secretobjective" -> "<:Secretobjective:1054660535544729670>";
+            case "public1" -> "<:Public1:1054075764510826539>";
+            case "public2" -> "<:Public2:1054075738602622986>";
+            case "agenda" -> "<:Agenda:1054660476874792990> ";
+            case "pn" -> "<:PN:1054660504175521882>";
             
             //COMPONENTS
             case "tg" -> "<:tg:1053857635570553024>";
             case "comm" -> "<:comm:1053857614028607538>";
-            case "Sleeper" -> "<:Sleeper:1047871121451663371>";
-            case "SleeperB" -> "<:SleeperB:1047871220831506484>";
+            case "sleeper" -> "<:Sleeper:1047871121451663371>";
+            case "sleeperb" -> "<:SleeperB:1047871220831506484>";
             
             //UNITS
             case "warsun" -> "<:warsun:993064568626614375>";
@@ -247,16 +247,16 @@ public class Helper {
             case "cruiser" -> "<:cruiser:993063818844459098>";
 
             //OTHER
-            case "WHalpha" -> "<:WHalpha:1056593618250518529>";
-            case "WHbeta" -> "<:WHbeta:1056593596012302366>";
-            case "WHgamma" -> "<:WHgamma:1056593568766111814>";
+            case "whalpha" -> "<:WHalpha:1056593618250518529>";
+            case "whbeta" -> "<:WHbeta:1056593596012302366>";
+            case "whgamma" -> "<:WHgamma:1056593568766111814>";
             case "influence" -> "<:influence:959575421337358336>";
             case "resources" -> "<:resources:959575421274451998>";
-            case "Legendaryplanet" -> "<:Legendaryplanet:947250386375426108>";
-            case "Cybernetictech" -> "<:Cybernetictech:947250608149245972>";
-            case "Propulsiontech" -> "<:Propulsiontech:947250608145068074>";
-            case "Biotictech" -> "<:Biotictech:947250608107315210>";
-            case "Warfaretech" -> "<:Warfaretech:947250607855644743>";
+            case "legendaryplanet" -> "<:Legendaryplanet:947250386375426108>";
+            case "cybernetictech" -> "<:Cybernetictech:947250608149245972>";
+            case "propulsiontech" -> "<:Propulsiontech:947250608145068074>";
+            case "biotictech" -> "<:Biotictech:947250608107315210>";
+            case "warfaretech" -> "<:Warfaretech:947250607855644743>";
 
             default -> "";
         };
