@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cards.CardsInfo;
+import ti4.commands.player.SendTG;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -76,11 +77,11 @@ public class PlayPN extends PNCardsSubcommandData {
 
         String promissoryNote = Mapper.getPromissoryNote(id, true);
         String[] pn = promissoryNote.split(";");
+        String pnOwner = Mapper.getPromissoryNoteOwner(id);
         if (pn.length > 3 && pn[3].equals("playarea")) {
             player.setPromissoryNotesInPlayArea(id);
         } else {
             player.removePromissoryNote(id);
-            String pnOwner = Mapper.getPromissoryNoteOwner(id);
             for (Player player_ : activeMap.getPlayers().values()) {
                 String playerColor = player_.getColor();
                 String playerFaction = player_.getFaction();
@@ -90,12 +91,10 @@ public class PlayPN extends PNCardsSubcommandData {
                     break;
                 }
             }
-        }
+        } 
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeMap.getName()).append(" ");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Played: ");
+        StringBuilder sb = new StringBuilder(SendTG.getPlayerRepresentation(event, player) + " played promissory note:\n");
+        sb.append(Helper.getFactionIconFromDiscord(pnOwner) +Helper.getEmojiFromDiscord("PN"));
         sb.append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
         
         MessageHelper.sendMessageToChannel(event, sb.toString());
