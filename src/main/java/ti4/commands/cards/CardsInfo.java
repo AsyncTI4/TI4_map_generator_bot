@@ -201,7 +201,7 @@ public class CardsInfo extends CardsSubcommandData {
                     String secretScoreMsg = "Your Secrets to Score";
                     String acPlayMsg = "Your Action Cards to play";
                     for (ThreadChannel threadChannel : threadChannels) {
-                        if (threadChannel.getName().equals(threadName) && !threadChannel.isArchived()) {
+                        if (threadChannel.getName().equals(threadName)) {
                             String text = playerPing + "\n";
                             MessageHelper.sendMessageToChannel(threadChannel, text);
                             MessageHelper.sendMessageToChannel(threadChannel, soText);
