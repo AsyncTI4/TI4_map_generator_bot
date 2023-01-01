@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.helpers.Constants;
+import ti4.map.Map;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 
@@ -94,6 +95,14 @@ public class RemoveUnits extends AddRemoveUnits {
     @Override
     public String getActionID() {
         return Constants.REMOVE_UNITS;
+    }
+
+    @Override
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map) {
+        super.actionAfterAll(event, tile, color, map);
+        for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
+            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+        }
     }
 
     @Override
