@@ -8,6 +8,7 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
 
+import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.StringTokenizer;
@@ -36,10 +37,18 @@ public class ExpInfo extends ExploreSubcommandData {
             StringBuilder info = new StringBuilder();
             ArrayList<String> deck = activeMap.getExploreDeck(currentType);
             Collections.sort(deck);
+            Integer deckCount = deck.size();
+            Double deckDrawChance = 1.0 / deckCount;
+            NumberFormat formatPercent = NumberFormat.getPercentInstance();
+
             ArrayList<String> discard = activeMap.getExploreDiscard(currentType);
             Collections.sort(discard);
-            info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DECK**\n").append(listNames(deck)).append("\n");
-            info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD**\n").append(listNames(discard)).append("\n");
+            Integer discardCount = discard.size();
+
+            info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DECK** (").append(String.valueOf(deckCount)).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
+            info.append(listNames(deck)).append("\n");
+            info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (").append(String.valueOf(discardCount)).append(")\n");
+            info.append(listNames(discard)).append("\n\n");
             MessageHelper.replyToMessage(event, info.toString());
         }
     }
