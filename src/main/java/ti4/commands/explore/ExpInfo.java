@@ -66,5 +66,4 @@ public class ExpInfo extends ExploreSubcommandData {
         }
         return sb.toString();
     }
-
 }
