@@ -1,6 +1,7 @@
 package ti4.commands.explore;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import ti4.commands.player.SendTG;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -22,7 +23,7 @@ public class DrawRelic extends GenericRelicAction {
         }
         player.addRelic(relicID);
         String[] relicData = Mapper.getRelic(relicID).split(";");
-        String relicString = Helper.getEmojiFromDiscord("Relic") + "Relic: " + relicData[0] + " - " + relicData[1];
+        String relicString =  "Player " + SendTG.getPlayerRepresentation(event, player) + " drew a Relic:\n" + Helper.getEmojiFromDiscord("Relic") + relicData[0] + " - " + relicData[1];
         MessageHelper.replyToMessage(event, relicString);
     }
 }

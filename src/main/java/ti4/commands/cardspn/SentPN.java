@@ -108,7 +108,7 @@ public class SentPN extends PNCardsSubcommandData {
         }
         CardsInfo.sentUserCardInfo(event, activeMap, targetPlayer);
         CardsInfo.sentUserCardInfo(event, activeMap, player);
-        String text = sendSftT ? "**SftT** " : (sendAlliance ? "**Alliance** " : "");
+        String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
         String message = SendTG.getPlayerRepresentation(event, player) + " sent " + Helper.getEmojiFromDiscord("PN") + text + "PN to " + SendTG.getPlayerRepresentation(event, targetPlayer);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
 
