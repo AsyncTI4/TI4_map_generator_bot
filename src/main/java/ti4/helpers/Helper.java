@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.MapGenerator;
@@ -257,6 +258,9 @@ public class Helper {
             case "propulsiontech" -> "<:Propulsiontech:947250608145068074>";
             case "biotictech" -> "<:Biotictech:947250608107315210>";
             case "warfaretech" -> "<:Warfaretech:947250607855644743>";
+            case "public1alt" -> "<:Public1Alt:1058978029243728022>";
+            case "public2alt" -> "<:Public2Alt:1058977929725493398>";
+            case "secretobjectivealt" -> "<:SecretobjectiveAlt:1058977803728584734>";
 
             default -> "";
         };
@@ -284,6 +288,14 @@ public class Helper {
             return "";
         }
         return userById.getAsMention();
+    }
+
+    public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player) {
+        String text = "";
+        String playerFaction = player.getFaction();
+        text += Helper.getFactionIconFromDiscord(playerFaction);
+        text += " " + Helper.getPlayerPing(player);
+        return text;
     }
 
     public static void isCCCountCorrect(SlashCommandInteractionEvent event, Map map, String color) {
