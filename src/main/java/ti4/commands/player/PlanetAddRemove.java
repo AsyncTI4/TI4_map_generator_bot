@@ -18,7 +18,7 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
     public PlanetAddRemove(String id, String description) {
         super(id, description);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET2, "2dn Planet").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET2, "2nd Planet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET3, "3rd Planet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET4, "4th Planet").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET5, "5th Planet").setAutoComplete(true));
