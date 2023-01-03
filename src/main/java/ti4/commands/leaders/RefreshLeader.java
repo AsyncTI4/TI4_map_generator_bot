@@ -2,6 +2,8 @@ package ti4.commands.leaders;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
+import ti4.helpers.Helper;
 import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -14,13 +16,19 @@ public class RefreshLeader extends LeaderAction {
 
     @Override
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeader(leader);
+        Leader playerLeader = player.getLeader(leader);    
         if (playerLeader != null){
             if (playerLeader.isLocked()){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Leader is locked");
                 return;
             }
             refreshLeader(player, playerLeader);
+            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" refreshed ").append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append("\n");
+            int tgCount = playerLeader.getTgCount();
+            if (tgCount > 0) {
+                message.append(String.valueOf(tgCount)).append(Emojis.tg).append(" transferred from Leader to Player");
+            }
+            MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
         }
