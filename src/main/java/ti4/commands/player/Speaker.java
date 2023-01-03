@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -30,7 +31,7 @@ public class Speaker extends PlayerSubcommandData {
             return;
         }
         activeMap.setSpeaker(player.getUserID());
-        String msg = "Speaker assigned to: " + Helper.getFactionIconFromDiscord(player.getFaction());
+        String msg = Emojis.SpeakerToken + "Speaker assigned to: " + Helper.getFactionIconFromDiscord(player.getFaction());
         msg += " " + player.getUserName();
         String color = player.getColor();
         if (color != null) {
