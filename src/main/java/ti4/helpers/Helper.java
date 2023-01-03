@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import ti4.helpers.Emojis;
 import ti4.MapGenerator;
 import ti4.ResourceHelper;
 import ti4.commands.tokens.AddCC;
@@ -164,32 +165,32 @@ public class Helper {
 
     public static String getFactionIconFromDiscord(String faction) {
         return switch (faction) {
-            case "arborec" -> "<:Arborec:946891797567799356>";
-            case "argent" -> "<:Argent:946891797366472725>";
-            case "cabal" -> "<:VuilRaith:946891797236441089>";
-            case "empyrean" -> "<:Empyrean:946891797257404466>";
-            case "ghost" -> "<:Creuss:946891797609721866>";
-            case "hacan" -> "<:Hacan:946891797228060684>";
-            case "jolnar" -> "<:JolNar:946891797114789918>";
-            case "l1z1x" -> "<:L1Z1X:946891797219647559>";
-            case "letnev" -> "<:Letnev:946891797458714704>";
-            case "yssaril" -> "<:Yssaril:946891798138196008>";
-            case "mahact" -> "<:Mahact:946891797274165248>";
-            case "mentak" -> "<:Mentak:946891797395800084>";
-            case "muaat" -> "<:Muaat:946891797177716777>";
-            case "naalu" -> "<:Naalu:946891797412601926>";
-            case "naaz" -> "<:NaazRokha:946891797437747200>";
-            case "nekro" -> "<:Nekro:946891797681025054>";
-            case "nomad" -> "<:Nomad:946891797400002561>";
-            case "saar" -> "<:Saar:946891797366472735>";
-            case "sardakk" -> "<:Sardakk:946891797307748436>";
-            case "sol" -> "<:Sol:946891797706194995>";
-            case "titans" -> "<:Titans:946891798062694400>";
-            case "winnu" -> "<:Winnu:946891798050136095>";
-            case "xxcha" -> "<:Xxcha:946891797639086090>";
-            case "yin" -> "<:Yin:946891797475491892>";
-            case "lazax" -> "<:Lazax:946891797639073884>";
-            case "keleres" -> "<:Keleres:968233661654765578>";
+            case "arborec" -> Emojis.Arborec;
+            case "argent" -> Emojis.Argent;
+            case "cabal" -> Emojis.Cabal;
+            case "empyrean" -> Emojis.Empyrean;
+            case "ghost" -> Emojis.Ghost;
+            case "hacan" -> Emojis.Hacan;
+            case "jolnar" -> Emojis.Jolnar;
+            case "l1z1x" -> Emojis.L1Z1X;
+            case "letnev" -> Emojis.Letnev;
+            case "yssaril" -> Emojis.Yssaril;
+            case "mahact" -> Emojis.Mahact;
+            case "mentak" -> Emojis.Mentak;
+            case "muaat" -> Emojis.Muaat;
+            case "naalu" -> Emojis.Naalu;
+            case "naaz" -> Emojis.Naaz;
+            case "nekro" -> Emojis.Nekro;
+            case "nomad" -> Emojis.Nomad;
+            case "saar" -> Emojis.Saar;
+            case "sardakk" -> Emojis.Sardakk;
+            case "sol" -> Emojis.Sol;
+            case "titans" -> Emojis.Titans;
+            case "winnu" -> Emojis.Winnu;
+            case "xxcha" -> Emojis.Xxcha;
+            case "yin" -> Emojis.Yin;
+            case "lazax" -> Emojis.Lazax;
+            case "keleres" -> Emojis.Keleres;
             default -> "";
         };
     }
@@ -202,65 +203,152 @@ public class Helper {
     public static String getEmojiFromDiscord(String emojiName) {
         return switch (emojiName.toLowerCase()) {
             //EXPLORATION
-            case "hfrag" -> "<:HFrag:1053857012766752788>";
-            case "cfrag" -> "<:CFrag:1053856733849722880>";
-            case "ifrag" -> "<:IFrag:1053857037131460648>";
-            case "ufrag" -> "<:UFrag:1053857056991490119>";
-            case "relic" -> "<:Relic:1054075788711964784>";
-            case "cultural" -> "<:Cultural:947250123333836801>";
-            case "industrial" -> "<:Industrial:946892033031819305>";
-            case "hazardous" -> "<:Hazardous:946892033006645318>";
-            case "frontier" -> "<:Frontier:966025493805678632>";
+            case "hfrag" -> Emojis.HFrag;
+            case "cfrag" -> Emojis.CFrag;
+            case "ifrag" -> Emojis.IFrag;
+            case "ufrag" -> Emojis.UFrag;
+            case "relic" -> Emojis.Relic;
+            case "cultural" -> Emojis.Cultural;
+            case "industrial" -> Emojis.Industrial;
+            case "hazardous" -> Emojis.Hazardous;
+            case "frontier" -> Emojis.Frontier;
 
             //CARDS
-            case "sc1" -> "<:SC1:1056594715673366548>";
-            case "sc2" -> "<:SC2:1056594746023366716>";
-            case "sc3" -> "<:SC3:1056594774620110879>";
-            case "sc4" -> "<:SC4:1056594795193172009>";
-            case "sc5" -> "<:SC5:1056594816454107187>";
-            case "sc6" -> "<:SC6:1056594839778623599>";
-            case "sc7" -> "<:SC7:1056594860360073236>";
-            case "sc8" -> "<:SC8:1056594882141098055>";
-            case "actioncard" -> "<:Actioncard:1054660449515352114>";
-            case "secretobjective" -> "<:Secretobjective:1054660535544729670>";
-            case "public1" -> "<:Public1:1054075764510826539>";
-            case "public2" -> "<:Public2:1054075738602622986>";
-            case "agenda" -> "<:Agenda:1054660476874792990> ";
-            case "pn" -> "<:PN:1054660504175521882>";
+            case "sc1" -> Emojis.SC1;
+            case "sc2" -> Emojis.SC2;
+            case "sc3" -> Emojis.SC3;
+            case "sc4" -> Emojis.SC4;
+            case "sc5" -> Emojis.SC5;
+            case "sc6" -> Emojis.SC6;
+            case "sc7" -> Emojis.SC7;
+            case "sc8" -> Emojis.SC8;
+            case "actioncard" -> Emojis.ActionCard;
+            case "agenda" -> Emojis.Agenda;
+            case "pn" -> Emojis.PN;
             
+            //OBJECTIVES
+            case "secretobjective" -> Emojis.SecretObjective;
+            case "public1" -> Emojis.Public1;
+            case "public2" -> Emojis.Public2;
+            case "public1alt" -> Emojis.Public1alt;
+            case "public2alt" -> Emojis.Public2alt;
+            case "secretobjectivealt" -> Emojis.SecretObjectiveAlt;
+
             //COMPONENTS
-            case "tg" -> "<:tg:1053857635570553024>";
-            case "comm" -> "<:comm:1053857614028607538>";
-            case "sleeper" -> "<:Sleeper:1047871121451663371>";
-            case "sleeperb" -> "<:SleeperB:1047871220831506484>";
+            case "tg" -> Emojis.tg;
+            case "comm" -> Emojis.comm;
+            case "sleeper" -> Emojis.Sleeper;
+            case "sleeperb" -> Emojis.SleeperB;
             
             //UNITS
-            case "warsun" -> "<:warsun:993064568626614375>";
-            case "spacedock" -> "<:spacedock:993064508828418159>";
-            case "pds" -> "<:pds:993064415639384064>";
-            case "mech" -> "<:mech:993064350988390430>";
-            case "infantry" -> "<:infantry:993064251994407004>";
-            case "flagship" -> "<:flagship:993064196264710204>";
-            case "fighter" -> "<:fighter:993064145907892284>";
-            case "dreadnought" -> "<:dreadnought:993064090589216828>";
-            case "destroyer" -> "<:destroyer:993063959840182323>";
-            case "carrier" -> "<:carrier:993063885168967700>";
-            case "cruiser" -> "<:cruiser:993063818844459098>";
+            case "warsun" -> Emojis.warsun;
+            case "spacedock" -> Emojis.spacedock;
+            case "pds" -> Emojis.pds;
+            case "mech" -> Emojis.mech;
+            case "infantry" -> Emojis.infantry;
+            case "flagship" -> Emojis.flagship;
+            case "fighter" -> Emojis.fighter;
+            case "dreadnought" -> Emojis.dreadnought;
+            case "destroyer" -> Emojis.destroyer;
+            case "carrier" -> Emojis.carrier;
+            case "cruiser" -> Emojis.cruiser;
+
+            //LEADERS - AGENTS
+            case "arborecagent" -> Emojis.ArborecAgent;
+            case "argentagent" -> Emojis.ArgentAgent;
+            case "cabalagent" -> Emojis.CabalAgent;
+            case "creussagent" -> Emojis.CreussAgent;
+            case "empyreanagent" -> Emojis.EmpyreanAgent;
+            case "hacanagent" -> Emojis.HacanAgent;
+            case "jolnaragent" -> Emojis.JolnarAgent;
+            case "keleresagent" -> Emojis.KeleresAgent;
+            case "l1z1xagent" -> Emojis.L1z1xAgent;
+            case "letnevagent" -> Emojis.LetnevAgent;
+            case "mahactagent" -> Emojis.MahactAgent;
+            case "mentakagent" -> Emojis.MentakAgent;
+            case "muaatagent" -> Emojis.MuaatAgent;
+            case "naaluagent" -> Emojis.NaaluAgent;
+            case "naazagent" -> Emojis.NaazAgent;
+            case "nekroagent" -> Emojis.NekroAgent;
+            case "nomadagentartuno" -> Emojis.NomadAgentArtuno;
+            case "nomadagentmercer" -> Emojis.NomadAgentMercer;
+            case "nomadagentthundarian" -> Emojis.NomadAgentThundarian;
+            case "sardakkagent" -> Emojis.SardakkAgent;
+            case "saaragent" -> Emojis.SaarAgent;
+            case "solagent" -> Emojis.SolAgent;
+            case "titansagent" -> Emojis.TitansAgent;
+            case "winnuagent" -> Emojis.WinnuAgent;
+            case "xxchaagent" -> Emojis.XxchaAgent;
+            case "yinagent" -> Emojis.YinAgent;
+            case "yssarilagent" -> Emojis.YssarilAgent;
+            
+            //LEADERS - COMMANDERS
+            case "arboreccommander" -> Emojis.ArborecCommander;
+            case "argentcommander" -> Emojis.ArgentCommander;
+            case "cabalcommander" -> Emojis.CabalCommander;
+            case "creusscommander" -> Emojis.CreussCommander;
+            case "empyreancommander" -> Emojis.EmpyreanCommander;
+            case "hacancommander" -> Emojis.HacanCommander;
+            case "jolnarcommander" -> Emojis.JolnarCommander;
+            case "kelerescommander" -> Emojis.KeleresCommander;
+            case "l1z1xcommander" -> Emojis.L1z1xCommander;
+            case "letnevcommander" -> Emojis.LetnevCommander;
+            case "mahactcommander" -> Emojis.MahactCommander;
+            case "mentakcommander" -> Emojis.MentakCommander;
+            case "muaatcommander" -> Emojis.MuaatCommander;
+            case "naalucommander" -> Emojis.NaaluCommander;
+            case "naazcommander" -> Emojis.NaazCommander;
+            case "nekrocommander" -> Emojis.NekroCommander;
+            case "nomadcommander" -> Emojis.NomadCommander;
+            case "sardakkcommander" -> Emojis.SardakkCommander;
+            case "saarcommander" -> Emojis.SaarCommander;
+            case "solcommander" -> Emojis.SolCommander;
+            case "titanscommander" -> Emojis.TitansCommander;
+            case "winnucommander" -> Emojis.WinnuCommander;
+            case "xxchacommander" -> Emojis.XxchaCommander;
+            case "yincommander" -> Emojis.YinCommander;
+            case "yssarilcommander" -> Emojis.YssarilCommander;
+
+            //LEADERS - HEROES
+            case "arborechero" -> Emojis.ArborecHero;
+            case "argenthero" -> Emojis.ArgentHero;
+            case "cabalhero" -> Emojis.CabalHero;
+            case "creusshero" -> Emojis.CreussHero;
+            case "empyreanhero" -> Emojis.EmpyreanHero;
+            case "hacanhero" -> Emojis.HacanHero;
+            case "jolnarhero" -> Emojis.JolnarHero;
+            case "keleresherokuuasi" -> Emojis.KeleresHeroKuuasi;
+            case "keleresheroodlynn" -> Emojis.KeleresHeroOdlynn;
+            case "keleresheroharka" -> Emojis.KeleresHeroHarka;
+            case "l1z1xhero" -> Emojis.L1z1xHero;
+            case "letnevhero" -> Emojis.LetnevHero;
+            case "mahacthero" -> Emojis.MahactHero;
+            case "mentakhero" -> Emojis.MentakHero;
+            case "muaathero" -> Emojis.MuaatHero;
+            case "naaluhero" -> Emojis.NaaluHero;
+            case "naazhero" -> Emojis.NaazHero;
+            case "nekrohero" -> Emojis.NekroHero;
+            case "nomadhero" -> Emojis.NomadHero;
+            case "sardakkhero" -> Emojis.SardakkHero;
+            case "saarhero" -> Emojis.SaarHero;
+            case "solhero" -> Emojis.SolHero;
+            case "titanshero" -> Emojis.TitansHero;
+            case "winnuhero" -> Emojis.WinnuHero;
+            case "xxchahero" -> Emojis.XxchaHero;
+            case "yinhero" -> Emojis.YinHero;
+            case "yssarilhero" -> Emojis.YssarilHero;
 
             //OTHER
-            case "whalpha" -> "<:WHalpha:1056593618250518529>";
-            case "whbeta" -> "<:WHbeta:1056593596012302366>";
-            case "whgamma" -> "<:WHgamma:1056593568766111814>";
-            case "influence" -> "<:influence:959575421337358336>";
-            case "resources" -> "<:resources:959575421274451998>";
-            case "legendaryplanet" -> "<:Legendaryplanet:947250386375426108>";
-            case "cybernetictech" -> "<:Cybernetictech:947250608149245972>";
-            case "propulsiontech" -> "<:Propulsiontech:947250608145068074>";
-            case "biotictech" -> "<:Biotictech:947250608107315210>";
-            case "warfaretech" -> "<:Warfaretech:947250607855644743>";
-            case "public1alt" -> "<:Public1Alt:1058978029243728022>";
-            case "public2alt" -> "<:Public2Alt:1058977929725493398>";
-            case "secretobjectivealt" -> "<:SecretobjectiveAlt:1058977803728584734>";
+            case "whalpha" -> Emojis.WHalpha;
+            case "whbeta" -> Emojis.WHbeta;
+            case "whgamma" -> Emojis.WHgamma;
+            case "influence" -> Emojis.influence;
+            case "resources" -> Emojis.resources;
+            case "legendaryplanet" -> Emojis.LegendaryPlanet;
+            case "cybernetictech" -> Emojis.CyberneticTech;
+            case "propulsiontech" -> Emojis.PropulsionTech;
+            case "biotictech" -> Emojis.BioticTech;
+            case "warfaretech" -> Emojis.WarfareTech;
 
             default -> "";
         };
@@ -296,6 +384,30 @@ public class Helper {
         text += Helper.getFactionIconFromDiscord(playerFaction);
         text += " " + Helper.getPlayerPing(player);
         return text;
+    }
+
+    public static String getPlayerFactionLeaderEmoji(Player player, String leader) {
+        String playerFaction = player.getFaction();
+        if (playerFaction.equals("nomad")) {
+            return switch (leader) {
+                case "artuno" -> Emojis.NomadAgentArtuno;
+                case "mercer" -> Emojis.NomadAgentMercer;
+                case "thundarian" -> Emojis.NomadAgentThundarian;
+                default -> "";
+            };
+        } else if (playerFaction.equals("keleres")) {// && (leader.equals("kuuasi") || leader.equals("odlynn") ||
+                                                     // leader.equals("harka"))) {
+            return switch (leader) {
+                case "kuuasi" -> Emojis.KeleresHeroKuuasi;
+                case "odlynn" -> Emojis.KeleresHeroOdlynn;
+                case "harka" -> Emojis.KeleresHeroHarka;
+                default -> "";
+            };
+        } else {
+            StringBuilder sb = new StringBuilder(playerFaction).append(leader);
+            return getEmojiFromDiscord(sb.toString());
+        }
+
     }
 
     public static void isCCCountCorrect(SlashCommandInteractionEvent event, Map map, String color) {
