@@ -27,7 +27,7 @@ public class RevealStage2 extends StatusSubcommandData {
         sb.append(Helper.getGamePing(event, activeMap)).append("\n");
         sb.append(" **Stage 2 Public Objective Reavealed**").append("\n");
         sb.append("(").append(objective.getValue()).append(") ");
-        sb.append(Helper.getEmojiFromDiscord("Public2"));
+        sb.append(Helper.getEmojiFromDiscord("Public2Alt"));
         sb.append(Mapper.getPublicObjective(objective.getKey())).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
