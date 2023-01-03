@@ -383,6 +383,7 @@ public class Helper {
         String playerFaction = player.getFaction();
         text += Helper.getFactionIconFromDiscord(playerFaction);
         text += " " + Helper.getPlayerPing(player);
+        text += " _(" + player.getColor() + ")_";
         return text;
     }
 
@@ -395,8 +396,7 @@ public class Helper {
                 case "thundarian" -> Emojis.NomadAgentThundarian;
                 default -> "";
             };
-        } else if (playerFaction.equals("keleres")) {// && (leader.equals("kuuasi") || leader.equals("odlynn") ||
-                                                     // leader.equals("harka"))) {
+        } else if (playerFaction.equals("keleres")) {
             return switch (leader) {
                 case "kuuasi" -> Emojis.KeleresHeroKuuasi;
                 case "odlynn" -> Emojis.KeleresHeroOdlynn;
@@ -407,7 +407,6 @@ public class Helper {
             StringBuilder sb = new StringBuilder(playerFaction).append(leader);
             return getEmojiFromDiscord(sb.toString());
         }
-
     }
 
     public static void isCCCountCorrect(SlashCommandInteractionEvent event, Map map, String color) {
