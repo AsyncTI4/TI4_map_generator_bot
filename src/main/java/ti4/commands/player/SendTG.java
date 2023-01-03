@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -47,7 +48,7 @@ public class SendTG extends PlayerSubcommandData {
             targetTG += sendTG;
             player_.setTg(targetTG);
 
-            MessageHelper.sendMessageToChannel(event.getChannel(), getPlayerRepresentation(event, player) + " sent " + sendTG + Helper.getEmojiFromDiscord("tg") + " trade goods to: " + getPlayerRepresentation(event, player_));
+            MessageHelper.sendMessageToChannel(event.getChannel(), getPlayerRepresentation(event, player) + " sent " + sendTG + Emojis.tg + " trade goods to " + getPlayerRepresentation(event, player_));
         }
     }
 
