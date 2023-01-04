@@ -15,10 +15,14 @@ public class PurgeLeader extends LeaderAction {
 
     @Override
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
+        Leader playerLeader = player.getLeader(leader);
         boolean purged = player.removeLeader(leader);
         if (purged) {
-            Leader playerLeader = player.getLeader(leader);
-            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" purged ").append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append(playerLeader.getName());
+            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
+                    .append(" purged ")
+                    .append(playerLeader.getId()). append(" ")
+                    .append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append(" ")
+                    .append(playerLeader.getName());
             MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");

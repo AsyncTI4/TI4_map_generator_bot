@@ -28,14 +28,19 @@ public class ExhaustLeader extends LeaderAction {
                 return;
             }
             playerLeader.setExhausted(true);
-            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" exhausted ").append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append(playerLeader.getName());
-            message.append(playerLeader.getName());
+            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
+                    .append(" exhausted ")
+                    .append(playerLeader.getId()).append(" ")
+                    .append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append(" ")
+                    .append(playerLeader.getName());
             OptionMapping optionTG = event.getOption(Constants.TG);
             if (optionTG != null) {
                 Stats.setValue(event, player, optionTG, playerLeader::setTgCount, playerLeader::getTgCount);
-                message.append(" - ").append(optionTG.toString())
-                                    .append(Emojis.tg).append(" placed on top of the leader _(")
-                                    .append(String.valueOf(playerLeader.getTgCount())).append(Emojis.tg).append(" total)_\n");
+                message.append(" - ").append(optionTG.getAsString())
+                        .append(Emojis.tg).append(" placed on top of the leader");
+                if (playerLeader.getTgCount() != optionTG.getAsInt()) {
+                    message.append(" _(").append(String.valueOf(playerLeader.getTgCount())).append(Emojis.tg).append(" total)_\n");
+                }
             }
             MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         } else {

@@ -43,27 +43,23 @@ public class SetHeroActiveLeader extends LeaderAction {
             return;
         }
 
-        String text = "";
-        text += Helper.getFactionIconFromDiscord(player.getFaction());
-        text += " " + player.getUserName();
-        String color = player.getColor();
-        if (color != null) {
-            text += " (" + color + ")";
-        }
-
-        text += " Played Hero.";
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
+        .append(" played ")
+        .append(playerLeader.getId()).append(" ")
+        .append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append(" ")
+        .append(playerLeader.getName());
         if ("letnev".equals(playerFaction) || "nomad".equals(playerFaction)) {
             if (playerLeader != null && Constants.HERO.equals(playerLeader.getId())) {
                 playerLeader.setLocked(false);
                 playerLeader.setActive(true);
-                MessageHelper.sendMessageToChannel(event.getChannel(), text + "\nLeader will be PURGED after status cleanup");
+                MessageHelper.sendMessageToChannel(event.getChannel(), message.toString() + " - Leader will be PURGED after status cleanup");
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
             }
         } else if (playerLeader != null && Constants.HERO.equals(playerLeader.getId())) {
             boolean purged = player.removeLeader(leader);
             if (purged) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), text + "\nLeader " + leader + " purged");
+                MessageHelper.sendMessageToChannel(event.getChannel(), message.toString() + " - Leader " + leader + " has been purged");
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
             }

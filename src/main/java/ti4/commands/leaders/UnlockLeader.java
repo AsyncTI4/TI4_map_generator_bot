@@ -2,7 +2,6 @@ package ti4.commands.leaders;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Leader;
 import ti4.map.Map;
@@ -19,7 +18,11 @@ public class UnlockLeader extends LeaderAction {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null){
             playerLeader.setLocked(false);
-            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" unlocked ").append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append(playerLeader.getName());
+            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
+                    .append(" unlocked ")
+                    .append(playerLeader.getId()).append(" ")
+                    .append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append(" ")
+                    .append(playerLeader.getName());
             MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
             if (playerLeader.isExhausted()){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Leader is also exhausted");
