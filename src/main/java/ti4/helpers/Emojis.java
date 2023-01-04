@@ -91,7 +91,7 @@ public class Emojis {
     public static final String KeleresAgent = "<:KeleresAgent:1059671221408645140>";
     public static final String L1z1xAgent = "<:L1Z1XAgent:1059671225061871676>";
     public static final String LetnevAgent = "<:LetnevAgent:1059671228857733190>";
-    public static final String MahactAgent = "";
+    public static final String MahactAgent = "<:MahactAgent:1060073060327235704>";
     public static final String MentakAgent = "<:MentakAgent:1059671232179617802>";
     public static final String MuaatAgent = "<:MuaatAgent:1059671235983855646>";
     public static final String NaaluAgent = "<:NaaluAgent:1059671281156509767>";
