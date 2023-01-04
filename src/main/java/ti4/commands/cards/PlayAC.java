@@ -79,7 +79,6 @@ public class PlayAC extends CardsSubcommandData {
         }
         String[] actionCard = Mapper.getActionCard(acID).split(";");
         String actionCardTitle = actionCard[0];
-        String actionCardPhase = actionCard[1];
         String actionCardWindow = actionCard[2];
         String actionCardText = actionCard[3];
 
@@ -87,9 +86,9 @@ public class PlayAC extends CardsSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getGamePing(guild, activeMap)).append(" ").append(activeMap.getName()).append("\n");
         sb.append(Helper.getPlayerRepresentation(event, player)).append(" played an Action Card:\n");
-        sb.append(Helper.getEmojiFromDiscord("actioncard")).append("__**").append(actionCardTitle).append("**__ (").append(actionCardPhase).append(" Phase) \n");
-        sb.append("        _").append(actionCardWindow).append(":_\n");
-        sb.append("        ").append(actionCardText).append("\n");
+        sb.append(Helper.getEmojiFromDiscord("actioncard")).append("__**").append(actionCardTitle).append("**__\n");
+        sb.append(">  _").append(actionCardWindow).append(":_\n");
+        sb.append(">  ").append(actionCardText).append("\n");
 
         Emoji sabotage = Emoji.fromMarkdown(":sabotage:");
         Emoji noSabo = Emoji.fromMarkdown(":nosabo:");
