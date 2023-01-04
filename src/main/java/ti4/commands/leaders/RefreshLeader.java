@@ -22,11 +22,15 @@ public class RefreshLeader extends LeaderAction {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Leader is locked");
                 return;
             }
-            refreshLeader(player, playerLeader);
-            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" refreshed ").append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append("\n");
             int tgCount = playerLeader.getTgCount();
+            refreshLeader(player, playerLeader);
+            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
+                    .append(" readied ")
+                    .append(playerLeader.getId()). append(" ")
+                    .append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append(" ")
+                    .append(playerLeader.getName());
             if (tgCount > 0) {
-                message.append(String.valueOf(tgCount)).append(Emojis.tg).append(" transferred from Leader to Player");
+                message.append(" - ").append(String.valueOf(tgCount)).append(Emojis.tg).append(" transferred from leader to player");
             }
             MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         } else {
