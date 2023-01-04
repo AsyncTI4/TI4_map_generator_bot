@@ -48,7 +48,7 @@ public class ExpInfo extends ExploreSubcommandData {
             info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DECK** (").append(String.valueOf(deckCount)).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
             info.append(listNames(deck)).append("\n");
             info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (").append(String.valueOf(discardCount)).append(")\n");
-            info.append(listNames(discard)).append("\n\n");
+            info.append(listNames(discard)).append("\n_ _\n");
             MessageHelper.replyToMessage(event, info.toString());
         }
     }
