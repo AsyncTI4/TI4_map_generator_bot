@@ -37,7 +37,7 @@ public class ExpFrontier extends ExploreSubcommandData {
                 }
             }
             StringBuilder messageText = new StringBuilder(Helper.getEmojiFromDiscord("Frontier"));
-            messageText.append("Frontier (*tile: "+ tile.getPosition() + "*) explored by " + SendTG.getPlayerRepresentation(event, player)).append(":\n");
+            messageText.append("Frontier *(tile "+ tile.getPosition() + ")* explored by " + SendTG.getPlayerRepresentation(event, player)).append(":\n");
             messageText.append(displayExplore(cardID));
             resolveExplore(event, cardID, tile, null, messageText.toString(), isEnigmatic);
         } else {

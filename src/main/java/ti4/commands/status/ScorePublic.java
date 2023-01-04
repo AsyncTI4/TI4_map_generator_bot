@@ -68,10 +68,10 @@ public class ScorePublic extends StatusSubcommandData {
         String emojiName = "";
         if (poName1 != null) {
             poName = poName1;
-            emojiName = "Public1";
+            emojiName = "Public1Alt";
         } else if (poName2 != null){
             poName = poName2;
-            emojiName = "Public2";
+            emojiName = "Public2Alt";
         }
         String message = Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(player) + " (" + player.getColor() + ") scored " + Helper.getEmojiFromDiscord(emojiName) + " " + poName;
         MessageHelper.sendMessageToChannel(channel, message);
