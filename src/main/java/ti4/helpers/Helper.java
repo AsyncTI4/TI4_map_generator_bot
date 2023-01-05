@@ -383,7 +383,9 @@ public class Helper {
         String playerFaction = player.getFaction();
         text += Helper.getFactionIconFromDiscord(playerFaction);
         text += " " + Helper.getPlayerPing(player);
-        text += " _(" + player.getColor() + ")_";
+        if (player.getColor() != null) {
+            text += " _(" + player.getColor() + ")_";
+        }
         return text;
     }
 
@@ -407,6 +409,11 @@ public class Helper {
             StringBuilder sb = new StringBuilder(playerFaction).append(leader);
             return getEmojiFromDiscord(sb.toString());
         }
+    }
+
+    public static String getSCEmojiFromInteger(Integer strategy_card) {
+        String scEmojiName = "SC" + String.valueOf(strategy_card);
+        return Helper.getEmojiFromDiscord(scEmojiName);
     }
 
     public static void isCCCountCorrect(SlashCommandInteractionEvent event, Map map, String color) {
