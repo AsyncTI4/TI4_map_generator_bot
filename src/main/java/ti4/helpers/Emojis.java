@@ -110,31 +110,31 @@ public class Emojis {
     public static final String YssarilAgent = "<:YssarilAgent:1059671329407762593>";
     
     //LEADERS - COMMANDERS
-    public static final String ArborecCommander = "";
-    public static final String ArgentCommander = "";
-    public static final String CabalCommander = "";
-    public static final String CreussCommander = "";
-    public static final String EmpyreanCommander = "";
-    public static final String HacanCommander = "";
-    public static final String JolnarCommander = "";
-    public static final String KeleresCommander = "";
-    public static final String L1z1xCommander = "";
-    public static final String LetnevCommander = "";
-    public static final String MahactCommander = "";
-    public static final String MentakCommander = "";
-    public static final String MuaatCommander = "";
-    public static final String NaaluCommander = "";
-    public static final String NaazCommander = "";
-    public static final String NekroCommander = "";
-    public static final String NomadCommander = "";
-    public static final String SardakkCommander = "";
-    public static final String SaarCommander = "";
-    public static final String SolCommander = "";
-    public static final String TitansCommander = "";
-    public static final String WinnuCommander = "";
-    public static final String XxchaCommander = "";
-    public static final String YinCommander = "";
-    public static final String YssarilCommander = "";
+    public static final String ArborecCommander = "<:ArborecCommander:1060184772086866062>";
+    public static final String ArgentCommander = "<:ArgentCommander:1060184777552048239>";
+    public static final String CabalCommander = " <:CabalCommander:1060184786263609394>";
+    public static final String CreussCommander = "<:CreussCommander:1060184792198561882>";
+    public static final String EmpyreanCommander = "<:EmpyreanCommander:1060184798078963782>";
+    public static final String HacanCommander = "<:HacanCommander:1060184804638859355>";
+    public static final String JolnarCommander = "<:JolNarCommander:1060184815627927552>";
+    public static final String KeleresCommander = "<:KeleresCommander:1060184820724027432>";
+    public static final String L1z1xCommander = "<:L1z1xCommander:1060184825924960266>";
+    public static final String LetnevCommander = "<:LetnevCommander:1060184831058788423>";
+    public static final String MahactCommander = "<:MahactCommander:1060184836213579826>";
+    public static final String MentakCommander = "<:MentakCommander:1060184841343225886>";
+    public static final String MuaatCommander = "<:MuaatCommander:1060184846799999046>";
+    public static final String NaaluCommander = "<:NaaluCommander:1060184852340686988>";
+    public static final String NaazCommander = "<:NaazCommander:1060184858116227092>";
+    public static final String NekroCommander = "<:NekroCommander:1060184863526883449>";
+    public static final String NomadCommander = "<:NomadCommander:1060184810267627521>";
+    public static final String SardakkCommander = "<:SardakkCommander:1060184874478227506>";
+    public static final String SaarCommander = "<:SaarCommander:1060184868815908936>";
+    public static final String SolCommander = "<:SolCommander:1060184879624634480>";
+    public static final String TitansCommander = "<:TitansCommander:1060184888344588318>";
+    public static final String WinnuCommander = "<:WinnuCommander:1060184894011084800>";
+    public static final String XxchaCommander = "<:XxchaCommander:1060184899404972112>";
+    public static final String YinCommander = "<:YinCommander:1060184905046315080>";
+    public static final String YssarilCommander = "<:YssarilCommander:1060184910880583792>";
 
     //LEADERS - HEROES
     public static final String ArborecHero = "";
@@ -177,4 +177,6 @@ public class Emojis {
     public static final String BioticTech = "<:Biotictech:947250608107315210>";
     public static final String WarfareTech = "<:Warfaretech:947250607855644743>";
     public static final String SpeakerToken = "<:Speakertoken:965363466821050389>";
+    public static final String Sabotage = "<:sabotage:962784058159546388>";
+    public static final String NoSabotage = "<:nosabo:962783456541171712>";
 }
