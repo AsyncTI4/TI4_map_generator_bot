@@ -139,6 +139,8 @@ public class Stats extends PlayerSubcommandData {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
+        //code to add info to website
+        File file = GenerateMap.getInstance().saveImage(activeMap);
         MessageHelper.replyToMessageTI4Logo(event);
     }
 
