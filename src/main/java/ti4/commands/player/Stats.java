@@ -20,7 +20,7 @@ import java.util.function.Supplier;
 public class Stats extends PlayerSubcommandData {
     public Stats() {
         super(Constants.STATS, "Player Stats: CC,TG,Commodities");
-        addOptions(new OptionData(OptionType.STRING, Constants.CC, "CC's Example: 3/3/2"))
+        addOptions(new OptionData(OptionType.STRING, Constants.CC, "CC's Example: 3/3/2 or +1/-1/+0"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactical command counter count"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet command counter count"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy command counter count"))
@@ -47,6 +47,7 @@ public class Stats extends PlayerSubcommandData {
             return;
         }
 
+        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(event, player) + " player stats changed:");
 
         OptionMapping optionCC = event.getOption(Constants.CC);
         OptionMapping optionT = event.getOption(Constants.TACTICAL);
@@ -64,9 +65,9 @@ public class Stats extends PlayerSubcommandData {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Wrong format for tokens count. Must be 3/3/3");
                 } else {
                     try {
-                        setValue(event, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken());
-                        setValue(event, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken());
-                        setValue(event, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken());
+                        setValue(event, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken());
+                        setValue(event, player, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken());
+                        setValue(event, player, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken());
                     } catch (Exception e) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "Not number entered, check CC count again");
                     }
@@ -176,23 +177,42 @@ public class Stats extends PlayerSubcommandData {
     }
 
     public static void setValue(SlashCommandInteractionEvent event, Player player, OptionMapping option, Consumer<Integer> consumer, Supplier<Integer> supplier) {
-        setValue(event, option.getName(), consumer, supplier, option.getAsString());
+        setValue(event, player, option.getName(), consumer, supplier, option.getAsString());
     }
 
-    public static void setValue(SlashCommandInteractionEvent event, String optionName, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
-        try {
+    public static void setValue(SlashCommandInteractionEvent event, Player player, String optionName, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
+            try {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             int number = Integer.parseInt(value);
             int existingNumber = supplier.get();
             if (setValue) {
                 consumer.accept(number);
+                MessageHelper.sendMessageToChannel(event.getChannel(), getSetValueMessage(event, player, optionName, number, existingNumber));
             } else {
-                number = existingNumber + number;
-                number = Math.max(number, 0);
-                consumer.accept(number);
+                int newNumber = existingNumber + number;
+                newNumber = Math.max(newNumber, 0);
+                consumer.accept(newNumber);
+                MessageHelper.sendMessageToChannel(event.getChannel(), getChangeValueMessage(event, player, optionName, number, existingNumber, newNumber));
             }
         } catch (Exception e) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not parse number for: " + optionName);
         }
+    }
+
+    private static String getSetValueMessage (SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber)
+    {
+        return ">  set **" + optionName + "** to " + String.valueOf(setToNumber) + " _(was " + String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber-existingNumber) + ")_";
+    }
+
+    private static String getChangeValueMessage(SlashCommandInteractionEvent event, Player player, String optionName, Integer changeNumber, Integer existingNumber, Integer newNumber) {
+        String changeDescription = "changed";
+        if (changeNumber > 0) {
+            changeDescription = "increased";
+        } else if (changeNumber < 0) {
+            changeDescription = "decreased";
+        }  
+        return ">  " + changeDescription + " **" + optionName + "** by "
+                + String.valueOf(changeNumber) + " _(was " + String.valueOf(existingNumber) + ", now "
+                + String.valueOf(newNumber) + ")_";
     }
 }

@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -91,19 +92,8 @@ public class PlayAC extends CardsSubcommandData {
         sb.append(">  _").append(actionCardWindow).append(":_\n");
         sb.append(">  ").append(actionCardText).append("\n");
 
-        Emoji sabotage = Emoji.fromMarkdown(":sabotage:");
-        Emoji noSabo = Emoji.fromMarkdown(":nosabo:");
-
-        JDA jda = event != null ? event.getJDA() : buttonInteractionEvent.getJDA();
-        for (Emote emote : jda.getEmotes()) {
-            if (emote.getName().toLowerCase().contains("sabotage")) {
-                sabotage = Emoji.fromEmote(emote);
-            } else if (emote.getName().toLowerCase().contains("nosabo")) {
-                noSabo = Emoji.fromEmote(emote);
-            }
-        }
-        Button sabotageButton = Button.danger("sabotage", "Sabotage").withEmoji(sabotage);
-        Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(noSabo);
+        Button sabotageButton = Button.danger("sabotage", "Sabotage").withEmoji(Emoji.fromMarkdown(Emojis.Sabotage));
+        Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(Emoji.fromMarkdown(Emojis.NoSabotage));
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannelWithButtons(channel, sb.toString(), null);
         } else {
