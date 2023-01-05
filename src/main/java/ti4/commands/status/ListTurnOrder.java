@@ -45,14 +45,14 @@ public class ListTurnOrder extends StatusSubcommandData {
             if (isPlayed) {
                 text += "~~";
             }
-            text += Helper.getSCAsMention(sc);
+            text += Helper.getSCEmojiFromInteger(sc) + Helper.getSCAsMention(sc);
             if (isPlayed) {
                 text += "~~";
             }
             if (passed) {
                 text += "~~";
             }
-            text += Helper.getFactionIconFromDiscord(player.getFaction());
+            text += Helper.getFactionIconFromDiscord(player.getFaction()); //TODO: Helper.getPlayerRepresentation vs SendTG.getPlayerRepresentation
             text += " " + userName;
             if (color != null) {
                 text += " (" + color + ")";

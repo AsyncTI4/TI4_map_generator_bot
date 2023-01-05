@@ -40,7 +40,7 @@ public class ExpInfo extends ExploreSubcommandData {
             Integer deckCount = deck.size();
             Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
             NumberFormat formatPercent = NumberFormat.getPercentInstance();
-
+            formatPercent.setMaximumFractionDigits(1);
             ArrayList<String> discard = activeMap.getExploreDiscard(currentType);
             Collections.sort(discard);
             Integer discardCount = discard.size();
