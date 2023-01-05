@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.commands.status.ListTurnOrder;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
@@ -34,7 +35,6 @@ public class SCPick extends PlayerSubcommandData {
         int sc = player.getSC();
         String msg = "";
         String msgExtra = "";
-        String emojiName = "SC" + String.valueOf(sc);
         if (sc != 0) {
             msg += Helper.getFactionIconFromDiscord(player.getFaction());
             msg += " " + player.getUserName();
@@ -42,7 +42,7 @@ public class SCPick extends PlayerSubcommandData {
             if (color != null) {
                 msg += " (" + color + ")";
             }
-            msg += " Picked: " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(sc);
+            msg += " Picked: " + Helper.getSCEmojiFromInteger(sc) + Helper.getSCAsMention(sc);
 
             boolean nextCorrectPing = false;
             boolean allPicked = true;
@@ -105,6 +105,7 @@ public class SCPick extends PlayerSubcommandData {
         }
         MessageHelper.replyToMessage(event, msg);
         if (!msgExtra.isEmpty()) {
+            ListTurnOrder.turnOrder(event, activeMap);
             MessageHelper.sendMessageToChannel(event.getChannel(), msgExtra);
         }
     }
