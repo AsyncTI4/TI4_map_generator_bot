@@ -55,9 +55,9 @@ public class LeadershipPrimary extends SCSubcommandData {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Wrong format for tokens count. Must be 3/3/3");
                 } else {
                     try {
-                        Stats.setValue(event, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken());
-                        Stats.setValue(event, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken());
-                        Stats.setValue(event, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken());
+                        Stats.setValue(event, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken());
+                        Stats.setValue(event, player, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken());
+                        Stats.setValue(event, player, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken());
                     } catch (Exception e) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "Not number entered, check CC count again");
                     }
