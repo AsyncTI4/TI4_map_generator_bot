@@ -391,14 +391,14 @@ public class Helper {
 
     public static String getPlayerFactionLeaderEmoji(Player player, String leader) {
         String playerFaction = player.getFaction();
-        if (playerFaction.equals("nomad")) {
+        if (playerFaction.equals("nomad") && leader.equals(Constants.AGENT)) {
             return switch (leader) {
                 case "artuno" -> Emojis.NomadAgentArtuno;
                 case "mercer" -> Emojis.NomadAgentMercer;
                 case "thundarian" -> Emojis.NomadAgentThundarian;
                 default -> "";
             };
-        } else if (playerFaction.equals("keleres")) {
+        } else if (playerFaction.equals("keleres") && leader.equals(Constants.HERO)) {
             return switch (leader) {
                 case "kuuasi" -> Emojis.KeleresHeroKuuasi;
                 case "odlynn" -> Emojis.KeleresHeroOdlynn;
