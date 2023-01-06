@@ -98,14 +98,13 @@ public class SCPick extends PlayerSubcommandData {
                 if (nextPlayer != null) {
                     msgExtra += " " + Helper.getPlayerPing(nextPlayer) + " is up for an action";
                 }
-            }
-
+                ListTurnOrder.turnOrder(event, activeMap);
+            }           
         } else {
             msg = "No SC picked.";
         }
         MessageHelper.replyToMessage(event, msg);
         if (!msgExtra.isEmpty()) {
-            ListTurnOrder.turnOrder(event, activeMap);
             MessageHelper.sendMessageToChannel(event.getChannel(), msgExtra);
         }
     }
