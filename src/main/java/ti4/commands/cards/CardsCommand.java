@@ -9,8 +9,6 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.MapGenerator;
 import ti4.commands.Command;
-import ti4.commands.cardspn.*;
-import ti4.commands.explore.ShuffleExpBackIntoDeck;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
