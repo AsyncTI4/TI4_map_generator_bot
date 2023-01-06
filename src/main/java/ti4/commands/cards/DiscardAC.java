@@ -11,8 +11,6 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.LinkedHashMap;
-
 public class DiscardAC extends CardsSubcommandData {
     public DiscardAC() {
         super(Constants.DISCARD_AC, "Discard Action Card");

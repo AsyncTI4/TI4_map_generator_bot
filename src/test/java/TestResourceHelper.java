@@ -1,5 +1,5 @@
 import org.junit.jupiter.api.Test;
-import ti4.ResourceHelper;
+//import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
@@ -16,8 +16,8 @@ public class TestResourceHelper {
         AliasHandler.init();
         Storage.init();
         String tileID = "18";
-        String tileName = Mapper.getTileID(tileID);
-        String tilePath = ResourceHelper.getInstance().getTileFile(tileID);
+        //String tileName = Mapper.getTileID(tileID);
+        //String tilePath = ResourceHelper.getInstance().getTileFile(tileID);
 
         assertEquals(tileID, tileID);
     }

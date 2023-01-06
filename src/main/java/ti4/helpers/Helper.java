@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import ti4.helpers.Emojis;
 import ti4.MapGenerator;
 import ti4.ResourceHelper;
 import ti4.commands.tokens.AddCC;

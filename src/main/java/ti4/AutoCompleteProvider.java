@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.interactions.commands.Command;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.LoggerHandler;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
