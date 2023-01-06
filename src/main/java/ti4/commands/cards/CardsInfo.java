@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import org.apache.commons.collections4.ListUtils;
 import ti4.MapGenerator;
 import ti4.generator.Mapper;
@@ -221,22 +220,22 @@ public class CardsInfo extends CardsSubcommandData {
                         }
                     }
                     if (!threadFound) {
-                        ThreadChannelAction threadChannel_ = textChannel.createThreadChannel(threadName, true);
-                        threadChannel_.queue(msg -> {
-                            String text = playerPing + "\n";
-                            sendTextToChannel(msg, soText);
-                            List<Message> messageList = getMessageObject(secretScoreMsg, soButtons);
-                            for (Message message : messageList) {
-                                msg.sendMessage(message).queue();
-                            }
-                            sendTextToChannel(msg, acText);
-                            messageList = getMessageObject(acPlayMsg, acButtons);
-                            for (Message message : messageList) {
-                                msg.sendMessage(message).queue();
-                            }
-                            sendTextToChannel(msg, pnText);
-                            ThreadChannelAction threadChannelAction = threadChannel_.setInvitable(false);
-                        });
+                        ThreadChannel new_thread = textChannel.createThreadChannel(threadName, true)
+                        .setInvitable(false)
+                        .complete();
+                        sendTextToChannel(new_thread, playerPing + "\n");
+                        List<Message> messageList = getMessageObject(secretScoreMsg, soButtons);
+                        for (Message message : messageList) {
+                            new_thread.sendMessage(message).queue();
+                        }
+                        sendTextToChannel(new_thread, acText);
+                        messageList = getMessageObject(acPlayMsg, acButtons);
+                        for (Message message : messageList) {
+                            new_thread.sendMessage(message).queue();
+                        }
+                        sendTextToChannel(new_thread, pnText);
+                        
+                        
                     }
                 } catch (Exception e) {
                     BotLogger.log("Could not create Private Thread");

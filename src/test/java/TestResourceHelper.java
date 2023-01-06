@@ -1,5 +1,3 @@
-package ti4;
-
 import org.junit.jupiter.api.Test;
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
