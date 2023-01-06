@@ -5,3 +5,5 @@
 /log/*
 localtesting.sh
 tibot.jar
+.vscode/settings.json
+.settings/org.eclipse.jdt.apt.core.prefs
