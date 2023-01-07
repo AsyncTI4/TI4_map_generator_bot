@@ -3,10 +3,10 @@ package ti4.commands.agenda;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.*;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import java.util.*;
@@ -49,15 +49,9 @@ public class ListVoteCount extends AgendaSubcommandData {
             }
             List<String> planets = new ArrayList<>(player.getPlanets());
             planets.removeAll(player.getExhaustedPlanets());
-            String userName = player.getUserName();
-            String color = player.getColor();
 
             String text = "";
-            text += Helper.getFactionIconFromDiscord(player.getFaction());
-            text += " " + userName;
-            if (color != null) {
-                text += " (" + color + ")";
-            }
+            text += Helper.getPlayerRepresentation(event, player);
             HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
             boolean bloodPactPn = false;
             boolean hasXxchaAlliance = false;
@@ -109,7 +103,7 @@ public class ListVoteCount extends AgendaSubcommandData {
             } else {
                 text += " vote Count: **" + influenceCount;
                 if ("argent".equals(player.getFaction())) {
-                    text += "(+" + map.getPlayers().keySet().size() + ")";
+                    text += "(+" + map.getPlayers().keySet().size() + " votes for Zeal)";
                 }
                 if (bloodPactPn) {
                     text += "(Blood Pact +4 votes)";
@@ -121,7 +115,7 @@ public class ListVoteCount extends AgendaSubcommandData {
             }
 
             if (player.getUserID().equals(speakerName)) {
-                text += " <:Speakertoken:965363466821050389> ";
+                text += " " + Emojis.SpeakerToken + " ";
             }
             text += "**";
             msg.append(i).append(". ").append(text).append("\n");
