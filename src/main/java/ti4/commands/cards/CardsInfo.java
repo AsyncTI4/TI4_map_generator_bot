@@ -214,7 +214,7 @@ public class CardsInfo extends CardsSubcommandData {
                                 threadChannel.sendMessage(message).queue();
                             }
                             MessageHelper.sendMessageToChannel(threadChannel, pnText);
-                            threadChannel.getManager().setInvitable(false);
+                            //threadChannel.getManager().setInvitable(false);
                             threadFound = true;
                             break;
                         }
@@ -224,6 +224,7 @@ public class CardsInfo extends CardsSubcommandData {
                         .setInvitable(false)
                         .complete();
                         sendTextToChannel(new_thread, playerPing + "\n");
+                        sendTextToChannel(new_thread, soText);
                         List<Message> messageList = getMessageObject(secretScoreMsg, soButtons);
                         for (Message message : messageList) {
                             new_thread.sendMessage(message).queue();
