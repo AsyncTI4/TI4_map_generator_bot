@@ -3,6 +3,7 @@ package ti4.commands.agenda;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.*;
@@ -35,21 +36,22 @@ public class ListVoteCount extends AgendaSubcommandData {
             Collections.rotate(orderList, rotationDistance);
         }
 
+        //Check if Argent Flight is in the game - if it is, put it at the front of the vote list.
+        Optional<Player> argentPlayer = orderList.stream().filter(player -> player.getFaction().equals("argent")).findFirst();
+        if (argentPlayer.isPresent()) {
+            orderList.remove(argentPlayer.orElse(null));
+            orderList.add(0, argentPlayer.get());
+        }
+
         for (Player player : orderList) {
             if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("white")) {
                 continue;
             }
             List<String> planets = new ArrayList<>(player.getPlanets());
             planets.removeAll(player.getExhaustedPlanets());
-            String userName = player.getUserName();
-            String color = player.getColor();
 
             String text = "";
-            text += Helper.getFactionIconFromDiscord(player.getFaction());
-            text += " " + userName;
-            if (color != null) {
-                text += " (" + color + ")";
-            }
+            text += Helper.getPlayerRepresentation(event, player);
             HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
             boolean bloodPactPn = false;
             boolean hasXxchaAlliance = false;
@@ -101,7 +103,7 @@ public class ListVoteCount extends AgendaSubcommandData {
             } else {
                 text += " vote Count: **" + influenceCount;
                 if ("argent".equals(player.getFaction())) {
-                    text += "(+" + map.getPlayers().keySet().size() + ")";
+                    text += "(+" + map.getPlayers().keySet().size() + " votes for Zeal)";
                 }
                 if (bloodPactPn) {
                     text += "(Blood Pact +4 votes)";
@@ -113,7 +115,7 @@ public class ListVoteCount extends AgendaSubcommandData {
             }
 
             if (player.getUserID().equals(speakerName)) {
-                text += " <:Speakertoken:965363466821050389> ";
+                text += " " + Emojis.SpeakerToken + " ";
             }
             text += "**";
             msg.append(i).append(". ").append(text).append("\n");
