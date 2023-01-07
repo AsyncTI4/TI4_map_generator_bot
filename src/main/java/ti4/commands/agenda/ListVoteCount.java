@@ -6,6 +6,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.*;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import java.util.*;
@@ -33,6 +34,13 @@ public class ListVoteCount extends AgendaSubcommandData {
         if (optSpeaker.isPresent()) {
             int rotationDistance = orderList.size() - orderList.indexOf(optSpeaker.get()) - 1;
             Collections.rotate(orderList, rotationDistance);
+        }
+
+        //Check if Argent Flight is in the game - if it is, put it at the front of the vote list.
+        Optional<Player> argentPlayer = orderList.stream().filter(player -> player.getFaction().equals("argent")).findFirst();
+        if (argentPlayer.isPresent()) {
+            orderList.remove(argentPlayer.orElse(null));
+            orderList.add(0, argentPlayer.get());
         }
 
         for (Player player : orderList) {
