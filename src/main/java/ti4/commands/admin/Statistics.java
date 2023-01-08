@@ -51,7 +51,7 @@ public class Statistics extends AdminSubcommandData {
                 boolean findWinner = true;
                 for (java.util.Map.Entry<Player, Integer> entry : userVPs.entrySet()) {
                     Integer vpScore = entry.getValue();
-                    if (vp == vpScore) {
+                    if (vp <= vpScore) {
                         String color = entry.getKey().getColor();
                         String faction = entry.getKey().getFaction();
 
