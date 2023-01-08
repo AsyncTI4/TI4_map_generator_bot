@@ -31,9 +31,6 @@ public class AdminCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        if (true){
-            return true;
-        }
         if (event.getName().equals(getActionID())) {
             Member member = event.getMember();
             if (member != null) {
