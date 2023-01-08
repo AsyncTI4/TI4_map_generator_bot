@@ -4,7 +4,10 @@ import net.dv8tion.jda.api.entities.Channel;
 import net.dv8tion.jda.api.entities.GuildChannel;
 import net.dv8tion.jda.api.entities.Role;
 import ti4.MapGenerator;
-import ti4.helpers.*;
+import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
+import ti4.helpers.Helper;
+import ti4.helpers.Storage;
 import ti4.message.BotLogger;
 
 import javax.annotation.CheckForNull;
@@ -566,84 +569,90 @@ public class MapSaveLoadManager {
                     }
                 }
                 HashMap<String, Tile> tileMap = new HashMap<>();
-                while (myReader.hasNextLine()) {
-                    String tileData = myReader.nextLine();
-                    if (TILE.equals(tileData)) {
-                        continue;
-                    }
-                    if (ENDTILE.equals(tileData)) {
-                        continue;
-                    }
-                    if (tileData.isEmpty()){
-                        continue;
-                    }
-                    Tile tile = readTile(tileData);
-                    tileMap.put(tile.getPosition(), tile);
-
+                try {
                     while (myReader.hasNextLine()) {
-                        String tmpData = myReader.nextLine();
-                        if (UNITHOLDER.equals(tmpData)) {
+                        String tileData = myReader.nextLine();
+                        if (TILE.equals(tileData)) {
                             continue;
                         }
-                        if (ENDUNITHOLDER.equals(tmpData)) {
-                            break;
+                        if (ENDTILE.equals(tileData)) {
+                            continue;
                         }
-                        String spaceHolder = null;
+                        if (tileData.isEmpty()) {
+                            continue;
+                        }
+                        Tile tile = readTile(tileData);
+                        tileMap.put(tile.getPosition(), tile);
+
                         while (myReader.hasNextLine()) {
-                            String data = tmpData != null ? tmpData : myReader.nextLine();
-                            tmpData = null;
-                            if (UNITS.equals(data)) {
-                                spaceHolder = myReader.nextLine();
-                                if (Constants.MIRAGE.equals(spaceHolder)) {
-                                    Helper.addMirageToTile(tile);
-                                } else if (!tile.isSpaceHolderValid(spaceHolder)) {
-                                    BotLogger.log(map.getName() + ": Not valid space holder detected: " + spaceHolder);
+                            String tmpData = myReader.nextLine();
+                            if (UNITHOLDER.equals(tmpData)) {
+                                continue;
+                            }
+                            if (ENDUNITHOLDER.equals(tmpData)) {
+                                break;
+                            }
+                            String spaceHolder = null;
+                            while (myReader.hasNextLine()) {
+                                String data = tmpData != null ? tmpData : myReader.nextLine();
+                                tmpData = null;
+                                if (UNITS.equals(data)) {
+                                    spaceHolder = myReader.nextLine();
+                                    if (Constants.MIRAGE.equals(spaceHolder)) {
+                                        Helper.addMirageToTile(tile);
+                                    } else if (!tile.isSpaceHolderValid(spaceHolder)) {
+                                        BotLogger.log(map.getName() + ": Not valid space holder detected: " + spaceHolder);
+                                    }
+                                    continue;
                                 }
-                                continue;
+                                if (ENDUNITS.equals(data)) {
+                                    break;
+                                }
+                                readUnit(tile, data, spaceHolder);
                             }
-                            if (ENDUNITS.equals(data)) {
-                                break;
+
+                            while (myReader.hasNextLine()) {
+                                String data = myReader.nextLine();
+                                if (UNITDAMAGE.equals(data)) {
+                                    continue;
+                                }
+                                if (ENDUNITDAMAGE.equals(data)) {
+                                    break;
+                                }
+                                readUnitDamage(tile, data, spaceHolder);
                             }
-                            readUnit(tile, data, spaceHolder);
+
+                            while (myReader.hasNextLine()) {
+                                String data = myReader.nextLine();
+                                if (PLANET_TOKENS.equals(data)) {
+                                    continue;
+                                }
+                                if (PLANET_ENDTOKENS.equals(data)) {
+                                    break;
+                                }
+                                readPlanetTokens(tile, data, spaceHolder);
+                            }
                         }
 
                         while (myReader.hasNextLine()) {
                             String data = myReader.nextLine();
-                            if (UNITDAMAGE.equals(data)) {
+                            if (TOKENS.equals(data)) {
                                 continue;
                             }
-                            if (ENDUNITDAMAGE.equals(data)) {
+                            if (ENDTOKENS.equals(data)) {
                                 break;
                             }
-                            readUnitDamage(tile, data, spaceHolder);
-                        }
-
-                        while (myReader.hasNextLine()) {
-                            String data = myReader.nextLine();
-                            if (PLANET_TOKENS.equals(data)) {
-                                continue;
-                            }
-                            if (PLANET_ENDTOKENS.equals(data)) {
-                                break;
-                            }
-                            readPlanetTokens(tile, data, spaceHolder);
+                            readTokens(tile, data);
                         }
                     }
-
-                    while (myReader.hasNextLine()) {
-                        String data = myReader.nextLine();
-                        if (TOKENS.equals(data)) {
-                            continue;
-                        }
-                        if (ENDTOKENS.equals(data)) {
-                            break;
-                        }
-                        readTokens(tile, data);
-                    }
+                } catch (Exception e) {
+                    BotLogger.log("Data read error: " + mapFile.getName());
                 }
                 map.setTileMap(tileMap);
             } catch (FileNotFoundException e) {
                 BotLogger.log("File not found to read map data: " + mapFile.getName());
+            } catch (Exception e) {
+                BotLogger.log("Data read error: " + mapFile.getName());
             }
             return map;
         } else {
@@ -865,10 +874,12 @@ public class MapSaveLoadManager {
                         player.setPromissoryNote(id, index);
                     }
                 }
-                case Constants.PROMISSORY_NOTES_PLAY_AREA -> player.setPromissoryNotesInPlayArea(getCardList(tokenizer.nextToken()));
+                case Constants.PROMISSORY_NOTES_PLAY_AREA ->
+                        player.setPromissoryNotesInPlayArea(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS -> player.setPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
-                case Constants.PLANETS_ABILITY_EXHAUSTED -> player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
+                case Constants.PLANETS_ABILITY_EXHAUSTED ->
+                        player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));
@@ -884,13 +895,13 @@ public class MapSaveLoadManager {
                             leader.setTgCount(Integer.parseInt(split[2]));
                             leader.setExhausted(Boolean.parseBoolean(split[3]));
                             leader.setLocked(Boolean.parseBoolean(split[4]));
-                            if (split.length == 6){
+                            if (split.length == 6) {
                                 leader.setActive(Boolean.parseBoolean(split[5]));
                             }
                             leaderList.add(leader);
                         }
                         player.setLeaders(leaderList);
-                    } catch (Exception e){
+                    } catch (Exception e) {
                         BotLogger.log("Could not parse leaders loading map");
                     }
                 }
@@ -943,7 +954,7 @@ public class MapSaveLoadManager {
         StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
         String tileID = tokenizer.nextToken();
         String position = tokenizer.nextToken();
-        if (position.equals("mr")){
+        if (position.equals("mr")) {
             position = "0a";
         }
         return new Tile(tileID, position);

@@ -68,7 +68,7 @@ public class Statistics extends AdminSubcommandData {
                     Date date = new Date(map.getLastModifiedDate());
                     Date currentDate = new Date();
                     long time_difference = currentDate.getTime() - date.getTime();
-                    // Calucalte time difference in days
+                    // Calculate time difference in days
                     long days_difference = (time_difference / (1000 * 60 * 60 * 24)) % 365;
                     if (days_difference > 30) {
                         Integer maxVP = userVPs.values().stream().max(Integer::compareTo).orElse(0);
