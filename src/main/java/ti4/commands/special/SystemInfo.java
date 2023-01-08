@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -13,8 +12,8 @@ import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Objects;
 
 public class SystemInfo extends SpecialSubcommandData {
@@ -47,8 +46,61 @@ public class SystemInfo extends SpecialSubcommandData {
             if (representation == null){
                 representation = name;
             }
-            sb.append(representation).append("\n");
             UnitHolder unitHolder = entry.getValue();
+            sb.append(representation);
+            if (unitHolder instanceof Planet planet){
+                sb.append(" Resources: ").append(planet.getResources()).append("/").append(planet.getInfluence());
+
+                //commented as not all planets get traits still
+//                sb.append(" Trait: ");
+//                ArrayList<String> planetType = planet.getPlanetType();
+//                for (String type : planet.getPlanetType()) {
+//                    sb.append(type).append(" ");
+//                }
+            }
+            sb.append("\n");
+            boolean hasCC = false;
+            for (String cc : unitHolder.getCCList()) {
+                if (!hasCC){
+                    sb.append("Command Counters: ");
+                    hasCC = true;
+                }
+                addtFactionIcon(activeMap, sb, colorToId, cc);
+            }
+            if (hasCC) {
+                sb.append("\n");
+            }
+            boolean hasControl = false;
+            for (String control : unitHolder.getControlList()) {
+                if (!hasControl){
+                    sb.append("Control Counters: ");
+                    hasControl = true;
+                }
+                addtFactionIcon(activeMap, sb, colorToId, control);
+            }
+            if (hasControl) {
+                sb.append("\n");
+            }
+            boolean hasToken = false;
+            java.util.Map<String, String> tokensToName = Mapper.getTokensToName();
+            for (String token : unitHolder.getTokenList()) {
+                if (!hasToken){
+                    sb.append("Tokens: ");
+                    hasToken = true;
+                }
+                for (java.util.Map.Entry<String, String> entry_ : tokensToName.entrySet()) {
+                    String key = entry_.getKey();
+                    String value = entry_.getValue();
+                    if (token.contains(key)){
+                            sb.append(value).append(" ");
+
+                        }
+                    }
+            }
+            if (hasToken) {
+                sb.append("\n");
+            }
+
             HashMap<String, Integer> units = unitHolder.getUnits();
             for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
 
@@ -56,17 +108,7 @@ public class SystemInfo extends SpecialSubcommandData {
 
                 for (String unitRepresentationKey : unitRepresentation.keySet()) {
                     if (key.endsWith(unitRepresentationKey)) {
-                        for (java.util.Map.Entry<String, String> colorEntry : colorToId.entrySet()) {
-                            String colorKey = colorEntry.getKey();
-                            String color = colorEntry.getValue();
-                            if (key.contains(colorKey)){
-                                for (Player player_ : activeMap.getPlayers().values()) {
-                                    if (Objects.equals(player_.getColor(), color)) {
-                                        sb.append(Helper.getFactionIconFromDiscord(player_.getFaction())).append(" ").append(" (").append(color).append(") ");
-                                    }
-                                }
-                            }
-                        }
+                        addtFactionIcon(activeMap, sb, colorToId, key);
                         sb.append(unitRepresentation.get(unitRepresentationKey)).append(": ").append(unitEntry.getValue()).append("\n");
                     }
                 }
@@ -74,6 +116,20 @@ public class SystemInfo extends SpecialSubcommandData {
             sb.append("----------\n");
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+    }
+
+    private static void addtFactionIcon(Map activeMap, StringBuilder sb, java.util.Map<String, String> colorToId, String key) {
+        for (java.util.Map.Entry<String, String> colorEntry : colorToId.entrySet()) {
+            String colorKey = colorEntry.getKey();
+            String color = colorEntry.getValue();
+            if (key.contains(colorKey)){
+                for (Player player_ : activeMap.getPlayers().values()) {
+                    if (Objects.equals(player_.getColor(), color)) {
+                        sb.append(Helper.getFactionIconFromDiscord(player_.getFaction())).append(" ").append(" (").append(color).append(") ");
+                    }
+                }
+            }
+        }
     }
 
     @Override
