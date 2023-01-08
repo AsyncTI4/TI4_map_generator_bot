@@ -8,6 +8,7 @@ import ti4.commands.cards.CardsInfo;
 import ti4.commands.player.SendTG;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -94,7 +95,7 @@ public class PlayPN extends PNCardsSubcommandData {
         } 
 
         StringBuilder sb = new StringBuilder(SendTG.getPlayerRepresentation(event, player) + " played promissory note:\n");
-        sb.append(Helper.getFactionIconFromDiscord(pnOwner) +Helper.getEmojiFromDiscord("PN"));
+        sb.append(Helper.getFactionIconFromDiscord(pnOwner) + Emojis.PN);
         sb.append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
         
         MessageHelper.sendMessageToChannel(event, sb.toString());

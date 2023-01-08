@@ -3,6 +3,7 @@ package ti4.commands.explore;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
@@ -24,7 +25,7 @@ public class ShowRemainingRelics extends GenericRelicAction {
         if (allRelics.isEmpty()) {
             text = new StringBuilder("**RELIC DECK IS EMPTY**");
         } else {
-            text = new StringBuilder(Helper.getEmojiFromDiscord("relic")+ " **RELICS REMAINING IN DECK**\n");
+            text = new StringBuilder(Emojis.Relic + " **RELICS REMAINING IN DECK**\n");
             for (String relicId : allRelics) {
                 String[] relicData = Mapper.getRelic(relicId).split(";");
                 text.append("- ").append(relicData[0]).append("\n");

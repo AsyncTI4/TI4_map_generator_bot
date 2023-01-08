@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
@@ -27,7 +28,7 @@ public class RevealStage2 extends StatusSubcommandData {
         sb.append(Helper.getGamePing(event, activeMap)).append("\n");
         sb.append(" **Stage 2 Public Objective Revealed**").append("\n");
         sb.append("(").append(objective.getValue()).append(") ");
-        sb.append(Helper.getEmojiFromDiscord("Public2Alt"));
+        sb.append(Emojis.Public2alt);
         sb.append(Mapper.getPublicObjective(objective.getKey())).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
