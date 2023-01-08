@@ -9,6 +9,7 @@ import ti4.commands.player.SendTG;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -109,7 +110,7 @@ public class SentPN extends PNCardsSubcommandData {
         CardsInfo.sentUserCardInfo(event, activeMap, targetPlayer);
         CardsInfo.sentUserCardInfo(event, activeMap, player);
         String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-        String message = SendTG.getPlayerRepresentation(event, player) + " sent " + Helper.getEmojiFromDiscord("PN") + text + "PN to " + SendTG.getPlayerRepresentation(event, targetPlayer);
+        String message = SendTG.getPlayerRepresentation(event, player) + " sent " + Emojis.PN + text + "PN to " + SendTG.getPlayerRepresentation(event, targetPlayer);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
 
         //Turned off, as we might change back

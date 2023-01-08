@@ -15,6 +15,7 @@ import ti4.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -84,7 +85,7 @@ public class CardsInfo extends CardsSubcommandData {
             for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
                 Integer idValue = so.getValue();
                 String key = so.getKey();
-                sb.append(index).append(". (").append(idValue).append(") - ").append(Helper.getEmojiFromDiscord("secretobjective")).append(Mapper.getSecretObjective(key)).append("\n");
+                sb.append(index).append(". (").append(idValue).append(") - ").append(Emojis.SecretObjective).append(Mapper.getSecretObjective(key)).append("\n");
                 index++;
                 String soName = secretObjectivesJustNames.get(key);
                 if (soName != null) {
@@ -94,7 +95,7 @@ public class CardsInfo extends CardsSubcommandData {
         }
         sb.append("\n").append("**Scored Secret Objectives:**").append("\n");
         for (java.util.Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
-            sb.append(index).append(". (").append(so.getValue()).append(") - ").append(Helper.getEmojiFromDiscord("secretobjective")).append(Mapper.getSecretObjective(so.getKey())).append("\n");
+            sb.append(index).append(". (").append(so.getValue()).append(") - ").append(Emojis.SecretObjective).append(Mapper.getSecretObjective(so.getKey())).append("\n");
             index++;
         }
         soText = sb.toString();
@@ -109,7 +110,7 @@ public class CardsInfo extends CardsSubcommandData {
             for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                sb.append(index).append(". (").append(value).append(") - ").append(Helper.getEmojiFromDiscord("actioncard")).append(Mapper.getActionCard(key)).append("\n");
+                sb.append(index).append(". (").append(value).append(") - ").append(Emojis.ActionCard).append(Mapper.getActionCard(key)).append("\n");
                 index++;
                 String ac_name = Mapper.getActionCardName(key);
                 if (ac_name != null) {
@@ -126,7 +127,7 @@ public class CardsInfo extends CardsSubcommandData {
         if (promissoryNotes != null) {
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    sb.append(index).append(". (").append(pn.getValue()).append(") - ").append(Helper.getEmojiFromDiscord("pn"))
+                    sb.append(index).append(". (").append(pn.getValue()).append(") - ").append(Emojis.PN)
                             .append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
                     sb.append("\n");
                     index++;
@@ -136,7 +137,7 @@ public class CardsInfo extends CardsSubcommandData {
             sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    sb.append(index).append(". (").append(pn.getValue()).append(") - ").append(Helper.getEmojiFromDiscord("pn")).append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
+                    sb.append(index).append(". (").append(pn.getValue()).append(") - ").append(Emojis.PN).append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
                     sb.append("\n");
                     index++;
                 }
