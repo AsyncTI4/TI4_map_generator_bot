@@ -201,6 +201,22 @@ public class Mapper {
                 .collect(Collectors.toList());
     }
 
+    public static Map<String, String> getTokensToName() {
+        Map<String, String> tokensToName = new HashMap<>();
+        for (Map.Entry<Object, Object> attachment : attachment_tokens.entrySet()) {
+            String key = (String)attachment.getKey();
+            String value = (String)attachment.getValue();
+            tokensToName.put(value, key);
+        }
+
+        for (Map.Entry<Object, Object> tokens : tokens.entrySet()) {
+            String key = (String)tokens.getKey();
+            String value = (String)tokens.getValue();
+            tokensToName.put(value, key);
+        }
+        return tokensToName;
+    }
+
     public static String getSecretObjective(String id) {
         return (String) secretObjectives.get(id);
     }
