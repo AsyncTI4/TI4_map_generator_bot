@@ -18,6 +18,7 @@ public class Constants {
     public static final String CONFIRM = "confirm";
     public static final String SHUTDOWN = "shutdown";
     public static final String RESET_EMOJI_CACHE = "reset_emoji_cache";
+    public static final String STATISTICS = "statistics";
     public static final String LOG_MESSAGE = "log_message";
     public static final String SET_GAME = "set_game";
     public static final String SET_STATUS = "set_status";
