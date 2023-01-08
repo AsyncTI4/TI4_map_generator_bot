@@ -35,6 +35,7 @@ public class SCPick extends PlayerSubcommandData {
         int sc = player.getSC();
         String msg = "";
         String msgExtra = "";
+        boolean allPicked = true;
         if (sc != 0) {
             msg += Helper.getFactionIconFromDiscord(player.getFaction());
             msg += " " + player.getUserName();
@@ -45,7 +46,6 @@ public class SCPick extends PlayerSubcommandData {
             msg += " Picked: " + Helper.getSCEmojiFromInteger(sc) + Helper.getSCAsMention(sc);
 
             boolean nextCorrectPing = false;
-            boolean allPicked = true;
             Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
                     .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("white"))
                     .collect(Collectors.toList());
@@ -98,12 +98,15 @@ public class SCPick extends PlayerSubcommandData {
                 if (nextPlayer != null) {
                     msgExtra += " " + Helper.getPlayerPing(nextPlayer) + " is up for an action";
                 }
-                ListTurnOrder.turnOrder(event, activeMap);
             }           
         } else {
             msg = "No SC picked.";
         }
         MessageHelper.replyToMessage(event, msg);
+
+        if (allPicked){
+        ListTurnOrder.turnOrder(event, activeMap);
+        }
         if (!msgExtra.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), msgExtra);
         }
