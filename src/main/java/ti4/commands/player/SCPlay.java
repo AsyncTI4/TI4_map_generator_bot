@@ -70,14 +70,14 @@ public class SCPlay extends PlayerSubcommandData {
                 }
             }
             Button noFollowButton = Button.primary("sc_no_follow", "Not Following");
-
+            Button trade_primary = Button.success("trade_primary", "Resolve Primary");
             Button refresh = Button.secondary("sc_refresh", "Replenish Commodities");
             Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash");
             Button draw_2_ac = Button.secondary("sc_ac_draw", "Draw 2 Action Cards");
             Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective");
             ActionRow of;
             if (sc == 5){
-                of = ActionRow.of(followButton, noFollowButton, refresh, refresh_and_wash);
+                of = ActionRow.of(trade_primary, followButton, noFollowButton, refresh, refresh_and_wash);
             } else if (sc == 3){
                 of = ActionRow.of(followButton, noFollowButton, draw_2_ac);
             } else if (sc == 8){

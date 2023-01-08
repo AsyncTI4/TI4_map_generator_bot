@@ -378,14 +378,16 @@ public class Helper {
     }
 
     public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player) {
-        String text = "";
-        String playerFaction = player.getFaction();
-        text += Helper.getFactionIconFromDiscord(playerFaction);
-        text += " " + Helper.getPlayerPing(player);
+        return getPlayerRepresentation(player);
+    }
+
+    public static String getPlayerRepresentation(Player player) {
+        StringBuilder sb = new StringBuilder(Helper.getFactionIconFromDiscord(player.getFaction()));
+        sb.append(" ").append(Helper.getPlayerPing(player));
         if (player.getColor() != null) {
-            text += " _(" + player.getColor() + ")_";
+            sb.append(" _(").append(player.getColor()).append(")_");
         }
-        return text;
+        return sb.toString();
     }
 
     public static String getPlayerFactionLeaderEmoji(Player player, String leader) {

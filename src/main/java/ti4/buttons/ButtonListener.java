@@ -12,6 +12,7 @@ import ti4.commands.cards.PlayAC;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.status.ScorePublic;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -178,6 +179,19 @@ public class ButtonListener extends ListenerAdapter {
                     player.setCommodities(0);
                     addReaction(event, true, "Replenishing and washing", "");
                 }
+                case "trade_primary" -> {
+                    if (5 != player.getSC()){
+                        break;
+                    }
+                    boolean used = addUsedSCPlayer(messageID, player, event, "Trade Primary");
+                    if (used) {
+                        break;
+                    }
+                    int tg = player.getTg();
+                    player.setTg(tg + 3);
+                    player.setCommodities(player.getCommoditiesTotal());
+                    addReaction(event, true, "gained 3" + Emojis.tg + " and replenished commodities (" + String.valueOf(player.getCommodities()) + Emojis.comm + ")", "");
+                }
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
         }
@@ -268,7 +282,7 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
         boolean foundThread = false;
-        String text = Helper.getFactionIconFromDiscord(playerFaction) + " " + message;
+        String text = Helper.getPlayerRepresentation(player) + " " + message;
         if (!additionalMessage.isEmpty()) {
             text += Helper.getGamePing(event.getGuild(), activeMap) + " " + additionalMessage;
         }
