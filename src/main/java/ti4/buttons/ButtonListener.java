@@ -222,7 +222,7 @@ public class ButtonListener extends ListenerAdapter {
         } else {
             strategicCC--;
             player.setStrategicCC(strategicCC);
-            message = Helper.getPlayerPing(player) + " following SC, deducted 1 CC from Strategy Tokens";
+            message = " following SC, deducted 1 CC from Strategy Tokens";
         }
         return message;
     }
