@@ -74,7 +74,7 @@ public class ScorePublic extends StatusSubcommandData {
             poName = poName2;
             emojiName = Emojis.Public2alt;
         }
-        String message = Helper.getPlayerRepresentation(player) + " scored " + emojiName + " " + poName;
+        String message = Helper.getPlayerRepresentation(player) + " scored " + emojiName + " __**" + poName + "**__";
         MessageHelper.sendMessageToChannel(channel, message);
     }
 
