@@ -24,7 +24,7 @@ public class RefreshLeader extends LeaderAction {
             }
             int tgCount = playerLeader.getTgCount();
             refreshLeader(player, playerLeader);
-            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
+            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player))
                     .append(" readied ")
                     .append(playerLeader.getId()). append(" ")
                     .append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append(" ")

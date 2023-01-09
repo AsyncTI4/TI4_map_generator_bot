@@ -18,7 +18,7 @@ public class PurgeLeader extends LeaderAction {
         Leader playerLeader = player.getLeader(leader);
         boolean purged = player.removeLeader(leader);
         if (purged) {
-            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
+            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player))
                     .append(" purged ")
                     .append(playerLeader.getId()). append(" ")
                     .append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append(" ")

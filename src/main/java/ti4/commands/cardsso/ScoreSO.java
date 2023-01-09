@@ -50,7 +50,7 @@ public class ScoreSO extends SOCardsSubcommandData {
             MessageHelper.sendMessageToChannel(channel, "No such Secret Objective ID found, please retry");
             return;
         }
-        StringBuilder message = new StringBuilder(Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(player) + " (" + player.getColor() + ") scored Secret Objective: \n" + Emojis.SecretObjectiveAlt);
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player) + " scored Secret Objective: \n" + Emojis.SecretObjectiveAlt);
         for (java.util.Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;

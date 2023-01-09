@@ -90,7 +90,7 @@ public class ButtonListener extends ListenerAdapter {
         } else {
             switch (buttonID) {
                 case Constants.PO_NO_SCORING -> {
-                    String message = Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(player) + " (" + player.getColor() + ") No scoring.";
+                    String message = Helper.getPlayerRepresentation(player) + " - no scoring.";
                     MessageHelper.sendMessageToChannel(event.getChannel(), message);
                 }
                 case "sabotage" -> addReaction(event, true, "Sabotaging Action Card Play", " Sabotage played");
@@ -222,7 +222,7 @@ public class ButtonListener extends ListenerAdapter {
         } else {
             strategicCC--;
             player.setStrategicCC(strategicCC);
-            message = Helper.getPlayerPing(player) + " following SC, deducted 1 CC from Strategy Tokens";
+            message = " following SC, deducted 1 CC from Strategy Tokens";
         }
         return message;
     }

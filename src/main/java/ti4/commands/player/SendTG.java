@@ -48,16 +48,8 @@ public class SendTG extends PlayerSubcommandData {
             targetTG += sendTG;
             player_.setTg(targetTG);
 
-            MessageHelper.sendMessageToChannel(event.getChannel(), getPlayerRepresentation(event, player) + " sent " + sendTG + Emojis.tg + " trade goods to " + getPlayerRepresentation(event, player_));
+            MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(player) + " sent " + sendTG + Emojis.tg + " trade goods to " + Helper.getPlayerRepresentation(player_));
         }
-    }
-
-    public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player) {
-        String text = "";
-        String playerFaction = player.getFaction();
-        text += Helper.getFactionIconFromDiscord(playerFaction);
-        text += " " + Helper.getPlayerPing(player);
-        return text;
     }
 
     @Override

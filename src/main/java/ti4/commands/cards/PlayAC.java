@@ -87,7 +87,7 @@ public class PlayAC extends CardsSubcommandData {
         activeMap.discardActionCard(player.getUserID(), acIndex);
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getGamePing(guild, activeMap)).append(" ").append(activeMap.getName()).append("\n");
-        sb.append(Helper.getPlayerRepresentation(event, player)).append(" played an Action Card:\n");
+        sb.append(Helper.getPlayerRepresentation(player)).append(" played an Action Card:\n");
         sb.append(Emojis.ActionCard).append("__**").append(actionCardTitle).append("**__ (").append(actionCardPhase).append(" Phase)\n");
         sb.append(">  _").append(actionCardWindow).append(":_\n");
         sb.append(">  ").append(actionCardText).append("\n");

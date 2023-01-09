@@ -392,10 +392,6 @@ public class Helper {
         return userById.getAsMention();
     }
 
-    public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player) {
-        return getPlayerRepresentation(player);
-    }
-
     public static String getPlayerRepresentation(Player player) {
         StringBuilder sb = new StringBuilder(Helper.getFactionIconFromDiscord(player.getFaction()));
         sb.append(" ").append(Helper.getPlayerPing(player));

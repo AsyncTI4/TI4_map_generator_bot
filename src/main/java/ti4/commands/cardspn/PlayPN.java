@@ -94,7 +94,7 @@ public class PlayPN extends PNCardsSubcommandData {
             }
         } 
 
-        StringBuilder sb = new StringBuilder(SendTG.getPlayerRepresentation(event, player) + " played promissory note:\n");
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player) + " played promissory note:\n");
         sb.append(Helper.getFactionIconFromDiscord(pnOwner) + Emojis.PN);
         sb.append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
         
