@@ -1,6 +1,6 @@
 # Getting Started
 
-Hello Async TI Developers
+Hello Async TI Developers!
 
 Please test your changes before making a PR. See below for methods and examples of how to test:
 
