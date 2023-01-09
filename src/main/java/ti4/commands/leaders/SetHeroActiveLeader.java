@@ -43,7 +43,7 @@ public class SetHeroActiveLeader extends LeaderAction {
             return;
         }
 
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player))
         .append(" played ")
         .append(playerLeader.getId()).append(" ")
         .append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append(" ")
