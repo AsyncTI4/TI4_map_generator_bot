@@ -47,7 +47,7 @@ public class Stats extends PlayerSubcommandData {
             return;
         }
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(event, player) + " player stats changed:");
+        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(player) + " player stats changed:");
 
         OptionMapping optionCC = event.getOption(Constants.CC);
         OptionMapping optionT = event.getOption(Constants.TACTICAL);

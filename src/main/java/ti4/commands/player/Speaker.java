@@ -31,12 +31,7 @@ public class Speaker extends PlayerSubcommandData {
             return;
         }
         activeMap.setSpeaker(player.getUserID());
-        String msg = Emojis.SpeakerToken + "Speaker assigned to: " + Helper.getFactionIconFromDiscord(player.getFaction());
-        msg += " " + player.getUserName();
-        String color = player.getColor();
-        if (color != null) {
-            msg += " (" + color + ")";
-        }
+        String msg = Emojis.SpeakerToken + "Speaker assigned to: " + Helper.getPlayerRepresentation(player);
         MessageHelper.replyToMessage(event, msg);
     }
 

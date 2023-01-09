@@ -51,7 +51,7 @@ public class ListVoteCount extends AgendaSubcommandData {
             planets.removeAll(player.getExhaustedPlanets());
 
             String text = "";
-            text += Helper.getPlayerRepresentation(event, player);
+            text += Helper.getPlayerRepresentation(player);
             HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
             boolean bloodPactPn = false;
             boolean hasXxchaAlliance = false;

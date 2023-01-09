@@ -52,11 +52,7 @@ public class ListTurnOrder extends StatusSubcommandData {
             if (passed) {
                 text += "~~";
             }
-            text += Helper.getFactionIconFromDiscord(player.getFaction()); //TODO: Helper.getPlayerRepresentation vs SendTG.getPlayerRepresentation
-            text += " " + userName;
-            if (color != null) {
-                text += " (" + color + ")";
-            }
+            text += Helper.getPlayerRepresentation(player);
             if (passed) {
                 text += "~~ - PASSED";
             }
