@@ -38,12 +38,7 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
             scoredSecretObjective.remove(id);
         }
 
-        String color = player.getColor();
-        sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
-        sb.append(" (").append(player.getFaction()).append(")");
-        if (color != null) {
-            sb.append(" (").append(color).append(")");
-        }
+        sb.append(Helper.getPlayerRepresentation(player));
         sb.append("\n");
         sb.append("**Secret Objectives:**").append("\n");
         int index = 1;

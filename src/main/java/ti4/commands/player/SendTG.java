@@ -52,12 +52,9 @@ public class SendTG extends PlayerSubcommandData {
         }
     }
 
+    //Likely don't need this - replaced with Helper.getPlayerRepresentation
     public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player) {
-        String text = "";
-        String playerFaction = player.getFaction();
-        text += Helper.getFactionIconFromDiscord(playerFaction);
-        text += " " + Helper.getPlayerPing(player);
-        return text;
+        return Helper.getPlayerRepresentation(event, player);
     }
 
     @Override

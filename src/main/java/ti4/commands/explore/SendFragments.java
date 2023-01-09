@@ -75,6 +75,6 @@ public class SendFragments extends ExploreSubcommandData {
 		};
 
 		MessageHelper.replyToMessageTI4Logo(event);
-		MessageHelper.sendMessageToChannel(event.getChannel(), SendTG.getPlayerRepresentation(event, sender) + " sent " + trait + " " + Helper.getEmojiFromDiscord(emojiName) + " relic fragments to: " + SendTG.getPlayerRepresentation(event, reciever));
+		MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(sender) + " sent " + trait + " " + Helper.getEmojiFromDiscord(emojiName) + " relic fragments to: " + Helper.getPlayerRepresentation(reciever));
 	}
 }

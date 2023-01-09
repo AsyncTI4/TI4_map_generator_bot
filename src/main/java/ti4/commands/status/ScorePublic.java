@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
@@ -68,12 +69,12 @@ public class ScorePublic extends StatusSubcommandData {
         String emojiName = "";
         if (poName1 != null) {
             poName = poName1;
-            emojiName = "Public1Alt";
+            emojiName = Emojis.Public1alt;
         } else if (poName2 != null){
             poName = poName2;
-            emojiName = "Public2Alt";
+            emojiName = Emojis.Public2alt;
         }
-        String message = Helper.getFactionIconFromDiscord(player.getFaction()) + " " + Helper.getPlayerPing(player) + " (" + player.getColor() + ") scored " + Helper.getEmojiFromDiscord(emojiName) + " " + poName;
+        String message = Helper.getPlayerRepresentation(player) + " scored " + emojiName + " " + poName;
         MessageHelper.sendMessageToChannel(channel, message);
     }
 

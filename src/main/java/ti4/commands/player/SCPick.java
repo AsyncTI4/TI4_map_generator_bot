@@ -37,12 +37,7 @@ public class SCPick extends PlayerSubcommandData {
         String msgExtra = "";
         boolean allPicked = true;
         if (sc != 0) {
-            msg += Helper.getFactionIconFromDiscord(player.getFaction());
-            msg += " " + player.getUserName();
-            String color = player.getColor();
-            if (color != null) {
-                msg += " (" + color + ")";
-            }
+            msg += Helper.getPlayerRepresentation(player);
             msg += " Picked: " + Helper.getSCEmojiFromInteger(sc) + Helper.getSCAsMention(sc);
 
             boolean nextCorrectPing = false;
@@ -56,8 +51,7 @@ public class SCPick extends PlayerSubcommandData {
                     continue;
                 }
                 if (nextCorrectPing && player_.getSC() == 0 && player_.getFaction() != null) {
-                    msgExtra += Helper.getFactionIconFromDiscord(player_.getFaction());
-                    msgExtra += " " + Helper.getPlayerPing(player_) + " To Pick SC";
+                    msgExtra += Helper.getPlayerRepresentation(player_) + " To Pick SC";
                     allPicked = false;
                     break;
                 }

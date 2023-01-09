@@ -52,13 +52,7 @@ public class ShowAC extends CardsSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("---------\n");
         sb.append("Game: ").append(activeMap.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        String color = player.getColor();
-        sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
-        sb.append("(").append(player.getFaction()).append(")");
-        if (color != null) {
-            sb.append(" (").append(color).append(")");
-        }
+        sb.append("Player: ").append(Helper.getPlayerRepresentation(player));
         sb.append("\n");
         sb.append("Showed Action Cards:").append("\n");
         sb.append(Mapper.getActionCard(acID)).append("\n");
