@@ -168,8 +168,7 @@ public class Turn extends PlayerSubcommandData {
             int sc = player.getSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
                 String text = "";
-                text += Helper.getFactionIconFromDiscord(player.getFaction());
-                text += " " + Helper.getPlayerPing(player) + " UP NEXT";
+                text += Helper.getPlayerRepresentation(player) + " UP NEXT";
                 MessageHelper.sendMessageToChannel(event.getChannel(), text);
                 return;
             }

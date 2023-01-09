@@ -110,7 +110,7 @@ public class SentPN extends PNCardsSubcommandData {
         CardsInfo.sentUserCardInfo(event, activeMap, targetPlayer);
         CardsInfo.sentUserCardInfo(event, activeMap, player);
         String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-        String message = SendTG.getPlayerRepresentation(event, player) + " sent " + Emojis.PN + text + "PN to " + SendTG.getPlayerRepresentation(event, targetPlayer);
+        String message = Helper.getPlayerRepresentation(player) + " sent " + Emojis.PN + text + "PN to " + Helper.getPlayerRepresentation(targetPlayer);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
 
         //Turned off, as we might change back

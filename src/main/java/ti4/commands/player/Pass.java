@@ -23,8 +23,7 @@ public class Pass extends PlayerSubcommandData {
             return;
         }
         player.setPassed(true);
-        String text = Helper.getFactionIconFromDiscord(player.getFaction());
-        text += " " + player.getUserName() + " (" + player.getColor() + ") PASSED";
+        String text = Helper.getPlayerRepresentation(player) + " PASSED";
         MessageHelper.sendMessageToChannel(event.getChannel(), text);
         Turn.pingNextPlayer(event, activeMap, player);
     }
