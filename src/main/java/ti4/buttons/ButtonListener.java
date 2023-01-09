@@ -90,7 +90,11 @@ public class ButtonListener extends ListenerAdapter {
         } else {
             switch (buttonID) {
                 case Constants.PO_NO_SCORING -> {
-                    String message = Helper.getPlayerRepresentation(player) + " - no scoring.";
+                    String message = Helper.getPlayerRepresentation(player) + " - no Public Objective scored.";
+                    MessageHelper.sendMessageToChannel(event.getChannel(), message);
+                }
+                case Constants.SO_NO_SCORING -> {
+                    String message = Helper.getPlayerRepresentation(player) + " - no Secret Objective scored.";
                     MessageHelper.sendMessageToChannel(event.getChannel(), message);
                 }
                 case "sabotage" -> addReaction(event, true, "Sabotaging Action Card Play", " Sabotage played");

@@ -50,12 +50,17 @@ public class ScoreSO extends SOCardsSubcommandData {
             MessageHelper.sendMessageToChannel(channel, "No such Secret Objective ID found, please retry");
             return;
         }
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player) + " scored Secret Objective: \n" + Emojis.SecretObjectiveAlt);
+
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player) + " scored " + Emojis.SecretObjectiveAlt + " ");
         for (java.util.Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }
-            message.append(Mapper.getSecretObjective(entry.getKey())).append("\n");
+            String[] soText = Mapper.getSecretObjective(entry.getKey()).split(";");
+            String soName = soText[0];
+            String soPhase = soText[1];
+            String soDescription = soText[2];
+            message.append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
         }
         MessageHelper.sendMessageToChannel(channel, message.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player, buttonInteractionEvent);
