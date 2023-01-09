@@ -1,6 +1,7 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -12,6 +13,7 @@ import org.apache.commons.collections4.ListUtils;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -110,31 +112,39 @@ public class Turn extends PlayerSubcommandData {
                 if (po_name == null) {
                     Integer integer = customPublicVP.get(key);
                     if (integer != null) {
-                        po_name = key;
-                        poStatus = 2;
+                        if (key.toLowerCase().contains("custodian") || key.toLowerCase().contains("imperial")) {
+                            //Don't add it for now
+                        } else {
+                            po_name = key;
+                            poStatus = 2;
+                        }
                     }
                 }
                 if (po_name != null) {
                     Integer value = objective.getValue();
                     Button objectiveButton;
-                    if (poStatus == 0) {
-                        objectiveButton = Button.success(Constants.PO_SCORING + value, "(" + value + ") " + po_name);
+                    if (poStatus == 0) { //Stage 1 Objectives
+                        objectiveButton = Button.success(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromMarkdown(Emojis.Public1alt));
                         poButtons1.add(objectiveButton);
-                    } else if (poStatus == 1) {
-                        objectiveButton = Button.primary(Constants.PO_SCORING + value, "(" + value + ") " + po_name);
+                    } else if (poStatus == 1) { //Stage 2 Objectives
+                        objectiveButton = Button.primary(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromMarkdown(Emojis.Public2alt));
                         poButtons2.add(objectiveButton);
-                    } else {
+                    } else if (poStatus == 2) { //Other Objectives
                         objectiveButton = Button.secondary(Constants.PO_SCORING + value, "(" + value + ") " + po_name);
                         poButtonsCustom.add(objectiveButton);
+                    } else {
+
                     }
                 }
             }
 
-            Button noScoring = Button.danger(Constants.PO_NO_SCORING, "No Scoring");
+            Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "No PO Scored");
+            Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");
             poButtons.addAll(poButtons1);
             poButtons.addAll(poButtons2);
             poButtons.addAll(poButtonsCustom);
-            poButtons.add(noScoring);
+            poButtons.add(noPOScoring);
+            poButtons.add(noSOScoring);
             poButtons.removeIf(Objects::isNull);
             List<List<Button>> partitions = ListUtils.partition(poButtons, 5);
             List<ActionRow> actionRows = new ArrayList<>();
