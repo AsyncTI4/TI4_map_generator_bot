@@ -21,7 +21,9 @@ import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Helper {
 
@@ -486,5 +488,40 @@ public class Helper {
             msg += "(" + color + ") is over CC limit. CC used: " + ccCount;
             MessageHelper.replyToMessage(event, msg);
         }
+    }
+
+    /**
+     * @param map : ti4.map.Map object
+     * @return String : TTS/TTPG Map String
+     */
+    public static String getMapString(Map map) {
+        List<String> tilePositions;
+        if (map.getPlayerCountForMap() == 6) {
+            tilePositions = MapStringMapper.mapFor6Player;
+        } else if (map.getPlayerCountForMap() == 8) {
+            tilePositions = MapStringMapper.mapFor8Player;
+        } else {
+            return new String("at the current time, `/game get_map_string` is only supported for 6 and 8 player games");
+        }
+        List<String> sortedTilePositions = tilePositions.stream().sorted().collect(Collectors.toList());
+        
+        HashMap<String, Tile> tileMap = new HashMap<>(map.getTileMap());
+        StringBuilder sb = new StringBuilder("Map String: `");
+        for (String position : sortedTilePositions) {
+            Boolean missingTile = true;
+            for (Tile tile : tileMap.values()){
+                if (tile.getPosition().equals(position)){
+                    missingTile = false;
+                    sb.append(tile.getTileID());
+                } 
+            }
+            if (missingTile) {
+                sb.append("0");
+            }
+            sb.append(" ");
+        }     
+        sb.deleteCharAt(sb.length() - 1);
+        sb.append("`");
+        return sb.toString();
     }
 }
