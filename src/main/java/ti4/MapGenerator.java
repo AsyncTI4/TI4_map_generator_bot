@@ -121,6 +121,13 @@ public class MapGenerator {
 	       commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
 	       commandsC.queue();
        }
+
+       if (args.length == 5) {
+	       Guild guild3 = jda.getGuildById(args[4]);
+	       CommandListUpdateAction commandsD = guild3.updateCommands();
+	       commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
+	       commandsD.queue();
+       }
         //------------------------------------------------
 
 //        CommandListUpdateAction commands_ = jda.updateCommands();
