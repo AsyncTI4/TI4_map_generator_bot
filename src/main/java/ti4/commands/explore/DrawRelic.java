@@ -24,7 +24,7 @@ public class DrawRelic extends GenericRelicAction {
         }
         player.addRelic(relicID);
         String[] relicData = Mapper.getRelic(relicID).split(";");
-        String relicString =  Helper.getPlayerRepresentation(player) + " drew a Relic:\n" + Emojis.Relic + relicData[0] + " - " + relicData[1];
+        String relicString =  Helper.getPlayerRepresentation(event, player) + " drew a Relic:\n" + Emojis.Relic + relicData[0] + " - " + relicData[1];
         MessageHelper.replyToMessage(event, relicString);
     }
 }

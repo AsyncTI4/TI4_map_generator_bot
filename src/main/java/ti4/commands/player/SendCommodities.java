@@ -47,7 +47,7 @@ public class SendCommodities extends PlayerSubcommandData {
             int targetTG = player_.getTg();
             targetTG += sendCommodities;
             player_.setTg(targetTG);
-            MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(player) + " sent " + sendCommodities + Emojis.comm + " commodities to " + Helper.getPlayerRepresentation(player_));
+            MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(event, player) + " sent " + sendCommodities + Emojis.comm + " commodities to " + Helper.getPlayerRepresentation(player_));
         }
     }
 

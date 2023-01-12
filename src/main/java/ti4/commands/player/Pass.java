@@ -23,7 +23,7 @@ public class Pass extends PlayerSubcommandData {
             return;
         }
         player.setPassed(true);
-        String text = Helper.getPlayerRepresentation(player) + " PASSED";
+        String text = Helper.getPlayerRepresentation(event, player) + " PASSED";
         MessageHelper.sendMessageToChannel(event.getChannel(), text);
         Turn.pingNextPlayer(event, activeMap, player);
     }

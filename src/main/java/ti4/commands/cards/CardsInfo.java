@@ -71,7 +71,7 @@ public class CardsInfo extends CardsSubcommandData {
         sb.append("--------------------\n");
         sb.append("**Game: **").append(activeMap.getName()).append("\n");
         String color = player.getColor();
-        sb.append(Helper.getPlayerRepresentation(player));
+        sb.append(Helper.getPlayerRepresentation(event, player));
         sb.append("\n");
         sb.append("**Secret Objectives:**").append("\n");
         int index = 1;
