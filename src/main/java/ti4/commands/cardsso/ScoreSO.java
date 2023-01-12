@@ -51,7 +51,7 @@ public class ScoreSO extends SOCardsSubcommandData {
             return;
         }
 
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player) + " scored " + Emojis.SecretObjectiveAlt + " ");
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player) + " scored " + Emojis.SecretObjectiveAlt + " ");
         for (java.util.Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;

@@ -178,7 +178,7 @@ public class Turn extends PlayerSubcommandData {
             int sc = player.getSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
                 String text = "";
-                text += Helper.getPlayerRepresentation(player) + " UP NEXT";
+                text += Helper.getPlayerRepresentation(event, player) + " UP NEXT";
                 MessageHelper.sendMessageToChannel(event.getChannel(), text);
                 return;
             }

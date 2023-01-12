@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import ti4.MapGenerator;
 import ti4.ResourceHelper;
@@ -136,18 +137,12 @@ public class Helper {
         return simpleDateFormat.format(date);
     }
 
-    public static String getSCAsMention(int sc) {
-        return switch (sc) {
-            case 1 -> "<@&947965021168762890>";
-            case 2 -> "<@&947965277633650699>";
-            case 3 -> "<@&947965381488807956>";
-            case 4 -> "<@&947965493376061441>";
-            case 5 -> "<@&947965546660495381>";
-            case 6 -> "<@&947965592013525022>";
-            case 7 -> "<@&947965632933146634>";
-            case 8 -> "<@&947965671394906172>";
-            default -> "**" + sc + "**";
-        };
+    public static String getRoleMentionByName(Guild guild,  String roleName) {
+        List<Role> roles = guild.getRolesByName(roleName, true);
+        if (!roles.isEmpty()){
+            return roles.get(0).getAsMention();
+        } 
+        return "[@" + roleName + "]";
     }
 
     public static String getColourAsMention(String colour) {
@@ -163,6 +158,32 @@ public class Helper {
             case "black" -> "<@&1061551792128806962>";
             default -> "(" + colour + ")";
         };
+    }
+
+    public static String getColourAsMention(Guild guild, String colour) {
+        return getRoleMentionByName(guild, colour);
+    }
+
+    public static String getSCAsMention(int sc) {
+        return switch (sc) {
+            case 1 -> "<@&947965021168762890>";
+            case 2 -> "<@&947965277633650699>";
+            case 3 -> "<@&947965381488807956>";
+            case 4 -> "<@&947965493376061441>";
+            case 5 -> "<@&947965546660495381>";
+            case 6 -> "<@&947965592013525022>";
+            case 7 -> "<@&947965632933146634>";
+            case 8 -> "<@&947965671394906172>";
+            default -> "**" + sc + "**";
+        };
+    }
+
+    public static String getSCAsMention(Guild guild, int sc) {
+        return getRoleMentionByName(guild, getSCName(sc));
+    }
+
+    public static String getSCAsMention(Guild guild, String scname) {
+        return getRoleMentionByName(guild, scname);
     }
 
     public static String getSCName(int sc) {
@@ -401,6 +422,27 @@ public class Helper {
             sb.append(" _").append(getColourAsMention(player.getColor())).append("_");
         }
         return sb.toString();
+    }
+
+    public static String getPlayerRepresentation(Guild guild, Player player) {
+        StringBuilder sb = new StringBuilder(Helper.getFactionIconFromDiscord(player.getFaction()));
+        sb.append(" ").append(Helper.getPlayerPing(player));
+        if (player.getColor() != null) {
+            sb.append(" _").append(getColourAsMention(guild, player.getColor())).append("_");
+        }
+        return sb.toString();
+    }
+
+    public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player) {
+        return getPlayerRepresentation(event.getGuild(), player);
+    }
+
+    public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player) {
+        return getPlayerRepresentation(event.getGuild(), player);
+    }
+
+    public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player) {
+        return getPlayerRepresentation(event.getGuild(), player);
     }
 
     public static String getPlayerFactionLeaderEmoji(Player player, String leader) {
