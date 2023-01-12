@@ -36,7 +36,12 @@ public class SystemInfo extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Tile not found");
             return;
         }
+        String tileName = tile.getTilePath();
+        tileName = tileName.substring(tileName.indexOf("_") + 1);
+        tileName = tileName.substring(0, tileName.indexOf(".png"));
+        tileName = " - " + tileName + "[" + tile.getTileID() + "]";
         StringBuilder sb = new StringBuilder();
+        sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
         java.util.Map<String, String> unitRepresentation = Mapper.getUnits();
         HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         java.util.Map<String, String> colorToId = Mapper.getColorToId();
