@@ -2,6 +2,7 @@ package ti4.message;
 
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import ti4.MapGenerator;
 
 import java.util.List;
@@ -20,7 +21,7 @@ public class BotLogger {
     }
 
     public static void log(String msg) {
-        log(null, msg);
+        log((SlashCommandInteractionEvent) null, msg);
     }
     public static void log(SlashCommandInteractionEvent event, String msg) {
         if (channel != null) {
@@ -28,6 +29,17 @@ public class BotLogger {
                 String channelName = event.getChannel().getName();
                 String commandString = event.getCommandString();
                 channel.sendMessage(channelName + " [" + commandString + " ] " + msg).queue();
+            } else {
+                channel.sendMessage(msg).queue();
+            }
+        }
+    }
+
+    public static void log(ButtonInteractionEvent event, String msg) {
+        if (channel != null) {
+            if (event != null) {
+                String channelName = event.getChannel().getName();
+                channel.sendMessage(channelName + " [button pressed] " + msg).queue();
             } else {
                 channel.sendMessage(msg).queue();
             }
