@@ -48,6 +48,7 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
 
+        BotLogger.log(event, buttonID);
         String gameName = event.getChannel().getName();
         gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
         gameName = gameName.substring(0, gameName.indexOf("-"));
