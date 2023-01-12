@@ -433,15 +433,27 @@ public class Helper {
         return sb.toString();
     }
 
+    @CheckForNull
     public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player) {
+        if (event == null) {
+            return getPlayerRepresentation(player);
+        }
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
+    @CheckForNull
     public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player) {
+        if (event == null) {
+            return getPlayerRepresentation(player);
+        }
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
+    @CheckForNull
     public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player) {
+        if (event == null) {
+            return getPlayerRepresentation(player);
+        }
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
