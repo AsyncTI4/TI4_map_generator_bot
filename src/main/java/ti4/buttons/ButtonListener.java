@@ -81,7 +81,7 @@ public class ButtonListener extends ListenerAdapter {
             String poID = buttonID.replace(Constants.PO_SCORING, "");
             try {
                 int poIndex = Integer.parseInt(poID);
-                ScorePublic.scorePO(event.getChannel(), activeMap, player, poIndex);
+                ScorePublic.scorePO(event, event.getChannel(), activeMap, player, poIndex);
             } catch (Exception e) {
                 BotLogger.log("Could not parse PO ID: " + poID);
                 event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.").queue();
@@ -90,11 +90,11 @@ public class ButtonListener extends ListenerAdapter {
         } else {
             switch (buttonID) {
                 case Constants.PO_NO_SCORING -> {
-                    String message = Helper.getPlayerRepresentation(player) + " - no Public Objective scored.";
+                    String message = Helper.getPlayerRepresentation(event, player) + " - no Public Objective scored.";
                     MessageHelper.sendMessageToChannel(event.getChannel(), message);
                 }
                 case Constants.SO_NO_SCORING -> {
-                    String message = Helper.getPlayerRepresentation(player) + " - no Secret Objective scored.";
+                    String message = Helper.getPlayerRepresentation(event, player) + " - no Secret Objective scored.";
                     MessageHelper.sendMessageToChannel(event.getChannel(), message);
                 }
                 case "sabotage" -> addReaction(event, true, "Sabotaging Action Card Play", " Sabotage played");
@@ -286,7 +286,7 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
         boolean foundThread = false;
-        String text = Helper.getPlayerRepresentation(player) + " " + message;
+        String text = Helper.getPlayerRepresentation(event, player) + " " + message;
         if (!additionalMessage.isEmpty()) {
             text += Helper.getGamePing(event.getGuild(), activeMap) + " " + additionalMessage;
         }

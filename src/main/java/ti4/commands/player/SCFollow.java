@@ -35,7 +35,7 @@ public class SCFollow extends PlayerSubcommandData {
         }
         strategicCC--;
         player.setStrategicCC(strategicCC);
-        String message = Helper.getPlayerRepresentation(player) + " following SC, deducted 1 CC from Strategy Tokens";
+        String message = Helper.getPlayerRepresentation(event, player) + " following SC, deducted 1 CC from Strategy Tokens";
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 
