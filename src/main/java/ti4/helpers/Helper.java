@@ -142,7 +142,7 @@ public class Helper {
         if (!roles.isEmpty()){
             return roles.get(0).getAsMention();
         } 
-        return ""; 
+        return "[@" + roleName + "]";
     }
 
     public static String getColourAsMention(String colour) {
