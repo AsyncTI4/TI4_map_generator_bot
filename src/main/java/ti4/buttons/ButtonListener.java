@@ -48,7 +48,7 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
 
-        BotLogger.log(event, buttonID);
+        // BotLogger.log(event, buttonID);
         String gameName = event.getChannel().getName();
         gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
         gameName = gameName.substring(0, gameName.indexOf("-"));
@@ -62,7 +62,7 @@ public class ButtonListener extends ListenerAdapter {
                     } catch (Exception e) {
                         BotLogger.log(event, "Could not parse AC ID: " + acID);
                         event.getChannel().sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
-                        MessageHelper.sendMessageToChannel(event.getChannel(), ExceptionUtils.getStackTrace(e));
+                        // MessageHelper.sendMessageToChannel(event.getChannel(), ExceptionUtils.getStackTrace(e));
                         return;
                     }
                     break;
@@ -79,7 +79,7 @@ public class ButtonListener extends ListenerAdapter {
                     } catch (Exception e) {
                         BotLogger.log(event, "Could not parse SO ID: " + soID);
                         event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.").queue();
-                        MessageHelper.sendMessageToChannel(event.getChannel(), ExceptionUtils.getStackTrace(e));
+                        // MessageHelper.sendMessageToChannel(event.getChannel(), ExceptionUtils.getStackTrace(e));
                         return;
                     }
                     break;
