@@ -37,8 +37,8 @@ public class SCPick extends PlayerSubcommandData {
         String msgExtra = "";
         boolean allPicked = true;
         if (sc != 0) {
-            msg += Helper.getPlayerRepresentation(player);
-            msg += " Picked: " + Helper.getSCEmojiFromInteger(sc) + Helper.getSCAsMention(sc);
+            msg += Helper.getPlayerRepresentation(event, player);
+            msg += " Picked: " + Helper.getSCEmojiFromInteger(sc) + Helper.getSCAsMention(event.getGuild(), sc);
 
             boolean nextCorrectPing = false;
             Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
