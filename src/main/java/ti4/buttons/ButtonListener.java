@@ -20,7 +20,7 @@ import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -57,7 +57,14 @@ public class ButtonListener extends ListenerAdapter {
             String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
             for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
                 if (textChannel_.getName().equals(gameName + "-actions")) {
-                    PlayAC.playAC(null, cardMap, player, acID, textChannel_, event.getGuild(), event);
+                    try {
+                        PlayAC.playAC(null, cardMap, player, acID, textChannel_, event.getGuild(), event);
+                    } catch (Exception e) {
+                        BotLogger.log(event, "Could not parse AC ID: " + acID);
+                        event.getChannel().sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
+                        event.getChannel().sendMessage(ExceptionUtils.getStackTrace(e));
+                        return;
+                    }
                     break;
                 }
             }
@@ -70,11 +77,11 @@ public class ButtonListener extends ListenerAdapter {
 
                         ScoreSO.scoreSO(null, cardMap, player, soIndex, textChannel_, event);
                     } catch (Exception e) {
-                        BotLogger.log("Could not parse SO ID: " + soID);
+                        BotLogger.log(event, "Could not parse SO ID: " + soID);
                         event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.").queue();
+                        event.getChannel().sendMessage(ExceptionUtils.getStackTrace(e));
                         return;
                     }
-
                     break;
                 }
             }
