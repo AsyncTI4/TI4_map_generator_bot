@@ -19,6 +19,7 @@ import ti4.message.MessageHelper;
 import javax.annotation.CheckForNull;
 import java.awt.*;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -549,24 +550,33 @@ public class Helper {
      * @return String : TTS/TTPG Map String
      */
     public static String getMapString(Map map) {
-        List<String> tilePositions;
+        List<String> tilePositions = new ArrayList<String>();
+        tilePositions.add("0a");
         if (map.getPlayerCountForMap() == 6) {
-            tilePositions = MapStringMapper.mapFor6Player;
+            tilePositions.addAll(MapStringMapper.mapFor6Player);
         } else if (map.getPlayerCountForMap() == 8) {
-            tilePositions = MapStringMapper.mapFor8Player;
+            tilePositions.addAll(MapStringMapper.mapFor8Player);
         } else {
             return new String("at the current time, `/game get_map_string` is only supported for 6 and 8 player games");
         }
         List<String> sortedTilePositions = tilePositions.stream().sorted().collect(Collectors.toList());
         
         HashMap<String, Tile> tileMap = new HashMap<>(map.getTileMap());
-        StringBuilder sb = new StringBuilder("Map String: `");
+        StringBuilder sb = new StringBuilder();
         for (String position : sortedTilePositions) {
             Boolean missingTile = true;
             for (Tile tile : tileMap.values()){
                 if (tile.getPosition().equals(position)){
+                    String tileID = tile.getTileID();
+                    if (position.equalsIgnoreCase("0a") && tileID.equalsIgnoreCase("18")) { //Mecatol Rex in Centre Position
+                        //do nothing!
+                    } else if (position.equalsIgnoreCase("0a") && !tileID.equalsIgnoreCase("18")) { //Something else is in the Centre Position
+                        sb.append("{").append(tileID).append("}");
+                    } else {
+                        sb.append(tileID);
+                    }
                     missingTile = false;
-                    sb.append(tile.getTileID());
+                    break;
                 } 
             }
             if (missingTile) {
@@ -574,8 +584,8 @@ public class Helper {
             }
             sb.append(" ");
         }     
-        sb.deleteCharAt(sb.length() - 1);
-        sb.append("`");
+        return sb.toString().trim();
+    }
         return sb.toString();
     }
 }
