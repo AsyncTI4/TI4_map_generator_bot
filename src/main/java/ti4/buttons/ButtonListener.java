@@ -33,16 +33,17 @@ public class ButtonListener extends ListenerAdapter {
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
         event.deferEdit().queue();
-        MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), "button");
+        String id = event.getUser().getId();
+        MessageListener.setActiveGame(event.getMessageChannel(), id, "button");
         String buttonID = event.getButton().getId();
         if (buttonID == null) {
             event.getChannel().sendMessage("Button command not found").queue();
             return;
         }
         String messageID = event.getMessage().getId();
-        String id = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(id);
-        Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
+        Player player = activeMap.getPlayer(id);
+        player = Helper.getGamePlayer(activeMap, player, event.getMember(), id);
         if (player == null) {
             event.getChannel().sendMessage("You're not a player of the game").queue();
             return;
