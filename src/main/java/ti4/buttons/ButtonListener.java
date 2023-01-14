@@ -50,9 +50,7 @@ public class ButtonListener extends ListenerAdapter {
         }
 
         // BotLogger.log(event, buttonID);
-        String gameName = event.getChannel().getName();
-        gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
-        gameName = gameName.substring(0, gameName.indexOf("-"));
+        String gameName = activeMap.getName();
         Map cardMap = MapManager.getInstance().getMap(gameName);
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
             String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
