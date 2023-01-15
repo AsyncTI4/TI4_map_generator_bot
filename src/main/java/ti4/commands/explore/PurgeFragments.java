@@ -25,7 +25,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 		addOptions(typeOption.setRequired(true), 
 				new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA or black market forgery)"));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
-		addOptions(new OptionData(OptionType.STRING, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"));
+		addOptions(new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"));
 	}
 
 	@Override
@@ -71,13 +71,14 @@ public class PurgeFragments extends ExploreSubcommandData {
 			activePlayer.removeFragment(id);
 		}
 
-		String message = "Fragments purged: " + fragmentsToPurge.toString();
+		String message = Helper.getPlayerRepresentation(event, activePlayer) + " purged fragments: " + fragmentsToPurge.toString();
 		MessageHelper.replyToMessage(event, message);
 
 		OptionMapping drawRelicOption = event.getOption(Constants.ALSO_DRAW_RELIC);
-		if (drawRelicOption.getAsBoolean()) {
-			BotLogger.log(event, "Draw a relic! To be implemented");
-			DrawRelic.drawRelicAndNotify(activePlayer, event, activeMap);
+		if (drawRelicOption != null) {
+			if (drawRelicOption.getAsBoolean()) {
+				DrawRelic.drawRelicAndNotify(activePlayer, event, activeMap);
+			}
 		}
 	}
 	
