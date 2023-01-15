@@ -106,7 +106,7 @@ public class ListVoteCount extends AgendaSubcommandData {
                     text += "(+" + map.getPlayers().keySet().size() + " votes for Zeal)";
                 }
                 if (bloodPactPn) {
-                    text += "(Blood Pact +4 votes)";
+                    text += "(+4 votes for Blood Pact )";
                 }
                 //Predictive Intelligence
                 if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
