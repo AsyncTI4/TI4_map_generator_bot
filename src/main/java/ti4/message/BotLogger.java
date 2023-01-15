@@ -16,14 +16,15 @@ public class BotLogger {
             if ("bot-log".equals(textChannel.getName())) {
                 channel = textChannel;
             }
-
         }
     }
 
     public static void log(String msg) {
         log((SlashCommandInteractionEvent) null, msg);
     }
+
     public static void log(SlashCommandInteractionEvent event, String msg) {
+        System.out.print(msg);
         if (channel != null) {
             if (event != null) {
                 String channelName = event.getChannel().getName();
@@ -36,6 +37,7 @@ public class BotLogger {
     }
 
     public static void log(ButtonInteractionEvent event, String msg) {
+        System.out.print(msg);
         if (channel != null) {
             if (event != null) {
                 String channelName = event.getChannel().getName();

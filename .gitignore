@@ -7,3 +7,7 @@ localtesting.sh
 tibot.jar
 .vscode/settings.json
 .settings/org.eclipse.jdt.apt.core.prefs
+.settings/org.eclipse.jdt.core.prefs
+*.code-workspace
+*.ps1
+launch.json

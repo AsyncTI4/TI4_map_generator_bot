@@ -7,6 +7,8 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Set;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 public class MapFileDeleter {
     public static Set<File> filesToDelete = new HashSet<>();
 
@@ -15,12 +17,16 @@ public class MapFileDeleter {
             file.delete();
         }
         File mapImageDirectory = Storage.getMapImageDirectory();
-        for (File file : mapImageDirectory.listFiles()) {
-            String absolutePath = file.getAbsolutePath();
-            if (absolutePath.endsWith(Constants.JPG) ||
-                    absolutePath.endsWith(Constants.PNG)) {
-                file.delete();
+        try {
+            for (File file : mapImageDirectory.listFiles()) {
+                String absolutePath = file.getAbsolutePath();
+                if (absolutePath.endsWith(Constants.JPG) ||
+                        absolutePath.endsWith(Constants.PNG)) {
+                    file.delete();
+                }
             }
+        } catch (Exception e) {
+            System.out.println(ExceptionUtils.getStackTrace(e));
         }
     }
 
