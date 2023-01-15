@@ -586,6 +586,4 @@ public class Helper {
         }     
         return sb.toString().trim();
     }
-        return sb.toString();
-    }
 }
