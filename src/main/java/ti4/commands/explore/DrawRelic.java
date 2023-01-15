@@ -1,11 +1,11 @@
 package ti4.commands.explore;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.player.SendTG;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -17,14 +17,32 @@ public class DrawRelic extends GenericRelicAction {
 
     @Override
     public void doAction(Player player, SlashCommandInteractionEvent event) {
-        String relicID = getActiveMap().drawRelic();
+        Map activeMap = getActiveMap();
+        String relicID = activeMap.drawRelic();
         if (relicID.isEmpty()) {
             MessageHelper.replyToMessage(event, "Relic deck is empty");
             return;
         }
         player.addRelic(relicID);
         String[] relicData = Mapper.getRelic(relicID).split(";");
-        String relicString =  Helper.getPlayerRepresentation(event, player) + " drew a Relic:\n" + Emojis.Relic + relicData[0] + " - " + relicData[1];
-        MessageHelper.replyToMessage(event, relicString);
+        StringBuilder message = new StringBuilder();
+        message.append(Helper.getPlayerRepresentation(event, player)).append(" drew a Relic:\n").append(Emojis.Relic).append(" __**").append(relicData[0]).append("**__\n> ").append(relicData[1]).append("\n");
+       
+        //Append helpful commands after relic draws and resolve effects:
+        switch (relicID) {
+            case ("nanoforge"):
+                message.append("Run the following commands to use Nanoforge:\n")
+                       .append("     `/explore relic_purge relic: nanoforge`\n")
+                       .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
+                break;
+            case ("shard"):
+                 Integer poIndex = activeMap.addCustomPO("Shard of the Throne", 1);
+                activeMap.scorePublicObjective(player.getUserID(), poIndex);
+                message.append("Custom PO 'Shard of the Throne' has been added.\n")
+                       .append(Helper.getPlayerRepresentation(event, player)).append(" scored 'Shard of the Throne'");
+                break;
+            }
+
+        MessageHelper.replyToMessage(event, message.toString());
     }
 }
