@@ -18,6 +18,10 @@ public class DrawRelic extends GenericRelicAction {
     @Override
     public void doAction(Player player, SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
+        drawRelicAndNotify(player, event, activeMap);
+    }
+
+    public static void drawRelicAndNotify(Player player, SlashCommandInteractionEvent event, Map activeMap) {
         String relicID = activeMap.drawRelic();
         if (relicID.isEmpty()) {
             MessageHelper.replyToMessage(event, "Relic deck is empty");

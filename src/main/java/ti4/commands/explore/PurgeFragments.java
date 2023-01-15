@@ -8,21 +8,24 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.explore.DrawRelic;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.generator.Mapper;
 
 public class PurgeFragments extends ExploreSubcommandData {
 
 	public PurgeFragments() {
-		super(Constants.PURGE_FRAGMENTS, "Purge a number of relic fragments to gain a relic (can use unknown fragments)");
+		super(Constants.PURGE_FRAGMENTS, "Purge a number of relic fragments (for example, to gain a relic. Can use unknown fragments)");
 		addOptions(typeOption.setRequired(true), 
 				new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA or black market forgery)"));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+		addOptions(new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"));
 	}
 
 	@Override
@@ -67,8 +70,16 @@ public class PurgeFragments extends ExploreSubcommandData {
 		for (String id : fragmentsToPurge) {
 			activePlayer.removeFragment(id);
 		}
-		
-		MessageHelper.replyToMessage(event, "Fragments purged: "+fragmentsToPurge.toString());
+
+		String message = Helper.getPlayerRepresentation(event, activePlayer) + " purged fragments: " + fragmentsToPurge.toString();
+		MessageHelper.replyToMessage(event, message);
+
+		OptionMapping drawRelicOption = event.getOption(Constants.ALSO_DRAW_RELIC);
+		if (drawRelicOption != null) {
+			if (drawRelicOption.getAsBoolean()) {
+				DrawRelic.drawRelicAndNotify(activePlayer, event, activeMap);
+			}
+		}
 	}
 	
 }
