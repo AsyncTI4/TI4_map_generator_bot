@@ -272,6 +272,7 @@ public class Constants {
     public static final String RELIC_DRAW_SPECIFIC = "relic_draw_specific";
     public static final String DRAW = "draw";
     public static final String RELIC_DRAW = "relic_draw";
+    public static final String ALSO_DRAW_RELIC = "also_draw_relic";
     public static final String RELIC_EXHAUST = "relic_exhaust";
     public static final String RELIC_REFRESH = "relic_ready";
     public static final String RELIC_PURGE = "relic_purge";
