@@ -7,3 +7,7 @@ localtesting.sh
 tibot.jar
 .vscode/settings.json
 .settings/org.eclipse.jdt.apt.core.prefs
+.vscode/launch.json
+.settings/org.eclipse.jdt.core.prefs
+TI4_map_generator_bot.code-workspace
+docker_run.ps1
