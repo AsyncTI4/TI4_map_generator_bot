@@ -77,8 +77,10 @@ public class AddTileList implements Command {
                 userActiveMap.setTile(tile);
                 tile = new Tile(AliasHandler.resolveTile(Constants.MALLICE), "TL");
                 userActiveMap.setTile(tile);
-                tile = new Tile(AliasHandler.resolveTile(Constants.MR), "0a");
-                userActiveMap.setTile(tile);
+                if (!tileList.startsWith("{") && !tileList.contains("}")) {
+                    tile = new Tile(AliasHandler.resolveTile(Constants.MR), "0a");
+                    userActiveMap.setTile(tile);
+                }
             }catch (Exception e){
                 BotLogger.log("Could not add setup and Mallice tiles");
             }
