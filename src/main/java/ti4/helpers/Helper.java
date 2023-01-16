@@ -439,6 +439,9 @@ public class Helper {
         if (event == null) {
             return getPlayerRepresentation(player);
         }
+        if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
+            return getColourAsMention(event.getGuild(), player.getColor());
+        }
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
@@ -447,6 +450,9 @@ public class Helper {
         if (event == null) {
             return getPlayerRepresentation(player);
         }
+        if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
+            return getColourAsMention(event.getGuild(), player.getColor());
+        }
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
@@ -454,6 +460,9 @@ public class Helper {
     public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player) {
         if (event == null) {
             return getPlayerRepresentation(player);
+        }
+        if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
+            return getColourAsMention(event.getGuild(), player.getColor());
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }

@@ -3,6 +3,7 @@ package ti4.commands.status;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -59,7 +60,7 @@ public class ListTurnOrder extends StatusSubcommandData {
                 }
                 
                 if(player.getUserID().equals(map.getSpeaker())) {
-                    text += " <:Speakertoken:965363466821050389>";
+                    text += " " + Emojis.SpeakerToken;
                 }
                 
                 order.put(sc, text);
@@ -82,6 +83,8 @@ public class ListTurnOrder extends StatusSubcommandData {
                 }
             }
             MessageHelper.replyToMessage(event, msg.toString());
+        } else {
+            MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup community_mode = YES`");
         }
     }
 
