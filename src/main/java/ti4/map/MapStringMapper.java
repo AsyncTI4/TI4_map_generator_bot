@@ -25,19 +25,16 @@ public class MapStringMapper {
         if (userActiveMap != null && userActiveMap.getPlayerCountForMap() == 8) {
             mapForPlayers = mapFor8Player;
         }
-        if (tokenizer.countTokens() == mapForPlayers.size()) {
-            int index = 0;
-            while (tokenizer.hasMoreTokens()) {
-                String tileID = tokenizer.nextToken();
-                if (tileID.startsWith("{") && tileID.endsWith("}"))
-                {
-                    tileID = tileID.replace("{", "").replace("}", "");
-                    mappedTiles.put("a0", AliasHandler.resolveTile(tileID));
-                    continue;
-                }
-                mappedTiles.put(mapForPlayers.get(index), AliasHandler.resolveTile(tileID));
-                index++;
+        int index = 0;
+        while (tokenizer.hasMoreTokens()) {
+            String tileID = tokenizer.nextToken();
+            if (tileID.startsWith("{") && tileID.endsWith("}")) {
+                tileID = tileID.replace("{", "").replace("}", "");
+                mappedTiles.put("a0", AliasHandler.resolveTile(tileID));
+                continue;
             }
+            mappedTiles.put(mapForPlayers.get(index), AliasHandler.resolveTile(tileID));
+            index++;
         }
         return mappedTiles;
     }
