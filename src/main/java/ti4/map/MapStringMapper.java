@@ -29,6 +29,12 @@ public class MapStringMapper {
             int index = 0;
             while (tokenizer.hasMoreTokens()) {
                 String tileID = tokenizer.nextToken();
+                if (tileID.startsWith("{") && tileID.endsWith("}"))
+                {
+                    tileID = tileID.replace("{", "").replace("}", "");
+                    mappedTiles.put("a0", AliasHandler.resolveTile(tileID));
+                    continue;
+                }
                 mappedTiles.put(mapForPlayers.get(index), AliasHandler.resolveTile(tileID));
                 index++;
             }
