@@ -23,64 +23,66 @@ public class ListTurnOrder extends StatusSubcommandData {
     }
 
     public static void turnOrder(SlashCommandInteractionEvent event, Map map) {
-        HashMap<Integer, String> order = new HashMap<>();
-        int naaluSC = 0;
-        for (Player player : map.getPlayers().values()) {
-            if (player.getFaction() == null || "null".equals(player.getFaction()) ||
-                player.getColor() == null || player.getColor().equals("white")){
-                continue;
+        if (!map.isCommunityMode()) { //Only send turn_order if not community mode
+            HashMap<Integer, String> order = new HashMap<>();
+            int naaluSC = 0;
+            for (Player player : map.getPlayers().values()) {
+                if (player.getFaction() == null || "null".equals(player.getFaction()) ||
+                    player.getColor() == null || player.getColor().equals("white")){
+                    continue;
+                }
+                int sc = player.getSC();
+                String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
+                if (scNumberIfNaaluInPlay.startsWith("0/")) {
+                    naaluSC = sc;
+                }
+                boolean passed = player.isPassed();
+                String userName = player.getUserName();
+                String color = player.getColor();
+                HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
+                Boolean found = scPlayed.get(sc);
+                boolean isPlayed = found != null ? found : false;
+                String text = "";
+                if (isPlayed) {
+                    text += "~~";
+                }
+                text += Helper.getSCEmojiFromInteger(sc) + Helper.getSCAsMention(event.getGuild(), sc);
+                if (isPlayed) {
+                    text += "~~";
+                }
+                if (passed) {
+                    text += "~~";
+                }
+                text += Helper.getPlayerRepresentation(event, player);
+                if (passed) {
+                    text += "~~ - PASSED";
+                }
+                
+                if(player.getUserID().equals(map.getSpeaker())) {
+                    text += " <:Speakertoken:965363466821050389>";
+                }
+                
+                order.put(sc, text);
             }
-            int sc = player.getSC();
-            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
-            if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                naaluSC = sc;
-            }
-            boolean passed = player.isPassed();
-            String userName = player.getUserName();
-            String color = player.getColor();
-            HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
-            Boolean found = scPlayed.get(sc);
-            boolean isPlayed = found != null ? found : false;
-            String text = "";
-            if (isPlayed) {
-                text += "~~";
-            }
-            text += Helper.getSCEmojiFromInteger(sc) + Helper.getSCAsMention(event.getGuild(), sc);
-            if (isPlayed) {
-                text += "~~";
-            }
-            if (passed) {
-                text += "~~";
-            }
-            text += Helper.getPlayerRepresentation(event, player);
-            if (passed) {
-                text += "~~ - PASSED";
-            }
-            
-            if(player.getUserID().equals(map.getSpeaker())) {
-            	text += " <:Speakertoken:965363466821050389>";
-            }
-            
-            order.put(sc, text);
-        }
-        StringBuilder msg = new StringBuilder();
+            StringBuilder msg = new StringBuilder();
 
 
-        if (naaluSC != 0) {
-            String text = order.get(naaluSC);
-            msg.append(0).append(". ").append(text).append("\n");
-        }
-        Integer max = Collections.max(map.getScTradeGoods().keySet());
-        for (int i = 1; i <= max; i++) {
-            if (naaluSC != 0 && i == naaluSC) {
-                continue;
+            if (naaluSC != 0) {
+                String text = order.get(naaluSC);
+                msg.append(0).append(". ").append(text).append("\n");
             }
-            String text = order.get(i);
-            if (text != null) {
-                msg.append(i).append(". ").append(text).append("\n");
+            Integer max = Collections.max(map.getScTradeGoods().keySet());
+            for (int i = 1; i <= max; i++) {
+                if (naaluSC != 0 && i == naaluSC) {
+                    continue;
+                }
+                String text = order.get(i);
+                if (text != null) {
+                    msg.append(i).append(". ").append(text).append("\n");
+                }
             }
+            MessageHelper.replyToMessage(event, msg.toString());
         }
-        MessageHelper.replyToMessage(event, msg.toString());
     }
 
     @Override
