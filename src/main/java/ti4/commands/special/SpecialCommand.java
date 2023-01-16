@@ -121,6 +121,7 @@ public class SpecialCommand implements Command {
         subcommands.add(new SystemInfo());
         subcommands.add(new StellarConverter());
         subcommands.add(new RiseOfMessiah());
+        subcommands.add(new SwapSC());
 
         return subcommands;
     }

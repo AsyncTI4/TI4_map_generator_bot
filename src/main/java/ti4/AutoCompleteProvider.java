@@ -42,7 +42,7 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.FACTION_COLOR -> {
+            case Constants.FACTION_COLOR, Constants.FACTION_COLOR_1, Constants.FACTION_COLOR_2 -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<String> factionColors = new ArrayList<>(Mapper.getFactions());
                 factionColors.addAll(Mapper.getColors());
