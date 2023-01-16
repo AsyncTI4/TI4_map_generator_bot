@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
@@ -32,17 +33,17 @@ public class RevealAgenda extends AgendaSubcommandData {
         sb.append(Mapper.getAgenda(id));
         sb.append("\n-----------\n");
         MessageHelper.sendMessageToChannel(event, sb.toString());
-        String text = Helper.getGamePing(event, activeMap) + " Please respond to <:nowhens:962921609671364658> for no whens and respond to <:noafters:962923748938362931> for no afters.";
+        String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you will **Play a When** or **Play an After** or not by pressing the buttons below:";
 
         Button playWhen = Button.danger("play_when", "Play When");
-        Button noWhen = Button.primary("no_when", "No Whens");
+        Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromMarkdown(Emojis.nowhens));
 
         Button playAfter = Button.danger("play_after", "Play After");
-        Button noAfter = Button.primary("no_after", "No Afters");
+        Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromMarkdown(Emojis.noafters));
 
         MessageHelper.sendMessageToChannel(event, text);
-        MessageHelper.sendMessageToChannelWithButtons(event, "<:nowhens:962921609671364658>", playWhen, noWhen);
-        MessageHelper.sendMessageToChannelWithButtons(event, "<:noafters:962923748938362931>", playAfter, noAfter);
+        MessageHelper.sendMessageToChannelWithButtons(event, Emojis.nowhens, playWhen, noWhen);
+        MessageHelper.sendMessageToChannelWithButtons(event, Emojis.noafters, playAfter, noAfter);
         ListVoteCount.turnOrder(event, activeMap);
     }
 }
