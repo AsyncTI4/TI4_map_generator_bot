@@ -219,6 +219,8 @@ public class Constants {
     public static final String PO_NO_SCORING = "po_no_scoring";
     public static final String SO_NO_SCORING = "so_no_scoring";
     public static final String FACTION_COLOR = "faction_or_color";
+    public static final String FACTION_COLOR_1 = "faction_or_color_1";
+    public static final String FACTION_COLOR_2 = "faction_or_color_2";
     public static final String STATS = "stats";
     public static final String SEND_TG = "send_tg";
     public static final String SEND_COMMODITIES = "send_commodities";
@@ -462,5 +464,6 @@ public class Constants {
     public static final String TERRAFORM = "terraform";
     public static final String CUSTODIAN_TOKEN = "custodian";
     public static final String CUSTODIAN_TOKEN_PNG = "token_custodian.png";
+    public static final String SWAP_SC = "swap_sc";
 
 }
