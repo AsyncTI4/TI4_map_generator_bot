@@ -90,6 +90,7 @@ public class Constants {
     public static final String COLOR_GF = "_gf.png";
     public static final String COLOR_FF = "_ff.png";
     public static final String SETUP6 = "setup6";
+    public static final String SETUP8 = "setup8";
     public static final String MALLICE = "mallicelocked";
     public static final String MR = "mr";
     public static final int SPACE_RADIUS = 115;

@@ -12,7 +12,6 @@ import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.LoggerHandler;
 import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -57,7 +56,7 @@ public class AddTileList implements Command {
             userActiveMap.clearTileMap();
             for (java.util.Map.Entry<String, String> entry : mappedTilesToPosition.entrySet()) {
                 String tileID = entry.getValue();
-                if (tileID.equals("0")){
+                if (tileID.equals("0")) {
                     continue;
                 }
                 String tileName = Mapper.getTileID(tileID);
@@ -73,7 +72,13 @@ public class AddTileList implements Command {
             }
 
             try {
-                Tile tile = new Tile(AliasHandler.resolveTile(Constants.SETUP6), "0");
+                Tile tile;
+                if (userActiveMap.getPlayerCountForMap() == 8) {
+                    tile = new Tile(AliasHandler.resolveTile(Constants.SETUP8), "0");
+                } else {
+                    tile = new Tile(AliasHandler.resolveTile(Constants.SETUP6), "0");
+                }
+
                 userActiveMap.setTile(tile);
                 tile = new Tile(AliasHandler.resolveTile(Constants.MALLICE), "TL");
                 userActiveMap.setTile(tile);
@@ -81,7 +86,7 @@ public class AddTileList implements Command {
                     tile = new Tile(AliasHandler.resolveTile(Constants.MR), "0a");
                     userActiveMap.setTile(tile);
                 }
-            }catch (Exception e){
+            } catch (Exception e) {
                 BotLogger.log("Could not add setup and Mallice tiles");
             }
 
