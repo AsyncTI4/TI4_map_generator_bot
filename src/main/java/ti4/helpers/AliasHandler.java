@@ -10,6 +10,7 @@ import java.util.*;
 
 public class AliasHandler {
     private static HashMap<String, String> tileAliasList = new HashMap<>();
+    private static HashMap<String, String> tilemapAliasList = new HashMap<>();
     private static HashMap<String, String> unitAliasList = new HashMap<>();
     private static ArrayList<String> unitList = new ArrayList<>();
     private static ArrayList<String> planetList = new ArrayList<>();
@@ -23,6 +24,7 @@ public class AliasHandler {
     public static void init()
     {
         readAliasFile("tile_alias.properties", tileAliasList, "Could not read tiles alias file");
+        readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tiles alias file");
         readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
         readAliasFile("unit_alias.properties", unitList);
         readAliasFile("planet_alias.properties", planetList, true);
@@ -88,6 +90,16 @@ public class AliasHandler {
     public static String resolveTile(String name)
     {
         String aliasID = tileAliasList.get(name);
+        return aliasID != null ? aliasID : name;
+    }
+
+    /** For resolving a TileID specific to this Async bot to a "Standard" TileID used by all other TI4 map tools, including TTPG/TTS
+     * @param name - Async specific Tile ID
+     * @return Standard TI4 Tile ID number
+     */
+    public static String resolveStandardTile(String name)
+    {
+        String aliasID = tilemapAliasList.get(name);
         return aliasID != null ? aliasID : name;
     }
 

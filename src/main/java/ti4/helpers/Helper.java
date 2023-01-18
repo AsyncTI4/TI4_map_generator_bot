@@ -577,7 +577,7 @@ public class Helper {
             Boolean missingTile = true;
             for (Tile tile : tileMap.values()){
                 if (tile.getPosition().equals(position)){
-                    String tileID = tile.getTileID();
+                    String tileID = AliasHandler.resolveStandardTile(tile.getTileID()).toUpperCase();
                     if (position.equalsIgnoreCase("0a") && tileID.equalsIgnoreCase("18")) { //Mecatol Rex in Centre Position
                         //do nothing!
                     } else if (position.equalsIgnoreCase("0a") && !tileID.equalsIgnoreCase("18")) { //Something else is in the Centre Position
@@ -590,7 +590,7 @@ public class Helper {
                 } 
             }
             if (missingTile) {
-                sb.append("0");
+                sb.append("-1");
             }
             sb.append(" ");
         }     
