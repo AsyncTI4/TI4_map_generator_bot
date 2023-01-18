@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -594,5 +595,18 @@ public class Helper {
             sb.append(" ");
         }     
         return sb.toString().trim();
+    }
+
+    public static HashMap<String, Integer> getLastEntryInHashMap(LinkedHashMap<String, Integer> linkedHashMap) {
+        int count = 1;
+        for (java.util.Map.Entry<String, Integer> it : linkedHashMap.entrySet()) {
+            if (count == linkedHashMap.size()) {
+                HashMap<String, Integer> lastEntry = new HashMap<String, Integer>();
+                lastEntry.put(it.getKey(), it.getValue());
+                return lastEntry;
+            }
+            count++;
+        }
+        return null;
     }
 }

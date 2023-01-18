@@ -46,7 +46,7 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
         while (componentActionACCount < 3) {
             Integer acID = null;
             String acKey = null;
-            for (java.util.Map.Entry<String, Integer> ac : getLastEntry(activeMap.drawActionCard(player.getUserID())).entrySet()) {
+            for (java.util.Map.Entry<String, Integer> ac : Helper.getLastEntryInHashMap(activeMap.drawActionCard(player.getUserID())).entrySet()) {
                 acID = ac.getValue();
                 acKey = ac.getKey();
             }
@@ -83,18 +83,5 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
         if (noMoreComponentActionCards) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "**All action cards in the deck have been revealed. __No component action cards remain.__**");
         }
-    }
-
-    public static HashMap<String, Integer> getLastEntry(LinkedHashMap<String, Integer> linkedHashMap) {
-        int count = 1;
-        for (java.util.Map.Entry<String, Integer> it : linkedHashMap.entrySet()) {
-            if (count == linkedHashMap.size()) {
-                HashMap<String, Integer> lastEntry = new HashMap<String, Integer>();
-                lastEntry.put(it.getKey(), it.getValue());
-                return lastEntry;
-            }
-            count++;
-        }
-        return null;
     }
 } 
