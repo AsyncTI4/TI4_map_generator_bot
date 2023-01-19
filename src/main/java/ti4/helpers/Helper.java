@@ -609,4 +609,22 @@ public class Helper {
         }
         return null;
     }
+
+    /**
+     * @param text string to add spaces on the left
+     * @param length minimum length of string
+     * @return left padded string
+     */
+    public static String leftpad(String text, int length) {
+        return String.format("%" + length + "." + length + "s", text);
+    }
+    
+    /**
+     * @param text string to add spaced on the right
+     * @param length minimum length of string
+     * @return right padded string
+     */
+    public static String rightpad(String text, int length) {
+        return String.format("%-" + length + "." + length + "s", text);
+    }
 }
