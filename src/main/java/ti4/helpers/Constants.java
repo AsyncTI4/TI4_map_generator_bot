@@ -44,6 +44,10 @@ public class Constants {
     public static final String DELETE_GAME = "delete_game";
     public static final String POSITION = "position";
     public static final String TILE_NAME = "tile_name";
+    public static final String TILE_NAME_2 = "tile_name_2";
+    public static final String TILE_NAME_3 = "tile_name_3";
+    public static final String TILE_NAME_4 = "tile_name_4";
+    public static final String TILE_NAME_5 = "tile_name_5";
     public static final String TILE_NAME_TO = "tile_name_to";
 
     public static final String HELP = "help";
