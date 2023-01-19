@@ -30,3 +30,5 @@ ENV SERVER2=$DISCORD_SERVER2
 ENTRYPOINT ["java", "-Xmx1600m", "-jar", "tibot.jar"]
 
 
+
+
