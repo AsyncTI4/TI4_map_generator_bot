@@ -1,6 +1,7 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.MessageBuilder;
+import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
 import net.dv8tion.jda.api.entities.TextChannel;
@@ -12,6 +13,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -71,10 +73,10 @@ public class SCPlay extends PlayerSubcommandData {
             }
             Button noFollowButton = Button.primary("sc_no_follow", "Not Following");
             Button trade_primary = Button.success("trade_primary", "Resolve Primary");
-            Button refresh = Button.secondary("sc_refresh", "Replenish Commodities");
-            Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash");
-            Button draw_2_ac = Button.secondary("sc_ac_draw", "Draw 2 Action Cards");
-            Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective");
+            Button refresh = Button.secondary("sc_refresh", "Replenish Commodities").withEmoji(Emoji.fromMarkdown(Emojis.comm));
+            Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash").withEmoji(Emoji.fromMarkdown(Emojis.Wash));
+            Button draw_2_ac = Button.secondary("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromMarkdown(Emojis.ActionCard));
+            Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromMarkdown(Emojis.SecretObjective));
             ActionRow of;
             if (sc == 5){
                 of = ActionRow.of(trade_primary, followButton, noFollowButton, refresh, refresh_and_wash);
