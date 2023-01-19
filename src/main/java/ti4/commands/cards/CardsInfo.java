@@ -142,8 +142,8 @@ public class CardsInfo extends CardsSubcommandData {
         if (promissoryNotes != null) {
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`").append(Emojis.PN)
-                            .append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
+                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`");
+                    sb.append(Emojis.PN).append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
                     sb.append("\n");
                     index++;
                 }
@@ -152,7 +152,8 @@ public class CardsInfo extends CardsSubcommandData {
             sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    sb.append(index).append(". (").append(pn.getValue()).append(") - ").append(Emojis.PN).append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
+                    sb.append("`").append(index).append(".").append("(" + pn.getValue()).append(")`");
+                    sb.append(Emojis.PN).append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
                     sb.append("\n");
                     index++;
                 }
@@ -212,8 +213,8 @@ public class CardsInfo extends CardsSubcommandData {
                     String threadName = CARDS_INFO + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
                     String playerPing = threadName + " " + Helper.getPlayerPing(player);
 
-                    String secretScoreMsg = "\nClick a button below to score your Secret Objective";
-                    String acPlayMsg = "\nClick a button below to play an Action Card";
+                    String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
+                    String acPlayMsg = "_ _\nClick a button below to play an Action Card";
                     for (ThreadChannel threadChannel : threadChannels) {
                         if (threadChannel.getName().equals(threadName)) {
                             String text = playerPing + "\n";
