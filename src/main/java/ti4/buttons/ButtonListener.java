@@ -49,7 +49,7 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
 
-        // BotLogger.log(event, buttonID);
+        BotLogger.log(event, buttonID);
         String gameName = activeMap.getName();
         Map cardMap = MapManager.getInstance().getMap(gameName);
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
