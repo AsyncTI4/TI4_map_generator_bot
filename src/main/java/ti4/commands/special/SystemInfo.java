@@ -20,107 +20,111 @@ public class SystemInfo extends SpecialSubcommandData {
     public SystemInfo() {
         super(Constants.SYSTEM_INFO, "Info for system (all units)");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_2, "System/Tile name").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_3, "System/Tile name").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_4, "System/Tile name").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_5, "System/Tile name").setRequired(false));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-        OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        if (tileOption == null){
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
-            return;
-        }
-        String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-        Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
-        if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile not found");
-            return;
-        }
-        String tileName = tile.getTilePath();
-        tileName = tileName.substring(tileName.indexOf("_") + 1);
-        tileName = tileName.substring(0, tileName.indexOf(".png"));
-        tileName = " - " + tileName + "[" + tile.getTileID() + "]";
-        StringBuilder sb = new StringBuilder();
-        sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
-        java.util.Map<String, String> unitRepresentation = Mapper.getUnits();
-        HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
-        java.util.Map<String, String> colorToId = Mapper.getColorToId();
-        for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
-            String name = entry.getKey();
-            String representation = planetRepresentations.get(name);
-            if (representation == null){
-                representation = name;
+        for (OptionMapping tileOption : event.getOptions()) {
+            if (tileOption == null){
+                continue;
             }
-            UnitHolder unitHolder = entry.getValue();
-            sb.append(representation);
-            if (unitHolder instanceof Planet planet){
-                sb.append(" Resources: ").append(planet.getResources()).append("/").append(planet.getInfluence());
+            String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
+            Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
+            if (tile == null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Tile " + tileOption.getAsString() + " not found");
+                continue;
+            }
+            String tileName = tile.getTilePath();
+            tileName = tileName.substring(tileName.indexOf("_") + 1);
+            tileName = tileName.substring(0, tileName.indexOf(".png"));
+            tileName = " - " + tileName + "[" + tile.getTileID() + "]";
+            StringBuilder sb = new StringBuilder();
+            sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
+            java.util.Map<String, String> unitRepresentation = Mapper.getUnits();
+            HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+            java.util.Map<String, String> colorToId = Mapper.getColorToId();
+            for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+                String name = entry.getKey();
+                String representation = planetRepresentations.get(name);
+                if (representation == null){
+                    representation = name;
+                }
+                UnitHolder unitHolder = entry.getValue();
+                sb.append(representation);
+                if (unitHolder instanceof Planet planet){
+                    sb.append(" Resources: ").append(planet.getResources()).append("/").append(planet.getInfluence());
 
-                //commented as not all planets get traits still
-//                sb.append(" Trait: ");
-//                ArrayList<String> planetType = planet.getPlanetType();
-//                for (String type : planet.getPlanetType()) {
-//                    sb.append(type).append(" ");
-//                }
-            }
-            sb.append("\n");
-            boolean hasCC = false;
-            for (String cc : unitHolder.getCCList()) {
-                if (!hasCC){
-                    sb.append("Command Counters: ");
-                    hasCC = true;
+                    //commented as not all planets get traits still
+    //                sb.append(" Trait: ");
+    //                ArrayList<String> planetType = planet.getPlanetType();
+    //                for (String type : planet.getPlanetType()) {
+    //                    sb.append(type).append(" ");
+    //                }
                 }
-                addtFactionIcon(activeMap, sb, colorToId, cc);
-            }
-            if (hasCC) {
                 sb.append("\n");
-            }
-            boolean hasControl = false;
-            for (String control : unitHolder.getControlList()) {
-                if (!hasControl){
-                    sb.append("Control Counters: ");
-                    hasControl = true;
+                boolean hasCC = false;
+                for (String cc : unitHolder.getCCList()) {
+                    if (!hasCC){
+                        sb.append("Command Counters: ");
+                        hasCC = true;
+                    }
+                    addtFactionIcon(activeMap, sb, colorToId, cc);
                 }
-                addtFactionIcon(activeMap, sb, colorToId, control);
-            }
-            if (hasControl) {
-                sb.append("\n");
-            }
-            boolean hasToken = false;
-            java.util.Map<String, String> tokensToName = Mapper.getTokensToName();
-            for (String token : unitHolder.getTokenList()) {
-                if (!hasToken){
-                    sb.append("Tokens: ");
-                    hasToken = true;
+                if (hasCC) {
+                    sb.append("\n");
                 }
-                for (java.util.Map.Entry<String, String> entry_ : tokensToName.entrySet()) {
-                    String key = entry_.getKey();
-                    String value = entry_.getValue();
-                    if (token.contains(key)){
-                            sb.append(value).append(" ");
+                boolean hasControl = false;
+                for (String control : unitHolder.getControlList()) {
+                    if (!hasControl){
+                        sb.append("Control Counters: ");
+                        hasControl = true;
+                    }
+                    addtFactionIcon(activeMap, sb, colorToId, control);
+                }
+                if (hasControl) {
+                    sb.append("\n");
+                }
+                boolean hasToken = false;
+                java.util.Map<String, String> tokensToName = Mapper.getTokensToName();
+                for (String token : unitHolder.getTokenList()) {
+                    if (!hasToken){
+                        sb.append("Tokens: ");
+                        hasToken = true;
+                    }
+                    for (java.util.Map.Entry<String, String> entry_ : tokensToName.entrySet()) {
+                        String key = entry_.getKey();
+                        String value = entry_.getValue();
+                        if (token.contains(key)){
+                                sb.append(value).append(" ");
 
+                            }
+                        }
+                }
+                if (hasToken) {
+                    sb.append("\n");
+                }
+
+                HashMap<String, Integer> units = unitHolder.getUnits();
+                for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+
+                    String key = unitEntry.getKey();
+
+                    for (String unitRepresentationKey : unitRepresentation.keySet()) {
+                        if (key.endsWith(unitRepresentationKey)) {
+                            addtFactionIcon(activeMap, sb, colorToId, key);
+                            sb.append(unitRepresentation.get(unitRepresentationKey)).append(": ").append(unitEntry.getValue()).append("\n");
                         }
                     }
-            }
-            if (hasToken) {
-                sb.append("\n");
-            }
-
-            HashMap<String, Integer> units = unitHolder.getUnits();
-            for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-
-                String key = unitEntry.getKey();
-
-                for (String unitRepresentationKey : unitRepresentation.keySet()) {
-                    if (key.endsWith(unitRepresentationKey)) {
-                        addtFactionIcon(activeMap, sb, colorToId, key);
-                        sb.append(unitRepresentation.get(unitRepresentationKey)).append(": ").append(unitEntry.getValue()).append("\n");
-                    }
                 }
+                sb.append("----------\n");
             }
-            sb.append("----------\n");
+            MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 
     private static void addtFactionIcon(Map activeMap, StringBuilder sb, java.util.Map<String, String> colorToId, String key) {
