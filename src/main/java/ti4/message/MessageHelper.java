@@ -72,12 +72,16 @@ public class MessageHelper {
         splitAndSent(messageText, channel, null, null, "");
     }
     private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, String... reaction) {
-        if (messageText.length() > 1500) {
+        Integer messageLength = messageText.length();
+        if (messageLength > 1500) {
             List<String> texts = new ArrayList<>();
             int index = 0;
-            while (index < messageText.length()) {
-                texts.add(messageText.substring(index, Math.min(index + 1500, messageText.length())));
-                index += 1500;
+            while (index < messageLength) {
+                String next1500Chars = messageText.substring(index, Math.min(index + 1500, messageLength));
+                Integer lastNewLineIndex = next1500Chars.lastIndexOf("\n") + 1; // number of chars until right after the last \n
+                String textToAdd = next1500Chars.substring(0, lastNewLineIndex);
+                texts.add(textToAdd);
+                index += lastNewLineIndex;
             }
             for (String text : texts) {
                 channel.sendMessage(text).queue();
@@ -104,12 +108,16 @@ public class MessageHelper {
     }
 
     private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, Guild guild, Button... buttons) {
-        if (messageText.length() > 1500) {
+        Integer messageLength = messageText.length();
+        if (messageLength > 1500) {
             List<String> texts = new ArrayList<>();
             int index = 0;
-            while (index < messageText.length()) {
-                texts.add(messageText.substring(index, Math.min(index + 1500, messageText.length())));
-                index += 1500;
+            while (index < messageLength) {
+                String next1500Chars = messageText.substring(index, Math.min(index + 1500, messageLength));
+                Integer lastNewLineIndex = next1500Chars.lastIndexOf("\n") + 1; // number of chars until right after the last \n
+                String textToAdd = next1500Chars.substring(0, lastNewLineIndex);
+                texts.add(textToAdd);
+                index += lastNewLineIndex;
             }
             for (String text : texts) {
                 channel.sendMessage(text).queue();
