@@ -34,7 +34,8 @@ public class ExploreAndDiscard extends ExploreSubcommandData {
             String cardID = activeMap.drawExplore(event.getOption(Constants.TRAIT).getAsString().toLowerCase());
             sb.append(displayExplore(cardID)).append(System.lineSeparator());
         }
-        sb.append("Cards have been discarded. Resolve effects and/or purge manually.");
+        sb.append("Cards have been discarded. Resolve effects and/or purge manually.\n");
+        sb.append("To choose a card to keep/use, run this command: `/explore use explore_card_id:{ID}`");
         MessageHelper.replyToMessage(event, sb.toString());
     }
 }
