@@ -96,7 +96,7 @@ public class Setup extends PlayerSubcommandData {
             if (option != null) {
                 playerSetup = Mapper.getPlayerSetup(option.getAsString());
             } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Could not setup keleres, select Keleres HS option");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Could not setup Keleres. Please select subfaction with the `keleres_hs` option");
                 return;
             }
         } else {
