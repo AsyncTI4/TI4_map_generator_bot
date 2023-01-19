@@ -42,16 +42,27 @@ public class Emojis {
 
     //CARDS
     public static final String SC1 = "<:SC1:1056594715673366548>";
+    public static final String SC1Back = "<:SC1Back:1065285486425411705>";
     public static final String SC2 = "<:SC2:1056594746023366716>";
+    public static final String SC2Back = "<:SC2Back:1065285514569199677>";
     public static final String SC3 = "<:SC3:1056594774620110879>";
+    public static final String SC3Back = "<:SC3Back:1065285537386205214>";
     public static final String SC4 = "<:SC4:1056594795193172009>";
+    public static final String SC4Back = "<:SC4Back:1065285562380062730>";
     public static final String SC5 = "<:SC5:1056594816454107187>";
+    public static final String SC5Back = "<:SC5Back:1065285585125769296>";
     public static final String SC6 = "<:SC6:1056594839778623599>";
+    public static final String SC6Back = "<:SC6Back:1065285613265371256>";
     public static final String SC7 = "<:SC7:1056594860360073236>";
+    public static final String SC7Back = "<:SC7Back:1065285634299809863>";
     public static final String SC8 = "<:SC8:1056594882141098055>";
+    public static final String SC8Back = "<:SC8Back:1065285658207330354>";
     public static final String ActionCard = "<:Actioncard:1054660449515352114>";
+    public static final String ActionCardAlt = "<:ActionCardAlt:1064838264520986655>";
     public static final String Agenda = "<:Agenda:1054660476874792990> ";
+    public static final String AgendaAlt = "<:AgendaAlt:1064838239690698812>";
     public static final String PN = "<:PN:1054660504175521882>";
+    public static final String PNALt = "<:PNALt:1064838292467613766>";
     
     //OBJECTIVES
     public static final String SecretObjective = "<:Secretobjective:1054660535544729670>";
@@ -60,7 +71,7 @@ public class Emojis {
     public static final String Public1alt = "<:Public1Alt:1058978029243728022>";
     public static final String Public2alt = "<:Public2Alt:1058977929725493398>";
     public static final String SecretObjectiveAlt = "<:SecretobjectiveAlt:1058977803728584734>";
-
+    
     //COMPONENTS
     public static final String tg = "<:tg:1053857635570553024>";
     public static final String comm = "<:comm:1053857614028607538>";
@@ -79,7 +90,7 @@ public class Emojis {
     public static final String destroyer = "<:destroyer:993063959840182323>";
     public static final String carrier = "<:carrier:993063885168967700>";
     public static final String cruiser = "<:cruiser:993063818844459098>";
-
+    
     //LEADERS - AGENTS
     public static final String ArborecAgent = "<:ArborecAgent:1059670895989374986>";
     public static final String ArgentAgent = "<:ArgentAgent:1059671022384713789>";
@@ -135,7 +146,7 @@ public class Emojis {
     public static final String XxchaCommander = "<:XxchaCommander:1060184899404972112>";
     public static final String YinCommander = "<:YinCommander:1060184905046315080>";
     public static final String YssarilCommander = "<:YssarilCommander:1060184910880583792>";
-
+    
     //LEADERS - HEROES
     public static final String ArborecHero = "<:ArborecHero:1062743673076469851> ";
     public static final String ArgentHero = "<:ArgentHero:1062743679984467988>";
@@ -188,7 +199,7 @@ public class Emojis {
     public static final String Influence_7 = "<:I7:864278934602776576>";
     public static final String Influence_8 = "<:I8:864278934173253653>";
     public static final String Influence_9 = "<:I9:864278934509322300>";
-
+    
     //OTHER
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
     public static final String WHbeta = "<:WHbeta:1056593596012302366>";
@@ -203,4 +214,6 @@ public class Emojis {
     public static final String NoSabotage = "<:nosabo:962783456541171712>";
     public static final String nowhens = "<:nowhens:962921609671364658>";
     public static final String noafters = "<:noafters:962923748938362931>";
+    public static final String Wash = "<a:Wash:1065334637532041298>";
+    public static final String winemaking = "<:winemaking:1064244730000584754>";
 }
