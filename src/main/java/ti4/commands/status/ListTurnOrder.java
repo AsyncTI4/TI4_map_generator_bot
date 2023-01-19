@@ -70,7 +70,7 @@ public class ListTurnOrder extends StatusSubcommandData {
 
             if (naaluSC != 0) {
                 String text = order.get(naaluSC);
-                msg.append(0).append(". ").append(text).append("\n");
+                msg.append("`").append(0).append(".`").append(text).append("\n");
             }
             Integer max = Collections.max(map.getScTradeGoods().keySet());
             for (int i = 1; i <= max; i++) {
@@ -79,7 +79,7 @@ public class ListTurnOrder extends StatusSubcommandData {
                 }
                 String text = order.get(i);
                 if (text != null) {
-                    msg.append(i).append(". ").append(text).append("\n");
+                    msg.append("`").append(i).append(".`").append(text).append("\n");
                 }
             }
             MessageHelper.replyToMessage(event, msg.toString());
