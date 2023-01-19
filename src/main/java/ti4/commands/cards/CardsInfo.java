@@ -81,7 +81,8 @@ public class CardsInfo extends CardsSubcommandData {
                 String soName = soSplit[0];
                 String soPhase = soSplit[1];
                 String soDescription = soSplit[2];
-                sb.append(index).append(". (").append(so.getValue()).append(") - ").append(Emojis.SecretObjective).append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
+                sb.append("`").append(index).append(".").append(Helper.leftpad("(" + so.getValue(), 4)).append(")`");
+                sb.append(Emojis.SecretObjective).append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
                 index++;
             }
         }
@@ -96,10 +97,11 @@ public class CardsInfo extends CardsSubcommandData {
                 String soPhase = soSplit[1];
                 String soDescription = soSplit[2];
                 Integer idValue = so.getValue();
-                sb.append(index).append(". (").append(idValue).append(") - ").append(Emojis.SecretObjective).append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
+                sb.append("`").append(index).append(".").append(Helper.leftpad("(" + idValue, 4)).append(")`");
+                sb.append(Emojis.SecretObjective).append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
                 index++;
                 if (soName != null) {
-                    soButtons.add(Button.primary(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName));
+                    soButtons.add(Button.primary(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromMarkdown(Emojis.SecretObjective)));
                 }
             }
         }
@@ -121,11 +123,12 @@ public class CardsInfo extends CardsSubcommandData {
                 String acDescription = acSplit[3];
                 Integer value = ac.getValue();
                 String key = ac.getKey();
-                sb.append(index).append(". (").append(value).append(") - ").append(Emojis.ActionCard).append("__**" + acName + "**__").append(" *(").append(acPhase).append(" Phase)*: _").append(acWindow).append(":_ ").append(acDescription).append("\n");
+                sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
+                sb.append(Emojis.ActionCard).append("__**" + acName + "**__").append(" *(").append(acPhase).append(" Phase)*: _").append(acWindow).append(":_ ").append(acDescription).append("\n");
                 index++;
                 String ac_name = Mapper.getActionCardName(key);
                 if (ac_name != null) {
-                    acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name));
+                    acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromMarkdown(Emojis.ActionCard)));
                 }
             }
         }
@@ -139,7 +142,7 @@ public class CardsInfo extends CardsSubcommandData {
         if (promissoryNotes != null) {
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    sb.append(index).append(". (").append(pn.getValue()).append(") - ").append(Emojis.PN)
+                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`").append(Emojis.PN)
                             .append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
                     sb.append("\n");
                     index++;
@@ -209,8 +212,8 @@ public class CardsInfo extends CardsSubcommandData {
                     String threadName = CARDS_INFO + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
                     String playerPing = threadName + " " + Helper.getPlayerPing(player);
 
-                    String secretScoreMsg = "Click a button below to score your Secret Objective";
-                    String acPlayMsg = "Click a button below to play an Action Card";
+                    String secretScoreMsg = "\nClick a button below to score your Secret Objective";
+                    String acPlayMsg = "\nClick a button below to play an Action Card";
                     for (ThreadChannel threadChannel : threadChannels) {
                         if (threadChannel.getName().equals(threadName)) {
                             String text = playerPing + "\n";
