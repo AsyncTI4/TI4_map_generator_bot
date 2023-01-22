@@ -41,23 +41,24 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
         String messageID = event.getMessage().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(id);
+
+        String gameName = event.getChannel().getName();
+        gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
+        gameName = gameName.substring(0, gameName.indexOf("-"));
+        Map activeMap = MapManager.getInstance().getMap(gameName);
         Player player = activeMap.getPlayer(id);
         player = Helper.getGamePlayer(activeMap, player, event.getMember(), id);
         if (player == null) {
             event.getChannel().sendMessage("You're not a player of the game").queue();
             return;
         }
-
-        String gameName = activeMap.getName();
-        Map cardMap = MapManager.getInstance().getMap(gameName);
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
             BotLogger.log(event, buttonID + " in game " + gameName);
             String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
             for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
                 if (textChannel_.getName().equals(gameName + "-actions")) {
                     try {
-                        PlayAC.playAC(null, cardMap, player, acID, textChannel_, event.getGuild(), event);
+                        PlayAC.playAC(null, activeMap, player, acID, textChannel_, event.getGuild(), event);
                     } catch (Exception e) {
                         BotLogger.log(event, "Could not parse AC ID: " + acID);
                         event.getChannel().sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
@@ -75,7 +76,7 @@ public class ButtonListener extends ListenerAdapter {
                     try {
                         int soIndex = Integer.parseInt(soID);
 
-                        ScoreSO.scoreSO(null, cardMap, player, soIndex, textChannel_, event);
+                        ScoreSO.scoreSO(null, activeMap, player, soIndex, textChannel_, event);
                     } catch (Exception e) {
                         BotLogger.log(event, "Could not parse SO ID: " + soID);
                         event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.").queue();
