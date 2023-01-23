@@ -51,7 +51,7 @@ public class SCPick extends PlayerSubcommandData {
                     continue;
                 }
                 if (nextCorrectPing && player_.getSC() == 0 && player_.getFaction() != null) {
-                    msgExtra += Helper.getPlayerRepresentation(player_) + " To Pick SC";
+                    msgExtra += Helper.getPlayerRepresentation(event, player_) + " To Pick SC";
                     allPicked = false;
                     break;
                 }
@@ -90,7 +90,7 @@ public class SCPick extends PlayerSubcommandData {
                     }
                 }
                 if (nextPlayer != null) {
-                    msgExtra += " " + Helper.getPlayerPing(nextPlayer) + " is up for an action";
+                    msgExtra += " " + Helper.getPlayerRepresentation(event, nextPlayer) + " is up for an action";
                 }
             }           
         } else {
