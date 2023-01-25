@@ -20,11 +20,12 @@ public class AliasHandler {
     private static HashMap<String, String> tokenAliasList = new HashMap<>();
     private static HashMap<String, String>  factionAliasList = new HashMap<>();
     private static HashMap<String, String>  colorAliasList = new HashMap<>();
+    private static HashMap<String, String>  ttpgAliasList = new HashMap<>();
 
     public static void init()
     {
         readAliasFile("tile_alias.properties", tileAliasList, "Could not read tiles alias file");
-        readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tiles alias file");
+        readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
         readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
         readAliasFile("unit_alias.properties", unitList);
         readAliasFile("planet_alias.properties", planetList, true);
@@ -34,6 +35,7 @@ public class AliasHandler {
         readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
         readAliasFile("faction_alias.properties", factionAliasList, "Could not read faction alias file");
         readAliasFile("color_alias.properties", colorAliasList, "Could not read color alias file");
+        readAliasFile("ttpg_alias.properties", colorAliasList, "Could not read TTPG alias file");
     }
     private static void readAliasFile(String fileName, ArrayList<String> list) {
         readAliasFile(fileName, list, false);
@@ -144,6 +146,12 @@ public class AliasHandler {
     public static String resolveToken(String name)
     {
         String aliasID = cctokenAliasList.get(name);
+        return aliasID != null ? aliasID : name;
+    }
+
+    public static String resolveTTPGName(String name)
+    {
+        String aliasID = ttpgAliasList.get(name);
         return aliasID != null ? aliasID : name;
     }
 }
