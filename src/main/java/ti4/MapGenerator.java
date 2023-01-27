@@ -40,6 +40,7 @@ public class MapGenerator {
 
     public static JDA jda;
     public static String userID;
+    public static Guild guild;
     public static String adminID;
     public static Role adminRole;
 
@@ -108,7 +109,7 @@ public class MapGenerator {
         commandManager.addCommand(new CustomCommand());
         commandManager.addCommand(new MiltyCommand());
 
-        Guild guild = jda.getGuildById(args[2]);
+        guild = jda.getGuildById(args[2]);
 
         CommandListUpdateAction commands = guild.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
@@ -128,6 +129,8 @@ public class MapGenerator {
 	       commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
 	       commandsD.queue();
        }
+
+       BotLogger.log("BOT STARTED UP");
         //------------------------------------------------
 
 //        CommandListUpdateAction commands_ = jda.updateCommands();
