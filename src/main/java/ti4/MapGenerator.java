@@ -138,7 +138,6 @@ public class MapGenerator {
 
 //        guild.updateCommands().queue();
 //        jda.updateCommands().queue();
-
         MapSaveLoadManager.loadMaps();
     }
 }
