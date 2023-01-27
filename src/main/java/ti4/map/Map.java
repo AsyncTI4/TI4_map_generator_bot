@@ -31,6 +31,7 @@ public class Map {
     private int vp = 10;
     private boolean communityMode = false;
     private boolean allianceMode = false;
+    private boolean fowMode = false;
 
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
@@ -184,8 +185,15 @@ public class Map {
         return allianceMode;
     }
 
+    public boolean isFoWMode() {
+        return fowMode;
+    }
+
     public void setAllianceMode(boolean allianceMode) {
         this.allianceMode = allianceMode;
+    }
+    public void setFoWMode(boolean fowMode) {
+        this.fowMode = fowMode;
     }
 
     public void setCommunityMode(boolean communityMode) {

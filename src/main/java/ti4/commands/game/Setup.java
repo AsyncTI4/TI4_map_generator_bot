@@ -17,6 +17,7 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Add Custom description to game").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.COMMUNITY_MODE, "Set to YES if want to allow Community Mode for map, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.ALLIANCE_MODE, "Set to YES if want to allow Alliance Mode for map, FALSE to disable it").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FOW_MODE, "Set to YES if want to allow FoW Mode for map, FALSE to disable it").setRequired(false));
     }
 
     @Override
@@ -77,6 +78,16 @@ public class Setup extends GameSubcommandData {
                 activeMap.setAllianceMode(true);
             } else if ("FALSE".equals(alliaceMode)){
                 activeMap.setAllianceMode(false);
+            }
+        }
+
+        OptionMapping fowOption = event.getOption(Constants.FOW_MODE);
+        if (fowOption != null){
+            String fowMode = fowOption.getAsString();
+            if ("YES".equals(fowMode)){
+                activeMap.setFoWMode(true);
+            } else if ("FALSE".equals(fowMode)){
+                activeMap.setFoWMode(false);
             }
         }
 
