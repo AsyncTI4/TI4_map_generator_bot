@@ -577,7 +577,7 @@ public class GenerateMap {
 
         int ccCount = Helper.getCCCount(map, playerColor);
         String CC_TAG = "cc";
-        if (playerColor == null){
+        if (playerColor == null) {
             return;
         }
         UnitTokenPosition reinforcementsPosition = PositionMapper.getReinforcementsPosition(CC_TAG);
@@ -1424,8 +1424,8 @@ public class GenerateMap {
     }
 
     private static int displayObjectives(int y, int x, LinkedHashMap<String, List<String>> scoredPublicObjectives, LinkedHashMap<String, Integer> revealedPublicObjectives,
-                                  LinkedHashMap<String, Player> players, HashMap<String, String> publicObjectivesState, Set<String> po, Integer objectiveWorth,
-                                  Integer[] column, LinkedHashMap<String, Integer> customPublicVP, boolean justCalculate, boolean fixedColumn, Graphics graphics, HashMap<Player, Integer> userVPs) {
+                                         LinkedHashMap<String, Player> players, HashMap<String, String> publicObjectivesState, Set<String> po, Integer objectiveWorth,
+                                         Integer[] column, LinkedHashMap<String, Integer> customPublicVP, boolean justCalculate, boolean fixedColumn, Graphics graphics, HashMap<Player, Integer> userVPs) {
         Set<String> keysToRemove = new HashSet<>();
         for (java.util.Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
 //            switch (column[0]) {
@@ -1485,12 +1485,12 @@ public class GenerateMap {
     }
 
     private static void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID,
-                                         boolean multiScoring, Integer objectiveWorth, boolean justCalculate, Graphics graphics, HashMap<Player, Integer> userVPs) {
+                                                boolean multiScoring, Integer objectiveWorth, boolean justCalculate, Graphics graphics, HashMap<Player, Integer> userVPs) {
         drawScoreControlMarkers(x, y, players, scoredPlayerID, multiScoring, objectiveWorth, justCalculate, false, graphics, userVPs);
     }
 
     private static void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID,
-                                         boolean multiScoring, Integer objectiveWorth, boolean justCalculate, boolean fixedColumn, Graphics graphics, HashMap<Player, Integer> userVPs) {
+                                                boolean multiScoring, Integer objectiveWorth, boolean justCalculate, boolean fixedColumn, Graphics graphics, HashMap<Player, Integer> userVPs) {
         try {
             int tempX = 0;
             BufferedImage factionImage = null;
@@ -1798,10 +1798,14 @@ public class GenerateMap {
             return o1.compareTo(o2);
         });
         for (String tokenID : tokenList) {
-            if (tokenID.contains(Constants.SLEEPER) || tokenID.contains(Constants.DMZ_LARGE) || tokenID.contains(Constants.WORLD_DESTROYED)) {
+            if (tokenID.contains(Constants.SLEEPER) ||
+                    tokenID.contains(Constants.DMZ_LARGE) ||
+                    tokenID.contains(Constants.WORLD_DESTROYED) ||
+                    tokenID.contains(Constants.CUSTODIAN_TOKEN) ||
+                    tokenID.contains(Constants.CONSULATE_TOKEN)) {
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
-                    BotLogger.log("Could not sleeper token file for: " + tokenID);
+                    BotLogger.log("Could not find token file for: " + tokenID);
                     continue;
                 }
                 float scale = 0.85f;
@@ -1816,6 +1820,9 @@ public class GenerateMap {
                     BotLogger.log("Could not parse sleeper token file for: " + tokenID);
                 }
                 Point position = new Point(centerPosition.x - (image.getWidth() / 2), centerPosition.y - (image.getHeight() / 2));
+                if (tokenID.contains(Constants.CUSTODIAN_TOKEN)) {
+                    position = new Point(70, 45);
+                }
                 graphics.drawImage(image, tileX + position.x, tileY + position.y - 10, null);
             }
         }
@@ -1839,7 +1846,11 @@ public class GenerateMap {
             Point centerPosition = unitHolder.getHolderCenterPosition();
             int xDelta = 0;
             for (String tokenID : tokenList) {
-                if (tokenID.contains(Constants.SLEEPER) || tokenID.contains(Constants.DMZ_LARGE) || tokenID.contains(Constants.WORLD_DESTROYED)) {
+                if (tokenID.contains(Constants.SLEEPER) ||
+                        tokenID.contains(Constants.DMZ_LARGE) ||
+                        tokenID.contains(Constants.WORLD_DESTROYED) ||
+                        tokenID.contains(Constants.CUSTODIAN_TOKEN) ||
+                        tokenID.contains(Constants.CONSULATE_TOKEN)) {
                     continue;
                 }
                 String tokenPath = tile.getTokenPath(tokenID);
@@ -1853,7 +1864,7 @@ public class GenerateMap {
                 } catch (Exception e) {
                     BotLogger.log("Could not parse control token file for: " + tokenID);
                 }
-                if (tokenPath.contains(Constants.DMZ_LARGE) || tokenPath.contains(Constants.WORLD_DESTROYED)) {
+                if (tokenPath.contains(Constants.DMZ_LARGE) || tokenPath.contains(Constants.WORLD_DESTROYED) || tokenPath.contains(Constants.CONSULATE_TOKEN)) {
                     graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - (image.getHeight() / 2), null);
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     graphics.drawImage(image, tileX + 70, tileY + 45, null);
