@@ -69,7 +69,7 @@ public class MessageHelper {
             gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
             gameName = gameName.substring(0, gameName.indexOf("-"));
             Map activeMap = MapManager.getInstance().getMap(gameName);
-            if (!activeMap.isFoWMode()) {
+            if (!activeMap.isFoWMode() || forceShowMap) {
                 sendFileToChannel(event.getChannel(), file);
                 replyToMessageTI4Logo(event);
             } else {
