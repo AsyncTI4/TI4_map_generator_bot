@@ -18,6 +18,10 @@ public class AddTile extends AddRemoveTile {
     @Override
     protected void tileAction(Tile tile, String position, Map userActiveMap) {
         userActiveMap.setTile(tile);
+        addCustodianToken(tile);
+    }
+
+    public static void addCustodianToken(Tile tile) {
         if (tile.getTileID().equals("18")){
             HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
             for (UnitHolder unitHolder : unitHolders.values()) {

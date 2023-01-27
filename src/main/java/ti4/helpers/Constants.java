@@ -468,6 +468,7 @@ public class Constants {
     public static final String ATTACHMENT_TITANSPN_PNG = "attachment_titanspn.png";
     public static final String TERRAFORM = "terraform";
     public static final String CUSTODIAN_TOKEN = "custodian";
+    public static final String CONSULATE_TOKEN = "consulate";
     public static final String CUSTODIAN_TOKEN_PNG = "token_custodian.png";
     public static final String SWAP_SC = "swap_sc";
     public static final String KELERES_HERO_MENTAK = "keleres_hero_mentak";

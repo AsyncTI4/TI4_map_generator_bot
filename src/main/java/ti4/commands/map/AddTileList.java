@@ -68,6 +68,7 @@ public class AddTileList implements Command {
                 }
 
                 Tile tile = new Tile(tileID, position);
+                AddTile.addCustodianToken(tile);
                 userActiveMap.setTile(tile);
             }
 
