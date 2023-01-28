@@ -65,11 +65,16 @@ public class MessageHelper {
     public static void replyToMessage(SlashCommandInteractionEvent event, File file, boolean forceShowMap) {
 
         try {
+            if (forceShowMap){
+                sendFileToChannel(event.getChannel(), file);
+                replyToMessageTI4Logo(event);
+                return;
+            }
             String gameName = event.getChannel().getName();
             gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
             gameName = gameName.substring(0, gameName.indexOf("-"));
             Map activeMap = MapManager.getInstance().getMap(gameName);
-            if (!activeMap.isFoWMode() || forceShowMap) {
+            if (!activeMap.isFoWMode()) {
                 sendFileToChannel(event.getChannel(), file);
                 replyToMessageTI4Logo(event);
             } else {
