@@ -57,6 +57,7 @@ abstract public class UnitHolder {
     public void removeCC(String cc) {
         ccList.remove(cc);
     }
+
     public void removeControl(String cc) {
         controlList.remove(cc);
     }
@@ -64,8 +65,13 @@ abstract public class UnitHolder {
     public boolean addToken(String cc) {
         return tokenList.add(cc);
     }
+
     public boolean removeToken(String cc) {
         return tokenList.remove(cc);
+    }
+
+    public void removeAllTokens() {
+        tokenList.clear();
     }
 
     public void removeAllCC() {

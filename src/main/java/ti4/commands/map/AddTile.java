@@ -17,6 +17,7 @@ public class AddTile extends AddRemoveTile {
 
     @Override
     protected void tileAction(Tile tile, String position, Map userActiveMap) {
+        userActiveMap.removeTile(position); //remove old tile first to clean up associated planet ownership
         userActiveMap.setTile(tile);
         addCustodianToken(tile);
     }

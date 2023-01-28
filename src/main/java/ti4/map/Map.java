@@ -2,6 +2,7 @@ package ti4.map;
 
 
 import ti4.commands.milty.MiltyDraftManager;
+import ti4.commands.player.PlanetRemove;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -1158,8 +1159,26 @@ public class Map {
     }
 
     public void removeTile(String position) {
+        Tile tileToRemove = tileMap.get(position);
+        if (tileToRemove != null) {
+            for (UnitHolder unitHolder : tileToRemove.getUnitHolders().values()) {
+                if (unitHolder instanceof Planet) {
+                    removePlanet(unitHolder);
+                }
+            }
+        }
+
         tileMap.remove(position);
         planets.clear();
+    }
+
+    public void removePlanet(UnitHolder planet) {
+        for (Player player_ : players.values()) {
+            String color = player_.getColor();
+            planet.removeAllUnits(color);
+            PlanetRemove.removePlayerControlToken(player_, planet);
+            player_.removePlanet(planet.getName());
+        }
     }
 
     public HashMap<String, UnitHolder> getPlanetsInfo() {
