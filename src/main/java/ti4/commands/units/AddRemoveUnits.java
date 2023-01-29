@@ -52,7 +52,7 @@ abstract public class AddRemoveUnits implements Command {
 
             OptionMapping optionMapGen = event.getOption(Constants.NO_MAPGEN);
             if (optionMapGen == null) {
-                File file = GenerateMap.getInstance().saveImage(activeMap);
+                File file = GenerateMap.getInstance().saveImage(activeMap, event);
                 MessageHelper.replyToMessage(event, file);
             } else {
                 MessageHelper.replyToMessage(event, "Map update completed");

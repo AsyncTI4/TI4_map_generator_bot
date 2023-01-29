@@ -70,7 +70,7 @@ public class ShowGame implements Command {
                 displayType = DisplayType.stats;
             }
         }
-        File file = GenerateMap.getInstance().saveImage(map, displayType);
+        File file = GenerateMap.getInstance().saveImage(map, displayType, event);
         MessageHelper.replyToMessage(event, file, true);
     }
 

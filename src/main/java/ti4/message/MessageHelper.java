@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.cards.CardsInfo;
+import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
 
@@ -74,11 +75,11 @@ public class MessageHelper {
             gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
             gameName = gameName.substring(0, gameName.indexOf("-"));
             Map activeMap = MapManager.getInstance().getMap(gameName);
-            if (!activeMap.isFoWMode()) {
+            if (!activeMap.isFoWMode() || activeMap.isFoWMode() && event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNLE)) {
                 sendFileToChannel(event.getChannel(), file);
                 replyToMessageTI4Logo(event);
             } else {
-                replyToMessage(event, "Map updated successfully. Use /special map_info to check the systems.");
+                replyToMessage(event, "Map updated successfully. Use /special system_info to check the systems.");
             }
         }
         catch (Exception e){

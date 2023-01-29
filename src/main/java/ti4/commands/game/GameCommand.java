@@ -73,7 +73,7 @@ public class GameCommand implements Command {
         if (!undoCommand) {
             MapSaveLoadManager.saveMap(activeMap);
         }
-        File file = GenerateMap.getInstance().saveImage(activeMap);
+        File file = GenerateMap.getInstance().saveImage(activeMap, event);
         MessageHelper.replyToMessage(event, file);
     }
 
