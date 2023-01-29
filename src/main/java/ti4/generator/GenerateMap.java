@@ -171,7 +171,7 @@ public class GenerateMap {
 
 
             String testing = System.getenv("TESTING");
-            if ((testing == null) && (displayType == DisplayType.all) && isFoWPrivate == null || isFoWPrivate) {
+            if ((testing == null) && ((displayType == DisplayType.all) && isFoWPrivate == null || isFoWPrivate)) {
                 new Thread(() -> {
                     WebHelper.putMap(map.getName(), mainImage);
                     WebHelper.putData(map.getName(), map);
