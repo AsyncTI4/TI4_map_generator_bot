@@ -44,7 +44,7 @@ public class Undo extends GameSubcommandData{
 
         MapSaveLoadManager.undo(userActiveMap);
         userActiveMap = MapManager.getInstance().getMap(userActiveMap.getName());
-        File file = GenerateMap.getInstance().saveImage(userActiveMap);
+        File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
         MessageHelper.replyToMessage(event, file);
     }
 }

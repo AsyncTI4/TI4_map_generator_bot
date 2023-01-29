@@ -141,7 +141,7 @@ public class Stats extends PlayerSubcommandData {
         MapSaveLoadManager.saveMap(activeMap);
         MessageHelper.replyToMessageTI4Logo(event);
         //code to add info to website
-        File file = GenerateMap.getInstance().saveImage(activeMap);
+        File file = GenerateMap.getInstance().saveImage(activeMap, event);
     }
 
     public static void pickSC(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping optionSC) {

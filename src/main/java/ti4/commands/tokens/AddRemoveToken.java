@@ -75,7 +75,7 @@ abstract public class AddRemoveToken implements Command {
                 parsingForTile(event, colors, tile, activeMap);
                 MapSaveLoadManager.saveMap(activeMap);
 
-                File file = GenerateMap.getInstance().saveImage(activeMap);
+                File file = GenerateMap.getInstance().saveImage(activeMap, event);
                 MessageHelper.replyToMessage(event, file);
             } else {
                 MessageHelper.replyToMessage(event, "Tile needs to be specified.");

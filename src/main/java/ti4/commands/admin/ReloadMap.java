@@ -33,7 +33,7 @@ public class ReloadMap extends AdminSubcommandData {
             Map map = MapManager.getInstance().getMap(mapName);
             MapSaveLoadManager.reload(map);
             map = MapManager.getInstance().getMap(mapName);
-            File file = GenerateMap.getInstance().saveImage(map);
+            File file = GenerateMap.getInstance().saveImage(map, event);
             MessageHelper.replyToMessage(event, file);
 
         } else {
