@@ -438,7 +438,7 @@ public class Helper {
     @CheckForNull
     public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
-        if (privateGame){
+        if (privateGame != null && privateGame){
             return getColourAsMention(event.getGuild(), player.getColor());
         }
         if (event == null) {
@@ -453,7 +453,7 @@ public class Helper {
     @CheckForNull
     public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
-        if (privateGame){
+        if (privateGame != null && privateGame){
             return getColourAsMention(event.getGuild(), player.getColor());
         }
         if (event == null) {
@@ -468,7 +468,7 @@ public class Helper {
     @CheckForNull
     public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
-        if (privateGame){
+        if (privateGame != null && privateGame){
             return getColourAsMention(event.getGuild(), player.getColor());
         }
         if (event == null) {
