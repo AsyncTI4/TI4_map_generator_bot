@@ -93,7 +93,7 @@ public class SCPlay extends PlayerSubcommandData {
                     if (user == null) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
                     } else {
-                        MessageHelper.sentToMessageToUser(event, message, user);
+                        MessageHelper.sentToMessageToUser(event, activeMap.getName() + " " + message, user);
                     }
                 }
             }

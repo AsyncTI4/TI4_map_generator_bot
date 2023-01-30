@@ -112,9 +112,9 @@ public class SCPick extends PlayerSubcommandData {
             User user = MapGenerator.jda.getUserById(privatePlayer.getUserID());
             if (user == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
-                return;
+            } else {
+                MessageHelper.sentToMessageToUser(event, activeMap.getName() + " " + msgExtra, user);
             }
-            MessageHelper.sentToMessageToUser(event, msgExtra, user);
         }
         if (allPicked) {
             ListTurnOrder.turnOrder(event, activeMap);
