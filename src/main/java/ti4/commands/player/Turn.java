@@ -187,9 +187,9 @@ public class Turn extends PlayerSubcommandData {
                     User user = MapGenerator.jda.getUserById(player.getUserID());
                     if (user == null) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
-                        return;
+                    } else {
+                        MessageHelper.sentToMessageToUser(event, map.getName() + " " + text, user);
                     }
-                    MessageHelper.sentToMessageToUser(event, text, user);
                 }
                 MessageHelper.sendMessageToChannel(event.getChannel(), text);
                 return;
