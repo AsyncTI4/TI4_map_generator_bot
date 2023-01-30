@@ -1,19 +1,17 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
-import net.dv8tion.jda.api.entities.ThreadChannel;
+import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -62,10 +60,10 @@ public class SCPlay extends PlayerSubcommandData {
             String threadName = name.substring(0, name.indexOf("-")) + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
             TextChannel textChannel = event.getTextChannel();
             Button followButton;
-            if (sc == 1){
+            if (sc == 1) {
                 followButton = Button.success("sc_follow_leadership", "SC Follow");
             } else {
-                if (sc == 5){
+                if (sc == 5) {
                     followButton = Button.success("sc_follow_trade", "SC Follow");
                 } else {
                     followButton = Button.success("sc_follow", "SC Follow");
@@ -78,14 +76,26 @@ public class SCPlay extends PlayerSubcommandData {
             Button draw_2_ac = Button.secondary("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromMarkdown(Emojis.ActionCard));
             Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromMarkdown(Emojis.SecretObjective));
             ActionRow of;
-            if (sc == 5){
+            if (sc == 5) {
                 of = ActionRow.of(trade_primary, followButton, noFollowButton, refresh, refresh_and_wash);
-            } else if (sc == 3){
+            } else if (sc == 3) {
                 of = ActionRow.of(followButton, noFollowButton, draw_2_ac);
-            } else if (sc == 8){
+            } else if (sc == 8) {
                 of = ActionRow.of(followButton, noFollowButton, draw_so);
             } else {
                 of = ActionRow.of(followButton, noFollowButton);
+            }
+
+            Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
+            if (privateGame != null && privateGame) {
+                for (Player player_ : activeMap.getPlayers().values()) {
+                    User user = MapGenerator.jda.getUserById(player_.getUserID());
+                    if (user == null) {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
+                    } else {
+                        MessageHelper.sentToMessageToUser(event, message, user);
+                    }
+                }
             }
 
             Message messageObject = new MessageBuilder()
