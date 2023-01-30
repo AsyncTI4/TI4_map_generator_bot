@@ -4,16 +4,19 @@ import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.Emoji;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import org.apache.commons.collections4.ListUtils;
+import ti4.MapGenerator;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -174,11 +177,20 @@ public class Turn extends PlayerSubcommandData {
             }
             tempProtection++;
         }
+        Boolean privateGame = FoWHelper.isPrivateGame(map, event);
         for (Player player : map.getPlayers().values()) {
             int sc = player.getSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
                 String text = "";
                 text += Helper.getPlayerRepresentation(event, player) + " UP NEXT";
+                if (privateGame != null && privateGame){
+                    User user = MapGenerator.jda.getUserById(player.getUserID());
+                    if (user == null) {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
+                        return;
+                    }
+                    MessageHelper.sentToMessageToUser(event, text, user);
+                }
                 MessageHelper.sendMessageToChannel(event.getChannel(), text);
                 return;
             }

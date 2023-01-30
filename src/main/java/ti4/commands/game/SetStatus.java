@@ -61,7 +61,7 @@ public class SetStatus extends GameSubcommandData{
         }
         if (!map.getOwnerID().equals(event.getUser().getId()) && !isAdmin){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game/Map owner can add/remove players.");
-            return;
+//            return;
         }
 
         try {
