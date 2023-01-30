@@ -59,10 +59,10 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
                 isAdmin = true;
             }
         }
-        if (!map.getOwnerID().equals(callerUser.getId()) && !isAdmin){
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game owner can add/remove players.");
-            return;
-        }
+//        if (!map.getOwnerID().equals(callerUser.getId()) && !isAdmin){
+//            MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game owner can add/remove players.");
+//            return;
+//        }
         if (!map.isMapOpen()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not open. Can add/remove only in open map.");
             return;

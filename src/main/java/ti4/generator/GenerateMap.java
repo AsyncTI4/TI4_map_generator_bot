@@ -128,7 +128,6 @@ public class GenerateMap {
         tilesToDisplay = new HashMap<>(map.getTileMap());
         if (map.isFoWMode() && event != null) {
             isFoWPrivate = false;
-            long time = System.currentTimeMillis();
             if (event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNLE)) {
                 isFoWPrivate = true;
                 Set<String> tilesToShow = fowFilter(map, event);
@@ -139,7 +138,6 @@ public class GenerateMap {
                     tilesToDisplay.put(key, new Tile("0b", key));
                 }
             }
-            System.out.println("TIME for FoW filter: " + (System.currentTimeMillis() - time));
         }
 
         File file = Storage.getMapImageStorage("temp.png");
@@ -1204,8 +1202,12 @@ public class GenerateMap {
     }
 
     private boolean isHasHSInView(Player player) {
-        String playerSetup = Mapper.getPlayerSetup(player.getFaction());
+        String faction = player.getFaction();
         boolean hasHSInView = false;
+        if (faction == null){
+            return hasHSInView;
+        }
+        String playerSetup = Mapper.getPlayerSetup(faction);
         if (playerSetup == null){
             return hasHSInView;
         }
