@@ -1205,9 +1205,12 @@ public class GenerateMap {
 
     private boolean isHasHSInView(Player player) {
         String playerSetup = Mapper.getPlayerSetup(player.getFaction());
+        boolean hasHSInView = false;
+        if (playerSetup == null){
+            return hasHSInView;
+        }
         String[] setupInfo = playerSetup.split(";");
         String hs = setupInfo[1];
-        boolean hasHSInView = false;
         for (Tile tile : tilesToDisplay.values()) {
             if (tile.getTileID().equals(hs)){
                 hasHSInView = true;
