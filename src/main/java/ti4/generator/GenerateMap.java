@@ -1264,9 +1264,12 @@ public class GenerateMap {
                         faction = getFactionByControlMarker(map.getPlayers().values(), fleetCCID);
                         factionImage = null;
                         if (faction != null) {
-                            String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
-                            if (factionImagePath != null) {
-                                factionImage = ImageIO.read(new File(factionImagePath));
+                            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != fowPlayer;
+                            if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
+                                String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
+                                if (factionImagePath != null) {
+                                    factionImage = ImageIO.read(new File(factionImagePath));
+                                }
                             }
                         }
 
@@ -1863,9 +1866,12 @@ public class GenerateMap {
                 String faction = getFactionByControlMarker(map.getPlayers().values(), ccID);
                 BufferedImage factionImage = null;
                 if (faction != null) {
-                    String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
-                    if (factionImagePath != null) {
-                        factionImage = ImageIO.read(new File(factionImagePath));
+                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate;
+                    if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
+                        String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
+                        if (factionImagePath != null) {
+                            factionImage = ImageIO.read(new File(factionImagePath));
+                        }
                     }
                 }
                 graphics.drawImage(image, tileX + 10 + deltaX, tileY + centerPosition.y - 40 + deltaY, null);
@@ -1904,9 +1910,12 @@ public class GenerateMap {
                 try {
                     factionImage = null;
                     if (faction != null) {
-                        String factionImagePath = tile.getCCPath("control_faction_" + faction + ".png");
-                        if (factionImagePath != null) {
-                            factionImage = ImageIO.read(new File(factionImagePath));
+                        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate;
+                        if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
+                            String factionImagePath = tile.getCCPath("control_faction_" + faction + ".png");
+                            if (factionImagePath != null) {
+                                factionImage = ImageIO.read(new File(factionImagePath));
+                            }
                         }
                     }
                     image = ImageIO.read(new File(controlPath));

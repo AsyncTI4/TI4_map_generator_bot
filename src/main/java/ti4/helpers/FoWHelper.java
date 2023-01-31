@@ -3,7 +3,6 @@ package ti4.helpers;
 import net.dv8tion.jda.api.entities.Channel;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import org.jetbrains.annotations.Nullable;
 import ti4.commands.cards.CardsInfo;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -13,7 +12,7 @@ import javax.annotation.CheckForNull;
 public class FoWHelper {
 
     public static Boolean isPrivateGame(ButtonInteractionEvent event) {
-        return isGamePrivate(null, null, event.getChannel());
+        return isPrivateGame(null, null, event.getChannel());
     }
 
     public static Boolean isPrivateGame(GenericCommandInteractionEvent event) {
@@ -21,10 +20,10 @@ public class FoWHelper {
     }
 
     public static Boolean isPrivateGame(@CheckForNull Map map, GenericCommandInteractionEvent event) {
-        return isGamePrivate(map, event, null);
+        return isPrivateGame(map, event, null);
     }
 
-    private static Boolean isGamePrivate(@Nullable Map map, @CheckForNull GenericCommandInteractionEvent event, @CheckForNull Channel channel_) {
+    public static Boolean isPrivateGame(Map map, @CheckForNull GenericCommandInteractionEvent event, @CheckForNull Channel channel_) {
         Boolean isFoWPrivate = null;
         if (event == null && channel_ == null) {
             return null;
