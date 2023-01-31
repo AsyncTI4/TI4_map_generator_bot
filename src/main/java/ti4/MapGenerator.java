@@ -17,6 +17,7 @@ import ti4.commands.cardspn.PNCardsCommand;
 import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.custom.CustomCommand;
 import ti4.commands.explore.ExploreCommand;
+import ti4.commands.fow.FOWCommand;
 import ti4.commands.game.GameCommand;
 import ti4.commands.help.*;
 import ti4.commands.leaders.LeaderCommand;
@@ -107,6 +108,7 @@ public class MapGenerator {
         commandManager.addCommand(new SpecialCommand());
         commandManager.addCommand(new LeaderCommand());
         commandManager.addCommand(new CustomCommand());
+        commandManager.addCommand(new FOWCommand());
         commandManager.addCommand(new MiltyCommand());
 
         guild = jda.getGuildById(args[2]);
