@@ -52,6 +52,11 @@ public class Turn extends PlayerSubcommandData {
         Integer max = Collections.max(map.getScTradeGoods().keySet());
 
         for (Player player : map.getPlayers().values()) {
+            if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("white")){
+                player.setPassed(true);
+            }
+        }
+        for (Player player : map.getPlayers().values()) {
             String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(player.getSC()));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 naaluSC = player.getSC();
@@ -90,7 +95,7 @@ public class Turn extends PlayerSubcommandData {
                 scPassed.put(sc, player.isPassed());
             }
         }
-        if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value)) {
+        if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value) || map.getPlayers().values().stream().allMatch(Player::isPassed)) {
             String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, map);
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
 

@@ -23,6 +23,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class GenerateMap {
@@ -1808,6 +1809,7 @@ public class GenerateMap {
             Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
             UnitHolder spaceUnitHolder = unitHolders.stream().filter(unitHolder -> unitHolder.getName().equals(Constants.SPACE)).findFirst().orElse(null);
             if (spaceUnitHolder != null) {
+                image = addSleeperToken(tile, image, tileX, tileY, spaceUnitHolder, GenerateMap::isValidCustodianToken);
                 image = addToken(tile, image, tileX, tileY, spaceUnitHolder);
                 unitHolders.remove(spaceUnitHolder);
                 unitHolders.add(spaceUnitHolder);
@@ -1815,7 +1817,7 @@ public class GenerateMap {
             int degree;
             int degreeChange = 5;
             for (UnitHolder unitHolder : unitHolders) {
-                image = addSleeperToken(tile, image, tileX, tileY, unitHolder);
+                image = addSleeperToken(tile, image, tileX, tileY, unitHolder, GenerateMap::isValidToken);
                 image = addControl(tile, image, tileX, tileY, unitHolder, rectangles, map);
             }
             if (spaceUnitHolder != null) {
@@ -1941,7 +1943,7 @@ public class GenerateMap {
         }
     }
 
-    private BufferedImage addSleeperToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
+    private BufferedImage addSleeperToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, Function<String, Boolean> isValid) {
         Point centerPosition = unitHolder.getHolderCenterPosition();
         ArrayList<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.remove(null);
@@ -1954,11 +1956,7 @@ public class GenerateMap {
             return o1.compareTo(o2);
         });
         for (String tokenID : tokenList) {
-            if (tokenID.contains(Constants.SLEEPER) ||
-                    tokenID.contains(Constants.DMZ_LARGE) ||
-                    tokenID.contains(Constants.WORLD_DESTROYED) ||
-                    tokenID.contains(Constants.CUSTODIAN_TOKEN) ||
-                    tokenID.contains(Constants.CONSULATE_TOKEN)) {
+            if (isValid.apply(tokenID)) {
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
                     BotLogger.log("Could not find token file for: " + tokenID);
@@ -1985,6 +1983,17 @@ public class GenerateMap {
         return image;
     }
 
+    private static boolean isValidToken(String tokenID) {
+        return tokenID.contains(Constants.SLEEPER) ||
+                tokenID.contains(Constants.DMZ_LARGE) ||
+                tokenID.contains(Constants.WORLD_DESTROYED) ||
+                tokenID.contains(Constants.CONSULATE_TOKEN);
+    }
+
+    private static boolean isValidCustodianToken(String tokenID) {
+        return tokenID.contains(Constants.CUSTODIAN_TOKEN);
+    }
+
     private BufferedImage addPlanetToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, ArrayList<Rectangle> rectangles) {
         ArrayList<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.sort((o1, o2) -> {
@@ -2002,11 +2011,7 @@ public class GenerateMap {
             Point centerPosition = unitHolder.getHolderCenterPosition();
             int xDelta = 0;
             for (String tokenID : tokenList) {
-                if (tokenID.contains(Constants.SLEEPER) ||
-                        tokenID.contains(Constants.DMZ_LARGE) ||
-                        tokenID.contains(Constants.WORLD_DESTROYED) ||
-                        tokenID.contains(Constants.CUSTODIAN_TOKEN) ||
-                        tokenID.contains(Constants.CONSULATE_TOKEN)) {
+                if (isValidToken(tokenID) || isValidCustodianToken(tokenID)) {
                     continue;
                 }
                 String tokenPath = tile.getTokenPath(tokenID);
