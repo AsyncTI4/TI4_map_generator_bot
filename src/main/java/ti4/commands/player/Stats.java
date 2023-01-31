@@ -228,7 +228,7 @@ public class Stats extends PlayerSubcommandData {
     }
 
     private static String getSetValueMessage (SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber) {
-        return ">  set **" + optionName + "** to " + String.valueOf(setToNumber) + " _(was " + String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber-existingNumber) + ")_";
+        return ">  set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was " + String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber-existingNumber) + ")_";
     }
 
     private static String getChangeValueMessage(SlashCommandInteractionEvent event, Player player, String optionName, Integer changeNumber, Integer existingNumber, Integer newNumber) {
@@ -239,8 +239,8 @@ public class Stats extends PlayerSubcommandData {
             changeDescription = "decreased";
         }  
         return ">  " + changeDescription + " **" + optionName + "** by "
-                + String.valueOf(changeNumber) + " _(was " + String.valueOf(existingNumber) + ", now "
-                + String.valueOf(newNumber) + ")_";
+                + String.valueOf(changeNumber) + "   _(was " + String.valueOf(existingNumber) + ", now **"
+                + String.valueOf(newNumber) + "**)_";
     }
 
     private static String getGeneralMessage (SlashCommandInteractionEvent event, Player player, OptionMapping option) {
