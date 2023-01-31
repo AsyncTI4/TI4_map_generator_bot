@@ -1997,6 +1997,7 @@ public class GenerateMap {
         return tokenID.contains(Constants.SLEEPER) ||
                 tokenID.contains(Constants.DMZ_LARGE) ||
                 tokenID.contains(Constants.WORLD_DESTROYED) ||
+                tokenID.contains(Constants.CUSTODIAN_TOKEN) ||
                 tokenID.contains(Constants.CONSULATE_TOKEN);
     }
 
