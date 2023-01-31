@@ -231,6 +231,15 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.SPEND_AS -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of("Resources", "Influence", "Votes")
+                        .filter(value -> value.contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
         }
     }
 }
