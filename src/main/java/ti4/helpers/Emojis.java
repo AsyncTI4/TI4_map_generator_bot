@@ -199,16 +199,33 @@ public class Emojis {
     public static final String Influence_7 = "<:I7:864278934602776576>";
     public static final String Influence_8 = "<:I8:864278934173253653>";
     public static final String Influence_9 = "<:I9:864278934509322300>";
+
+    //PLANETS
+    public static final String HopesEnd = "<:HopesEnd:1068567741264572557>";
+    public static final String Primor = "<:Primor:1068567710990077952>";
+    public static final String MecatolRex = "<:MecatolRex:1068082190832898090>";
+
+    //ANOMOLIES
+    public static final String Supernova = "<:Supernova:1068081584978284635>";
+    public static final String Asteroid = "<:Asteroid:1068567369305292842>";
+    public static final String GravRift = "<:GravRift:1068079069893234750>";
+    public static final String Nebula = "<:Nebula:1068567639498166313>";
+
+    //TECHNOLOGY
+    public static final String CyberneticTech = "<:Cybernetictech:947250608149245972>";
+    public static final String PropulsionTech = "<:Propulsiontech:947250608145068074>";
+    public static final String BioticTech = "<:Biotictech:947250608107315210>";
+    public static final String WarfareTech = "<:Warfaretech:947250607855644743>";
     
+    //GOOD DOGS
+    public static final String GoodDog = "<:GoodDog:1068567308819255316>";
+    public static final String Ozzie = "<:Ozzie:1069446695689134140>";
+
     //OTHER
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
     public static final String WHbeta = "<:WHbeta:1056593596012302366>";
     public static final String WHgamma = "<:WHgamma:1056593568766111814>";
     public static final String LegendaryPlanet = "<:Legendaryplanet:947250386375426108>";
-    public static final String CyberneticTech = "<:Cybernetictech:947250608149245972>";
-    public static final String PropulsionTech = "<:Propulsiontech:947250608145068074>";
-    public static final String BioticTech = "<:Biotictech:947250608107315210>";
-    public static final String WarfareTech = "<:Warfaretech:947250607855644743>";
     public static final String SpeakerToken = "<:Speakertoken:965363466821050389>";
     public static final String Sabotage = "<:sabotage:962784058159546388>";
     public static final String NoSabotage = "<:nosabo:962783456541171712>";
