@@ -201,9 +201,12 @@ public class Emojis {
     public static final String Influence_9 = "<:I9:864278934509322300>";
 
     //PLANETS
+    public static final String MecatolRex = "<:MecatolRex:1068082190832898090>";
     public static final String HopesEnd = "<:HopesEnd:1068567741264572557>";
     public static final String Primor = "<:Primor:1068567710990077952>";
-    public static final String MecatolRex = "<:MecatolRex:1068082190832898090>";
+    public static final String Mallice = "";
+    public static final String Mirage = "";
+    public static final String planet = "<:planet:948433122263969802>";
 
     //ANOMOLIES
     public static final String Supernova = "<:Supernova:1068081584978284635>";
