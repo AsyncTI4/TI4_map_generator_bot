@@ -261,6 +261,14 @@ public class Helper {
             case "sc6" -> Emojis.SC6;
             case "sc7" -> Emojis.SC7;
             case "sc8" -> Emojis.SC8;
+            case "sc1back" -> Emojis.SC1Back;
+            case "sc2back" -> Emojis.SC2Back;
+            case "sc3back" -> Emojis.SC3Back;
+            case "sc4back" -> Emojis.SC4Back;
+            case "sc5back" -> Emojis.SC5Back;
+            case "sc6back" -> Emojis.SC6Back;
+            case "sc7back" -> Emojis.SC7Back;
+            case "sc8back" -> Emojis.SC8Back;
             case "actioncard" -> Emojis.ActionCard;
             case "agenda" -> Emojis.Agenda;
             case "pn" -> Emojis.PN;
@@ -504,6 +512,11 @@ public class Helper {
 
     public static String getSCEmojiFromInteger(Integer strategy_card) {
         String scEmojiName = "SC" + String.valueOf(strategy_card);
+        return Helper.getEmojiFromDiscord(scEmojiName);
+    }
+    
+    public static String getSCBackEmojiFromInteger(Integer strategy_card) {
+        String scEmojiName = "SC" + String.valueOf(strategy_card) + "Back";
         return Helper.getEmojiFromDiscord(scEmojiName);
     }
 
