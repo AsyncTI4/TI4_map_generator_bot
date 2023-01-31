@@ -140,8 +140,6 @@ public class GenerateMap {
                 }
             }
         }
-        BotLogger.log("SAVE MAP: Init done");
-
         File file = Storage.getMapImageStorage("temp.png");
         try (FileOutputStream outputStream = new FileOutputStream(file)) {
             if (displayType == DisplayType.all || displayType == DisplayType.map) {
@@ -166,12 +164,10 @@ public class GenerateMap {
             graphics.setColor(Color.WHITE);
             String timeStamp = getTimeStamp();
             graphics.drawString(map.getName() + " " + timeStamp, 0, 34);
-            BotLogger.log("SAVE MAP: Tiles Added");
             gameInfo(map, displayType);
-            BotLogger.log("SAVE MAP: Game Info Added");
 
             String testing = System.getenv("TESTING");
-            if ((testing == null) && ((displayType == DisplayType.all) && isFoWPrivate == null || !isFoWPrivate)) {
+            if (testing == null && displayType == DisplayType.all && (isFoWPrivate == null || !isFoWPrivate)) {
                 new Thread(() -> {
                     WebHelper.putMap(map.getName(), mainImage);
                     WebHelper.putData(map.getName(), map);
