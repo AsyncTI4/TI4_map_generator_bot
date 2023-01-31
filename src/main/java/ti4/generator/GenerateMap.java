@@ -229,6 +229,10 @@ public class GenerateMap {
             Set<String> tileIDsToShow = new HashSet<>(tilesWithPlayerUnitsPlanets);
             for (String tileID : tilesWithPlayerUnitsPlanets) {
                 tileIDsToShow.addAll(Mapper.getAdjacentTilesIDs(tileID));
+                List<String> adjacentCustomTiles = map.getCustomAdjacentTiles().get(tileID);
+                if (adjacentCustomTiles != null) {
+                    tileIDsToShow.addAll(adjacentCustomTiles);
+                }
                 Tile tile = tilesToDisplay.get(tileID);
                 List<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
                 if (wormholeIDs != null) {

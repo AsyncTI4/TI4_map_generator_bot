@@ -63,6 +63,7 @@ public class Map {
     private LinkedHashMap<String, Integer> revealedPublicObjectives = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> customPublicVP = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
+    private LinkedHashMap<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
     private ArrayList<String> publicObjectives1 = new ArrayList<>();
     private ArrayList<String> publicObjectives2 = new ArrayList<>();
     private ArrayList<String> soToPoList = new ArrayList<>();
@@ -440,6 +441,22 @@ public class Map {
         this.scoredPublicObjectives = scoredPublicObjectives;
     }
 
+    public void setCustomAdjacentTiles(LinkedHashMap<String, List<String>> customAdjacentTiles) {
+        this.customAdjacentTiles = customAdjacentTiles;
+    }
+
+    public void addCustomAdjacentTiles(String primaryTile, List<String> customAdjacentTiles) {
+        this.customAdjacentTiles.put(primaryTile, customAdjacentTiles);
+    }
+
+    public void removeCustomAdjacentTiles(String primaryTile) {
+        this.customAdjacentTiles.remove(primaryTile);
+    }
+
+    public void clearCustomAdjacentTiles() {
+        this.customAdjacentTiles.clear();
+    }
+
     public void setPublicObjectives1(ArrayList<String> publicObjectives1) {
         this.publicObjectives1 = publicObjectives1;
     }
@@ -468,6 +485,10 @@ public class Map {
 
     public LinkedHashMap<String, List<String>> getScoredPublicObjectives() {
         return scoredPublicObjectives;
+    }
+
+    public LinkedHashMap<String, List<String>> getCustomAdjacentTiles() {
+        return customAdjacentTiles;
     }
 
     public LinkedHashMap<String, Integer> getLaws() {

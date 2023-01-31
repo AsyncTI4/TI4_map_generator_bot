@@ -248,6 +248,14 @@ public class MapSaveLoadManager {
         writer.write(Constants.SCORED_PO + " " + sb1);
         writer.write(System.lineSeparator());
 
+        StringBuilder adjacentTiles = new StringBuilder();
+        for (java.util.Map.Entry<String, List<String>> entry : map.getCustomAdjacentTiles().entrySet()) {
+            String userIds = String.join("-", entry.getValue());
+            adjacentTiles.append(entry.getKey()).append(",").append(userIds).append(";");
+        }
+        writer.write(Constants.CUSTOM_ADJACENT_TILES + " " + adjacentTiles);
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.CREATION_DATE + " " + map.getCreationDate());
         writer.write(System.lineSeparator());
         writer.write(Constants.LAST_MODIFIED_DATE + " " + new Date().getTime());
@@ -691,6 +699,8 @@ public class MapSaveLoadManager {
                 map.setCustomPublicVP(getParsedCards(tokenizer[1]));
             } else if (Constants.SCORED_PO.equals(identification)) {
                 map.setScoredPublicObjectives(getParsedCardsForScoredPO(tokenizer[1]));
+            } else if (Constants.CUSTOM_ADJACENT_TILES.equals(identification)) {
+                map.setCustomAdjacentTiles(getParsedCardsForScoredPO(tokenizer[1]));
             } else if (Constants.AGENDAS.equals(identification)) {
                 map.setAgendas(getCardList(tokenizer[1]));
             } else if (Constants.AC_DISCARDED.equals(identification)) {
