@@ -56,7 +56,6 @@ public class Stats extends PlayerSubcommandData {
         if (optionCC != null && (optionT != null || optionF != null || optionS != null)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Use format 3/3/3 for command counters or individual values, not both");
         } else {
-
             if (optionCC != null) {
                 @SuppressWarnings("ConstantConditions")
                 String cc = AliasHandler.resolveFaction(optionCC.getAsString().toLowerCase());
@@ -87,50 +86,69 @@ public class Stats extends PlayerSubcommandData {
                 Helper.isCCCountCorrect(event, activeMap, player.getColor());
             }
         }
+
         OptionMapping optionTG = event.getOption(Constants.TG);
         if (optionTG != null) {
             setValue(event, player, optionTG, player::setTg, player::getTg);
         }
+
         OptionMapping optionC = event.getOption(Constants.COMMODITIES);
         if (optionC != null) {
             setValue(event, player, optionC, player::setCommodities, player::getCommodities);
         }
+
         OptionMapping optionCT = event.getOption(Constants.COMMODITIES_TOTAL);
         if (optionCT != null) {
             player.setCommoditiesTotal(optionCT.getAsInt());
+            StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionCT));
+            MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         }
 
         OptionMapping optionSpeaker = event.getOption(Constants.SPEAKER);
         if (optionSpeaker != null) {
+            StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionSpeaker));
             String value = optionSpeaker.getAsString().toLowerCase();
             if ("y".equals(value) || "yes".equals(value)) {
                 activeMap.setSpeaker(player.getUserID());
+            } else {
+                message.append(", which is not a valid input. Please use one of: y/yes");
             }
+            MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         }
 
         OptionMapping optionPassed = event.getOption(Constants.PASSED);
         if (optionPassed != null) {
+            StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionPassed));
             String value = optionPassed.getAsString().toLowerCase();
             if ("y".equals(value) || "yes".equals(value)) {
                 player.setPassed(true);
-                Turn.pingNextPlayer(event, activeMap, player);
+                // Turn.pingNextPlayer(event, activeMap, player);
             } else if ("n".equals(value) || "no".equals(value)) {
                 player.setPassed(false);
+            } else {
+                message.append(", which is not a valid input. Please use one of: y/yes/n/no");
             }
+            MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         }
         pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
 
         OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
         if (optionSCPlayed != null) {
+            StringBuilder message = new StringBuilder();
             int sc = player.getSC();
             if (sc > 0) {
                 String value = optionSCPlayed.getAsString().toLowerCase();
                 if ("y".equals(value) || "yes".equals(value)) {
                     activeMap.setSCPlayed(sc, true);
+                    message.append("> flipped " + Helper.getSCEmojiFromInteger(sc) + " to " + Helper.getSCBackEmojiFromInteger(sc) + " (played)");
                 } else if ("n".equals(value) || "no".equals(value)) {
                     activeMap.setSCPlayed(sc, false);
+                    message.append("> flipped " + Helper.getSCBackEmojiFromInteger(sc) + " to " + Helper.getSCEmojiFromInteger(sc) + " (unplayed)");
                 }
+            } else {
+                message.append("> attempted to change " + Constants.SC_PLAYED + ", but player has not picked an SC (SC = 0)");
             }
+            MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         }
     }
 
@@ -209,8 +227,7 @@ public class Stats extends PlayerSubcommandData {
         }
     }
 
-    private static String getSetValueMessage (SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber)
-    {
+    private static String getSetValueMessage (SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber) {
         return ">  set **" + optionName + "** to " + String.valueOf(setToNumber) + " _(was " + String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber-existingNumber) + ")_";
     }
 
@@ -224,5 +241,9 @@ public class Stats extends PlayerSubcommandData {
         return ">  " + changeDescription + " **" + optionName + "** by "
                 + String.valueOf(changeNumber) + " _(was " + String.valueOf(existingNumber) + ", now "
                 + String.valueOf(newNumber) + ")_";
+    }
+
+    private static String getGeneralMessage (SlashCommandInteractionEvent event, Player player, OptionMapping option) {
+        return ">  set **" + option.getName() + "** to " + option.getAsString();
     }
 }
