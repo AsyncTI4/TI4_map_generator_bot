@@ -53,7 +53,7 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
-            BotLogger.log(event, buttonID + " in game " + gameName);
+            // BotLogger.log(event, buttonID + " in game " + gameName);
             String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
             for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
                 if (textChannel_.getName().equals(gameName + "-actions")) {
@@ -69,7 +69,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
-            BotLogger.log(event, buttonID + " in game " + gameName);
+            // BotLogger.log(event, buttonID + " in game " + gameName);
             String soID = buttonID.replace(Constants.SO_SCORE_FROM_HAND, "");
             for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
                 if (textChannel_.getName().equals(gameName + "-actions")) {
