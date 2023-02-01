@@ -18,10 +18,17 @@ public class AliasHandler {
     private static HashMap<String, String> cctokenAliasList = new HashMap<>();
     private static HashMap<String, String> attachmentAliasList = new HashMap<>();
     private static HashMap<String, String> tokenAliasList = new HashMap<>();
-    private static HashMap<String, String>  factionAliasList = new HashMap<>();
-    private static HashMap<String, String>  colorAliasList = new HashMap<>();
-    private static HashMap<String, String>  ttpgAliasList = new HashMap<>();
-    private static HashMap<String, String>  ttpgPositionAliasList = new HashMap<>();
+    private static HashMap<String, String> factionAliasList = new HashMap<>();
+    private static HashMap<String, String> colorAliasList = new HashMap<>();
+    private static HashMap<String, String> techAliasList = new HashMap<>();
+    private static HashMap<String, String> actionCardAliasList = new HashMap<>();
+    private static HashMap<String, String> agendaAliasList = new HashMap<>();
+    private static HashMap<String, String> explorationAliasList = new HashMap<>();
+    private static HashMap<String, String> relicAliasList = new HashMap<>();
+    private static HashMap<String, String> publicObjectiveAliasList = new HashMap<>();
+    private static HashMap<String, String> secretObjectiveAliasList = new HashMap<>();
+    private static HashMap<String, String> promissoryAliasList = new HashMap<>();
+    private static HashMap<String, String> ttpgPositionAliasList = new HashMap<>();
 
     public static void init()
     {
@@ -36,7 +43,14 @@ public class AliasHandler {
         readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
         readAliasFile("faction_alias.properties", factionAliasList, "Could not read faction alias file");
         readAliasFile("color_alias.properties", colorAliasList, "Could not read color alias file");
-        readAliasFile("ttpg_alias.properties", ttpgAliasList, "Could not read TTPG alias file");
+        readAliasFile("tech_alias.properties", techAliasList, "Could not read tech alias file");
+        readAliasFile("action_card_alias.properties", actionCardAliasList, "Could not read action card alias file");
+        readAliasFile("agenda_alias.properties", agendaAliasList, "Could not read agenda alias file");
+        readAliasFile("exploration_alias.properties", explorationAliasList, "Could not read exploration alias file");
+        readAliasFile("relic_alias.properties", relicAliasList, "Could not read relic alias file");
+        readAliasFile("public_objective_alias.properties", publicObjectiveAliasList, "Could not read public objective alias file");
+        readAliasFile("secret_objective_alias.properties", secretObjectiveAliasList, "Could not read secret objective alias file");
+        readAliasFile("promissory_alias.properties", promissoryAliasList, "Could not read promissory alias file");
         readAliasFile("position_alias.properties", ttpgPositionAliasList, "Could not read TTPG position_alias file");
     }
     private static void readAliasFile(String fileName, ArrayList<String> list) {
@@ -151,9 +165,51 @@ public class AliasHandler {
         return aliasID != null ? aliasID : name;
     }
 
-    public static String resolveTTPGName(String name)
+    public static String resolveTech(String name)
     {
-        String aliasID = ttpgAliasList.get(name);
+        String aliasID = techAliasList.get(name);
+        return aliasID != null ? aliasID : name;
+    }
+
+    public static String resolveActionCard(String name)
+    {
+        String aliasID = actionCardAliasList.get(name);
+        return aliasID != null ? aliasID : name;
+    }
+
+    public static String resolveAgenda(String name)
+    {
+        String aliasID = agendaAliasList.get(name);
+        return aliasID != null ? aliasID : name;
+    }
+
+    public static String resolveExploration(String name)
+    {
+        String aliasID = explorationAliasList.get(name);
+        return aliasID != null ? aliasID : name;
+    }
+    
+    public static String resolvePromissory(String name)
+    {
+        String aliasID = promissoryAliasList.get(name);
+        return aliasID != null ? aliasID : name;
+    }
+    
+    public static String resolveRelic(String name)
+    {
+        String aliasID = relicAliasList.get(name);
+        return aliasID != null ? aliasID : name;
+    }
+    
+    public static String resolvePublicObjective(String name)
+    {
+        String aliasID = publicObjectiveAliasList.get(name);
+        return aliasID != null ? aliasID : name;
+    }
+    
+    public static String resolveSecretObjective(String name)
+    {
+        String aliasID = secretObjectiveAliasList.get(name);
         return aliasID != null ? aliasID : name;
     }
 
