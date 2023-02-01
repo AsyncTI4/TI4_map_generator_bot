@@ -50,8 +50,7 @@ public class MapSaveLoadManager {
     }
 
     public static void saveMap(Map map) {
-
-        File mapFile = Storage.getMapImageStorage(map.getName() + ".txt");
+        File mapFile = Storage.getMapImageStorage(map.getName() + TXT);
         if (mapFile != null) {
             saveUndo(map, mapFile);
             try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
