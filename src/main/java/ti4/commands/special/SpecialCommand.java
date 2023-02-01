@@ -123,6 +123,7 @@ public class SpecialCommand implements Command {
         subcommands.add(new RiseOfMessiah());
         subcommands.add(new SwapSC());
         subcommands.add(new KeleresHeroMentak());
+        subcommands.add(new NovaSeed());
 
         return subcommands;
     }

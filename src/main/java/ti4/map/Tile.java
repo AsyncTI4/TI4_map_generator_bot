@@ -23,6 +23,13 @@ public class Tile {
         initPlanetsAndSpace(tileID);
     }
 
+    public Tile(String tileID, String position, UnitHolder spaceHolder) {
+        this.tileID = tileID;
+        this.position = position != null ? position.toLowerCase() : null;
+        initPlanetsAndSpace(tileID);
+        unitHolders.replace(Constants.SPACE, spaceHolder);
+    }
+
     private void initPlanetsAndSpace(String tileID) {
 
         Space space = new Space(Constants.SPACE, Constants.SPACE_CENTER_POSITION);
