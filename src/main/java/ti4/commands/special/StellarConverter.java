@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.player.PlanetRemove;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.*;
@@ -54,12 +53,8 @@ public class StellarConverter extends SpecialSubcommandData {
             MessageHelper.replyToMessage(event, "System not found that contains planet");
             return;
         }
-        for (Player player_ : activeMap.getPlayers().values()) {
-            String color = player_.getColor();
-            unitHolder.removeAllUnits(color);
-            PlanetRemove.removePlayerControlToken(player_, unitHolder);
-            player_.removePlanet(unitHolder.getName());
-        }
+        
+        activeMap.removePlanet(unitHolder);
         tile.addToken(Constants.WORLD_DESTROYED_PNG, unitHolder.getName());
     }
 
