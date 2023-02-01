@@ -42,6 +42,7 @@ public class AddCustomAdjacentTile extends FOWSubcommandData {
             return;
         }
 
+        adjacentTiles = adjacentTiles.replace(" ", "");
         List<String> tiles = Arrays.asList(adjacentTiles.split(","));
         activeMap.addCustomAdjacentTiles(primaryTile, tiles);
     }
