@@ -36,16 +36,19 @@ import ti4.map_ttpg.TTPGPlayer;
 public class ConvertTTPGtoAsync {
     public static final java.util.Map<String,String> fakePlayers = new HashMap<String, String>() {
         {
-            // put("947763140517560331", "TI4 Game Management");
             put("481860200169472030", "PrisonerOne");
-            // put("814883082033037383", "Map Bot");
-            put("235148962103951360", "Carl-bot");
-            put("936929561302675456", "Midjourney Bot");
-            put("812171459564011580", "RoboDane");
-            // put("572698679618568193", "Dicecord");
             put("345897843757678603", "TerTerro");
             put("150809002974904321", "Holytispoon");
-            // put("960683086570487848", "TheEpicNerd");
+            put("936295970671566879", "somno");
+            put("426282231234035722", "Son of Leto(UTC-6)");
+            put("960683086570487848", "TheEpicNerd");
+            // put("947763140517560331", "TI4 Game Management");
+            // put("1059869343636263023", "TI4-Bot-Test");
+            // put("814883082033037383", "Map Bot");
+            // put("235148962103951360", "Carl-bot");
+            // put("936929561302675456", "Midjourney Bot");
+            // put("812171459564011580", "RoboDane");
+            // put("572698679618568193", "Dicecord");
         }
     };
     
@@ -101,6 +104,11 @@ public class ConvertTTPGtoAsync {
             asyncPlayer.setFaction(AliasHandler.resolveFaction(ttpgPlayer.getFactionShort().toLowerCase()));
             asyncPlayer.setColor(AliasHandler.resolveColor(ttpgPlayer.getColorActual().toLowerCase()));
 
+            //PLANETS
+            for (String planet : ttpgPlayer.getPlanetCards()) {
+                asyncPlayer.addPlanet(AliasHandler.resolvePlanet(planet.toLowerCase()));
+            }
+
             //LEADERS
             if (!asyncPlayer.getFaction().equals("keleres") || !asyncPlayer.getFaction().equals("nomad")) { //deal with these chumps later
                 asyncPlayer.getLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked") ? false : true);
@@ -118,9 +126,9 @@ public class ConvertTTPGtoAsync {
             }
 
             //TECHS
-            // for (String technology : ttpgPlayer.getTechnologies()) {
-            //     asyncPlayer.addTech(AliasHandler.resolveTTPGName(technology));
-            // }
+            for (String technology : ttpgPlayer.getTechnologies()) {
+                asyncPlayer.addTech(AliasHandler.resolveTech(technology.toLowerCase()));
+            }
             
             index++;
         }
@@ -153,7 +161,7 @@ public class ConvertTTPGtoAsync {
 
         // TILE +-X +-Y SPACE ; PLANET1 ; PLANET2 ; ...
         Pattern firstRegionPattern = Pattern.compile("^([0-9AB]+)([-+][0-9]+)([-+][0-9]+)(.*)?$");
-        Pattern rotPattern = Pattern.compile("^(\\d+)([AB])(\\d)$");
+        Pattern rotPattern = Pattern.compile("^(\\d+)([AB])(\\d)$"); //ignore hyperlanes for now
         Pattern regionAttachmentsPattern = Pattern.compile("^(.*)\\*(.*)$");
 
         String[] regions = ttpgHex.split(";");
@@ -206,11 +214,14 @@ public class ConvertTTPGtoAsync {
 
         if (asyncPosition == null) {
             System.out.println("    Could not map: " + ttpgPosition);
-        } else {
-            tile = new Tile(tileID, asyncPosition);
+            return tile;
         }
         
         
+        
+        tile = new Tile(tileID, asyncPosition);
+             
+    
         return tile;
     }
 
