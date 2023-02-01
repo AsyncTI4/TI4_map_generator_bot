@@ -122,6 +122,7 @@ public class Constants {
     public static final String DIPLO_SYSTEM = "diplo_system";
 
     public static final String NOVA_SEED = "nova_seed";
+    public static final String DESTROY_OTHER_UNITS = "destroy_other_units";
     public static final String RISE_OF_A_MESSIAH = "rise_of_a_messiah";
     public static final String SLEEPER_TOKEN = "sleeper_token";
     public static final String STELLAR_CONVERTER = "stellar_converter";
