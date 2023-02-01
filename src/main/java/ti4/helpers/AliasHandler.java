@@ -21,6 +21,7 @@ public class AliasHandler {
     private static HashMap<String, String>  factionAliasList = new HashMap<>();
     private static HashMap<String, String>  colorAliasList = new HashMap<>();
     private static HashMap<String, String>  ttpgAliasList = new HashMap<>();
+    private static HashMap<String, String>  ttpgPositionAliasList = new HashMap<>();
 
     public static void init()
     {
@@ -35,7 +36,8 @@ public class AliasHandler {
         readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
         readAliasFile("faction_alias.properties", factionAliasList, "Could not read faction alias file");
         readAliasFile("color_alias.properties", colorAliasList, "Could not read color alias file");
-        readAliasFile("ttpg_alias.properties", colorAliasList, "Could not read TTPG alias file");
+        readAliasFile("ttpg_alias.properties", ttpgAliasList, "Could not read TTPG alias file");
+        readAliasFile("position_alias.properties", ttpgPositionAliasList, "Could not read TTPG position_alias file");
     }
     private static void readAliasFile(String fileName, ArrayList<String> list) {
         readAliasFile(fileName, list, false);
@@ -153,5 +155,12 @@ public class AliasHandler {
     {
         String aliasID = ttpgAliasList.get(name);
         return aliasID != null ? aliasID : name;
+    }
+
+    public static String resolveTTPGPosition(String position)
+    {
+        String aliasID = ttpgAliasList.get(position);
+        System.out.println("resolving TTTPG position: " + position + " to async position: " + aliasID);
+        return aliasID != null ? aliasID : position;
     }
 }
