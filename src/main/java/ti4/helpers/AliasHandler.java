@@ -157,10 +157,14 @@ public class AliasHandler {
         return aliasID != null ? aliasID : name;
     }
 
+    /** Given a Position parameter like [+-][0-9][+-][0-9], will return Async position like [0-9][a-z]
+     * @param position TTPG like [+-][0-9][+-][0-9] Eg. +0+0, +2-2, +0+8
+     * @return Async position like [0-9][a-z] Eg. 0a, 2e, 4a
+     */
     public static String resolveTTPGPosition(String position)
     {
-        String aliasID = ttpgAliasList.get(position);
-        System.out.println("resolving TTTPG position: " + position + " to async position: " + aliasID);
-        return aliasID != null ? aliasID : position;
+        String aliasID = ttpgPositionAliasList.get(position);
+        System.out.println("resolving TTPG position: " + position + " to async position: " + aliasID);
+        return aliasID != null ? aliasID : null;
     }
 }
