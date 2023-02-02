@@ -71,7 +71,7 @@ public class Setup extends GameSubcommandData {
             }
         }
 
-        OptionMapping allianceOption = event.getOption(Constants.COMMUNITY_MODE);
+        OptionMapping allianceOption = event.getOption(Constants.ALLIANCE_MODE);
         if (allianceOption != null){
             String alliaceMode = allianceOption.getAsString();
             if ("YES".equals(alliaceMode)){
