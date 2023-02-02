@@ -343,7 +343,11 @@ public class GenerateMap {
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
         graphics.drawString(map.getCustomName(), 0, y);
-        y = strategyCards(map, y);
+        boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
+        if (!convertToGenericSC) {
+            y = strategyCards(map, y);
+        }
+
         int tempY = y;
         userVPs = new HashMap<>();
         y = objectives(map, y + 180, graphics, userVPs, false);
