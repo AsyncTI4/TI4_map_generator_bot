@@ -134,13 +134,12 @@ public class Mapper {
         return Arrays.stream(property.split(",")).toList();
     }
 
-    @CheckForNull
-    public static List<String> getWormholes(String tileID) {
+    public static Set<String> getWormholes(String tileID) {
         String property = wormholes.getProperty(tileID);
         if (property == null){
-            return null;
+            return new HashSet<>();
         }
-        return Arrays.stream(property.split(",")).toList();
+        return Arrays.stream(property.split(",")).collect(Collectors.toSet());
     }
 
     public static Set<String> getWormholesTiles(String wormholeID) {
