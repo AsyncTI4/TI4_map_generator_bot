@@ -11,7 +11,9 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 public class AddCustomAdjacentTile extends FOWSubcommandData {
@@ -19,6 +21,7 @@ public class AddCustomAdjacentTile extends FOWSubcommandData {
         super(Constants.ADD_CUSTOM_ADJACENT_TILES, "Add Custom Adjacent Tiles. ");
         addOptions(new OptionData(OptionType.STRING, Constants.PRIMARY_TILE, "Primary Tile").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ADJACENT_TILES, "Adjacent Tiles").setRequired(true));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.TWO_WAY, "Are added tiles two way connection").setRequired(false));
     }
 
     @Override
@@ -43,7 +46,22 @@ public class AddCustomAdjacentTile extends FOWSubcommandData {
         }
 
         adjacentTiles = adjacentTiles.replace(" ", "");
-        List<String> tiles = Arrays.asList(adjacentTiles.split(","));
+        String[] tilesSplit = adjacentTiles.split(",");
+        List<String> tiles = Arrays.asList(tilesSplit);
         activeMap.addCustomAdjacentTiles(primaryTile, tiles);
+        OptionMapping twoWayOption = event.getOption(Constants.TWO_WAY);
+        if (twoWayOption != null && twoWayOption.getAsBoolean()){
+            for (String tile : tiles) {
+                LinkedHashMap<String, List<String>> customAdjacentTiles = activeMap.getCustomAdjacentTiles();
+                List<String> customTiles = customAdjacentTiles.get(tile);
+                if (customTiles == null){
+                    customTiles = new ArrayList<>();
+                }
+                if (!customTiles.contains(primaryTile)){
+                    customTiles.add(primaryTile);
+                    activeMap.addCustomAdjacentTiles(tile, customTiles);
+                }
+            }
+        }
     }
 }

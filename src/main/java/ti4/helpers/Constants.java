@@ -33,6 +33,11 @@ public class Constants {
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
 
+    public static String ALPHA = "alpha";
+    public static String BETA = "beta";
+    public static String GAMMA = "gamma";
+    public static String DELTA = "delta";
+
     public static final String DRAW_SPECIFIC_SO_FOR_PLAYER = "draw_specific_so_for_player";
 
     public static final String SAVE_GAMES = "save_games";
@@ -330,6 +335,7 @@ public class Constants {
     public static final String CUSTOM_ADJACENT_TILES = "customAdjacentTiles";
     public static final String PRIMARY_TILE = "primary_tile";
     public static final String ADJACENT_TILES = "adjacent_tiles";
+    public static final String TWO_WAY = "two_way";
     public static final String PO1 = "publicObjectives1";
     public static final String PO2 = "publicObjectives2";
 

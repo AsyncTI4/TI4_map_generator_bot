@@ -234,26 +234,39 @@ public class GenerateMap {
                     tileIDsToShow.addAll(adjacentCustomTiles);
                 }
                 Tile tile = tilesToDisplay.get(tileID);
-                List<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-                if (wormholeIDs != null) {
-                    for (String wormholeID : wormholeIDs) {
-                        Set<String> wormholesTiles = Mapper.getWormholesTiles(wormholeID);
-                        for (java.util.Map.Entry<String, Tile> tileEntry : tilesToDisplay.entrySet()) {
-                            String position = tileEntry.getKey();
-                            if (tileIDsToShow.contains(position)) {
-                                continue;
-                            }
-                            Tile tile_ = tileEntry.getValue();
-                            if (wormholesTiles.contains(tile_.getTileID())) {
-                                tileIDsToShow.add(position);
-                                continue;
-                            }
-                            for (UnitHolder unitHolder : tile_.getUnitHolders().values()) {
-                                HashSet<String> tokenList = unitHolder.getTokenList();
-                                for (String token : tokenList) {
-                                    if (token.contains(wormholeID)) {
-                                        tileIDsToShow.add(position);
-                                    }
+                Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
+                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                    HashSet<String> tokenList = unitHolder.getTokenList();
+                    for (String token : tokenList) {
+                        if (token.contains(Constants.ALPHA)) {
+                            wormholeIDs.add(Constants.ALPHA);
+                        } else if (token.contains(Constants.BETA)) {
+                            wormholeIDs.add(Constants.BETA);
+                        } else if (token.contains(Constants.GAMMA)) {
+                            wormholeIDs.add(Constants.GAMMA);
+                        } else if (token.contains(Constants.DELTA)) {
+                            wormholeIDs.add(Constants.DELTA);
+                        }
+                    }
+                }
+
+                for (String wormholeID : wormholeIDs) {
+                    Set<String> wormholesTiles = Mapper.getWormholesTiles(wormholeID);
+                    for (java.util.Map.Entry<String, Tile> tileEntry : tilesToDisplay.entrySet()) {
+                        String position = tileEntry.getKey();
+                        if (tileIDsToShow.contains(position)) {
+                            continue;
+                        }
+                        Tile tile_ = tileEntry.getValue();
+                        if (wormholesTiles.contains(tile_.getTileID())) {
+                            tileIDsToShow.add(position);
+                            continue;
+                        }
+                        for (UnitHolder unitHolder : tile_.getUnitHolders().values()) {
+                            HashSet<String> tokenList = unitHolder.getTokenList();
+                            for (String token : tokenList) {
+                                if (token.contains(wormholeID)) {
+                                    tileIDsToShow.add(position);
                                 }
                             }
                         }
@@ -351,7 +364,7 @@ public class GenerateMap {
                 x = realX;
 
                 boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != fowPlayer;
-                if (convertToGeneric){
+                if (convertToGeneric) {
                     if (!isHasHSInView(player)) {
                         continue;
                     }
@@ -1129,7 +1142,7 @@ public class GenerateMap {
             String userName = player.getUserName();
 
             boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != fowPlayer;
-            if (convertToGeneric){
+            if (convertToGeneric) {
                 if (!isHasHSInView(player)) {
                     continue;
                 }
@@ -1206,17 +1219,17 @@ public class GenerateMap {
     private boolean isHasHSInView(Player player) {
         String faction = player.getFaction();
         boolean hasHSInView = false;
-        if (faction == null){
+        if (faction == null) {
             return hasHSInView;
         }
         String playerSetup = Mapper.getPlayerSetup(faction);
-        if (playerSetup == null){
+        if (playerSetup == null) {
             return hasHSInView;
         }
         String[] setupInfo = playerSetup.split(";");
         String hs = setupInfo[1];
         for (Tile tile : tilesToDisplay.values()) {
-            if (tile.getTileID().equals(hs)){
+            if (tile.getTileID().equals(hs)) {
                 hasHSInView = true;
                 break;
             }
@@ -1450,7 +1463,7 @@ public class GenerateMap {
                     boolean convertToGeneric = false;
                     for (Player player : map.getPlayers().values()) {
                         if (optionalText.equals(player.getFaction()) || optionalText.equals(player.getColor())) {
-                            if (isFoWPrivate != null && isFoWPrivate && player != fowPlayer){
+                            if (isFoWPrivate != null && isFoWPrivate && player != fowPlayer) {
                                 convertToGeneric = true;
                             }
                             faction = player.getFaction();
@@ -1577,8 +1590,8 @@ public class GenerateMap {
     }
 
     private int displayObjectives(int y, int x, LinkedHashMap<String, List<String>> scoredPublicObjectives, LinkedHashMap<String, Integer> revealedPublicObjectives,
-                                         LinkedHashMap<String, Player> players, HashMap<String, String> publicObjectivesState, Set<String> po, Integer objectiveWorth,
-                                         Integer[] column, LinkedHashMap<String, Integer> customPublicVP, boolean justCalculate, boolean fixedColumn, Graphics graphics, HashMap<Player, Integer> userVPs) {
+                                  LinkedHashMap<String, Player> players, HashMap<String, String> publicObjectivesState, Set<String> po, Integer objectiveWorth,
+                                  Integer[] column, LinkedHashMap<String, Integer> customPublicVP, boolean justCalculate, boolean fixedColumn, Graphics graphics, HashMap<Player, Integer> userVPs) {
         Set<String> keysToRemove = new HashSet<>();
         for (java.util.Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
 //            switch (column[0]) {
@@ -1638,12 +1651,12 @@ public class GenerateMap {
     }
 
     private void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID,
-                                                boolean multiScoring, Integer objectiveWorth, boolean justCalculate, Graphics graphics, HashMap<Player, Integer> userVPs) {
+                                         boolean multiScoring, Integer objectiveWorth, boolean justCalculate, Graphics graphics, HashMap<Player, Integer> userVPs) {
         drawScoreControlMarkers(x, y, players, scoredPlayerID, multiScoring, objectiveWorth, justCalculate, false, graphics, userVPs);
     }
 
     private void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID,
-                                                boolean multiScoring, Integer objectiveWorth, boolean justCalculate, boolean fixedColumn, Graphics graphics, HashMap<Player, Integer> userVPs) {
+                                         boolean multiScoring, Integer objectiveWorth, boolean justCalculate, boolean fixedColumn, Graphics graphics, HashMap<Player, Integer> userVPs) {
         try {
             int tempX = 0;
             BufferedImage factionImage = null;
