@@ -12,6 +12,8 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.print.attribute.standard.Chromaticity;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -21,16 +23,20 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
 import ti4.commands.map.AddTileList;
+import ti4.commands.player.PlanetAdd;
 import ti4.commands.status.ScorePublic;
+import ti4.commands.tokens.AddControl;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.map_ttpg.TTPGPlayer;
 
 public class ConvertTTPGtoAsync {
@@ -134,9 +140,10 @@ public class ConvertTTPGtoAsync {
         }
         // setScoredPublicObjectives(ttpgMap.getObjectives().getPublicObjectivesI());
 
+        //TILES - HEX SUMMARY
         String[] hexSummary = ttpgMap.getHexSummary().split(",");
         for (String hex : hexSummary) {
-            System.out.println("Hex:  " + hex);
+            System.out.println("Hex: " + hex);
             if (hex.length() > 0) {
                 Tile tile = ConvertTTPGHexToAsyncTile(asyncMap, hex);
                 if (tile != null) {
@@ -148,6 +155,21 @@ public class ConvertTTPGtoAsync {
                 System.out.println("0 length hex string");
             }
         }
+
+        //add control tokens to all owned planets
+        for (Tile tile : asyncMap.getTileMap().values()) {
+            for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                for (Player player : asyncMap.getPlayers().values()) {
+                    for (String planet : player.getPlanets()) {
+                        // System.out.println(unitHolder.getName() + "  " + planet + "   " + player.getColor());
+                        if (unitHolder.getName().equalsIgnoreCase(planet)) {
+                            tile.addControl(Mapper.getControlID(player.getColor()), planet);
+                        }
+                    }
+                }
+            }
+        }
+
         return asyncMap;
     }
 
@@ -157,28 +179,21 @@ public class ConvertTTPGtoAsync {
     // }
     
     public static Tile ConvertTTPGHexToAsyncTile (Map asyncMap, String ttpgHex) {
-        System.out.println(" Examining hex summary:\n  " + ttpgHex);
+        // System.out.println(" Examining hex summary:  " + ttpgHex);
 
         // TILE +-X +-Y SPACE ; PLANET1 ; PLANET2 ; ...
         Pattern firstRegionPattern = Pattern.compile("^([0-9AB]+)([-+][0-9]+)([-+][0-9]+)(.*)?$");
         Pattern rotPattern = Pattern.compile("^(\\d+)([AB])(\\d)$"); //ignore hyperlanes for now
-        Pattern regionAttachmentsPattern = Pattern.compile("^(.*)\\*(.*)$");
-
-        String[] regions = ttpgHex.split(";");
-        for (String region : regions) {
-            System.out.println("   region: " + region);
-        }
-
-        
+        Pattern regionAttachmentsPattern = Pattern.compile("^(.*)\\*(.*)$");  
         
         Matcher matcher = firstRegionPattern.matcher(ttpgHex);
         if (matcher.find()) {
-            System.out.println("     Matches!");
-            System.out.println("       group(0):" + matcher.group(0));
-            System.out.println("       group(1):" + matcher.group(1));
-            System.out.println("       group(2):" + matcher.group(2));
-            System.out.println("       group(3):" + matcher.group(3));
-            System.out.println("       group(4):" + matcher.group(4));
+            // System.out.println("     Matches!");
+            // System.out.println("       group(0):" + matcher.group(0));
+            System.out.println("     TileID:" + matcher.group(1));
+            System.out.println("     X:" + matcher.group(2));
+            System.out.println("     Y:" + matcher.group(3));
+            // System.out.println("       group(4):" + matcher.group(4));
             
         } else {
             System.out.println("     No Match");
@@ -196,7 +211,7 @@ public class ConvertTTPGtoAsync {
         switch (tileID) {
             //TODO: smart placement of mallice/whdelta/nombox
             case "82" -> { //Mallice
-                tileID = "82b";
+                tileID = "82b"; //TODO: If 82 hasunits, then 82b, otherwise, 82a
                 asyncPosition = "tl"; //hardcode top left for now
             }
             case "51" -> { //Creuss
@@ -218,16 +233,126 @@ public class ConvertTTPGtoAsync {
         }
         
         
-        
         tile = new Tile(tileID, asyncPosition);
-             
+        String tileContents = matcher.group(4);
+
+        Integer index = 0;
+        String[] regions = tileContents.split(";");
+        System.out.print(regions.length);
+
+        //PER REGION/PLANET/UNITHOLDER
+        for (String regionContents : regions) {
+            Boolean isSpaceRegion = index == 0 ? true : false;
+            Boolean isPlanetRegion = index > 0 ? true : false;
+            String planetAlias = tileID + "_" + index;
+            if (isSpaceRegion) {
+                System.out.println("     spaceContents: " + regionContents);
+            } else {
+
+                String asyncPlanet = AliasHandler.resolvePlanet(planetAlias);
+                System.out.println("     planet: " + planetAlias + ": " + asyncPlanet);
+                System.out.println("         contents: " + regionContents);
+                
+                //Find attachments
+                Matcher matcher2 = regionAttachmentsPattern.matcher(regionContents);
+                Boolean hasAttachments = matcher2.find();
+                String attachments = null;
+                System.out.println("         hasAttachments: " + hasAttachments.toString());
+                if (hasAttachments) {
+                    attachments = matcher2.group(2);
+                    for (Character attachment : attachments.toCharArray()) {
+                        System.out.println("          - " + attachment + ": "+ AliasHandler.resolveTTPGAttachment(Character.toString(attachment)));
+                        tile.addToken(AliasHandler.resolveTTPGAttachment(Character.toString(attachment)), planetAlias);
+                    }
+                }
+            }
+
+
+            String colour = "";
+            Integer regionCount = 1;
+
+            //DECODE REGION STRING, CHAR BY CHAR
+            for (int i = 0; i < regionContents.length(); i++) {
+                Character chr = regionContents.charAt(i);
+                String str = Character.toString(chr);
+
+                if (Character.isUpperCase(chr)) { //is a new Color, signify a new set of player's units
+                    //reset colour & count
+                    colour = AliasHandler.resolveColor(str.toLowerCase());
+                    regionCount = 1;
+
+                    System.out.println("            player: " + colour);
+                    // playerUnits.put(colour, "");
+
+                } else if (Character.isDigit(chr)) { // is a count, signify a new group of units
+                    System.out.println("                count: " + str);
+                    regionCount = Integer.valueOf(str);
+
+                } else if (Character.isLowerCase(chr)) { // is a unit, control_token, or CC
+                    if (!colour.equals("")){ //colour hasn't shown up yet, so probably just tokens in space, skip unit crap
+                        if (str.equals("t")) { //CC
+                            tile.addCC(Mapper.getCCID(colour));
+                        } else if (str.equals("o")) { //control_token
+                            tile.addToken(Mapper.getControlID(colour), AliasHandler.resolvePlanet(planetAlias));
+                        } else { // is a unit
+                            System.out.println("                unit:  " + AliasHandler.resolveTTPGUnit(str));
+                            String asyncPlanet = isPlanetRegion ? " " + AliasHandler.resolvePlanet(planetAlias) : "";
+                            String unit = AliasHandler.resolveTTPGUnit(str);
+                            
+                            
+                            String unitID = Mapper.getUnitID(unit, colour);
+                            String unitCount = String.valueOf(regionCount);
+                            
+                            if (isSpaceRegion) {
+                                tile.addUnit("space", unitID, unitCount);
+                            } else if (isPlanetRegion) {
+                                tile.addUnit(AliasHandler.resolvePlanet(planetAlias), unitID, unitCount);
+                            }
+                            
+                            // playerUnits.computeIfPresent(colour, (k, v) -> v + unitCount + " " + unit + asyncPlanet + ", ");
+                        }
+                    }
+
+                    if (str.equals("e")) {
+                        System.out.println("attempt to add frontier token to " + tile.getPosition());
+                        tile.addToken(Constants.FRONTIER, Constants.SPACE);
+                    }
+                } else {
+                    System.out.println("                what is this?  " + str);
+                }
+            }
+
+            // System.out.println(playerUnits.toString());
+            // for (Entry<String,String> unitString : playerUnits.entrySet()) {
+            //     System.out.println(unitString.getKey());
+            //     System.out.println(tileID);
+            //     System.out.println(unitString.getValue());
+            //     String unitID = Mapper.getUnitID(unit, color);
+            // }
+
+
+
+            index++;
+        }
+
+        //String color = Helper.getColor(activeMap, event);
+        // String unitID = Mapper.getUnitID(unit, color);
+
+        // if (matcher2.find()) {
+        //     System.out.println("     Matches!");
+        //     for (int i = 0; i < matcher.groupCount()-1; i++) {
+        //         System.out.println("       group(" + i + "):" + matcher2.group(i));
+        //     }          
+        // } else {
+        //     System.out.println("     No Match");
+        // }
     
         return tile;
     }
 
+    // private static String parseRegion() {
 
-
-
+    // }
 
 
     public static String currentDateTime() {
