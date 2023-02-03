@@ -7,12 +7,9 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import javax.print.attribute.standard.Chromaticity;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -22,10 +19,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.fasterxml.jackson.databind.SerializationFeature;
 
-import ti4.commands.map.AddTileList;
-import ti4.commands.player.PlanetAdd;
-import ti4.commands.status.ScorePublic;
-import ti4.commands.tokens.AddControl;
 import ti4.commands.tokens.AddToken;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -33,12 +26,10 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.map.Map;
-import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.map_ttpg.TTPGPlayer;
 
 public class ConvertTTPGtoAsync {
 
@@ -116,8 +107,6 @@ public class ConvertTTPGtoAsync {
             // put("572698679618568193", "Dicecord");
         }
     };
-    
-
 
     public static void main(String[] args) throws Exception {
         PositionMapper.init();
@@ -150,31 +139,35 @@ public class ConvertTTPGtoAsync {
             }
         };
         
+        //ADD STAGE 1 PUBLIC OBJECTIVES
         for (String objective : ttpgMap.getObjectives().getPublicObjectivesI()) {
             asyncMap.addSpecificStage1(AliasHandler.resolveObjective(objective));
         }
+
+        //ADD STAGE 2 PUBLIC OBJECTIVES
         for (String objective : ttpgMap.getObjectives().getPublicObjectivesII()) {
             asyncMap.addSpecificStage2(AliasHandler.resolveObjective(objective));
         }
+
+        //ADD CUSTOM PUBLIC OBJECTIVES FROM AGENDAS
         for (String objective : ttpgMap.getObjectives().getAgenda()) {
             asyncMap.addCustomPO(objective, 1);
             //asyncMap.addLaw(null, objective); TODO: if point from Law, make sure law is added
         }
+
+        //ADD CUSTOM PUBLIC OBJECTIVES FROM RELICS
         for (String objective : ttpgMap.getObjectives().getRelics()) {
             asyncMap.addCustomPO(objective, 1);
         }
+
+        //ADD CUSTOM PUBLIC OBJECTIVES FROM OTHER SOURCES
         for (String objective : ttpgMap.getObjectives().getOther()) {
             asyncMap.addCustomPO(objective, 1);
         }
 
-        // System.out.println(asyncMap.getRevealedPublicObjectives());
 
-        // System.out.println("Mapped? " + AddTileList.setMapTileList(null, ttpgMap.getMapString(), asyncMap));
-
+        //PLAYERS
         Integer index = 0;
-        LinkedHashMap<String, Player> asyncPlayers = asyncMap.getPlayers();
-
-        //PLAYER
         for (Entry<String,String> fakePlayer : fakePlayers.entrySet()) {
             asyncMap.addPlayer(fakePlayer.getKey().toString(), fakePlayer.getValue().toString());
             Player asyncPlayer = asyncMap.getPlayer(fakePlayer.getKey().toString());
@@ -190,7 +183,7 @@ public class ConvertTTPGtoAsync {
             asyncPlayer.setFleetCC(ttpgPlayer.getCommandTokens().getFleet());
             asyncPlayer.setStrategicCC(ttpgPlayer.getCommandTokens().getStrategy());
 
-            //SCORED OBJECTIVES
+            //PLAYER SCORED OBJECTIVES
             for (String ttpgScoredObjective : ttpgPlayer.getObjectives()) {
                 String asyncScoredObjective = AliasHandler.resolveObjective(ttpgScoredObjective);
                 if (asyncMap.getSecretObjectives().contains(asyncScoredObjective)) {
@@ -216,12 +209,12 @@ public class ConvertTTPGtoAsync {
                 }
             }
 
-            //PLANETS
+            //PLAYER PLANETS
             for (String planet : ttpgPlayer.getPlanetCards()) {
                 asyncPlayer.addPlanet(AliasHandler.resolvePlanet(planet.toLowerCase()));
             }
 
-            //LEADERS
+            //PLAYER LEADERS
             if (!asyncPlayer.getFaction().equals("keleres") && !asyncPlayer.getFaction().equals("nomad")) { //deal with these chumps later
                 asyncPlayer.getLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked") ? false : true);
                 asyncPlayer.getLeader("commander").setLocked(ttpgPlayer.getLeaders().getCommander().equals("unlocked") ? false : true);
@@ -252,7 +245,7 @@ public class ConvertTTPGtoAsync {
                 
             }
 
-            //CUSTODIAN POINTS
+            //PLAYER CUSTODIAN POINTS
             Integer ttpgCustodianPoints = ttpgPlayer.getCustodiansPoints();
             if (ttpgCustodianPoints > 0) {
                 while (ttpgCustodianPoints > 0) {
@@ -261,12 +254,12 @@ public class ConvertTTPGtoAsync {
                 }
             }
 
-            //TECHS
+            //PLAYER TECHS
             for (String technology : ttpgPlayer.getTechnologies()) {
                 asyncPlayer.addTech(AliasHandler.resolveTech(technology.toLowerCase()));
             }
             
-            //RELICS
+            //PLAYER RELICS
             for (String relic : ttpgPlayer.getRelicCards()) {
                 asyncPlayer.addRelic(AliasHandler.resolveRelic(relic));
                 asyncMap.getAllRelics().remove(AliasHandler.resolveRelic(relic));
@@ -275,7 +268,7 @@ public class ConvertTTPGtoAsync {
             index++;
         }
 
-        //TILES - HEX SUMMARY
+        //ADD TILES -> PARSE HEX SUMMARY
         String[] hexSummary = ttpgMap.getHexSummary().split(",");
         for (String hex : hexSummary) {
             System.out.println("Hex: " + hex);
@@ -291,7 +284,7 @@ public class ConvertTTPGtoAsync {
             }
         }
 
-        //add control tokens to all owned planets
+        //ADD CONTROL TOKENS
         for (Tile tile : asyncMap.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                 for (Player player : asyncMap.getPlayers().values()) {
@@ -304,7 +297,6 @@ public class ConvertTTPGtoAsync {
                 }
             }
         }
-
         return asyncMap;
     }
    
@@ -364,26 +356,18 @@ public class ConvertTTPGtoAsync {
             return tile;
         }
         
-        
+        //PER REGION/PLANET/UNITHOLDER
         tile = new Tile(tileID, asyncPosition);
         String tileContents = matcher.group(4);
-
         Integer index = 0;
         String[] regions = tileContents.split(";");
         System.out.print(regions.length);
-
-
-
-
-        //PER REGION/PLANET/UNITHOLDER
         for (String regionContents : regions) {
             Boolean regionIsSpace = index == 0 ? true : false;
             Boolean regionIsPlanet = index > 0 ? true : false;
 
             String planetAlias = tileID + "_" + index; //unique planet ID in planet_alias.properties
             String planet = AliasHandler.resolvePlanet(planetAlias);
-
-
 
             if (regionIsSpace) {
                 System.out.println("     spaceContents: " + regionContents);
@@ -419,8 +403,6 @@ public class ConvertTTPGtoAsync {
 
             String colour = "";
             Integer regionCount = 1;
-
-
 
             //DECODE REGION STRING, CHAR BY CHAR
             for (int i = 0; i < regionContents.length(); i++) {
@@ -474,26 +456,9 @@ public class ConvertTTPGtoAsync {
 
             index++; //next Region/Planet/UnitHolder
         }
-
-        //String color = Helper.getColor(activeMap, event);
-        // String unitID = Mapper.getUnitID(unit, color);
-
-        // if (matcher2.find()) {
-        //     System.out.println("     Matches!");
-        //     for (int i = 0; i < matcher.groupCount()-1; i++) {
-        //         System.out.println("       group(" + i + "):" + matcher2.group(i));
-        //     }          
-        // } else {
-        //     System.out.println("     No Match");
-        // }
     
         return tile;
     }
-
-    // private static String parseRegion() {
-
-    // }
-
 
     public static String currentDateTime() {
         return ZonedDateTime.now().format(DateTimeFormatter.ofPattern( "uuuuMMddHHmmss" ));   
@@ -502,13 +467,9 @@ public class ConvertTTPGtoAsync {
     public static TTPGMap getTTPGMapFromJsonFile(String filePath) throws Exception {
         String jsonSource = readFileAsString(filePath);
         JsonNode node = parse(jsonSource);
-
-        // System.out.println(generateString(node,true));
-
         TTPGMap ttpgMap = fromJson(node, TTPGMap.class);
         return ttpgMap;
     }
-
 
     public static String readFileAsString(String file)throws Exception
     {
