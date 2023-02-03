@@ -3,6 +3,7 @@ package ti4.map;
 
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
@@ -293,7 +294,7 @@ public class Map {
     public ArrayList<String> getPublicObjectives2() {
         return publicObjectives2;
     }
-
+    
     public java.util.Map.Entry<String, Integer> revealState1() {
         return revealObjective(publicObjectives1);
     }
@@ -301,7 +302,7 @@ public class Map {
     public java.util.Map.Entry<String, Integer> revealState2() {
         return revealObjective(publicObjectives2);
     }
-
+    
     public java.util.Map.Entry<String, Integer> revealObjective(ArrayList<String> objectiveList) {
         if (!objectiveList.isEmpty()) {
             String id = objectiveList.get(0);
@@ -309,6 +310,27 @@ public class Map {
             addRevealedPublicObjective(id);
             for (java.util.Map.Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
                 if (entry.getKey().equals(id)) {
+                    return entry;
+                }
+            }
+        }
+        return null;
+    }
+    
+    public java.util.Map.Entry<String, Integer> addSpecificStage1(String objective) {
+        return addSpecificObjective(publicObjectives1, objective);
+    }
+
+    public java.util.Map.Entry<String, Integer> addSpecificStage2(String objective) {
+        return addSpecificObjective(publicObjectives2, objective);
+    }
+
+    public java.util.Map.Entry<String, Integer> addSpecificObjective(ArrayList<String> objectiveList, String objective) {
+        if (!objectiveList.isEmpty()) {
+            objectiveList.remove(objective);
+            addRevealedPublicObjective(objective);
+            for (java.util.Map.Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
+                if (entry.getKey().equals(objective)) {
                     return entry;
                 }
             }
