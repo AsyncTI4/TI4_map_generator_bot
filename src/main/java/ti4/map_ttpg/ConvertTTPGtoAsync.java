@@ -26,6 +26,7 @@ import ti4.commands.map.AddTileList;
 import ti4.commands.player.PlanetAdd;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddControl;
+import ti4.commands.tokens.AddToken;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
@@ -40,6 +41,64 @@ import ti4.map.UnitHolder;
 import ti4.map_ttpg.TTPGPlayer;
 
 public class ConvertTTPGtoAsync {
+
+    private static final ArrayList<String> validColours = new ArrayList<String>(){{
+        add("W"); //White
+        add("B"); //Blue
+        add("P"); //Purple
+        add("Y"); //Yellow
+        add("R"); //Red
+        add("G"); //Green
+        add("E"); //Orange
+        add("K"); //Pink
+    }};
+
+    private static final ArrayList<String> validUnits = new ArrayList<String>(){{
+        add("c"); //carrier
+        add("d"); //dreadnought
+        add("f"); //fighter
+        add("h"); //flagship
+        add("i"); //infantry
+        add("m"); //mech
+        add("o"); //control_token
+        add("p"); //pds
+        add("r"); //cruiser
+        add("s"); //space_dock
+        add("t"); //command_token
+        add("w"); //war_sun
+        add("y"); //destroyer
+    }};
+
+    private static final ArrayList<String> validAttachments = new ArrayList<String>(){{
+        add("C"); //cybernetic_research_facility_face
+        add("I"); //biotic_research_facility_face
+        add("O"); //propulsion_research_facility_face
+        add("W"); //warfare_research_facility_face
+        add("a"); //alpha_wormhole
+        add("b"); //beta_wormhole
+        add("c"); //cybernetic_Research_Facility_back
+        add("d"); //dyson_sphere
+        add("e"); //frontier
+        add("f"); //nano_forge
+        add("g"); //gamma_wormhole
+        add("h"); //grav_tear
+        add("i"); //biotic_research_facility_back
+        add("j"); //tomb_of_emphidia
+        add("k"); //mirage
+        add("l"); //stellar_converter
+        add("m"); //mining_world
+        add("n"); //ion_storm
+        add("o"); //propulsion_research_facility_back
+        add("p"); //paradise_world
+        add("q"); //ul_sleeper
+        add("r"); //rich_world
+        add("t"); //ul_terraform
+        add("u"); //ul_geoform
+        add("w"); //warfare_research_facility_back
+        add("x"); //lazax_survivors
+        add("z"); //dmz
+    }};
+
     public static final java.util.Map<String,String> fakePlayers = new HashMap<String, String>() {
         {
             put("481860200169472030", "PrisonerOne");
@@ -82,8 +141,8 @@ public class ConvertTTPGtoAsync {
         Mapper.init();
         Map asyncMap = new Map() {
             {
-                setOwnerID("947763140517560331");
-                setOwnerName("TI4 Game Management");
+                setOwnerID("481860200169472030");
+                setOwnerName("PrisonerOne");
                 setPlayerCountForMap(ttpgMap.getPlayers().size());
                 setVp(ttpgMap.getScoreboard());
                 setRound(ttpgMap.getRound());
@@ -91,6 +150,13 @@ public class ConvertTTPGtoAsync {
             }
         };
         
+        for (String objective : ttpgMap.getObjectives().getPublicObjectivesI()) {
+            asyncMap.setPublicObjectives1((ArrayList<String>)ttpgMap.getObjectives().getPublicObjectivesI());
+        }
+
+
+
+
         // System.out.println("Mapped? " + AddTileList.setMapTileList(null, ttpgMap.getMapString(), asyncMap));
 
         Integer index = 0;
@@ -101,14 +167,14 @@ public class ConvertTTPGtoAsync {
             TTPGPlayer ttpgPlayer = ttpgMap.getPlayers().get(index);
 
             //PLAYER STATS
+            asyncPlayer.setFaction(AliasHandler.resolveFaction(ttpgPlayer.getFactionShort().toLowerCase()));
+            asyncPlayer.setColor(AliasHandler.resolveColor(ttpgPlayer.getColorActual().toLowerCase()));
             asyncPlayer.setCommodities(ttpgPlayer.getCommodities());
             asyncPlayer.setCommoditiesTotal(ttpgPlayer.getMaxCommodities());
             asyncPlayer.setTg(ttpgPlayer.getTradeGoods());
             asyncPlayer.setTacticalCC(ttpgPlayer.getCommandTokens().getTactics());
             asyncPlayer.setFleetCC(ttpgPlayer.getCommandTokens().getFleet());
             asyncPlayer.setStrategicCC(ttpgPlayer.getCommandTokens().getStrategy());
-            asyncPlayer.setFaction(AliasHandler.resolveFaction(ttpgPlayer.getFactionShort().toLowerCase()));
-            asyncPlayer.setColor(AliasHandler.resolveColor(ttpgPlayer.getColorActual().toLowerCase()));
 
             //PLANETS
             for (String planet : ttpgPlayer.getPlanetCards()) {
@@ -172,12 +238,7 @@ public class ConvertTTPGtoAsync {
 
         return asyncMap;
     }
-
-    // public static Player ConvertTTPGPlayerToAsyncPlayer (TTPGPlayer ttpgPlayer) {
-    //     Player asyncPlayer = new Player(ttpgPlayer);
-    //     return asyncPlayer;
-    // }
-    
+   
     public static Tile ConvertTTPGHexToAsyncTile (Map asyncMap, String ttpgHex) {
         // System.out.println(" Examining hex summary:  " + ttpgHex);
 
@@ -208,10 +269,12 @@ public class ConvertTTPGtoAsync {
 
         String asyncPosition = AliasHandler.resolveTTPGPosition(ttpgPosition);
 
+
+        //Handle special cases, tiles to go in TL/TR/BL/BR
         switch (tileID) {
             //TODO: smart placement of mallice/whdelta/nombox
             case "82" -> { //Mallice
-                tileID = "82b"; //TODO: If 82 hasunits, then 82b, otherwise, 82a
+                tileID = "82b"; //TODO: If 82 hasunits or control, then 82b, otherwise, 82a
                 asyncPosition = "tl"; //hardcode top left for now
             }
             case "51" -> { //Creuss
@@ -219,10 +282,10 @@ public class ConvertTTPGtoAsync {
                 asyncPosition = "tr"; //hardcode top right for now
             }
             case "17" -> { //DeltaWH
-                //TODO: move Creuss if exists in tileList
+                //TODO: move Creuss if exists in tileList - i.e. if 17 is near BL, put 51 in BL
             }
-            case "54" -> { //Cabal, add S11 cabal prison nearby
-                Tile prison = new Tile("S11", "br");
+            case "54" -> { //Cabal, add S11 cabal prison nearby - i.e. if 54 is near BR, put S11 in BR
+                Tile prison = new Tile("S11", "br"); //hardcode bottom right for now
                 asyncMap.setTile(prison);
             }
         }
@@ -240,55 +303,73 @@ public class ConvertTTPGtoAsync {
         String[] regions = tileContents.split(";");
         System.out.print(regions.length);
 
+
+
+
         //PER REGION/PLANET/UNITHOLDER
         for (String regionContents : regions) {
-            Boolean isSpaceRegion = index == 0 ? true : false;
-            Boolean isPlanetRegion = index > 0 ? true : false;
-            String planetAlias = tileID + "_" + index;
-            if (isSpaceRegion) {
+            Boolean regionIsSpace = index == 0 ? true : false;
+            Boolean regionIsPlanet = index > 0 ? true : false;
+
+            String planetAlias = tileID + "_" + index; //unique planet ID in planet_alias.properties
+            String planet = AliasHandler.resolvePlanet(planetAlias);
+
+
+
+            if (regionIsSpace) {
                 System.out.println("     spaceContents: " + regionContents);
             } else {
-
-                String asyncPlanet = AliasHandler.resolvePlanet(planetAlias);
-                System.out.println("     planet: " + planetAlias + ": " + asyncPlanet);
+                System.out.println("     planet: " + planetAlias + ": " + planet);
                 System.out.println("         contents: " + regionContents);
-                
-                //Find attachments
-                Matcher matcher2 = regionAttachmentsPattern.matcher(regionContents);
-                Boolean hasAttachments = matcher2.find();
-                String attachments = null;
-                System.out.println("         hasAttachments: " + hasAttachments.toString());
-                if (hasAttachments) {
-                    attachments = matcher2.group(2);
-                    for (Character attachment : attachments.toCharArray()) {
-                        System.out.println("          - " + attachment + ": "+ AliasHandler.resolveTTPGAttachment(Character.toString(attachment)));
-                        tile.addToken(AliasHandler.resolveTTPGAttachment(Character.toString(attachment)), planetAlias);
+            }
+            
+            //Find attachments, and split off region
+            Matcher matcherAttachments = regionAttachmentsPattern.matcher(regionContents);
+            Boolean hasAttachments = matcherAttachments.find();
+            String attachments = null;
+            System.out.println("         hasAttachments: " + hasAttachments.toString());
+            if (hasAttachments) {
+                regionContents = matcherAttachments.group(1);
+                attachments = matcherAttachments.group(2);
+                for (Character attachment : attachments.toCharArray()) {
+                    String attachmentResolved = AliasHandler.resolveTTPGAttachment(Character.toString(attachment));
+                    System.out.println("          - " + attachment + ": " + attachmentResolved);
+
+                    String tokenFileName = Mapper.getTokenID(attachmentResolved);
+                    String attachmentFileName = Mapper.getAttachmentID(attachmentResolved);
+
+                    if (tokenFileName != null) {
+                        tile.addToken(tokenFileName, planet);
+                    } else if (attachmentFileName != null) {
+                        tile.addToken(attachmentFileName, planet);
+                    } else {
+                        System.out.println("          - " + attachmentResolved + " could not be added - not found");
                     }
                 }
             }
 
-
             String colour = "";
             Integer regionCount = 1;
+
+
 
             //DECODE REGION STRING, CHAR BY CHAR
             for (int i = 0; i < regionContents.length(); i++) {
                 Character chr = regionContents.charAt(i);
                 String str = Character.toString(chr);
 
-                if (Character.isUpperCase(chr)) { //is a new Color, signify a new set of player's units
+                if (validColours.contains(str)) { //is a new Color, signify a new set of player's units //MAY ALSO BE AN ATTACHMENT???
                     //reset colour & count
                     colour = AliasHandler.resolveColor(str.toLowerCase());
                     regionCount = 1;
 
                     System.out.println("            player: " + colour);
-                    // playerUnits.put(colour, "");
 
                 } else if (Character.isDigit(chr)) { // is a count, signify a new group of units
                     System.out.println("                count: " + str);
                     regionCount = Integer.valueOf(str);
 
-                } else if (Character.isLowerCase(chr)) { // is a unit, control_token, or CC
+                } else if (Character.isLowerCase(chr) && validUnits.contains(str)) { // is a unit, control_token, or CC
                     if (!colour.equals("")){ //colour hasn't shown up yet, so probably just tokens in space, skip unit crap
                         if (str.equals("t")) { //CC
                             tile.addCC(Mapper.getCCID(colour));
@@ -296,43 +377,33 @@ public class ConvertTTPGtoAsync {
                             tile.addToken(Mapper.getControlID(colour), AliasHandler.resolvePlanet(planetAlias));
                         } else { // is a unit
                             System.out.println("                unit:  " + AliasHandler.resolveTTPGUnit(str));
-                            String asyncPlanet = isPlanetRegion ? " " + AliasHandler.resolvePlanet(planetAlias) : "";
                             String unit = AliasHandler.resolveTTPGUnit(str);
                             
                             
                             String unitID = Mapper.getUnitID(unit, colour);
                             String unitCount = String.valueOf(regionCount);
                             
-                            if (isSpaceRegion) {
+                            if (regionIsSpace) {
                                 tile.addUnit("space", unitID, unitCount);
-                            } else if (isPlanetRegion) {
+                            } else if (regionIsPlanet) {
                                 tile.addUnit(AliasHandler.resolvePlanet(planetAlias), unitID, unitCount);
                             }
                             
-                            // playerUnits.computeIfPresent(colour, (k, v) -> v + unitCount + " " + unit + asyncPlanet + ", ");
                         }
                     }
 
-                    if (str.equals("e")) {
+                } else if (validAttachments.contains(str)) { //attachments that were there that didn't match the RegEx above
+                    if (str.equals("e")) { //frontier token
                         System.out.println("attempt to add frontier token to " + tile.getPosition());
-                        tile.addToken(Constants.FRONTIER, Constants.SPACE);
+                        // tile.addToken(Mapper.getTokenPath(Constants.FRONTIER), Constants.SPACE);
+                        AddToken.addToken(null, tile, Constants.FRONTIER, null);
                     }
                 } else {
-                    System.out.println("                what is this?  " + str);
+                    System.out.println("                character not recognized:  " + str);
                 }
             }
 
-            // System.out.println(playerUnits.toString());
-            // for (Entry<String,String> unitString : playerUnits.entrySet()) {
-            //     System.out.println(unitString.getKey());
-            //     System.out.println(tileID);
-            //     System.out.println(unitString.getValue());
-            //     String unitID = Mapper.getUnitID(unit, color);
-            // }
-
-
-
-            index++;
+            index++; //next Region/Planet/UnitHolder
         }
 
         //String color = Helper.getColor(activeMap, event);
