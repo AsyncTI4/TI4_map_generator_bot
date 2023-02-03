@@ -25,15 +25,15 @@ public class TTPGObjectives {
     @JsonProperty("Public Objectives I")
     private List<String> publicObjectivesI = null;
     @JsonProperty("Public Objectives II")
-    private List<Object> publicObjectivesII = null;
+    private List<String> publicObjectivesII = null;
     @JsonProperty("Secret Objectives")
     private List<String> secretObjectives = null;
     @JsonProperty("Agenda")
     private List<String> agenda = null;
     @JsonProperty("Relics")
-    private List<Object> relics = null;
+    private List<String> relics = null;
     @JsonProperty("Other")
-    private List<Object> other = null;
+    private List<String> other = null;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
@@ -48,12 +48,12 @@ public class TTPGObjectives {
     }
 
     @JsonProperty("Public Objectives II")
-    public List<Object> getPublicObjectivesII() {
+    public List<String> getPublicObjectivesII() {
         return publicObjectivesII;
     }
 
     @JsonProperty("Public Objectives II")
-    public void setPublicObjectivesII(List<Object> publicObjectivesII) {
+    public void setPublicObjectivesII(List<String> publicObjectivesII) {
         this.publicObjectivesII = publicObjectivesII;
     }
 
@@ -78,22 +78,22 @@ public class TTPGObjectives {
     }
 
     @JsonProperty("Relics")
-    public List<Object> getRelics() {
+    public List<String> getRelics() {
         return relics;
     }
 
     @JsonProperty("Relics")
-    public void setRelics(List<Object> relics) {
+    public void setRelics(List<String> relics) {
         this.relics = relics;
     }
 
     @JsonProperty("Other")
-    public List<Object> getOther() {
+    public List<String> getOther() {
         return other;
     }
 
     @JsonProperty("Other")
-    public void setOther(List<Object> other) {
+    public void setOther(List<String> other) {
         this.other = other;
     }
 
