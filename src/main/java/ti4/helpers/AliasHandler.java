@@ -266,7 +266,7 @@ public class AliasHandler {
     
     public static String resolveRelic(String name)
     {
-        String aliasID = relicAliasList.get(name);
+        String aliasID = relicAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {

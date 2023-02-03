@@ -252,6 +252,12 @@ public class ConvertTTPGtoAsync {
                 asyncPlayer.addTech(AliasHandler.resolveTech(technology.toLowerCase()));
             }
             
+            //RELICS
+            for (String relic : ttpgPlayer.getRelicCards()) {
+                asyncPlayer.addRelic(AliasHandler.resolveRelic(relic));
+                asyncMap.getAllRelics().remove(AliasHandler.resolveRelic(relic));
+            }
+
             index++;
         }
         // setScoredPublicObjectives(ttpgMap.getObjectives().getPublicObjectivesI());
