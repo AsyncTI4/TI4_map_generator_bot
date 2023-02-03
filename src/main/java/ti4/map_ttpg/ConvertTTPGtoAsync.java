@@ -151,16 +151,21 @@ public class ConvertTTPGtoAsync {
         };
         
         for (String objective : ttpgMap.getObjectives().getPublicObjectivesI()) {
-            asyncMap.setPublicObjectives1((ArrayList<String>)ttpgMap.getObjectives().getPublicObjectivesI());
+            asyncMap.addSpecificStage1(AliasHandler.resolvePublicObjective(objective));
+        }
+        for (String objective : ttpgMap.getObjectives().getPublicObjectivesII()) {
+            asyncMap.addSpecificStage2(AliasHandler.resolvePublicObjective(objective));
         }
 
 
-
+        // System.out.println(asyncMap.getRevealedPublicObjectives());
 
         // System.out.println("Mapped? " + AddTileList.setMapTileList(null, ttpgMap.getMapString(), asyncMap));
 
         Integer index = 0;
         LinkedHashMap<String, Player> asyncPlayers = asyncMap.getPlayers();
+
+        //PLAYER
         for (Entry<String,String> fakePlayer : fakePlayers.entrySet()) {
             asyncMap.addPlayer(fakePlayer.getKey().toString(), fakePlayer.getValue().toString());
             Player asyncPlayer = asyncMap.getPlayer(fakePlayer.getKey().toString());
@@ -175,6 +180,17 @@ public class ConvertTTPGtoAsync {
             asyncPlayer.setTacticalCC(ttpgPlayer.getCommandTokens().getTactics());
             asyncPlayer.setFleetCC(ttpgPlayer.getCommandTokens().getFleet());
             asyncPlayer.setStrategicCC(ttpgPlayer.getCommandTokens().getStrategy());
+
+
+
+            //SCORED OBJECTIVES
+            for (Entry<String, Integer> revealedObjective : asyncMap.getRevealedPublicObjectives().entrySet()) {
+                for (String ttpgScoredObjective : ttpgPlayer.getObjectives()) {
+                    if (AliasHandler.resolvePublicObjective(ttpgScoredObjective).equalsIgnoreCase(revealedObjective.getKey())) {
+                        asyncMap.scorePublicObjective(asyncPlayer.getUserID(),revealedObjective.getValue());
+                    }
+                }
+            }
 
             //PLANETS
             for (String planet : ttpgPlayer.getPlanetCards()) {

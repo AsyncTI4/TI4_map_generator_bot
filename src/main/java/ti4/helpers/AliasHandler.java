@@ -279,7 +279,7 @@ public class AliasHandler {
     
     public static String resolvePublicObjective(String name)
     {
-        String aliasID = publicObjectiveAliasList.get(name);
+        String aliasID = publicObjectiveAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -290,7 +290,7 @@ public class AliasHandler {
     
     public static String resolveSecretObjective(String name)
     {
-        String aliasID = secretObjectiveAliasList.get(name);
+        String aliasID = secretObjectiveAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
