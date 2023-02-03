@@ -208,10 +208,34 @@ public class ConvertTTPGtoAsync {
             }
 
             //LEADERS
-            if (!asyncPlayer.getFaction().equals("keleres") || !asyncPlayer.getFaction().equals("nomad")) { //deal with these chumps later
+            if (!asyncPlayer.getFaction().equals("keleres") && !asyncPlayer.getFaction().equals("nomad")) { //deal with these chumps later
                 asyncPlayer.getLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked") ? false : true);
                 asyncPlayer.getLeader("commander").setLocked(ttpgPlayer.getLeaders().getCommander().equals("unlocked") ? false : true);
                 asyncPlayer.getLeader("hero").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
+            } else if (asyncPlayer.getFaction().equals("keleres")) {
+                String subFaction = ttpgPlayer.getFactionShort().toLowerCase();
+                switch (subFaction) {
+                    case "keleres - argent" : 
+                        System.out.println(subFaction);
+                        asyncPlayer.getLeader("kuuasi").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
+                        asyncPlayer.removeLeader("odlynn");
+                        asyncPlayer.removeLeader("harka");
+                        break;
+                    case "keleres - xxcha" : 
+                        System.out.println(subFaction);
+                        asyncPlayer.getLeader("odlynn").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
+                        asyncPlayer.removeLeader("kuuasi");
+                        asyncPlayer.removeLeader("harka");
+                        break;
+                    case "keleres - mentak" : 
+                        System.out.println(subFaction);
+                        asyncPlayer.getLeader("harka").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
+                        asyncPlayer.removeLeader("kuuasi");
+                        asyncPlayer.removeLeader("odlynn");
+                        break;
+                }
+            } else if (asyncPlayer.getFaction().equals("nomad")) { //need an example before we do this
+                
             }
 
             //CUSTODIAN POINTS
