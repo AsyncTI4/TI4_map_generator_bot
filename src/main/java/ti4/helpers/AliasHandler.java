@@ -29,6 +29,9 @@ public class AliasHandler {
     private static HashMap<String, String> secretObjectiveAliasList = new HashMap<>();
     private static HashMap<String, String> promissoryAliasList = new HashMap<>();
     private static HashMap<String, String> ttpgPositionAliasList = new HashMap<>();
+    private static HashMap<String, String> ttpgAttachmentAliasList = new HashMap<>();
+    private static HashMap<String, String> ttpgTokenAliasList = new HashMap<>();
+    private static HashMap<String, String> ttpgUnitAliasList = new HashMap<>();
 
     public static void init()
     {
@@ -52,6 +55,9 @@ public class AliasHandler {
         readAliasFile("secret_objective_alias.properties", secretObjectiveAliasList, "Could not read secret objective alias file");
         readAliasFile("promissory_alias.properties", promissoryAliasList, "Could not read promissory alias file");
         readAliasFile("position_alias.properties", ttpgPositionAliasList, "Could not read TTPG position_alias file");
+        readAliasFile("ttpg_attachment_alias.properties", ttpgAttachmentAliasList, "Could not read TTPG attachment_alias file");
+        readAliasFile("ttpg_token_alias.properties", ttpgTokenAliasList, "Could not read TTPG token_alias file");
+        readAliasFile("ttpg_unit_alias.properties", ttpgUnitAliasList, "Could not read TTPG unit_alias file");
     }
     private static void readAliasFile(String fileName, ArrayList<String> list) {
         readAliasFile(fileName, list, false);
@@ -108,7 +114,12 @@ public class AliasHandler {
     public static String resolveTile(String name)
     {
         String aliasID = tileAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for Tile: " + name);
+            return name;
+        }
     }
 
     /** For resolving a TileID specific to this Async bot to a "Standard" TileID used by all other TI4 map tools, including TTPG/TTS
@@ -118,25 +129,45 @@ public class AliasHandler {
     public static String resolveStandardTile(String name)
     {
         String aliasID = tilemapAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for StandardTile: " + name);
+            return name;
+        }
     }
 
     public static String resolveFaction(String name)
     {
         String aliasID = factionAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for Faction: " + name);
+            return name;
+        }
     }
 
     public static String resolveColor(String name)
     {
         String aliasID = colorAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for Color: " + name);
+            return name;
+        }
     }
 
     public static String resolveUnit(String name)
     {
         String aliasID = unitAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for Unit: " + name);
+            return name;
+        }
     }
 
     public static ArrayList<String> getUnitList() {
@@ -150,67 +181,155 @@ public class AliasHandler {
     public static String resolvePlanet(String name)
     {
         String aliasID = planetAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for Planet: " + name);
+            return name;
+        }
     }
 
     public static String resolveAttachment(String name)
     {
         String aliasID = planetAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for Attachment: " + name);
+            return name;
+        }
     }
 
     public static String resolveToken(String name)
     {
         String aliasID = cctokenAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for Token: " + name);
+            return name;
+        }
     }
 
     public static String resolveTech(String name)
     {
         String aliasID = techAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for Tech: " + name);
+            return name;
+        }
     }
 
     public static String resolveActionCard(String name)
     {
         String aliasID = actionCardAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for ActionCard: " + name);
+            return name;
+        }
     }
 
     public static String resolveAgenda(String name)
     {
         String aliasID = agendaAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for Agenda: " + name);
+            return name;
+        }
     }
 
     public static String resolveExploration(String name)
     {
         String aliasID = explorationAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for Exploration: " + name);
+            return name;
+        }
     }
     
     public static String resolvePromissory(String name)
     {
         String aliasID = promissoryAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for Promissory: " + name);
+            return name;
+        }
     }
     
     public static String resolveRelic(String name)
     {
         String aliasID = relicAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for Relic: " + name);
+            return name;
+        }
     }
     
     public static String resolvePublicObjective(String name)
     {
         String aliasID = publicObjectiveAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for PublicObjective: " + name);
+            return name;
+        }
     }
     
     public static String resolveSecretObjective(String name)
     {
         String aliasID = secretObjectiveAliasList.get(name);
-        return aliasID != null ? aliasID : name;
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for SecretObjective: " + name);
+            return name;
+        }
+    }
+    
+    public static String resolveTTPGAttachment(String name)
+    {
+        String aliasID = ttpgAttachmentAliasList.get(name);
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for ttpgAttachment: " + name);
+            return name;
+        }
+    }
+    
+    public static String resolveTTPGToken(String name)
+    {
+        String aliasID = ttpgTokenAliasList.get(name);
+        if (aliasID != null) {
+            return aliasID;
+        } else {
+            System.out.println("Could not find an alias for TTPGToken: " + name);
+            return name;
+        }
+    }
+    
+    public static String resolveTTPGUnit(String name)
+    {
+        String aliasID = ttpgUnitAliasList.get(name);
+        if (aliasID != null) {
+            return resolveUnit(aliasID);
+        } else {
+            System.out.println("Could not find an alias for TTPGUnit: " + name);
+            return name;
+        }
     }
 
     /** Given a Position parameter like [+-][0-9][+-][0-9], will return Async position like [0-9][a-z]
@@ -220,7 +339,7 @@ public class AliasHandler {
     public static String resolveTTPGPosition(String position)
     {
         String aliasID = ttpgPositionAliasList.get(position);
-        System.out.println("resolving TTPG position: " + position + " to async position: " + aliasID);
+        // System.out.println("resolving TTPG position: " + position + " to async position: " + aliasID);
         return aliasID != null ? aliasID : null;
     }
 }
