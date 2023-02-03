@@ -156,8 +156,16 @@ public class ConvertTTPGtoAsync {
         for (String objective : ttpgMap.getObjectives().getPublicObjectivesII()) {
             asyncMap.addSpecificStage2(AliasHandler.resolveObjective(objective));
         }
-        //HANDLE POLITICAL CENSURE
-
+        for (String objective : ttpgMap.getObjectives().getAgenda()) {
+            asyncMap.addCustomPO(objective, 1);
+            //asyncMap.addLaw(null, objective); TODO: if point from Law, make sure law is added
+        }
+        for (String objective : ttpgMap.getObjectives().getRelics()) {
+            asyncMap.addCustomPO(objective, 1);
+        }
+        for (String objective : ttpgMap.getObjectives().getOther()) {
+            asyncMap.addCustomPO(objective, 1);
+        }
 
         // System.out.println(asyncMap.getRevealedPublicObjectives());
 
@@ -197,6 +205,12 @@ public class ConvertTTPGtoAsync {
                     for (Entry<String, Integer> revealedObjective : asyncMap.getRevealedPublicObjectives().entrySet()) {
                         if (asyncScoredObjective.equalsIgnoreCase(revealedObjective.getKey())) {
                             asyncMap.scorePublicObjective(asyncPlayer.getUserID(),revealedObjective.getValue());
+                        }
+                    }
+                } else if (asyncMap.getCustomPublicVP().containsKey(ttpgScoredObjective)) {
+                    for (Entry<String, Integer> customObjective : asyncMap.getCustomPublicVP().entrySet()) {
+                        if (ttpgScoredObjective.equalsIgnoreCase(customObjective.getKey())) {
+                            asyncMap.scorePublicObjective(asyncPlayer.getUserID(),customObjective.getValue());
                         }
                     }
                 }
@@ -260,7 +274,6 @@ public class ConvertTTPGtoAsync {
 
             index++;
         }
-        // setScoredPublicObjectives(ttpgMap.getObjectives().getPublicObjectivesI());
 
         //TILES - HEX SUMMARY
         String[] hexSummary = ttpgMap.getHexSummary().split(",");
