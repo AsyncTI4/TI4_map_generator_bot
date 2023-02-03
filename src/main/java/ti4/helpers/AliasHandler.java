@@ -25,8 +25,7 @@ public class AliasHandler {
     private static HashMap<String, String> agendaAliasList = new HashMap<>();
     private static HashMap<String, String> explorationAliasList = new HashMap<>();
     private static HashMap<String, String> relicAliasList = new HashMap<>();
-    private static HashMap<String, String> publicObjectiveAliasList = new HashMap<>();
-    private static HashMap<String, String> secretObjectiveAliasList = new HashMap<>();
+    private static HashMap<String, String> objectiveAliasList = new HashMap<>();
     private static HashMap<String, String> promissoryAliasList = new HashMap<>();
     private static HashMap<String, String> ttpgPositionAliasList = new HashMap<>();
     private static HashMap<String, String> ttpgAttachmentAliasList = new HashMap<>();
@@ -51,8 +50,7 @@ public class AliasHandler {
         readAliasFile("agenda_alias.properties", agendaAliasList, "Could not read agenda alias file");
         readAliasFile("exploration_alias.properties", explorationAliasList, "Could not read exploration alias file");
         readAliasFile("relic_alias.properties", relicAliasList, "Could not read relic alias file");
-        readAliasFile("public_objective_alias.properties", publicObjectiveAliasList, "Could not read public objective alias file");
-        readAliasFile("secret_objective_alias.properties", secretObjectiveAliasList, "Could not read secret objective alias file");
+        readAliasFile("objective_alias.properties", objectiveAliasList, "Could not read objective alias file");
         readAliasFile("promissory_alias.properties", promissoryAliasList, "Could not read promissory alias file");
         readAliasFile("position_alias.properties", ttpgPositionAliasList, "Could not read TTPG position_alias file");
         readAliasFile("ttpg_attachment_alias.properties", ttpgAttachmentAliasList, "Could not read TTPG attachment_alias file");
@@ -277,28 +275,17 @@ public class AliasHandler {
         }
     }
     
-    public static String resolvePublicObjective(String name)
+    public static String resolveObjective(String name)
     {
-        String aliasID = publicObjectiveAliasList.get(name.toLowerCase());
+        String aliasID = objectiveAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for PublicObjective: " + name);
+            System.out.println("Could not find an alias for Objective: " + name);
             return name;
         }
     }
-    
-    public static String resolveSecretObjective(String name)
-    {
-        String aliasID = secretObjectiveAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
-        } else {
-            System.out.println("Could not find an alias for SecretObjective: " + name);
-            return name;
-        }
-    }
-    
+        
     public static String resolveTTPGAttachment(String name)
     {
         String aliasID = ttpgAttachmentAliasList.get(name);

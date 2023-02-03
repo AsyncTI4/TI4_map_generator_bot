@@ -151,11 +151,12 @@ public class ConvertTTPGtoAsync {
         };
         
         for (String objective : ttpgMap.getObjectives().getPublicObjectivesI()) {
-            asyncMap.addSpecificStage1(AliasHandler.resolvePublicObjective(objective));
+            asyncMap.addSpecificStage1(AliasHandler.resolveObjective(objective));
         }
         for (String objective : ttpgMap.getObjectives().getPublicObjectivesII()) {
-            asyncMap.addSpecificStage2(AliasHandler.resolvePublicObjective(objective));
+            asyncMap.addSpecificStage2(AliasHandler.resolveObjective(objective));
         }
+        //HANDLE POLITICAL CENSURE
 
 
         // System.out.println(asyncMap.getRevealedPublicObjectives());
@@ -181,13 +182,22 @@ public class ConvertTTPGtoAsync {
             asyncPlayer.setFleetCC(ttpgPlayer.getCommandTokens().getFleet());
             asyncPlayer.setStrategicCC(ttpgPlayer.getCommandTokens().getStrategy());
 
-
-
             //SCORED OBJECTIVES
-            for (Entry<String, Integer> revealedObjective : asyncMap.getRevealedPublicObjectives().entrySet()) {
-                for (String ttpgScoredObjective : ttpgPlayer.getObjectives()) {
-                    if (AliasHandler.resolvePublicObjective(ttpgScoredObjective).equalsIgnoreCase(revealedObjective.getKey())) {
-                        asyncMap.scorePublicObjective(asyncPlayer.getUserID(),revealedObjective.getValue());
+            for (String ttpgScoredObjective : ttpgPlayer.getObjectives()) {
+                String asyncScoredObjective = AliasHandler.resolveObjective(ttpgScoredObjective);
+                if (asyncMap.getSecretObjectives().contains(asyncScoredObjective)) {
+                    asyncPlayer.setSecret(asyncScoredObjective);
+                    for (Entry<String,Integer> secretObjective : asyncPlayer.getSecrets().entrySet()) {
+                        if (secretObjective.getKey().equalsIgnoreCase(asyncScoredObjective)) {
+                            asyncPlayer.setSecretScored(asyncScoredObjective, secretObjective.getValue());
+                        }
+                    }
+                    
+                } else if (asyncMap.getRevealedPublicObjectives().containsKey(asyncScoredObjective)) {
+                    for (Entry<String, Integer> revealedObjective : asyncMap.getRevealedPublicObjectives().entrySet()) {
+                        if (asyncScoredObjective.equalsIgnoreCase(revealedObjective.getKey())) {
+                            asyncMap.scorePublicObjective(asyncPlayer.getUserID(),revealedObjective.getValue());
+                        }
                     }
                 }
             }
