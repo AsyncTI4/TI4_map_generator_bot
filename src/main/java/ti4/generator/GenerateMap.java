@@ -300,6 +300,8 @@ public class GenerateMap {
         tiles.add(tileID); // we are allowed to at least *see* this tile!!
         if (hyperlaneData == null && sourceDirection != -1) return tiles; //do not explore non-hyperlanes except for your starting space
         List<String> directlyAdjacentTiles = Mapper.getAdjacentTilesIDs(tileID);
+
+        if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) return tiles; //adjacency file for this tile is not filled in
         // for each adjacent tile...
         for (int i=0; i<6; i++) {
             String tileID_ = directlyAdjacentTiles.get(i);
