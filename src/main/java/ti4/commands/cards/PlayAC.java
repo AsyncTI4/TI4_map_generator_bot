@@ -1,17 +1,15 @@
 package ti4.commands.cards;
 
-import net.dv8tion.jda.api.JDA;
-import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -44,7 +42,7 @@ public class PlayAC extends CardsSubcommandData {
         playAC(event, activeMap, player, option.getAsString().toLowerCase(), event.getChannel(), event.getGuild(), null);
     }
 
-    public static void playAC(GenericCommandInteractionEvent event, Map activeMap, Player player, String value, MessageChannel channel, Guild guild, ButtonInteractionEvent buttonInteractionEvent) {
+    public static void playAC(SlashCommandInteractionEvent event, Map activeMap, Player player, String value, MessageChannel channel, Guild guild, ButtonInteractionEvent buttonInteractionEvent) {
         String acID = null;
         int acIndex = -1;
         try {
@@ -92,8 +90,8 @@ public class PlayAC extends CardsSubcommandData {
         sb.append(">  _").append(actionCardWindow).append(":_\n");
         sb.append(">  ").append(actionCardText).append("\n");
 
-        Button sabotageButton = Button.danger("sabotage", "Sabotage").withEmoji(Emoji.fromMarkdown(Emojis.Sabotage));
-        Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(Emoji.fromMarkdown(Emojis.NoSabotage));
+        Button sabotageButton = Button.danger("sabotage", "Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
+        Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(Emoji.fromFormatted(Emojis.NoSabotage));
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannelWithButtons(channel, sb.toString(), null);
         } else {

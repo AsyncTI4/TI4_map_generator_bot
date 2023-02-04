@@ -1,12 +1,17 @@
 package ti4.message;
 
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+
 import ti4.commands.cards.CardsInfo;
 import ti4.helpers.Constants;
 import ti4.map.Map;
@@ -35,7 +40,8 @@ public class MessageHelper {
     }
 
     public static void sendFileToChannel(MessageChannel channel, File file) {
-        channel.sendFile(file).queue();
+        FileUpload fileUpload = FileUpload.fromData(file);
+        channel.sendFiles(fileUpload).queue();
     }
 
 
@@ -126,7 +132,7 @@ public class MessageHelper {
                 if (guild != null) {
                     Message complete = channel.sendMessage(messageText).complete();
                     for (String reactionID : reaction) {
-                        Emote emoteById = guild.getEmoteById(reactionID);
+                        Emoji emoteById = guild.getEmojiById(reactionID);
                         if (emoteById == null) {
                             continue;
                         }
@@ -160,9 +166,9 @@ public class MessageHelper {
             } else {
                 Guild guild_ = guild == null ? event.getGuild() : guild;
                 if (guild_ != null) {
-                    Message message = new MessageBuilder()
-                            .append(messageText)
-                            .setActionRows(ActionRow.of(buttons)).build();
+                    MessageCreateData message = new MessageCreateBuilder()
+                            .addContent(messageText)
+                            .addComponents(ActionRow.of(buttons)).build();
                     channel.sendMessage(message).queue();
                     return;
                 }
