@@ -9,7 +9,9 @@ import ti4.helpers.Constants;
 import ti4.message.BotLogger;
 
 import java.awt.*;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class Tile {
@@ -203,6 +205,16 @@ public class Tile {
         } catch (Exception e) {
             BotLogger.log("Could not parse unit count");
         }
+    }
+
+    public List<Boolean> getHyperlaneData(Integer sourceDirection) {
+        List<List<Boolean>> fullHyperlaneData = Mapper.getHyperlaneData(this.tileID);
+        if (fullHyperlaneData == null || fullHyperlaneData.size() == 0) {
+            return null;
+        } else if (sourceDirection < 0 || sourceDirection > 5) {
+            return Collections.emptyList();
+        }
+        return fullHyperlaneData.get(sourceDirection);
     }
 
     public String getTileID() {

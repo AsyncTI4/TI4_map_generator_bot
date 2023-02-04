@@ -231,7 +231,13 @@ public class GenerateMap {
             }
             Set<String> tileIDsToShow = new HashSet<>(tilesWithPlayerUnitsPlanets);
             for (String tileID : tilesWithPlayerUnitsPlanets) {
-                tileIDsToShow.addAll(Mapper.getAdjacentTilesIDs(tileID));
+                Set<String> hyperlaneAdjacentTiles = traverseAdjacencies(map, tileID, -1, new HashSet<>(), null);
+
+                for (String tileID_ : hyperlaneAdjacentTiles) {
+                    if (tileID_ != "x") {
+                        tileIDsToShow.add(tileID_);
+                    }
+                }
                 List<String> adjacentCustomTiles = map.getCustomAdjacentTiles().get(tileID);
                 if (adjacentCustomTiles != null) {
                     tileIDsToShow.addAll(adjacentCustomTiles);
@@ -279,6 +285,36 @@ public class GenerateMap {
             return tileIDsToShow;
         }
         return Collections.emptySet();
+    }
+
+    private Set<String> traverseAdjacencies(Map map, String tileID, Integer sourceDirection, Set<String> exploredSet, String prevTile) {
+        Set<String> tiles = new HashSet<>();
+        if(exploredSet.contains(tileID + sourceDirection)) return tiles; // We already explored this tile from this direction!
+        exploredSet.add(tileID + sourceDirection); // mark it as explored
+
+        Tile currentTile = map.getTileByPosition(tileID);
+        if (currentTile == null) return tiles; //could not load the requested tile
+        List<Boolean> hyperlaneData = currentTile.getHyperlaneData(sourceDirection);
+        if (hyperlaneData != null && hyperlaneData.size() == 0) return tiles; // We could not load the hyperlane data correctly, quit
+        
+        tiles.add(tileID); // we are allowed to at least *see* this tile!!
+        if (hyperlaneData == null && sourceDirection != -1) return tiles; //do not explore non-hyperlanes except for your starting space
+        List<String> directlyAdjacentTiles = Mapper.getAdjacentTilesIDs(tileID);
+        // for each adjacent tile...
+        for (int i=0; i<6; i++) {
+            String tileID_ = directlyAdjacentTiles.get(i);
+            
+            if (tileID_ == "x") 
+                continue; // the tile doesn't exist, skip.
+
+            if (hyperlaneData != null && !hyperlaneData.get(i))
+                continue; // the hyperlane doesn't go that direction, skip.
+            
+            // explore that tile now!
+            Set<String> newTiles = traverseAdjacencies(map, tileID_, (i+3) % 6, exploredSet, tileID+sourceDirection);
+            tiles.addAll(newTiles);
+        }
+        return tiles;
     }
 
     private static void unitCheck(Player player, Set<String> tilesWithPlayerUnitsAndAdjacent, java.util.Map<String, String> colorToId, java.util.Map<String, String> unitRepresentation, Tile tile, String tileID) {
