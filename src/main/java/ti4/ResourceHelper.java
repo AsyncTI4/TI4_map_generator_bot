@@ -2,7 +2,8 @@ package ti4;
 
 import ti4.helpers.Storage;
 
-import javax.annotation.CheckForNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
@@ -47,13 +48,13 @@ public class ResourceHelper {
         return null;
     }
 
-    @CheckForNull
+    @Nullable
     public String getPositionFile(String name)
     {
         return getResourceFromFolder("positions/", name, "Could not find position files");
     }
 
-    @CheckForNull
+    @Nullable
     public String getTileFile(String name)
     {
         String unitPath = tileCache.get(name);
@@ -66,7 +67,7 @@ public class ResourceHelper {
         return tile;
     }
 
-    @CheckForNull
+    @Nullable
     public String getFactionFile(String name)
     {
         String unitPath = factionCache.get(name);
@@ -79,7 +80,7 @@ public class ResourceHelper {
         return tile;
     }
 
-    @CheckForNull
+    @Nullable
     public String getGeneralFile(String name)
     {
         String unitPath = generalCache.get(name);
@@ -92,7 +93,7 @@ public class ResourceHelper {
         return tile;
     }
 
-    @CheckForNull
+    @Nullable
     public String getUnitFile(String name) {
         String unitPath = unitCache.get(name);
         if (unitPath != null) {
@@ -102,7 +103,7 @@ public class ResourceHelper {
         unitCache.put(name, unit);
         return unit;
     }
-    @CheckForNull
+    @Nullable
     public String getCCFile(String name)
     {
         String ccPath = ccCache.get(name);
@@ -115,7 +116,7 @@ public class ResourceHelper {
         return cc;
     }
 
-    @CheckForNull
+    @Nullable
     public String getAttachmentFile(String name)
     {
         String tokenPath = attachmentCache.get(name);
@@ -128,7 +129,7 @@ public class ResourceHelper {
         return token;
     }
 
-    @CheckForNull
+    @Nullable
     public String getPlanetResource(String name)
     {
         String planetInfoPath = planetCache.get(name);
@@ -141,7 +142,7 @@ public class ResourceHelper {
         return token;
     }
 
-    @CheckForNull
+    @Nullable
     public String getPAResource(String name)
     {
         String paInfoPath = paCache.get(name);
@@ -154,7 +155,7 @@ public class ResourceHelper {
         return token;
     }
 
-    @CheckForNull
+    @Nullable
     public String getTokenFile(String name)
     {
         String tokenPath = tokenCache.get(name);
@@ -167,7 +168,7 @@ public class ResourceHelper {
         return token;
     }
 
-    @CheckForNull
+    @Nullable
     public String getResourceFromFolder(String folder, String name, String errorDescription) {
         File resourceFile = new File(Storage.getResourcePath() + File.separator + folder + name);
         if (resourceFile.exists()){
@@ -176,25 +177,25 @@ public class ResourceHelper {
         return null;
     }
 
-    @CheckForNull
+    @Nullable
     public String getInfoFile(String name)
     {
         return getResourceFromFolder("info/", name, "Could not find info file");
     }
 
-    @CheckForNull
+    @Nullable
     public String getWebFile(String name)
     {
         return getResourceFromFolder("web/", name, "Could not find web file");
     }
 
-    @CheckForNull
+    @Nullable
     public String getAliasFile(String name)
     {
         return getResourceFromFolder("alias/", name, "Could not find alias file");
     }
 
-    @CheckForNull
+    @Nullable
     public String getHelpFile(String name)
     {
         return getResourceFromFolder("help/", name, "Could not find alias file");

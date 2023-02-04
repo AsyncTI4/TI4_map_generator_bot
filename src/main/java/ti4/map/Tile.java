@@ -1,13 +1,13 @@
 package ti4.map;
 
+import org.jetbrains.annotations.Nullable;
+
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
-import ti4.helpers.LoggerHandler;
 import ti4.message.BotLogger;
 
-import javax.annotation.CheckForNull;
 import java.awt.*;
 import java.util.HashMap;
 import java.util.StringTokenizer;
@@ -15,7 +15,7 @@ import java.util.StringTokenizer;
 public class Tile {
     private final String tileID;
     private String position;
-    private HashMap<String, UnitHolder> unitHolders = new HashMap();
+    private HashMap<String, UnitHolder> unitHolders = new HashMap<>();
 
     public Tile(String tileID, String position) {
         this.tileID = tileID;
@@ -50,7 +50,7 @@ public class Tile {
         }
     }
 
-    @CheckForNull
+    @Nullable
     public String getUnitPath(String unitID) {
         String unitPath = ResourceHelper.getInstance().getUnitFile(unitID);
         if (unitPath == null) {
@@ -60,12 +60,12 @@ public class Tile {
         return unitPath;
     }
 
-    @CheckForNull
+    @Nullable
     public String getCCPath(String ccID) {
        return Mapper.getCCPath(ccID);
     }
 
-    @CheckForNull
+    @Nullable
     public String getAttachmentPath(String tokenID) {
         String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
         if (tokenPath == null) {
@@ -75,7 +75,7 @@ public class Tile {
         return tokenPath;
     }
 
-    @CheckForNull
+    @Nullable
     public String getTokenPath(String tokenID) {
         return Mapper.getTokenPath(tokenID);
     }
@@ -91,7 +91,7 @@ public class Tile {
         }
     }
 
-     public void addUnitDamage(String spaceHolder, String unitID, @CheckForNull Integer count) {
+     public void addUnitDamage(String spaceHolder, String unitID, @Nullable Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null && count != null) {
             HashMap<String, Integer> units = unitHolder.getUnits();
@@ -167,7 +167,7 @@ public class Tile {
         }
     }
 
-    public void removeUnitDamage(String spaceHolder, String unitID, @CheckForNull Integer count) {
+    public void removeUnitDamage(String spaceHolder, String unitID, @Nullable Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null && count != null) {
             unitHolder.removeUnitDamage(unitID, count);

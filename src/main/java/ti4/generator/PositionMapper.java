@@ -4,7 +4,8 @@ import ti4.ResourceHelper;
 import ti4.map.Map;
 import ti4.message.BotLogger;
 
-import javax.annotation.CheckForNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.awt.*;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -89,7 +90,7 @@ public class PositionMapper {
         return positionTileMap6Player.getProperty(position) != null;
     }
 
-    @CheckForNull
+    @Nullable
     public static Point getTilePosition(String position, Map map) {
         if (map != null && map.getPlayerCountForMap() == 8) {
             return getPosition(position, positionTileMap8Player);
