@@ -1,13 +1,19 @@
 package ti4.commands.player;
 
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+
 import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -58,7 +64,7 @@ public class SCPlay extends PlayerSubcommandData {
         String name = channel.getName();
         if (name.contains("-")) {
             String threadName = name.substring(0, name.indexOf("-")) + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
-            TextChannel textChannel = event.getTextChannel();
+            TextChannel textChannel = event.getChannel().asTextChannel();
             Button followButton;
             if (sc == 1) {
                 followButton = Button.success("sc_follow_leadership", "SC Follow");
@@ -71,10 +77,10 @@ public class SCPlay extends PlayerSubcommandData {
             }
             Button noFollowButton = Button.primary("sc_no_follow", "Not Following");
             Button trade_primary = Button.success("trade_primary", "Resolve Primary");
-            Button refresh = Button.secondary("sc_refresh", "Replenish Commodities").withEmoji(Emoji.fromMarkdown(Emojis.comm));
-            Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash").withEmoji(Emoji.fromMarkdown(Emojis.Wash));
-            Button draw_2_ac = Button.secondary("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromMarkdown(Emojis.ActionCard));
-            Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromMarkdown(Emojis.SecretObjective));
+            Button refresh = Button.secondary("sc_refresh", "Replenish Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
+            Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash").withEmoji(Emoji.fromFormatted(Emojis.Wash));
+            Button draw_2_ac = Button.secondary("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
+            Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective));
             ActionRow of;
             if (sc == 5) {
                 of = ActionRow.of(trade_primary, followButton, noFollowButton, refresh, refresh_and_wash);
@@ -98,9 +104,9 @@ public class SCPlay extends PlayerSubcommandData {
                 }
             }
 
-            Message messageObject = new MessageBuilder()
-                    .append(message)
-                    .setActionRows(of).build();
+            MessageCreateData messageObject = new MessageCreateBuilder()
+                    .addContent(message)
+                    .addComponents(of).build();
             channel.sendMessage(messageObject).queue(message_ -> {
                 ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);

@@ -1,8 +1,9 @@
 package ti4.map;
 
-import net.dv8tion.jda.api.entities.Channel;
-import net.dv8tion.jda.api.entities.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.Role;
+
 import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -10,7 +11,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
 
-import javax.annotation.CheckForNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.*;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
@@ -521,7 +523,7 @@ public class MapSaveLoadManager {
         MapManager.getInstance().setMapList(mapList);
     }
 
-    @CheckForNull
+    @Nullable
     private static Map loadMap(File mapFile) {
         if (mapFile != null) {
             Map map = new Map();

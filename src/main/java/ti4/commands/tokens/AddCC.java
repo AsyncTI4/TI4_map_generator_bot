@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+
 import ti4.commands.units.MoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -15,7 +16,7 @@ import ti4.map.MapManager;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
-import javax.annotation.CheckForNull;
+import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 
 public class AddCC extends AddRemoveToken {
@@ -47,7 +48,7 @@ public class AddCC extends AddRemoveToken {
         tile.addCC(ccID);
     }
 
-    public static boolean hasCC(@CheckForNull SlashCommandInteractionEvent event, String color, Tile tile) {
+    public static boolean hasCC(@Nullable SlashCommandInteractionEvent event, String color, Tile tile) {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null && event != null) {

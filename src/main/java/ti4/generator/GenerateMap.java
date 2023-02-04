@@ -1,16 +1,19 @@
 package ti4.generator;
 
 import com.pngencoder.PngEncoder;
+
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import ti4.ResourceHelper;
 import ti4.helpers.*;
 import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.BotLogger;
 
-import javax.annotation.CheckForNull;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -95,14 +98,14 @@ public class GenerateMap {
         return instance;
     }
 
-    public File saveImage(Map map, @CheckForNull SlashCommandInteractionEvent event) {
+    public File saveImage(Map map, @Nullable SlashCommandInteractionEvent event) {
         if (map.getDisplayTypeForced() != null) {
             return saveImage(map, map.getDisplayTypeForced(), event);
         }
         return saveImage(map, DisplayType.all, event);
     }
 
-    public File saveImage(Map map, @CheckForNull DisplayType displayType, @CheckForNull SlashCommandInteractionEvent event) {
+    public File saveImage(Map map, @Nullable DisplayType displayType, @Nullable SlashCommandInteractionEvent event) {
         init(map);
         if (map.getDisplayTypeForced() != null) {
             displayType = map.getDisplayTypeForced();
@@ -208,7 +211,7 @@ public class GenerateMap {
         return jpgFile;
     }
 
-    private Set<String> fowFilter(Map map, @CheckForNull SlashCommandInteractionEvent event) {
+    private Set<String> fowFilter(Map map, @Nullable SlashCommandInteractionEvent event) {
         User user = event.getUser();
         fowPlayer = map.getPlayer(user.getId());
         Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
@@ -309,7 +312,7 @@ public class GenerateMap {
 
     }
 
-    @CheckForNull
+    @Nullable
     private String getFactionPath(String factionID) {
         if (factionID.equals("null")) {
             return null;

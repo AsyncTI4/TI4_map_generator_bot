@@ -8,6 +8,9 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+
+import org.jetbrains.annotations.Nullable;
+
 import ti4.MapGenerator;
 import ti4.ResourceHelper;
 import ti4.commands.tokens.AddCC;
@@ -16,7 +19,6 @@ import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-import javax.annotation.CheckForNull;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,12 +32,12 @@ import java.util.stream.Collectors;
 
 public class Helper {
 
-    @CheckForNull
+    @Nullable
     public static Player getGamePlayer(Map map, Player initialPlayer, SlashCommandInteractionEvent event, String userID) {
         return getGamePlayer(map, initialPlayer, event.getMember(), userID);
     }
 
-    @CheckForNull
+    @Nullable
     public static Player getGamePlayer(Map map, Player initialPlayer, Member member, String userID) {
         Collection<Player> players = map.getPlayers().values();
         if (!map.isCommunityMode()) {
@@ -57,7 +59,7 @@ public class Helper {
         return initialPlayer != null ? initialPlayer : map.getPlayer(userID);
     }
 
-    @CheckForNull
+    @Nullable
     public static Player getPlayer(Map activeMap, Player player, SlashCommandInteractionEvent event) {
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
@@ -82,7 +84,7 @@ public class Helper {
         return player;
     }
 
-    @CheckForNull
+    @Nullable
     public static String getColor(Map activeMap, SlashCommandInteractionEvent event) {
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
         if (factionColorOption != null) {
@@ -101,7 +103,7 @@ public class Helper {
         return null;
     }
 
-    @CheckForNull
+    @Nullable
     public static String getColorFromString(Map activeMap, String factionColor) {
         factionColor = AliasHandler.resolveColor(factionColor);
         factionColor = AliasHandler.resolveFaction(factionColor);
@@ -114,7 +116,7 @@ public class Helper {
         return factionColor;
     }
 
-    @CheckForNull
+    @Nullable
     public static String getDamagePath() {
         String tokenPath = ResourceHelper.getInstance().getResourceFromFolder("extra/", "marker_damage.png", "Could not find damage token file");
         if (tokenPath == null) {
@@ -443,7 +445,7 @@ public class Helper {
         return sb.toString();
     }
 
-    @CheckForNull
+    @Nullable
     public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
         if (privateGame != null && privateGame){
@@ -458,7 +460,7 @@ public class Helper {
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
-    @CheckForNull
+    @Nullable
     public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
         if (privateGame != null && privateGame){
@@ -473,7 +475,7 @@ public class Helper {
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
-    @CheckForNull
+    @Nullable
     public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
         if (privateGame != null && privateGame){

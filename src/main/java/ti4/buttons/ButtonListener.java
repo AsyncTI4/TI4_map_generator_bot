@@ -1,6 +1,8 @@
 package ti4.buttons;
 
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.*;
+import net.dv8tion.jda.api.entities.emoji.*;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -20,14 +22,13 @@ import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class ButtonListener extends ListenerAdapter {
-    public static HashMap<Guild, HashMap<String, Emote>> emoteMap = new HashMap<>();
+    public static HashMap<Guild, HashMap<String, Emoji>> emoteMap = new HashMap<>();
     private static HashMap<String, Set<Player>> playerUsedSC = new HashMap<>();
 
     @Override
@@ -265,18 +266,18 @@ public class ButtonListener extends ListenerAdapter {
             event.getChannel().sendMessage("Could not find server Emojis").queue();
             return;
         }
-        HashMap<String, Emote> emojiMap = emoteMap.get(guild);
-        List<Emote> emotes = guild.getEmotes();
-        if (emojiMap != null && emojiMap.size() != emotes.size()) {
+        HashMap<String, Emoji> emojiMap = emoteMap.get(guild);
+        List<RichCustomEmoji> emojis = guild.getEmojis();
+        if (emojiMap != null && emojiMap.size() != emojis.size()) {
             emojiMap.clear();
         }
         if (emojiMap == null || emojiMap.isEmpty()) {
             emojiMap = new HashMap<>();
-            for (Emote emote : emotes) {
-                emojiMap.put(emote.getName().toLowerCase(), emote);
+            for (Emoji emoji : emojis) {
+                emojiMap.put(emoji.getName().toLowerCase(), emoji);
             }
         }
-        Emote emoteToUse = emojiMap.get(playerFaction.toLowerCase());
+        Emoji emojiToUse = emojiMap.get(playerFaction.toLowerCase());
         Message mainMessage = event.getInteraction().getMessage();
         String messageId = mainMessage.getId();
 
@@ -287,11 +288,11 @@ public class ButtonListener extends ListenerAdapter {
 //            // ...
 //        });
         if (!skipReaction) {
-            if (emoteToUse == null) {
+            if (emojiToUse == null) {
                 event.getChannel().sendMessage("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
                 return;
             }
-            event.getChannel().addReactionById(messageId, emoteToUse).queue();
+            event.getChannel().addReactionById(messageId, emojiToUse).queue();
             return;
         }
         boolean foundThread = false;
