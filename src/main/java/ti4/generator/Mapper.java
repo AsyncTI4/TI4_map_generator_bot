@@ -45,6 +45,7 @@ public class Mapper {
     private static final Properties miltyDraft = new Properties();
     private static final Properties agendaRepresentation = new Properties();
     private static final Properties adjacentTiles = new Properties();
+    private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties wormholes = new Properties();
     private static final HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = new HashMap<>();
 
@@ -75,6 +76,7 @@ public class Mapper {
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("agenda_representation.properties", agendaRepresentation, "Could not read agenda representaion file");
         readData("adjacent.properties", adjacentTiles, "Could not read adjacent tiles file");
+        readData("hyperlanes.properties",hyperlaneAdjacencies,"Could not read hyperlanes file");
         readData("wormholes.properties", wormholes, "Could not read wormholes file");
     }
 
@@ -132,6 +134,21 @@ public class Mapper {
             return Collections.emptyList();
         }
         return Arrays.stream(property.split(",")).toList();
+    }
+
+    public static List<List<Boolean>> getHyperlaneData(String tileID) {
+        String property = hyperlaneAdjacencies.getProperty(tileID);
+        if (property == null) return Collections.emptyList();
+
+        List<String> directions = Arrays.stream(property.split(";")).toList();
+        List<List<Boolean>> data = new ArrayList<>();
+        for (String dir : directions) {
+            List<String> info = Arrays.stream(dir.split(",")).toList();
+            List<Boolean> connections = new ArrayList<>();
+            for (String value : info) connections.add(value.equals("1"));
+            data.add(connections);
+        }
+        return data;
     }
 
     public static Set<String> getWormholes(String tileID) {
