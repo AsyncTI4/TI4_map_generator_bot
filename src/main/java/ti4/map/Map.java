@@ -1,5 +1,6 @@
 package ti4.map;
 
+import org.jetbrains.annotations.Nullable;
 
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.player.PlanetRemove;
@@ -9,7 +10,6 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 
-import javax.annotation.CheckForNull;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -25,7 +25,7 @@ public class Map {
 
     private HashMap<String, UnitHolder> planets = new HashMap<>();
 
-    @CheckForNull
+    @Nullable
     private DisplayType displayTypeForced = null;
     @ExportableField
     private int playerCountForMap = 6;
@@ -645,7 +645,7 @@ public class Map {
         return false;
     }
 
-    @CheckForNull
+    @Nullable
     public java.util.Map.Entry<String, Integer> drawAgenda() {
         if (!agendas.isEmpty()) {
             for (String id : agendas) {
@@ -676,7 +676,7 @@ public class Map {
         return id;
     }
 
-    @CheckForNull
+    @Nullable
     public LinkedHashMap<String, Integer> drawActionCard(String userID) {
         if (!actionCards.isEmpty()) {
             String id = actionCards.get(0);
@@ -784,7 +784,7 @@ public class Map {
         return false;
     }
 
-    @CheckForNull
+    @Nullable
     public String drawActionCardAndDiscard() {
         if (!actionCards.isEmpty()) {
             String id = actionCards.get(0);
@@ -799,7 +799,7 @@ public class Map {
         }
     }
 
-    @CheckForNull
+    @Nullable
     public LinkedHashMap<String, Integer> drawSecretObjective(String userID) {
         if (!secretObjectives.isEmpty()) {
             String id = secretObjectives.get(0);
@@ -813,7 +813,7 @@ public class Map {
         return null;
     }
 
-    @CheckForNull
+    @Nullable
     public LinkedHashMap<String, Integer> drawSpecificSecretObjective(String soID, String userID) {
         if (!secretObjectives.isEmpty()) {
             boolean remove = secretObjectives.remove(soID);
@@ -963,7 +963,7 @@ public class Map {
         return false;
     }
 
-    @CheckForNull
+    @Nullable
     public LinkedHashMap<String, Integer> getSecretObjective(String userID) {
         Player player = getPlayer(userID);
         if (player != null) {
@@ -972,7 +972,7 @@ public class Map {
         return null;
     }
 
-    @CheckForNull
+    @Nullable
     public LinkedHashMap<String, Integer> getScoredSecretObjective(String userID) {
         Player player = getPlayer(userID);
         if (player != null) {

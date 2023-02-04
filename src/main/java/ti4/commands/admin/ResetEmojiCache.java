@@ -1,7 +1,8 @@
 package ti4.commands.admin;
 
-import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.emoji.*;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+
 import ti4.buttons.ButtonListener;
 import ti4.helpers.Constants;
 import ti4.message.BotLogger;
@@ -17,9 +18,9 @@ public class ResetEmojiCache extends AdminSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
 
-        List<Emote> emotes = event.getJDA().getEmotes();
-        for (Emote emote : emotes) {
-            BotLogger.log(emote.getName() + " " + emote.getIdLong());
+        List<RichCustomEmoji> emojis = event.getJDA().getEmojis();
+        for (Emoji emoji : emojis) {
+            BotLogger.log(emoji.getName() + " " + emoji.getFormatted());
         }
         ButtonListener.emoteMap.clear();
 

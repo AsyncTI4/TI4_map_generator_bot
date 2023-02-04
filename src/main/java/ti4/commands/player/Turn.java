@@ -1,16 +1,18 @@
 package ti4.commands.player;
 
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+
 import org.apache.commons.collections4.ListUtils;
+
 import ti4.MapGenerator;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
@@ -132,10 +134,10 @@ public class Turn extends PlayerSubcommandData {
                     Integer value = objective.getValue();
                     Button objectiveButton;
                     if (poStatus == 0) { //Stage 1 Objectives
-                        objectiveButton = Button.success(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromMarkdown(Emojis.Public1alt));
+                        objectiveButton = Button.success(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public1alt));
                         poButtons1.add(objectiveButton);
                     } else if (poStatus == 1) { //Stage 2 Objectives
-                        objectiveButton = Button.primary(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromMarkdown(Emojis.Public2alt));
+                        objectiveButton = Button.primary(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public2alt));
                         poButtons2.add(objectiveButton);
                     } else if (poStatus == 2) { //Other Objectives
                         objectiveButton = Button.secondary(Constants.PO_SCORING + value, "(" + value + ") " + po_name);
@@ -159,9 +161,9 @@ public class Turn extends PlayerSubcommandData {
             for (List<Button> partition : partitions) {
                 actionRows.add(ActionRow.of(partition));
             }
-            Message messageObject = new MessageBuilder()
-                    .append(message)
-                    .setActionRows(actionRows).build();
+            MessageCreateData messageObject = new MessageCreateBuilder()
+                    .addContent(message)
+                    .addComponents(actionRows).build();
             MessageChannel channel = event.getChannel();
             channel.sendMessage(messageObject).queue();
 

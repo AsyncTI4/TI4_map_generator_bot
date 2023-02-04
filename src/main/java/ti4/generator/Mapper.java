@@ -1,12 +1,12 @@
 package ti4.generator;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.message.BotLogger;
-
-import javax.annotation.CheckForNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -258,7 +258,7 @@ public class Mapper {
         return (String) actionCards.get(id);
     }
 
-    @CheckForNull
+    @Nullable
     public static String getActionCardName(String id) {
         String info = (String) actionCards.get(id);
         // if we would break trying to split the note, just return whatever is there
@@ -351,7 +351,7 @@ public class Mapper {
         return agenda.toString();
     }
 
-    @CheckForNull
+    @Nullable
     public static String getAgendaTitle(String id) {
         String agendaInfo = (String)agendaRepresentation.get(id);
         if (agendaInfo == null){
@@ -370,7 +370,7 @@ public class Mapper {
         return split[0];
     }
 
-    @CheckForNull
+    @Nullable
     public static String getAgendaText(String id) {
         String agendaInfo = (String)agendaRepresentation.get(id);
         if (agendaInfo == null){
@@ -433,7 +433,7 @@ public class Mapper {
         return agendaList;
     }
 
-    @CheckForNull
+    @Nullable
     public static String getCCPath(String ccID) {
         String ccPath = ResourceHelper.getInstance().getCCFile(ccID);
         if (ccPath == null) {
@@ -443,7 +443,7 @@ public class Mapper {
         return ccPath;
     }
 
-    @CheckForNull
+    @Nullable
     public static String getTokenPath(String tokenID) {
         String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
         if (tokenPath == null || !(new File(tokenPath).exists())) {

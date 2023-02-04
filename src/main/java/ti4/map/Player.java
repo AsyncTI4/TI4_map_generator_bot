@@ -1,6 +1,6 @@
 package ti4.map;
 
-import net.dv8tion.jda.api.entities.Channel;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import ti4.MapGenerator;
@@ -8,13 +8,13 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 
-import javax.annotation.CheckForNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Map;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Player {
-
+    
     private String userID;
     private String userName;
 
@@ -45,9 +45,9 @@ public class Player {
     private List<String> mahactCC = new ArrayList<>();
     private List<Leader> leaders = new ArrayList<>();
 
-    @CheckForNull
+    @Nullable
     private Role roleForCommunity = null;
-    @CheckForNull
+    @Nullable
     private Channel channelForCommunity = null;
 
 
@@ -84,7 +84,7 @@ public class Player {
          mahactCC.remove(cc);
     }
 
-    @CheckForNull
+    @Nullable
     public Role getRoleForCommunity() {
         return roleForCommunity;
     }
@@ -93,7 +93,7 @@ public class Player {
         this.roleForCommunity = roleForCommunity;
     }
 
-    @CheckForNull
+    @Nullable
     public Channel getChannelForCommunity() {
         return channelForCommunity;
     }
@@ -385,7 +385,7 @@ public class Player {
         }
     }
 
-    @CheckForNull
+    @Nullable
     public Leader getLeader(String leaderID) {
         for (Leader leader : leaders) {
             if (leader.getId().equals(leaderID) || leader.getName().equals(leaderID)){

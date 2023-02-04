@@ -3,7 +3,6 @@ package ti4.helpers;
 import org.jetbrains.annotations.Nullable;
 import ti4.message.BotLogger;
 
-import javax.annotation.CheckForNull;
 import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
@@ -108,22 +107,22 @@ public class Storage {
         return tiFont;
     }
 
-    @CheckForNull
+    @Nullable
     public static File getMapUndoStorage(String mapName) {
         return new File(getStoragePath() + MAPS_UNDO + mapName);
     }
 
-    @CheckForNull
+    @Nullable
     public static File getMapUndoDirectory() {
         return new File(getStoragePath() + MAPS_UNDO);
     }
 
-    @CheckForNull
+    @Nullable
     public static File getMapImageStorage(String mapName) {
         return new File(getStoragePath() + MAPS + mapName);
     }
 
-    @CheckForNull
+    @Nullable
     public static File getMapImageDirectory() {
         return new File(getStoragePath() + MAPS);
     }
@@ -133,12 +132,12 @@ public class Storage {
         return System.getenv("RESOURCE_PATH");
     }
 
-    @CheckForNull
+    @Nullable
     public static File getMapStorage(String mapName) {
         return new File(getStoragePath() + MAPS + mapName);
     }
 
-    @CheckForNull
+    @Nullable
     public static File getDeletedMapStorage(String mapName) {
         return new File(getStoragePath() + DELETED_MAPS + mapName);
     }
@@ -159,7 +158,7 @@ public class Storage {
     }
 
 
-    @CheckForNull
+    @Nullable
     public static File getLoggerFile() {
         String resource = getStoragePath();
         if (resource == null) return null;

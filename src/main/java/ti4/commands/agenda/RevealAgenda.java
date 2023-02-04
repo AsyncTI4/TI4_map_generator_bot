@@ -1,9 +1,9 @@
 package ti4.commands.agenda;
 
-import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.entities.Emote;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -36,10 +36,10 @@ public class RevealAgenda extends AgendaSubcommandData {
         String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you will **Play a When** or **Play an After** or not by pressing the buttons below:";
 
         Button playWhen = Button.danger("play_when", "Play When");
-        Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromMarkdown(Emojis.nowhens));
+        Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
 
         Button playAfter = Button.danger("play_after", "Play After");
-        Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromMarkdown(Emojis.noafters));
+        Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromFormatted(Emojis.noafters));
 
         MessageHelper.sendMessageToChannel(event, text);
         MessageHelper.sendMessageToChannelWithButtons(event, Emojis.nowhens, playWhen, noWhen);
