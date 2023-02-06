@@ -86,13 +86,13 @@ public class Constants {
     public static final String ADD_TILE_LIST = "add_tile_list";
     public static final String ADD_FRONTIER_TOKENS = "add_frontier_tokens";
     public static final String ADD_UNITS = "add_units";
-    public static final String ADD_UNIT_DAMAGE = "add_damage_unit";
+    public static final String ADD_UNIT_DAMAGE = "add_sustain_damage";
     public static final String MOVE_UNITS = "move_units";
     public static final String NO_MAPGEN = "no_mapgen";
     public static final String REMOVE_UNITS = "remove_units";
-    public static final String REMOVE_UNIT_DAMAGE = "remove_damage_unit";
+    public static final String REMOVE_UNIT_DAMAGE = "remove_sustain_damage";
     public static final String REMOVE_ALL_UNITS = "remove_all_units";
-    public static final String REMOVE_ALL_UNIT_DAMAGE = "remove_damage_all_units";
+    public static final String REMOVE_ALL_UNIT_DAMAGE = "remove_all_sustain_damage";
     public static final String SPACE = "space";
     public static final String COMMAND = "command_";
     public static final String CONTROL = "control_";
@@ -131,7 +131,7 @@ public class Constants {
     public static final String RISE_OF_A_MESSIAH = "rise_of_a_messiah";
     public static final String SLEEPER_TOKEN = "sleeper_token";
     public static final String STELLAR_CONVERTER = "stellar_converter";
-    public static final String ION_TOKEN_FLIP = "ion_token_flip";
+    public static final String ION_TOKEN_FLIP = "ion_storm_flip";
     public static final String TOKEN_SLEEPER_PNG = "token_sleeper.png";
     public static final String WORLD_DESTROYED_PNG = "token_worlddestroyed.png";
     public static final String TOKEN_ION_ALPHA_PNG = "token_ionalpha.png";
