@@ -276,18 +276,29 @@ public class ConvertTTPGtoAsync {
             for (String card : ttpgPlayer.getHandCards()) {
                 switch (determineCardType(card)) {
                     case "promissory" :
-                        asyncPlayer.setPromissoryNote(AliasHandler.resolvePromissory(card.toLowerCase()));
+                        asyncPlayer.setPromissoryNote(AliasHandler.resolvePromissory(card));
                         break;
                     case "action" :
-                        asyncPlayer.setActionCard(AliasHandler.resolveActionCard(card.toLowerCase()));
+                        asyncPlayer.setActionCard(AliasHandler.resolveActionCard(card));
                         break;
                     case "secret" :
-                        asyncPlayer.setSecret(AliasHandler.resolveObjective(card.toLowerCase()));
+                        asyncPlayer.setSecret(AliasHandler.resolveObjective(card));
+                        break;
+                    case "relic" :
+                        asyncPlayer.addRelic(AliasHandler.resolveRelic(card));
+                        break;
+                    case "explore" :
+                        asyncPlayer.addFragment(AliasHandler.resolveExploration(card));
                         break;
                     default :
                         System.out.println("Could not add card to hand: " + card);
                         break;
                 }
+            }
+
+            //PLAYER ALLIANCES
+            for (String alliance : ttpgPlayer.getAlliances()) {
+                asyncPlayer.setPromissoryNotesInPlayArea(AliasHandler.resolvePromissory(alliance + "_an"));
             }
 
             index++;
@@ -322,6 +333,37 @@ public class ConvertTTPGtoAsync {
                 }
             }
         }
+
+        // DECK AC
+        for (String card : ttpgMap.getDecks().getCardAction().getDiscard()) {
+            asyncMap.setDiscardActionCard(AliasHandler.resolveActionCard(card));
+        }
+
+        // DECK AGENDA
+        for (String card : ttpgMap.getDecks().getCardAgenda().getDiscard()) {
+            asyncMap.addDiscardAgenda(AliasHandler.resolveAgenda(card));
+        }
+
+        // DECK CULTURAL
+        for (String card : ttpgMap.getDecks().getCardExplorationCultural().getDiscard()) {
+            asyncMap.discardExplore(AliasHandler.resolveExploration(card));
+        }
+
+        // DECK HAZARDOUS
+        for (String card : ttpgMap.getDecks().getCardExplorationHazardous().getDiscard()) {
+            asyncMap.discardExplore(AliasHandler.resolveExploration(card));
+        }
+
+        // DECK INDUSTRIAL
+        for (String card : ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard()) {
+            asyncMap.discardExplore(AliasHandler.resolveExploration(card));
+        }
+
+        // DECK FRONTIER
+        for (String card : ttpgMap.getDecks().getCardExplorationFrontier().getDiscard()) {
+            asyncMap.discardExplore(AliasHandler.resolveExploration(card));
+        }
+
         return asyncMap;
     }
    
@@ -332,6 +374,10 @@ public class ConvertTTPGtoAsync {
             return "action";
         } else if (Mapper.getSecretObjectives().containsKey(AliasHandler.resolveObjective(card))) {
             return "secret";
+        } else if (Mapper.getRelics().containsKey(AliasHandler.resolveRelic(card))) {
+            return "relic";
+        } else if (Mapper.getExplores().containsKey(AliasHandler.resolveExploration(card))) {
+            return "explore";
         } else {
             return "unknown";
         }
