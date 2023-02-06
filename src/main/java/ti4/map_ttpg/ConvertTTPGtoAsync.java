@@ -115,7 +115,7 @@ public class ConvertTTPGtoAsync {
         Storage.init();
         // String jsonSource = readFileAsString("storage/ttpg_exports/TTPG-Export.json");
         // JsonNode node = parse(jsonSource);
-        TTPGMap ttpgMap = getTTPGMapFromJsonFile("storage/ttpg_exports/TTPG-Export-Hadouken.json");
+        TTPGMap ttpgMap = getTTPGMapFromJsonFile("storage/ttpg_exports/TTPG-Export-Hadouken-New.json");
 
         Map map = ConvertTTPGMaptoAsyncMap(ttpgMap);
 
@@ -135,7 +135,7 @@ public class ConvertTTPGtoAsync {
                 setPlayerCountForMap(ttpgMap.getPlayers().size());
                 setVp(ttpgMap.getScoreboard());
                 setRound(ttpgMap.getRound());
-                setName("ttpgimport");// + currentDateTime());
+                setName("ttpgimport_new");// + currentDateTime());
             }
         };
         
@@ -215,7 +215,7 @@ public class ConvertTTPGtoAsync {
             }
 
             //PLAYER LEADERS
-            if (!asyncPlayer.getFaction().equals("keleres") && !asyncPlayer.getFaction().equals("nomad")) { //deal with these chumps later
+            if (!asyncPlayer.getFaction().equals("keleres") && !asyncPlayer.getFaction().equals("nomad")) {
                 asyncPlayer.getLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked") ? false : true);
                 asyncPlayer.getLeader("commander").setLocked(ttpgPlayer.getLeaders().getCommander().equals("unlocked") ? false : true);
                 asyncPlayer.getLeader("hero").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
@@ -361,7 +361,7 @@ public class ConvertTTPGtoAsync {
         String tileContents = matcher.group(4);
         Integer index = 0;
         String[] regions = tileContents.split(";");
-        System.out.print(regions.length);
+        System.out.println("# of regions: " + regions.length);
         for (String regionContents : regions) {
             Boolean regionIsSpace = index == 0 ? true : false;
             Boolean regionIsPlanet = index > 0 ? true : false;
