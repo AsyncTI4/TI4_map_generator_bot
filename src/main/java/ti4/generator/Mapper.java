@@ -93,7 +93,7 @@ public class Mapper {
                 String value = (String) entry.getValue();
                 String[] pns = value.split(";");
                 String id = pns[1].toLowerCase();
-                if (id.equals(color) || AliasHandler.resolveFaction(id).equals(faction)) {
+                if (id.equals(color) || (isFaction(id) && AliasHandler.resolveFaction(id).equals(faction))) { 
                     pnList.add((String) entry.getKey());
                 }
             }
