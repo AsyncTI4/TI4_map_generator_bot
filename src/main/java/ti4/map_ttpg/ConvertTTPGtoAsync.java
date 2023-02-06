@@ -385,7 +385,8 @@ public class ConvertTTPGtoAsync {
                 regionContents = matcherAttachments.group(1);
                 attachments = matcherAttachments.group(2);
                 for (Character attachment : attachments.toCharArray()) {
-                    String attachmentResolved = AliasHandler.resolveTTPGAttachment(Character.toString(attachment));
+                    String attachment_proper = Character.toString(attachment) + (Character.isUpperCase(attachment) ? "_cap" : ""); //bypass AliasHandler's toLowercase'ing
+                    String attachmentResolved = AliasHandler.resolveTTPGAttachment(attachment_proper.toLowerCase());
                     System.out.println("          - " + attachment + ": " + attachmentResolved);
 
                     String tokenFileName = Mapper.getTokenID(attachmentResolved);
