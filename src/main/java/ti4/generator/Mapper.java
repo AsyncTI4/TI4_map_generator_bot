@@ -100,7 +100,14 @@ public class Mapper {
         }
         return pnList;
     }
-
+    
+    public static List<String> getPromissoryNotes() {
+        List<String> pnList = new ArrayList<>();
+        for (Map.Entry<Object, Object> entry : promissoryNotes.entrySet()) {
+            pnList.add((String) entry.getKey());
+        }
+        return pnList;
+    }
     public static boolean isColorValid(String color) {
         return colors.getProperty(color) != null;
     }

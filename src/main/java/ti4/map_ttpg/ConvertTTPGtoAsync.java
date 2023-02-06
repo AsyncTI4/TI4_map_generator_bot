@@ -191,6 +191,7 @@ public class ConvertTTPGtoAsync {
                     for (Entry<String,Integer> secretObjective : asyncPlayer.getSecrets().entrySet()) {
                         if (secretObjective.getKey().equalsIgnoreCase(asyncScoredObjective)) {
                             asyncPlayer.setSecretScored(asyncScoredObjective, secretObjective.getValue());
+                            asyncPlayer.removeSecret(secretObjective.getValue());
                         }
                     }
                     
@@ -265,6 +266,30 @@ public class ConvertTTPGtoAsync {
                 asyncMap.getAllRelics().remove(AliasHandler.resolveRelic(relic));
             }
 
+
+            // //CLEAN PLAYER HANDCARDS
+            // for (Integer cardID : asyncPlayer.getPromissoryNotes().values()) {
+            //     asyncPlayer.removePromissoryNote(cardID);
+            // }
+
+            //PLAYER HANDCARDS
+            for (String card : ttpgPlayer.getHandCards()) {
+                switch (determineCardType(card)) {
+                    case "promissory" :
+                        asyncPlayer.setPromissoryNote(AliasHandler.resolvePromissory(card.toLowerCase()));
+                        break;
+                    case "action" :
+                        asyncPlayer.setActionCard(AliasHandler.resolveActionCard(card.toLowerCase()));
+                        break;
+                    case "secret" :
+                        asyncPlayer.setSecret(AliasHandler.resolveObjective(card.toLowerCase()));
+                        break;
+                    default :
+                        System.out.println("Could not add card to hand: " + card);
+                        break;
+                }
+            }
+
             index++;
         }
 
@@ -300,6 +325,19 @@ public class ConvertTTPGtoAsync {
         return asyncMap;
     }
    
+    private static String determineCardType(String card) {
+        if (Mapper.getPromissoryNotes().contains(AliasHandler.resolvePromissory(card))) {
+            return "promissory";
+        } else if (Mapper.getActionCards().containsKey(AliasHandler.resolveActionCard(card))) {
+            return "action";
+        } else if (Mapper.getSecretObjectives().containsKey(AliasHandler.resolveObjective(card))) {
+            return "secret";
+        } else {
+            return "unknown";
+        }
+    }
+
+
     public static Tile ConvertTTPGHexToAsyncTile (Map asyncMap, String ttpgHex) {
         // System.out.println(" Examining hex summary:  " + ttpgHex);
 
