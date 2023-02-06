@@ -1,7 +1,8 @@
 
 package ti4.map_ttpg;
 
-import java.util.HashMap;
+
+import java.util.LinkedHashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -17,7 +18,6 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "codex3",
     "baseMagen"
 })
-
 public class TTPGConfig {
 
     @JsonProperty("codex1")
@@ -29,7 +29,7 @@ public class TTPGConfig {
     @JsonProperty("baseMagen")
     private Boolean baseMagen;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
     @JsonProperty("codex1")
     public Boolean getCodex1() {

@@ -1,7 +1,8 @@
 
 package ti4.map_ttpg;
 
-import java.util.HashMap;
+
+import java.util.LinkedHashMap;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -25,7 +26,7 @@ public class TTPGCommandTokens {
     @JsonProperty("strategy")
     private Integer strategy;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
     @JsonProperty("tactics")
     public Integer getTactics() {

@@ -1,8 +1,8 @@
-
 package ti4.map_ttpg;
 
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
@@ -13,49 +13,23 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({
-    "agent",
-    "commander",
-    "hero"
+    "deck"
 })
-public class TTPGLeaders {
+public class TTPGCardObjectivePublic1 {
 
-    @JsonProperty("agent")
-    private String agent = "purged";
-    @JsonProperty("commander")
-    private String commander = "purged";
-    @JsonProperty("hero")
-    private String hero = "purged";
+    @JsonProperty("deck")
+    private List<String> deck;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
-    @JsonProperty("agent")
-    public String getAgent() {
-        return agent;
+    @JsonProperty("deck")
+    public List<String> getDeck() {
+        return deck;
     }
 
-    @JsonProperty("agent")
-    public void setAgent(String agent) {
-        this.agent = agent;
-    }
-
-    @JsonProperty("commander")
-    public String getCommander() {
-        return commander;
-    }
-
-    @JsonProperty("commander")
-    public void setCommander(String commander) {
-        this.commander = commander;
-    }
-
-    @JsonProperty("hero")
-    public String getHero() {
-        return hero;
-    }
-
-    @JsonProperty("hero")
-    public void setHero(String hero) {
-        this.hero = hero;
+    @JsonProperty("deck")
+    public void setDeck(List<String> deck) {
+        this.deck = deck;
     }
 
     @JsonAnyGetter
