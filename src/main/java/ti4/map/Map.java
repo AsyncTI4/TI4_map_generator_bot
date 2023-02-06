@@ -820,7 +820,7 @@ public class Map {
         return null;
     }
 
-    private void setDiscardActionCard(String id) {
+    public void setDiscardActionCard(String id) {
         Collection<Integer> values = discardActionCards.values();
         int identifier = new Random().nextInt(1000);
         while (values.contains(identifier)) {
