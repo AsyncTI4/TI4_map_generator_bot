@@ -111,7 +111,7 @@ public class AliasHandler {
 
     public static String resolveTile(String name)
     {
-        String aliasID = tileAliasList.get(name);
+        String aliasID = tileAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -126,7 +126,7 @@ public class AliasHandler {
      */
     public static String resolveStandardTile(String name)
     {
-        String aliasID = tilemapAliasList.get(name);
+        String aliasID = tilemapAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -137,7 +137,7 @@ public class AliasHandler {
 
     public static String resolveFaction(String name)
     {
-        String aliasID = factionAliasList.get(name);
+        String aliasID = factionAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -148,7 +148,7 @@ public class AliasHandler {
 
     public static String resolveColor(String name)
     {
-        String aliasID = colorAliasList.get(name);
+        String aliasID = colorAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -159,7 +159,7 @@ public class AliasHandler {
 
     public static String resolveUnit(String name)
     {
-        String aliasID = unitAliasList.get(name);
+        String aliasID = unitAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -178,7 +178,7 @@ public class AliasHandler {
 
     public static String resolvePlanet(String name)
     {
-        String aliasID = planetAliasList.get(name);
+        String aliasID = planetAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -189,7 +189,7 @@ public class AliasHandler {
 
     public static String resolveAttachment(String name)
     {
-        String aliasID = planetAliasList.get(name);
+        String aliasID = planetAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -200,7 +200,7 @@ public class AliasHandler {
 
     public static String resolveToken(String name)
     {
-        String aliasID = cctokenAliasList.get(name);
+        String aliasID = cctokenAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -211,7 +211,7 @@ public class AliasHandler {
 
     public static String resolveTech(String name)
     {
-        String aliasID = techAliasList.get(name);
+        String aliasID = techAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -222,7 +222,7 @@ public class AliasHandler {
 
     public static String resolveActionCard(String name)
     {
-        String aliasID = actionCardAliasList.get(name);
+        String aliasID = actionCardAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -233,7 +233,7 @@ public class AliasHandler {
 
     public static String resolveAgenda(String name)
     {
-        String aliasID = agendaAliasList.get(name);
+        String aliasID = agendaAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -244,7 +244,7 @@ public class AliasHandler {
 
     public static String resolveExploration(String name)
     {
-        String aliasID = explorationAliasList.get(name);
+        String aliasID = explorationAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -255,7 +255,7 @@ public class AliasHandler {
     
     public static String resolvePromissory(String name)
     {
-        String aliasID = promissoryAliasList.get(name);
+        String aliasID = promissoryAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -288,7 +288,7 @@ public class AliasHandler {
         
     public static String resolveTTPGAttachment(String name)
     {
-        String aliasID = ttpgAttachmentAliasList.get(name);
+        String aliasID = ttpgAttachmentAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -299,7 +299,7 @@ public class AliasHandler {
     
     public static String resolveTTPGToken(String name)
     {
-        String aliasID = ttpgTokenAliasList.get(name);
+        String aliasID = ttpgTokenAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -310,7 +310,7 @@ public class AliasHandler {
     
     public static String resolveTTPGUnit(String name)
     {
-        String aliasID = ttpgUnitAliasList.get(name);
+        String aliasID = ttpgUnitAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return resolveUnit(aliasID);
         } else {
