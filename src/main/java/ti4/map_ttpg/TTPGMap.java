@@ -1,7 +1,8 @@
 
 package ti4.map_ttpg;
 
-import java.util.HashMap;
+
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -18,6 +19,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "isPoK",
     "scoreboard",
     "config",
+    "decks",
     "hexSummary",
     "laws",
     "mapString",
@@ -29,19 +31,21 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class TTPGMap {
 
     @JsonProperty("players")
-    private List<TTPGPlayer> players = null;
+    private List<TTPGPlayer> players;
     @JsonProperty("setupTimestamp")
-    private Float setupTimestamp;
+    private Double setupTimestamp;
     @JsonProperty("isPoK")
     private Boolean isPoK;
     @JsonProperty("scoreboard")
     private Integer scoreboard;
     @JsonProperty("config")
     private TTPGConfig config;
+    @JsonProperty("decks")
+    private TTPGDecks decks;
     @JsonProperty("hexSummary")
     private String hexSummary;
     @JsonProperty("laws")
-    private List<Object> laws = null;
+    private List<String> laws;
     @JsonProperty("mapString")
     private String mapString;
     @JsonProperty("objectives")
@@ -49,11 +53,11 @@ public class TTPGMap {
     @JsonProperty("round")
     private Integer round;
     @JsonProperty("timestamp")
-    private Float timestamp;
+    private Double timestamp;
     @JsonProperty("turn")
     private String turn;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
     @JsonProperty("players")
     public List<TTPGPlayer> getPlayers() {
@@ -66,12 +70,12 @@ public class TTPGMap {
     }
 
     @JsonProperty("setupTimestamp")
-    public Float getSetupTimestamp() {
+    public Double getSetupTimestamp() {
         return setupTimestamp;
     }
 
     @JsonProperty("setupTimestamp")
-    public void setSetupTimestamp(Float setupTimestamp) {
+    public void setSetupTimestamp(Double setupTimestamp) {
         this.setupTimestamp = setupTimestamp;
     }
 
@@ -105,6 +109,16 @@ public class TTPGMap {
         this.config = config;
     }
 
+    @JsonProperty("decks")
+    public TTPGDecks getDecks() {
+        return decks;
+    }
+
+    @JsonProperty("decks")
+    public void setDecks(TTPGDecks decks) {
+        this.decks = decks;
+    }
+
     @JsonProperty("hexSummary")
     public String getHexSummary() {
         return hexSummary;
@@ -116,12 +130,12 @@ public class TTPGMap {
     }
 
     @JsonProperty("laws")
-    public List<Object> getLaws() {
+    public List<String> getLaws() {
         return laws;
     }
 
     @JsonProperty("laws")
-    public void setLaws(List<Object> laws) {
+    public void setLaws(List<String> laws) {
         this.laws = laws;
     }
 
@@ -156,12 +170,12 @@ public class TTPGMap {
     }
 
     @JsonProperty("timestamp")
-    public Float getTimestamp() {
+    public Double getTimestamp() {
         return timestamp;
     }
 
     @JsonProperty("timestamp")
-    public void setTimestamp(Float timestamp) {
+    public void setTimestamp(Double timestamp) {
         this.timestamp = timestamp;
     }
 

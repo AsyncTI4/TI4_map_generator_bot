@@ -1,7 +1,8 @@
 
 package ti4.map_ttpg;
 
-import java.util.HashMap;
+
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -35,7 +36,7 @@ public class TTPGObjectives {
     @JsonProperty("Other")
     private List<String> other = null;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
     @JsonProperty("Public Objectives I")
     public List<String> getPublicObjectivesI() {

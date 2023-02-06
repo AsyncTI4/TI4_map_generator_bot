@@ -1,7 +1,8 @@
 
 package ti4.map_ttpg;
 
-import java.util.HashMap;
+
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
@@ -39,13 +40,13 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class TTPGPlayer {
 
     @JsonProperty("laws")
-    private List<Object> laws = null;
+    private List<String> laws;
     @JsonProperty("objectives")
-    private List<String> objectives = null;
+    private List<String> objectives;
     @JsonProperty("active")
     private Boolean active;
     @JsonProperty("alliances")
-    private List<Object> alliances = null;
+    private List<String> alliances;
     @JsonProperty("color")
     private String color;
     @JsonProperty("colorActual")
@@ -55,7 +56,7 @@ public class TTPGPlayer {
     @JsonProperty("custodiansPoints")
     private Integer custodiansPoints;
     @JsonProperty("handCards")
-    private List<String> handCards = null;
+    private List<String> handCards;
     @JsonProperty("factionName")
     private String factionName;
     @JsonProperty("factionShort")
@@ -65,17 +66,17 @@ public class TTPGPlayer {
     @JsonProperty("steamName")
     private String steamName;
     @JsonProperty("planetCards")
-    private List<String> planetCards = null;
+    private List<String> planetCards;
     @JsonProperty("relicCards")
-    private List<String> relicCards = null;
+    private List<String> relicCards;
     @JsonProperty("score")
     private Integer score;
     @JsonProperty("strategyCards")
-    private List<Object> strategyCards = null;
+    private List<Object> strategyCards;
     @JsonProperty("strategyCardsFaceDown")
-    private List<Object> strategyCardsFaceDown = null;
+    private List<Object> strategyCardsFaceDown;
     @JsonProperty("technologies")
-    private List<String> technologies = null;
+    private List<String> technologies;
     @JsonProperty("commodities")
     private Integer commodities;
     @JsonProperty("tradeGoods")
@@ -83,15 +84,15 @@ public class TTPGPlayer {
     @JsonProperty("maxCommodities")
     private Integer maxCommodities;
     @JsonIgnore
-    private Map<String, Object> additionalProperties = new HashMap<String, Object>();
+    private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
     @JsonProperty("laws")
-    public List<Object> getLaws() {
+    public List<String> getLaws() {
         return laws;
     }
 
     @JsonProperty("laws")
-    public void setLaws(List<Object> laws) {
+    public void setLaws(List<String> laws) {
         this.laws = laws;
     }
 
@@ -116,12 +117,12 @@ public class TTPGPlayer {
     }
 
     @JsonProperty("alliances")
-    public List<Object> getAlliances() {
+    public List<String> getAlliances() {
         return alliances;
     }
 
     @JsonProperty("alliances")
-    public void setAlliances(List<Object> alliances) {
+    public void setAlliances(List<String> alliances) {
         this.alliances = alliances;
     }
 
