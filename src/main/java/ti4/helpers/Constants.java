@@ -471,5 +471,6 @@ public class Constants {
     public static final String CUSTODIAN_TOKEN_PNG = "token_custodian.png";
     public static final String SWAP_SC = "swap_sc";
     public static final String KELERES_HERO_MENTAK = "keleres_hero_mentak";
+    public static final String BOTHELPER = "bothelper";
 
 }
