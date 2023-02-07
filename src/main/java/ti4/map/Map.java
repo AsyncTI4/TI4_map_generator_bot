@@ -515,6 +515,19 @@ public class Map {
         this.discardAgendas = discardAgendas;
     }
 
+    public void setDiscardAgendas(ArrayList<String> discardAgendasList) {
+        LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
+        for (String card : discardAgendasList) {
+            Collection<Integer> values = discardAgendas.values();
+            int identifier = new Random().nextInt(1000);
+            while (values.contains(identifier)) {
+                identifier = new Random().nextInt(1000);
+            }
+            discardAgendas.put(card, identifier);
+        }
+        this.discardAgendas = discardAgendas;
+    }
+
     public void setSentAgendas(LinkedHashMap<String, Integer> sentAgendas) {
         this.sentAgendas = sentAgendas;
     }
@@ -1032,6 +1045,19 @@ public class Map {
     }
 
     public void setDiscardActionCards(LinkedHashMap<String, Integer> discardActionCards) {
+        this.discardActionCards = discardActionCards;
+    }
+
+    public void setDiscardActionCards(ArrayList<String> discardActionCardList) {
+        LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
+        for (String card : discardActionCardList) {
+            Collection<Integer> values = discardActionCards.values();
+            int identifier = new Random().nextInt(1000);
+            while (values.contains(identifier)) {
+                identifier = new Random().nextInt(1000);
+            }
+            discardActionCards.put(card, identifier);
+        }
         this.discardActionCards = discardActionCards;
     }
 
