@@ -43,6 +43,7 @@ public class GenerateMap {
     private static int scoreTokenWidth = 0;
     private int extraWidth = 200;
     private static Point tilePositionPoint = new Point(230, 295);
+    private static Point labelPositionPoint = new Point(90, 295);
     private static Point numberPositionPoint = new Point(40, 27);
     private static HashMap<Player, Integer> userVPs = new HashMap<>();
 
@@ -137,10 +138,13 @@ public class GenerateMap {
                 Set<String> tilesToShow = fowFilter(map, event);
                 Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
                 keys.removeAll(tilesToShow);
+                updatePlayerFogFilter(map, fowPlayer, tilesToShow);
+                
                 for (String key : keys) {
                     tilesToDisplay.remove(key);
-                    tilesToDisplay.put(key, new Tile("0b", key));
+                    tilesToDisplay.put(key, fowPlayer.buildFogTile(key));
                 }
+                
             }
         }
         File file = Storage.getMapImageStorage("temp.png");
@@ -317,6 +321,16 @@ public class GenerateMap {
             tiles.addAll(newTiles);
         }
         return tiles;
+    }
+
+    private void updatePlayerFogFilter(Map map, Player player, Set<String> tileKeys) {
+        for (String key_ : tileKeys) {
+            Tile tileToUpdate = map.getTileByPosition(key_);
+            
+            if(tileToUpdate != null) {
+                player.updateFogFilter(tileToUpdate);
+            }
+        }
     }
 
     private static void unitCheck(Player player, Set<String> tilesWithPlayerUnitsAndAdjacent, java.util.Map<String, String> colorToId, java.util.Map<String, String> unitRepresentation, Tile tile, String tileID) {
@@ -1852,6 +1866,8 @@ public class GenerateMap {
     private void addTile(Tile tile, Map map, boolean justTile) {
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
+            BufferedImage fogOfWar = ImageIO.read(new File(tile.getFowTilePath()));
+
             Point positionPoint = PositionMapper.getTilePosition(tile.getPosition(), map);
             if (positionPoint == null) {
                 System.out.println();
@@ -1863,9 +1879,15 @@ public class GenerateMap {
 
                 graphics.setFont(Storage.getFont20());
                 graphics.setColor(Color.WHITE);
+                if(isFoWPrivate && tile.hasFog()) {
+                    graphics.drawImage(fogOfWar, tileX, tileY, null);
+                    graphics.drawString(tile.getFogLabel(), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
+                }
                 graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x, tileY + tilePositionPoint.y);
                 return;
             }
+            if(isFoWPrivate && tile.hasFog()) return;
+
             ArrayList<Rectangle> rectangles = new ArrayList<>();
 
             Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
