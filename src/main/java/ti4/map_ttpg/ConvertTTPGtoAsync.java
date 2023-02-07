@@ -5,6 +5,7 @@ import java.nio.file.Paths;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
@@ -271,8 +272,12 @@ public class ConvertTTPGtoAsync {
             //     asyncPlayer.removePromissoryNote(cardID);
             // }
 
-            //PLAYER HANDCARDS
-            for (String card : ttpgPlayer.getHandCards()) {
+            //PLAYER HANDCARDS and TABLECARDS
+            ArrayList<String> handAndTableCards = new ArrayList<>(){{
+                addAll(ttpgPlayer.getHandCards());
+                addAll(ttpgPlayer.getTableCards());
+            }};
+            for (String card : handAndTableCards) {
                 switch (determineCardType(card)) {
                     case "promissory" :
                         asyncPlayer.setPromissoryNote(AliasHandler.resolvePromissory(card));
@@ -286,7 +291,7 @@ public class ConvertTTPGtoAsync {
                     case "relic" :
                         asyncPlayer.addRelic(AliasHandler.resolveRelic(card));
                         break;
-                    case "explore" :
+                    case "fragment" :
                         asyncPlayer.addFragment(AliasHandler.resolveExploration(card));
                         break;
                     default :
@@ -338,6 +343,7 @@ public class ConvertTTPGtoAsync {
             addAll(ttpgMap.getDecks().getCardAction().getDeck());
             replaceAll(card -> AliasHandler.resolveActionCard(card));
         }};
+        Collections.shuffle(actionCards);
         asyncMap.setActionCards(actionCards);
 
         // ACTION CARD DISCARD
@@ -352,6 +358,7 @@ public class ConvertTTPGtoAsync {
             addAll(ttpgMap.getDecks().getCardAgenda().getDeck());
             replaceAll(card -> AliasHandler.resolveAgenda(card));
         }};
+        Collections.reverse(agendaCards);
         asyncMap.setAgendas(agendaCards);
 
         // AGENDA DISCARD
@@ -369,6 +376,7 @@ public class ConvertTTPGtoAsync {
             addAll(ttpgMap.getDecks().getCardExplorationFrontier().getDeck());
             replaceAll(card -> AliasHandler.resolveExploration(card));
         }};
+        Collections.shuffle(exploreCards);
         asyncMap.setExploreDeck(exploreCards);
 
         // EXPLORATION DISCARD
@@ -386,27 +394,29 @@ public class ConvertTTPGtoAsync {
             addAll(ttpgMap.getDecks().getCardRelic().getDeck());
             replaceAll(card -> AliasHandler.resolveRelic(card));
         }};
+        Collections.shuffle(relicCards);
         asyncMap.setRelics(relicCards);
 
         // STAGE 1 PUBLIC OBJECTIVE DECK
         ArrayList<String> publicCardsStage1 = new ArrayList<>() {{
-            addAll(ttpgMap.getDecks().getCardObjectivePublic1().getDeck());
+            addAll(ttpgMap.getObjectives().getPublicObjectivesII());
             replaceAll(card -> AliasHandler.resolveObjective(card));
         }};
-        asyncMap.setPublicObjectives1(publicCardsStage1);
+        asyncMap.getPublicObjectives1().removeAll(publicCardsStage1);
 
         // STAGE 2 PUBLIC OBJECTIVE DECK
         ArrayList<String> publicCardsStage2 = new ArrayList<>() {{
-            addAll(ttpgMap.getDecks().getCardObjectivePublic2().getDeck());
+            addAll(ttpgMap.getObjectives().getPublicObjectivesII());
             replaceAll(card -> AliasHandler.resolveObjective(card));
         }};
-        asyncMap.setPublicObjectives2(publicCardsStage2);
+        asyncMap.getPublicObjectives2().removeAll(publicCardsStage2);
 
         // SECRET OBJECTIVE DECK
         ArrayList<String> secretCards = new ArrayList<>() {{
             addAll(ttpgMap.getDecks().getCardObjectiveSecret().getDeck());
             replaceAll(card -> AliasHandler.resolveObjective(card));
         }};
+        Collections.shuffle(secretCards);
         asyncMap.setSecretObjectives(secretCards);
 
         // TG ON STRAT CARDS
@@ -432,6 +442,9 @@ public class ConvertTTPGtoAsync {
         } else if (Mapper.getRelics().containsKey(AliasHandler.resolveRelic(card))) {
             return "relic";
         } else if (Mapper.getExplores().containsKey(AliasHandler.resolveExploration(card))) {
+            if (card.contains("Fragment")) {
+                return "fragment";
+            }
             return "explore";
         } else {
             return "unknown";

@@ -32,6 +32,7 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "score",
     "strategyCards",
     "strategyCardsFaceDown",
+    "tableCards",
     "technologies",
     "commodities",
     "tradeGoods",
@@ -75,6 +76,8 @@ public class TTPGPlayer {
     private List<Object> strategyCards;
     @JsonProperty("strategyCardsFaceDown")
     private List<Object> strategyCardsFaceDown;
+    @JsonProperty("tableCards")
+    private List<String> tableCards;
     @JsonProperty("technologies")
     private List<String> technologies;
     @JsonProperty("commodities")
@@ -264,6 +267,16 @@ public class TTPGPlayer {
     @JsonProperty("strategyCardsFaceDown")
     public void setStrategyCardsFaceDown(List<Object> strategyCardsFaceDown) {
         this.strategyCardsFaceDown = strategyCardsFaceDown;
+    }
+
+    @JsonProperty("tableCards")
+    public List<String> getTableCards() {
+        return tableCards;
+    }
+
+    @JsonProperty("tableCards")
+    public void setTableCards(List<String> tableCards) {
+        this.tableCards = tableCards;
     }
 
     @JsonProperty("technologies")
