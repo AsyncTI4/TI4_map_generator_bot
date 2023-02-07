@@ -1867,6 +1867,7 @@ public class GenerateMap {
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
             BufferedImage fogOfWar = ImageIO.read(new File(tile.getFowTilePath()));
+            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate;
 
             Point positionPoint = PositionMapper.getTilePosition(tile.getPosition(), map);
             if (positionPoint == null) {
@@ -1879,14 +1880,15 @@ public class GenerateMap {
 
                 graphics.setFont(Storage.getFont20());
                 graphics.setColor(Color.WHITE);
-                if(isFoWPrivate && tile.hasFog()) {
+                if(convertToGeneric && tile.hasFog()) {
                     graphics.drawImage(fogOfWar, tileX, tileY, null);
                     graphics.drawString(tile.getFogLabel(), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
                 }
                 graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x, tileY + tilePositionPoint.y);
                 return;
             }
-            if(isFoWPrivate && tile.hasFog()) return;
+            
+            if(convertToGeneric && tile.hasFog()) return;
 
             ArrayList<Rectangle> rectangles = new ArrayList<>();
 
