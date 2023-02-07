@@ -26,7 +26,8 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
     "objectives",
     "round",
     "timestamp",
-    "turn"
+    "turn",
+    "unpickedStrategyCards"
 })
 public class TTPGMap {
 
@@ -56,6 +57,8 @@ public class TTPGMap {
     private Double timestamp;
     @JsonProperty("turn")
     private String turn;
+    @JsonProperty("unpickedStrategyCards")
+    private TTPGUnpickedStrategyCards unpickedStrategyCards;
     @JsonIgnore
     private Map<String, Object> additionalProperties = new LinkedHashMap<String, Object>();
 
@@ -187,6 +190,16 @@ public class TTPGMap {
     @JsonProperty("turn")
     public void setTurn(String turn) {
         this.turn = turn;
+    }
+
+    @JsonProperty("unpickedStrategyCards")
+    public TTPGUnpickedStrategyCards getUnpickedStrategyCards() {
+        return unpickedStrategyCards;
+    }
+
+    @JsonProperty("unpickedStrategyCards")
+    public void setUnpickedStrategyCards(TTPGUnpickedStrategyCards unpickedStrategyCards) {
+        this.unpickedStrategyCards = unpickedStrategyCards;
     }
 
     @JsonAnyGetter
