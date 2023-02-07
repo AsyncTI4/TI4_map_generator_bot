@@ -69,6 +69,8 @@ public class Constants {
     public static final String COLOR = "color";
     public static final String SEARCH_WARRANT = "search_warrant";
     public static final String ADD_CUSTOM_ADJACENT_TILES = "add_custom_adjacent_tiles";
+    public static final String ADD_FOG_TILE = "add_fog_tile";
+    public static final String REMOVE_FOG_TILE = "remove_fog_tile";
     public static final String REMOVE_CUSTOM_ADJACENT_TILES = "remove_custom_adjacent_tiles";
     public static final String REMOVE_ALL_CUSTOM_ADJACENT_TILES = "remove_all_custom_adjacent_tiles";
     public static final String ADD_TILE = "add_tile";
@@ -145,7 +147,9 @@ public class Constants {
     public static final String REMOVE_CC_FROM_FS = "mahact_cc_from_fs";
     public static final String SPECIAL = "special";
     public static final String FOW = "fow";
-
+    public static final String FOW_SYSTEMS = "fow_systems";
+    public static final String LABEL = "label";
+    
     public static final String MILTY = "milty";
     public static final String START = "start";
     public static final String SLICE_COUNT = "slice_count";

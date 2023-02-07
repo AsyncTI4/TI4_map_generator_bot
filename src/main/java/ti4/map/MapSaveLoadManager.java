@@ -382,6 +382,23 @@ public class MapSaveLoadManager {
             writer.write(Constants.LEADERS + " " + leaderInfo);
             writer.write(System.lineSeparator());
 
+            StringBuilder fogOfWarSystems = new StringBuilder();
+            HashMap<String,String> fow_systems = player.getFogFilter();
+            HashMap<String,String> fow_labels = player.getFogLabels();
+            for (String key : fow_systems.keySet()) {
+                String system = fow_systems.get(key);
+                String label = fow_labels.get(key);
+                fogOfWarSystems.append(key);
+                fogOfWarSystems.append(",");
+                fogOfWarSystems.append(system);
+                fogOfWarSystems.append(",");
+                fogOfWarSystems.append(label == null || label == "" ? "." : label);
+                fogOfWarSystems.append(";");
+            }
+            writer.write(Constants.FOW_SYSTEMS + " " + fogOfWarSystems);
+            writer.write(System.lineSeparator());
+
+
             writer.write(ENDPLAYER);
             writer.write(System.lineSeparator());
         }
@@ -924,6 +941,16 @@ public class MapSaveLoadManager {
                         player.setLeaders(leaderList);
                     } catch (Exception e) {
                         BotLogger.log("Could not parse leaders loading map");
+                    }
+                }
+                case Constants.FOW_SYSTEMS -> {
+                    StringTokenizer fow_systems = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (fow_systems.hasMoreTokens()) {
+                        String[] system = fow_systems.nextToken().split(",");
+                        String position = system[0];
+                        String tileID = system[1];
+                        String label = system[2];
+                        player.addFogTile(tileID, position, label);
                     }
                 }
                 case Constants.SO_SCORED -> {
