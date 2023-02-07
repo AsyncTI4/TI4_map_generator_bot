@@ -1288,7 +1288,7 @@ public class GenerateMap {
         String[] setupInfo = playerSetup.split(";");
         String hs = setupInfo[1];
         for (Tile tile : tilesToDisplay.values()) {
-            if (tile.getTileID().equals(hs)) {
+            if (tile.getTileID().equals(hs) && !tile.hasFog()) {
                 hasHSInView = true;
                 break;
             }
