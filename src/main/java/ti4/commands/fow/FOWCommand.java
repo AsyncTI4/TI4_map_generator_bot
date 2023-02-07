@@ -109,6 +109,8 @@ public class FOWCommand implements Command {
     private Collection<FOWSubcommandData> getSubcommands() {
         Collection<FOWSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new AddCustomAdjacentTile());
+        subcommands.add(new AddFogTile());
+        subcommands.add(new RemoveFogTile());
         subcommands.add(new RemoveCustomAdjacentTile());
         subcommands.add(new RemoveAllCustomAdjacentTiles());
 
