@@ -278,6 +278,7 @@ public class Constants {
     public static final String IRF = "industrial_relic_fragment";
     public static final String VRF = "void_relic_fragment";
     public static final String STRATEGY_CARD = "strategy_card";
+    public static final String DUMMY = "dummy";
 
     public static final String TXT = ".txt";
     public static final String JPG = ".jpg";

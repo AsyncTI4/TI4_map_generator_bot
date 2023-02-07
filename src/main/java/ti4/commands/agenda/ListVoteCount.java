@@ -109,7 +109,11 @@ public class ListVoteCount extends AgendaSubcommandData {
             } else {
                 text += " vote Count: **" + influenceCount;
                 if ("argent".equals(player.getFaction())) {
-                    text += "(+" + map.getPlayers().keySet().size() + " votes for Zeal)";
+                    int numPlayers = 0;
+                    for (Player player_ : map.getPlayers().values()) {
+                        if (player_.getFaction() != null && !player_.isDummy()) numPlayers++;
+                    }
+                    text += "(+" + numPlayers + " votes for Zeal)";
                 }
                 if (bloodPactPn) {
                     text += "(+4 votes for Blood Pact )";

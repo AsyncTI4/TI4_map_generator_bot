@@ -31,6 +31,7 @@ public class Stats extends PlayerSubcommandData {
                 .addOptions(new OptionData(OptionType.STRING, Constants.SC_PLAYED, "Strategy Card played y/n"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player passed y/n"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
+                .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
                 .addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
                 .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
@@ -150,6 +151,15 @@ public class Stats extends PlayerSubcommandData {
             }
             MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         }
+
+        OptionMapping optionDummy = event.getOption(Constants.DUMMY);
+        if (optionDummy != null) {
+            StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionDummy));
+            boolean value = optionDummy.getAsBoolean();
+            player.setDummy(value);
+            MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
+        }
+
     }
 
     @Override
