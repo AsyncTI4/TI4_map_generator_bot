@@ -6,7 +6,6 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -334,35 +333,81 @@ public class ConvertTTPGtoAsync {
             }
         }
 
-        // DECK AC
-        for (String card : ttpgMap.getDecks().getCardAction().getDiscard()) {
-            asyncMap.setDiscardActionCard(AliasHandler.resolveActionCard(card));
-        }
+        // ACTION CARD DECK
+        ArrayList<String> actionCards = new ArrayList<>() {{
+            addAll(ttpgMap.getDecks().getCardAction().getDeck());
+            replaceAll(card -> AliasHandler.resolveActionCard(card));
+        }};
+        asyncMap.setActionCards(actionCards);
 
-        // DECK AGENDA
-        for (String card : ttpgMap.getDecks().getCardAgenda().getDiscard()) {
-            asyncMap.addDiscardAgenda(AliasHandler.resolveAgenda(card));
-        }
+        // ACTION CARD DISCARD
+        ArrayList<String> actionDiscards = new ArrayList<>() {{
+            addAll(ttpgMap.getDecks().getCardAction().getDiscard());
+            replaceAll(card -> AliasHandler.resolveActionCard(card));
+        }};
+        asyncMap.setDiscardActionCards(actionDiscards);
 
-        // DECK CULTURAL
-        for (String card : ttpgMap.getDecks().getCardExplorationCultural().getDiscard()) {
-            asyncMap.discardExplore(AliasHandler.resolveExploration(card));
-        }
+        // AGENDA DECK
+        ArrayList<String> agendaCards = new ArrayList<>() {{
+            addAll(ttpgMap.getDecks().getCardAgenda().getDeck());
+            replaceAll(card -> AliasHandler.resolveAgenda(card));
+        }};
+        asyncMap.setAgendas(agendaCards);
 
-        // DECK HAZARDOUS
-        for (String card : ttpgMap.getDecks().getCardExplorationHazardous().getDiscard()) {
-            asyncMap.discardExplore(AliasHandler.resolveExploration(card));
-        }
+        // AGENDA DISCARD
+        ArrayList<String> agendaDiscards = new ArrayList<>() {{
+            addAll(ttpgMap.getDecks().getCardAgenda().getDiscard());
+            replaceAll(card -> AliasHandler.resolveAgenda(card));
+        }};
+        asyncMap.setDiscardAgendas(agendaDiscards);
 
-        // DECK INDUSTRIAL
-        for (String card : ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard()) {
-            asyncMap.discardExplore(AliasHandler.resolveExploration(card));
-        }
+        // EXPLORATION DECK
+        ArrayList<String> exploreCards = new ArrayList<>() {{
+            addAll(ttpgMap.getDecks().getCardExplorationCultural().getDeck());
+            addAll(ttpgMap.getDecks().getCardExplorationHazardous().getDeck());
+            addAll(ttpgMap.getDecks().getCardExplorationIndustrial().getDeck());
+            addAll(ttpgMap.getDecks().getCardExplorationFrontier().getDeck());
+            replaceAll(card -> AliasHandler.resolveExploration(card));
+        }};
+        asyncMap.setExploreDeck(exploreCards);
 
-        // DECK FRONTIER
-        for (String card : ttpgMap.getDecks().getCardExplorationFrontier().getDiscard()) {
-            asyncMap.discardExplore(AliasHandler.resolveExploration(card));
-        }
+        // EXPLORATION DISCARD
+        ArrayList<String> exploreDiscards = new ArrayList<>() {{
+            addAll(ttpgMap.getDecks().getCardExplorationCultural().getDiscard());
+            addAll(ttpgMap.getDecks().getCardExplorationHazardous().getDiscard());
+            addAll(ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard());
+            addAll(ttpgMap.getDecks().getCardExplorationFrontier().getDiscard());
+            replaceAll((card) -> AliasHandler.resolveExploration(card));
+        }};
+        asyncMap.setExploreDiscard(exploreDiscards);
+
+        // RELIC DECK
+        ArrayList<String> relicCards = new ArrayList<>() {{
+            addAll(ttpgMap.getDecks().getCardRelic().getDeck());
+            replaceAll(card -> AliasHandler.resolveRelic(card));
+        }};
+        asyncMap.setRelics(relicCards);
+
+        // STAGE 1 PUBLIC OBJECTIVE DECK
+        ArrayList<String> publicCardsStage1 = new ArrayList<>() {{
+            addAll(ttpgMap.getDecks().getCardObjectivePublic1().getDeck());
+            replaceAll(card -> AliasHandler.resolveObjective(card));
+        }};
+        asyncMap.setPublicObjectives1(publicCardsStage1);
+
+        // STAGE 2 PUBLIC OBJECTIVE DECK
+        ArrayList<String> publicCardsStage2 = new ArrayList<>() {{
+            addAll(ttpgMap.getDecks().getCardObjectivePublic2().getDeck());
+            replaceAll(card -> AliasHandler.resolveObjective(card));
+        }};
+        asyncMap.setPublicObjectives2(publicCardsStage2);
+
+        // SECRET OBJECTIVE DECK
+        ArrayList<String> secretCards = new ArrayList<>() {{
+            addAll(ttpgMap.getDecks().getCardObjectiveSecret().getDeck());
+            replaceAll(card -> AliasHandler.resolveObjective(card));
+        }};
+        asyncMap.setSecretObjectives(secretCards);
 
         return asyncMap;
     }
