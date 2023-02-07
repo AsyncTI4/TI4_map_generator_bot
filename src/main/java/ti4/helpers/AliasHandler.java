@@ -18,8 +18,8 @@ public class AliasHandler {
     private static HashMap<String, String> cctokenAliasList = new HashMap<>();
     private static HashMap<String, String> attachmentAliasList = new HashMap<>();
     private static HashMap<String, String> tokenAliasList = new HashMap<>();
-    private static HashMap<String, String>  factionAliasList = new HashMap<>();
-    private static HashMap<String, String>  colorAliasList = new HashMap<>();
+    private static HashMap<String, String> factionAliasList = new HashMap<>();
+    private static HashMap<String, String> colorAliasList = new HashMap<>();
 
     public static void init()
     {
