@@ -422,11 +422,9 @@ public class GenerateMap {
                 int baseY = y;
                 x = realX;
 
-                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != fowPlayer;
+                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != fowPlayer && !canSeeStatsOfPlayer(player, fowPlayer);
                 if (convertToGeneric) {
-                    if (!isHasHSInView(player)) {
-                        continue;
-                    }
+                    continue;
                 }
 
                 y += 34;
@@ -1087,7 +1085,7 @@ public class GenerateMap {
 
         for (Player player : players) {
             try {
-                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != fowPlayer;
+                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != fowPlayer && !canSeeStatsOfPlayer(player, fowPlayer);
                 String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
                 String faction = null;
                 if (player.getColor() != null && player.getFaction() != null) {
@@ -1200,11 +1198,9 @@ public class GenerateMap {
             Player player = playerEntry.getValue();
             String userName = player.getUserName();
 
-            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != fowPlayer;
+            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != fowPlayer && !canSeeStatsOfPlayer(player, fowPlayer);
             if (convertToGeneric) {
-                if (!isHasHSInView(player)) {
-                    continue;
-                }
+                continue;
             }
             graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), points.get(0).x, points.get(0).y);
             Integer vpCount = userVPs.get(player);
@@ -1275,7 +1271,7 @@ public class GenerateMap {
 
     }
 
-    private boolean isHasHSInView(Player player) {
+    private boolean canSeeStatsOfPlayer(Player player, Player viewingPlayer) {
         String faction = player.getFaction();
         boolean hasHSInView = false;
         if (faction == null) {
@@ -1287,13 +1283,41 @@ public class GenerateMap {
         }
         String[] setupInfo = playerSetup.split(";");
         String hs = setupInfo[1];
+        if (player.getFaction().equals("ghost")) {
+            hs = "51";
+        }
+
         for (Tile tile : tilesToDisplay.values()) {
             if (tile.getTileID().equals(hs) && !tile.hasFog()) {
                 hasHSInView = true;
                 break;
             }
         }
-        return hasHSInView;
+        
+        return viewingPlayer != null && player != null && 
+            ( hasHSInView
+                || hasPlayersPromInPlayArea(player, viewingPlayer) 
+                || hasMahactCCInFleet(player, viewingPlayer));
+    }
+
+    private boolean hasPlayersPromInPlayArea(@NotNull Player player, @NotNull Player viewingPlayer) {
+        boolean hasPromInPA = false;
+        String playerColor = player.getColor();
+        String playerFaction = player.getFaction();
+        List<String> promissoriesInPlayArea = viewingPlayer.getPromissoryNotesInPlayArea();
+        for (String prom_ : promissoriesInPlayArea) {
+            String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(prom_);
+            if (playerColor != null && playerColor.equals(promissoryNoteOwner) || playerFaction != null && playerFaction.equals(promissoryNoteOwner)) {
+                hasPromInPA = true;
+                break;
+            }
+        }
+        return hasPromInPA;
+    }
+
+    private boolean hasMahactCCInFleet(@NotNull Player player, @NotNull Player viewingPlayer) {
+        List<String> mahactCCs = viewingPlayer.getMahactCC();
+        return mahactCCs.contains(player.getColor());
     }
 
     private void drawCCOfPlayer(String ccID, int x, int y, int ccCount, boolean isLetnev, Player player, Map map) {
@@ -1340,7 +1364,7 @@ public class GenerateMap {
                         faction = getFactionByControlMarker(map.getPlayers().values(), fleetCCID);
                         factionImage = null;
                         if (faction != null) {
-                            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != fowPlayer;
+                            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != fowPlayer && !canSeeStatsOfPlayer(player, fowPlayer);
                             if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
                                 String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
                                 if (factionImagePath != null) {
@@ -1522,7 +1546,7 @@ public class GenerateMap {
                     boolean convertToGeneric = false;
                     for (Player player : map.getPlayers().values()) {
                         if (optionalText.equals(player.getFaction()) || optionalText.equals(player.getColor())) {
-                            if (isFoWPrivate != null && isFoWPrivate && player != fowPlayer) {
+                            if (isFoWPrivate != null && isFoWPrivate && player != fowPlayer && !canSeeStatsOfPlayer(player, fowPlayer)) {
                                 convertToGeneric = true;
                             }
                             faction = player.getFaction();
@@ -1723,7 +1747,7 @@ public class GenerateMap {
                 Player player = playerEntry.getValue();
                 String userID = player.getUserID();
 
-                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != fowPlayer;
+                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != fowPlayer && !canSeeStatsOfPlayer(player, fowPlayer);
                 if (scoredPlayerID.contains(userID)) {
                     String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
                     if (controlID.contains("null")) {
@@ -1791,6 +1815,21 @@ public class GenerateMap {
             }
         }
         return faction;
+    }
+
+    private static Player getPlayerByControlMarker(Collection<Player> players, String controlID) {
+        Player player = null;
+        for (Player player_ : players) {
+            if (player_.getColor() != null && player_.getFaction() != null) {
+                String playerControlMarker = Mapper.getControlID(player_.getColor());
+                String playerCC = Mapper.getCCID(player_.getColor());
+                if (controlID.equals(playerControlMarker) || controlID.equals(playerCC)) {
+                    player = player_;
+                    break;
+                }
+            }
+        }
+        return player;
     }
 
     private Color getSCColor(int sc, Map map) {
@@ -1867,7 +1906,7 @@ public class GenerateMap {
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
             BufferedImage fogOfWar = ImageIO.read(new File(tile.getFowTilePath()));
-            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate;
+            boolean tileIsFoggy = isFoWPrivate != null && isFoWPrivate && tile.hasFog();
 
             Point positionPoint = PositionMapper.getTilePosition(tile.getPosition(), map);
             if (positionPoint == null) {
@@ -1880,7 +1919,7 @@ public class GenerateMap {
 
                 graphics.setFont(Storage.getFont20());
                 graphics.setColor(Color.WHITE);
-                if(convertToGeneric && tile.hasFog()) {
+                if(tileIsFoggy) {
                     graphics.drawImage(fogOfWar, tileX, tileY, null);
                     graphics.drawString(tile.getFogLabel(), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
                 }
@@ -1888,7 +1927,7 @@ public class GenerateMap {
                 return;
             }
             
-            if(convertToGeneric && tile.hasFog()) return;
+            if(tileIsFoggy) return;
 
             ArrayList<Rectangle> rectangles = new ArrayList<>();
 
@@ -1950,9 +1989,10 @@ public class GenerateMap {
                 Point centerPosition = unitHolder.getHolderCenterPosition();
 
                 String faction = getFactionByControlMarker(map.getPlayers().values(), ccID);
+                Player player = getPlayerByControlMarker(map.getPlayers().values(), ccID);
                 BufferedImage factionImage = null;
                 if (faction != null) {
-                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate;
+                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != null && !canSeeStatsOfPlayer(player, fowPlayer);
                     if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
                         String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
                         if (factionImagePath != null) {
@@ -1987,6 +2027,7 @@ public class GenerateMap {
                     continue;
                 }
                 String faction = getFactionByControlMarker(map.getPlayers().values(), controlID);
+                Player player = getPlayerByControlMarker(map.getPlayers().values(), controlID);
 
                 String controlPath = tile.getCCPath(controlID);
                 if (controlPath == null) {
@@ -1996,7 +2037,7 @@ public class GenerateMap {
                 try {
                     factionImage = null;
                     if (faction != null) {
-                        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate;
+                        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && player != null && !canSeeStatsOfPlayer(player, fowPlayer);
                         if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
                             String factionImagePath = tile.getCCPath("control_faction_" + faction + ".png");
                             if (factionImagePath != null) {
