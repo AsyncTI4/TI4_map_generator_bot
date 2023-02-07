@@ -409,6 +409,16 @@ public class ConvertTTPGtoAsync {
         }};
         asyncMap.setSecretObjectives(secretCards);
 
+        // TG ON STRAT CARDS
+        asyncMap.setScTradeGood(1, ttpgMap.getUnpickedStrategyCards().getLeadership());
+        asyncMap.setScTradeGood(2, ttpgMap.getUnpickedStrategyCards().getDiplomacy());
+        asyncMap.setScTradeGood(3, ttpgMap.getUnpickedStrategyCards().getPolitics());
+        asyncMap.setScTradeGood(4, ttpgMap.getUnpickedStrategyCards().getConstruction());
+        asyncMap.setScTradeGood(5, ttpgMap.getUnpickedStrategyCards().getTrade());
+        asyncMap.setScTradeGood(6, ttpgMap.getUnpickedStrategyCards().getWarfare());
+        asyncMap.setScTradeGood(7, ttpgMap.getUnpickedStrategyCards().getTechnology());
+        asyncMap.setScTradeGood(8, ttpgMap.getUnpickedStrategyCards().getImperial());
+
         return asyncMap;
     }
    
