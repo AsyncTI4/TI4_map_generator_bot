@@ -21,6 +21,7 @@ public class Player {
 
     private boolean passed = false;
     private boolean searchWarrant = false;
+    private boolean isDummy = false;
 
     private String faction;
     private String color;
@@ -688,5 +689,13 @@ public class Player {
 
     public HashMap<String,String> getFogLabels() {
         return fow_customLabels;
+    }
+
+    public boolean isDummy() {
+        return isDummy;
+    }
+    
+    public void setDummy(boolean isDummy) {
+        this.isDummy = isDummy;
     }
 }
