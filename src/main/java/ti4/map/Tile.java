@@ -18,10 +18,21 @@ public class Tile {
     private final String tileID;
     private String position;
     private HashMap<String, UnitHolder> unitHolders = new HashMap<>();
+    
+    private Boolean fog = false;
+    private String fogLabel = "";
 
     public Tile(String tileID, String position) {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
+        initPlanetsAndSpace(tileID);
+    }
+
+    public Tile(String tileID, String position, Boolean fog_, String fogLabel_) {
+        this.tileID = tileID;
+        this.position = position != null ? position.toLowerCase() : null;
+        this.fog = fog_;
+        this.fogLabel = fogLabel_;
         initPlanetsAndSpace(tileID);
     }
 
@@ -231,6 +242,35 @@ public class Tile {
 
     public String getTilePath() {
         String tileName = Mapper.getTileID(tileID);
+        String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+        if (tilePath == null) {
+            BotLogger.log("Could not find tile: " + tileID);
+        }
+        return tilePath;
+    }
+
+    public boolean hasFog() {
+        return fog;
+    }
+
+    public void setFogOfWar(Boolean fog_) {
+        fog = fog_;
+    }
+
+    public String getFogLabel() {
+        return fogLabel;
+    }
+
+    public void setFogLabel(String fogLabel_) {
+        this.fogLabel = fogLabel_;
+    }
+
+    public String getFowTilePath() {
+        String tileName = Mapper.getTileID("fow");
+        if(this.tileID.equals("82a") || this.tileID.equals("82b") || this.tileID.equals("51")) {
+            tileName = Mapper.getTileID("fowb");
+        }
+        
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
             BotLogger.log("Could not find tile: " + tileID);
