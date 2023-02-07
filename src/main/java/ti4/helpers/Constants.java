@@ -472,5 +472,7 @@ public class Constants {
     public static final String SWAP_SC = "swap_sc";
     public static final String KELERES_HERO_MENTAK = "keleres_hero_mentak";
     public static final String BOTHELPER = "bothelper";
+    public static final String CREATE_GAME_CHANNELS = "create_game_channels";
+    public static final String IMPORT_TTPG = "import_ttpg";
 
 }
