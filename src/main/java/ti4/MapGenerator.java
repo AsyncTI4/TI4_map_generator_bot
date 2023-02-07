@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.utils.MemberCachePolicy;
 import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
+import ti4.commands.bothelper.BothelperCommand;
 import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.cards.CardsCommand;
 import ti4.commands.cardspn.PNCardsCommand;
@@ -42,6 +43,8 @@ public class MapGenerator {
     public static String userID;
     public static String adminID;
     public static Role adminRole;
+    public static Role developerRole;
+    public static Role bothelperRole;
 
     public static void main(String[] args)
             throws LoginException {
@@ -68,6 +71,8 @@ public class MapGenerator {
         Storage.init();
 
         adminRole = jda.getRoleById("943596173896323072");
+        developerRole = jda.getRoleById("947648366056185897");
+        bothelperRole = jda.getRoleById("970033771179028531");
 
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddTile());
@@ -96,6 +101,7 @@ public class MapGenerator {
         commandManager.addCommand(new HelpCommand());
         commandManager.addCommand(new ExploreCommand());
         commandManager.addCommand(new AdminCommand());
+        commandManager.addCommand(new BothelperCommand());
         commandManager.addCommand(new PlayerCommand());
         commandManager.addCommand(new GameCommand());
         commandManager.addCommand(new CardsCommand());
