@@ -1,8 +1,9 @@
 package ti4.map;
 
-import net.dv8tion.jda.api.entities.Channel;
-import net.dv8tion.jda.api.entities.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.Role;
+
 import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -10,7 +11,8 @@ import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
 
-import javax.annotation.CheckForNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.io.*;
 import java.nio.file.CopyOption;
 import java.nio.file.Files;
@@ -247,6 +249,14 @@ public class MapSaveLoadManager {
         writer.write(Constants.SCORED_PO + " " + sb1);
         writer.write(System.lineSeparator());
 
+        StringBuilder adjacentTiles = new StringBuilder();
+        for (java.util.Map.Entry<String, List<String>> entry : map.getCustomAdjacentTiles().entrySet()) {
+            String userIds = String.join("-", entry.getValue());
+            adjacentTiles.append(entry.getKey()).append(",").append(userIds).append(";");
+        }
+        writer.write(Constants.CUSTOM_ADJACENT_TILES + " " + adjacentTiles);
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.CREATION_DATE + " " + map.getCreationDate());
         writer.write(System.lineSeparator());
         writer.write(Constants.LAST_MODIFIED_DATE + " " + new Date().getTime());
@@ -258,6 +268,8 @@ public class MapSaveLoadManager {
         writer.write(Constants.COMMUNITY_MODE + " " + map.isCommunityMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.ALLIANCE_MODE + " " + map.isAllianceMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.FOW_MODE + " " + map.isFoWMode());
         writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
@@ -298,6 +310,9 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.SEARCH_WARRANT + " " + player.isSearchWarrant());
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.DUMMY + " " + player.isDummy());
             writer.write(System.lineSeparator());
 
             writeCards(player.getActionCards(), writer, Constants.AC);
@@ -367,6 +382,22 @@ public class MapSaveLoadManager {
                 leaderInfo.append(";");
             }
             writer.write(Constants.LEADERS + " " + leaderInfo);
+            writer.write(System.lineSeparator());
+
+            StringBuilder fogOfWarSystems = new StringBuilder();
+            HashMap<String,String> fow_systems = player.getFogFilter();
+            HashMap<String,String> fow_labels = player.getFogLabels();
+            for (String key : fow_systems.keySet()) {
+                String system = fow_systems.get(key);
+                String label = fow_labels.get(key);
+                fogOfWarSystems.append(key);
+                fogOfWarSystems.append(",");
+                fogOfWarSystems.append(system);
+                fogOfWarSystems.append(",");
+                fogOfWarSystems.append(label == null || label == "" ? "." : label);
+                fogOfWarSystems.append(";");
+            }
+            writer.write(Constants.FOW_SYSTEMS + " " + fogOfWarSystems);
             writer.write(System.lineSeparator());
 
             writer.write(ENDPLAYER);
@@ -510,7 +541,7 @@ public class MapSaveLoadManager {
         MapManager.getInstance().setMapList(mapList);
     }
 
-    @CheckForNull
+    @Nullable
     private static Map loadMap(File mapFile) {
         if (mapFile != null) {
             Map map = new Map();
@@ -688,6 +719,8 @@ public class MapSaveLoadManager {
                 map.setCustomPublicVP(getParsedCards(tokenizer[1]));
             } else if (Constants.SCORED_PO.equals(identification)) {
                 map.setScoredPublicObjectives(getParsedCardsForScoredPO(tokenizer[1]));
+            } else if (Constants.CUSTOM_ADJACENT_TILES.equals(identification)) {
+                map.setCustomAdjacentTiles(getParsedCardsForScoredPO(tokenizer[1]));
             } else if (Constants.AGENDAS.equals(identification)) {
                 map.setAgendas(getCardList(tokenizer[1]));
             } else if (Constants.AC_DISCARDED.equals(identification)) {
@@ -775,6 +808,13 @@ public class MapSaveLoadManager {
                 try {
                     boolean value = Boolean.parseBoolean(tokenizer[1]);
                     map.setAllianceMode(value);
+                } catch (Exception e) {
+                    //Do nothing
+                }
+            } else if (Constants.FOW_MODE.equals(identification)) {
+                try {
+                    boolean value = Boolean.parseBoolean(tokenizer[1]);
+                    map.setFoWMode(value);
                 } catch (Exception e) {
                     //Do nothing
                 }
@@ -904,6 +944,16 @@ public class MapSaveLoadManager {
                         BotLogger.log("Could not parse leaders loading map");
                     }
                 }
+                case Constants.FOW_SYSTEMS -> {
+                    StringTokenizer fow_systems = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (fow_systems.hasMoreTokens()) {
+                        String[] system = fow_systems.nextToken().split(",");
+                        String position = system[0];
+                        String tileID = system[1];
+                        String label = system[2];
+                        player.addFogTile(tileID, position, label);
+                    }
+                }
                 case Constants.SO_SCORED -> {
                     StringTokenizer secrets = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (secrets.hasMoreTokens()) {
@@ -933,6 +983,7 @@ public class MapSaveLoadManager {
                 case Constants.STRATEGY_CARD -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
             }
         }
     }

@@ -267,3 +267,7 @@ Its workaround for that single explore
 sliceCount - slice count to generate (default is player count + 2, max 9)
 factionCount - faction count to randomize (default is player count + 2, max 25)
 anomalies_can_touch - if set to true, red boarder tiles can touch in slice
+
+/fow add_custom_adjacent_tiles primary_tile adjacent_tiles <- add custom adjacent tiles for game, primary tile a1 example, secondary ones separated in comma, like 2b,2d,2e
+/fow remove_custom_adjacent_tiles primary_tile
+/fow remove_all_custom_adjacent_tiles

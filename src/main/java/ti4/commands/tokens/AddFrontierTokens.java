@@ -52,7 +52,7 @@ public class AddFrontierTokens implements Command {
             Map activeMap = mapManager.getUserActiveMap(userID);
             parsingForTile(event, activeMap);
             MapSaveLoadManager.saveMap(activeMap);
-            File file = GenerateMap.getInstance().saveImage(activeMap);
+            File file = GenerateMap.getInstance().saveImage(activeMap, event);
             MessageHelper.replyToMessage(event, file);
         }
     }

@@ -1,19 +1,25 @@
 package ti4.message;
 
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.Event;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.buttons.ButtonListener;
+import net.dv8tion.jda.api.utils.FileUpload;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+
+import ti4.commands.cards.CardsInfo;
+import ti4.helpers.Constants;
+import ti4.map.Map;
+import ti4.map.MapManager;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 public class MessageHelper {
 
@@ -34,13 +40,15 @@ public class MessageHelper {
     }
 
     public static void sendFileToChannel(MessageChannel channel, File file) {
-        channel.sendFile(file).queue();
+        FileUpload fileUpload = FileUpload.fromData(file);
+        channel.sendFiles(fileUpload).queue();
     }
 
 
     public static void replyToMessageTI4Logo(SlashCommandInteractionEvent event) {
         replyToMessage(event, "");
     }
+
     public static void replyToMessage(SlashCommandInteractionEvent event, String messageText) {
         if (messageText.length() > 1500) {
             splitAndSent(messageText, event.getChannel());
@@ -58,8 +66,31 @@ public class MessageHelper {
     }
 
     public static void replyToMessage(SlashCommandInteractionEvent event, File file) {
-        sendFileToChannel(event.getChannel(), file);
-        replyToMessageTI4Logo(event);
+        replyToMessage(event, file, false);
+    }
+
+    public static void replyToMessage(SlashCommandInteractionEvent event, File file, boolean forceShowMap) {
+
+        try {
+            if (forceShowMap){
+                sendFileToChannel(event.getChannel(), file);
+                replyToMessageTI4Logo(event);
+                return;
+            }
+            String gameName = event.getChannel().getName();
+            gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
+            gameName = gameName.substring(0, gameName.indexOf("-"));
+            Map activeMap = MapManager.getInstance().getMap(gameName);
+            if (!activeMap.isFoWMode() || activeMap.isFoWMode() && event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNLE)) {
+                sendFileToChannel(event.getChannel(), file);
+                replyToMessageTI4Logo(event);
+            } else {
+                replyToMessage(event, "Map updated successfully. Use /special system_info to check the systems.");
+            }
+        }
+        catch (Exception e){
+            replyToMessage(event, "Could not send response, use /show_game or contact Admins or Bothelper");
+        }
     }
 
     public static void sentToMessageToUser(GenericInteractionCreateEvent event, String messageText) {
@@ -71,6 +102,7 @@ public class MessageHelper {
     private static void splitAndSent(String messageText, MessageChannel channel) {
         splitAndSent(messageText, channel, null, null, "");
     }
+
     private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, String... reaction) {
         Integer messageLength = messageText.length();
         if (messageLength > 1500) {
@@ -100,7 +132,7 @@ public class MessageHelper {
                 if (guild != null) {
                     Message complete = channel.sendMessage(messageText).complete();
                     for (String reactionID : reaction) {
-                        Emote emoteById = guild.getEmoteById(reactionID);
+                        Emoji emoteById = guild.getEmojiById(reactionID);
                         if (emoteById == null) {
                             continue;
                         }
@@ -134,9 +166,9 @@ public class MessageHelper {
             } else {
                 Guild guild_ = guild == null ? event.getGuild() : guild;
                 if (guild_ != null) {
-                    Message message = new MessageBuilder()
-                            .append(messageText)
-                            .setActionRows(ActionRow.of(buttons)).build();
+                    MessageCreateData message = new MessageCreateBuilder()
+                            .addContent(messageText)
+                            .addComponents(ActionRow.of(buttons)).build();
                     channel.sendMessage(message).queue();
                     return;
                 }

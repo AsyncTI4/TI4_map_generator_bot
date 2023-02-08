@@ -1,8 +1,13 @@
 package ti4.commands.cards;
 
-import net.dv8tion.jda.api.MessageBuilder;
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import net.dv8tion.jda.api.entities.channel.*;
+import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -10,8 +15,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+
 import org.apache.commons.collections4.ListUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.Nullable;
+
 import ti4.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -23,7 +32,6 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-import javax.annotation.CheckForNull;
 import java.util.*;
 
 public class CardsInfo extends CardsSubcommandData {
@@ -49,11 +57,11 @@ public class CardsInfo extends CardsSubcommandData {
         sentUserCardInfo(event, activeMap, player);
     }
 
-    public static void sentUserCardInfo(GenericCommandInteractionEvent event, Map activeMap, Player player) {
+    public static void sentUserCardInfo(SlashCommandInteractionEvent event, Map activeMap, Player player) {
         sentUserCardInfo(event, activeMap, player, null);
     }
 
-    public static void sentUserCardInfo(@CheckForNull GenericCommandInteractionEvent event, Map activeMap, Player player, @CheckForNull ButtonInteractionEvent buttonEvent) {
+    public static void sentUserCardInfo(@Nullable SlashCommandInteractionEvent event, Map activeMap, Player player, @Nullable ButtonInteractionEvent buttonEvent) {
         checkAndAddPNs(activeMap, player);
         OptionMapping longPNOption = event != null ? event.getOption(Constants.LONG_PN_DISPLAY) : null;
         boolean longPNDisplay = false;
@@ -101,7 +109,7 @@ public class CardsInfo extends CardsSubcommandData {
                 sb.append(Emojis.SecretObjective).append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
                 index++;
                 if (soName != null) {
-                    soButtons.add(Button.primary(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromMarkdown(Emojis.SecretObjective)));
+                    soButtons.add(Button.primary(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
                 }
             }
         }
@@ -128,7 +136,7 @@ public class CardsInfo extends CardsSubcommandData {
                 index++;
                 String ac_name = Mapper.getActionCardName(key);
                 if (ac_name != null) {
-                    acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromMarkdown(Emojis.ActionCard)));
+                    acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }
@@ -169,6 +177,7 @@ public class CardsInfo extends CardsSubcommandData {
             } else {
                 try {
                     Channel channel = event != null ? event.getChannel() : buttonEvent.getChannel();
+                    MessageChannelUnion channelUnion = event != null ? event.getChannel() : buttonEvent.getChannel();
                     if (channel == null) {
                         MessageHelper.sentToMessageToUser(event, cardInfo, userById);
                         BotLogger.log("Could not find channel");
@@ -195,7 +204,7 @@ public class CardsInfo extends CardsSubcommandData {
 
                         if (textChannel == null) {
                             if (ChannelType.GUILD_PUBLIC_THREAD.equals(type) || ChannelType.GUILD_PRIVATE_THREAD.equals(type)) {
-                                IThreadContainer parentChannel = event != null ? event.getThreadChannel().getParentChannel() : buttonEvent.getThreadChannel().getParentChannel();
+                                IThreadContainer parentChannel = channelUnion.asThreadChannel().getParentChannel();
                                 if (parentChannel instanceof TextChannel) {
                                     textChannel = (TextChannel) parentChannel;
                                 } else {
@@ -204,7 +213,7 @@ public class CardsInfo extends CardsSubcommandData {
                                     return;
                                 }
                             } else {
-                                textChannel = event != null ? event.getTextChannel() : buttonEvent.getTextChannel();
+                                textChannel = channelUnion.asTextChannel();
                             }
                         }
                     }
@@ -220,13 +229,13 @@ public class CardsInfo extends CardsSubcommandData {
                             String text = playerPing + "\n";
                             MessageHelper.sendMessageToChannel(threadChannel, text);
                             MessageHelper.sendMessageToChannel(threadChannel, soText);
-                            List<Message> messageList = getMessageObject(secretScoreMsg, soButtons);
-                            for (Message message : messageList) {
+                            List<MessageCreateData> messageList = getMessageObject(secretScoreMsg, soButtons);
+                            for (MessageCreateData message : messageList) {
                                 threadChannel.sendMessage(message).queue();
                             }
                             MessageHelper.sendMessageToChannel(threadChannel, acText);
                             messageList = getMessageObject(acPlayMsg, acButtons);
-                            for (Message message : messageList) {
+                            for (MessageCreateData message : messageList) {
                                 threadChannel.sendMessage(message).queue();
                             }
                             MessageHelper.sendMessageToChannel(threadChannel, pnText);
@@ -242,13 +251,13 @@ public class CardsInfo extends CardsSubcommandData {
                         .complete();
                         sendTextToChannel(new_thread, playerPing + "\n");
                         sendTextToChannel(new_thread, soText);
-                        List<Message> messageList = getMessageObject(secretScoreMsg, soButtons);
-                        for (Message message : messageList) {
+                        List<MessageCreateData> messageList = getMessageObject(secretScoreMsg, soButtons);
+                        for (MessageCreateData message : messageList) {
                             new_thread.sendMessage(message).queue();
                         }
                         sendTextToChannel(new_thread, acText);
                         messageList = getMessageObject(acPlayMsg, acButtons);
-                        for (Message message : messageList) {
+                        for (MessageCreateData message : messageList) {
                             new_thread.sendMessage(message).queue();
                         }
                         sendTextToChannel(new_thread, pnText);
@@ -278,7 +287,7 @@ public class CardsInfo extends CardsSubcommandData {
         }
     }
 
-    private static List<Message> getMessageObject(String message, List<Button> buttons) {
+    private static List<MessageCreateData> getMessageObject(String message, List<Button> buttons) {
         buttons.removeIf(Objects::isNull);
         List<List<Button>> partitions = ListUtils.partition(buttons, 5);
         List<ActionRow> actionRows = new ArrayList<>();
@@ -286,12 +295,12 @@ public class CardsInfo extends CardsSubcommandData {
             actionRows.add(ActionRow.of(partition));
         }
         List<List<ActionRow>> partitionActionRows = ListUtils.partition(actionRows, 5);
-        List<Message> buttonMessages = new ArrayList<>();
+        List<MessageCreateData> buttonMessages = new ArrayList<>();
 
         for (List<ActionRow> partitionActionRow : partitionActionRows) {
-            buttonMessages.add(new MessageBuilder()
-                    .append(message)
-                    .setActionRows(partitionActionRow).build());
+            buttonMessages.add(new MessageCreateBuilder()
+                    .addContent(message)
+                    .addComponents(partitionActionRow).build());
         }
         return buttonMessages;
     }

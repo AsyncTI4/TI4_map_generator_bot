@@ -8,6 +8,7 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
@@ -48,6 +49,7 @@ public class SystemInfo extends SpecialSubcommandData {
             java.util.Map<String, String> unitRepresentation = Mapper.getUnits();
             HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
             java.util.Map<String, String> colorToId = Mapper.getColorToId();
+            Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
             for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
                 String name = entry.getKey();
                 String representation = planetRepresentations.get(name);
@@ -73,7 +75,7 @@ public class SystemInfo extends SpecialSubcommandData {
                         sb.append("Command Counters: ");
                         hasCC = true;
                     }
-                    addtFactionIcon(activeMap, sb, colorToId, cc);
+                    addtFactionIcon(activeMap, sb, colorToId, cc, privateGame);
                 }
                 if (hasCC) {
                     sb.append("\n");
@@ -84,7 +86,7 @@ public class SystemInfo extends SpecialSubcommandData {
                         sb.append("Control Counters: ");
                         hasControl = true;
                     }
-                    addtFactionIcon(activeMap, sb, colorToId, control);
+                    addtFactionIcon(activeMap, sb, colorToId, control, privateGame);
                 }
                 if (hasControl) {
                     sb.append("\n");
@@ -116,7 +118,7 @@ public class SystemInfo extends SpecialSubcommandData {
 
                     for (String unitRepresentationKey : unitRepresentation.keySet()) {
                         if (key.endsWith(unitRepresentationKey)) {
-                            addtFactionIcon(activeMap, sb, colorToId, key);
+                            addtFactionIcon(activeMap, sb, colorToId, key, privateGame);
                             sb.append(unitRepresentation.get(unitRepresentationKey)).append(": ").append(unitEntry.getValue()).append("\n");
                         }
                     }
@@ -127,14 +129,19 @@ public class SystemInfo extends SpecialSubcommandData {
         }
     }
 
-    private static void addtFactionIcon(Map activeMap, StringBuilder sb, java.util.Map<String, String> colorToId, String key) {
+    private static void addtFactionIcon(Map activeMap, StringBuilder sb, java.util.Map<String, String> colorToId, String key, Boolean privateGame) {
+
         for (java.util.Map.Entry<String, String> colorEntry : colorToId.entrySet()) {
             String colorKey = colorEntry.getKey();
             String color = colorEntry.getValue();
             if (key.contains(colorKey)){
                 for (Player player_ : activeMap.getPlayers().values()) {
                     if (Objects.equals(player_.getColor(), color)) {
-                        sb.append(Helper.getFactionIconFromDiscord(player_.getFaction())).append(" ").append(" (").append(color).append(") ");
+                        if (privateGame != null && privateGame) {
+                            sb.append(" (").append(color).append(") ");
+                        } else {
+                            sb.append(Helper.getFactionIconFromDiscord(player_.getFaction())).append(" ").append(" (").append(color).append(") ");
+                        }
                     }
                 }
             }

@@ -1,8 +1,10 @@
 package ti4.message;
 
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+
 import ti4.MapGenerator;
 
 import java.util.List;
@@ -11,12 +13,12 @@ public class BotLogger {
     private static TextChannel channel;
 
     static {
+        Guild guild = MapGenerator.guild;
         List<TextChannel> textChannels = MapGenerator.jda.getTextChannels();
         for (TextChannel textChannel : textChannels) {
-            if ("bot-log".equals(textChannel.getName())) {
+            if ("bot-log".equals(textChannel.getName()) && (textChannel.getGuild() == guild) || textChannel.getGuild().getName().equals("Bot Test Server")) {
                 channel = textChannel;
             }
-
         }
     }
 

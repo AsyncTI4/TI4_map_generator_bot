@@ -1,7 +1,9 @@
 package ti4.map;
 
+import org.jetbrains.annotations.Nullable;
 
 import ti4.commands.milty.MiltyDraftManager;
+import ti4.commands.player.PlanetRemove;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -9,7 +11,6 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 
-import javax.annotation.CheckForNull;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.List;
@@ -25,13 +26,14 @@ public class Map {
 
     private HashMap<String, UnitHolder> planets = new HashMap<>();
 
-    @CheckForNull
+    @Nullable
     private DisplayType displayTypeForced = null;
     @ExportableField
     private int playerCountForMap = 6;
     private int vp = 10;
     private boolean communityMode = false;
     private boolean allianceMode = false;
+    private boolean fowMode = false;
 
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
@@ -63,6 +65,7 @@ public class Map {
     private LinkedHashMap<String, Integer> revealedPublicObjectives = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> customPublicVP = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
+    private LinkedHashMap<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
     private ArrayList<String> publicObjectives1 = new ArrayList<>();
     private ArrayList<String> publicObjectives2 = new ArrayList<>();
     private ArrayList<String> soToPoList = new ArrayList<>();
@@ -185,8 +188,15 @@ public class Map {
         return allianceMode;
     }
 
+    public boolean isFoWMode() {
+        return fowMode;
+    }
+
     public void setAllianceMode(boolean allianceMode) {
         this.allianceMode = allianceMode;
+    }
+    public void setFoWMode(boolean fowMode) {
+        this.fowMode = fowMode;
     }
 
     public void setCommunityMode(boolean communityMode) {
@@ -454,6 +464,22 @@ public class Map {
         this.scoredPublicObjectives = scoredPublicObjectives;
     }
 
+    public void setCustomAdjacentTiles(LinkedHashMap<String, List<String>> customAdjacentTiles) {
+        this.customAdjacentTiles = customAdjacentTiles;
+    }
+
+    public void addCustomAdjacentTiles(String primaryTile, List<String> customAdjacentTiles) {
+        this.customAdjacentTiles.put(primaryTile, customAdjacentTiles);
+    }
+
+    public void removeCustomAdjacentTiles(String primaryTile) {
+        this.customAdjacentTiles.remove(primaryTile);
+    }
+
+    public void clearCustomAdjacentTiles() {
+        this.customAdjacentTiles.clear();
+    }
+
     public void setPublicObjectives1(ArrayList<String> publicObjectives1) {
         this.publicObjectives1 = publicObjectives1;
     }
@@ -482,6 +508,10 @@ public class Map {
 
     public LinkedHashMap<String, List<String>> getScoredPublicObjectives() {
         return scoredPublicObjectives;
+    }
+
+    public LinkedHashMap<String, List<String>> getCustomAdjacentTiles() {
+        return customAdjacentTiles;
     }
 
     public LinkedHashMap<String, Integer> getLaws() {
@@ -650,7 +680,7 @@ public class Map {
         return false;
     }
 
-    @CheckForNull
+    @Nullable
     public java.util.Map.Entry<String, Integer> drawAgenda() {
         if (!agendas.isEmpty()) {
             for (String id : agendas) {
@@ -681,7 +711,7 @@ public class Map {
         return id;
     }
 
-    @CheckForNull
+    @Nullable
     public LinkedHashMap<String, Integer> drawActionCard(String userID) {
         if (!actionCards.isEmpty()) {
             String id = actionCards.get(0);
@@ -789,7 +819,7 @@ public class Map {
         return false;
     }
 
-    @CheckForNull
+    @Nullable
     public String drawActionCardAndDiscard() {
         if (!actionCards.isEmpty()) {
             String id = actionCards.get(0);
@@ -804,7 +834,7 @@ public class Map {
         }
     }
 
-    @CheckForNull
+    @Nullable
     public LinkedHashMap<String, Integer> drawSecretObjective(String userID) {
         if (!secretObjectives.isEmpty()) {
             String id = secretObjectives.get(0);
@@ -818,7 +848,7 @@ public class Map {
         return null;
     }
 
-    @CheckForNull
+    @Nullable
     public LinkedHashMap<String, Integer> drawSpecificSecretObjective(String soID, String userID) {
         if (!secretObjectives.isEmpty()) {
             boolean remove = secretObjectives.remove(soID);
@@ -968,7 +998,7 @@ public class Map {
         return false;
     }
 
-    @CheckForNull
+    @Nullable
     public LinkedHashMap<String, Integer> getSecretObjective(String userID) {
         Player player = getPlayer(userID);
         if (player != null) {
@@ -977,7 +1007,7 @@ public class Map {
         return null;
     }
 
-    @CheckForNull
+    @Nullable
     public LinkedHashMap<String, Integer> getScoredSecretObjective(String userID) {
         Player player = getPlayer(userID);
         if (player != null) {
@@ -1177,8 +1207,26 @@ public class Map {
     }
 
     public void removeTile(String position) {
+        Tile tileToRemove = tileMap.get(position);
+        if (tileToRemove != null) {
+            for (UnitHolder unitHolder : tileToRemove.getUnitHolders().values()) {
+                if (unitHolder instanceof Planet) {
+                    removePlanet(unitHolder);
+                }
+            }
+        }
+
         tileMap.remove(position);
         planets.clear();
+    }
+
+    public void removePlanet(UnitHolder planet) {
+        for (Player player_ : players.values()) {
+            String color = player_.getColor();
+            planet.removeAllUnits(color);
+            PlanetRemove.removePlayerControlToken(player_, planet);
+            player_.removePlanet(planet.getName());
+        }
     }
 
     public HashMap<String, UnitHolder> getPlanetsInfo() {

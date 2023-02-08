@@ -1,6 +1,8 @@
 package ti4.buttons;
 
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.*;
+import net.dv8tion.jda.api.entities.emoji.*;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -20,14 +22,13 @@ import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 public class ButtonListener extends ListenerAdapter {
-    public static HashMap<Guild, HashMap<String, Emote>> emoteMap = new HashMap<>();
+    public static HashMap<Guild, HashMap<String, Emoji>> emoteMap = new HashMap<>();
     private static HashMap<String, Set<Player>> playerUsedSC = new HashMap<>();
 
     @Override
@@ -41,23 +42,24 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
         String messageID = event.getMessage().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(id);
+
+        String gameName = event.getChannel().getName();
+        gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
+        gameName = gameName.substring(0, gameName.indexOf("-"));
+        Map activeMap = MapManager.getInstance().getMap(gameName);
         Player player = activeMap.getPlayer(id);
         player = Helper.getGamePlayer(activeMap, player, event.getMember(), id);
         if (player == null) {
             event.getChannel().sendMessage("You're not a player of the game").queue();
             return;
         }
-
-        String gameName = activeMap.getName();
-        Map cardMap = MapManager.getInstance().getMap(gameName);
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
-            BotLogger.log(event, buttonID + " in game " + gameName);
+            // BotLogger.log(event, buttonID + " in game " + gameName);
             String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
             for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
                 if (textChannel_.getName().equals(gameName + "-actions")) {
                     try {
-                        PlayAC.playAC(null, cardMap, player, acID, textChannel_, event.getGuild(), event);
+                        PlayAC.playAC(null, activeMap, player, acID, textChannel_, event.getGuild(), event);
                     } catch (Exception e) {
                         BotLogger.log(event, "Could not parse AC ID: " + acID);
                         event.getChannel().sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
@@ -68,14 +70,14 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
-            BotLogger.log(event, buttonID + " in game " + gameName);
+            // BotLogger.log(event, buttonID + " in game " + gameName);
             String soID = buttonID.replace(Constants.SO_SCORE_FROM_HAND, "");
             for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
                 if (textChannel_.getName().equals(gameName + "-actions")) {
                     try {
                         int soIndex = Integer.parseInt(soID);
 
-                        ScoreSO.scoreSO(null, cardMap, player, soIndex, textChannel_, event);
+                        ScoreSO.scoreSO(null, activeMap, player, soIndex, textChannel_, event);
                     } catch (Exception e) {
                         BotLogger.log(event, "Could not parse SO ID: " + soID);
                         event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.").queue();
@@ -264,18 +266,18 @@ public class ButtonListener extends ListenerAdapter {
             event.getChannel().sendMessage("Could not find server Emojis").queue();
             return;
         }
-        HashMap<String, Emote> emojiMap = emoteMap.get(guild);
-        List<Emote> emotes = guild.getEmotes();
-        if (emojiMap != null && emojiMap.size() != emotes.size()) {
+        HashMap<String, Emoji> emojiMap = emoteMap.get(guild);
+        List<RichCustomEmoji> emojis = guild.getEmojis();
+        if (emojiMap != null && emojiMap.size() != emojis.size()) {
             emojiMap.clear();
         }
         if (emojiMap == null || emojiMap.isEmpty()) {
             emojiMap = new HashMap<>();
-            for (Emote emote : emotes) {
-                emojiMap.put(emote.getName().toLowerCase(), emote);
+            for (Emoji emoji : emojis) {
+                emojiMap.put(emoji.getName().toLowerCase(), emoji);
             }
         }
-        Emote emoteToUse = emojiMap.get(playerFaction.toLowerCase());
+        Emoji emojiToUse = emojiMap.get(playerFaction.toLowerCase());
         Message mainMessage = event.getInteraction().getMessage();
         String messageId = mainMessage.getId();
 
@@ -286,11 +288,11 @@ public class ButtonListener extends ListenerAdapter {
 //            // ...
 //        });
         if (!skipReaction) {
-            if (emoteToUse == null) {
+            if (emojiToUse == null) {
                 event.getChannel().sendMessage("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
                 return;
             }
-            event.getChannel().addReactionById(messageId, emoteToUse).queue();
+            event.getChannel().addReactionById(messageId, emojiToUse).queue();
             return;
         }
         boolean foundThread = false;

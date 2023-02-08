@@ -18,6 +18,7 @@ import ti4.commands.cardspn.PNCardsCommand;
 import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.custom.CustomCommand;
 import ti4.commands.explore.ExploreCommand;
+import ti4.commands.fow.FOWCommand;
 import ti4.commands.game.GameCommand;
 import ti4.commands.help.*;
 import ti4.commands.leaders.LeaderCommand;
@@ -41,6 +42,7 @@ public class MapGenerator {
 
     public static JDA jda;
     public static String userID;
+    public static Guild guild;
     public static String adminID;
     public static Role adminRole;
     public static Role developerRole;
@@ -112,9 +114,10 @@ public class MapGenerator {
         commandManager.addCommand(new SpecialCommand());
         commandManager.addCommand(new LeaderCommand());
         commandManager.addCommand(new CustomCommand());
+        commandManager.addCommand(new FOWCommand());
         commandManager.addCommand(new MiltyCommand());
 
-        Guild guild = jda.getGuildById(args[2]);
+        guild = jda.getGuildById(args[2]);
 
         CommandListUpdateAction commands = guild.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
@@ -134,6 +137,7 @@ public class MapGenerator {
 	       commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
 	       commandsD.queue();
        }
+       BotLogger.log("BOT STARTED UP");
         //------------------------------------------------
 
 //        CommandListUpdateAction commands_ = jda.updateCommands();
@@ -142,7 +146,6 @@ public class MapGenerator {
 
 //        guild.updateCommands().queue();
 //        jda.updateCommands().queue();
-
         MapSaveLoadManager.loadMaps();
     }
 }

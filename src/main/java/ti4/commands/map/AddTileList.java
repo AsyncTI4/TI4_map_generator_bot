@@ -68,6 +68,7 @@ public class AddTileList implements Command {
                 }
 
                 Tile tile = new Tile(tileID, position);
+                AddTile.addCustodianToken(tile);
                 userActiveMap.setTile(tile);
             }
 
@@ -92,7 +93,7 @@ public class AddTileList implements Command {
 
             MapSaveLoadManager.saveMap(userActiveMap);
 
-            File file = GenerateMap.getInstance().saveImage(userActiveMap);
+            File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
             MessageHelper.replyToMessage(event, file);
         }
     }

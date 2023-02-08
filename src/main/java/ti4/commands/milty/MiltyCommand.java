@@ -98,7 +98,7 @@ public class MiltyCommand implements Command {
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
 
-        File file = GenerateMap.getInstance().saveImage(activeMap);
+        File file = GenerateMap.getInstance().saveImage(activeMap, event);
         MessageHelper.replyToMessage(event, file);
     }
 

@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -77,7 +78,7 @@ public class SetupCommunityGame extends GameSubcommandData {
                 return;
             }
             player_.setRoleForCommunity(role.getAsRole());
-            player_.setChannelForCommunity(channel.getAsGuildChannel());
+            player_.setChannelForCommunity(channel.getAsChannel());
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify group player, role and channel");
             return;

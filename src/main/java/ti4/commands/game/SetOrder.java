@@ -64,10 +64,10 @@ public class SetOrder extends GameSubcommandData {
                 isAdmin = true;
             }
         }
-        if (players_.stream().noneMatch(player -> player.getUserID().equals(callerUser.getId())) && !isAdmin) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game owner can add/remove players.");
-            return;
-        }
+//        if (players_.stream().noneMatch(player -> player.getUserID().equals(callerUser.getId())) && !isAdmin) {
+//            MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game owner can add/remove players.");
+//            return;
+//        }
 
 
         LinkedHashMap<String, Player> newPlayerOrder = new LinkedHashMap<>();
