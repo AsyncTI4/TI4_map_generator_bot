@@ -5,6 +5,7 @@ import org.jetbrains.annotations.Nullable;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.player.PlanetRemove;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
@@ -303,7 +304,7 @@ public class Map {
     public ArrayList<String> getPublicObjectives2() {
         return publicObjectives2;
     }
-
+    
     public java.util.Map.Entry<String, Integer> revealState1() {
         return revealObjective(publicObjectives1);
     }
@@ -311,7 +312,7 @@ public class Map {
     public java.util.Map.Entry<String, Integer> revealState2() {
         return revealObjective(publicObjectives2);
     }
-
+    
     public java.util.Map.Entry<String, Integer> revealObjective(ArrayList<String> objectiveList) {
         if (!objectiveList.isEmpty()) {
             String id = objectiveList.get(0);
@@ -319,6 +320,27 @@ public class Map {
             addRevealedPublicObjective(id);
             for (java.util.Map.Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
                 if (entry.getKey().equals(id)) {
+                    return entry;
+                }
+            }
+        }
+        return null;
+    }
+    
+    public java.util.Map.Entry<String, Integer> addSpecificStage1(String objective) {
+        return addSpecificObjective(publicObjectives1, objective);
+    }
+
+    public java.util.Map.Entry<String, Integer> addSpecificStage2(String objective) {
+        return addSpecificObjective(publicObjectives2, objective);
+    }
+
+    public java.util.Map.Entry<String, Integer> addSpecificObjective(ArrayList<String> objectiveList, String objective) {
+        if (!objectiveList.isEmpty()) {
+            objectiveList.remove(objective);
+            addRevealedPublicObjective(objective);
+            for (java.util.Map.Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
+                if (entry.getKey().equals(objective)) {
                     return entry;
                 }
             }
@@ -520,6 +542,19 @@ public class Map {
     }
 
     public void setDiscardAgendas(LinkedHashMap<String, Integer> discardAgendas) {
+        this.discardAgendas = discardAgendas;
+    }
+
+    public void setDiscardAgendas(ArrayList<String> discardAgendasList) {
+        LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
+        for (String card : discardAgendasList) {
+            Collection<Integer> values = discardAgendas.values();
+            int identifier = new Random().nextInt(1000);
+            while (values.contains(identifier)) {
+                identifier = new Random().nextInt(1000);
+            }
+            discardAgendas.put(card, identifier);
+        }
         this.discardAgendas = discardAgendas;
     }
 
@@ -828,7 +863,7 @@ public class Map {
         return null;
     }
 
-    private void setDiscardActionCard(String id) {
+    public void setDiscardActionCard(String id) {
         Collection<Integer> values = discardActionCards.values();
         int identifier = new Random().nextInt(1000);
         while (values.contains(identifier)) {
@@ -1040,6 +1075,19 @@ public class Map {
     }
 
     public void setDiscardActionCards(LinkedHashMap<String, Integer> discardActionCards) {
+        this.discardActionCards = discardActionCards;
+    }
+
+    public void setDiscardActionCards(ArrayList<String> discardActionCardList) {
+        LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
+        for (String card : discardActionCardList) {
+            Collection<Integer> values = discardActionCards.values();
+            int identifier = new Random().nextInt(1000);
+            while (values.contains(identifier)) {
+                identifier = new Random().nextInt(1000);
+            }
+            discardActionCards.put(card, identifier);
+        }
         this.discardActionCards = discardActionCards;
     }
 
