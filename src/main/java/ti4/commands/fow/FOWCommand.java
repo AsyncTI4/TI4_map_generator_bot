@@ -113,6 +113,7 @@ public class FOWCommand implements Command {
         subcommands.add(new RemoveFogTile());
         subcommands.add(new RemoveCustomAdjacentTile());
         subcommands.add(new RemoveAllCustomAdjacentTiles());
+        subcommands.add(new ShowAllPlayedSC());
 
         return subcommands;
     }
