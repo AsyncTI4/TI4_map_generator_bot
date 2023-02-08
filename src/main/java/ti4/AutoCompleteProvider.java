@@ -4,11 +4,13 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.interactions.commands.Command;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 
+import java.io.File;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -221,6 +223,22 @@ public class AutoCompleteProvider {
             case Constants.NO_MAPGEN -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Stream.of("True")
+                        .filter(value -> value.contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.TTPG_FILE_NAME -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                String dir = Storage.getTTPGExportDirectory().getPath();
+                
+                Set<String> fileSet = Stream.of(new File(dir).listFiles())
+                    .filter(file -> !file.isDirectory())
+                    .map(File::getName)
+                    .collect(Collectors.toSet());
+
+                List<Command.Choice> options = fileSet.stream()
                         .filter(value -> value.contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))

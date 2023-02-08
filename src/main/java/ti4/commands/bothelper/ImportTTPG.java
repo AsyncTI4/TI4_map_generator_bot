@@ -11,7 +11,7 @@ import ti4.message.MessageHelper;
 public class ImportTTPG extends BothelperSubcommandData {
     public ImportTTPG(){
         super(Constants.IMPORT_TTPG, "Import a recent TTPG Export to a new Async game");
-        addOptions(new OptionData(OptionType.STRING, Constants.TTPG_FILE_NAME, "FilePath to Load").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TTPG_FILE_NAME, "FilePath to Load").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "GameName to Create").setRequired(true));
     }
 
@@ -19,9 +19,9 @@ public class ImportTTPG extends BothelperSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping optionFileName = event.getOption(Constants.TTPG_FILE_NAME);
         OptionMapping optionGameName = event.getOption(Constants.GAME_NAME);
-        String filepath = "storage/ttpg_exports/TTPG-Export-Hadouken-New.json";
+        String filepath = optionFileName.getAsString();
         String gameName = optionGameName.getAsString();
         ConvertTTPGtoAsync.ImportTTPG(filepath, gameName);
-        MessageHelper.sendMessageToChannel(event, "TTPG File: `" + filepath + "` has been imported as game name: **" + gameName + "**");
+        MessageHelper.replyToMessage(event, "TTPG File: `" + filepath + "` has been imported as game name: **" + gameName + "**");
     }
 }
