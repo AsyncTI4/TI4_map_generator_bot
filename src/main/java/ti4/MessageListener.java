@@ -72,7 +72,7 @@ public class MessageListener extends ListenerAdapter {
 
         String gameID = channelNameTokenizer.nextToken();
         boolean anyMatchGameExists = mapList.stream().anyMatch(map -> map.equals(gameID));
-        if (!anyMatchGameExists && !(eventName.contains(Constants.CREATE_GAME) || eventName.contains(Constants.SHOW_GAME)) ) {
+        if (!anyMatchGameExists && !(eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.CREATE_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN))) {
             return false;
         }
         if (anyMatchGameExists && (mapManager.getUserActiveMap(userID) == null || !mapManager.getUserActiveMap(userID).getName().equals(gameID) && (mapManager.getMap(gameID) != null && (mapManager.getMap(gameID).isMapOpen() || mapManager.getMap(gameID).getPlayerIDs().contains(userID))))) {
