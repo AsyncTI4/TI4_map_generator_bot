@@ -1,5 +1,6 @@
 package ti4.map_ttpg;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.ZonedDateTime;
@@ -23,6 +24,7 @@ import ti4.commands.tokens.AddToken;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
@@ -128,7 +130,8 @@ public class ConvertTTPGtoAsync {
 
     public static void ImportTTPG(String filename, String gamename) {
         try {
-            TTPGMap ttpgMap = getTTPGMapFromJsonFile(filename);
+            File file = Storage.getTTPGExportStorage(filename);
+            TTPGMap ttpgMap = getTTPGMapFromJsonFile(file);
             Map map = ConvertTTPGMaptoAsyncMap(ttpgMap, gamename);
             MapSaveLoadManager.saveMap(map);
             MapSaveLoadManager.loadMaps();
@@ -636,9 +639,21 @@ public class ConvertTTPGtoAsync {
         return ttpgMap;
     }
 
-    public static String readFileAsString(String file)throws Exception
+    public static TTPGMap getTTPGMapFromJsonFile(File file) throws Exception {
+        String jsonSource = readFileAsString(file);
+        JsonNode node = parse(jsonSource);
+        TTPGMap ttpgMap = fromJson(node, TTPGMap.class);
+        return ttpgMap;
+    }
+
+    public static String readFileAsString(String filepath)throws Exception
     {
-        return new String(Files.readAllBytes(Paths.get(file)));
+        return new String(Files.readAllBytes(Paths.get(filepath)));
+    }
+
+    public static String readFileAsString(File file)throws Exception
+    {
+        return new String(Files.readAllBytes(Paths.get(file.getAbsolutePath())));
     }
 
     public static JsonNode parse(String source) throws JsonMappingException, JsonProcessingException {

@@ -14,6 +14,7 @@ public class Storage {
     public static final String MAPS_UNDO = "/maps/undo/";
     public static final String MAPS = "/maps/";
     public static final String DELETED_MAPS = "/deletedmaps/";
+    public static final String TTPG_EXPORTS = "/ttpg_exports/";
     private static Font TI_FONT_20 = null;
     private static Font TI_FONT_24 = null;
     private static Font TI_FONT_26 = null;
@@ -141,6 +142,16 @@ public class Storage {
     @CheckForNull
     public static File getDeletedMapStorage(String mapName) {
         return new File(getStoragePath() + DELETED_MAPS + mapName);
+    }
+
+    @CheckForNull
+    public static File getTTPGExportDirectory() {
+        return new File(getStoragePath() + TTPG_EXPORTS);
+    }
+
+    @CheckForNull
+    public static File getTTPGExportStorage(String fileName) {
+        return new File(getStoragePath() + TTPG_EXPORTS + fileName);
     }
 
     public static void init() {
