@@ -1,19 +1,24 @@
 package ti4.commands.player;
 
-import net.dv8tion.jda.api.MessageBuilder;
-import net.dv8tion.jda.api.entities.Emoji;
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+
 import org.apache.commons.collections4.ListUtils;
+
+import ti4.MapGenerator;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -48,6 +53,11 @@ public class Turn extends PlayerSubcommandData {
         int naaluSC = 0;
         Integer max = Collections.max(map.getScTradeGoods().keySet());
 
+        for (Player player : map.getPlayers().values()) {
+            if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("white")){
+                player.setPassed(true);
+            }
+        }
         for (Player player : map.getPlayers().values()) {
             String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(player.getSC()));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
@@ -87,7 +97,7 @@ public class Turn extends PlayerSubcommandData {
                 scPassed.put(sc, player.isPassed());
             }
         }
-        if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value)) {
+        if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value) || map.getPlayers().values().stream().allMatch(Player::isPassed)) {
             String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, map);
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
 
@@ -124,10 +134,10 @@ public class Turn extends PlayerSubcommandData {
                     Integer value = objective.getValue();
                     Button objectiveButton;
                     if (poStatus == 0) { //Stage 1 Objectives
-                        objectiveButton = Button.success(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromMarkdown(Emojis.Public1alt));
+                        objectiveButton = Button.success(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public1alt));
                         poButtons1.add(objectiveButton);
                     } else if (poStatus == 1) { //Stage 2 Objectives
-                        objectiveButton = Button.primary(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromMarkdown(Emojis.Public2alt));
+                        objectiveButton = Button.primary(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public2alt));
                         poButtons2.add(objectiveButton);
                     } else if (poStatus == 2) { //Other Objectives
                         objectiveButton = Button.secondary(Constants.PO_SCORING + value, "(" + value + ") " + po_name);
@@ -151,9 +161,9 @@ public class Turn extends PlayerSubcommandData {
             for (List<Button> partition : partitions) {
                 actionRows.add(ActionRow.of(partition));
             }
-            Message messageObject = new MessageBuilder()
-                    .append(message)
-                    .setActionRows(actionRows).build();
+            MessageCreateData messageObject = new MessageCreateBuilder()
+                    .addContent(message)
+                    .addComponents(actionRows).build();
             MessageChannel channel = event.getChannel();
             channel.sendMessage(messageObject).queue();
 
@@ -174,11 +184,20 @@ public class Turn extends PlayerSubcommandData {
             }
             tempProtection++;
         }
+        Boolean privateGame = FoWHelper.isPrivateGame(map, event);
         for (Player player : map.getPlayers().values()) {
             int sc = player.getSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
                 String text = "";
                 text += Helper.getPlayerRepresentation(event, player) + " UP NEXT";
+                if (privateGame != null && privateGame){
+                    User user = MapGenerator.jda.getUserById(player.getUserID());
+                    if (user == null) {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
+                    } else {
+                        MessageHelper.sentToMessageToUser(event, map.getName() + " " + text, user);
+                    }
+                }
                 MessageHelper.sendMessageToChannel(event.getChannel(), text);
                 return;
             }

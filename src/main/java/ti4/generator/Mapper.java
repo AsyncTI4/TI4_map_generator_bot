@@ -1,12 +1,12 @@
 package ti4.generator;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.message.BotLogger;
-
-import javax.annotation.CheckForNull;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -44,6 +44,9 @@ public class Mapper {
     private static final Properties playerSetup = new Properties();
     private static final Properties miltyDraft = new Properties();
     private static final Properties agendaRepresentation = new Properties();
+    private static final Properties adjacentTiles = new Properties();
+    private static final Properties hyperlaneAdjacencies = new Properties();
+    private static final Properties wormholes = new Properties();
     private static final HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = new HashMap<>();
 
     public static void init() {
@@ -72,6 +75,9 @@ public class Mapper {
         readData("faction_setup.properties", playerSetup, "Could not read player setup file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("agenda_representation.properties", agendaRepresentation, "Could not read agenda representaion file");
+        readData("adjacent.properties", adjacentTiles, "Could not read adjacent tiles file");
+        readData("hyperlanes.properties",hyperlaneAdjacencies,"Could not read hyperlanes file");
+        readData("wormholes.properties", wormholes, "Could not read wormholes file");
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -127,6 +133,50 @@ public class Mapper {
 
     public static String getTileID(String tileID) {
         return tiles.getProperty(tileID);
+    }
+
+    public static List<String> getAdjacentTilesIDs(String tileID) {
+        String property = adjacentTiles.getProperty(tileID);
+        if (property == null){
+            return Collections.emptyList();
+        }
+        return Arrays.stream(property.split(",")).toList();
+    }
+
+    public static List<List<Boolean>> getHyperlaneData(String tileID) {
+        String property = hyperlaneAdjacencies.getProperty(tileID);
+        if (property == null) return Collections.emptyList();
+
+        List<String> directions = Arrays.stream(property.split(";")).toList();
+        List<List<Boolean>> data = new ArrayList<>();
+        for (String dir : directions) {
+            List<String> info = Arrays.stream(dir.split(",")).toList();
+            List<Boolean> connections = new ArrayList<>();
+            for (String value : info) connections.add(value.equals("1"));
+            data.add(connections);
+        }
+        return data;
+    }
+
+    public static Set<String> getWormholes(String tileID) {
+        String property = wormholes.getProperty(tileID);
+        if (property == null){
+            return new HashSet<>();
+        }
+        return Arrays.stream(property.split(",")).collect(Collectors.toSet());
+    }
+
+    public static Set<String> getWormholesTiles(String wormholeID) {
+        Set<String> tileIDs = new HashSet<>();
+        for (Map.Entry<Object, Object> wormholeEntry : wormholes.entrySet()) {
+            Object value = wormholeEntry.getValue();
+            if (value instanceof String){
+                if (Arrays.asList(((String) value).split(",")).contains(wormholeID)){
+                    tileIDs.add((String)wormholeEntry.getKey());
+                }
+            }
+        }
+        return tileIDs;
     }
 
     public static String getFactionFileName(String factionID) {
@@ -232,7 +282,7 @@ public class Mapper {
         return (String) actionCards.get(id);
     }
 
-    @CheckForNull
+    @Nullable
     public static String getActionCardName(String id) {
         String info = (String) actionCards.get(id);
         // if we would break trying to split the note, just return whatever is there
@@ -325,7 +375,7 @@ public class Mapper {
         return agenda.toString();
     }
 
-    @CheckForNull
+    @Nullable
     public static String getAgendaTitle(String id) {
         String agendaInfo = (String)agendaRepresentation.get(id);
         if (agendaInfo == null){
@@ -344,7 +394,7 @@ public class Mapper {
         return split[0];
     }
 
-    @CheckForNull
+    @Nullable
     public static String getAgendaText(String id) {
         String agendaInfo = (String)agendaRepresentation.get(id);
         if (agendaInfo == null){
@@ -407,7 +457,7 @@ public class Mapper {
         return agendaList;
     }
 
-    @CheckForNull
+    @Nullable
     public static String getCCPath(String ccID) {
         String ccPath = ResourceHelper.getInstance().getCCFile(ccID);
         if (ccPath == null) {
@@ -417,7 +467,7 @@ public class Mapper {
         return ccPath;
     }
 
-    @CheckForNull
+    @Nullable
     public static String getTokenPath(String tokenID) {
         String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
         if (tokenPath == null || !(new File(tokenPath).exists())) {

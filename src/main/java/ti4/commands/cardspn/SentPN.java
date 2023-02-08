@@ -115,7 +115,7 @@ public class SentPN extends PNCardsSubcommandData {
 
         //Turned off, as we might change back
         if (areaPN && false) {
-            File file = GenerateMap.getInstance().saveImage(activeMap);
+            File file = GenerateMap.getInstance().saveImage(activeMap, event);
             MessageHelper.sendFileToChannel(event.getChannel(), file);
         }
     }

@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.Command;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
+import ti4.helpers.FoWHelper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
@@ -50,8 +51,11 @@ public class AutoCompleteProvider {
                 factionColors.addAll(Mapper.getColors());
 
                 List<String> factionColorsRetain = new ArrayList<>();
+                Boolean privateGame = FoWHelper.isPrivateGame(activeMap, null, event.getChannel());
                 for (Player player : activeMap.getPlayers().values()) {
-                    factionColorsRetain.add(player.getFaction());
+                    if (privateGame == null || !privateGame) {
+                        factionColorsRetain.add(player.getFaction());
+                    }
                     factionColorsRetain.add(player.getColor());
                 }
                 factionColors.retainAll(factionColorsRetain);
@@ -239,6 +243,11 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toSet());
 
                 List<Command.Choice> options = fileSet.stream()
+
+            case Constants.SPEND_AS -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of("Resources", "Influence", "Votes")
+
                         .filter(value -> value.contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))

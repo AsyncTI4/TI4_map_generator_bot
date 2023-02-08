@@ -11,6 +11,7 @@ public class Constants {
     public static final String GAME_CUSTOM_NAME = "game_custom_name";
     public static final String COMMUNITY_MODE = "community_mode";
     public static final String ALLIANCE_MODE = "alliance_mode";
+    public static final String FOW_MODE = "fow_mode";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String CHANNLE_FOR_COMMUNITY = "channelForCommunity";
     public static final String DISPLAY_TYPE = "display_type";
@@ -31,6 +32,11 @@ public class Constants {
     public static final String REPLACE = "replace";
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
+
+    public static String ALPHA = "alpha";
+    public static String BETA = "beta";
+    public static String GAMMA = "gamma";
+    public static String DELTA = "delta";
 
     public static final String DRAW_SPECIFIC_SO_FOR_PLAYER = "draw_specific_so_for_player";
 
@@ -62,6 +68,11 @@ public class Constants {
     public static final String UNIT_NAMES_TO = "unit_names_to";
     public static final String COLOR = "color";
     public static final String SEARCH_WARRANT = "search_warrant";
+    public static final String ADD_CUSTOM_ADJACENT_TILES = "add_custom_adjacent_tiles";
+    public static final String ADD_FOG_TILE = "add_fog_tile";
+    public static final String REMOVE_FOG_TILE = "remove_fog_tile";
+    public static final String REMOVE_CUSTOM_ADJACENT_TILES = "remove_custom_adjacent_tiles";
+    public static final String REMOVE_ALL_CUSTOM_ADJACENT_TILES = "remove_all_custom_adjacent_tiles";
     public static final String ADD_TILE = "add_tile";
     public static final String ADD_CC = "add_cc";
     public static final String ADD_CC_FROM_TACTICS = "add_cc_from_tactics";
@@ -77,13 +88,13 @@ public class Constants {
     public static final String ADD_TILE_LIST = "add_tile_list";
     public static final String ADD_FRONTIER_TOKENS = "add_frontier_tokens";
     public static final String ADD_UNITS = "add_units";
-    public static final String ADD_UNIT_DAMAGE = "add_damage_unit";
+    public static final String ADD_UNIT_DAMAGE = "add_sustain_damage";
     public static final String MOVE_UNITS = "move_units";
     public static final String NO_MAPGEN = "no_mapgen";
     public static final String REMOVE_UNITS = "remove_units";
-    public static final String REMOVE_UNIT_DAMAGE = "remove_damage_unit";
+    public static final String REMOVE_UNIT_DAMAGE = "remove_sustain_damage";
     public static final String REMOVE_ALL_UNITS = "remove_all_units";
-    public static final String REMOVE_ALL_UNIT_DAMAGE = "remove_damage_all_units";
+    public static final String REMOVE_ALL_UNIT_DAMAGE = "remove_all_sustain_damage";
     public static final String SPACE = "space";
     public static final String COMMAND = "command_";
     public static final String CONTROL = "control_";
@@ -116,10 +127,13 @@ public class Constants {
 
     public static final String SYSTEM_INFO = "system_info";
     public static final String DIPLO_SYSTEM = "diplo_system";
+
+    public static final String NOVA_SEED = "nova_seed";
+    public static final String DESTROY_OTHER_UNITS = "destroy_other_units";
     public static final String RISE_OF_A_MESSIAH = "rise_of_a_messiah";
     public static final String SLEEPER_TOKEN = "sleeper_token";
     public static final String STELLAR_CONVERTER = "stellar_converter";
-    public static final String ION_TOKEN_FLIP = "ion_token_flip";
+    public static final String ION_TOKEN_FLIP = "ion_storm_flip";
     public static final String TOKEN_SLEEPER_PNG = "token_sleeper.png";
     public static final String WORLD_DESTROYED_PNG = "token_worlddestroyed.png";
     public static final String TOKEN_ION_ALPHA_PNG = "token_ionalpha.png";
@@ -132,7 +146,10 @@ public class Constants {
     public static final String ADD_CC_TO_FS = "mahact_cc_to_fs";
     public static final String REMOVE_CC_FROM_FS = "mahact_cc_from_fs";
     public static final String SPECIAL = "special";
-
+    public static final String FOW = "fow";
+    public static final String FOW_SYSTEMS = "fow_systems";
+    public static final String LABEL = "label";
+    
     public static final String MILTY = "milty";
     public static final String START = "start";
     public static final String SLICE_COUNT = "slice_count";
@@ -261,6 +278,7 @@ public class Constants {
     public static final String IRF = "industrial_relic_fragment";
     public static final String VRF = "void_relic_fragment";
     public static final String STRATEGY_CARD = "strategy_card";
+    public static final String DUMMY = "dummy";
 
     public static final String TXT = ".txt";
     public static final String JPG = ".jpg";
@@ -320,6 +338,10 @@ public class Constants {
     public static final String REVEALED_PO = "revealedPublicObjectives";
     public static final String CUSTOM_PO_VP = "customPublicVP";
     public static final String SCORED_PO = "scoredPublicObjectives";
+    public static final String CUSTOM_ADJACENT_TILES = "customAdjacentTiles";
+    public static final String PRIMARY_TILE = "primary_tile";
+    public static final String ADJACENT_TILES = "adjacent_tiles";
+    public static final String TWO_WAY = "two_way";
     public static final String PO1 = "publicObjectives1";
     public static final String PO2 = "publicObjectives2";
 
@@ -429,6 +451,8 @@ public class Constants {
     public static final String HERO = "hero";
 
     public static final ArrayList<String> leaderList = new ArrayList<>();
+    public static final String PRIVATE_CHANNLE = "-private";
+
     static {
         leaderList.add(AGENT);
         leaderList.add(COMMANDER);
@@ -468,6 +492,7 @@ public class Constants {
     public static final String ATTACHMENT_TITANSPN_PNG = "attachment_titanspn.png";
     public static final String TERRAFORM = "terraform";
     public static final String CUSTODIAN_TOKEN = "custodian";
+    public static final String CONSULATE_TOKEN = "consulate";
     public static final String CUSTODIAN_TOKEN_PNG = "token_custodian.png";
     public static final String SWAP_SC = "swap_sc";
     public static final String KELERES_HERO_MENTAK = "keleres_hero_mentak";
@@ -475,5 +500,6 @@ public class Constants {
     public static final String CREATE_GAME_CHANNELS = "create_game_channels";
     public static final String IMPORT_TTPG = "import_ttpg";
     public static final String TTPG_FILE_NAME = "ttpg_file_name";
+    public static final String SPEND_AS = "spend_as";
 
 }

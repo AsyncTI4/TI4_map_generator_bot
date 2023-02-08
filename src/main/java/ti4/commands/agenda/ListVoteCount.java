@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.*;
@@ -23,6 +24,11 @@ public class ListVoteCount extends AgendaSubcommandData {
     }
 
     public static void turnOrder(SlashCommandInteractionEvent event, Map map) {
+        Boolean privateGame = FoWHelper.isPrivateGame(event);
+        if (privateGame){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "FoW game, secret information, cant be revealed");
+            return;
+        }
         StringBuilder msg = new StringBuilder();
         int i = 1;
         List<Player> orderList = new ArrayList<>();
@@ -103,7 +109,11 @@ public class ListVoteCount extends AgendaSubcommandData {
             } else {
                 text += " vote Count: **" + influenceCount;
                 if ("argent".equals(player.getFaction())) {
-                    text += "(+" + map.getPlayers().keySet().size() + " votes for Zeal)";
+                    int numPlayers = 0;
+                    for (Player player_ : map.getPlayers().values()) {
+                        if (player_.getFaction() != null && !player_.isDummy()) numPlayers++;
+                    }
+                    text += "(+" + numPlayers + " votes for Zeal)";
                 }
                 if (bloodPactPn) {
                     text += "(+4 votes for Blood Pact )";

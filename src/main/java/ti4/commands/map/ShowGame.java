@@ -70,8 +70,8 @@ public class ShowGame implements Command {
                 displayType = DisplayType.stats;
             }
         }
-        File file = GenerateMap.getInstance().saveImage(map, displayType);
-        MessageHelper.replyToMessage(event, file);
+        File file = GenerateMap.getInstance().saveImage(map, displayType, event);
+        MessageHelper.replyToMessage(event, file, true);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

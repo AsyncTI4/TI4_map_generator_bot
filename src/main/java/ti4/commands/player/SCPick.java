@@ -1,12 +1,15 @@
 package ti4.commands.player;
 
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.MapGenerator;
+import ti4.commands.status.ListTurnOrder;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
-import ti4.commands.status.ListTurnOrder;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
@@ -36,6 +39,7 @@ public class SCPick extends PlayerSubcommandData {
         String msg = "";
         String msgExtra = "";
         boolean allPicked = true;
+        Player privatePlayer = null;
         if (sc != 0) {
             msg += Helper.getPlayerRepresentation(event, player);
             msg += " Picked: " + Helper.getSCEmojiFromInteger(sc) + Helper.getSCAsMention(event.getGuild(), sc);
@@ -47,11 +51,12 @@ public class SCPick extends PlayerSubcommandData {
             Queue<Player> players = new ArrayDeque<>(activePlayers);
             while (players.iterator().hasNext()) {
                 Player player_ = players.poll();
-                if (player_ == null || player_.getFaction() == null || "white".equals(player_.getFaction())){
+                if (player_ == null || player_.getFaction() == null || "white".equals(player_.getFaction())) {
                     continue;
                 }
                 if (nextCorrectPing && player_.getSC() == 0 && player_.getFaction() != null) {
-                    msgExtra += Helper.getPlayerRepresentation(player_) + " To Pick SC";
+                    msgExtra += Helper.getPlayerRepresentation(event, player_) + " To Pick SC";
+                    privatePlayer = player_;
                     allPicked = false;
                     break;
                 }
@@ -90,16 +95,29 @@ public class SCPick extends PlayerSubcommandData {
                     }
                 }
                 if (nextPlayer != null) {
-                    msgExtra += " " + Helper.getPlayerPing(nextPlayer) + " is up for an action";
+                    msgExtra += " " + Helper.getPlayerRepresentation(event, nextPlayer) + " is up for an action";
+                    privatePlayer = nextPlayer;
                 }
-            }           
+            }
         } else {
             msg = "No SC picked.";
         }
         MessageHelper.replyToMessage(event, msg);
-
-        if (allPicked){
-        ListTurnOrder.turnOrder(event, activeMap);
+        Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
+        if (privateGame != null && privateGame) {
+            if (privatePlayer == null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), msgExtra + " Ping personally as Bot could not find player");
+                return;
+            }
+            User user = MapGenerator.jda.getUserById(privatePlayer.getUserID());
+            if (user == null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
+            } else {
+                MessageHelper.sentToMessageToUser(event, activeMap.getName() + " " + msgExtra, user);
+            }
+        }
+        if (allPicked) {
+            ListTurnOrder.turnOrder(event, activeMap);
         }
         if (!msgExtra.isEmpty()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), msgExtra);

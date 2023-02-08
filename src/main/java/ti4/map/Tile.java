@@ -1,26 +1,46 @@
 package ti4.map;
 
+import org.jetbrains.annotations.Nullable;
+
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
-import ti4.helpers.LoggerHandler;
 import ti4.message.BotLogger;
 
-import javax.annotation.CheckForNull;
 import java.awt.*;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 
 public class Tile {
     private final String tileID;
     private String position;
-    private HashMap<String, UnitHolder> unitHolders = new HashMap();
+    private HashMap<String, UnitHolder> unitHolders = new HashMap<>();
+    
+    private Boolean fog = false;
+    private String fogLabel = "";
 
     public Tile(String tileID, String position) {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
         initPlanetsAndSpace(tileID);
+    }
+
+    public Tile(String tileID, String position, Boolean fog_, String fogLabel_) {
+        this.tileID = tileID;
+        this.position = position != null ? position.toLowerCase() : null;
+        this.fog = fog_;
+        this.fogLabel = fogLabel_;
+        initPlanetsAndSpace(tileID);
+    }
+
+    public Tile(String tileID, String position, UnitHolder spaceHolder) {
+        this.tileID = tileID;
+        this.position = position != null ? position.toLowerCase() : null;
+        initPlanetsAndSpace(tileID);
+        unitHolders.replace(Constants.SPACE, spaceHolder);
     }
 
     private void initPlanetsAndSpace(String tileID) {
@@ -43,7 +63,7 @@ public class Tile {
         }
     }
 
-    @CheckForNull
+    @Nullable
     public String getUnitPath(String unitID) {
         String unitPath = ResourceHelper.getInstance().getUnitFile(unitID);
         if (unitPath == null) {
@@ -53,12 +73,12 @@ public class Tile {
         return unitPath;
     }
 
-    @CheckForNull
+    @Nullable
     public String getCCPath(String ccID) {
        return Mapper.getCCPath(ccID);
     }
 
-    @CheckForNull
+    @Nullable
     public String getAttachmentPath(String tokenID) {
         String tokenPath = ResourceHelper.getInstance().getAttachmentFile(tokenID);
         if (tokenPath == null) {
@@ -68,7 +88,7 @@ public class Tile {
         return tokenPath;
     }
 
-    @CheckForNull
+    @Nullable
     public String getTokenPath(String tokenID) {
         return Mapper.getTokenPath(tokenID);
     }
@@ -84,7 +104,7 @@ public class Tile {
         }
     }
 
-     public void addUnitDamage(String spaceHolder, String unitID, @CheckForNull Integer count) {
+     public void addUnitDamage(String spaceHolder, String unitID, @Nullable Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null && count != null) {
             HashMap<String, Integer> units = unitHolder.getUnits();
@@ -160,7 +180,7 @@ public class Tile {
         }
     }
 
-    public void removeUnitDamage(String spaceHolder, String unitID, @CheckForNull Integer count) {
+    public void removeUnitDamage(String spaceHolder, String unitID, @Nullable Integer count) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null && count != null) {
             unitHolder.removeUnitDamage(unitID, count);
@@ -198,6 +218,16 @@ public class Tile {
         }
     }
 
+    public List<Boolean> getHyperlaneData(Integer sourceDirection) {
+        List<List<Boolean>> fullHyperlaneData = Mapper.getHyperlaneData(this.tileID);
+        if (fullHyperlaneData == null || fullHyperlaneData.size() == 0) {
+            return null;
+        } else if (sourceDirection < 0 || sourceDirection > 5) {
+            return Collections.emptyList();
+        }
+        return fullHyperlaneData.get(sourceDirection);
+    }
+
     public String getTileID() {
         return tileID;
     }
@@ -212,6 +242,35 @@ public class Tile {
 
     public String getTilePath() {
         String tileName = Mapper.getTileID(tileID);
+        String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+        if (tilePath == null) {
+            BotLogger.log("Could not find tile: " + tileID);
+        }
+        return tilePath;
+    }
+
+    public boolean hasFog() {
+        return fog;
+    }
+
+    public void setFogOfWar(Boolean fog_) {
+        fog = fog_;
+    }
+
+    public String getFogLabel() {
+        return fogLabel;
+    }
+
+    public void setFogLabel(String fogLabel_) {
+        this.fogLabel = fogLabel_;
+    }
+
+    public String getFowTilePath() {
+        String tileName = Mapper.getTileID("fow");
+        if(this.tileID.equals("82a") || this.tileID.equals("82b") || this.tileID.equals("51")) {
+            tileName = Mapper.getTileID("fowb");
+        }
+        
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
             BotLogger.log("Could not find tile: " + tileID);

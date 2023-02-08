@@ -42,7 +42,7 @@ abstract public class AddRemoveTile implements Command {
             Map userActiveMap = tileParsing(event, userID, mapManager);
             if (userActiveMap == null) return;
             MapSaveLoadManager.saveMap(userActiveMap);
-            File file = GenerateMap.getInstance().saveImage(userActiveMap);
+            File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
             MessageHelper.replyToMessage(event, file);
         }
     }

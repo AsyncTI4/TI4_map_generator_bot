@@ -1,6 +1,6 @@
 package ti4.map;
 
-import net.dv8tion.jda.api.entities.Channel;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import ti4.MapGenerator;
@@ -8,18 +8,20 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 
-import javax.annotation.CheckForNull;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import java.util.Map;
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class Player {
-
+    
     private String userID;
     private String userName;
 
     private boolean passed = false;
     private boolean searchWarrant = false;
+    private boolean isDummy = false;
 
     private String faction;
     private String color;
@@ -45,9 +47,12 @@ public class Player {
     private List<String> mahactCC = new ArrayList<>();
     private List<Leader> leaders = new ArrayList<>();
 
-    @CheckForNull
+    private HashMap<String,String> fow_seenTiles = new HashMap<>();
+    private HashMap<String,String> fow_customLabels = new HashMap<>();
+
+    @Nullable
     private Role roleForCommunity = null;
-    @CheckForNull
+    @Nullable
     private Channel channelForCommunity = null;
 
 
@@ -84,7 +89,7 @@ public class Player {
          mahactCC.remove(cc);
     }
 
-    @CheckForNull
+    @Nullable
     public Role getRoleForCommunity() {
         return roleForCommunity;
     }
@@ -93,7 +98,7 @@ public class Player {
         this.roleForCommunity = roleForCommunity;
     }
 
-    @CheckForNull
+    @Nullable
     public Channel getChannelForCommunity() {
         return channelForCommunity;
     }
@@ -385,7 +390,7 @@ public class Player {
         }
     }
 
-    @CheckForNull
+    @Nullable
     public Leader getLeader(String leaderID) {
         for (Leader leader : leaders) {
             if (leader.getId().equals(leaderID) || leader.getName().equals(leaderID)){
@@ -649,5 +654,48 @@ public class Player {
 
     public boolean isSearchWarrant() {
         return searchWarrant;
+    }
+
+    public void updateFogFilter(@NotNull Tile tile) {
+        fow_seenTiles.put(tile.getPosition(), tile.getTileID());
+        fow_customLabels.remove(tile.getPosition());
+    }
+
+    public void addFogTile(String tileID, String position, String label) {
+        fow_seenTiles.put(position, tileID);
+        if(label != null && !label.equals(".") && !label.equals("")) {
+            fow_customLabels.put(position, label);
+        }
+    }
+
+    public void removeFogTile(String position) {
+        fow_seenTiles.remove(position);
+        fow_customLabels.remove(position);
+    }
+
+    public Tile buildFogTile(String position) {
+        String tileID = fow_seenTiles.get(position);
+        if (tileID == null) tileID = "0b";
+
+        String label = fow_customLabels.get(position);
+        if (label == null) label = "";
+
+        return new Tile(tileID, position, !tileID.equals("0b"), label);
+    }
+
+    public HashMap<String,String> getFogFilter() {
+        return fow_seenTiles;
+    }
+
+    public HashMap<String,String> getFogLabels() {
+        return fow_customLabels;
+    }
+
+    public boolean isDummy() {
+        return isDummy;
+    }
+    
+    public void setDummy(boolean isDummy) {
+        this.isDummy = isDummy;
     }
 }

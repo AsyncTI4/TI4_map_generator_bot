@@ -36,7 +36,7 @@ public class Statistics extends AdminSubcommandData {
             if (map.getName().startsWith("pbd")) {
                 int vp = map.getVp();
                 HashMap<Player, Integer> userVPs = new HashMap<>();
-                GenerateMap.objectives(map, 0, graphics, userVPs, false);
+                GenerateMap.getInstance().objectives(map, 0, graphics, userVPs, false);
                 for (Player player : map.getPlayers().values()) {
                     String color = player.getColor();
                     String faction = player.getFaction();

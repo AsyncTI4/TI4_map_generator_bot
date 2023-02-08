@@ -1,12 +1,11 @@
 package ti4.commands.game;
 
-import net.dv8tion.jda.api.entities.NewsChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+
 import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -45,6 +44,9 @@ public class Info extends GameSubcommandData{
         sb.append("Game name: " + map.getName()).append(NEW_LINE);
         sb.append("Game owner: " + map.getOwnerName()).append(NEW_LINE);
         sb.append("Game status: " + map.getMapStatus()).append(NEW_LINE);
+        sb.append("Community Mode: " + map.isCommunityMode()).append(NEW_LINE);
+        sb.append("Alliance Mode: " + map.isAllianceMode()).append(NEW_LINE);
+        sb.append("FoW Mode: " + map.isFoWMode()).append(NEW_LINE);
         sb.append("Created: " + map.getCreationDate()).append(NEW_LINE);
         sb.append("Last Modified: " + Helper.getDateRepresentation(map.getLastModifiedDate())).append(NEW_LINE);
         sb.append("Map String: `" + Helper.getMapString(map)).append("`").append(NEW_LINE);
