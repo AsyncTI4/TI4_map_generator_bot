@@ -21,7 +21,11 @@ public class ImportTTPG extends BothelperSubcommandData {
         OptionMapping optionGameName = event.getOption(Constants.GAME_NAME);
         String filepath = optionFileName.getAsString();
         String gameName = optionGameName.getAsString();
-        ConvertTTPGtoAsync.ImportTTPG(filepath, gameName);
-        MessageHelper.replyToMessage(event, "TTPG File: `" + filepath + "` has been imported as game name: **" + gameName + "**");
+        Boolean imported = ConvertTTPGtoAsync.ImportTTPG(filepath, gameName);
+        if (imported) {
+            MessageHelper.replyToMessage(event, "TTPG File: `" + filepath + "` has been imported as game name: **" + gameName + "**");
+        } else {
+            MessageHelper.replyToMessage(event, "TTPG File: `" + filepath + "` failed to be imported");
+        }
     }
 }

@@ -12,6 +12,9 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonMappingException;
@@ -128,17 +131,23 @@ public class ConvertTTPGtoAsync {
     //     // Map newMap = MapSaveLoadManager.loadMap
     // }
 
-    public static void ImportTTPG(String filename, String gamename) {
+    public static Boolean ImportTTPG(String filename, String gamename) {
         try {
             File file = Storage.getTTPGExportStorage(filename);
             TTPGMap ttpgMap = getTTPGMapFromJsonFile(file);
+            if (ttpgMap == null) {
+                BotLogger.log("TTPG Import Failed:\n> filename: " + filename + " is not valid TTPG export JSON format");
+                return false;
+            }
             Map map = ConvertTTPGMaptoAsyncMap(ttpgMap, gamename);
             MapSaveLoadManager.saveMap(map);
             MapSaveLoadManager.loadMaps();
         } catch (Exception e) {
             BotLogger.log("TTPG Import Failed: " + gamename + "    filename: " + filename);
-            BotLogger.log(e.getStackTrace().toString());
+            BotLogger.log(ExceptionUtils.getStackTrace(e));
+            return false;
         }
+        return true;
     }
 
     public static Map ConvertTTPGMaptoAsyncMap(TTPGMap ttpgMap, String gameName) {
@@ -634,16 +643,22 @@ public class ConvertTTPGtoAsync {
 
     public static TTPGMap getTTPGMapFromJsonFile(String filePath) throws Exception {
         String jsonSource = readFileAsString(filePath);
-        JsonNode node = parse(jsonSource);
-        TTPGMap ttpgMap = fromJson(node, TTPGMap.class);
-        return ttpgMap;
+        if (isValid(jsonSource)) {
+            JsonNode node = parse(jsonSource);
+            TTPGMap ttpgMap = fromJson(node, TTPGMap.class);
+            return ttpgMap;
+        }
+        return null;
     }
 
     public static TTPGMap getTTPGMapFromJsonFile(File file) throws Exception {
         String jsonSource = readFileAsString(file);
-        JsonNode node = parse(jsonSource);
-        TTPGMap ttpgMap = fromJson(node, TTPGMap.class);
-        return ttpgMap;
+        if (isValid(jsonSource)) {
+            JsonNode node = parse(jsonSource);
+            TTPGMap ttpgMap = fromJson(node, TTPGMap.class);
+            return ttpgMap;
+        }
+        return null;
     }
 
     public static String readFileAsString(String filepath)throws Exception
@@ -658,6 +673,15 @@ public class ConvertTTPGtoAsync {
 
     public static JsonNode parse(String source) throws JsonMappingException, JsonProcessingException {
         return objectMapper.readTree(source);
+    }
+
+    public static boolean isValid(String json) {
+        try {
+            objectMapper.readTree(json);
+        } catch (JacksonException e) {
+            return false;
+        }
+        return true;
     }
 
     private static ObjectMapper objectMapper = new ObjectMapper();
