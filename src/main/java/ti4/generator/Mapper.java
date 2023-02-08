@@ -99,14 +99,21 @@ public class Mapper {
                 String value = (String) entry.getValue();
                 String[] pns = value.split(";");
                 String id = pns[1].toLowerCase();
-                if (id.equals(color) || AliasHandler.resolveFaction(id).equals(faction)) {
+                if (id.equals(color) || (isFaction(id) && AliasHandler.resolveFaction(id).equals(faction))) { 
                     pnList.add((String) entry.getKey());
                 }
             }
         }
         return pnList;
     }
-
+    
+    public static List<String> getPromissoryNotes() {
+        List<String> pnList = new ArrayList<>();
+        for (Map.Entry<Object, Object> entry : promissoryNotes.entrySet()) {
+            pnList.add((String) entry.getKey());
+        }
+        return pnList;
+    }
     public static boolean isColorValid(String color) {
         return colors.getProperty(color) != null;
     }
