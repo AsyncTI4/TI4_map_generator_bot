@@ -10,14 +10,20 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.helpers.Constants;
+import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.MapFileDeleter;
 import ti4.map.MapManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
+import java.io.File;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
+import java.util.concurrent.CompletableFuture;
 
 public class MessageListener extends ListenerAdapter {
 
@@ -112,6 +118,27 @@ public class MessageListener extends ListenerAdapter {
             } else {
                 System.out.printf("[%s][%s] %s: %s\n", event.getGuild().getName(), event.getTextChannel().getName(), event.getMember().getEffectiveName(), event.getMessage().getContentDisplay());
                 System.out.printf("[%s][%s] %s: %s\n", event.getGuild().getId(), event.getTextChannel().getId(), event.getAuthor().getId(), event.getMessage().getContentDisplay());
+            }
+        }
+
+        // TTPG-EXPORTS - Save attachment to ttpg_exports folder for later processing
+        if (event.getChannel().getName().equalsIgnoreCase("ttpg-exports")) {
+            List<Message.Attachment> attachments = event.getMessage().getAttachments();
+            if (attachments.isEmpty()) {
+                return; // no attachments on the message!
+            } else if (!attachments.get(0).getFileExtension().equalsIgnoreCase("json")) {
+                // MessageHelper.sendMessageToChannel(event.getChannel(), "File is not a JSON file. Will not be saved.");
+                return;
+            } else { //write to file
+                String currentDateTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuu-MM-dd-HHmmss"));
+                String fileName = "ttpgexport_" + currentDateTime + ".json";
+                String filePath =  Storage.getTTPGExportDirectory() + "\\" + fileName;
+                CompletableFuture<File> future = attachments.get(0).downloadToFile(filePath);
+                future.exceptionally(error -> { // handle possible errors
+                    error.printStackTrace();
+                    return null;
+                });
+                MessageHelper.sendMessageToChannel(event.getChannel(), "File imported as: `" + fileName + "`");
             }
         }
     }
