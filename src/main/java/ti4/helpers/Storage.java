@@ -143,12 +143,12 @@ public class Storage {
         return new File(getStoragePath() + DELETED_MAPS + mapName);
     }
 
-    @CheckForNull
+    @Nullable
     public static File getTTPGExportDirectory() {
         return new File(getStoragePath() + TTPG_EXPORTS);
     }
 
-    @CheckForNull
+    @Nullable
     public static File getTTPGExportStorage(String fileName) {
         return new File(getStoragePath() + TTPG_EXPORTS + fileName);
     }
