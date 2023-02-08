@@ -159,6 +159,7 @@ public class Storage {
         if(resource!=null) {
             createDirectory(resource, DELETED_MAPS);
             createDirectory(resource, MAPS);
+            createDirectory(resource, TTPG_EXPORTS);
         }
     }
 
@@ -168,7 +169,6 @@ public class Storage {
             directory.mkdir();
         }
     }
-
 
     @CheckForNull
     public static File getLoggerFile() {
