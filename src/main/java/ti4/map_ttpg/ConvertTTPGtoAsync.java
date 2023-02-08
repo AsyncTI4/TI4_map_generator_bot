@@ -21,15 +21,14 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import ti4.commands.tokens.AddToken;
 import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 
 public class ConvertTTPGtoAsync {
 
@@ -108,25 +107,38 @@ public class ConvertTTPGtoAsync {
         }
     };
 
-    public static void main(String[] args) throws Exception {
-        PositionMapper.init();
-        Mapper.init();
-        AliasHandler.init();
-        Storage.init();
-        // String jsonSource = readFileAsString("storage/ttpg_exports/TTPG-Export.json");
-        // JsonNode node = parse(jsonSource);
-        TTPGMap ttpgMap = getTTPGMapFromJsonFile("storage/ttpg_exports/TTPG-Export-Hadouken-New.json");
+    //Uncomment main for debugging locally without running the bot
+    // public static void main(String[] args) throws Exception {
+    //     PositionMapper.init();
+    //     Mapper.init();
+    //     AliasHandler.init();
+    //     Storage.init();
+    //     // String jsonSource = readFileAsString("storage/ttpg_exports/TTPG-Export.json");
+    //     // JsonNode node = parse(jsonSource);
+    //     TTPGMap ttpgMap = getTTPGMapFromJsonFile("storage/ttpg_exports/TTPG-Export-Hadouken-New.json");
 
-        Map map = ConvertTTPGMaptoAsyncMap(ttpgMap);
+    //     Map map = ConvertTTPGMaptoAsyncMap(ttpgMap, "ttpgimport_dev");
 
-        // JsonNode node = toJson(map);
-        // System.out.println(generateString(node,true));
+    //     // JsonNode node = toJson(map);
+    //     // System.out.println(generateString(node,true));
 
-        MapSaveLoadManager.saveMap(map);
-        // Map newMap = MapSaveLoadManager.loadMap
+    //     MapSaveLoadManager.saveMap(map);
+    //     // Map newMap = MapSaveLoadManager.loadMap
+    // }
+
+    public static void ImportTTPG(String filename, String gamename) {
+        try {
+            TTPGMap ttpgMap = getTTPGMapFromJsonFile(filename);
+            Map map = ConvertTTPGMaptoAsyncMap(ttpgMap, gamename);
+            MapSaveLoadManager.saveMap(map);
+            MapSaveLoadManager.loadMaps();
+        } catch (Exception e) {
+            BotLogger.log("TTPG Import Failed: " + gamename + "    filename: " + filename);
+            BotLogger.log(e.getStackTrace().toString());
+        }
     }
 
-    public static Map ConvertTTPGMaptoAsyncMap(TTPGMap ttpgMap){
+    public static Map ConvertTTPGMaptoAsyncMap(TTPGMap ttpgMap, String gameName) {
         Mapper.init();
         Map asyncMap = new Map() {
             {
@@ -135,7 +147,7 @@ public class ConvertTTPGtoAsync {
                 setPlayerCountForMap(ttpgMap.getPlayers().size());
                 setVp(ttpgMap.getScoreboard());
                 setRound(ttpgMap.getRound());
-                setName("ttpgimport_new");// + currentDateTime());
+                setName(gameName);
             }
         };
         

@@ -474,5 +474,6 @@ public class Constants {
     public static final String BOTHELPER = "bothelper";
     public static final String CREATE_GAME_CHANNELS = "create_game_channels";
     public static final String IMPORT_TTPG = "import_ttpg";
+    public static final String TTPG_FILE_NAME = "ttpg_file_name";
 
 }

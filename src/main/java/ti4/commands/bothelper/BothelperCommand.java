@@ -82,19 +82,14 @@ public class BothelperCommand implements Command {
         }
     }
 
-
     protected String getActionDescription() {
         return "Bothelper";
     }
 
     private Collection<BothelperSubcommandData> getSubcommands() {
         Collection<BothelperSubcommandData> subcommands = new HashSet<>();
-        // subcommands.add(new SaveMaps());
-        // subcommands.add(new ResetEmojiCache());
-        // subcommands.add(new ReloadMap());
-        // subcommands.add(new CardsInfoForPlayer());
-        // subcommands.add(new DrawSpecificSOForPlayer());
-        // subcommands.add(new Statistics());
+        subcommands.add(new ImportTTPG());
+        subcommands.add(new CreateGameChannels());
         return subcommands;
     }
 

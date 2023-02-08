@@ -9,15 +9,10 @@ import ti4.map.MapManager;
 
 public abstract class BothelperSubcommandData extends SubcommandData {
 
-    private Map activeMap;
     private User user;
 
     public BothelperSubcommandData(@NotNull String name, @NotNull String description) {
         super(name, description);
-    }
-
-    public Map getActiveMap() {
-        return activeMap;
     }
 
     public User getUser() {
@@ -28,6 +23,5 @@ public abstract class BothelperSubcommandData extends SubcommandData {
 
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
-        activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
     }
 }
