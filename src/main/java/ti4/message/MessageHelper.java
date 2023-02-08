@@ -79,9 +79,15 @@ public class MessageHelper {
             while (index < messageLength) {
                 String next1500Chars = messageText.substring(index, Math.min(index + 1500, messageLength));
                 Integer lastNewLineIndex = next1500Chars.lastIndexOf("\n") + 1; // number of chars until right after the last \n
-                String textToAdd = next1500Chars.substring(0, lastNewLineIndex);
+                String textToAdd = "";
+                if (lastNewLineIndex > 0) {
+                    textToAdd = next1500Chars.substring(0, lastNewLineIndex);
+                    index += lastNewLineIndex;
+                } else {
+                    textToAdd = next1500Chars;
+                    index += next1500Chars.length();
+                }
                 texts.add(textToAdd);
-                index += lastNewLineIndex;
             }
             for (String text : texts) {
                 channel.sendMessage(text).queue();
