@@ -132,8 +132,9 @@ public class MessageListener extends ListenerAdapter {
             } else { //write to file
                 String currentDateTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuu-MM-dd-HHmmss"));
                 String fileName = "ttpgexport_" + currentDateTime + ".json";
-                String filePath =  Storage.getTTPGExportDirectory() + "\\" + fileName;
-                CompletableFuture<File> future = attachments.get(0).downloadToFile(filePath);
+                String filePath =  Storage.getTTPGExportDirectory() + "/" + fileName;
+                File file = new File(filePath);
+                CompletableFuture<File> future = attachments.get(0).getProxy().downloadToFile(file);
                 future.exceptionally(error -> { // handle possible errors
                     error.printStackTrace();
                     return null;
