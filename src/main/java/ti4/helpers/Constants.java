@@ -451,7 +451,7 @@ public class Constants {
     public static final String HERO = "hero";
 
     public static final ArrayList<String> leaderList = new ArrayList<>();
-    public static final String PRIVATE_CHANNLE = "-private";
+    public static final String PRIVATE_CHANNEL = "-private";
 
     static {
         leaderList.add(AGENT);
