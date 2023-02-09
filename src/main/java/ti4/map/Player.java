@@ -440,7 +440,9 @@ public class Player {
     }
 
     public void setColor(String color) {
-        this.color = AliasHandler.resolveColor(color);
+        if (!color.equals("null")) {
+            this.color = AliasHandler.resolveColor(color);
+        }
         initPNs();
     }
 

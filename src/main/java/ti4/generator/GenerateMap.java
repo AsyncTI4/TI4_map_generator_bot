@@ -2088,6 +2088,7 @@ public class GenerateMap {
             }
             return o1.compareTo(o2);
         });
+        boolean containsDMZ = tokenList.stream().anyMatch(token -> token.contains(Constants.DMZ_LARGE));
         for (String tokenID : tokenList) {
             if (isValid.apply(tokenID)) {
                 String tokenPath = tile.getTokenPath(tokenID);
@@ -2109,6 +2110,8 @@ public class GenerateMap {
                 Point position = new Point(centerPosition.x - (image.getWidth() / 2), centerPosition.y - (image.getHeight() / 2));
                 if (tokenID.contains(Constants.CUSTODIAN_TOKEN)) {
                     position = new Point(70, 45);
+                } else if (tokenID.contains(Constants.SLEEPER) && containsDMZ) {
+                    position = new Point(position.x + 10, position.y + 10);
                 }
                 graphics.drawImage(image, tileX + position.x, tileY + position.y - 10, null);
             }
