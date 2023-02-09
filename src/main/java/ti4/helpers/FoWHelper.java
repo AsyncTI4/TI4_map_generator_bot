@@ -47,7 +47,7 @@ public class FoWHelper {
             if (channel == null) {
                 return isFoWPrivate;
             }
-            isFoWPrivate = channel.getName().endsWith(Constants.PRIVATE_CHANNLE);
+            isFoWPrivate = channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
         }
         return isFoWPrivate;
     }

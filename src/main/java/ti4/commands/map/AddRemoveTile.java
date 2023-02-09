@@ -66,7 +66,20 @@ abstract public class AddRemoveTile implements Command {
         if (planetTileName.equals("18")){
             tile.addToken("token_custodian.png", "mr");
         }
+
         Map userActiveMap = mapManager.getUserActiveMap(userID);
+        Boolean isFowPrivate = null;
+        if (userActiveMap.isFoWMode() && event != null) {
+            isFowPrivate = false;
+            if (event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
+                isFowPrivate = true;
+            }
+        }
+        if (isFowPrivate != null && isFowPrivate) {
+            MessageHelper.replyToMessage(event, "Cannot run this command in a private channel.");
+            return null;
+        }
+
         tileAction(tile, position, userActiveMap);
         return userActiveMap;
     }
