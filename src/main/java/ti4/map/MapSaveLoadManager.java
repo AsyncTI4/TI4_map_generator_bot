@@ -295,7 +295,7 @@ public class MapSaveLoadManager {
 
             writer.write(Constants.FACTION + " " + player.getFaction());
             writer.write(System.lineSeparator());
-            //TODO: Remove when no longer relevant
+            //TODO Remove when no longer relevant
             String playerColor = player.getColor();
             if(player.getFaction() == null || "null".equals(player.getFaction())) {
                 playerColor = "null";
