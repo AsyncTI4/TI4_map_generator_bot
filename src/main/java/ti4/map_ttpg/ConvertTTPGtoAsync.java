@@ -8,6 +8,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Objects;
 import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -25,6 +26,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import ti4.commands.tokens.AddToken;
 import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
@@ -97,18 +99,18 @@ public class ConvertTTPGtoAsync {
     public static final java.util.Map<String,String> fakePlayers = new HashMap<String, String>() {
         {
             put("481860200169472030", "PrisonerOne");
-            put("345897843757678603", "TerTerro");
             put("150809002974904321", "Holytispoon");
-            put("936295970671566879", "somno");
-            put("426282231234035722", "Son of Leto(UTC-6)");
-            put("960683086570487848", "TheEpicNerd");
-            // put("947763140517560331", "TI4 Game Management");
-            // put("1059869343636263023", "TI4-Bot-Test");
-            // put("814883082033037383", "Map Bot");
-            // put("235148962103951360", "Carl-bot");
-            // put("936929561302675456", "Midjourney Bot");
-            // put("812171459564011580", "RoboDane");
-            // put("572698679618568193", "Dicecord");
+            put("947763140517560331", "TI4 Game Management");
+            put("235148962103951360", "Carl-bot");
+            put("812171459564011580", "RoboDane");
+            put("572698679618568193", "Dicecord");
+            put("814883082033037383", "Map Bot");
+            put("936929561302675456", "Midjourney Bot");
+            // put("345897843757678603", "TerTerro");
+            // put("936295970671566879", "somno");
+            // put("426282231234035722", "Son of Leto(UTC-6)");
+            // put("960683086570487848", "TheEpicNerd");
+            // put("1059869343636263023", "TI4-Bot-Test"); //PrisonerOne's Test Bot
         }
     };
 
@@ -120,7 +122,7 @@ public class ConvertTTPGtoAsync {
     //     Storage.init();
     //     // String jsonSource = readFileAsString("storage/ttpg_exports/TTPG-Export.json");
     //     // JsonNode node = parse(jsonSource);
-    //     TTPGMap ttpgMap = getTTPGMapFromJsonFile("storage/ttpg_exports/TTPG-Export-Hadouken-New.json");
+    //     TTPGMap ttpgMap = getTTPGMapFromJsonFile("storage/ttpg_exports/export_holyt.json");
 
     //     Map map = ConvertTTPGMaptoAsyncMap(ttpgMap, "ttpgimport_dev");
 
@@ -189,9 +191,13 @@ public class ConvertTTPGtoAsync {
             asyncMap.addCustomPO(objective, 1);
         }
 
+        //PLAYER ORDER MAPPING
+        // TTPG player array starts in bottom right and goes clockwise
+        // Async player array starts at top and goes clockwise
+        // for 6 player games, need to shift ttpgPlayers 2 right - i.e. 0,1,2,3,4,5 -> 4,5,0,1,2,3
 
         //PLAYERS
-        Integer index = 0;
+        Integer index = ttpgMap.getPlayers().size() - 2;
         for (Entry<String,String> fakePlayer : fakePlayers.entrySet()) {
             asyncMap.addPlayer(fakePlayer.getKey().toString(), fakePlayer.getValue().toString());
             Player asyncPlayer = asyncMap.getPlayer(fakePlayer.getKey().toString());
@@ -329,7 +335,9 @@ public class ConvertTTPGtoAsync {
                 asyncPlayer.setPromissoryNotesInPlayArea(AliasHandler.resolvePromissory(alliance + "_an"));
             }
 
-            index++;
+            //INDEX
+            if (index == ttpgMap.getPlayers().size() - 1) index = 0; else index++; //shift ttpgPlayer array to match Async array
+            if (asyncMap.getPlayers().size() == asyncMap.getPlayerCountForMap()) break;
         }
 
         //ADD TILES -> PARSE HEX SUMMARY
@@ -371,8 +379,9 @@ public class ConvertTTPGtoAsync {
         asyncMap.setActionCards(actionCards);
 
         // ACTION CARD DISCARD
+        ArrayList<String> ttpgActionDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardAction().getDiscard();
         ArrayList<String> actionDiscards = new ArrayList<>() {{
-            addAll(ttpgMap.getDecks().getCardAction().getDiscard());
+            if (Objects.nonNull(ttpgActionDiscards)) addAll(ttpgActionDiscards);
             replaceAll(card -> AliasHandler.resolveActionCard(card));
         }};
         asyncMap.setDiscardActionCards(actionDiscards);
@@ -386,36 +395,46 @@ public class ConvertTTPGtoAsync {
         asyncMap.setAgendas(agendaCards);
 
         // AGENDA DISCARD
+        ArrayList<String> ttpgAgendaDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardAction().getDiscard();
         ArrayList<String> agendaDiscards = new ArrayList<>() {{
-            addAll(ttpgMap.getDecks().getCardAgenda().getDiscard());
+            if (Objects.nonNull(ttpgAgendaDiscards)) addAll(ttpgAgendaDiscards);
             replaceAll(card -> AliasHandler.resolveAgenda(card));
         }};
         asyncMap.setDiscardAgendas(agendaDiscards);
 
         // EXPLORATION DECK
+        ArrayList<String> ttpgExploreCulturalCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDeck();
+        ArrayList<String> ttpgExploreHazardousCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationHazardous().getDeck();
+        ArrayList<String> ttpgExploreIndustrialCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationIndustrial().getDeck();
+        ArrayList<String> ttpgExploreFrontierCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationFrontier().getDeck();
         ArrayList<String> exploreCards = new ArrayList<>() {{
-            addAll(ttpgMap.getDecks().getCardExplorationCultural().getDeck());
-            addAll(ttpgMap.getDecks().getCardExplorationHazardous().getDeck());
-            addAll(ttpgMap.getDecks().getCardExplorationIndustrial().getDeck());
-            addAll(ttpgMap.getDecks().getCardExplorationFrontier().getDeck());
+            if (Objects.nonNull(ttpgExploreCulturalCards)) addAll(ttpgExploreCulturalCards);
+            if (Objects.nonNull(ttpgExploreHazardousCards)) addAll(ttpgExploreHazardousCards);
+            if (Objects.nonNull(ttpgExploreIndustrialCards)) addAll(ttpgExploreIndustrialCards);
+            if (Objects.nonNull(ttpgExploreFrontierCards)) addAll(ttpgExploreFrontierCards);
             replaceAll(card -> AliasHandler.resolveExploration(card));
         }};
         Collections.shuffle(exploreCards);
         asyncMap.setExploreDeck(exploreCards);
 
-        // EXPLORATION DISCARD
+        // EXPLORATION DISCARD        
+        ArrayList<String> ttpgExploreCulturalDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDeck();
+        ArrayList<String> ttpgExploreHazardousDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationHazardous().getDeck();
+        ArrayList<String> ttpgExploreIndustrialDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationIndustrial().getDeck();
+        ArrayList<String> ttpgExploreFrontierDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationFrontier().getDeck();
         ArrayList<String> exploreDiscards = new ArrayList<>() {{
-            addAll(ttpgMap.getDecks().getCardExplorationCultural().getDiscard());
-            addAll(ttpgMap.getDecks().getCardExplorationHazardous().getDiscard());
-            addAll(ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard());
-            addAll(ttpgMap.getDecks().getCardExplorationFrontier().getDiscard());
-            replaceAll((card) -> AliasHandler.resolveExploration(card));
+            if (Objects.nonNull(ttpgExploreCulturalDiscards)) addAll(ttpgExploreCulturalDiscards);
+            if (Objects.nonNull(ttpgExploreHazardousDiscards)) addAll(ttpgExploreHazardousDiscards);
+            if (Objects.nonNull(ttpgExploreIndustrialDiscards)) addAll(ttpgExploreIndustrialDiscards);
+            if (Objects.nonNull(ttpgExploreFrontierDiscards)) addAll(ttpgExploreFrontierDiscards);
+            replaceAll(card -> AliasHandler.resolveExploration(card));
         }};
         asyncMap.setExploreDiscard(exploreDiscards);
 
         // RELIC DECK
+        ArrayList<String> ttpgRelicCards = (ArrayList<String>) ttpgMap.getDecks().getCardRelic().getDeck();
         ArrayList<String> relicCards = new ArrayList<>() {{
-            addAll(ttpgMap.getDecks().getCardRelic().getDeck());
+            if (Objects.nonNull(ttpgRelicCards)) addAll(ttpgRelicCards);
             replaceAll(card -> AliasHandler.resolveRelic(card));
         }};
         Collections.shuffle(relicCards);
