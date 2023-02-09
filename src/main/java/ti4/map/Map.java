@@ -286,6 +286,7 @@ public class Map {
     }
 
     public void setScTradeGood(Integer sc, Integer tradeGoodCount) {
+        if (Objects.isNull(tradeGoodCount)) tradeGoodCount = 0;
         scTradeGoods.put(sc, tradeGoodCount);
     }
 
