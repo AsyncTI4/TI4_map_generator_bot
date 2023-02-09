@@ -122,7 +122,7 @@ public class ConvertTTPGtoAsync {
     //     Storage.init();
     //     // String jsonSource = readFileAsString("storage/ttpg_exports/TTPG-Export.json");
     //     // JsonNode node = parse(jsonSource);
-    //     TTPGMap ttpgMap = getTTPGMapFromJsonFile("storage/ttpg_exports/export_holyt.json");
+    //     TTPGMap ttpgMap = getTTPGMapFromJsonFile("storage/ttpg_exports/export_holyt2.json");
 
     //     Map map = ConvertTTPGMaptoAsyncMap(ttpgMap, "ttpgimport_dev");
 
@@ -187,9 +187,9 @@ public class ConvertTTPGtoAsync {
         }
 
         //ADD CUSTOM PUBLIC OBJECTIVES FROM OTHER SOURCES
-        for (String objective : ttpgMap.getObjectives().getOther()) {
-            asyncMap.addCustomPO(objective, 1);
-        }
+        // for (String objective : ttpgMap.getObjectives().getOther()) {
+        //     asyncMap.addCustomPO(objective, 1);
+        // }
 
         //PLAYER ORDER MAPPING
         // TTPG player array starts in bottom right and goes clockwise
@@ -237,6 +237,13 @@ public class ConvertTTPGtoAsync {
                             asyncMap.scorePublicObjective(asyncPlayer.getUserID(),customObjective.getValue());
                         }
                     }
+                }
+            }
+
+            //PLAYER SUPPORT FOR THE THRONE
+            for (String objective : ttpgPlayer.getObjectives()) {
+                if (objective.startsWith("Support for the Throne")) {
+                    asyncPlayer.setPromissoryNotesInPlayArea(AliasHandler.resolvePromissory(objective));
                 }
             }
 
@@ -541,7 +548,7 @@ public class ConvertTTPGtoAsync {
                 //TODO: move Creuss if exists in tileList - i.e. if 17 is near BL, put 51 in BL
             }
             case "54" -> { //Cabal, add S11 cabal prison nearby - i.e. if 54 is near BR, put S11 in BR
-                Tile prison = new Tile("S11", "br"); //hardcode bottom right for now
+                Tile prison = new Tile("s11", "br"); //hardcode bottom right for now
                 asyncMap.setTile(prison);
             }
         }
@@ -580,20 +587,29 @@ public class ConvertTTPGtoAsync {
                 regionContents = matcherAttachments.group(1);
                 attachments = matcherAttachments.group(2);
                 for (Character attachment : attachments.toCharArray()) {
-                    String attachment_proper = Character.toString(attachment) + (Character.isUpperCase(attachment) ? "_cap" : ""); //bypass AliasHandler's toLowercase'ing
-                    String attachmentResolved = AliasHandler.resolveTTPGAttachment(attachment_proper.toLowerCase());
-                    System.out.println("          - " + attachment + ": " + attachmentResolved);
+                    if (!validAttachments.contains(attachment)) {
+                        String attachment_proper = Character.toString(attachment) + (Character.isUpperCase(attachment) ? "_cap" : ""); //bypass AliasHandler's toLowercase'ing
+                        String attachmentResolved = AliasHandler.resolveTTPGAttachment(attachment_proper);
+                        System.out.println("          - " + attachment + ": " + attachmentResolved);
+                        
+                        String attachmentFileName = Mapper.getAttachmentID(attachmentResolved);
+                        String tokenFileName = Mapper.getTokenID(attachmentResolved);
 
-                    String tokenFileName = Mapper.getTokenID(attachmentResolved);
-                    String attachmentFileName = Mapper.getAttachmentID(attachmentResolved);
-
-                    if (tokenFileName != null) {
-                        tile.addToken(tokenFileName, planet);
-                    } else if (attachmentFileName != null) {
-                        tile.addToken(attachmentFileName, planet);
+                        if (tokenFileName != null && regionIsPlanet) {
+                            tile.addToken(tokenFileName, planet);
+                        } else if (attachmentFileName != null && regionIsPlanet) {
+                            tile.addToken(attachmentFileName, planet);
+                        } else if (tokenFileName != null && regionIsSpace) {
+                            tile.addToken(tokenFileName, Constants.SPACE);
+                        } else if (attachmentFileName != null && regionIsSpace) {
+                            tile.addToken(attachmentFileName, Constants.SPACE);
+                        } else {
+                            System.out.println("          - " + attachmentResolved + " could not be added - not found");
+                        }
                     } else {
-                        System.out.println("          - " + attachmentResolved + " could not be added - not found");
+                        System.out.println("                character not recognized:  " + Character.toString(attachment));
                     }
+
                 }
             }
 
