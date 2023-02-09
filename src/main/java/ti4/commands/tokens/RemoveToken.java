@@ -39,6 +39,9 @@ public class RemoveToken extends AddRemoveToken {
                     MessageHelper.replyToMessage(event, "Token: " + tokenName + " is not valid");
                     return;
                 }
+                if (tokenID.equals(Constants.CUSTODIAN_TOKEN_PNG)) {
+                    removeToken(event, tile, tokenID, false);
+                }
                 removeToken(event, tile, tokenID, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName));
                 activeMap.clearPlanetsCache();
             }
