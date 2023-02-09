@@ -20,7 +20,7 @@ public class PlanetRemove extends PlanetAddRemove {
 
     public static void removePlayerControlToken(Player player, UnitHolder unitHolder) {
         String color = player.getColor();
-        if (unitHolder != null && color != null && !"white".equals(color)) {
+        if (unitHolder != null && color != null && !"null".equals(color)) {
             String ccID = Mapper.getControlID(color);
             String ccPath = Mapper.getCCPath(ccID);
             if (ccPath != null) {

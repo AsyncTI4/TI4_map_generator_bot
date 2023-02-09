@@ -103,7 +103,7 @@ public class Helper {
         return null;
     }
 
-    @Nullable
+
     public static String getColorFromString(Map activeMap, String factionColor) {
         factionColor = AliasHandler.resolveColor(factionColor);
         factionColor = AliasHandler.resolveFaction(factionColor);

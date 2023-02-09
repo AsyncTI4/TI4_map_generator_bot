@@ -115,7 +115,8 @@ public class Mapper {
         return pnList;
     }
     public static boolean isColorValid(String color) {
-        return colors.getProperty(color) != null;
+        String property = colors.getProperty(color);
+        return property != null && !property.equals("null");
     }
 
     public static boolean isFaction(String faction) {

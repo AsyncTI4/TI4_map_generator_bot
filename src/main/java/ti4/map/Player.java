@@ -436,7 +436,7 @@ public class Player {
     }
 
     public String getColor() {
-        return color != null ? color : "white";
+        return color != null ? color : "null";
     }
 
     public void setColor(String color) {

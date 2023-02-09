@@ -431,9 +431,9 @@ public class GenerateMap {
                 graphics.setFont(Storage.getFont32());
                 Color color = getColor(player.getColor());
                 graphics.setColor(Color.WHITE);
-                String userName = player.getUserName() + ("white".equals(player.getColor()) ? "" : " (" + player.getColor() + ")");
+                String userName = player.getUserName() + ("null".equals(player.getColor()) ? "" : " (" + player.getColor() + ")");
                 graphics.drawString(userName, x, y);
-                if (player.getFaction() == null || "white".equals(player.getColor()) || player.getColor() == null) {
+                if (player.getFaction() == null || "null".equals(player.getColor()) || player.getColor() == null) {
                     continue;
                 }
 
@@ -1137,7 +1137,7 @@ public class GenerateMap {
         if (Constants.NAALU.equals(player.getFaction())) {
             boolean giftPlayed = false;
             Collection<Player> activePlayers = map.getPlayers().values().stream()
-                    .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("white")).toList();
+                    .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("null")).toList();
             for (Player player_ : activePlayers) {
                 if (player != player_ && player_.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
                     giftPlayed = true;

@@ -29,7 +29,7 @@ public class ListTurnOrder extends StatusSubcommandData {
             int naaluSC = 0;
             for (Player player : map.getPlayers().values()) {
                 if (player.getFaction() == null || "null".equals(player.getFaction()) ||
-                    player.getColor() == null || player.getColor().equals("white")){
+                    player.getColor() == null || player.getColor().equals("null")){
                     continue;
                 }
                 int sc = player.getSC();
