@@ -47,23 +47,26 @@ public class MapSaveLoadManager {
     public static void saveMaps() {
         HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
         for (java.util.Map.Entry<String, Map> mapEntry : mapList.entrySet()) {
-            saveMap(mapEntry.getValue());
+            saveMap(mapEntry.getValue(), true);
         }
     }
-
     public static void saveMap(Map map) {
+        saveMap(map, false);
+    }
+    public static void saveMap(Map map, boolean keepModifiedDate) {
         File mapFile = Storage.getMapImageStorage(map.getName() + TXT);
         if (mapFile != null) {
             saveUndo(map, mapFile);
             try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
                 HashMap<String, Tile> tileMap = map.getTileMap();
                 writer.write(map.getOwnerID());
+                writer.write(map.getOwnerID());
                 writer.write(System.lineSeparator());
                 writer.write(map.getOwnerName());
                 writer.write(System.lineSeparator());
                 writer.write(map.getName());
                 writer.write(System.lineSeparator());
-                saveMapInfo(writer, map);
+                saveMapInfo(writer, map, keepModifiedDate);
 
                 for (java.util.Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
                     Tile tile = tileEntry.getValue();
@@ -159,7 +162,7 @@ public class MapSaveLoadManager {
         }
     }
 
-    private static void saveMapInfo(FileWriter writer, Map map) throws IOException {
+    private static void saveMapInfo(FileWriter writer, Map map, boolean keepModifiedDate) throws IOException {
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
 
@@ -259,7 +262,8 @@ public class MapSaveLoadManager {
 
         writer.write(Constants.CREATION_DATE + " " + map.getCreationDate());
         writer.write(System.lineSeparator());
-        writer.write(Constants.LAST_MODIFIED_DATE + " " + new Date().getTime());
+        long time = keepModifiedDate ? map.getLastModifiedDate() : new Date().getTime();
+        writer.write(Constants.LAST_MODIFIED_DATE + " " + time);
         writer.write(System.lineSeparator());
         writer.write(Constants.ROUND + " " + map.getRound());
         writer.write(System.lineSeparator());
@@ -291,7 +295,12 @@ public class MapSaveLoadManager {
 
             writer.write(Constants.FACTION + " " + player.getFaction());
             writer.write(System.lineSeparator());
-            writer.write(Constants.COLOR + " " + player.getColor());
+            //TODO: Remove when no longer relevant
+            String playerColor = player.getColor();
+            if(player.getFaction() == null || "null".equals(player.getFaction())) {
+                playerColor = "null";
+            }
+            writer.write(Constants.COLOR + " " + playerColor);
             writer.write(System.lineSeparator());
 
             Role roleForCommunity = player.getRoleForCommunity();
@@ -394,7 +403,7 @@ public class MapSaveLoadManager {
                 fogOfWarSystems.append(",");
                 fogOfWarSystems.append(system);
                 fogOfWarSystems.append(",");
-                fogOfWarSystems.append(label == null || label == "" ? "." : label);
+                fogOfWarSystems.append(label == null || label.equals("") ? "." : label);
                 fogOfWarSystems.append(";");
             }
             writer.write(Constants.FOW_SYSTEMS + " " + fogOfWarSystems);

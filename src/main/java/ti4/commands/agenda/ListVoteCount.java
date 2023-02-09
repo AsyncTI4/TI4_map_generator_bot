@@ -50,7 +50,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         }
 
         for (Player player : orderList) {
-            if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("white")) {
+            if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
                 continue;
             }
             List<String> planets = new ArrayList<>(player.getPlanets());
