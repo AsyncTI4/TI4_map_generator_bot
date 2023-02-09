@@ -115,7 +115,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for Tile: " + name);
+            //System.out.println("Could not find an alias for Tile: " + name);
             return name;
         }
     }
@@ -130,7 +130,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for StandardTile: " + name);
+            //System.out.println("Could not find an alias for StandardTile: " + name);
             return name;
         }
     }
@@ -141,7 +141,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for Faction: " + name);
+            //System.out.println("Could not find an alias for Faction: " + name);
             return name;
         }
     }
@@ -152,7 +152,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for Color: " + name);
+            //System.out.println("Could not find an alias for Color: " + name);
             return name;
         }
     }
@@ -163,7 +163,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for Unit: " + name);
+            //System.out.println("Could not find an alias for Unit: " + name);
             return name;
         }
     }
@@ -182,7 +182,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for Planet: " + name);
+            //System.out.println("Could not find an alias for Planet: " + name);
             return name;
         }
     }
@@ -193,7 +193,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for Attachment: " + name);
+            //System.out.println("Could not find an alias for Attachment: " + name);
             return name;
         }
     }
@@ -204,7 +204,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for Token: " + name);
+            //System.out.println("Could not find an alias for Token: " + name);
             return name;
         }
     }
@@ -215,7 +215,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for Tech: " + name);
+            //System.out.println("Could not find an alias for Tech: " + name);
             return name;
         }
     }
@@ -226,7 +226,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for ActionCard: " + name);
+            //System.out.println("Could not find an alias for ActionCard: " + name);
             return name;
         }
     }
@@ -237,7 +237,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for Agenda: " + name);
+            //System.out.println("Could not find an alias for Agenda: " + name);
             return name;
         }
     }
@@ -248,7 +248,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for Exploration: " + name);
+            //System.out.println("Could not find an alias for Exploration: " + name);
             return name;
         }
     }
@@ -259,7 +259,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for Promissory: " + name);
+            //System.out.println("Could not find an alias for Promissory: " + name);
             return name;
         }
     }
@@ -270,7 +270,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for Relic: " + name);
+            //System.out.println("Could not find an alias for Relic: " + name);
             return name;
         }
     }
@@ -281,7 +281,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for Objective: " + name);
+            //System.out.println("Could not find an alias for Objective: " + name);
             return name;
         }
     }
@@ -292,7 +292,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for ttpgAttachment: " + name);
+            //System.out.println("Could not find an alias for ttpgAttachment: " + name);
             return name;
         }
     }
@@ -303,7 +303,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            System.out.println("Could not find an alias for TTPGToken: " + name);
+            //System.out.println("Could not find an alias for TTPGToken: " + name);
             return name;
         }
     }
@@ -314,7 +314,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return resolveUnit(aliasID);
         } else {
-            System.out.println("Could not find an alias for TTPGUnit: " + name);
+            //System.out.println("Could not find an alias for TTPGUnit: " + name);
             return name;
         }
     }
