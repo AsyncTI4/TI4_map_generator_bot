@@ -50,7 +50,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         }
 
         for (Player player : orderList) {
-            if (!player.isActivePlayer()) {
+            if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("white")) {
                 continue;
             }
             List<String> planets = new ArrayList<>(player.getPlanets());
@@ -111,9 +111,7 @@ public class ListVoteCount extends AgendaSubcommandData {
                 if ("argent".equals(player.getFaction())) {
                     int numPlayers = 0;
                     for (Player player_ : map.getPlayers().values()) {
-                        if (player_.isActivePlayer()) {
-                            numPlayers++;
-                        }
+                        if (player_.getFaction() != null && !player_.isDummy()) numPlayers++;
                     }
                     text += "(+" + numPlayers + " votes for Zeal)";
                 }
