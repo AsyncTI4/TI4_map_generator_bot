@@ -81,7 +81,7 @@ public class MessageHelper {
             gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
             gameName = gameName.substring(0, gameName.indexOf("-"));
             Map activeMap = MapManager.getInstance().getMap(gameName);
-            if (!activeMap.isFoWMode() || activeMap.isFoWMode() && event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNLE)) {
+            if (!activeMap.isFoWMode() || activeMap.isFoWMode() && event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
                 sendFileToChannel(event.getChannel(), file);
                 replyToMessageTI4Logo(event);
             } else {
