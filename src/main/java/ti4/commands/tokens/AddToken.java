@@ -55,7 +55,7 @@ public class AddToken extends AddRemoveToken {
     private static void addToken(SlashCommandInteractionEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet, Map activeMap) {
         String unitHolder = Constants.SPACE;
         if (needSpecifyPlanet) {
-            OptionMapping option = event.getOption(Constants.PLANET_NAME);
+            OptionMapping option = event.getOption(Constants.PLANET);
             if (option != null) {
                 unitHolder = option.getAsString().toLowerCase();
             } else {
@@ -139,7 +139,7 @@ public class AddToken extends AddRemoveToken {
                                 .setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
                                 .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.PLANET_NAME, "Planet name"))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))
 
         );
     }
