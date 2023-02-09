@@ -179,7 +179,7 @@ public class Stats extends PlayerSubcommandData {
             }
             int scNumber = optionSC.getAsInt();
             LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
-            if (player.getColor() == null || "white".equals(player.getColor()) || player.getFaction() == null) {
+            if (!player.isActivePlayer()) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Can pick SC only if faction and color picked");
                 return;
             }
