@@ -46,12 +46,12 @@ public class SCPick extends PlayerSubcommandData {
 
             boolean nextCorrectPing = false;
             Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
-                    .filter(player_ -> player_.isActivePlayer())
+                    .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("white"))
                     .collect(Collectors.toList());
             Queue<Player> players = new ArrayDeque<>(activePlayers);
             while (players.iterator().hasNext()) {
                 Player player_ = players.poll();
-                if (!player_.isActivePlayer()) {
+                if (player_ == null || player_.getFaction() == null || "white".equals(player_.getFaction())) {
                     continue;
                 }
                 if (nextCorrectPing && player_.getSC() == 0 && player_.getFaction() != null) {

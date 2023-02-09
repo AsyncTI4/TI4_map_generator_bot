@@ -358,7 +358,7 @@ public class Player {
     }
 
     public String getFaction() {
-        return faction != null ? faction : "null";
+        return faction;
     }
 
     public void setFaction(String faction) {
@@ -436,7 +436,7 @@ public class Player {
     }
 
     public String getColor() {
-        return color != null ? color : "null";
+        return color != null ? color : "white";
     }
 
     public void setColor(String color) {
@@ -697,9 +697,5 @@ public class Player {
     
     public void setDummy(boolean isDummy) {
         this.isDummy = isDummy;
-    }
-
-    public boolean isActivePlayer() {
-        return !isDummy && !"null".equals(getColor()) && !"null".equals(getFaction());
     }
 }

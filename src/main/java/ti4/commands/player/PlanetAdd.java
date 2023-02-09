@@ -30,7 +30,7 @@ public class PlanetAdd extends PlanetAddRemove {
         UnitHolder unitHolder = map.getPlanetsInfo().get(planet);
         String color = player.getColor();
         boolean moveTitanPN = false;
-        if (unitHolder != null && player.isActivePlayer()) {
+        if (unitHolder != null && color != null && !"white".equals(color)) {
             String ccID = Mapper.getControlID(color);
             String ccPath = Mapper.getCCPath(ccID);
             if (ccPath != null) {
