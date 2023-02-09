@@ -40,7 +40,7 @@ public class Statistics extends AdminSubcommandData {
                 for (Player player : map.getPlayers().values()) {
                     String color = player.getColor();
                     String faction = player.getFaction();
-                    if (faction != null && color != null && !faction.isEmpty() && !faction.equals("null")) {
+                    if (player.isActivePlayer()) {
                         factionCount.putIfAbsent(faction, 1);
                         factionCount.computeIfPresent(faction, (key, integer) -> integer + 1);
 

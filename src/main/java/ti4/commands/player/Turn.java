@@ -54,7 +54,7 @@ public class Turn extends PlayerSubcommandData {
         Integer max = Collections.max(map.getScTradeGoods().keySet());
 
         for (Player player : map.getPlayers().values()) {
-            if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("white")){
+            if (!player.isActivePlayer()){
                 player.setPassed(true);
             }
         }
