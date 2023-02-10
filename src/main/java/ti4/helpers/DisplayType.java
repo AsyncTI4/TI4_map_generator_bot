@@ -3,7 +3,8 @@ package ti4.helpers;
 public enum DisplayType {
     all("all"),
     map("map"),
-    stats("stats");
+    stats("stats"),
+    split("split");
 
     public final String value;
 
