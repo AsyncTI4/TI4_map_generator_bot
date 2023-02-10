@@ -41,7 +41,7 @@ public class CardsInfo extends CardsSubcommandData {
 
     public CardsInfo() {
         super(Constants.INFO, "Resent all my cards in Private Message");
-        addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to enable").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false));
     }
 
@@ -90,15 +90,15 @@ public class CardsInfo extends CardsSubcommandData {
                 String soPhase = soSplit[1];
                 String soDescription = soSplit[2];
                 sb.append("`").append(index).append(".").append(Helper.leftpad("(" + so.getValue(), 4)).append(")`");
-                sb.append(Emojis.SecretObjective).append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
+                sb.append(Emojis.SecretObjective).append("__" + soName + "__"); //.append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
+                sb.append("\n");
                 index++;
             }
         }
         sb.append("\n");
-        sb.append("**Secret Objectives:**").append("\n");
+        sb.append("**Unscored Secret Objectives:**").append("\n");
         List<Button> soButtons = new ArrayList<>();
         if (secretObjective != null) {
-            // HashMap<String, String> secretObjectivesJustNames = Mapper.getSecretObjectivesJustNames();
             for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
                 String[] soSplit = Mapper.getSecretObjective(so.getKey()).split(";");
                 String soName = soSplit[0];
