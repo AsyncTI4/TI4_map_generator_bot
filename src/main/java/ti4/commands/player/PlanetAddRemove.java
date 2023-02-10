@@ -5,15 +5,19 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import java.util.List;
 import java.util.Set;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
 
 public abstract class PlanetAddRemove extends PlayerSubcommandData{
     public PlanetAddRemove(String id, String description) {
@@ -50,24 +54,29 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
     }
 
     private void parseParameter(SlashCommandInteractionEvent event, Player player, OptionMapping option, Map map) {
-        if (option != null) {
-            String planetID = option.getAsString();
-            if (Mapper.isValidPlanet(planetID)) {
-                doAction(player, planetID, map);
-                MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planetID));
-            } else {
-                Set<String> planets = map.getPlanets();
-                List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
-                if (possiblePlanets.isEmpty()){
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "No matching Planet found");
-                    return;
-                } else if (possiblePlanets.size() > 1){
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "More that one matching Planet found");
-                    return;
+        try {
+            if (option != null) {
+                String planetID = AliasHandler.resolvePlanet(option.getAsString());
+                if (Mapper.isValidPlanet(planetID)) {
+                    doAction(player, planetID, map);
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planetID));
+                } else {
+                    Set<String> planets = map.getPlanets();
+                    List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
+                    if (possiblePlanets.isEmpty()){
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "No matching Planet found");
+                        return;
+                    } else if (possiblePlanets.size() > 1){
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "More that one matching Planet found");
+                        return;
+                    }
+                    doAction(player, possiblePlanets.get(0), map);
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planetID));
                 }
-                doAction(player, possiblePlanets.get(0), map);
-                MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planetID));
             }
+        } catch (Exception e) {
+            BotLogger.log(event, "Error parsing planet: " + option.getAsString());
+            BotLogger.log(ExceptionUtils.getStackTrace(e));
         }
     }
 
@@ -96,7 +105,7 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
      * @return special message depending on which action was used and which planet was targeted
      */
     private String resolvePlanetMessage(String planet) {
-        System.out.println("resolving " + getActionID() + " message for " + planet);
+        // System.out.println("resolving " + getActionID() + " message for " + planet);
         if (getActionID().equals(Constants.PLANET_EXHAUST_ABILITY)) {
             return switch (planet) {
                 case "hopesend" ->  Emojis.HopesEnd + Emojis.LegendaryPlanet + " **Imperial Arms Vault**: You may exhaust this card at the end of your turn to place 1 mech from your reinforcements on any planet you control, or draw 1 action card";
