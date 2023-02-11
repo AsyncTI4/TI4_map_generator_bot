@@ -250,6 +250,23 @@ public class Helper {
         };
     }
 
+    public static String getPlanetEmoji(String planet) {
+        return switch (planet) {
+            case "mr" -> Emojis.MecatolRex;
+            case "hopesend" -> Emojis.HopesEnd;
+            case "primor" -> Emojis.Primor;
+            case "meharxull" -> Emojis.PlanetMeharXull;
+            case "perimeter" -> Emojis.PlanetPerimeter;
+            case "archonvail" -> Emojis.PlanetArchonVail;
+            default -> Emojis.planet;
+        };
+    }
+
+    public static String getPlanetRepresentationPlusEmojis (String planet) {
+        String planetProper = Mapper.getPlanetRepresentations().get(planet);
+        return Helper.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
+    }
+
     /**
      * Takes an emoji's name string and returns its full name including ID.
      * @emojiName the name of the emoji as entered on the Emoji section of the server

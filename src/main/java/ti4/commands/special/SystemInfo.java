@@ -57,8 +57,8 @@ public class SystemInfo extends SpecialSubcommandData {
                     representation = name;
                 }
                 UnitHolder unitHolder = entry.getValue();
-                sb.append(representation);
-                if (unitHolder instanceof Planet planet){
+                if (unitHolder instanceof Planet planet) {
+                    sb.append(Helper.getPlanetRepresentationPlusEmojis(representation));
                     sb.append(" Resources: ").append(planet.getResources()).append("/").append(planet.getInfluence());
 
                     //commented as not all planets get traits still
@@ -67,6 +67,8 @@ public class SystemInfo extends SpecialSubcommandData {
     //                for (String type : planet.getPlanetType()) {
     //                    sb.append(type).append(" ");
     //                }
+                } else {
+                    sb.append(representation);
                 }
                 sb.append("\n");
                 boolean hasCC = false;

@@ -207,6 +207,9 @@ public class Emojis {
     public static final String Mallice = "";
     public static final String Mirage = "";
     public static final String planet = "<:planet:948433122263969802>";
+    public static final String PlanetArchonVail = "<:PlanetArchonVail:1072808333188268102>";
+    public static final String PlanetMeharXull = "<:PlanetMeharXull:1072808307514945586>";
+    public static final String PlanetPerimeter = "<:PlanetPerimeter:1072808270147887174>";
 
     //ANOMOLIES
     public static final String Supernova = "<:Supernova:1068081584978284635>";
