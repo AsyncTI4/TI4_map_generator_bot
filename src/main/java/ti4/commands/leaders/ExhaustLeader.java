@@ -28,16 +28,15 @@ public class ExhaustLeader extends LeaderAction {
                 return;
             }
             playerLeader.setExhausted(true);
+            MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerFactionLeaderEmoji(player, leader));
             StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
                     .append(" exhausted ")
                     .append(playerLeader.getId()).append(" ")
-                    .append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append(" ")
                     .append(playerLeader.getName());
             OptionMapping optionTG = event.getOption(Constants.TG);
             if (optionTG != null) {
                 Stats.setValue(event, player, optionTG, playerLeader::setTgCount, playerLeader::getTgCount);
-                message.append(" - ").append(optionTG.getAsString())
-                        .append(Emojis.tg).append(" placed on top of the leader");
+                message.append(" - ").append(optionTG.getAsString()).append(Emojis.tg).append(" placed on top of the leader");
                 if (playerLeader.getTgCount() != optionTG.getAsInt()) {
                     message.append(" _(").append(String.valueOf(playerLeader.getTgCount())).append(Emojis.tg).append(" total)_\n");
                 }
