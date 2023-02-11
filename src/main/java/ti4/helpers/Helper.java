@@ -204,6 +204,20 @@ public class Helper {
         };
     }
 
+    public static Integer getSCNumber(String sc) {
+        return switch (sc.toLowerCase()) {
+            case "leadership" -> 1;
+            case "diplomacy" -> 2;
+            case "politics" -> 3;
+            case "construction" -> 4;
+            case "trade" -> 5;
+            case "warfare" -> 6;
+            case "technology" -> 7;
+            case "imperial" -> 8;
+            default -> 0;
+        };
+    }
+
     public static String getFactionIconFromDiscord(String faction) {
         return switch (faction) {
             case "arborec" -> Emojis.Arborec;
