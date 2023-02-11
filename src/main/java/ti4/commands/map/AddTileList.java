@@ -88,7 +88,7 @@ public class AddTileList implements Command {
                     userActiveMap.setTile(tile);
                 }
             } catch (Exception e) {
-                BotLogger.log(event, "Could not add setup and Mallice tiles");
+                BotLogger.log("Could not add setup and Mallice tiles");
             }
 
             MapSaveLoadManager.saveMap(userActiveMap);
