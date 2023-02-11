@@ -64,14 +64,15 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
                     Set<String> planets = map.getPlanets();
                     List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
                     if (possiblePlanets.isEmpty()){
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "No matching Planet found");
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "> No matching Planet '" + planetID + "'' found - please try again.");
                         return;
-                    } else if (possiblePlanets.size() > 1){
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "More that one matching Planet found");
+                    } else if (possiblePlanets.size() > 1) {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
                         return;
                     }
-                    doAction(player, possiblePlanets.get(0), map);
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planetID));
+                    String planet = possiblePlanets.get(0);
+                    doAction(player, planet, map);
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planet));
                 }
             }
         } catch (Exception e) {
@@ -123,13 +124,7 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
                 default -> Emojis.planet + " " + planet;
             };
         } else {
-            return switch (planet) {
-                case "hopesend" ->  Emojis.HopesEnd + " Hope's End";
-                case "primor" ->  Emojis.Primor +  " Primor";
-                case "mallice" ->  Emojis.Mallice + " Mallice";
-                case "mirage" ->  Emojis.Mirage + " Mirage";
-                default -> Emojis.planet + " " + planet;
-            };
+            return Helper.getPlanetRepresentationPlusEmojis(planet);
         }
     }
 
