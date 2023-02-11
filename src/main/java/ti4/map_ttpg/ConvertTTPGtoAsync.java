@@ -29,6 +29,7 @@ import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.MapSaveLoadManager;
@@ -212,6 +213,12 @@ public class ConvertTTPGtoAsync {
             asyncPlayer.setTacticalCC(ttpgPlayer.getCommandTokens().getTactics());
             asyncPlayer.setFleetCC(ttpgPlayer.getCommandTokens().getFleet());
             asyncPlayer.setStrategicCC(ttpgPlayer.getCommandTokens().getStrategy());
+
+            //PLAYER STRATEGY CARDS
+            String ttpgSC = (String) ttpgPlayer.getStrategyCards().get(0);
+            String ttpgSCplayed = (String) ttpgPlayer.getStrategyCardsFaceDown().get(0);
+            if (Objects.nonNull(ttpgSC)) asyncPlayer.setSC(Helper.getSCNumber(ttpgSC));
+            if (Objects.nonNull(ttpgSCplayed)) asyncMap.setSCPlayed(Helper.getSCNumber(ttpgSCplayed), true);
 
             //PLAYER SCORED OBJECTIVES
             for (String ttpgScoredObjective : ttpgPlayer.getObjectives()) {
