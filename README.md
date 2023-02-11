@@ -4,11 +4,37 @@ Hello Async TI Developers!
 
 Please test your changes before making a PR. See below for methods and examples of how to test:
 
----
+## 1.0 - Locally
 
-## 1.0 - Using Docker
+### 1.1 - Windows 10, VS Code
 
-### 1.1 - Windows 10, VS Code, Docker Desktop
+Ensure your launch.json file includes a configuration like this:
+
+```json
+{
+    "type": "java",
+    "name": "Launch MapGenerator",
+    "request": "launch",
+    "mainClass": "ti4.MapGenerator",
+    "projectName": "TI4_map_generator_discord_bot",
+    "args": [
+        "{DISCORD_BOT_KEY}", // Discord Developer Portal
+        "{DISCORD USER ID}", //User Settings, 3 Hash marks next to username, Copy ID
+        "{DISCORD SERVER ID}" // Right-Click Discord Server Name and Copy ID
+    ]
+    ,
+    "env": {
+        "DB_PATH": "C:/{FULL_PATH_TO_PROJECT}/TI4_map_generator_bot/storage",
+        "RESOURCE_PATH": "C:/{FULL_PATH_TO_PROJECT}/TI4_map_generator_bot/src/main/resources"
+        }
+}
+```
+
+Set the 5 variables to match your bot, user, server, and system.
+
+## 2.0 - Using Docker
+
+### 2.1 - Windows 10, VS Code, Docker Desktop
 
 Run the following commands in the root project folder: `.\TI4_map_generator_bot`
 
@@ -24,6 +50,7 @@ where:
 - `$discordServerID` = "12345" # Right-Click Discord Server Name and Copy ID
 
 You can create a `docker_run.ps1` file in `.\TI4_map_generator_bot` to do cleanup, build, and run with PowerShell
+
 ```powershell
 $discordBotKey = "" # Discord Developer Portal
 $discordUserID = "" # User Settings, 3 Hash marks next to username, Copy ID
@@ -37,9 +64,7 @@ docker run -v ${PWD}/storage:/opt/STORAGE tibot $discordBotKey $discordUserID $d
 
 Bot should now be running and able to receive commands from the server for testing!
 
----
-
-## 2.0 - Softnum's VPS
+## 3.0 - Softnum's VPS
 
 Do steps 1 & 2 from here: https://support.hostway.com/hc/en-us/articles/115001509884-How-To-Use-SSH-Keys-on-Windows-Clients-with-PuTTY-
 
@@ -48,6 +73,7 @@ Tell Softnum the **public** key
 Load the **private** key into pageant
 
 On vps, use these commands to try your code:
+
 ```bash
 cd /opt/TI4_map_generator_bot
 git status
@@ -58,4 +84,5 @@ git checkout (yourbranch)
 cd /opt/ti4bot
 runbot.sh
 ```
+
 Ask Softnum for invite to test Discord server.
