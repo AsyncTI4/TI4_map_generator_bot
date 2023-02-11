@@ -1,11 +1,11 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.Command;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -14,7 +14,6 @@ import ti4.message.MessageHelper;
 
 import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public abstract class TechAddRemove extends PlayerSubcommandData{
     public TechAddRemove(String id, String description) {
@@ -53,7 +52,7 @@ public abstract class TechAddRemove extends PlayerSubcommandData{
 
     private void parseParameter(SlashCommandInteractionEvent event, Player player, OptionMapping techOption) {
         if (techOption != null) {
-            String techID = techOption.getAsString();
+            String techID = AliasHandler.resolveTech(techOption.getAsString());
             if (Mapper.isValidTech(techID)) {
                 doAction(player, techID);
             } else {
