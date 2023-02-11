@@ -180,7 +180,7 @@ public class CardsInfo extends CardsSubcommandData {
                     MessageChannelUnion channelUnion = event != null ? event.getChannel() : buttonEvent.getChannel();
                     if (channel == null) {
                         MessageHelper.sentToMessageToUser(event, cardInfo, userById);
-                        BotLogger.log(event, "Could not find channel");
+                        BotLogger.log("Could not find channel");
                         return;
                     }
                     if (event != null) {
@@ -263,7 +263,7 @@ public class CardsInfo extends CardsSubcommandData {
                         sendTextToChannel(new_thread, pnText);
                     }
                 } catch (Exception e) {
-                    BotLogger.log(event, "Could not create Private Thread");
+                    BotLogger.log("Could not create Private Thread");
                 }
             }
         } else {
