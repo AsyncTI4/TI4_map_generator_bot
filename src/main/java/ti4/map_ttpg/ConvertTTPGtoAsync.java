@@ -613,6 +613,12 @@ public class ConvertTTPGtoAsync {
                         } else {
                             System.out.println("          - " + attachmentResolved + " could not be added - not found");
                         }
+
+                        if (Constants.MIRAGE.equalsIgnoreCase(attachmentResolved)) {
+                            Helper.addMirageToTile(tile);
+                            tile.addToken(tokenFileName, Constants.SPACE);
+                            // asyncMap.clearPlanetsCache();
+                        }
                     } else {
                         System.out.println("                character not recognized:  " + Character.toString(attachment));
                     }
