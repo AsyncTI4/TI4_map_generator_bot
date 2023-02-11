@@ -98,6 +98,10 @@ public class PlayPN extends PNCardsSubcommandData {
         sb.append(Helper.getFactionIconFromDiscord(pnOwner) + Emojis.PN);
         sb.append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
         
+        if (id.equalsIgnoreCase("titanspn")) {
+            sb.append("`/add_token token:titanspn`\n");
+        }
+
         MessageHelper.sendMessageToChannel(event, sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
