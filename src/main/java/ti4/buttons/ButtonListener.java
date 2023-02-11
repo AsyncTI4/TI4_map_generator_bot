@@ -93,7 +93,7 @@ public class ButtonListener extends ListenerAdapter {
                 int poIndex = Integer.parseInt(poID);
                 ScorePublic.scorePO(event, event.getChannel(), activeMap, player, poIndex);
             } catch (Exception e) {
-                BotLogger.log("Could not parse PO ID: " + poID);
+                BotLogger.log(event, "Could not parse PO ID: " + poID);
                 event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.").queue();
                 return;
             }
