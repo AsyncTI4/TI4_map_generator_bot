@@ -1,17 +1,15 @@
 package ti4.map;
 
+import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
-import net.dv8tion.jda.api.entities.Role;
-
+import org.jetbrains.annotations.Nullable;
 import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
-
-import org.jetbrains.annotations.Nullable;
 
 import java.io.*;
 import java.nio.file.CopyOption;
@@ -50,9 +48,11 @@ public class MapSaveLoadManager {
             saveMap(mapEntry.getValue(), true);
         }
     }
+
     public static void saveMap(Map map) {
         saveMap(map, false);
     }
+
     public static void saveMap(Map map, boolean keepModifiedDate) {
         File mapFile = Storage.getMapImageStorage(map.getName() + TXT);
         if (mapFile != null) {
@@ -296,7 +296,7 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
             //TODO Remove when no longer relevant
             String playerColor = player.getColor();
-            if(player.getFaction() == null || "null".equals(player.getFaction())) {
+            if (player.getFaction() == null || "null".equals(player.getFaction())) {
                 playerColor = "null";
             }
             writer.write(Constants.COLOR + " " + playerColor);
@@ -393,8 +393,8 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
 
             StringBuilder fogOfWarSystems = new StringBuilder();
-            HashMap<String,String> fow_systems = player.getFogFilter();
-            HashMap<String,String> fow_labels = player.getFogLabels();
+            HashMap<String, String> fow_systems = player.getFogFilter();
+            HashMap<String, String> fow_labels = player.getFogLabels();
             for (String key : fow_systems.keySet()) {
                 String system = fow_systems.get(key);
                 String label = fow_labels.get(key);
