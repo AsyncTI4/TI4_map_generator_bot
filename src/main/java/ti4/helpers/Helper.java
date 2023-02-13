@@ -524,21 +524,21 @@ public class Helper {
 
     public static String getPlayerFactionLeaderEmoji(Player player, String leader) {
         String playerFaction = player.getFaction();
-        if (playerFaction.equals("nomad")) {
+        if (playerFaction.equals("nomad") && !leader.equals("commander") && !leader.equals("hero")) {
             return switch (leader) {
                 case "artuno" -> Emojis.NomadAgentArtuno;
                 case "mercer" -> Emojis.NomadAgentMercer;
                 case "thundarian" -> Emojis.NomadAgentThundarian;
                 case "agent" -> Emojis.GoodDog;
-                default -> "";
+                default -> " ";
             };
-        } else if (playerFaction.equals("keleres")) {
+        } else if (playerFaction.equals("keleres") && !leader.equals("agent") && !leader.equals("commander")) {
             return switch (leader) {
                 case "kuuasi" -> Emojis.KeleresHeroKuuasi;
                 case "odlynn" -> Emojis.KeleresHeroOdlynn;
                 case "harka" -> Emojis.KeleresHeroHarka;
                 case "hero" -> Emojis.GoodDog;
-                default -> "";
+                default -> " ";
             };
         } else {
             StringBuilder sb = new StringBuilder(playerFaction).append(leader);
