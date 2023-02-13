@@ -2,6 +2,7 @@ package ti4.commands.bothelper;
 
 import java.util.Objects;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
@@ -60,6 +61,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
 
+        //ROLE PERMISSIONS
+        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+
         //CREATE CHANNELS
         Category category = event.getOption(Constants.CATEGORY).getAsChannel().asCategory();
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
@@ -69,12 +73,14 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //TABLETALK CHANNEL
         TextChannel chatChannel = event.getGuild().createTextChannel(newChatChannelName, category)
+            .addRolePermissionOverride(role.getIdLong(), permission, 0)
             .complete();
         MessageHelper.sendMessageToChannel((MessageChannel) chatChannel, role.getAsMention()+ " - table talk channel");
         message.append("> " + chatChannel.getAsMention()).append("\n");
 
         //ACTIONS CHANNEL
         TextChannel actionsChannel = event.getGuild().createTextChannel(newActionsChannelName, category)
+            .addRolePermissionOverride(role.getIdLong(), permission, 0)
             .complete();
         MessageHelper.sendMessageToChannel((MessageChannel) actionsChannel, role.getAsMention() + " - actions channel");
         message.append("> " + actionsChannel.getAsMention()).append("\n");
@@ -84,6 +90,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
                         .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR)
                         .setInvitable(false)
                         .complete();
+        MessageHelper.sendMessageToChannel((MessageChannel) actionsChannel, "bot thread: " + botThread.getAsMention());
 
         StringBuilder botGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - bot/map channel\n");
         botGetStartedMessage.append("Use the following commands to get started:\n");
