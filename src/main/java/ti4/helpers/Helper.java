@@ -258,7 +258,8 @@ public class Helper {
             case "meharxull" -> Emojis.PlanetMeharXull;
             case "perimeter" -> Emojis.PlanetPerimeter;
             case "archonvail" -> Emojis.PlanetArchonVail;
-            default -> Emojis.planet;
+            case "semlore" -> Emojis.SemLord;
+            default -> Emojis.SemLor;
         };
     }
 
