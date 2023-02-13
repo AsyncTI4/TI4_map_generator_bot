@@ -338,7 +338,7 @@ public class Helper {
             case "arborecagent" -> Emojis.ArborecAgent;
             case "argentagent" -> Emojis.ArgentAgent;
             case "cabalagent" -> Emojis.CabalAgent;
-            case "creussagent" -> Emojis.CreussAgent;
+            case "ghostagent" -> Emojis.GhostAgent;
             case "empyreanagent" -> Emojis.EmpyreanAgent;
             case "hacanagent" -> Emojis.HacanAgent;
             case "jolnaragent" -> Emojis.JolnarAgent;
@@ -367,7 +367,7 @@ public class Helper {
             case "arboreccommander" -> Emojis.ArborecCommander;
             case "argentcommander" -> Emojis.ArgentCommander;
             case "cabalcommander" -> Emojis.CabalCommander;
-            case "creusscommander" -> Emojis.CreussCommander;
+            case "ghostcommander" -> Emojis.GhostCommander;
             case "empyreancommander" -> Emojis.EmpyreanCommander;
             case "hacancommander" -> Emojis.HacanCommander;
             case "jolnarcommander" -> Emojis.JolnarCommander;
@@ -394,7 +394,7 @@ public class Helper {
             case "arborechero" -> Emojis.ArborecHero;
             case "argenthero" -> Emojis.ArgentHero;
             case "cabalhero" -> Emojis.CabalHero;
-            case "creusshero" -> Emojis.CreussHero;
+            case "ghosthero" -> Emojis.GhostHero;
             case "empyreanhero" -> Emojis.EmpyreanHero;
             case "hacanhero" -> Emojis.HacanHero;
             case "jolnarhero" -> Emojis.JolnarHero;
