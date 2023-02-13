@@ -60,7 +60,6 @@ public class MapGenerator {
                 .build();
 
         jda.addEventListener(new MessageListener(), new ButtonListener());
-
         try {
             jda.awaitReady();
         } catch (InterruptedException e) {
