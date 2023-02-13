@@ -125,7 +125,6 @@ public class Storage {
 
     @Nullable
     public static File getMapImageDirectory() {
-        BotLogger.log("Storage Path" + getStoragePath());
         return new File(getStoragePath() + MAPS);
     }
 
