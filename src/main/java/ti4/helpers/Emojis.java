@@ -201,7 +201,7 @@ public class Emojis {
     public static final String Influence_9 = "<:I9:864278934509322300>";
 
     //PLANETS
-    public static final String MecatolRex = "<:MecatolRex:1068082190832898090>";
+    public static final String MecatolRex = "<:MecatolRex:1072083209250152489>";
     public static final String HopesEnd = "<:HopesEnd:1068567741264572557>";
     public static final String Primor = "<:Primor:1068567710990077952>";
     public static final String Mallice = "";
@@ -210,6 +210,10 @@ public class Emojis {
     public static final String PlanetArchonVail = "<:PlanetArchonVail:1072808333188268102>";
     public static final String PlanetMeharXull = "<:PlanetMeharXull:1072808307514945586>";
     public static final String PlanetPerimeter = "<:PlanetPerimeter:1072808270147887174>";
+    public static final String SemLor = "<:SemLor:1072075882618961930>";
+    public static final String SemLord = "<:SemLord:1072076401462738965>";
+    public static final String SemiLor = "<:SemiLor:1072076567053869106>";
+
 
     //ANOMOLIES
     public static final String Supernova = "<:Supernova:1068081584978284635>";
