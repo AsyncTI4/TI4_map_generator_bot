@@ -501,6 +501,7 @@ public class MapSaveLoadManager {
     }
 
     private static File[] readAllMapFiles() {
+        BotLogger.log("readAllMapFiles");
         File folder = Storage.getMapImageDirectory();
         BotLogger.log("Save File Folder:" + folder.getAbsolutePath());
         if (folder == null) {
@@ -532,6 +533,7 @@ public class MapSaveLoadManager {
     }
 
     public static void loadMaps() {
+        BotLogger.log("Load Maps");
         HashMap<String, Map> mapList = new HashMap<>();
         File[] files = readAllMapFiles();
         if (files != null) {
