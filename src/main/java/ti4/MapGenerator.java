@@ -59,6 +59,7 @@ public class MapGenerator {
 //                .enableIntents(Arrays.asList(GatewayIntent.values()))
                 .build();
 
+	    
         jda.addEventListener(new MessageListener(), new ButtonListener());
         try {
             jda.awaitReady();
