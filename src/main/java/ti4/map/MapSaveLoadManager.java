@@ -546,7 +546,7 @@ public class MapSaveLoadManager {
                     }
                 }
             }
-        }
+        }BotLogger.log("game count:"+mapList.size());
         MapManager.getInstance().setMapList(mapList);
     }
 
