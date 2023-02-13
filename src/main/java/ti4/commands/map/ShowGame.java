@@ -70,10 +70,16 @@ public class ShowGame implements Command {
                 displayType = DisplayType.stats;
             } else if (temp.equals(DisplayType.split.getValue())) {
                 displayType = DisplayType.map;
-                File map_file = GenerateMap.getInstance().saveImage(map, displayType, event);
+                File map_file = GenerateMap.getInstance().saveImage(map, displayType, null);
                 MessageHelper.replyToMessage(event, map_file);
 
                 displayType = DisplayType.stats;
+                File stats_file = GenerateMap.getInstance().saveImage(map, displayType, null);
+                MessageHelper.replyToMessage(event, stats_file);
+
+                displayType = DisplayType.all;
+                GenerateMap.getInstance().saveImage(map, displayType, null);
+                return;
             }
         }
         File file = GenerateMap.getInstance().saveImage(map, displayType, event);
