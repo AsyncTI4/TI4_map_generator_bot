@@ -537,7 +537,7 @@ public class MapSaveLoadManager {
         HashMap<String, Map> mapList = new HashMap<>();
         File[] files = readAllMapFiles();
         if (files != null) {
-            BotLogger.log("Files count:" + files.lenght);
+            BotLogger.log("Files count:" + files.length);
             for (File file : files) {
                 if (isTxtExtention(file)) {
                     try {
