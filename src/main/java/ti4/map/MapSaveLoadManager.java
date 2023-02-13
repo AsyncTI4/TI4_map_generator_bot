@@ -60,7 +60,6 @@ public class MapSaveLoadManager {
             try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
                 HashMap<String, Tile> tileMap = map.getTileMap();
                 writer.write(map.getOwnerID());
-                writer.write(map.getOwnerID());
                 writer.write(System.lineSeparator());
                 writer.write(map.getOwnerName());
                 writer.write(System.lineSeparator());
