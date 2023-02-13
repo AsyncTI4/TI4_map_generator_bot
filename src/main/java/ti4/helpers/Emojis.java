@@ -95,7 +95,7 @@ public class Emojis {
     public static final String ArborecAgent = "<:ArborecAgent:1059670895989374986>";
     public static final String ArgentAgent = "<:ArgentAgent:1059671022384713789>";
     public static final String CabalAgent = "<:CabalAgent:1059671042215391282> ";
-    public static final String CreussAgent = "<:CreussAgent:1059671068551417866>";
+    public static final String GhostAgent = "<:GhostAgent:1059671068551417866>";
     public static final String EmpyreanAgent = "<:EmpyreanAgent:1059671103578058882>";
     public static final String HacanAgent = "<:HacanAgent:1059671127137456209>";
     public static final String JolnarAgent = "<:JolNarAgent:1059671161237164102>";
@@ -124,7 +124,7 @@ public class Emojis {
     public static final String ArborecCommander = "<:ArborecCommander:1060184772086866062>";
     public static final String ArgentCommander = "<:ArgentCommander:1060184777552048239>";
     public static final String CabalCommander = " <:CabalCommander:1060184786263609394>";
-    public static final String CreussCommander = "<:CreussCommander:1060184792198561882>";
+    public static final String GhostCommander = "<:GhostCommander:1060184792198561882>";
     public static final String EmpyreanCommander = "<:EmpyreanCommander:1060184798078963782>";
     public static final String HacanCommander = "<:HacanCommander:1060184804638859355>";
     public static final String JolnarCommander = "<:JolNarCommander:1060184815627927552>";
@@ -151,7 +151,7 @@ public class Emojis {
     public static final String ArborecHero = "<:ArborecHero:1062743673076469851> ";
     public static final String ArgentHero = "<:ArgentHero:1062743679984467988>";
     public static final String CabalHero = "<:CabalHero:1062743685952978994>";
-    public static final String CreussHero = "<:CreussHero:1062743691120357426>";
+    public static final String GhostHero = "<:GhostHero:1062743691120357426>";
     public static final String EmpyreanHero = "<:EmpyreanHero:1062743698498129930>";
     public static final String HacanHero = "<:HacanHero:1062743704626003978>";
     public static final String JolnarHero = "<:JolNarHero:1062743711781494856>";
