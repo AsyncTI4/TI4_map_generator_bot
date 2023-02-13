@@ -534,9 +534,11 @@ public class MapSaveLoadManager {
         HashMap<String, Map> mapList = new HashMap<>();
         File[] files = readAllMapFiles();
         if (files != null) {
+            BotLogger.log("Files count:" + files.lenght);
             for (File file : files) {
                 if (isTxtExtention(file)) {
                     try {
+                        BotLogger.log("Loading game: " + file.getName());
                         Map map = loadMap(file);
                         if (map != null) {
                             mapList.put(map.getName(), map);
