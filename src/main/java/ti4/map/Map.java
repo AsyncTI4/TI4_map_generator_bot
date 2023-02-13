@@ -1185,6 +1185,10 @@ public class Map {
     }
 
     public void setOwnerID(String ownerID) {
+        if (ownerID.length() > 18)
+        {
+            ownerID = ownerID.substring(0, 18);
+        }
         this.ownerID = ownerID;
     }
 

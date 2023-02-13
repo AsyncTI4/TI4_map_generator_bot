@@ -41,6 +41,7 @@ public class Constants {
     public static final String DRAW_SPECIFIC_SO_FOR_PLAYER = "draw_specific_so_for_player";
 
     public static final String SAVE_GAMES = "save_games";
+    public static final String SAVE_GAME = "save_game";
     public static final String RELOAD_GAME = "reload_game";
     public static final String LIST_TILES = "list_tiles";
     public static final String LIST_PLANETS = "list_planets";
