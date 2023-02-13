@@ -502,6 +502,7 @@ public class MapSaveLoadManager {
 
     private static File[] readAllMapFiles() {
         File folder = Storage.getMapImageDirectory();
+        BotLogger.log("Save File Folder:" + folder.getAbsolutePath());
         if (folder == null) {
             try {
                 //noinspection ConstantConditions
