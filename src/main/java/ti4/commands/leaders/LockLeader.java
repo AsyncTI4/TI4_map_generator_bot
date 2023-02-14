@@ -5,7 +5,6 @@ import ti4.helpers.Constants;
 import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class LockLeader extends LeaderAction {
     public LockLeader() {
@@ -18,7 +17,7 @@ public class LockLeader extends LeaderAction {
         if (playerLeader != null){
             playerLeader.setLocked(true);
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
+            editReplyMessage("Leader not found");
         }
     }
 }

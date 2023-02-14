@@ -21,7 +21,7 @@ public class SetHeroActiveLeader extends LeaderAction {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            editReplyMessage("Player could not be found");
             return;
         }
         action(event, "hero", activeMap, player);
@@ -39,7 +39,7 @@ public class SetHeroActiveLeader extends LeaderAction {
         String playerFaction = player.getFaction();
 
         if (playerLeader != null && playerLeader.isLocked()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Leader locked, use /leaders unlock hero");
+            editReplyMessage("Leader locked, use /leaders unlock hero");
             return;
         }
 
@@ -52,9 +52,9 @@ public class SetHeroActiveLeader extends LeaderAction {
             if (playerLeader != null && Constants.HERO.equals(playerLeader.getId())) {
                 playerLeader.setLocked(false);
                 playerLeader.setActive(true);
-                MessageHelper.sendMessageToChannel(event.getChannel(), message.toString() + " - Leader will be PURGED after status cleanup");
+                editReplyMessage(message.toString() + " - Leader will be PURGED after status cleanup");
             } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
+                editReplyMessage("Leader not found");
             }
         } else if (playerLeader != null && Constants.HERO.equals(playerLeader.getId())) {
             boolean purged = player.removeLeader(leader);

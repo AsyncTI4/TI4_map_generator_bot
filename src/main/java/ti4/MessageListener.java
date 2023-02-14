@@ -40,7 +40,9 @@ public class MessageListener extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         event.getInteraction().deferReply().queue();
         String userID = event.getUser().getId();
-        if (!event.getInteraction().getName().equals("help")) {
+
+        // CHECK IF CHANNEL IS MATCHED TO A GAME
+        if (!event.getInteraction().getName().equals("help")) { //SKIP /help COMMANDS
             boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName());
             if (!isChannelOK) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Command canceled. Execute command in correct channel, as game name.");
