@@ -61,26 +61,27 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
 
-        //ROLE PERMISSIONS
-        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-
         //CREATE CHANNELS
         Category category = event.getOption(Constants.CATEGORY).getAsChannel().asCategory();
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
         String newChatChannelName = gameName + "-" + gameFunName;
         String newActionsChannelName = gameName + "-actions";
         String newBotThreadName = gameName + "-bot-map-updates";
+        long gameRoleID = role.getIdLong();
+        long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
         //TABLETALK CHANNEL
         TextChannel chatChannel = event.getGuild().createTextChannel(newChatChannelName, category)
-            .addRolePermissionOverride(role.getIdLong(), permission, 0)
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
         MessageHelper.sendMessageToChannel((MessageChannel) chatChannel, role.getAsMention()+ " - table talk channel");
         message.append("> " + chatChannel.getAsMention()).append("\n");
 
         //ACTIONS CHANNEL
         TextChannel actionsChannel = event.getGuild().createTextChannel(newActionsChannelName, category)
-            .addRolePermissionOverride(role.getIdLong(), permission, 0)
+            .syncPermissionOverrides()
+            .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
         MessageHelper.sendMessageToChannel((MessageChannel) actionsChannel, role.getAsMention() + " - actions channel");
         message.append("> " + actionsChannel.getAsMention()).append("\n");
