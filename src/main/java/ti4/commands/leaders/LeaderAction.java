@@ -17,8 +17,7 @@ abstract public class LeaderAction extends LeaderSubcommandData {
     }
 
     protected void options() {
-        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action")
-                .setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
@@ -29,7 +28,7 @@ abstract public class LeaderAction extends LeaderSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            editReplyMessage("Player could not be found");
             return;
         }
 
@@ -37,7 +36,7 @@ abstract public class LeaderAction extends LeaderSubcommandData {
         if (leader != null) {
             action(event, leader.getAsString(), activeMap, player);
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Need to specify leader");
+            editReplyMessage("Need to specify leader");
         }
     }
 
