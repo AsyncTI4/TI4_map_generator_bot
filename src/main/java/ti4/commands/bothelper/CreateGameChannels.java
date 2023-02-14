@@ -5,11 +5,15 @@ import java.util.Objects;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.GuildChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
@@ -36,9 +40,22 @@ public class CreateGameChannels extends BothelperSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String gameName = event.getOption(Constants.GAME_NAME).getAsString();
         
-        
+        //CHECK ROLE IS VALID
         if (event.getGuild().getRolesByName(gameName, false).size() > 0) {
             MessageHelper.replyToMessage(event, "Role: **" + gameName + "** already exists. Try again with a new name.");
+            return;
+        }
+
+        //CHECK CATEGORY IS VALID
+        GuildChannelUnion categoryChannel = event.getOption(Constants.CATEGORY).getAsChannel();
+        if (categoryChannel == null || categoryChannel.getType() != ChannelType.CATEGORY) {
+            MessageHelper.replyToMessage(event, "Category: **" + categoryChannel.getName() + "** does not exist. Create the category or pick a different category, then try again.");
+            return;
+        } 
+        
+        Category category = categoryChannel.asCategory();
+        if (category.getChannels().size() > 48) {
+            MessageHelper.replyToMessage(event, "Category: **" + category.getName() + "** is full. Create a new category then try again.");
             return;
         }
 
@@ -62,7 +79,6 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         //CREATE CHANNELS
-        Category category = event.getOption(Constants.CATEGORY).getAsChannel().asCategory();
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
         String newChatChannelName = gameName + "-" + gameFunName;
         String newActionsChannelName = gameName + "-actions";
@@ -87,9 +103,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         message.append("> " + actionsChannel.getAsMention()).append("\n");
 
         //BOT/MAP THREAD
-        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName, true)
-                        .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR)
-                        .setInvitable(false)
+        ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
+                        .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS)
                         .complete();
         MessageHelper.sendMessageToChannel((MessageChannel) actionsChannel, "bot thread: " + botThread.getAsMention());
 
