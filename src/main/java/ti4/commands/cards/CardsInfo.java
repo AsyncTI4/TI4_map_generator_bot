@@ -246,9 +246,9 @@ public class CardsInfo extends CardsSubcommandData {
                     }
                     if (!threadFound) {
                         ThreadChannel new_thread = textChannel.createThreadChannel(threadName, true)
-                        .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR)
-                        .setInvitable(false)
-                        .complete();
+                            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR)
+                            .setInvitable(false)
+                            .complete();
                         sendTextToChannel(new_thread, playerPing + "\n");
                         sendTextToChannel(new_thread, soText);
                         List<MessageCreateData> messageList = getMessageObject(secretScoreMsg, soButtons);
