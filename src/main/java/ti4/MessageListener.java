@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 public class MessageListener extends ListenerAdapter {
 
     @Override
@@ -61,8 +63,10 @@ public class MessageListener extends ListenerAdapter {
                     command.execute(event);
                 } catch (Exception e) {
                     String messageText = "Error trying to execute command: " + command.getActionID();
+                    String errorMessage = ExceptionUtils.getMessage(e);
                     MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
                     BotLogger.log(messageText);
+                    BotLogger.log(errorMessage.substring(0, Math.min(1500, errorMessage.length())));
                 }
             }
         }
