@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.message.BotLogger;
 
 public abstract class LeaderSubcommandData extends SubcommandData {
 
@@ -31,7 +32,11 @@ public abstract class LeaderSubcommandData extends SubcommandData {
     }
     
     public void editReplyMessage(String messageText) {
-        this.replyMessage.editMessage(messageText).queue();
+        if (this.replyMessage != null) {
+            this.replyMessage.editMessage(messageText).queue();
+        } else {
+            BotLogger.log("replyMessage was null when attempting to edit");
+        }
     }
 
     abstract public void execute(SlashCommandInteractionEvent event);
