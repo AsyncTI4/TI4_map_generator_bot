@@ -24,7 +24,7 @@ public class ExhaustLeader extends LeaderAction {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null) {
             if (playerLeader.isLocked()) {
-                editReplyMessage("Leader '" + leader + "'' is locked");
+                editReplyMessage("Leader '" + leader + "' is locked");
                 return;
             }
             playerLeader.setExhausted(true);
