@@ -504,5 +504,6 @@ public class Constants {
     public static final String GAME_FUN_NAME = "game_fun_name";
     public static final String SPEND_AS = "spend_as";
     public static final String CATEGORY = "category";
+    public static final String SERVER_LIMIT_STATS = "server_limit_stats";
 
 }
