@@ -34,6 +34,7 @@ public class Map {
     private boolean communityMode = false;
     private boolean allianceMode = false;
     private boolean fowMode = false;
+    private boolean hasEnded = false;
 
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
@@ -201,6 +202,14 @@ public class Map {
 
     public void setCommunityMode(boolean communityMode) {
         this.communityMode = communityMode;
+    }
+
+    public boolean isHasEnded() {
+        return hasEnded;
+    }
+
+    public void setHasEnded(boolean hasEnded) {
+        this.hasEnded = hasEnded;
     }
 
     public void setCreationDate(String creationDate) {

@@ -15,6 +15,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
 public class GameEnd extends GameSubcommandData {
@@ -48,11 +49,11 @@ public class GameEnd extends GameSubcommandData {
         } else if (gameRoles.size() == 0) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No roles match the game name (" + gameName + ")");
         } else {
-            
             //POST GAME INFO
-            MessageHelper.sendMessageToChannel(event.getChannel(), Info.getGameInfo(null, null, userActiveMap).toString());
-            
-            
+            userActiveMap.setHasEnded(true);
+            MapSaveLoadManager.saveMap(userActiveMap);
+            MessageHelper.sendMessageToChannel(event.getChannel(), Info.getGameInfo(null, null, userActiveMap).toString());           
+
             //SEND THE MAP IMAGE
             File file = GenerateMap.getInstance().saveImage(userActiveMap, DisplayType.map, event);
             MessageHelper.replyToMessage(event, file);
@@ -76,6 +77,7 @@ public class GameEnd extends GameSubcommandData {
             
             MessageHelper.sendMessageToChannel(event.getChannel(), "Role deleted: " + gameRole.getName());
             gameRole.delete().queue();
+            
         }
     }
 }
