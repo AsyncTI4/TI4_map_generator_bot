@@ -505,5 +505,6 @@ public class Constants {
     public static final String SPEND_AS = "spend_as";
     public static final String CATEGORY = "category";
     public static final String GAME_END = "end";
+    public static final String GAME_HAS_ENDED = "game_has_ended";
 
 }
