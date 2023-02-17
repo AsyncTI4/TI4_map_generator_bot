@@ -90,6 +90,7 @@ public class BothelperCommand implements Command {
         Collection<BothelperSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new ImportTTPG());
         subcommands.add(new CreateGameChannels());
+        subcommands.add(new ServerLimitStats());
         return subcommands;
     }
 
