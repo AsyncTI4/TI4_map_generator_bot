@@ -118,10 +118,10 @@ abstract public class AddRemoveUnits implements Command {
             if (unitInfoTokenizer.hasMoreTokens()) {
                 String planetToken = unitInfoTokenizer.nextToken();
                 planetName = AliasHandler.resolvePlanet(planetToken);
-                if (!Mapper.isValidPlanet(planetName)) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: `" + planetToken + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
-                    continue;
-                }
+                // if (!Mapper.isValidPlanet(planetName)) {
+                //     MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: `" + planetToken + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
+                //     continue;
+                // }
             }
 
             planetName = getPlanet(event, tile, planetName);
