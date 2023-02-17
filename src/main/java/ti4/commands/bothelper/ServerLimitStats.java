@@ -41,7 +41,7 @@ public class ServerLimitStats extends BothelperSubcommandData {
         sb.append(roleCount).append(" / 250" + getPercentage(roleCount, 250) + " - roles").append("\n");
         sb.append(channelCount).append(" / 500" + getPercentage(channelCount, 500) + " - channels").append("\n");
         sb.append(threadCount).append(" / 1000" + getPercentage(threadCount, 1000) + " - threads").append("\n");
-        sb.append("     - ").append(cardsInfoThreadCount).append("   " + getPercentage(cardsInfoThreadCount, roleCount) + " 'Cards Info' threads (/ac info)").append("\n");
+        sb.append("     - ").append(cardsInfoThreadCount).append("   " + getPercentage(cardsInfoThreadCount, threadCount) + " 'Cards Info' threads (/ac info)").append("\n");
         sb.append("     - ").append(botThreadCount).append("   " + getPercentage(botThreadCount, threadCount) + "'-bot' threads").append("\n");
         sb.append("     - ").append(scThreadCount).append("   " + getPercentage(scThreadCount, threadCount) + "'-round-' threads (/sc play)").append("\n");
 
