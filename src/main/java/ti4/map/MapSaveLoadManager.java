@@ -274,7 +274,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.FOW_MODE + " " + map.isFoWMode());
         writer.write(System.lineSeparator());
-
+        writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
+        writer.write(System.lineSeparator());
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -823,6 +824,13 @@ public class MapSaveLoadManager {
                 try {
                     boolean value = Boolean.parseBoolean(tokenizer[1]);
                     map.setFoWMode(value);
+                } catch (Exception e) {
+                    //Do nothing
+                }
+            } else if (Constants.GAME_HAS_ENDED.equals(identification)) {
+                try {
+                    boolean value = Boolean.parseBoolean(tokenizer[1]);
+                    map.setHasEnded(value);
                 } catch (Exception e) {
                     //Do nothing
                 }
