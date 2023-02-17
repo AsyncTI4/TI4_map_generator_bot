@@ -83,9 +83,15 @@ abstract public class AddRemoveUnits implements Command {
 
     public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Map map) {
         unitList = unitList.replace(", ", ",");
-        StringTokenizer tokenizer = new StringTokenizer(unitList, ",");
-        while (tokenizer.hasMoreTokens()) {
-            StringTokenizer unitInfoTokenizer = new StringTokenizer(tokenizer.nextToken(), " ");
+        StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
+        while (unitListTokenizer.hasMoreTokens()) {
+            String unitListToken = unitListTokenizer.nextToken();
+            StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
+            
+            // int tokenCount = unitInfoTokenizer.countTokens();
+            // if (tokenCount > 3) {
+            //     MessageHelper.sendMessageToChannel(event.getChannel(), "Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts");
+            // }
 
             int count = 1;
             boolean numberIsSet = false;
@@ -106,12 +112,18 @@ abstract public class AddRemoveUnits implements Command {
             String unitID = Mapper.getUnitID(unit, color);
             String unitPath = tile.getUnitPath(unitID);
             if (unitPath == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit: " + unit + " is not valid and not supported.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
                 continue;
             }
             if (unitInfoTokenizer.hasMoreTokens()) {
-                planetName = AliasHandler.resolvePlanet(unitInfoTokenizer.nextToken());
+                String planetToken = unitInfoTokenizer.nextToken();
+                planetName = AliasHandler.resolvePlanet(planetToken);
+                if (!Mapper.isValidPlanet(planetName)) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: `" + planetToken + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
+                    continue;
+                }
             }
+
             planetName = getPlanet(event, tile, planetName);
             unitAction(event, tile, count, planetName, unitID, color);
 

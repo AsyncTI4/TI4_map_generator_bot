@@ -38,7 +38,7 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
         if (gameOption != null) {
             mapName = event.getOptions().get(0).getAsString();
             if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exists, use /list_games");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exist, use `/help list_games`");
                 return;
             }
         }else {
@@ -64,7 +64,7 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
 //            return;
 //        }
         if (!map.isMapOpen()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not open. Can add/remove only in open map.");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not open. Can only add/remove players when game status is 'open'.");
             return;
         }
 
