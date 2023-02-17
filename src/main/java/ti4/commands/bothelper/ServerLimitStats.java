@@ -1,5 +1,6 @@
 package ti4.commands.bothelper;
 
+import java.text.NumberFormat;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -30,16 +31,19 @@ public class ServerLimitStats extends BothelperSubcommandData {
         int emojiCount = guild.getEmojis().size();
         int emojiMax = guild.getMaxEmojis();
 
+
+        // Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
+
         StringBuilder sb = new StringBuilder("Server Limit Statistics:\n>>> ");
-        sb.append(memberCount).append(" / " + memberMax + " - members").append("\n");
+        sb.append(memberCount).append(" / " + memberMax + getPercentage(memberCount, memberMax) + " - members").append("\n");
         sb.append(boostCount).append(" - boosts").append("\n");
-        sb.append(emojiCount).append(" / " + emojiMax + " - emojis").append("\n");
-        sb.append(roleCount).append(" / 250 - roles").append("\n");
-        sb.append(channelCount).append(" / 500 - channels").append("\n");
-        sb.append(threadCount).append(" / 1000 - threads").append("\n");
-        sb.append("     - ").append(cardsInfoThreadCount).append("   'Cards Info' threads (/ac info)").append("\n");
-        sb.append("     - ").append(botThreadCount).append("   '-bot' threads").append("\n");
-        sb.append("     - ").append(scThreadCount).append("   '-round-' threads (/sc play)").append("\n");
+        sb.append(emojiCount).append(" / " + emojiMax + getPercentage(emojiCount, emojiMax) + " - emojis").append("\n");
+        sb.append(roleCount).append(" / 250" + getPercentage(roleCount, 250) + " - roles").append("\n");
+        sb.append(channelCount).append(" / 500" + getPercentage(channelCount, 500) + " - channels").append("\n");
+        sb.append(threadCount).append(" / 1000" + getPercentage(threadCount, 1000) + " - threads").append("\n");
+        sb.append("     - ").append(cardsInfoThreadCount).append("   " + getPercentage(cardsInfoThreadCount, roleCount) + " 'Cards Info' threads (/ac info)").append("\n");
+        sb.append("     - ").append(botThreadCount).append("   " + getPercentage(botThreadCount, threadCount) + "'-bot' threads").append("\n");
+        sb.append("     - ").append(scThreadCount).append("   " + getPercentage(scThreadCount, threadCount) + "'-round-' threads (/sc play)").append("\n");
 
         MessageHelper.replyToMessage(event, sb.toString());
 
@@ -48,5 +52,13 @@ public class ServerLimitStats extends BothelperSubcommandData {
         // }
 
 
+    }
+
+    private String getPercentage(double numerator, double denominator) {
+        NumberFormat formatPercent = NumberFormat.getPercentInstance();
+        formatPercent.setMinimumFractionDigits(1);
+        String formatted = formatPercent.format(denominator == 0 ? 0.0 : (numerator / denominator));
+        formatted = " *(" + formatted + ")* ";
+        return formatted;
     }
 }
