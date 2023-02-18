@@ -23,7 +23,9 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
         }
         
         List<ThreadChannel> threadChannels = event.getGuild().getThreadChannels();
-        threadChannels = threadChannels.stream().sorted((object1, object2) -> object1.retrieveMessageById(object1.getLatestMessageId()).complete().getTimeCreated().compareTo(object2.retrieveMessageById(object2.getLatestMessageId()).complete().getTimeCreated())).limit(threadCount).toList();
+        threadChannels = threadChannels.stream()
+            .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
+            .limit(threadCount).toList();
     
         for (ThreadChannel threadChannel : threadChannels) {
             threadChannel.getManager().setArchived(true).queue();
