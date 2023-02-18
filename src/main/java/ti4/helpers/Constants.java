@@ -507,4 +507,7 @@ public class Constants {
     public static final String SERVER_LIMIT_STATS = "server_limit_stats";
     public static final String GAME_END = "end";
     public static final String GAME_HAS_ENDED = "game_has_ended";
+    public static final String ARCHIVE_OLD_THREADS = "archive_old_threads";
+    public static final String THREAD_COUNT = "thread_count";
+    public static final String LIST_OLD_CHANNELS = "list_old_channels";
 }
