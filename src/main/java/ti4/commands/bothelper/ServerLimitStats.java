@@ -4,7 +4,6 @@ import java.text.NumberFormat;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -14,7 +13,6 @@ import ti4.message.MessageHelper;
 public class ServerLimitStats extends BothelperSubcommandData {
     public ServerLimitStats(){
         super(Constants.SERVER_LIMIT_STATS, "Import a recent TTPG Export to a new Async game");
-
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -42,9 +40,6 @@ public class ServerLimitStats extends BothelperSubcommandData {
         int emojiCount = guild.getEmojis().size();
         int emojiMax = guild.getMaxEmojis();
 
-
-        // Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
-
         StringBuilder sb = new StringBuilder("Server Limit Statistics:\n>>> ");
         sb.append(memberCount).append(" / " + memberMax + getPercentage(memberCount, memberMax) + " - members").append("\n");
         sb.append(boostCount).append(" - boosts").append("\n");
@@ -60,12 +55,6 @@ public class ServerLimitStats extends BothelperSubcommandData {
         sb.append("     - ").append(privateThreadCount).append("   " + getPercentage(privateThreadCount, threadCount) + "  private threads").append("\n");
 
         MessageHelper.replyToMessage(event, sb.toString());
-
-        // for (ThreadChannel thread : threadChannels.stream().sorted((object1, object2) -> object2.getTimeArchiveInfoLastModified().compareTo(object1.getTimeArchiveInfoLastModified())).toList()) {
-        //     System.out.println(thread.getName() + "  " + thread.getTimeArchiveInfoLastModified());
-        // }
-
-
     }
 
     private String getPercentage(double numerator, double denominator) {
