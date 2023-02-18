@@ -91,6 +91,7 @@ public class BothelperCommand implements Command {
         subcommands.add(new ImportTTPG());
         subcommands.add(new CreateGameChannels());
         subcommands.add(new ServerLimitStats());
+        subcommands.add(new ArchiveOldThreads());
         return subcommands;
     }
 
