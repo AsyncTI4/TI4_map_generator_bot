@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 
 public class ServerLimitStats extends BothelperSubcommandData {
     public ServerLimitStats(){
-        super(Constants.SERVER_LIMIT_STATS, "Import a recent TTPG Export to a new Async game");
+        super(Constants.SERVER_LIMIT_STATS, "Server Limit Stats");
     }
 
     public void execute(SlashCommandInteractionEvent event) {
