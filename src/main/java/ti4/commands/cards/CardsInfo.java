@@ -172,26 +172,40 @@ public class CardsInfo extends CardsSubcommandData {
         User userById = event != null ? event.getJDA().getUserById(player.getUserID()) : (buttonEvent != null ? buttonEvent.getJDA().getUserById(player.getUserID()) : null);
         if (userById != null) {
             String cardInfo = soText + "\n" + acText + "\n" + pnText;
-            if (activeMap.isCommunityMode() && player.getChannelForCommunity() instanceof MessageChannel) {
-                MessageHelper.sendMessageToChannel((MessageChannel) player.getChannelForCommunity(), cardInfo);
+
+            if (activeMap.isCommunityMode() && player.getPrivateChannel() != null) {
+                //TODO: switch to this line if we want to show the buttons on cards in community mode
+                //     sendCardInfoToChannel(player.getPrivateChannel(), null, soText, soButtons, acText, acButtons, pnText);
+                MessageHelper.sendMessageToChannel(player.getPrivateChannel(), cardInfo);
             } else {
                 try {
-                    Channel channel = event != null ? event.getChannel() : buttonEvent.getChannel();
+                    MessageChannel channel = event != null ? event.getChannel() : buttonEvent.getChannel();
                     MessageChannelUnion channelUnion = event != null ? event.getChannel() : buttonEvent.getChannel();
+                    if (activeMap.isFoWMode()) {
+                        if (player.getPrivateChannel() == null) {
+                            MessageHelper.sendMessageToChannel(channel, "Private channels are not set up for this game. Messages will be suppressed.");
+                        } else {
+                            channel = player.getPrivateChannel();
+                        }
+                    }
+
                     if (channel == null) {
-                        MessageHelper.sentToMessageToUser(event, cardInfo, userById);
+                        MessageHelper.sendMessageToUser(cardInfo, userById);
                         BotLogger.log("Could not find channel");
                         return;
                     }
                     if (event != null) {
                         OptionMapping option = event.getOption(Constants.DM_CARD_INFO);
                         if (option != null && option.getAsBoolean()) {
-                            MessageHelper.sentToMessageToUser(event, cardInfo, userById);
+                            MessageHelper.sendMessageToUser(cardInfo, userById);
                         }
                     }
                     ChannelType type = channel.getType();
 
                     TextChannel textChannel = threadTextChannels.get(activeMap);
+                    if (activeMap.isFoWMode()) {
+                        textChannel = (TextChannel) channel;
+                    }
                     if (textChannel == null) {
                         String mainChannelName = activeMap.getName() + "-actions";
                         for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
@@ -208,8 +222,8 @@ public class CardsInfo extends CardsSubcommandData {
                                 if (parentChannel instanceof TextChannel) {
                                     textChannel = (TextChannel) parentChannel;
                                 } else {
-                                    MessageHelper.sentToMessageToUser(event, cardInfo, userById);
-                                    MessageHelper.sentToMessageToUser(event, "Please Execute info command in non thread channel", userById);
+                                    MessageHelper.sendMessageToUser(cardInfo, userById);
+                                    MessageHelper.sendMessageToUser("Please Execute info command in non thread channel", userById);
                                     return;
                                 }
                             } else {
@@ -222,24 +236,9 @@ public class CardsInfo extends CardsSubcommandData {
                     String threadName = CARDS_INFO + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
                     String playerPing = threadName + " " + Helper.getPlayerPing(player);
 
-                    String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
-                    String acPlayMsg = "_ _\nClick a button below to play an Action Card";
                     for (ThreadChannel threadChannel : threadChannels) {
                         if (threadChannel.getName().equals(threadName)) {
-                            String text = playerPing + "\n";
-                            MessageHelper.sendMessageToChannel(threadChannel, text);
-                            MessageHelper.sendMessageToChannel(threadChannel, soText);
-                            List<MessageCreateData> messageList = getMessageObject(secretScoreMsg, soButtons);
-                            for (MessageCreateData message : messageList) {
-                                threadChannel.sendMessage(message).queue();
-                            }
-                            MessageHelper.sendMessageToChannel(threadChannel, acText);
-                            messageList = getMessageObject(acPlayMsg, acButtons);
-                            for (MessageCreateData message : messageList) {
-                                threadChannel.sendMessage(message).queue();
-                            }
-                            MessageHelper.sendMessageToChannel(threadChannel, pnText);
-                            //threadChannel.getManager().setInvitable(false);
+                            sendCardInfoToChannel(threadChannel, playerPing, soText, soButtons, acText, acButtons, pnText);
                             threadFound = true;
                             break;
                         }
@@ -249,42 +248,33 @@ public class CardsInfo extends CardsSubcommandData {
                             .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR)
                             .setInvitable(false)
                             .complete();
-                        sendTextToChannel(new_thread, playerPing + "\n");
-                        sendTextToChannel(new_thread, soText);
-                        List<MessageCreateData> messageList = getMessageObject(secretScoreMsg, soButtons);
-                        for (MessageCreateData message : messageList) {
-                            new_thread.sendMessage(message).queue();
-                        }
-                        sendTextToChannel(new_thread, acText);
-                        messageList = getMessageObject(acPlayMsg, acButtons);
-                        for (MessageCreateData message : messageList) {
-                            new_thread.sendMessage(message).queue();
-                        }
-                        sendTextToChannel(new_thread, pnText);
+                        sendCardInfoToChannel(new_thread, playerPing, soText, soButtons, acText, acButtons, pnText);
                     }
                 } catch (Exception e) {
                     BotLogger.log("Could not create Private Thread");
                 }
             }
         } else {
-            MessageHelper.sentToMessageToUser(event != null ? event : buttonEvent, "Player: " + player.getUserName() + " not found");
+            MessageHelper.sendMessageToUser("Player: " + player.getUserName() + " not found", event != null ? event : buttonEvent);
         }
     }
 
-    private static void sendTextToChannel(ThreadChannel msg, String text) {
-        if (text.length() > 1500) {
-            List<String> texts = new ArrayList<>();
-            int index_ = 0;
-            while (index_ < text.length()) {
-                texts.add(text.substring(index_, Math.min(index_ + 1500, text.length())));
-                index_ += 1500;
-            }
-            for (String msgText : texts) {
-                msg.sendMessage(msgText).queue();
-            }
-        } else {
-            msg.sendMessage(text).queue();
+    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String so, List<Button> soButtons, String ac, List<Button> acButtons, String pn) {
+        String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
+        String acPlayMsg = "_ _\nClick a button below to play an Action Card";
+        String text = ping == null ? null : ping + "\n";
+        MessageHelper.sendMessageToChannel(privateChannel, text);
+        MessageHelper.sendMessageToChannel(privateChannel, so);
+        List<MessageCreateData> messageList = getMessageObject(secretScoreMsg, soButtons);
+        for (MessageCreateData message : messageList) {
+            privateChannel.sendMessage(message).queue();
         }
+        MessageHelper.sendMessageToChannel(privateChannel, ac);
+        messageList = getMessageObject(acPlayMsg, acButtons);
+        for (MessageCreateData message : messageList) {
+            privateChannel.sendMessage(message).queue();
+        }
+        MessageHelper.sendMessageToChannel(privateChannel, pn);
     }
 
     private static List<MessageCreateData> getMessageObject(String message, List<Button> buttons) {

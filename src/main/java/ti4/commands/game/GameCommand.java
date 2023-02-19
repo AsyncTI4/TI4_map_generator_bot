@@ -94,7 +94,7 @@ public class GameCommand implements Command {
         subcommands.add(new SCCount());
         subcommands.add(new Setup());
         subcommands.add(new Replace());
-        subcommands.add(new SetupCommunityGame());
+        subcommands.add(new SetupGameChannels());
         return subcommands;
     }
 

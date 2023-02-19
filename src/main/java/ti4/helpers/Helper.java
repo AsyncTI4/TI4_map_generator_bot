@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -456,7 +457,11 @@ public class Helper {
         if (userById == null) {
             return "";
         }
-        return userById.getAsMention();
+        String mention = userById.getAsMention();
+        if (player.getUserID() == "154000388121559040") {
+            mention += " " + Emoji.fromFormatted(Emojis.BortWindow);
+        }
+        return mention;
     }
 
     public static String getPlayerRepresentation(Player player) {

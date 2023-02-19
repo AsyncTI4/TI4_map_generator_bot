@@ -110,8 +110,14 @@ public class SentPN extends PNCardsSubcommandData {
         CardsInfo.sentUserCardInfo(event, activeMap, targetPlayer);
         CardsInfo.sentUserCardInfo(event, activeMap, player);
         String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-        String message = Helper.getPlayerRepresentation(event, player) + " sent " + Emojis.PN + text + "PN to " + Helper.getPlayerRepresentation(targetPlayer);
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        String message = Helper.getPlayerRepresentation(event, player) + " sent " + Emojis.PN + text + "PN to " + Helper.getPlayerRepresentation(event, targetPlayer);
+        if (activeMap.isFoWMode()) {
+            String fail = "User for faction not found. Report to ADMIN";
+            String success = message + "\nThe other player has been notified";
+            MessageHelper.sendPrivateMessageToPlayer(targetPlayer, activeMap, event, message, fail, success);
+        } else {
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        }
 
         //Turned off, as we might change back
         if (areaPN && false) {
