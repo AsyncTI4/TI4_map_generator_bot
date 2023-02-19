@@ -10,7 +10,7 @@ public class Remove extends AddRemovePlayer {
 
     private StringBuilder sb = new StringBuilder();
     public Remove() {
-        super(Constants.REMOVE, "Remove player to game");
+        super(Constants.REMOVE, "Remove player from game");
     }
 
 
@@ -37,7 +37,7 @@ public class Remove extends AddRemovePlayer {
         if (option != null){
             User extraUser = option.getAsUser();
             map.removePlayer(extraUser.getId());
-            sb.append("Removed player: ").append(extraUser.getName()).append(" to game: ").append(map.getName()).append("\n");
+            sb.append("Removed player: ").append(extraUser.getName()).append(" from game: ").append(map.getName()).append("\n");
         }
     }
 }

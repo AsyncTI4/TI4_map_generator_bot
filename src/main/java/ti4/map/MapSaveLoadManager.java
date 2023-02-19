@@ -281,7 +281,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.FOW_MODE + " " + map.isFoWMode());
         writer.write(System.lineSeparator());
-
+        writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
+        writer.write(System.lineSeparator());
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -821,6 +822,14 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         map.setFoWMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.GAME_HAS_ENDED -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setHasEnded(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

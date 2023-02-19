@@ -47,6 +47,7 @@ public class Player {
     private List<String> mahactCC = new ArrayList<>();
     private List<Leader> leaders = new ArrayList<>();
 
+    private HashMap<String,String> debt_tokens = new HashMap<>();
     private HashMap<String,String> fow_seenTiles = new HashMap<>();
     private HashMap<String,String> fow_customLabels = new HashMap<>();
 
