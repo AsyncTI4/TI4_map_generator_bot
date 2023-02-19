@@ -79,7 +79,7 @@ public class ButtonListener extends ListenerAdapter {
             mainGameChannel = activeMap.getMainGameChannel();
         }
 
-        MessageChannel actionsChannel = event.getChannel();
+        MessageChannel actionsChannel = null;
         for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
             if (textChannel_.getName().equals(gameName + "-actions")) {
                 actionsChannel = textChannel_;
@@ -89,19 +89,24 @@ public class ButtonListener extends ListenerAdapter {
 
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
             String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
-            MessageChannel channel = actionsChannel;
-            if (activeMap.isFoWMode() && activeMap.getMainGameChannel() != null) {
+            MessageChannel channel = null;
+            if (activeMap.getMainGameChannel() != null) {
                 channel = activeMap.getMainGameChannel();
+            } else {
+                channel = actionsChannel;
             }
 
-            try {
-                PlayAC.playAC(null, activeMap, player, acID, channel, event.getGuild(), event);
-            } catch (Exception e) {
-                BotLogger.log(event, "Could not parse AC ID: " + acID);
-                event.getChannel().sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
-                return;
+            if (channel != null) {
+                try {
+                    PlayAC.playAC(null, activeMap, player, acID, channel, event.getGuild(), event);
+                } catch (Exception e) {
+                    BotLogger.log(event, "Could not parse AC ID: " + acID);
+                    event.getChannel().sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
+                    return;
+                }
+            } else {
+                event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
             }
-
         } else if (buttonID.startsWith(Constants.SO_SCORE_FROM_HAND)) {
             String soID = buttonID.replace(Constants.SO_SCORE_FROM_HAND, "");
             MessageChannel channel = null;
@@ -113,13 +118,17 @@ public class ButtonListener extends ListenerAdapter {
                 channel = actionsChannel;
             }
 
-            try {
-                int soIndex = Integer.parseInt(soID);
-                ScoreSO.scoreSO(null, activeMap, player, soIndex, channel, event);
-            } catch (Exception e) {
-                BotLogger.log(event, "Could not parse SO ID: " + soID);
-                event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.").queue();
-                return;
+            if (channel != null) {
+                try {
+                    int soIndex = Integer.parseInt(soID);
+                    ScoreSO.scoreSO(null, activeMap, player, soIndex, channel, event);
+                } catch (Exception e) {
+                    BotLogger.log(event, "Could not parse SO ID: " + soID);
+                    event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.").queue();
+                    return;
+                }
+            } else {
+                event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
             }
         } else if (buttonID.startsWith(Constants.PO_SCORING)) {
             String poID = buttonID.replace(Constants.PO_SCORING, "");
