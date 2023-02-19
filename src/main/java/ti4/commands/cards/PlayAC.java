@@ -9,11 +9,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -44,8 +42,10 @@ public class PlayAC extends CardsSubcommandData {
     }
 
     public static void playAC(SlashCommandInteractionEvent event, Map activeMap, Player player, String value, MessageChannel channel, Guild guild, ButtonInteractionEvent buttonInteractionEvent) {
-        MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? channel : activeMap.getMainGameChannel();
-        
+        MessageChannel mainGameChannel = channel;
+        if (activeMap.isFoWMode() && activeMap.getMainGameChannel() != null) {
+            mainGameChannel = activeMap.getMainGameChannel();
+        }
         String acID = null;
         int acIndex = -1;
         try {
@@ -89,7 +89,7 @@ public class PlayAC extends CardsSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getGamePing(guild, activeMap)).append(" ").append(activeMap.getName()).append("\n");
 
-        if(activeMap.isFoWMode()) {
+        if (activeMap.isFoWMode()) {
             sb.append("Someone played an Action Card:\n");
         } else {
             sb.append(Helper.getPlayerRepresentation(event, player)).append(" played an Action Card:\n");
