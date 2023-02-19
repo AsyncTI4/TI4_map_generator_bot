@@ -89,11 +89,9 @@ public class ButtonListener extends ListenerAdapter {
 
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
             String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
-            MessageChannel channel = null;
-            if (activeMap.getMainGameChannel() != null) {
+            MessageChannel channel = actionsChannel;
+            if (activeMap.isFoWMode() && activeMap.getMainGameChannel() != null) {
                 channel = activeMap.getMainGameChannel();
-            } else {
-                channel = actionsChannel;
             }
 
             try {
