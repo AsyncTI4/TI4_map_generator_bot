@@ -89,7 +89,7 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
      * @return
      */
     private String getActionHeaderMessage(SlashCommandInteractionEvent event, Player player) {
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event.getGuild(), player)).append(" ");
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" ");
         return switch (getActionID()) {
             case Constants.PLANET_ADD -> message.append(" added planet(s)").toString();
             case Constants.PLANET_REMOVE -> message.append(" removed planet(s)").toString();

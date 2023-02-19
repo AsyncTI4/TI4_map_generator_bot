@@ -13,7 +13,8 @@ public class Constants {
     public static final String ALLIANCE_MODE = "alliance_mode";
     public static final String FOW_MODE = "fow_mode";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
-    public static final String CHANNLE_FOR_COMMUNITY = "channelForCommunity";
+    public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
+    public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
     public static final String DISPLAY_TYPE = "display_type";
     public static final String GAME_STATUS = "game_status";
     public static final String CONFIRM = "confirm";
@@ -209,7 +210,8 @@ public class Constants {
     public static final String PASS = "pass";
     public static final String TURN = "turn_end";
     public static final String SPEAKER = "speaker";
-
+    
+    public static final String MAIN_GAME_CHANNEL = "main_game_channel";
     public static final String CHANNEL1 = "channel1";
     public static final String CHANNEL2 = "channel2";
     public static final String CHANNEL3 = "channel3";
@@ -248,7 +250,7 @@ public class Constants {
     public static final String SEND_TG = "send_tg";
     public static final String SEND_COMMODITIES = "send_commodities";
     public static final String SETUP = "setup";
-    public static final String COMMUNITY_SETUP = "community_setup";
+    public static final String GAME_CHANNEL_SETUP = "game_channel_setup";
     public static final String PLANETS = "planets";
     public static final String PLANETS_EXHAUSTED = "planets_exhausted";
     public static final String PLANETS_ABILITY_EXHAUSTED = "planets_ability_exhausted";

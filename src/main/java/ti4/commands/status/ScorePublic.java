@@ -54,11 +54,11 @@ public class ScorePublic extends StatusSubcommandData {
         }
     }
 
-    public static void scorePO(ButtonInteractionEvent event, MessageChannel channel, Map activeMap, Player player, int poID) {
+    public static void scorePO(ButtonInteractionEvent event, MessageChannel channel, Map activeMap, Player player, int poID, boolean inform) {
         boolean scored = activeMap.scorePublicObjective(player.getUserID(), poID);
         if (!scored) {
             MessageHelper.sendMessageToChannel(channel, "No such Public Objective ID found or already scored, please retry");
-        } else {
+        } else if (inform) {
             informAboutScoring(event, channel, activeMap, player, poID);
         }
     }

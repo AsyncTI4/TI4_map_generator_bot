@@ -1,5 +1,8 @@
 package ti4.helpers;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Emojis {
     //FACTIONS
     public static final String Arborec = "<:Arborec:946891797567799356>";
@@ -243,4 +246,8 @@ public class Emojis {
     public static final String noafters = "<:noafters:962923748938362931>";
     public static final String Wash = "<a:Wash:1065334637532041298>";
     public static final String winemaking = "<:winemaking:1064244730000584754>";
+    public static final String BortWindow = "<:bortwindow:1032312829585399880>";
+
+    //LIST OF SYMBOLS FOR FOG STUFF
+    public static List<String> symbols = Arrays.asList(warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag, CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2, tg, comm, Sleeper, influence, resources, SemLord, Supernova, Asteroid, GravRift, Nebula, CyberneticTech, PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken, BortWindow);
 }

@@ -135,7 +135,10 @@ public class GenerateMap {
             isFoWPrivate = false;
             if (event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
                 isFoWPrivate = true;
-                Set<String> tilesToShow = fowFilter(map, event);
+                Player player = getFowPlayer(map, event);
+                fowPlayer = Helper.getGamePlayer(map, player, event, null);
+
+                Set<String> tilesToShow = fowFilter(map);
                 Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
                 keys.removeAll(tilesToShow);
                 updatePlayerFogFilter(map, fowPlayer, tilesToShow);
@@ -215,9 +218,13 @@ public class GenerateMap {
         return jpgFile;
     }
 
-    private Set<String> fowFilter(Map map, @Nullable SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        fowPlayer = map.getPlayer(user.getId());
+    private Player getFowPlayer(Map map, @Nullable SlashCommandInteractionEvent event) {
+        String user = event.getUser().getId();
+        return map.getPlayer(user);
+    }
+
+    private Set<String> fowFilter(Map map) {
+        
         Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
         if (fowPlayer != null) {
             java.util.Map<String, String> colorToId = Mapper.getColorToId();
