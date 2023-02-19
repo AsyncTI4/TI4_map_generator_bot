@@ -252,7 +252,7 @@ public class Helper {
     }
 
     public static String getPlanetEmoji(String planet) {
-        return switch (planet) {
+        return switch (planet.toLowerCase()) {
             case "mr" -> Emojis.MecatolRex;
             case "hopesend" -> Emojis.HopesEnd;
             case "primor" -> Emojis.Primor;

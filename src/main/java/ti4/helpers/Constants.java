@@ -135,6 +135,10 @@ public class Constants {
     public static final String RISE_OF_A_MESSIAH = "rise_of_a_messiah";
     public static final String SLEEPER_TOKEN = "sleeper_token";
     public static final String STELLAR_CONVERTER = "stellar_converter";
+    public static final String SEND_DEBT = "send_debt";
+    public static final String DEBT_COUNT = "debt_count";
+    public static final String REMOVE_DEBT = "remove_debt";
+    public static final String DEBT = "debt";
     public static final String ION_TOKEN_FLIP = "ion_storm_flip";
     public static final String TOKEN_SLEEPER_PNG = "token_sleeper.png";
     public static final String WORLD_DESTROYED_PNG = "token_worlddestroyed.png";
@@ -506,5 +510,10 @@ public class Constants {
     public static final String GAME_FUN_NAME = "game_fun_name";
     public static final String SPEND_AS = "spend_as";
     public static final String CATEGORY = "category";
-
+    public static final String SERVER_LIMIT_STATS = "server_limit_stats";
+    public static final String GAME_END = "end";
+    public static final String GAME_HAS_ENDED = "game_has_ended";
+    public static final String ARCHIVE_OLD_THREADS = "archive_old_threads";
+    public static final String THREAD_COUNT = "thread_count";
+    public static final String LIST_OLD_CHANNELS = "list_old_channels";
 }
