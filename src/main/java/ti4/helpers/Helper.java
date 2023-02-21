@@ -525,18 +525,22 @@ public class Helper {
         String playerFaction = player.getFaction();
         if (playerFaction.equals("nomad")) {
             return switch (leader) {
+                case "agent" -> Emojis.GoodDog;
                 case "artuno" -> Emojis.NomadAgentArtuno;
                 case "mercer" -> Emojis.NomadAgentMercer;
                 case "thundarian" -> Emojis.NomadAgentThundarian;
-                case "agent" -> Emojis.GoodDog;
+                case "commander" -> Emojis.NomadCommander;
+                case "hero" -> Emojis.NomadHero;
                 default -> "";
             };
         } else if (playerFaction.equals("keleres")) {
             return switch (leader) {
+                case "hero" -> Emojis.GoodDog;
+                case "agent" -> Emojis.KeleresAgent;
+                case "commander" -> Emojis.KeleresCommander;
                 case "kuuasi" -> Emojis.KeleresHeroKuuasi;
                 case "odlynn" -> Emojis.KeleresHeroOdlynn;
                 case "harka" -> Emojis.KeleresHeroHarka;
-                case "hero" -> Emojis.GoodDog;
                 default -> "";
             };
         } else {
