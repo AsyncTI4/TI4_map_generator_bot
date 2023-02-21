@@ -14,7 +14,7 @@ public class Add extends AddRemovePlayer {
 
 
     protected String getResponseMessage(Map map, User user) {
-        return "Added player: " +user.getName()+" to game: " + map.getName() + " successful";
+        return user.getName() + " added players to game: " + map.getName() + " - successful";
     }
 
     @Override

@@ -1,6 +1,8 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -30,10 +32,18 @@ public class SCPick extends PlayerSubcommandData {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
+
+        Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
+        boolean isFowPrivateGame = (privateGame != null && privateGame);
+
+        MessageChannel eventChannel = event.getChannel();
+        MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? eventChannel : activeMap.getMainGameChannel();
+
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "You're not a player of this game");
+            MessageHelper.sendMessageToChannel(eventChannel, "You're not a player of this game");
             return;
         }
+        
         Stats.pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
         int sc = player.getSC();
         String msg = "";
@@ -103,24 +113,25 @@ public class SCPick extends PlayerSubcommandData {
             msg = "No SC picked.";
         }
         MessageHelper.replyToMessage(event, msg);
-        Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
-        if (privateGame != null && privateGame) {
+        
+        if (isFowPrivateGame) {
+            if (allPicked) {
+                msgExtra = Helper.getPlayerRepresentation(event, privatePlayer) + " UP NEXT";
+            }
             if (privatePlayer == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), msgExtra + " Ping personally as Bot could not find player");
+                MessageHelper.sendMessageToChannel(eventChannel, msgExtra + "\n**Ping personally as Bot could not find player**");
                 return;
             }
-            User user = MapGenerator.jda.getUserById(privatePlayer.getUserID());
-            if (user == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
-            } else {
-                MessageHelper.sentToMessageToUser(event, activeMap.getName() + " " + msgExtra, user);
+            String fail = "User for faction not found. Report to ADMIN";
+            String success = "The next player has been notified";
+            MessageHelper.sendPrivateMessageToPlayer(privatePlayer, activeMap, event, msgExtra, fail, success);
+        } else {
+            if (allPicked) {
+                ListTurnOrder.turnOrder(event, activeMap);
             }
-        }
-        if (allPicked) {
-            ListTurnOrder.turnOrder(event, activeMap);
-        }
-        if (!msgExtra.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), msgExtra);
+            if (!msgExtra.isEmpty()) {
+                MessageHelper.sendMessageToChannel(eventChannel, msgExtra);
+            }
         }
     }
 

@@ -17,8 +17,9 @@ public class SetHeroInactiveLeader extends LeaderAction {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null){
             playerLeader.setActive(false);
+            editReplyMessage("Leader deactivated/unplayed");
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
+            editReplyMessage("Leader not found");
         }
     }
 }

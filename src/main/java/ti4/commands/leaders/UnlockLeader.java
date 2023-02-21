@@ -18,7 +18,7 @@ public class UnlockLeader extends LeaderAction {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null){
             playerLeader.setLocked(false);
-            MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getFactionLeaderEmoji(player, playerLeader));
+            editReplyMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
             StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
                     .append(" unlocked ")
                     .append(Helper.getLeaderFullRepresentation(player, playerLeader));
@@ -27,7 +27,7 @@ public class UnlockLeader extends LeaderAction {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Leader is also exhausted");
             }
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
+            editReplyMessage("Leader not found");
         }
     }
 }

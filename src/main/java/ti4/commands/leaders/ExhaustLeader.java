@@ -23,26 +23,26 @@ public class ExhaustLeader extends LeaderAction {
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null) {
-            if (playerLeader.isLocked()){
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Leader is locked");
+            if (playerLeader.isLocked()) {
+                editReplyMessage("Leader '" + leader + "' is locked");
                 return;
             }
             playerLeader.setExhausted(true);
-            MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getFactionLeaderEmoji(player, playerLeader));
-            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
+            editReplyMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
+            StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(event, player))
                     .append(" exhausted ")
                     .append(Helper.getLeaderFullRepresentation(player, playerLeader));
             OptionMapping optionTG = event.getOption(Constants.TG);
             if (optionTG != null) {
                 Stats.setValue(event, player, optionTG, playerLeader::setTgCount, playerLeader::getTgCount);
-                message.append(" - ").append(optionTG.getAsString()).append(Emojis.tg).append(" placed on top of the leader");
+                messageText.append(" - ").append(optionTG.getAsString()).append(Emojis.tg).append(" placed on top of the leader");
                 if (playerLeader.getTgCount() != optionTG.getAsInt()) {
-                    message.append(" _(").append(String.valueOf(playerLeader.getTgCount())).append(Emojis.tg).append(" total)_\n");
+                    messageText.append(" _(").append(String.valueOf(playerLeader.getTgCount())).append(Emojis.tg).append(" total)_\n");
                 }
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
+            MessageHelper.sendMessageToChannel(event.getChannel(), messageText.toString());
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
+            editReplyMessage("Leader '" + leader + "'' not found");
         }
     }
 }

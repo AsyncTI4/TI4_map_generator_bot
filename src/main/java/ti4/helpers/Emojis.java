@@ -1,5 +1,8 @@
 package ti4.helpers;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class Emojis {
     //FACTIONS
     public static final String Arborec = "<:Arborec:946891797567799356>";
@@ -95,7 +98,7 @@ public class Emojis {
     public static final String ArborecAgent = "<:ArborecAgent:1059670895989374986>";
     public static final String ArgentAgent = "<:ArgentAgent:1059671022384713789>";
     public static final String CabalAgent = "<:CabalAgent:1059671042215391282> ";
-    public static final String CreussAgent = "<:CreussAgent:1059671068551417866>";
+    public static final String GhostAgent = "<:GhostAgent:1059671068551417866>";
     public static final String EmpyreanAgent = "<:EmpyreanAgent:1059671103578058882>";
     public static final String HacanAgent = "<:HacanAgent:1059671127137456209>";
     public static final String JolnarAgent = "<:JolNarAgent:1059671161237164102>";
@@ -124,7 +127,7 @@ public class Emojis {
     public static final String ArborecCommander = "<:ArborecCommander:1060184772086866062>";
     public static final String ArgentCommander = "<:ArgentCommander:1060184777552048239>";
     public static final String CabalCommander = " <:CabalCommander:1060184786263609394>";
-    public static final String CreussCommander = "<:CreussCommander:1060184792198561882>";
+    public static final String GhostCommander = "<:GhostCommander:1060184792198561882>";
     public static final String EmpyreanCommander = "<:EmpyreanCommander:1060184798078963782>";
     public static final String HacanCommander = "<:HacanCommander:1060184804638859355>";
     public static final String JolnarCommander = "<:JolNarCommander:1060184815627927552>";
@@ -151,7 +154,7 @@ public class Emojis {
     public static final String ArborecHero = "<:ArborecHero:1062743673076469851> ";
     public static final String ArgentHero = "<:ArgentHero:1062743679984467988>";
     public static final String CabalHero = "<:CabalHero:1062743685952978994>";
-    public static final String CreussHero = "<:CreussHero:1062743691120357426>";
+    public static final String GhostHero = "<:GhostHero:1062743691120357426>";
     public static final String EmpyreanHero = "<:EmpyreanHero:1062743698498129930>";
     public static final String HacanHero = "<:HacanHero:1062743704626003978>";
     public static final String JolnarHero = "<:JolNarHero:1062743711781494856>";
@@ -201,7 +204,7 @@ public class Emojis {
     public static final String Influence_9 = "<:I9:864278934509322300>";
 
     //PLANETS
-    public static final String MecatolRex = "<:MecatolRex:1068082190832898090>";
+    public static final String MecatolRex = "<:MecatolRex:1072083209250152489>";
     public static final String HopesEnd = "<:HopesEnd:1068567741264572557>";
     public static final String Primor = "<:Primor:1068567710990077952>";
     public static final String Mallice = "";
@@ -210,6 +213,10 @@ public class Emojis {
     public static final String PlanetArchonVail = "<:PlanetArchonVail:1072808333188268102>";
     public static final String PlanetMeharXull = "<:PlanetMeharXull:1072808307514945586>";
     public static final String PlanetPerimeter = "<:PlanetPerimeter:1072808270147887174>";
+    public static final String SemLor = "<:SemLor:1072075882618961930>";
+    public static final String SemLord = "<:SemLord:1072076401462738965>";
+    public static final String SemiLor = "<:SemiLor:1072076567053869106>";
+
 
     //ANOMOLIES
     public static final String Supernova = "<:Supernova:1068081584978284635>";
@@ -239,4 +246,8 @@ public class Emojis {
     public static final String noafters = "<:noafters:962923748938362931>";
     public static final String Wash = "<a:Wash:1065334637532041298>";
     public static final String winemaking = "<:winemaking:1064244730000584754>";
+    public static final String BortWindow = "<:bortwindow:1032312829585399880>";
+
+    //LIST OF SYMBOLS FOR FOG STUFF
+    public static List<String> symbols = Arrays.asList(warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag, CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2, tg, comm, Sleeper, influence, resources, SemLord, Supernova, Asteroid, GravRift, Nebula, CyberneticTech, PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken, BortWindow);
 }

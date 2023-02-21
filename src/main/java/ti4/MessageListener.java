@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 public class MessageListener extends ListenerAdapter {
 
     @Override
@@ -40,7 +42,9 @@ public class MessageListener extends ListenerAdapter {
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
         event.getInteraction().deferReply().queue();
         String userID = event.getUser().getId();
-        if (!event.getInteraction().getName().equals("help")) {
+
+        // CHECK IF CHANNEL IS MATCHED TO A GAME
+        if (!event.getInteraction().getName().equals("help")) { //SKIP /help COMMANDS
             boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName());
             if (!isChannelOK) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Command canceled. Execute command in correct channel, as game name.");
@@ -59,8 +63,10 @@ public class MessageListener extends ListenerAdapter {
                     command.execute(event);
                 } catch (Exception e) {
                     String messageText = "Error trying to execute command: " + command.getActionID();
+                    String errorMessage = ExceptionUtils.getMessage(e);
                     MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
                     BotLogger.log(messageText);
+                    BotLogger.log(errorMessage.substring(0, Math.min(1500, errorMessage.length())));
                 }
             }
         }
