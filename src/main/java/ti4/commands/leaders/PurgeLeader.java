@@ -21,7 +21,7 @@ public class PurgeLeader extends LeaderAction {
             MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getFactionLeaderEmoji(player, playerLeader));
             StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
                     .append(" purged ")
-                    .append(Helper.getLeaderRepresentation(player, playerLeader, true, true));
+                    .append(Helper.getLeaderFullRepresentation(player, playerLeader));
             MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
