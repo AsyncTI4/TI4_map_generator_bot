@@ -520,33 +520,31 @@ public class Helper {
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }
+    public static String getLeaderRepresentation(String faction, Leader leader, boolean includeTitle, boolean includeAbility) {
+        String leaderID = faction + leader.getId() + leader.getName();
 
-    public static String getPlayerFactionLeaderEmoji(Player player, String leader) {
-        String playerFaction = player.getFaction();
-        if (playerFaction.equals("nomad")) {
-            return switch (leader) {
-                case "agent" -> Emojis.GoodDog;
-                case "artuno" -> Emojis.NomadAgentArtuno;
-                case "mercer" -> Emojis.NomadAgentMercer;
-                case "thundarian" -> Emojis.NomadAgentThundarian;
-                case "commander" -> Emojis.NomadCommander;
-                case "hero" -> Emojis.NomadHero;
-                default -> "";
-            };
-        } else if (playerFaction.equals("keleres")) {
-            return switch (leader) {
-                case "hero" -> Emojis.GoodDog;
-                case "agent" -> Emojis.KeleresAgent;
-                case "commander" -> Emojis.KeleresCommander;
-                case "kuuasi" -> Emojis.KeleresHeroKuuasi;
-                case "odlynn" -> Emojis.KeleresHeroOdlynn;
-                case "harka" -> Emojis.KeleresHeroHarka;
-                default -> "";
-            };
-        } else {
-            StringBuilder sb = new StringBuilder(playerFaction).append(leader);
-            return getEmojiFromDiscord(sb.toString());
+        String leaderRep =  Mapper.getLeaderRepresentations().get(leaderID.toString());
+        if (leaderRep == null) {
+            BotLogger.log("Invalid `leaderID=" + leaderID.toString() + "` caught within `Helper.getLeaderRepresentation`");
+            return leader.getId();
         }
+
+        //leaderID = 0:LeaderName ; 1:LeaderTitle ; 2:BacksideTitle ; 3:AbilityWindow ; 4:AbilityText 
+        String[] leaderRepSplit = leaderRep.split(";");
+        String leaderName = leaderRepSplit[0];
+        String leaderTitle = leaderRepSplit[1];
+        String heroAbilityName = leaderRepSplit[2];
+        String leaderAbilityWindow = leaderRepSplit[3];
+        String leaderAbilityText = leaderRepSplit[4];
+        
+        StringBuilder representation = new StringBuilder();
+        representation.append(getFactionLeaderEmoji(faction, leader)).append(" **").append(leaderName).append("**");
+        if (includeTitle) representation.append(": ").append(leaderTitle); //add title
+        if (includeAbility && leader.getId().equals(Constants.HERO)) representation.append(" - ").append("__**").append(heroAbilityName).append("**__"); //add hero ability name
+        if (includeAbility) representation.append(" - *").append(leaderAbilityWindow).append("* ").append(leaderAbilityText); //add ability
+
+        return representation.toString();
+    }
     }
 
     public static String getSCEmojiFromInteger(Integer strategy_card) {
