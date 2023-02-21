@@ -62,7 +62,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
             return;
         }
-        MessageHelper.sentToMessageToUser(event, sb.toString(), user);
+        MessageHelper.sendMessageToUser(sb.toString(), user);
         CardsInfo.sentUserCardInfo(event, activeMap, player);
 
 

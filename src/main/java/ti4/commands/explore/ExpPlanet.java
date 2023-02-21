@@ -68,7 +68,7 @@ public class ExpPlanet extends ExploreSubcommandData {
         Player player = activeMap.getPlayer(event.getUser().getId());
 
         StringBuilder messageText = new StringBuilder(Helper.getEmojiFromDiscord(drawColor));
-        messageText.append("Planet "+ planetName +" *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(event, player)).append(":\n");
+        messageText.append("Planet "+ Helper.getPlanetRepresentationPlusEmojis(planetName) +" *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(event, player)).append(":\n");
         messageText.append(displayExplore(cardID));
         resolveExplore(event, cardID, tile, planetName, messageText.toString(), false);
     }

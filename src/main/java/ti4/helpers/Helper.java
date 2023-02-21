@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -251,14 +252,15 @@ public class Helper {
     }
 
     public static String getPlanetEmoji(String planet) {
-        return switch (planet) {
+        return switch (planet.toLowerCase()) {
             case "mr" -> Emojis.MecatolRex;
             case "hopesend" -> Emojis.HopesEnd;
             case "primor" -> Emojis.Primor;
             case "meharxull" -> Emojis.PlanetMeharXull;
             case "perimeter" -> Emojis.PlanetPerimeter;
             case "archonvail" -> Emojis.PlanetArchonVail;
-            default -> Emojis.planet;
+            case "semlore" -> Emojis.SemLord;
+            default -> Emojis.SemLor;
         };
     }
 
@@ -337,7 +339,7 @@ public class Helper {
             case "arborecagent" -> Emojis.ArborecAgent;
             case "argentagent" -> Emojis.ArgentAgent;
             case "cabalagent" -> Emojis.CabalAgent;
-            case "creussagent" -> Emojis.CreussAgent;
+            case "ghostagent" -> Emojis.GhostAgent;
             case "empyreanagent" -> Emojis.EmpyreanAgent;
             case "hacanagent" -> Emojis.HacanAgent;
             case "jolnaragent" -> Emojis.JolnarAgent;
@@ -366,7 +368,7 @@ public class Helper {
             case "arboreccommander" -> Emojis.ArborecCommander;
             case "argentcommander" -> Emojis.ArgentCommander;
             case "cabalcommander" -> Emojis.CabalCommander;
-            case "creusscommander" -> Emojis.CreussCommander;
+            case "ghostcommander" -> Emojis.GhostCommander;
             case "empyreancommander" -> Emojis.EmpyreanCommander;
             case "hacancommander" -> Emojis.HacanCommander;
             case "jolnarcommander" -> Emojis.JolnarCommander;
@@ -393,7 +395,7 @@ public class Helper {
             case "arborechero" -> Emojis.ArborecHero;
             case "argenthero" -> Emojis.ArgentHero;
             case "cabalhero" -> Emojis.CabalHero;
-            case "creusshero" -> Emojis.CreussHero;
+            case "ghosthero" -> Emojis.GhostHero;
             case "empyreanhero" -> Emojis.EmpyreanHero;
             case "hacanhero" -> Emojis.HacanHero;
             case "jolnarhero" -> Emojis.JolnarHero;
@@ -455,7 +457,11 @@ public class Helper {
         if (userById == null) {
             return "";
         }
-        return userById.getAsMention();
+        String mention = userById.getAsMention();
+        if (player.getUserID() == "154000388121559040") {
+            mention += " " + Emoji.fromFormatted(Emojis.BortWindow);
+        }
+        return mention;
     }
 
     public static String getPlayerRepresentation(Player player) {

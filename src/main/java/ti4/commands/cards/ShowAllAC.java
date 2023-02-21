@@ -52,7 +52,7 @@ public class ShowAllAC extends CardsSubcommandData {
             return;
         }
 
-        MessageHelper.sentToMessageToUser(event, sb.toString(), user);
+        MessageHelper.sendMessageToUser(sb.toString(), user);
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
 }

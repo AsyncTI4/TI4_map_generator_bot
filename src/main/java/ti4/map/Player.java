@@ -1,6 +1,6 @@
 package ti4.map;
 
-import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import ti4.MapGenerator;
@@ -47,13 +47,14 @@ public class Player {
     private List<String> mahactCC = new ArrayList<>();
     private List<Leader> leaders = new ArrayList<>();
 
+    private HashMap<String,String> debt_tokens = new HashMap<>();
     private HashMap<String,String> fow_seenTiles = new HashMap<>();
     private HashMap<String,String> fow_customLabels = new HashMap<>();
 
     @Nullable
     private Role roleForCommunity = null;
     @Nullable
-    private Channel channelForCommunity = null;
+    private MessageChannel privateChannel = null;
 
 
     private int crf = 0;
@@ -99,12 +100,12 @@ public class Player {
     }
 
     @Nullable
-    public Channel getChannelForCommunity() {
-        return channelForCommunity;
+    public MessageChannel getPrivateChannel() {
+        return privateChannel;
     }
 
-    public void setChannelForCommunity(Channel channelForCommunity) {
-        this.channelForCommunity = channelForCommunity;
+    public void setPrivateChannel(MessageChannel privateChannel) {
+        this.privateChannel = privateChannel;
     }
 
     public void setUserID(String userID) {

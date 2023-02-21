@@ -2,6 +2,7 @@ package ti4.map;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.player.PlanetRemove;
 import ti4.generator.Mapper;
@@ -34,6 +35,10 @@ public class Map {
     private boolean communityMode = false;
     private boolean allianceMode = false;
     private boolean fowMode = false;
+    private boolean hasEnded = false;
+
+    @Nullable
+    private MessageChannel mainChannel = null;
 
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
@@ -192,6 +197,14 @@ public class Map {
         return fowMode;
     }
 
+    public void setMainGameChannel(MessageChannel channel) {
+        mainChannel = channel;
+    }
+
+    public MessageChannel getMainGameChannel() {
+        return mainChannel;
+    }
+
     public void setAllianceMode(boolean allianceMode) {
         this.allianceMode = allianceMode;
     }
@@ -201,6 +214,14 @@ public class Map {
 
     public void setCommunityMode(boolean communityMode) {
         this.communityMode = communityMode;
+    }
+
+    public boolean isHasEnded() {
+        return hasEnded;
+    }
+
+    public void setHasEnded(boolean hasEnded) {
+        this.hasEnded = hasEnded;
     }
 
     public void setCreationDate(String creationDate) {

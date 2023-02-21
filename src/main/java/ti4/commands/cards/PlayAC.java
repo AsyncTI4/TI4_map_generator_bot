@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -43,6 +44,8 @@ public class PlayAC extends CardsSubcommandData {
     }
 
     public static void playAC(SlashCommandInteractionEvent event, Map activeMap, Player player, String value, MessageChannel channel, Guild guild, ButtonInteractionEvent buttonInteractionEvent) {
+        MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? channel : activeMap.getMainGameChannel();
+        
         String acID = null;
         int acIndex = -1;
         try {
@@ -85,18 +88,19 @@ public class PlayAC extends CardsSubcommandData {
         activeMap.discardActionCard(player.getUserID(), acIndex);
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getGamePing(guild, activeMap)).append(" ").append(activeMap.getName()).append("\n");
-        sb.append(Helper.getPlayerRepresentation(event, player)).append(" played an Action Card:\n");
+
+        if (activeMap.isFoWMode()) {
+            sb.append("Someone played an Action Card:\n");
+        } else {
+            sb.append(Helper.getPlayerRepresentation(event, player)).append(" played an Action Card:\n");
+        }
         sb.append(Emojis.ActionCard).append("__**").append(actionCardTitle).append("**__ (").append(actionCardPhase).append(" Phase)\n");
         sb.append(">  _").append(actionCardWindow).append(":_\n");
         sb.append(">  ").append(actionCardText).append("\n");
 
         Button sabotageButton = Button.danger("sabotage", "Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
         Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(Emoji.fromFormatted(Emojis.NoSabotage));
-        if (acID.contains("sabo")) {
-            MessageHelper.sendMessageToChannelWithButtons(channel, sb.toString(), null);
-        } else {
-            MessageHelper.sendMessageToChannelWithButtons(channel, sb.toString(), guild, sabotageButton, noSabotageButton);
-        }
+        MessageHelper.sendMessageToChannelWithButtons(mainGameChannel, sb.toString(), guild, sabotageButton, noSabotageButton);
         CardsInfo.sentUserCardInfo(event, activeMap, player, buttonInteractionEvent);
     }
 }

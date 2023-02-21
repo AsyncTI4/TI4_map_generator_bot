@@ -29,17 +29,17 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null){
-            MessageHelper.sentToMessageToUser(event, sb.toString());
+            MessageHelper.sendMessageToUser(sb.toString(), event);
         } else {
             User userById = event.getJDA().getUserById(player.getUserID());
             if (userById != null) {
-                if (activeMap.isCommunityMode() && player.getChannelForCommunity() instanceof MessageChannel) {
-                    MessageHelper.sendMessageToChannel((MessageChannel) player.getChannelForCommunity(), sb.toString());
+                if (activeMap.isCommunityMode() && player.getPrivateChannel() instanceof MessageChannel) {
+                    MessageHelper.sendMessageToChannel((MessageChannel) player.getPrivateChannel(), sb.toString());
                 } else {
-                    MessageHelper.sentToMessageToUser(event, sb.toString(), userById);
+                    MessageHelper.sendMessageToUser(sb.toString(), userById);
                 }
             } else {
-                MessageHelper.sentToMessageToUser(event, sb.toString());
+                MessageHelper.sendMessageToUser(sb.toString(), event);
             }
         }
     }
