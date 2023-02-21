@@ -520,6 +520,15 @@ public class Helper {
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }
+    
+    public static String getFactionLeaderEmoji(String faction, Leader leader) {
+        return getEmojiFromDiscord(faction + leader.getId() + leader.getName());
+    }
+
+    public static String getFactionLeaderEmoji(Player player, Leader leader) {
+        return getFactionLeaderEmoji(player.getFaction(), leader);
+    }
+
     public static String getLeaderRepresentation(String faction, Leader leader, boolean includeTitle, boolean includeAbility) {
         String leaderID = faction + leader.getId() + leader.getName();
 

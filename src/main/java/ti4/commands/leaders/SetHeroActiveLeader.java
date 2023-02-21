@@ -46,7 +46,7 @@ public class SetHeroActiveLeader extends LeaderAction {
         StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
         .append(" played ")
         .append(playerLeader.getId()).append(" ")
-        .append(Helper.getPlayerFactionLeaderEmoji(player, leader)).append(" ")
+        .append(Helper.getFactionLeaderEmoji(player, playerLeader)).append(" ")
         .append(playerLeader.getName());
         if ("letnev".equals(playerFaction) || "nomad".equals(playerFaction)) {
             if (playerLeader != null && Constants.HERO.equals(playerLeader.getId())) {

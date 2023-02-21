@@ -28,7 +28,7 @@ public class ExhaustLeader extends LeaderAction {
                 return;
             }
             playerLeader.setExhausted(true);
-            MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerFactionLeaderEmoji(player, leader));
+            MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getFactionLeaderEmoji(player, playerLeader));
             StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
                     .append(" exhausted ")
                     .append(playerLeader.getId()).append(" ")
