@@ -39,9 +39,13 @@ public class SetHeroActiveLeader extends LeaderAction {
         String playerFaction = player.getFaction();
 
         if (playerLeader != null && playerLeader.isLocked()) {
-            editReplyMessage("Leader locked, use command to unlock `/leaders unlock leader:hero`");
+            editReplyMessage("Leader '" + leader + "' is locked, use command to unlock `/leaders unlock leader:" + leader + "`");
+            return;
+        } else if(playerLeader == null) {
+            editReplyMessage("Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
             return;
         }
+        
         editReplyMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
         StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
         .append(" played ")
