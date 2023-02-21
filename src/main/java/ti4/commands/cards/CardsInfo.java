@@ -27,6 +27,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -78,10 +79,12 @@ public class CardsInfo extends CardsSubcommandData {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("--------------------\n");
-        sb.append("**Game: **").append(activeMap.getName()).append("\n");
+        sb.append("**Game: **`").append(activeMap.getName()).append("`\n");
         sb.append(Helper.getPlayerRepresentation(event, player));
         int index = 1;
         sb.append("\n");
+
+        //SCORED SECRET OBJECTIVES
         sb.append("**Scored Secret Objectives:**").append("\n");
         if (scoredSecretObjective != null) {
             for (java.util.Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
@@ -96,6 +99,8 @@ public class CardsInfo extends CardsSubcommandData {
             }
         }
         sb.append("\n");
+
+        //UNSCORED SECRET OBJECTIVES
         sb.append("**Unscored Secret Objectives:**").append("\n");
         List<Button> soButtons = new ArrayList<>();
         if (secretObjective != null) {
@@ -117,6 +122,8 @@ public class CardsInfo extends CardsSubcommandData {
         sb = new StringBuilder();
 
         sb.append("_ _\n");
+
+        //ACTION CARDS
         sb.append("**Action Cards:**").append("\n");
         index = 1;
 
@@ -143,6 +150,8 @@ public class CardsInfo extends CardsSubcommandData {
         acText = sb.toString();
         sb = new StringBuilder();
         sb.append("_ _\n");
+
+        //PROMISSORY NOTES
         sb.append("**Promissory Notes:**").append("\n");
         index = 1;
         LinkedHashMap<String, Integer> promissoryNotes = player.getPromissoryNotes();
@@ -157,6 +166,8 @@ public class CardsInfo extends CardsSubcommandData {
                 }
             }
             sb.append("\n");
+
+            //PLAY AREA PROMISSORY NOTES
             sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (promissoryNotesInPlayArea.contains(pn.getKey())) {
@@ -167,8 +178,25 @@ public class CardsInfo extends CardsSubcommandData {
                 }
             }
         }
-        sb.append("--------------------\n");
         pnText = sb.toString();
+
+        //LEADERS
+        sb = new StringBuilder();
+        sb.append("_ _\n");
+        sb.append("**Leaders:**").append("\n");
+        for (Leader leader : player.getLeaders()) {
+            if (leader.isLocked()) {
+                sb.append("LOCKED: ").append(Helper.getLeaderLockedRepresentation(player, leader)).append("\n");
+            } else if (leader.isExhausted()) {
+                sb.append("EXHAUSTED: ").append("~~").append(Helper.getLeaderFullRepresentation(player, leader)).append("~~\n");
+            } else if (leader.isActive()) {
+                sb.append("ACTIVE: ").append(Helper.getLeaderFullRepresentation(player, leader)).append("\nActive Hero will be purged during `/status cleanup`\n");
+            } else {
+                sb.append(Helper.getLeaderFullRepresentation(player, leader)).append("\n");
+            }
+        }
+        String leadersText = sb.toString();
+        sb.append("--------------------\n");
         User userById = event != null ? event.getJDA().getUserById(player.getUserID()) : (buttonEvent != null ? buttonEvent.getJDA().getUserById(player.getUserID()) : null);
         if (userById != null) {
             String cardInfo = soText + "\n" + acText + "\n" + pnText;
@@ -238,7 +266,7 @@ public class CardsInfo extends CardsSubcommandData {
 
                     for (ThreadChannel threadChannel : threadChannels) {
                         if (threadChannel.getName().equals(threadName)) {
-                            sendCardInfoToChannel(threadChannel, playerPing, soText, soButtons, acText, acButtons, pnText);
+                            sendCardInfoToChannel(threadChannel, playerPing, soText, soButtons, acText, acButtons, pnText, leadersText);
                             threadFound = true;
                             break;
                         }
@@ -248,7 +276,7 @@ public class CardsInfo extends CardsSubcommandData {
                             .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR)
                             .setInvitable(false)
                             .complete();
-                        sendCardInfoToChannel(new_thread, playerPing, soText, soButtons, acText, acButtons, pnText);
+                        sendCardInfoToChannel(new_thread, playerPing, soText, soButtons, acText, acButtons, pnText, leadersText);
                     }
                 } catch (Exception e) {
                     BotLogger.log("Could not create Private Thread");
@@ -259,7 +287,7 @@ public class CardsInfo extends CardsSubcommandData {
         }
     }
 
-    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String so, List<Button> soButtons, String ac, List<Button> acButtons, String pn) {
+    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String so, List<Button> soButtons, String ac, List<Button> acButtons, String pn, String leadersText) {
         String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
         String acPlayMsg = "_ _\nClick a button below to play an Action Card";
         String text = ping == null ? null : ping + "\n";
@@ -275,6 +303,7 @@ public class CardsInfo extends CardsSubcommandData {
             privateChannel.sendMessage(message).queue();
         }
         MessageHelper.sendMessageToChannel(privateChannel, pn);
+        MessageHelper.sendMessageToChannel(privateChannel, leadersText);
     }
 
     private static List<MessageCreateData> getMessageObject(String message, List<Button> buttons) {
