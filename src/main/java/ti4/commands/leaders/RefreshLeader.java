@@ -27,8 +27,7 @@ public class RefreshLeader extends LeaderAction {
             MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getFactionLeaderEmoji(player, playerLeader));
             StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
                     .append(" readied ")
-                    .append(playerLeader.getId()). append(" ")
-                    .append(playerLeader.getName());
+                    .append(Helper.getLeaderRepresentation(player, playerLeader, false, false));
             if (tgCount > 0) {
                 message.append(" - ").append(String.valueOf(tgCount)).append(Emojis.tg).append(" transferred from leader to player");
             }
