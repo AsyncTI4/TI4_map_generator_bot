@@ -213,6 +213,20 @@ public class CardsInfo extends CardsSubcommandData {
         }
         pnText = sb.toString();
 
+        //ADD YSSARIL AGENT REFERENCE
+        if (player.getFaction().equals("yssaril")) {
+            leaderSB.append("_ _\n");
+            leaderSB.append("**Other Faction's Agents:**").append("\n");
+            for (Player player_ : activeMap.getPlayers().values()) {
+                if (player_ != player) {
+                    if (player.getLeader(Constants.AGENT).isExhausted()) {
+                        leaderSB.append("EXHAUSTED: ").append(Helper.getLeaderFullRepresentation(player_, player_.getLeader(Constants.AGENT))).append("\n");
+                    } else {
+                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, player_.getLeader(Constants.AGENT))).append("\n");
+                    }
+                }
+            }
+        }
         leaderSB.append("--------------------\n");
         String leadersText = leaderSB.toString();
 
