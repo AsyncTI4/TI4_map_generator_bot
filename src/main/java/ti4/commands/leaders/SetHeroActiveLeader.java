@@ -45,7 +45,7 @@ public class SetHeroActiveLeader extends LeaderAction {
 
         StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
         .append(" played ")
-        .append(Helper.getLeaderRepresentation(player, playerLeader, true, true));
+        .append(Helper.getLeaderFullRepresentation(player, playerLeader));
         if ("letnev".equals(playerFaction) || "nomad".equals(playerFaction)) {
             if (playerLeader != null && Constants.HERO.equals(playerLeader.getId())) {
                 playerLeader.setLocked(false);
