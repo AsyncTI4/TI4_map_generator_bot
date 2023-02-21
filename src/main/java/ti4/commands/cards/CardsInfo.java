@@ -227,6 +227,19 @@ public class CardsInfo extends CardsSubcommandData {
                 }
             }
         }
+
+        //ADD MAHACT IMPERIA REFERENCE
+        if (player.getFaction().equals("mahact")) {
+            leaderSB.append("_ _\n");
+            leaderSB.append("**Imperia Commanders:**").append("\n");
+            for (Player player_ : activeMap.getPlayers().values()) {
+                if (player_ != player) {
+                    if (player.getMahactCC().contains(player_.getColor())) {
+                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, player_.getLeader(Constants.COMMANDER))).append("\n");
+                    }
+                }
+            }
+        }
         leaderSB.append("--------------------\n");
         String leadersText = leaderSB.toString();
 
