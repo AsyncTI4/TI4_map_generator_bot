@@ -529,6 +529,10 @@ public class Helper {
         return getFactionLeaderEmoji(player.getFaction(), leader);
     }
 
+    public static String getLeaderRepresentation(Player player, Leader leader, boolean includeTitle, boolean includeAbility) {
+        return getLeaderRepresentation(player.getFaction(), leader, includeTitle, includeAbility);
+    }
+
     public static String getLeaderRepresentation(String faction, Leader leader, boolean includeTitle, boolean includeAbility) {
         String leaderID = faction + leader.getId() + leader.getName();
 
