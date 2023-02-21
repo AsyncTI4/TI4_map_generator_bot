@@ -151,6 +151,22 @@ public class CardsInfo extends CardsSubcommandData {
         sb = new StringBuilder();
         sb.append("_ _\n");
 
+        // LEADERS
+        StringBuilder leaderSB = new StringBuilder();
+        leaderSB.append("_ _\n");
+        leaderSB.append("**Leaders:**").append("\n");
+        for (Leader leader : player.getLeaders()) {
+            if (leader.isLocked()) {
+                leaderSB.append("LOCKED: ").append(Helper.getLeaderLockedRepresentation(player, leader)).append("\n");
+            } else if (leader.isExhausted()) {
+                leaderSB.append("EXHAUSTED: ").append("~~").append(Helper.getLeaderFullRepresentation(player, leader)).append("~~\n");
+            } else if (leader.isActive()) {
+                leaderSB.append("ACTIVE: ").append(Helper.getLeaderFullRepresentation(player, leader)).append("\nActive Hero will be purged during `/status cleanup`\n");
+            } else {
+                leaderSB.append(Helper.getLeaderFullRepresentation(player, leader)).append("\n");
+            }
+        }
+        
         //PROMISSORY NOTES
         sb.append("**Promissory Notes:**").append("\n");
         index = 1;
@@ -171,32 +187,35 @@ public class CardsInfo extends CardsSubcommandData {
             sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (promissoryNotesInPlayArea.contains(pn.getKey())) {
+                    String pnData = Mapper.getPromissoryNote(pn.getKey(), longPNDisplay);
                     sb.append("`").append(index).append(".").append("(" + pn.getValue()).append(")`");
-                    sb.append(Emojis.PN).append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
+                    sb.append(Emojis.PN).append(pnData);
                     sb.append("\n");
                     index++;
+                    if (pnData.contains("Alliance")) {
+                        String[] split = pnData.split(";");
+                        if (split.length < 2) continue;
+                        String colour = split[1];
+                        for (Player player_ : activeMap.getPlayers().values()) {
+                            if (player_.getColor().equalsIgnoreCase(colour)) {
+                                Leader playerLeader = player_.getLeader(Constants.COMMANDER);
+                                leaderSB.append("ALLIANCE: ");
+                                if (playerLeader.isLocked()) {
+                                    leaderSB.append("(LOCKED) ").append(Helper.getLeaderLockedRepresentation(player_, playerLeader)).append("\n");
+                                } else {
+                                    leaderSB.append(Helper.getLeaderFullRepresentation(player_, playerLeader)).append("\n");
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
         pnText = sb.toString();
 
-        //LEADERS
-        sb = new StringBuilder();
-        sb.append("_ _\n");
-        sb.append("**Leaders:**").append("\n");
-        for (Leader leader : player.getLeaders()) {
-            if (leader.isLocked()) {
-                sb.append("LOCKED: ").append(Helper.getLeaderLockedRepresentation(player, leader)).append("\n");
-            } else if (leader.isExhausted()) {
-                sb.append("EXHAUSTED: ").append("~~").append(Helper.getLeaderFullRepresentation(player, leader)).append("~~\n");
-            } else if (leader.isActive()) {
-                sb.append("ACTIVE: ").append(Helper.getLeaderFullRepresentation(player, leader)).append("\nActive Hero will be purged during `/status cleanup`\n");
-            } else {
-                sb.append(Helper.getLeaderFullRepresentation(player, leader)).append("\n");
-            }
-        }
-        String leadersText = sb.toString();
-        sb.append("--------------------\n");
+        leaderSB.append("--------------------\n");
+        String leadersText = leaderSB.toString();
+
         User userById = event != null ? event.getJDA().getUserById(player.getUserID()) : (buttonEvent != null ? buttonEvent.getJDA().getUserById(player.getUserID()) : null);
         if (userById != null) {
             String cardInfo = soText + "\n" + acText + "\n" + pnText;
