@@ -36,6 +36,7 @@ public abstract class CardsSubcommandData extends SubcommandData {
     public void preExecute(SlashCommandInteractionEvent event) {
         user = event.getUser();
         activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
+        Helper.checkThreadLimitAndArchive(event.getGuild());
 
         Player player = Helper.getGamePlayer(activeMap, null, event, user.getId());
         if (player != null) {
