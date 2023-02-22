@@ -127,7 +127,7 @@ public class Turn extends PlayerSubcommandData {
                 if (po_name == null) {
                     Integer integer = customPublicVP.get(key);
                     if (integer != null) {
-                        if (key.toLowerCase().contains("custodian") || key.toLowerCase().contains("imperial")) {
+                        if (key.toLowerCase().contains("custodian") || key.toLowerCase().contains("imperial") ||  key.contains("Shard of the Throne")) {
                             //Don't add it for now
                         } else {
                             po_name = key;
