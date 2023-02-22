@@ -27,6 +27,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -36,7 +37,7 @@ import java.util.*;
 
 public class CardsInfo extends CardsSubcommandData {
 
-    public static final String CARDS_INFO = "Cards Info-";
+    public static final String CARDS_INFO = Constants.CARDS_INFO_THREAD_PREFIX;
     private static HashMap<Map, TextChannel> threadTextChannels = new HashMap<>();
 
     public CardsInfo() {
@@ -78,10 +79,12 @@ public class CardsInfo extends CardsSubcommandData {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("--------------------\n");
-        sb.append("**Game: **").append(activeMap.getName()).append("\n");
+        sb.append("**Game: **`").append(activeMap.getName()).append("`\n");
         sb.append(Helper.getPlayerRepresentation(event, player));
         int index = 1;
         sb.append("\n");
+
+        //SCORED SECRET OBJECTIVES
         sb.append("**Scored Secret Objectives:**").append("\n");
         if (scoredSecretObjective != null) {
             for (java.util.Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
@@ -96,6 +99,8 @@ public class CardsInfo extends CardsSubcommandData {
             }
         }
         sb.append("\n");
+
+        //UNSCORED SECRET OBJECTIVES
         sb.append("**Unscored Secret Objectives:**").append("\n");
         List<Button> soButtons = new ArrayList<>();
         if (secretObjective != null) {
@@ -117,6 +122,8 @@ public class CardsInfo extends CardsSubcommandData {
         sb = new StringBuilder();
 
         sb.append("_ _\n");
+
+        //ACTION CARDS
         sb.append("**Action Cards:**").append("\n");
         index = 1;
 
@@ -143,6 +150,8 @@ public class CardsInfo extends CardsSubcommandData {
         acText = sb.toString();
         sb = new StringBuilder();
         sb.append("_ _\n");
+       
+        //PROMISSORY NOTES
         sb.append("**Promissory Notes:**").append("\n");
         index = 1;
         LinkedHashMap<String, Integer> promissoryNotes = player.getPromissoryNotes();
@@ -157,18 +166,21 @@ public class CardsInfo extends CardsSubcommandData {
                 }
             }
             sb.append("\n");
+
+            //PLAY AREA PROMISSORY NOTES
             sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (promissoryNotesInPlayArea.contains(pn.getKey())) {
+                    String pnData = Mapper.getPromissoryNote(pn.getKey(), longPNDisplay);
                     sb.append("`").append(index).append(".").append("(" + pn.getValue()).append(")`");
-                    sb.append(Emojis.PN).append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
+                    sb.append(Emojis.PN).append(pnData);
                     sb.append("\n");
                     index++;
                 }
             }
         }
-        sb.append("--------------------\n");
         pnText = sb.toString();
+
         User userById = event != null ? event.getJDA().getUserById(player.getUserID()) : (buttonEvent != null ? buttonEvent.getJDA().getUserById(player.getUserID()) : null);
         if (userById != null) {
             String cardInfo = soText + "\n" + acText + "\n" + pnText;
@@ -207,7 +219,7 @@ public class CardsInfo extends CardsSubcommandData {
                         textChannel = (TextChannel) channel;
                     }
                     if (textChannel == null) {
-                        String mainChannelName = activeMap.getName() + "-actions";
+                        String mainChannelName = activeMap.getName() + Constants.ACTIONS_CHANNEL_SUFFIX;
                         for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
                             if (textChannel_.getName().equals(mainChannelName)) {
                                 textChannel = textChannel_;

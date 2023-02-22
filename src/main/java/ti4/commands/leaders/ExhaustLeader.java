@@ -28,12 +28,10 @@ public class ExhaustLeader extends LeaderAction {
                 return;
             }
             playerLeader.setExhausted(true);
-
-            editReplyMessage(Helper.getPlayerFactionLeaderEmoji(player, leader));
+            editReplyMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
             StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(event, player))
                     .append(" exhausted ")
-                    .append(playerLeader.getId()).append(" ")
-                    .append(playerLeader.getName());
+                    .append(Helper.getLeaderFullRepresentation(player, playerLeader));
             OptionMapping optionTG = event.getOption(Constants.TG);
             if (optionTG != null) {
                 Stats.setValue(event, player, optionTG, playerLeader::setTgCount, playerLeader::getTgCount);

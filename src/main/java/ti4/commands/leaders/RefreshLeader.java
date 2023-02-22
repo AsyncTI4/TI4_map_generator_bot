@@ -24,11 +24,10 @@ public class RefreshLeader extends LeaderAction {
             }
             int tgCount = playerLeader.getTgCount();
             refreshLeader(player, playerLeader);
-            editReplyMessage(Helper.getPlayerFactionLeaderEmoji(player, leader));
+            editReplyMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
             StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
                     .append(" readied ")
-                    .append(playerLeader.getId()). append(" ")
-                    .append(playerLeader.getName());
+                    .append(Helper.getLeaderShortRepresentation(player, playerLeader));
             if (tgCount > 0) {
                 message.append(" - ").append(String.valueOf(tgCount)).append(Emojis.tg).append(" transferred from leader to player");
             }

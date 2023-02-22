@@ -81,7 +81,7 @@ public class ButtonListener extends ListenerAdapter {
 
         MessageChannel actionsChannel = null;
         for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
-            if (textChannel_.getName().equals(gameName + "-actions")) {
+            if (textChannel_.getName().equals(gameName + Constants.ACTIONS_CHANNEL_SUFFIX)) {
                 actionsChannel = textChannel_;
                 break;
             }
