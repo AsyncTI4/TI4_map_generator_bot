@@ -4,8 +4,6 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -17,6 +15,7 @@ import org.jetbrains.annotations.Nullable;
 import ti4.MapGenerator;
 import ti4.ResourceHelper;
 import ti4.commands.bothelper.ArchiveOldThreads;
+import ti4.commands.bothelper.ListOldChannels;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
 import ti4.map.*;
@@ -735,9 +734,10 @@ public class Helper {
 
     public static void checkThreadLimitAndArchive(Guild guild) {
         int threadCount = guild.getThreadChannels().size();
-        int closeCount = 10;
-        if (threadCount > 995) {
-            BotLogger.log("`Helper.checkThreadLimit:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads");
+        int closeCount = 1;
+        if (threadCount > 5) {
+            BotLogger.log("`Helper.checkThreadLimit:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
+            BotLogger.log(ListOldChannels.getOldThreadsMessage(guild, closeCount));
             ArchiveOldThreads.archiveOldThreads(guild, closeCount);
         }
     }
