@@ -87,6 +87,7 @@ public class ScorePublic extends StatusSubcommandData {
         }
         String message = Helper.getPlayerRepresentation(event, player) + " scored " + emojiName + " __**" + poName + "**__";
         MessageHelper.sendMessageToChannel(channel, message);
+        Helper.checkIfHeroUnlocked(event, activeMap, player);
     }
 
     public static void informAboutScoring(ButtonInteractionEvent event, MessageChannel channel, Map activeMap, Player player, int poID) {

@@ -65,5 +65,6 @@ public class ScoreSO extends SOCardsSubcommandData {
         }
         MessageHelper.sendMessageToChannel(channel, message.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player, buttonInteractionEvent);
+        Helper.checkIfHeroUnlocked(event, activeMap, player);
     }
 }

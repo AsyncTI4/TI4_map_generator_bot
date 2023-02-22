@@ -15,6 +15,10 @@ public class UnlockLeader extends LeaderAction {
 
     @Override
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
+        unlockLeader(event, leader, activeMap, player);
+    }
+
+    public void unlockLeader(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null){
             playerLeader.setLocked(false);
