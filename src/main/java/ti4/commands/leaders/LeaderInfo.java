@@ -38,7 +38,7 @@ public class LeaderInfo extends LeaderSubcommandData {
     
     public LeaderInfo() {
         super(Constants.INFO, "Send Leader info to your Cards-Info thread");
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false));
+        // addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
@@ -47,9 +47,10 @@ public class LeaderInfo extends LeaderSubcommandData {
         User user = getUser();
         Player player = activeMap.getPlayer(user.getId());
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+           editReplyMessage("Player could not be found");
             return;
         }
+        editReplyMessage(Helper.getPlayerRepresentation(event, player) + " Leader Info:");
 
         String leaderInfo = getLeaderInfo(activeMap, player);
 
@@ -60,7 +61,7 @@ public class LeaderInfo extends LeaderSubcommandData {
             }
         }
 
-        MessageHelper.replyToMessage(event, leaderInfo);
+        MessageHelper.sendMessageToChannel(event.getChannel(), leaderInfo);
     }
 
     public static String getLeaderInfo(Map activeMap, Player player) {
