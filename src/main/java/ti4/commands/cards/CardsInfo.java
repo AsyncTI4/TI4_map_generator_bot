@@ -150,23 +150,7 @@ public class CardsInfo extends CardsSubcommandData {
         acText = sb.toString();
         sb = new StringBuilder();
         sb.append("_ _\n");
-
-        // LEADERS
-        StringBuilder leaderSB = new StringBuilder();
-        leaderSB.append("_ _\n");
-        leaderSB.append("**Leaders:**").append("\n");
-        for (Leader leader : player.getLeaders()) {
-            if (leader.isLocked()) {
-                leaderSB.append("LOCKED: ").append(Helper.getLeaderLockedRepresentation(player, leader)).append("\n");
-            } else if (leader.isExhausted()) {
-                leaderSB.append("EXHAUSTED: ").append("~~").append(Helper.getLeaderFullRepresentation(player, leader)).append("~~\n");
-            } else if (leader.isActive()) {
-                leaderSB.append("ACTIVE: ").append(Helper.getLeaderFullRepresentation(player, leader)).append("\nActive Hero will be purged during `/status cleanup`\n");
-            } else {
-                leaderSB.append(Helper.getLeaderFullRepresentation(player, leader)).append("\n");
-            }
-        }
-        
+       
         //PROMISSORY NOTES
         sb.append("**Promissory Notes:**").append("\n");
         index = 1;
@@ -192,56 +176,10 @@ public class CardsInfo extends CardsSubcommandData {
                     sb.append(Emojis.PN).append(pnData);
                     sb.append("\n");
                     index++;
-                    if (pnData.contains("Alliance")) {
-                        String[] split = pnData.split(";");
-                        if (split.length < 2) continue;
-                        String colour = split[1];
-                        for (Player player_ : activeMap.getPlayers().values()) {
-                            if (player_.getColor().equalsIgnoreCase(colour)) {
-                                Leader playerLeader = player_.getLeader(Constants.COMMANDER);
-                                leaderSB.append("ALLIANCE: ");
-                                if (playerLeader.isLocked()) {
-                                    leaderSB.append("(LOCKED) ").append(Helper.getLeaderLockedRepresentation(player_, playerLeader)).append("\n");
-                                } else {
-                                    leaderSB.append(Helper.getLeaderFullRepresentation(player_, playerLeader)).append("\n");
-                                }
-                            }
-                        }
-                    }
                 }
             }
         }
         pnText = sb.toString();
-
-        //ADD YSSARIL AGENT REFERENCE
-        if (player.getFaction().equals("yssaril")) {
-            leaderSB.append("_ _\n");
-            leaderSB.append("**Other Faction's Agents:**").append("\n");
-            for (Player player_ : activeMap.getPlayers().values()) {
-                if (player_ != player) {
-                    if (player.getLeader(Constants.AGENT).isExhausted()) {
-                        leaderSB.append("EXHAUSTED: ").append(Helper.getLeaderFullRepresentation(player_, player_.getLeader(Constants.AGENT))).append("\n");
-                    } else {
-                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, player_.getLeader(Constants.AGENT))).append("\n");
-                    }
-                }
-            }
-        }
-
-        //ADD MAHACT IMPERIA REFERENCE
-        if (player.getFaction().equals("mahact")) {
-            leaderSB.append("_ _\n");
-            leaderSB.append("**Imperia Commanders:**").append("\n");
-            for (Player player_ : activeMap.getPlayers().values()) {
-                if (player_ != player) {
-                    if (player.getMahactCC().contains(player_.getColor())) {
-                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, player_.getLeader(Constants.COMMANDER))).append("\n");
-                    }
-                }
-            }
-        }
-        leaderSB.append("--------------------\n");
-        String leadersText = leaderSB.toString();
 
         User userById = event != null ? event.getJDA().getUserById(player.getUserID()) : (buttonEvent != null ? buttonEvent.getJDA().getUserById(player.getUserID()) : null);
         if (userById != null) {
@@ -312,7 +250,7 @@ public class CardsInfo extends CardsSubcommandData {
 
                     for (ThreadChannel threadChannel : threadChannels) {
                         if (threadChannel.getName().equals(threadName)) {
-                            sendCardInfoToChannel(threadChannel, playerPing, soText, soButtons, acText, acButtons, pnText, leadersText);
+                            sendCardInfoToChannel(threadChannel, playerPing, soText, soButtons, acText, acButtons, pnText);
                             threadFound = true;
                             break;
                         }
@@ -322,7 +260,7 @@ public class CardsInfo extends CardsSubcommandData {
                             .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR)
                             .setInvitable(false)
                             .complete();
-                        sendCardInfoToChannel(new_thread, playerPing, soText, soButtons, acText, acButtons, pnText, leadersText);
+                        sendCardInfoToChannel(new_thread, playerPing, soText, soButtons, acText, acButtons, pnText);
                     }
                 } catch (Exception e) {
                     BotLogger.log("Could not create Private Thread");
@@ -333,7 +271,7 @@ public class CardsInfo extends CardsSubcommandData {
         }
     }
 
-    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String so, List<Button> soButtons, String ac, List<Button> acButtons, String pn, String leadersText) {
+    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String so, List<Button> soButtons, String ac, List<Button> acButtons, String pn) {
         String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
         String acPlayMsg = "_ _\nClick a button below to play an Action Card";
         String text = ping == null ? null : ping + "\n";
@@ -349,7 +287,6 @@ public class CardsInfo extends CardsSubcommandData {
             privateChannel.sendMessage(message).queue();
         }
         MessageHelper.sendMessageToChannel(privateChannel, pn);
-        MessageHelper.sendMessageToChannel(privateChannel, leadersText);
     }
 
     private static List<MessageCreateData> getMessageObject(String message, List<Button> buttons) {
