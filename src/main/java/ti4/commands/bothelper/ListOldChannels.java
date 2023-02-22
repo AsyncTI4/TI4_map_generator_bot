@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.TimeUtil;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
@@ -38,7 +39,7 @@ public class ListOldChannels extends BothelperSubcommandData {
         
         StringBuilder sb = new StringBuilder("Least Active Channels:\n>>> ");
         for (TextChannel channel : channels) {
-            sb.append("`" + channel.getLatestMessageId() + "`  " + channel.getAsMention()).append("\n");
+            sb.append("`" + TimeUtil.getTimeCreated(channel.getLatestMessageIdLong()).toString() + "`  " + channel.getAsMention()).append("\n");
         }
         return sb.toString();
     }
@@ -54,7 +55,7 @@ public class ListOldChannels extends BothelperSubcommandData {
         
         sb = new StringBuilder("Least Active Threads:\n>>> ");
         for (ThreadChannel threadChannel : threadChannels) {
-            sb.append("`" + threadChannel.getLatestMessageId() + "`  " + threadChannel.getAsMention()).append("\n");
+            sb.append("`" + TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong()).toString() + "`  " + threadChannel.getAsMention()).append("\n");
         }
         return sb.toString();
     }
