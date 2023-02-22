@@ -2,11 +2,9 @@ package ti4.commands.bothelper;
 
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -25,8 +23,13 @@ public class ListOldChannels extends BothelperSubcommandData {
             MessageHelper.replyToMessage(event, "Please choose a number between 1 and 100");
             return;
         }
-        
-        List<TextChannel> channels = event.getGuild().getTextChannels();
+        Guild guild = event.getGuild();
+        MessageHelper.replyToMessage(event, getOldChannelsMessage(guild, channelCount));
+        MessageHelper.sendMessageToChannel(event, getOldThreadsMessage(guild, channelCount));
+    }
+
+    public static String getOldChannelsMessage(Guild guild, Integer channelCount) {
+        List<TextChannel> channels = guild.getTextChannels();
         channels = channels.stream()
                             .filter(c -> c.getLatestMessageId() != "0")
                             .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
@@ -37,6 +40,22 @@ public class ListOldChannels extends BothelperSubcommandData {
         for (TextChannel channel : channels) {
             sb.append("`" + channel.getLatestMessageId() + "`  " + channel.getAsMention()).append("\n");
         }
-        MessageHelper.replyToMessage(event, sb.toString());
+        return sb.toString();
+    }
+
+    public static String getOldThreadsMessage(Guild guild, Integer channelCount) {
+        StringBuilder sb;
+        List<ThreadChannel> threadChannels = guild.getThreadChannels();
+        threadChannels = threadChannels.stream()
+                            .filter(c -> c.getLatestMessageId() != "0")
+                            .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
+                            .limit(channelCount)
+                            .toList();
+        
+        sb = new StringBuilder("Least Active Threads:\n>>> ");
+        for (ThreadChannel threadChannel : threadChannels) {
+            sb.append("`" + threadChannel.getLatestMessageId() + "`  " + threadChannel.getAsMention()).append("\n");
+        }
+        return sb.toString();
     }
 }
