@@ -30,8 +30,13 @@ public class RevealAgenda extends AgendaSubcommandData {
         if (uniqueID != null) {
             sb.append("(").append(uniqueID).append(") - ");
         }
-        sb.append(Mapper.getAgenda(id));
-        sb.append("\n-----------\n");
+        sb.append(Mapper.getAgenda(id)).append("\n");
+        switch (id) {
+            case ("mutiny") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Mutiny public_vp_worth:1`").append("\n");
+            case ("seed_empire") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Seed of an Empire public_vp_worth:1`").append("\n");
+            case ("censure") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`").append("\n");
+        }
+        sb.append("-----------\n");
         MessageHelper.sendMessageToChannel(event, sb.toString());
         String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you will **Play a When** or **Play an After** or not by pressing the buttons below:";
 

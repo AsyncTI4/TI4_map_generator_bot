@@ -39,6 +39,8 @@ public class SCPlay extends PlayerSubcommandData {
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
 
+        Helper.checkThreadLimitAndArchive(event.getGuild());
+
         MessageChannel eventChannel = event.getChannel();
         MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? eventChannel : activeMap.getMainGameChannel();
 
@@ -103,7 +105,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
-            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
+            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
             threadChannel.queue();
         });
         

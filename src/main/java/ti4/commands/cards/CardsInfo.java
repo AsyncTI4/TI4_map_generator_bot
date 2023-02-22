@@ -257,7 +257,7 @@ public class CardsInfo extends CardsSubcommandData {
                     }
                     if (!threadFound) {
                         ThreadChannel new_thread = textChannel.createThreadChannel(threadName, true)
-                            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR)
+                            .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS)
                             .setInvitable(false)
                             .complete();
                         sendCardInfoToChannel(new_thread, playerPing, soText, soButtons, acText, acButtons, pnText);
