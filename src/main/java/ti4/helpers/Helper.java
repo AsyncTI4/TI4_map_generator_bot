@@ -526,29 +526,65 @@ public class Helper {
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }
+    
+    public static String getFactionLeaderEmoji(String faction, Leader leader) {
+        return getEmojiFromDiscord(faction + leader.getId() + leader.getName());
+    }
 
-    public static String getPlayerFactionLeaderEmoji(Player player, String leader) {
-        String playerFaction = player.getFaction();
-        if (playerFaction.equals("nomad") && !leader.equals("commander") && !leader.equals("hero")) {
-            return switch (leader) {
-                case "artuno" -> Emojis.NomadAgentArtuno;
-                case "mercer" -> Emojis.NomadAgentMercer;
-                case "thundarian" -> Emojis.NomadAgentThundarian;
-                case "agent" -> Emojis.GoodDog;
-                default -> " ";
-            };
-        } else if (playerFaction.equals("keleres") && !leader.equals("agent") && !leader.equals("commander")) {
-            return switch (leader) {
-                case "kuuasi" -> Emojis.KeleresHeroKuuasi;
-                case "odlynn" -> Emojis.KeleresHeroOdlynn;
-                case "harka" -> Emojis.KeleresHeroHarka;
-                case "hero" -> Emojis.GoodDog;
-                default -> " ";
-            };
-        } else {
-            StringBuilder sb = new StringBuilder(playerFaction).append(leader);
-            return getEmojiFromDiscord(sb.toString());
+    public static String getFactionLeaderEmoji(Player player, Leader leader) {
+        return getFactionLeaderEmoji(player.getFaction(), leader);
+    }
+    
+    public static String getLeaderRepresentation(String faction, Leader leader, boolean includeTitle, boolean includeAbility, boolean includeUnlockCondition) {
+        String leaderID = faction + leader.getId() + leader.getName();
+
+        String leaderRep =  Mapper.getLeaderRepresentations().get(leaderID.toString());
+        if (leaderRep == null) {
+            BotLogger.log("Invalid `leaderID=" + leaderID.toString() + "` caught within `Helper.getLeaderRepresentation`");
+            return leader.getId();
         }
+
+        //leaderID = 0:LeaderName ; 1:LeaderTitle ; 2:BacksideTitle/HeroAbility ; 3:AbilityWindow ; 4:AbilityText 
+        String[] leaderRepSplit = leaderRep.split(";");
+        String leaderName = leaderRepSplit[0];
+        String leaderTitle = leaderRepSplit[1];
+        String heroAbilityName = leaderRepSplit[2];
+        String leaderAbilityWindow = leaderRepSplit[3];
+        String leaderAbilityText = leaderRepSplit[4];
+        String leaderUnlockCondition = leaderRepSplit[5];
+        
+        StringBuilder representation = new StringBuilder();
+        representation.append(getFactionLeaderEmoji(faction, leader)).append(" **").append(leaderName).append("**");
+        if (includeTitle) representation.append(": ").append(leaderTitle); //add title
+        if (includeAbility && leader.getId().equals(Constants.HERO)) representation.append(" - ").append("__**").append(heroAbilityName).append("**__"); //add hero ability name
+        if (includeAbility) representation.append(" - *").append(leaderAbilityWindow).append("* ").append(leaderAbilityText); //add ability
+        if (includeUnlockCondition) representation.append(" *Unlock:* ").append(leaderUnlockCondition);
+
+        return representation.toString();
+    }
+    
+    public static String getLeaderRepresentation(Player player, String leader, boolean includeTitle, boolean includeAbility) {
+        return getLeaderRepresentation(player.getFaction(), player.getLeader(leader), includeTitle, includeAbility, false);
+    }
+
+    public static String getLeaderRepresentation(Player player, Leader leader, boolean includeTitle, boolean includeAbility) {
+        return getLeaderRepresentation(player.getFaction(), leader, includeTitle, includeAbility, false);
+    }
+    
+    public static String getLeaderShortRepresentation(Player player, Leader leader) {
+        return getLeaderRepresentation(player.getFaction(), leader, false, false, false);
+    }
+
+    public static String getLeaderMediumRepresentation(Player player, Leader leader) {
+        return getLeaderRepresentation(player.getFaction(), leader, true, false, false);
+    }
+
+    public static String getLeaderFullRepresentation(Player player, Leader leader) {
+        return getLeaderRepresentation(player.getFaction(), leader, true, true, false);
+    }
+
+    public static String getLeaderLockedRepresentation(Player player, Leader leader) {
+        return getLeaderRepresentation(player.getFaction(), leader, false, false, true);
     }
 
     public static String getSCEmojiFromInteger(Integer strategy_card) {
