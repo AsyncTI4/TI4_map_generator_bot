@@ -100,7 +100,11 @@ public class PlayAC extends CardsSubcommandData {
 
         Button sabotageButton = Button.danger("sabotage", "Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
         Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(Emoji.fromFormatted(Emojis.NoSabotage));
-        MessageHelper.sendMessageToChannelWithButtons(mainGameChannel, sb.toString(), guild, sabotageButton, noSabotageButton);
+        if (acID.contains("sabo")) {
+            MessageHelper.sendMessageToChannelWithButtons(mainGameChannel, sb.toString(), null);
+        } else {
+            MessageHelper.sendMessageToChannelWithButtons(mainGameChannel, sb.toString(), guild, sabotageButton, noSabotageButton);
+        }
         CardsInfo.sentUserCardInfo(event, activeMap, player, buttonInteractionEvent);
     }
 }
