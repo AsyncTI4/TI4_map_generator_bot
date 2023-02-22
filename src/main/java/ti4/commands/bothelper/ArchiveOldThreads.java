@@ -2,6 +2,7 @@ package ti4.commands.bothelper;
 
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -21,8 +22,13 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
             MessageHelper.replyToMessage(event, "Please choose a number between 1 and 100");
             return;
         }
-        
-        List<ThreadChannel> threadChannels = event.getGuild().getThreadChannels();
+
+        archiveOldThreads(event.getGuild(), threadCount);
+        MessageHelper.replyToMessage(event, "Archived " + threadCount + " threads");
+    }
+
+    public static void archiveOldThreads(Guild guild, Integer threadCount) {
+        List<ThreadChannel> threadChannels = guild.getThreadChannels();
         threadChannels = threadChannels.stream()
             .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
             .limit(threadCount).toList();
@@ -30,6 +36,5 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
         for (ThreadChannel threadChannel : threadChannels) {
             threadChannel.getManager().setArchived(true).queue();
         }
-        MessageHelper.replyToMessage(event, "Archived " + threadCount + " threads");
     }
 }
