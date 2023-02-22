@@ -66,7 +66,9 @@ public class SetHeroActiveLeader extends LeaderAction {
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
             }
-
+            if (playerFaction.equals("titans")) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "`/add_token token:titanshero`");
+            }
         }
     }
 }
