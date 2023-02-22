@@ -26,7 +26,7 @@ import java.util.List;
 public class MessageHelper {
 
     public static void sendMessageToChannel(SlashCommandInteractionEvent event, String messageText, String... reaction) {
-        splitAndSent(messageText, event.getChannel(), event, reaction);
+        splitAndSent(messageText, event.getChannel(), event, false, reaction);
     }
 
     public static void sendMessageToChannelWithButtons(SlashCommandInteractionEvent event, String messageText, Button... buttons) {
@@ -39,6 +39,10 @@ public class MessageHelper {
 
     public static void sendMessageToChannel(MessageChannel channel, String messageText) {
         splitAndSent(messageText, channel);
+    }
+
+    public static void sendMessageToChannelAndPin(MessageChannel channel, String messageText) {
+        splitAndSent(messageText, channel, null, true);
     }
 
     public static void sendFileToChannel(MessageChannel channel, File file) {
@@ -96,10 +100,10 @@ public class MessageHelper {
     }
 
     private static void splitAndSent(String messageText, MessageChannel channel) {
-        splitAndSent(messageText, channel, null, null, "");
+        splitAndSent(messageText, channel, null, false, null, "");
     }
 
-    private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, String... reaction) {
+    private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, Boolean pinMessages, String... reaction) {
         if (messageText == null || channel == null) {
             return;
         }
@@ -122,30 +126,38 @@ public class MessageHelper {
                 texts.add(textToAdd);
             }
             for (String text : texts) {
-                channel.sendMessage(text).queue();
+                channel.sendMessage(text).queue(x -> {
+                    if (pinMessages) x.pin().queue();
+                });    
             }
         } else {
             if (event == null || reaction == null || reaction.length == 0) {
-                channel.sendMessage(messageText).queue();
+                channel.sendMessage(messageText).queue(x -> {
+                    if (pinMessages) x.pin().queue();
+                });
             } else {
                 Guild guild = event.getGuild();
                 if (guild != null) {
-                    Message complete = channel.sendMessage(messageText).complete();
-                    for (String reactionID : reaction) {
-                        Emoji emoteById = guild.getEmojiById(reactionID);
-                        if (emoteById == null) {
-                            continue;
+                    channel.sendMessage(messageText).queue(complete -> {
+                        if (pinMessages) complete.pin().queue();
+                        for (String reactionID : reaction) {
+                            Emoji emoteById = guild.getEmojiById(reactionID);
+                            if (emoteById == null) {
+                                continue;
+                            }
+                            complete.addReaction(emoteById).queue();
                         }
-                        complete.addReaction(emoteById).queue();
-                    }
+                    });
                     return;
                 }
-                channel.sendMessage(messageText).queue();
+                channel.sendMessage(messageText).queue(x -> {
+                    if (pinMessages) x.pin().queue();
+                });
             }
         }
     }
 
-    private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, Guild guild, Button... buttons) {
+    private static void  splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, Guild guild, Button... buttons) {
         Integer messageLength = messageText.length();
         if (messageLength > 1500) {
             List<String> texts = new ArrayList<>();

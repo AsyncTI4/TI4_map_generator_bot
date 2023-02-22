@@ -30,7 +30,7 @@ public class RevealStage2 extends StatusSubcommandData {
         sb.append("(").append(objective.getValue()).append(") ");
         sb.append(Emojis.Public2alt).append(" ");
         sb.append("**").append(objectiveName).append("** - ").append(objectiveDescription).append("\n");
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        MessageHelper.sendMessageToChannelAndPin(event.getChannel(), sb.toString());
     }
 
     @Override
