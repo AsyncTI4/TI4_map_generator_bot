@@ -37,7 +37,7 @@ import java.util.*;
 
 public class CardsInfo extends CardsSubcommandData {
 
-    public static final String CARDS_INFO = "Cards Info-";
+    public static final String CARDS_INFO = Constants.CARDS_INFO_THREAD_PREFIX;
     private static HashMap<Map, TextChannel> threadTextChannels = new HashMap<>();
 
     public CardsInfo() {
@@ -219,7 +219,7 @@ public class CardsInfo extends CardsSubcommandData {
                         textChannel = (TextChannel) channel;
                     }
                     if (textChannel == null) {
-                        String mainChannelName = activeMap.getName() + "-actions";
+                        String mainChannelName = activeMap.getName() + Constants.ACTIONS_CHANNEL_SUFFIX;
                         for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
                             if (textChannel_.getName().equals(mainChannelName)) {
                                 textChannel = textChannel_;

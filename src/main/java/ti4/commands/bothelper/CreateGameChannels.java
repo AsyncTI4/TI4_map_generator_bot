@@ -87,8 +87,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         //CREATE CHANNELS
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
         String newChatChannelName = gameName + "-" + gameFunName;
-        String newActionsChannelName = gameName + "-actions";
-        String newBotThreadName = gameName + "-bot-map-updates";
+        String newActionsChannelName = gameName + Constants.ACTIONS_CHANNEL_SUFFIX;
+        String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
         long gameRoleID = role.getIdLong();
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
