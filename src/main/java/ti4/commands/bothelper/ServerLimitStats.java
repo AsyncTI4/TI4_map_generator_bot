@@ -64,19 +64,20 @@ public class ServerLimitStats extends BothelperSubcommandData {
         sb.append(boostCount).append(" - boosts").append("\n");
         sb.append(emojiCount).append(" / " + emojiMax + getPercentage(emojiCount, emojiMax) + " - emojis").append("\n");
         sb.append(roleCount).append(" / 250" + getPercentage(roleCount, 250) + " - roles").append("\n");
-        sb.append(channelCount).append(" / 500" + getPercentage(channelCount, 500) + " - channels").append("\n");
+        sb.append("**").append(channelCount).append(" / 500" + getPercentage(channelCount, 500) + " - channels**").append("\n");
         sb.append("     - ").append(pbdChannelCount).append("   " + getPercentage(pbdChannelCount, channelCount) + "  'pbd' channels").append("\n");
         sb.append("     - ").append(categoryChannelCount).append("   " + getPercentage(categoryChannelCount, channelCount) + "  categories").append("\n");
-        sb.append("     - ").append(inLimboChannelCount).append("   " + getPercentage(inLimboChannelCount, channelCount) + "  'in-limbo' channels").append("\n");
-        sb.append(threadCount).append(" / 1000" + getPercentage(threadCount, 1000) + " - threads").append("\n");
-        sb.append("     - ").append(inLimboThreadCount).append("   " + getPercentage(inLimboThreadCount, threadCount) + "  'in-limbo' threads").append("\n");
+        sb.append("**").append(threadCount).append(" / 1000" + getPercentage(threadCount, 1000) + " - threads**").append("\n");
         sb.append("     - ").append(privateThreadCount).append("   " + getPercentage(privateThreadCount, threadCount) + "  private threads").append("\n");
         sb.append("     - ").append(cardsInfoThreadCount).append("   " + getPercentage(cardsInfoThreadCount, threadCount) + "  'Cards Info' threads (/ac info)").append("\n");
         sb.append("     - ").append(publicThreadCount).append("   " + getPercentage(publicThreadCount, threadCount) + "  public threads").append("\n");
-        sb.append("     - ").append(botThreadCount).append("   " + getPercentage(botThreadCount, threadCount) + "  '-bot-' threads").append("\n");
-        sb.append("     - ").append(mapThreadCount).append("   " + getPercentage(mapThreadCount, threadCount) + "  '-map-' threads").append("\n");
+        sb.append("     - ").append(botThreadCount + mapThreadCount).append("   " + getPercentage(botThreadCount + mapThreadCount, threadCount) + "  '-bot-' and '-map-' threads").append("\n");
         sb.append("     - ").append(scThreadCount).append("   " + getPercentage(scThreadCount, threadCount) + "  '-round-' threads (/sc play)").append("\n");
-
+        if (inLimboArchive != null) {
+            sb.append("**In Limbo:** ").append(inLimboArchive.getAsMention()).append("\n");
+            sb.append("     - ").append(inLimboChannelCount).append("   " + getPercentage(inLimboChannelCount, channelCount) + "  'in-limbo' channels").append("\n");
+            sb.append("     - ").append(inLimboThreadCount).append("   " + getPercentage(inLimboThreadCount, threadCount) + "  'in-limbo' threads").append("\n");
+        }
         MessageHelper.replyToMessage(event, sb.toString());
     }
 
