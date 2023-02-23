@@ -30,7 +30,7 @@ Ensure your launch.json file includes a configuration like this:
 }
 ```
 
-Set the 5 variables to match your bot, user, server, and system.
+Set the 5 {variables} to match your bot, user, server, and system.
 
 ## 2.0 - Using Docker
 
