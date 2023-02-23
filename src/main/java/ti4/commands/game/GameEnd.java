@@ -58,12 +58,6 @@ public class GameEnd extends GameSubcommandData {
             File file = GenerateMap.getInstance().saveImage(userActiveMap, DisplayType.map, event);
             MessageHelper.replyToMessage(event, file);
             
-            //INFORM BOTHELPER
-            MessageHelper.sendMessageToChannel(event.getChannel(), event.getGuild().getRolesByName("Bothelper", true).get(0).getAsMention() + " - this game has concluded");
-            // TextChannel bothelperLoungeChannel = event.getGuild().getTextChannelById(1029569891193331712l);
-            TextChannel bothelperLoungeChannel = event.getGuild().getTextChannelsByName("bothelper-lounge", true).get(0);
-            if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, event.getChannel().getAsMention() + " - Game: " + gameName + " has concluded. React here when complete");
-            
             //ASK USERS FOR SUMMARY
             TextChannel pbdChroniclesChannel = event.getGuild().getTextChannelsByName("the-pbd-chronicles", true).get(0);
             String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles" : pbdChroniclesChannel.getAsMention();
@@ -74,6 +68,12 @@ public class GameEnd extends GameSubcommandData {
             }
             message.append("\nPlease provide a summary of the game for the @Bothelper to post into " + channelMention);
             MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
+            
+            //INFORM BOTHELPER
+            MessageHelper.sendMessageToChannel(event.getChannel(), event.getGuild().getRolesByName("Bothelper", true).get(0).getAsMention() + " - this game has concluded");
+            // TextChannel bothelperLoungeChannel = event.getGuild().getTextChannelById(1029569891193331712l);
+            TextChannel bothelperLoungeChannel = event.getGuild().getTextChannelsByName("bothelper-lounge", true).get(0);
+            if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, event.getChannel().getAsMention() + " - Game: " + gameName + " has concluded.\nReact here when a post has been made in " + channelMention + ", the role '" + gameRole.getName() + "'' deleted, and channels moved to the 'In Limbo Archive' category.");
             
             // MessageHelper.sendMessageToChannel(event.getChannel(), "Role deleted: " + gameRole.getName());
             // gameRole.delete().queue();
