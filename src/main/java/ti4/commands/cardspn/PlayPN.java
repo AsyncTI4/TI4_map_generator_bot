@@ -97,6 +97,7 @@ public class PlayPN extends PNCardsSubcommandData {
         sb.append(Helper.getFactionIconFromDiscord(pnOwner) + Emojis.PN);
         sb.append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
         
+        //TERRAFORM TIP
         if (id.equalsIgnoreCase("terraform")) {
             sb.append("`/add_token token:titanspn`\n");
         }
