@@ -736,7 +736,7 @@ public class Helper {
         int threadCount = guild.getThreadChannels().size();
         int closeCount = 5;
         if (threadCount > 995) {
-            BotLogger.log("`Helper.checkThreadLimitAndArchive:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
+            BotLogger.log(MapGenerator.adminRole.getAsMention() + " `Helper.checkThreadLimitAndArchive:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
             BotLogger.log(ListOldChannels.getOldThreadsMessage(guild, closeCount));
             ArchiveOldThreads.archiveOldThreads(guild, closeCount);
         }
