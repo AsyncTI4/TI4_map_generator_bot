@@ -20,7 +20,7 @@ import ti4.message.MessageHelper;
 
 public class GameEnd extends GameSubcommandData {
     public GameEnd() {
-            super(Constants.GAME_END, "Declare the game has ended - deletes role and informs @Bothelper");
+            super(Constants.GAME_END, "Declare the game has ended & informs @Bothelper");
             addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm ending the game with 'YES'").setRequired(true));
     }
 
@@ -75,8 +75,8 @@ public class GameEnd extends GameSubcommandData {
             message.append("\nPlease provide a summary of the game for the @Bothelper to post into " + channelMention);
             MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
             
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Role deleted: " + gameRole.getName());
-            gameRole.delete().queue();
+            // MessageHelper.sendMessageToChannel(event.getChannel(), "Role deleted: " + gameRole.getName());
+            // gameRole.delete().queue();
             
         }
     }
