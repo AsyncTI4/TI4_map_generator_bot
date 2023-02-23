@@ -62,7 +62,7 @@ docker build -t tibot .
 docker run -v ${PWD}/storage:/opt/STORAGE tibot $discordBotKey $discordUserID $discordServerID
 ```
 
-Bot should now be running and able to receive commands from the server for testing!
+Bot should now be running and able to receive commands on your test server!
 
 ## 3.0 - Softnum's VPS
 
