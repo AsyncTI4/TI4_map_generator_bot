@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
@@ -22,9 +23,9 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
             MessageHelper.replyToMessage(event, "Please choose a number between 1 and 100");
             return;
         }
-
+        MessageHelper.replyToMessage(event, "Archiving " + threadCount + " threads - " + MapGenerator.adminRole.getAsMention());
+        MessageHelper.sendMessageToChannel(event.getChannel(), ListOldChannels.getOldThreadsMessage(event.getGuild(), threadCount));
         archiveOldThreads(event.getGuild(), threadCount);
-        MessageHelper.replyToMessage(event, "Archived " + threadCount + " threads");
     }
 
     public static void archiveOldThreads(Guild guild, Integer threadCount) {
