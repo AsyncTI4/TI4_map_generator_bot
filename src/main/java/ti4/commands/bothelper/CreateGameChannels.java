@@ -1,8 +1,12 @@
 package ti4.commands.bothelper;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Objects;
 
 import net.dv8tion.jda.api.Permission;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
@@ -12,17 +16,18 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.GuildChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class CreateGameChannels extends BothelperSubcommandData {
     public CreateGameChannels(){
         super(Constants.CREATE_GAME_CHANNELS, "Create Role and Game Channels for a New Game");
-        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game Name/Role to Create - e.g. pbd###").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here").setRequired(true));
         addOptions(new OptionData(OptionType.CHANNEL, Constants.CATEGORY, "Category #category-name - only select a category").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName"));
@@ -33,22 +38,31 @@ public class CreateGameChannels extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Player6 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
+        addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next pbd###)"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String gameName = event.getOption(Constants.GAME_NAME).getAsString();
+        Guild guild = event.getGuild();
+
+        OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
+        String gameName = null;
+        if (gameNameOption != null) {
+            gameName = gameNameOption.getAsString();
+        } else {
+            gameName = getNextGameName(guild);
+        }        
         
         //CHECK ROLE IS VALID
-        if (event.getGuild().getRolesByName(gameName, false).size() > 0) {
+        if (guild.getRolesByName(gameName, false).size() > 0) {
             MessageHelper.replyToMessage(event, "Role: **" + gameName + "** already exists. Try again with a new name.");
             return;
         }
 
         //CHECK ROLE COUNT
-        if (event.getGuild().getRoles().size() >= 250) {
+        if (guild.getRoles().size() >= 250) {
             MessageHelper.replyToMessage(event, "Server is at the role limit - please contact @Admin to resolve.");
-            BotLogger.log(event, "Cannot create a new role. Server is currently has " + event.getGuild().getRoles().size() + " roles.");
+            BotLogger.log(event, "Cannot create a new role. Server is currently has " + guild.getRoles().size() + " roles.");
             return;
         }
 
@@ -68,7 +82,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         StringBuilder message = new StringBuilder("Role and Channels have been set up:\n");
 
         //CREATE ROLE
-        Role role = event.getGuild().createRole()
+        Role role = guild.createRole()
             .setName(gameName)
             .setMentionable(true)
             .complete();
@@ -78,7 +92,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         for (int i = 1; i <= 8; i++) {
             if (Objects.nonNull(event.getOption("player" + i))) {
                 Member member = event.getOption("player" + i).getAsMember();
-                event.getGuild().addRoleToMember(member, role).complete();
+                guild.addRoleToMember(member, role).complete();
             } else {
                 break;
             }
@@ -93,7 +107,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
 
         //TABLETALK CHANNEL
-        TextChannel chatChannel = event.getGuild().createTextChannel(newChatChannelName, category)
+        TextChannel chatChannel = guild.createTextChannel(newChatChannelName, category)
             .syncPermissionOverrides()
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
@@ -101,7 +115,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         message.append("> " + chatChannel.getAsMention()).append("\n");
 
         //ACTIONS CHANNEL
-        TextChannel actionsChannel = event.getGuild().createTextChannel(newActionsChannelName, category)
+        TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
             .syncPermissionOverrides()
             .addRolePermissionOverride(gameRoleID, permission, 0)
             .complete();
@@ -129,5 +143,21 @@ public class CreateGameChannels extends BothelperSubcommandData {
         message.append("> " + botThread.getAsMention()).append("\n");
         
         MessageHelper.replyToMessage(event, message.toString());
+    }
+
+    private static String getNextGameName(Guild guild) {
+        List<Role> pbdRoles = guild.getRoles().stream()
+            .filter(r -> r.getName().startsWith("pbd"))
+            .toList();
+
+        ArrayList<Integer> pbdNumbers = new ArrayList<>();
+        for (Role role : pbdRoles) {
+            String pbdNum = role.getName().replace("pbd", "");
+            if (Helper.isInteger(pbdNum)) {
+                pbdNumbers.add(Integer.parseInt(pbdNum));
+            }
+        }
+        int nextPBDNumber = Collections.max(pbdNumbers) + 1;
+        return "pbd" + nextPBDNumber;
     }
 }
