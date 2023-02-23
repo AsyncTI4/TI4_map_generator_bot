@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cards.CardsInfo;
-import ti4.commands.player.SendTG;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -98,7 +97,7 @@ public class PlayPN extends PNCardsSubcommandData {
         sb.append(Helper.getFactionIconFromDiscord(pnOwner) + Emojis.PN);
         sb.append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
         
-        if (id.equalsIgnoreCase("titanspn")) {
+        if (id.equalsIgnoreCase("terraform")) {
             sb.append("`/add_token token:titanspn`\n");
         }
 
