@@ -724,7 +724,7 @@ public class Helper {
     }
     
     /**
-     * @param text string to add spaced on the right
+     * @param text string to add spaces on the right
      * @param length minimum length of string
      * @return right padded string
      */
@@ -734,9 +734,9 @@ public class Helper {
 
     public static void checkThreadLimitAndArchive(Guild guild) {
         int threadCount = guild.getThreadChannels().size();
-        int closeCount = 10;
-        if (threadCount > 975) {
-            BotLogger.log("`Helper.checkThreadLimit:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
+        int closeCount = 5;
+        if (threadCount > 995) {
+            BotLogger.log("`Helper.checkThreadLimitAndArchive:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
             BotLogger.log(ListOldChannels.getOldThreadsMessage(guild, closeCount));
             ArchiveOldThreads.archiveOldThreads(guild, closeCount);
         }
