@@ -55,7 +55,7 @@ public class ListOldChannels extends BothelperSubcommandData {
         
         sb = new StringBuilder("Least Active Threads:\n");
         for (ThreadChannel threadChannel : threadChannels) {
-            sb.append("> `" + TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong()).toString() + "`  **" + threadChannel.getName() + "** from channel **" + threadChannel.getParentChannel().getName()).append("**\n");
+            sb.append("> `" + TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong()).toString() + "`  " + threadChannel.getAsMention() + " **" + threadChannel.getName() + "** from channel **" + threadChannel.getParentChannel().getName()).append("**\n");
         }
         return sb.toString();
     }
