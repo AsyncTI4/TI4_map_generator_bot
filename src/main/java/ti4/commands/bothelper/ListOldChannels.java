@@ -32,14 +32,14 @@ public class ListOldChannels extends BothelperSubcommandData {
     public static String getOldChannelsMessage(Guild guild, Integer channelCount) {
         List<TextChannel> channels = guild.getTextChannels();
         channels = channels.stream()
-                            .filter(c -> c.getLatestMessageId() != "0")
+                            .filter(c -> c.getLatestMessageIdLong() != 0)
                             .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
                             .limit(channelCount)
                             .toList();
         
-        StringBuilder sb = new StringBuilder("Least Active Channels:\n>>> ");
+        StringBuilder sb = new StringBuilder("Least Active Channels:\n");
         for (TextChannel channel : channels) {
-            sb.append("`" + TimeUtil.getTimeCreated(channel.getLatestMessageIdLong()).toString() + "`  " + channel.getAsMention()).append("\n");
+            sb.append("> `" + TimeUtil.getTimeCreated(channel.getLatestMessageIdLong()).toString() + "`  " + channel.getAsMention()).append("\n");
         }
         return sb.toString();
     }
@@ -48,14 +48,14 @@ public class ListOldChannels extends BothelperSubcommandData {
         StringBuilder sb;
         List<ThreadChannel> threadChannels = guild.getThreadChannels();
         threadChannels = threadChannels.stream()
-                            .filter(c -> c.getLatestMessageId() != "0")
+                            .filter(c -> c.getLatestMessageIdLong() != 0)
                             .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
                             .limit(channelCount)
                             .toList();
         
-        sb = new StringBuilder("Least Active Threads:\n>>> ");
+        sb = new StringBuilder("Least Active Threads:\n");
         for (ThreadChannel threadChannel : threadChannels) {
-            sb.append("`" + TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong()).toString() + "`  " + threadChannel.getAsMention()).append("\n");
+            sb.append("> `" + TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong()).toString() + "`  **" + threadChannel.getName() + "** from channel **" + threadChannel.getParentChannel().getName()).append("**\n");
         }
         return sb.toString();
     }
