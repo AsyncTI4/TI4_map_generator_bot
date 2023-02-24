@@ -23,7 +23,8 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
             MessageHelper.replyToMessage(event, "Please choose a number between 1 and 100");
             return;
         }
-        MessageHelper.replyToMessage(event, "Archiving " + threadCount + " threads - " + MapGenerator.adminRole.getAsMention());
+        String mention = event.getGuild().getMemberById("150809002974904321").getAsMention(); //@HolyTispoon
+        MessageHelper.replyToMessage(event, "Archiving " + threadCount + " threads - " + mention);
         MessageHelper.sendMessageToChannel(event.getChannel(), ListOldChannels.getOldThreadsMessage(event.getGuild(), threadCount));
         archiveOldThreads(event.getGuild(), threadCount);
     }
