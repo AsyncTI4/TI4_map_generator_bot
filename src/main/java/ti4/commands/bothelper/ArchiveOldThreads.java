@@ -32,7 +32,7 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
     public static void archiveOldThreads(Guild guild, Integer threadCount) {
         List<ThreadChannel> threadChannels = guild.getThreadChannels();
         threadChannels = threadChannels.stream()
-            .filter(c -> c.getLatestMessageId() != "0")
+            .filter(c -> c.getLatestMessageIdLong() != 0)
             .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
             .limit(threadCount)
             .toList();
