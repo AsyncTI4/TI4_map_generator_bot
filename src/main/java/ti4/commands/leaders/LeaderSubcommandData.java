@@ -13,7 +13,6 @@ public abstract class LeaderSubcommandData extends SubcommandData {
 
     private Map activeMap;
     private User user;
-    protected Message replyMessage;
     
     public String getActionID() {
         return getName();
@@ -31,18 +30,18 @@ public abstract class LeaderSubcommandData extends SubcommandData {
         return user;
     }
     
-    public void editReplyMessage(String messageText) {
-        if (this.replyMessage != null) {
-            this.replyMessage.editMessage(messageText).queue();
-        } else {
-            BotLogger.log("replyMessage was null when attempting to edit");
-        }
+    /**
+     * Edits the original message after submitting a slash command
+     * @param event
+     * @param messageText new message - must be under 1500 chars (for now)
+     */
+    public void editReplyMessage(SlashCommandInteractionEvent event, String messageText) {
+        event.getHook().editOriginal(messageText).queue();
     }
 
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void preExecute(SlashCommandInteractionEvent event) {
-        replyMessage = event.getHook().sendMessage("Executing: `" + event.getCommandString() + "`").complete();
         user = event.getUser();
         activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
     }

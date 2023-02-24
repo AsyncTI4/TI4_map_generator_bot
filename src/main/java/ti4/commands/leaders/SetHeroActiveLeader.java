@@ -21,7 +21,7 @@ public class SetHeroActiveLeader extends LeaderAction {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
-            editReplyMessage("Player could not be found");
+            editReplyMessage(event, "Player could not be found");
             return;
         }
         action(event, "hero", activeMap, player);
@@ -39,15 +39,15 @@ public class SetHeroActiveLeader extends LeaderAction {
         String playerFaction = player.getFaction();
 
         if (playerLeader != null && playerLeader.isLocked()) {
-            editReplyMessage("Leader is locked, use command to unlock `/leaders unlock leader:" + leader + "`");
+            editReplyMessage(event, "Leader is locked, use command to unlock `/leaders unlock leader:" + leader + "`");
             MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getLeaderLockedRepresentation(player, playerLeader));
             return;
         } else if(playerLeader == null) {
-            editReplyMessage("Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
+            editReplyMessage(event, "Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
             return;
         }
         
-        editReplyMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
+        editReplyMessage(event, Helper.getFactionLeaderEmoji(player, playerLeader));
         StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
         .append(" played ")
         .append(Helper.getLeaderFullRepresentation(player, playerLeader));
