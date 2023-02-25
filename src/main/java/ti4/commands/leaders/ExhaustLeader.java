@@ -24,11 +24,11 @@ public class ExhaustLeader extends LeaderAction {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null) {
             if (playerLeader.isLocked()) {
-                editReplyMessage(event, "Leader '" + leader + "' is locked");
+                sendMessage("Leader '" + leader + "' is locked");
                 return;
             }
             playerLeader.setExhausted(true);
-            editReplyMessage(event, Helper.getFactionLeaderEmoji(player, playerLeader));
+            sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
             StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(event, player))
                     .append(" exhausted ")
                     .append(Helper.getLeaderFullRepresentation(player, playerLeader));
@@ -40,9 +40,9 @@ public class ExhaustLeader extends LeaderAction {
                     messageText.append(" _(").append(String.valueOf(playerLeader.getTgCount())).append(Emojis.tg).append(" total)_\n");
                 }
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), messageText.toString());
+            sendMessage(messageText.toString());
         } else {
-            editReplyMessage(event, "Leader '" + leader + "'' not found");
+            sendMessage("Leader '" + leader + "'' not found");
         }
     }
 }

@@ -18,13 +18,13 @@ public class PurgeLeader extends LeaderAction {
         Leader playerLeader = player.getLeader(leader);
         boolean purged = player.removeLeader(leader);
         if (purged) {
-            editReplyMessage(event, Helper.getFactionLeaderEmoji(player, playerLeader));
+            sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
             StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
                     .append(" purged ")
                     .append(Helper.getLeaderFullRepresentation(player, playerLeader));
-            MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
+            sendMessage(message.toString());
         } else {
-            editReplyMessage(event, "Leader not found");
+            sendMessage("Leader not found");
         }
     }
 }

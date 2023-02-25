@@ -21,7 +21,7 @@ public class SetHeroActiveLeader extends LeaderAction {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
-            editReplyMessage(event, "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         action(event, "hero", activeMap, player);
@@ -39,15 +39,15 @@ public class SetHeroActiveLeader extends LeaderAction {
         String playerFaction = player.getFaction();
 
         if (playerLeader != null && playerLeader.isLocked()) {
-            editReplyMessage(event, "Leader is locked, use command to unlock `/leaders unlock leader:" + leader + "`");
-            MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getLeaderLockedRepresentation(player, playerLeader));
+            sendMessage("Leader is locked, use command to unlock `/leaders unlock leader:" + leader + "`");
+            sendMessage(Helper.getLeaderLockedRepresentation(player, playerLeader));
             return;
         } else if(playerLeader == null) {
-            editReplyMessage(event, "Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
+            sendMessage("Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
             return;
         }
         
-        editReplyMessage(event, Helper.getFactionLeaderEmoji(player, playerLeader));
+        sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
         StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
         .append(" played ")
         .append(Helper.getLeaderFullRepresentation(player, playerLeader));
@@ -55,19 +55,19 @@ public class SetHeroActiveLeader extends LeaderAction {
             if (playerLeader != null && Constants.HERO.equals(playerLeader.getId())) {
                 playerLeader.setLocked(false);
                 playerLeader.setActive(true);
-                MessageHelper.sendMessageToChannel(event.getChannel(), message.toString() + " - Leader will be PURGED after status cleanup");
+                sendMessage(message.toString() + " - Leader will be PURGED after status cleanup");
             } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
+                sendMessage("Leader not found");
             }
         } else if (playerLeader != null && Constants.HERO.equals(playerLeader.getId())) {
             boolean purged = player.removeLeader(leader);
             if (purged) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), message.toString() + " - Leader " + leader + " has been purged");
+                sendMessage(message.toString() + " - Leader " + leader + " has been purged");
             } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Leader not found");
+                sendMessage("Leader not found");
             }
             if (playerFaction.equals("titans")) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "`/add_token token:titanshero`");
+                sendMessage("`/add_token token:titanshero`");
             }
         }
     }

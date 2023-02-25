@@ -47,10 +47,10 @@ public class LeaderInfo extends LeaderSubcommandData {
         User user = getUser();
         Player player = activeMap.getPlayer(user.getId());
         if (player == null) {
-           editReplyMessage(event, "Player could not be found");
+           sendMessage("Player could not be found");
             return;
         }
-        editReplyMessage(event, Helper.getPlayerRepresentation(event, player) + " Leader Info:");
+        sendMessage(Helper.getPlayerRepresentation(event, player) + " Leader Info:");
 
         String leaderInfo = getLeaderInfo(activeMap, player);
 
@@ -61,7 +61,7 @@ public class LeaderInfo extends LeaderSubcommandData {
             }
         }
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), leaderInfo);
+        sendMessage(leaderInfo);
     }
 
     public static String getLeaderInfo(Map activeMap, Player player) {
