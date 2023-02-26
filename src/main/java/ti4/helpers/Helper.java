@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import ti4.MapGenerator;
@@ -442,16 +443,21 @@ public class Helper {
         return getGamePing(event.getGuild(), activeMap);
     }
 
-    public static String getGamePing(Guild guild, Map activeMap) {
-        String categoryForPlayers = "";
+    public static String getGamePing(@NotNull Guild guild, @NotNull Map activeMap) {
         if (guild != null) {
             for (Role role : guild.getRoles()) {
                 if (activeMap.getName().equals(role.getName().toLowerCase())) {
-                    categoryForPlayers = role.getAsMention();
+                    return role.getAsMention();
                 }
             }
+            StringBuilder sb = new StringBuilder(activeMap.getName()).append(" ");
+            for (String playerID : activeMap.getPlayerIDs()) {
+                Member member = guild.getMemberById(playerID);
+                if (member != null) sb.append(guild.getMemberById(playerID).getAsMention()).append(" ");
+            }
+            return sb.toString();
         }
-        return categoryForPlayers;
+        return "";
     }
 
     public static String getPlayerPing(Player player) {
