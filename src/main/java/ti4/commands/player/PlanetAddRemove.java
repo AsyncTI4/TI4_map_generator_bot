@@ -124,7 +124,7 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
                 default -> Emojis.planet + " " + planet;
             };
         } else {
-            return Helper.getPlanetRepresentationPlusEmojis(planet);
+            return Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, getActiveMap());
         }
     }
 
