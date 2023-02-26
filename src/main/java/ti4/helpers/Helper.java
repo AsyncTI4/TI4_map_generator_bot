@@ -305,6 +305,26 @@ public class Helper {
         }        
     }
 
+    public static int getPlanetResources(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return -1;
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return planet.getResources();
+        }        
+    }
+
+    public static int getPlanetInfluence(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return -1;
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return planet.getInfluence();
+        }        
+    }
+
     public static String getInfluenceEmoji(int count) {
         return switch (count) {
             case 0 -> Emojis.Influence_0;
