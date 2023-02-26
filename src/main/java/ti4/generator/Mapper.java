@@ -67,7 +67,7 @@ public class Mapper {
         readData("promissory_notes.properties", promissoryNotes, "Could not read promissory notes file");
         readData("exploration.properties", explore, "Could not read explore file");
         readData("leaders.properties", leaders, "Could not read leaders file");
-        readData("Relics.properties", relics, "Could not read relic file");
+        readData("relics.properties", relics, "Could not read relic file");
         readData("tech.properties", techs, "Could not read tech file");
         readData("planets.properties", planets, "Could not read planets file");
         readData("attachments_info.properties", attachmentInfo, "Could not read attachment info file");
