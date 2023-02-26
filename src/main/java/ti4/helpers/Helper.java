@@ -1,15 +1,19 @@
 package ti4.helpers;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import ti4.MapGenerator;
@@ -442,16 +446,21 @@ public class Helper {
         return getGamePing(event.getGuild(), activeMap);
     }
 
-    public static String getGamePing(Guild guild, Map activeMap) {
-        String categoryForPlayers = "";
+    public static String getGamePing(@NotNull Guild guild, @NotNull Map activeMap) {
         if (guild != null) {
             for (Role role : guild.getRoles()) {
                 if (activeMap.getName().equals(role.getName().toLowerCase())) {
-                    categoryForPlayers = role.getAsMention();
+                    return role.getAsMention();
                 }
             }
+            StringBuilder sb = new StringBuilder(activeMap.getName()).append(" ");
+            for (String playerID : activeMap.getPlayerIDs()) {
+                Member member = guild.getMemberById(playerID);
+                if (member != null) sb.append(guild.getMemberById(playerID).getAsMention()).append(" ");
+            }
+            return sb.toString();
         }
-        return categoryForPlayers;
+        return "";
     }
 
     public static String getPlayerPing(Player player) {
@@ -766,5 +775,37 @@ public class Helper {
             }
         }
         return true;
+    }
+
+    public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Map activeMap) {
+        String gameName = activeMap.getName();
+        List<Role> roles = guild.getRolesByName(gameName, true);
+        Role role = null;
+        if (!roles.isEmpty()) {
+            if (roles.size() > 1) {
+                BotLogger.log("There are " + roles.size() + " roles that match the game name: `" + gameName + "` - please investigate, as this may cause issues.");
+                return;
+            } 
+            role = roles.get(0);
+        }
+
+        if (role == null) { //make sure players have access to the game channels
+            List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
+            for (GuildChannel channel : channels) {
+                TextChannel textChannel = guild.getTextChannelById(channel.getId());
+                if (textChannel != null) {
+                    for (String playerID : activeMap.getPlayerIDs()) {
+                        Member member = guild.getMemberById(playerID);
+                        long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+                        textChannel.getManager().putMemberPermissionOverride(member.getIdLong(), allow, 0).queue();
+                    }
+                }
+            }
+        } else { //make sure players have the role
+            for (String playerID : activeMap.getPlayerIDs()) {
+                Member member = guild.getMemberById(playerID);
+                if (member != null) guild.addRoleToMember(member, role).queue();
+            }
+        }
     }
 }
