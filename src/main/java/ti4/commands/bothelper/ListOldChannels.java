@@ -1,5 +1,7 @@
 package ti4.commands.bothelper;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -39,7 +41,9 @@ public class ListOldChannels extends BothelperSubcommandData {
         
         StringBuilder sb = new StringBuilder("Least Active Channels:\n");
         for (TextChannel channel : channels) {
-            sb.append("> `" + TimeUtil.getTimeCreated(channel.getLatestMessageIdLong()).toString() + "`  " + channel.getAsMention()).append("\n");
+            OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(channel.getLatestMessageIdLong());
+            Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
+            sb.append("> `" + latestActivityTime.toString() + " (" + duration.toDays() + " days ago)`  " + channel.getAsMention()).append("\n");
         }
         return sb.toString();
     }
@@ -55,7 +59,9 @@ public class ListOldChannels extends BothelperSubcommandData {
         
         sb = new StringBuilder("Least Active Threads:\n");
         for (ThreadChannel threadChannel : threadChannels) {
-            sb.append("> `" + TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong()).toString() + "`  " + threadChannel.getAsMention() + " **" + threadChannel.getName() + "** from channel **" + threadChannel.getParentChannel().getName()).append("**\n");
+            OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
+            Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
+            sb.append("> `" + latestActivityTime.toString() + " (" + duration.toHours() + " hours ago)`  " + threadChannel.getAsMention() + " **" + threadChannel.getName() + "** from channel **" + threadChannel.getParentChannel().getName()).append("**\n");
         }
         return sb.toString();
     }
