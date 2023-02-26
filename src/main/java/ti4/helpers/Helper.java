@@ -710,6 +710,112 @@ public class Helper {
         return sb.toString().trim();
     }
 
+    public static Integer getPlayerResourcesAvailable(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        int resourcesCount = 0;
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+                resourcesCount += resourcesCountFromPlanetsRes;
+            }
+        } 
+
+        int resourcesCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+
+        resourcesCount += resourcesCountFromPlanets;
+        return resourcesCount;
+    }
+
+    public static Integer getPlayerResourcesTotal(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        int resourcesCount = 0;
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+                resourcesCount += resourcesCountFromPlanetsRes;
+            }
+        } 
+
+        int resourcesCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+
+        resourcesCount += resourcesCountFromPlanets;
+        return resourcesCount;
+    }
+
+    public static Integer getPlayerInfluenceAvailable(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        int influenceCount = 0;
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+                influenceCount += influenceCountFromPlanetsRes;
+            }
+        } 
+
+        int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+
+        influenceCount += influenceCountFromPlanets;
+        return influenceCount;
+    }
+    
+    public static Integer getPlayerInfluenceTotal(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        int influenceCount = 0;
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+                influenceCount += influenceCountFromPlanetsRes;
+            }
+        } 
+
+        int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+
+        influenceCount += influenceCountFromPlanets;
+        return influenceCount;
+    }
+
+    public static String getPlayerResourceInfluenceRepresentation(Player player, Map map) {
+        StringBuilder sb = new StringBuilder(getPlayerRepresentation(player)).append(":\n");
+        sb.append("Resources: ").append(getPlayerResourcesAvailable(player, map)).append("/").append(getPlayerResourcesTotal(player, map)).append("\n");
+        sb.append("Influence: ").append(getPlayerInfluenceAvailable(player, map)).append("/").append(getPlayerInfluenceTotal(player, map)).append("\n");
+        return sb.toString();
+    }
+
     public static HashMap<String, Integer> getLastEntryInHashMap(LinkedHashMap<String, Integer> linkedHashMap) {
         int count = 1;
         for (java.util.Map.Entry<String, Integer> it : linkedHashMap.entrySet()) {
