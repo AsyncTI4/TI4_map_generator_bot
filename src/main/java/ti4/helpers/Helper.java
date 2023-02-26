@@ -270,9 +270,19 @@ public class Helper {
         };
     }
 
-    public static String getPlanetRepresentationPlusEmojis (String planet) {
+    public static String getPlanetRepresentationPlusEmoji(String planet) {
         String planetProper = Mapper.getPlanetRepresentations().get(planet);
         return Helper.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
+    }
+
+    public static String getPlanetRepresentationPlusEmojiPlusResourceInfluence(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return getPlanetRepresentationPlusEmoji(planetID);
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + getResourceEmoji(planet.getResources()) + getInfluenceEmoji(planet.getInfluence());
+        }        
     }
 
     public static String getInfluenceEmoji(int count) {
