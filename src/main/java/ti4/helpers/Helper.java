@@ -275,6 +275,38 @@ public class Helper {
         return Helper.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
     }
 
+    public static String getInfluenceEmoji(int count) {
+        return switch (count) {
+            case 0 -> Emojis.Influence_0;
+            case 1 -> Emojis.Influence_1;
+            case 2 -> Emojis.Influence_2;
+            case 3 -> Emojis.Influence_3;
+            case 4 -> Emojis.Influence_4;
+            case 5 -> Emojis.Influence_5;
+            case 6 -> Emojis.Influence_6;
+            case 7 -> Emojis.Influence_7;
+            case 8 -> Emojis.Influence_8;
+            case 9 -> Emojis.Influence_9;
+            default -> Emojis.influence + count;
+        };
+    }
+
+    public static String getResourceEmoji(int count) {
+        return switch (count) {
+            case 0 -> Emojis.Resources_0;
+            case 1 -> Emojis.Resources_1;
+            case 2 -> Emojis.Resources_2;
+            case 3 -> Emojis.Resources_3;
+            case 4 -> Emojis.Resources_4;
+            case 5 -> Emojis.Resources_5;
+            case 6 -> Emojis.Resources_6;
+            case 7 -> Emojis.Resources_7;
+            case 8 -> Emojis.Resources_8;
+            case 9 -> Emojis.Resources_9;
+            default -> Emojis.resources + count;
+        };
+    }
+
     /**
      * Takes an emoji's name string and returns its full name including ID.
      * @emojiName the name of the emoji as entered on the Emoji section of the server
