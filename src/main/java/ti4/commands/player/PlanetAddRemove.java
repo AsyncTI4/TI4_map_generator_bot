@@ -14,7 +14,9 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -43,14 +45,22 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), getActionHeaderMessage(event, player) + resolveSpendAs(event) + ":");
+        
+        ArrayList<OptionMapping> planetOptions = new ArrayList<>();
+        planetOptions.add(event.getOption(Constants.PLANET));
+        planetOptions.add(event.getOption(Constants.PLANET2));
+        planetOptions.add(event.getOption(Constants.PLANET3));
+        planetOptions.add(event.getOption(Constants.PLANET4));
+        planetOptions.add(event.getOption(Constants.PLANET5));
+        planetOptions.add(event.getOption(Constants.PLANET6));
 
-        parseParameter(event, player, event.getOption(Constants.PLANET), activeMap);
-        parseParameter(event, player, event.getOption(Constants.PLANET2), activeMap);
-        parseParameter(event, player, event.getOption(Constants.PLANET3), activeMap);
-        parseParameter(event, player, event.getOption(Constants.PLANET4), activeMap);
-        parseParameter(event, player, event.getOption(Constants.PLANET5), activeMap);
-        parseParameter(event, player, event.getOption(Constants.PLANET6), activeMap);
+        ArrayList<String> planetIDs = new ArrayList<>(planetOptions.stream().filter(Objects::nonNull).map(p -> AliasHandler.resolvePlanet(p.getAsString())).toList());
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), getActionHeaderMessage(event, player) + resolveSpendAs(event, planetIDs) + ":");
+
+        for (OptionMapping planetOption : planetOptions.stream().filter(Objects::nonNull).toList()) {
+            parseParameter(event, player, planetOption, activeMap);
+        }
     }
 
     private void parseParameter(SlashCommandInteractionEvent event, Player player, OptionMapping option, Map map) {
@@ -132,17 +142,32 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
      * @param event - if "spend_as" option is used for "planet_exhaust"
      * @return message describing what the planets were exhausted for
      */
-    private String resolveSpendAs(SlashCommandInteractionEvent event) {
+    private String resolveSpendAs(SlashCommandInteractionEvent event, List<String> planetIDs) {
         OptionMapping option = event.getOption(Constants.SPEND_AS);
+        // List<String> planetIDs = planetOptions.stream().filter(Objects::nonNull).map(p -> AliasHandler.resolvePlanet(p.getAsString())).toList();
         if (option != null) {
             StringBuilder message = new StringBuilder(", spent as ");
             String spendAs = option.getAsString();
-            return switch (spendAs.toLowerCase()) {
-                case "resources" -> message.append(Emojis.resources + " resources").toString();
-                case "influence" -> message.append(Emojis.influence + " influence").toString();
-                case "votes" -> message.append(" votes").toString();
+            int sum = 0;
+            switch (spendAs.toLowerCase()) {
+                case "resources" -> {
+                    for (String planetID : planetIDs) {
+                        sum += Helper.getPlanetResources(planetID, getActiveMap());
+                    }
+                    message.append(Helper.getResourceEmoji(sum) + " resources").toString();
+                }
+                case "influence" -> {
+                    for (String planetID : planetIDs) {
+                        sum += Helper.getPlanetInfluence(planetID, getActiveMap());
+                    }
+                    message.append(Helper.getInfluenceEmoji(sum) + " influence").toString();
+                }
+                case "votes" -> {
+                    message.append(" votes").toString();
+                }
                 default -> message.append(spendAs).toString();
             };
+            return message.toString();
         }
         return "";
     }
