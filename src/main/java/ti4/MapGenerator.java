@@ -133,6 +133,7 @@ public class MapGenerator {
 	       commandsC.queue();
        }
 
+       //FOW game
        if (args.length >= 5) {
 	       Guild guild3 = jda.getGuildById(args[4]);
            BotLogger.log("BOT STARTED UP: " + guild3.getName());
