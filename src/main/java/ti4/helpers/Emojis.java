@@ -182,26 +182,26 @@ public class Emojis {
     //RESOURCE AND INFLUENCE SYMBOLS
     public static final String influence = "<:influence:959575421337358336>";
     public static final String resources = "<:resources:959575421274451998>";
-    public static final String Resources_0 = "<:R0:864278976553156640>";
-    public static final String Resources_1 = "<:R1:864278976524189727>";
-    public static final String Resources_2 = "<:R2:864278977133019157>";
-    public static final String Resources_3 = "<:R3:864278977321631754>";
-    public static final String Resources_4 = "<:R4:864278977355186176>";
-    public static final String Resources_5 = "<:R5:864278977468170290>";
-    public static final String Resources_6 = "<:R6:864278977459126278>";
-    public static final String Resources_7 = "<:R7:864278977468432395>";
-    public static final String Resources_8 = "<:R8:864278977530691604>";
-    public static final String Resources_9 = "<:R9:864278977463451699>";
-    public static final String Influence_0 = "<:I0:864278934032351282>";
-    public static final String Influence_1 = "<:I1:864278934195798046>";
-    public static final String Influence_2 = "<:I2:864278934249406474>";
-    public static final String Influence_3 = "<:I3:864278934786932746>";
-    public static final String Influence_4 = "<:I4:864278934501195836>";
-    public static final String Influence_5 = "<:I5:864278934506176552>";
-    public static final String Influence_6 = "<:I6:864278934504996866>";
-    public static final String Influence_7 = "<:I7:864278934602776576>";
-    public static final String Influence_8 = "<:I8:864278934173253653>";
-    public static final String Influence_9 = "<:I9:864278934509322300>";
+    public static final String Resources_0 = "<:R0:1079293906451177472>";
+    public static final String Resources_1 = "<:R1:1079293915217281104>";
+    public static final String Resources_2 = "<:R2:1079293931113680997>";
+    public static final String Resources_3 = "<:R3:1079293948931088394>";
+    public static final String Resources_4 = "<:R4:1079293960129884210>";
+    public static final String Resources_5 = "<:R5:1079293972612128829>";
+    public static final String Resources_6 = "<:R6:1079293982397448352>";
+    public static final String Resources_7 = "<:R7:1079293992161775696>";
+    public static final String Resources_8 = "<:R8:1079294002156818502>";
+    public static final String Resources_9 = "<:R9:1079294013510778951>";
+    public static final String Influence_0 = "<:I0:1079293767967842324>";
+    public static final String Influence_1 = "<:I1:1079293791883767898>";
+    public static final String Influence_2 = "<:I2:1079293800201076817>";
+    public static final String Influence_3 = "<:I3:1079293814113570866>";
+    public static final String Influence_4 = "<:I4:1079293829842206741>";
+    public static final String Influence_5 = "<:I5:1079293841867288586>";
+    public static final String Influence_6 = "<:I6:1079293852659236935>";
+    public static final String Influence_7 = "<:I7:1079293863560216686>";
+    public static final String Influence_8 = "<:I8:1079293873316171846>";
+    public static final String Influence_9 = "<:I9:1079293882833043496>";
 
     //PLANETS
     public static final String MecatolRex = "<:MecatolRex:1072083209250152489>";
