@@ -11,6 +11,7 @@ public class Ping extends GameSubcommandData {
     }
 
     public void execute(SlashCommandInteractionEvent event) {
+        Helper.fixGameChannelPermissions(event.getGuild(),getActiveMap());
         event.getHook().editOriginal(Helper.getGamePing(event.getGuild(), getActiveMap())).queue();
     }
 }
