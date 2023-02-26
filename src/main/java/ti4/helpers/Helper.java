@@ -285,6 +285,26 @@ public class Helper {
         }        
     }
 
+    public static String getPlanetRepresentationPlusEmojiPlusInfluence(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return getPlanetRepresentationPlusEmoji(planetID);
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + getInfluenceEmoji(planet.getInfluence());
+        }        
+    }
+
+    public static String getPlanetRepresentationPlusEmojiPlusResources(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return getPlanetRepresentationPlusEmoji(planetID);
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + getResourceEmoji(planet.getResources());
+        }        
+    }
+
     public static String getInfluenceEmoji(int count) {
         return switch (count) {
             case 0 -> Emojis.Influence_0;
