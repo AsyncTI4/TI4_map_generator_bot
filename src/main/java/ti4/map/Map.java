@@ -106,10 +106,8 @@ public class Map {
 
         Set<String> exp = Mapper.getExplores().keySet();
         explore.addAll(exp);
-        Set<String> rel = Mapper.getRelics().keySet();
-        relics.addAll(rel);
         Collections.shuffle(explore);
-        Collections.shuffle(relics);
+        resetRelics();
 
         //Default SC initialization
         for (int i = 0; i < 8; i++) {
@@ -203,6 +201,7 @@ public class Map {
     public void setAbsolMode(boolean absolMode) {
         this.absolMode = absolMode;
         resetAgendas();
+        resetRelics();
     }
 
     public void setMainGameChannel(MessageChannel channel) {
@@ -1098,6 +1097,16 @@ public class Map {
     public void setRelics(ArrayList<String> deck) {
         deck = new ArrayList<>(new HashSet<>(deck));
         relics = deck;
+    }
+
+    private void resetRelics() {
+        HashMap<String, String> relics = Mapper.getRelics(); //ALL agendas including absol
+        if (this.absolMode) {
+            this.relics = new ArrayList<>(relics.keySet().stream().filter(r -> r.startsWith("absol_")).toList());
+        } else { //ALL relics, except absol - if more decks get added, this will need to be rebuilt
+            this.relics = new ArrayList<>(relics.keySet().stream().filter(Predicate.not(r -> r.startsWith("absol_"))).toList());
+        }
+        Collections.shuffle(this.relics);
     }
 
     public void setSecretObjectives(List<String> secretObjectives) {
