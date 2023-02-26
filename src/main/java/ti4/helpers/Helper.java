@@ -270,9 +270,91 @@ public class Helper {
         };
     }
 
-    public static String getPlanetRepresentationPlusEmojis (String planet) {
+    public static String getPlanetRepresentationPlusEmoji(String planet) {
         String planetProper = Mapper.getPlanetRepresentations().get(planet);
         return Helper.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
+    }
+
+    public static String getPlanetRepresentationPlusEmojiPlusResourceInfluence(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return getPlanetRepresentationPlusEmoji(planetID);
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + getResourceEmoji(planet.getResources()) + getInfluenceEmoji(planet.getInfluence());
+        }        
+    }
+
+    public static String getPlanetRepresentationPlusEmojiPlusInfluence(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return getPlanetRepresentationPlusEmoji(planetID);
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + getInfluenceEmoji(planet.getInfluence());
+        }        
+    }
+
+    public static String getPlanetRepresentationPlusEmojiPlusResources(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return getPlanetRepresentationPlusEmoji(planetID);
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + getResourceEmoji(planet.getResources());
+        }        
+    }
+
+    public static int getPlanetResources(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return -1;
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return planet.getResources();
+        }        
+    }
+
+    public static int getPlanetInfluence(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return -1;
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return planet.getInfluence();
+        }        
+    }
+
+    public static String getInfluenceEmoji(int count) {
+        return switch (count) {
+            case 0 -> Emojis.Influence_0;
+            case 1 -> Emojis.Influence_1;
+            case 2 -> Emojis.Influence_2;
+            case 3 -> Emojis.Influence_3;
+            case 4 -> Emojis.Influence_4;
+            case 5 -> Emojis.Influence_5;
+            case 6 -> Emojis.Influence_6;
+            case 7 -> Emojis.Influence_7;
+            case 8 -> Emojis.Influence_8;
+            case 9 -> Emojis.Influence_9;
+            default -> Emojis.influence + count;
+        };
+    }
+
+    public static String getResourceEmoji(int count) {
+        return switch (count) {
+            case 0 -> Emojis.Resources_0;
+            case 1 -> Emojis.Resources_1;
+            case 2 -> Emojis.Resources_2;
+            case 3 -> Emojis.Resources_3;
+            case 4 -> Emojis.Resources_4;
+            case 5 -> Emojis.Resources_5;
+            case 6 -> Emojis.Resources_6;
+            case 7 -> Emojis.Resources_7;
+            case 8 -> Emojis.Resources_8;
+            case 9 -> Emojis.Resources_9;
+            default -> Emojis.resources + count;
+        };
     }
 
     /**
@@ -708,6 +790,112 @@ public class Helper {
             sb.append(" ");
         }     
         return sb.toString().trim();
+    }
+
+    public static Integer getPlayerResourcesAvailable(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        int resourcesCount = 0;
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+                resourcesCount += resourcesCountFromPlanetsRes;
+            }
+        } 
+
+        int resourcesCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+
+        resourcesCount += resourcesCountFromPlanets;
+        return resourcesCount;
+    }
+
+    public static Integer getPlayerResourcesTotal(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        int resourcesCount = 0;
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+                resourcesCount += resourcesCountFromPlanetsRes;
+            }
+        } 
+
+        int resourcesCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+
+        resourcesCount += resourcesCountFromPlanets;
+        return resourcesCount;
+    }
+
+    public static Integer getPlayerInfluenceAvailable(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        int influenceCount = 0;
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+                influenceCount += influenceCountFromPlanetsRes;
+            }
+        } 
+
+        int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+
+        influenceCount += influenceCountFromPlanets;
+        return influenceCount;
+    }
+    
+    public static Integer getPlayerInfluenceTotal(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        int influenceCount = 0;
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+                influenceCount += influenceCountFromPlanetsRes;
+            }
+        } 
+
+        int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+
+        influenceCount += influenceCountFromPlanets;
+        return influenceCount;
+    }
+
+    public static String getPlayerResourceInfluenceRepresentation(Player player, Map map) {
+        StringBuilder sb = new StringBuilder(getPlayerRepresentation(player)).append(":\n");
+        sb.append("Resources: ").append(getPlayerResourcesAvailable(player, map)).append("/").append(getPlayerResourcesTotal(player, map)).append("\n");
+        sb.append("Influence: ").append(getPlayerInfluenceAvailable(player, map)).append("/").append(getPlayerInfluenceTotal(player, map)).append("\n");
+        return sb.toString();
     }
 
     public static HashMap<String, Integer> getLastEntryInHashMap(LinkedHashMap<String, Integer> linkedHashMap) {

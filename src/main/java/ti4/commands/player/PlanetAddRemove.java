@@ -14,7 +14,10 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -43,40 +46,45 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), getActionHeaderMessage(event, player) + resolveSpendAs(event) + ":");
+        
+        ArrayList<OptionMapping> planetOptions = new ArrayList<>();
+        planetOptions.add(event.getOption(Constants.PLANET));
+        planetOptions.add(event.getOption(Constants.PLANET2));
+        planetOptions.add(event.getOption(Constants.PLANET3));
+        planetOptions.add(event.getOption(Constants.PLANET4));
+        planetOptions.add(event.getOption(Constants.PLANET5));
+        planetOptions.add(event.getOption(Constants.PLANET6));
 
-        parseParameter(event, player, event.getOption(Constants.PLANET), activeMap);
-        parseParameter(event, player, event.getOption(Constants.PLANET2), activeMap);
-        parseParameter(event, player, event.getOption(Constants.PLANET3), activeMap);
-        parseParameter(event, player, event.getOption(Constants.PLANET4), activeMap);
-        parseParameter(event, player, event.getOption(Constants.PLANET5), activeMap);
-        parseParameter(event, player, event.getOption(Constants.PLANET6), activeMap);
+        LinkedHashSet<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(p -> AliasHandler.resolvePlanet(p.getAsString())).toList());
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), getActionHeaderMessage(event, player) + resolveSpendAs(event, planetIDs) + ":");
+
+        for (String planetID : planetIDs) {
+            parseParameter(event, player, planetID, activeMap);
+        }
     }
 
-    private void parseParameter(SlashCommandInteractionEvent event, Player player, OptionMapping option, Map map) {
+    private void parseParameter(SlashCommandInteractionEvent event, Player player, String planetID, Map map) {
         try {
-            if (option != null) {
-                String planetID = AliasHandler.resolvePlanet(option.getAsString());
-                if (Mapper.isValidPlanet(planetID)) {
-                    doAction(player, planetID, map);
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planetID));
-                } else {
-                    Set<String> planets = map.getPlanets();
-                    List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
-                    if (possiblePlanets.isEmpty()){
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "> No matching Planet '" + planetID + "'' found - please try again.");
-                        return;
-                    } else if (possiblePlanets.size() > 1) {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
-                        return;
-                    }
-                    String planet = possiblePlanets.get(0);
-                    doAction(player, planet, map);
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planet));
+            if (Mapper.isValidPlanet(planetID)) {
+                doAction(player, planetID, map);
+                MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planetID));
+            } else {
+                Set<String> planets = map.getPlanets();
+                List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
+                if (possiblePlanets.isEmpty()){
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "> No matching Planet '" + planetID + "'' found - please try again.");
+                    return;
+                } else if (possiblePlanets.size() > 1) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
+                    return;
                 }
+                String planet = possiblePlanets.get(0);
+                doAction(player, planet, map);
+                MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planet));
             }
         } catch (Exception e) {
-            BotLogger.log(event, "Error parsing planet: " + option.getAsString());
+            BotLogger.log(event, "Error parsing planet: " + planetID);
             BotLogger.log(ExceptionUtils.getStackTrace(e));
         }
     }
@@ -124,7 +132,7 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
                 default -> Emojis.planet + " " + planet;
             };
         } else {
-            return Helper.getPlanetRepresentationPlusEmojis(planet);
+            return Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planet, getActiveMap());
         }
     }
 
@@ -132,17 +140,31 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
      * @param event - if "spend_as" option is used for "planet_exhaust"
      * @return message describing what the planets were exhausted for
      */
-    private String resolveSpendAs(SlashCommandInteractionEvent event) {
+    private String resolveSpendAs(SlashCommandInteractionEvent event, LinkedHashSet<String> planetIDs) {
         OptionMapping option = event.getOption(Constants.SPEND_AS);
         if (option != null) {
             StringBuilder message = new StringBuilder(", spent as ");
             String spendAs = option.getAsString();
-            return switch (spendAs.toLowerCase()) {
-                case "resources" -> message.append(Emojis.resources + " resources").toString();
-                case "influence" -> message.append(Emojis.influence + " influence").toString();
-                case "votes" -> message.append(" votes").toString();
+            int sum = 0;
+            switch (spendAs.toLowerCase()) {
+                case "resources" -> {
+                    for (String planetID : planetIDs) {
+                        sum += Helper.getPlanetResources(planetID, getActiveMap());
+                    }
+                    message.append(Helper.getResourceEmoji(sum) + " resources").toString();
+                }
+                case "influence" -> {
+                    for (String planetID : planetIDs) {
+                        sum += Helper.getPlanetInfluence(planetID, getActiveMap());
+                    }
+                    message.append(Helper.getInfluenceEmoji(sum) + " influence").toString();
+                }
+                case "votes" -> {
+                    message.append(" votes").toString();
+                }
                 default -> message.append(spendAs).toString();
             };
+            return message.toString();
         }
         return "";
     }
