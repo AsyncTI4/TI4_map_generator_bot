@@ -15,6 +15,7 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -54,39 +55,36 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
         planetOptions.add(event.getOption(Constants.PLANET5));
         planetOptions.add(event.getOption(Constants.PLANET6));
 
-        ArrayList<String> planetIDs = new ArrayList<>(planetOptions.stream().filter(Objects::nonNull).map(p -> AliasHandler.resolvePlanet(p.getAsString())).toList());
+        LinkedHashSet<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(p -> AliasHandler.resolvePlanet(p.getAsString())).toList());
 
         MessageHelper.sendMessageToChannel(event.getChannel(), getActionHeaderMessage(event, player) + resolveSpendAs(event, planetIDs) + ":");
 
-        for (OptionMapping planetOption : planetOptions.stream().filter(Objects::nonNull).toList()) {
-            parseParameter(event, player, planetOption, activeMap);
+        for (String planetID : planetIDs) {
+            parseParameter(event, player, planetID, activeMap);
         }
     }
 
-    private void parseParameter(SlashCommandInteractionEvent event, Player player, OptionMapping option, Map map) {
+    private void parseParameter(SlashCommandInteractionEvent event, Player player, String planetID, Map map) {
         try {
-            if (option != null) {
-                String planetID = AliasHandler.resolvePlanet(option.getAsString());
-                if (Mapper.isValidPlanet(planetID)) {
-                    doAction(player, planetID, map);
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planetID));
-                } else {
-                    Set<String> planets = map.getPlanets();
-                    List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
-                    if (possiblePlanets.isEmpty()){
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "> No matching Planet '" + planetID + "'' found - please try again.");
-                        return;
-                    } else if (possiblePlanets.size() > 1) {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
-                        return;
-                    }
-                    String planet = possiblePlanets.get(0);
-                    doAction(player, planet, map);
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planet));
+            if (Mapper.isValidPlanet(planetID)) {
+                doAction(player, planetID, map);
+                MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planetID));
+            } else {
+                Set<String> planets = map.getPlanets();
+                List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
+                if (possiblePlanets.isEmpty()){
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "> No matching Planet '" + planetID + "'' found - please try again.");
+                    return;
+                } else if (possiblePlanets.size() > 1) {
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
+                    return;
                 }
+                String planet = possiblePlanets.get(0);
+                doAction(player, planet, map);
+                MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planet));
             }
         } catch (Exception e) {
-            BotLogger.log(event, "Error parsing planet: " + option.getAsString());
+            BotLogger.log(event, "Error parsing planet: " + planetID);
             BotLogger.log(ExceptionUtils.getStackTrace(e));
         }
     }
@@ -142,9 +140,8 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
      * @param event - if "spend_as" option is used for "planet_exhaust"
      * @return message describing what the planets were exhausted for
      */
-    private String resolveSpendAs(SlashCommandInteractionEvent event, List<String> planetIDs) {
+    private String resolveSpendAs(SlashCommandInteractionEvent event, LinkedHashSet<String> planetIDs) {
         OptionMapping option = event.getOption(Constants.SPEND_AS);
-        // List<String> planetIDs = planetOptions.stream().filter(Objects::nonNull).map(p -> AliasHandler.resolvePlanet(p.getAsString())).toList();
         if (option != null) {
             StringBuilder message = new StringBuilder(", spent as ");
             String spendAs = option.getAsString();
