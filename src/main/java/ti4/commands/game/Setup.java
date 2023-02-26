@@ -1,9 +1,12 @@
 package ti4.commands.game;
 
+import java.util.ArrayList;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.map.Map;
@@ -18,6 +21,7 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.COMMUNITY_MODE, "Set to YES if want to allow Community Mode for map, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.ALLIANCE_MODE, "Set to YES if want to allow Alliance Mode for map, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FOW_MODE, "Set to YES if want to allow FoW Mode for map, FALSE to disable it").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's - do NOT change this mid-game"));
     }
 
     @Override
@@ -97,6 +101,10 @@ public class Setup extends GameSubcommandData {
             activeMap.setCustomName(customName);
         }
 
+        OptionMapping absolModeOption = event.getOption(Constants.ABSOL_MODE);
+        if (absolModeOption != null) {
+            getActiveMap().setAbsolMode(absolModeOption.getAsBoolean());
+        }
 
         if (displayType != null) {
             activeMap.setDisplayTypeForced(displayType);
