@@ -281,6 +281,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.FOW_MODE + " " + map.isFoWMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.ABSOL_MODE + " " + map.isAbsolMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
         writer.write(System.lineSeparator());
         writer.write(ENDGAMEINFO);
@@ -822,6 +824,14 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         map.setFoWMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.ABSOL_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setAbsolMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
