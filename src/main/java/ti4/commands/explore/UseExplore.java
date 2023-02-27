@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.Planet;
-import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
@@ -50,9 +49,8 @@ public class UseExplore extends ExploreSubcommandData {
                     return;
                 }
             }
-            Player player = activeMap.getPlayer(event.getUser().getId());
-            String messageText = "Used card: " + id + " by player: " + player.getUserName();
-            resolveExplore(event, id, tile, planetName, messageText, ExpFrontier.checkIfEngimaticDevice(player, id));
+            String messageText = "Used card: " + id + " by player: " + activeMap.getPlayer(event.getUser().getId()).getUserName();
+            resolveExplore(event, id, tile, planetName, messageText, false);
         } else {
             MessageHelper.replyToMessage(event, "Invalid card ID");
         }

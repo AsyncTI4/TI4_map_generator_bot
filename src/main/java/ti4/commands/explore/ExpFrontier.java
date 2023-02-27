@@ -1,10 +1,9 @@
 package ti4.commands.explore;
 
-import org.jetbrains.annotations.NotNull;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.player.SendTG;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -29,22 +28,21 @@ public class ExpFrontier extends ExploreSubcommandData {
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
             String cardID = activeMap.drawExplore(Constants.FRONTIER);
+            boolean isEnigmatic = false;
             Player player = activeMap.getPlayer(getUser().getId());
             player = Helper.getPlayer(activeMap, player, event);
+            if ("ed1".equals(cardID) || "ed2".equals(cardID)){
+                if (player != null){
+                    player.addRelic(Constants.ENIGMATIC_DEVICE);
+                    isEnigmatic = true;
+                }
+            }
             StringBuilder messageText = new StringBuilder(Emojis.Frontier);
             messageText.append("Frontier *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(event, player)).append(":\n");
             messageText.append(displayExplore(cardID));
-            resolveExplore(event, cardID, tile, null, messageText.toString(), checkIfEngimaticDevice(player, cardID));
+            resolveExplore(event, cardID, tile, null, messageText.toString(), isEnigmatic);
         } else {
             MessageHelper.replyToMessage(event, "No frontier token in given system.");
         }
-    }
-
-    public static boolean checkIfEngimaticDevice(@NotNull Player player, String cardID) {
-        if (player != null && ("ed1".equals(cardID) || "ed2".equals(cardID))) {
-            player.addRelic(Constants.ENIGMATIC_DEVICE);
-            return true;
-        }
-        return false;
     }
 }
