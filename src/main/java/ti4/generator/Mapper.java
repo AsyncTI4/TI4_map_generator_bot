@@ -60,14 +60,14 @@ public class Mapper {
         readData("special_case.properties", special_case, "Could not read token name file");
         readData("general.properties", general, "Could not read general token name file");
         readData("factions.properties", factions, "Could not read factions name file");
-        readData("Secret_objectives.properties", secretObjectives, "Could not read secret objectives file");
+        readData("secret_objectives.properties", secretObjectives, "Could not read secret objectives file");
         readData("action_cards.properties", actionCards, "Could not read action cards file");
-        readData("Agendas.properties", agendas, "Could not read agendas file");
+        readData("agendas.properties", agendas, "Could not read agendas file");
         readData("public_objective.properties", publicObjectives, "Could not read public objective file");
-        readData("Promissory_Notes.properties", promissoryNotes, "Could not read promissory notes file");
+        readData("promissory_notes.properties", promissoryNotes, "Could not read promissory notes file");
         readData("exploration.properties", explore, "Could not read explore file");
         readData("leaders.properties", leaders, "Could not read leaders file");
-        readData("Relics.properties", relics, "Could not read relic file");
+        readData("relics.properties", relics, "Could not read relic file");
         readData("tech.properties", techs, "Could not read tech file");
         readData("planets.properties", planets, "Could not read planets file");
         readData("attachments_info.properties", attachmentInfo, "Could not read attachment info file");

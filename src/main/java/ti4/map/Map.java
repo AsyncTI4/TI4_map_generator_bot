@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.player.PlanetRemove;
 import ti4.generator.Mapper;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
@@ -15,6 +14,7 @@ import ti4.message.BotLogger;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.*;
 
 public class Map {
@@ -35,6 +35,7 @@ public class Map {
     private boolean communityMode = false;
     private boolean allianceMode = false;
     private boolean fowMode = false;
+    private boolean absolMode = false;
     private boolean hasEnded = false;
 
     @Nullable
@@ -93,9 +94,7 @@ public class Map {
         this.actionCards = new ArrayList<>(actionCards.keySet());
         Collections.shuffle(this.actionCards);
 
-        HashMap<String, String> agendas = Mapper.getAgendas();
-        this.agendas = new ArrayList<>(agendas.keySet());
-        Collections.shuffle(this.agendas);
+        resetAgendas();
 
         Set<String> po1 = Mapper.getPublicObjectivesState1().keySet();
         Set<String> po2 = Mapper.getPublicObjectivesState2().keySet();
@@ -106,11 +105,9 @@ public class Map {
         addCustomPO(Constants.CUSTODIAN, 1);
 
         Set<String> exp = Mapper.getExplores().keySet();
-        Set<String> rel = Mapper.getRelics().keySet();
         explore.addAll(exp);
-        relics.addAll(rel);
         Collections.shuffle(explore);
-        Collections.shuffle(relics);
+        resetRelics();
 
         //Default SC initialization
         for (int i = 0; i < 8; i++) {
@@ -195,6 +192,14 @@ public class Map {
 
     public boolean isFoWMode() {
         return fowMode;
+    }
+
+    public boolean isAbsolMode() {
+        return absolMode;
+    }
+
+    public void setAbsolMode(boolean absolMode) {
+        this.absolMode = absolMode;
     }
 
     public void setMainGameChannel(MessageChannel channel) {
@@ -553,8 +558,12 @@ public class Map {
     }
 
     public void resetAgendas() {
-        HashMap<String, String> agendas = Mapper.getAgendas();
-        this.agendas = new ArrayList<>(agendas.keySet());
+        HashMap<String, String> agendas = Mapper.getAgendas(); //ALL agendas, including absol
+        if (this.absolMode) {
+            this.agendas = new ArrayList<>(agendas.keySet().stream().filter(a -> a.startsWith("absol_")).toList());
+        } else { //ALL agendas, except absol - if more decks get added, this will need to be rebuilt
+            this.agendas = new ArrayList<>(agendas.keySet().stream().filter(Predicate.not(a -> a.startsWith("absol_"))).toList());
+        }
         Collections.shuffle(this.agendas);
         discardAgendas = new LinkedHashMap<>();
     }
@@ -1086,6 +1095,17 @@ public class Map {
     public void setRelics(ArrayList<String> deck) {
         deck = new ArrayList<>(new HashSet<>(deck));
         relics = deck;
+    }
+
+    public void resetRelics() {
+        HashMap<String, String> relics = Mapper.getRelics(); //ALL agendas including absol
+        if (this.absolMode) {
+            this.relics = new ArrayList<>(relics.keySet().stream().filter(r -> r.startsWith("absol_")).toList());
+            this.relics.add(Constants.ENIGMATIC_DEVICE);
+        } else { //ALL relics, except absol - if more decks get added, this will need to be rebuilt
+            this.relics = new ArrayList<>(relics.keySet().stream().filter(Predicate.not(r -> r.startsWith("absol_"))).toList());
+        }
+        Collections.shuffle(this.relics);
     }
 
     public void setSecretObjectives(List<String> secretObjectives) {
