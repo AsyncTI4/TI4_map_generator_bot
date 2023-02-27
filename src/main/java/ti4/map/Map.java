@@ -200,8 +200,6 @@ public class Map {
 
     public void setAbsolMode(boolean absolMode) {
         this.absolMode = absolMode;
-        resetAgendas();
-        resetRelics();
     }
 
     public void setMainGameChannel(MessageChannel channel) {
@@ -1099,7 +1097,7 @@ public class Map {
         relics = deck;
     }
 
-    private void resetRelics() {
+    public void resetRelics() {
         HashMap<String, String> relics = Mapper.getRelics(); //ALL agendas including absol
         if (this.absolMode) {
             this.relics = new ArrayList<>(relics.keySet().stream().filter(r -> r.startsWith("absol_")).toList());
