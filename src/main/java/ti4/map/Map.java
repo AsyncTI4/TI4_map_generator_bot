@@ -1101,6 +1101,7 @@ public class Map {
         HashMap<String, String> relics = Mapper.getRelics(); //ALL agendas including absol
         if (this.absolMode) {
             this.relics = new ArrayList<>(relics.keySet().stream().filter(r -> r.startsWith("absol_")).toList());
+            this.relics.add(Constants.ENIGMATIC_DEVICE);
         } else { //ALL relics, except absol - if more decks get added, this will need to be rebuilt
             this.relics = new ArrayList<>(relics.keySet().stream().filter(Predicate.not(r -> r.startsWith("absol_"))).toList());
         }
