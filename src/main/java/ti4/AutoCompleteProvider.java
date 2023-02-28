@@ -66,19 +66,9 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.CC -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<String> values = Arrays.asList("no", "retreat", "reinforcements");
-                List<Command.Choice> options = values.stream()
-                        .filter(token -> token.contains(enteredValue))
-                        .limit(25)
-                        .map(token -> new Command.Choice(token, token))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
-            }
             case Constants.CC_USE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<String> values = Arrays.asList("tactics", "t", "retreat", "reinforcements", "r", "no");
+                List<String> values = Arrays.asList("t/tactics","r/retreat/reinforcements","no");
                 List<Command.Choice> options = values.stream()
                         .filter(token -> token.contains(enteredValue))
                         .limit(25)

@@ -29,7 +29,7 @@ public class AddCC extends AddRemoveToken {
                 usedTactics = true;
                 String value = option.getAsString().toLowerCase();
                 switch (value) {
-                    case "t", "tactics" -> {
+                    case "t", "tactics", "tac", "tact" -> {
                         MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
                     }
                 }
