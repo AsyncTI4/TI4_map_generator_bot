@@ -79,12 +79,16 @@ public class StatusCommand implements Command {
     }
 
     public static void reply(SlashCommandInteractionEvent event) {
+        reply(event, null);
+    }
+
+    public static void reply(SlashCommandInteractionEvent event, String message) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
 
         File file = GenerateMap.getInstance().saveImage(activeMap, event);
-        MessageHelper.replyToMessage(event, file);
+        MessageHelper.replyToMessage(event, file, false, message, message != null);
     }
 
 

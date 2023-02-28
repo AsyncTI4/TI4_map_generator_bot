@@ -194,9 +194,9 @@ public class Turn extends PlayerSubcommandData {
         for (Player player : map.getPlayers().values()) {
             int sc = player.getSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
-                String text = Helper.getPlayerRepresentation(event, player) + " UP NEXT";
+                String text = Helper.getPlayerRepresentation(event, player, true) + " UP NEXT";
                 if (isFowPrivateGame) {
-                    String fail = "User for faction not found. Report to ADMIN";
+                    String fail = "User for next faction not found. Report to ADMIN";
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, map, event, text, fail, success);
                 } else {

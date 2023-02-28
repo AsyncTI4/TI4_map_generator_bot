@@ -21,6 +21,7 @@ public class StellarConverter extends SpecialSubcommandData {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getPlayer(activeMap, player, event);
+        player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
@@ -49,7 +50,7 @@ public class StellarConverter extends SpecialSubcommandData {
                 }
             }
         }
-        if (tile == null) {
+        if (tile == null || unitHolder == null) {
             MessageHelper.replyToMessage(event, "System not found that contains planet");
             return;
         }

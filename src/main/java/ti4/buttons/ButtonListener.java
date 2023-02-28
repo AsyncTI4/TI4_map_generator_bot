@@ -362,7 +362,7 @@ public class ButtonListener extends ListenerAdapter {
         
 
         boolean foundThread = false;
-        String text = Helper.getPlayerRepresentation(event, player) + " " + message;
+        String text = Helper.getPlayerRepresentation(event, player, !sendPublic) + " " + message;
         if (activeMap.isFoWMode()) {
             text = message;
         }

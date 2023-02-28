@@ -33,7 +33,6 @@ public class ShowAllPN extends PNCardsSubcommandData {
             return;
         }
 
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
         OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
         boolean longPNDisplay = false;
         if (longPNOption != null) {

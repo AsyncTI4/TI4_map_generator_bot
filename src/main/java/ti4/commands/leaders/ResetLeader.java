@@ -21,6 +21,7 @@ public class ResetLeader extends LeaderSubcommandData {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getPlayer(activeMap, player, event);
+        player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
             editReplyMessage(event, "Player could not be found");
             return;

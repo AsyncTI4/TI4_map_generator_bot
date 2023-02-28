@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -51,6 +52,7 @@ public class UseExplore extends ExploreSubcommandData {
                 }
             }
             Player player = activeMap.getPlayer(event.getUser().getId());
+            player = Helper.getGamePlayer(activeMap, player, event, null);
             String messageText = "Used card: " + id + " by player: " + player.getUserName();
             resolveExplore(event, id, tile, planetName, messageText, ExpFrontier.checkIfEngimaticDevice(player, id));
         } else {
