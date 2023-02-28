@@ -13,6 +13,7 @@ import ti4.message.BotLogger;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -106,12 +107,23 @@ public class AutoCompleteProvider {
             case Constants.RELIC -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 HashMap<String, String> relics = Mapper.getRelics();
-                List<Command.Choice> options = relics.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
+                if (activeMap.isAbsolMode()){
+                    List<Command.Choice> options = relics.entrySet().stream()
+                            .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                            .filter(value -> value.getKey().startsWith("absol_"))
+                            .limit(25)
+                            .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                            .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                } else {
+                    List<Command.Choice> options = relics.entrySet().stream()
+                            .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                            .filter(Predicate.not(value -> value.getKey().startsWith("absol_")))
+                            .limit(25)
+                            .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                            .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
             }
             case Constants.KELERES_HS -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
