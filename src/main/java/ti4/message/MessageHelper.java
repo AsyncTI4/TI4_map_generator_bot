@@ -72,14 +72,18 @@ public class MessageHelper {
     }
 
     public static void replyToMessage(SlashCommandInteractionEvent event, File file) {
-        replyToMessage(event, file, false);
+        replyToMessage(event, file, false, null, false);
     }
 
     public static void replyToMessage(SlashCommandInteractionEvent event, File file, boolean forceShowMap) {
+        replyToMessage(event, file, forceShowMap, null, false);
+    }
+
+    public static void replyToMessage(SlashCommandInteractionEvent event, File file, boolean forceShowMap, String messageText, boolean pinMessage) {
 
         try {
             if (forceShowMap){
-                sendFileToChannel(event.getChannel(), file);
+                sendMessageWithFile(event.getChannel(), file, messageText, pinMessage);
                 replyToMessageTI4Logo(event);
                 return;
             }
@@ -88,7 +92,7 @@ public class MessageHelper {
             gameName = gameName.substring(0, gameName.indexOf("-"));
             Map activeMap = MapManager.getInstance().getMap(gameName);
             if (!activeMap.isFoWMode() || activeMap.isFoWMode() && event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
-                sendFileToChannel(event.getChannel(), file);
+                sendMessageWithFile(event.getChannel(), file, messageText, pinMessage);
                 replyToMessageTI4Logo(event);
             } else {
                 replyToMessage(event, "Map updated successfully. Use /special system_info to check the systems.");
@@ -97,6 +101,18 @@ public class MessageHelper {
         catch (Exception e){
             replyToMessage(event, "Could not send response, use /show_game or contact Admins or Bothelper");
         }
+    }
+
+    public static void sendMessageWithFile(MessageChannel channel, File file, String messageText, boolean pinMessage) {
+        FileUpload fileUpload = FileUpload.fromData(file);
+        MessageCreateBuilder message = new MessageCreateBuilder();
+        if (messageText != null) {
+            message.addContent(messageText);
+        }
+        MessageCreateData messageObject = message.addFiles(fileUpload).build();
+        channel.sendMessage(messageObject).queue(x -> {
+            if (pinMessage) x.pin().queue();
+        });
     }
 
     private static void splitAndSent(String messageText, MessageChannel channel) {

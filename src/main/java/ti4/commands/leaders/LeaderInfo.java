@@ -46,6 +46,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         Map activeMap = getActiveMap();
         User user = getUser();
         Player player = activeMap.getPlayer(user.getId());
+        player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
            editReplyMessage(event, "Player could not be found");
             return;

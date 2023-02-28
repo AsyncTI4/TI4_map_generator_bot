@@ -1,12 +1,9 @@
 package ti4.commands.player;
 
-import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.MapGenerator;
 import ti4.commands.status.ListTurnOrder;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -37,7 +34,6 @@ public class SCPick extends PlayerSubcommandData {
         boolean isFowPrivateGame = (privateGame != null && privateGame);
 
         MessageChannel eventChannel = event.getChannel();
-        MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? eventChannel : activeMap.getMainGameChannel();
 
         if (player == null) {
             MessageHelper.sendMessageToChannel(eventChannel, "You're not a player of this game");
@@ -51,7 +47,7 @@ public class SCPick extends PlayerSubcommandData {
         boolean allPicked = true;
         Player privatePlayer = null;
         if (sc != 0) {
-            msg += Helper.getPlayerRepresentation(event, player);
+            msg += Helper.getPlayerRepresentation(event, player, true);
             msg += " Picked: " + Helper.getSCEmojiFromInteger(sc) + Helper.getSCAsMention(event.getGuild(), sc);
 
             boolean nextCorrectPing = false;
@@ -65,7 +61,7 @@ public class SCPick extends PlayerSubcommandData {
                     continue;
                 }
                 if (nextCorrectPing && player_.getSC() == 0 && player_.getFaction() != null) {
-                    msgExtra += Helper.getPlayerRepresentation(event, player_) + " To Pick SC";
+                    msgExtra += Helper.getPlayerRepresentation(event, player_, true) + " To Pick SC";
                     privatePlayer = player_;
                     allPicked = false;
                     break;
@@ -116,13 +112,9 @@ public class SCPick extends PlayerSubcommandData {
         
         if (isFowPrivateGame) {
             if (allPicked) {
-                msgExtra = Helper.getPlayerRepresentation(event, privatePlayer) + " UP NEXT";
+                msgExtra = Helper.getPlayerRepresentation(event, privatePlayer, true) + " UP NEXT";
             }
-            if (privatePlayer == null) {
-                MessageHelper.sendMessageToChannel(eventChannel, msgExtra + "\n**Ping personally as Bot could not find player**");
-                return;
-            }
-            String fail = "User for faction not found. Report to ADMIN";
+            String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(privatePlayer, activeMap, event, msgExtra, fail, success);
         } else {

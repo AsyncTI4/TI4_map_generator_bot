@@ -577,45 +577,63 @@ public class Helper {
 
     @Nullable
     public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player) {
+        return getPlayerRepresentation(event, player, false);
+    }
+
+    @Nullable
+    public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player, boolean overrideFow) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
-        if (privateGame != null && privateGame){
+        if (privateGame != null && privateGame && !overrideFow){
             return getColourAsMention(event.getGuild(), player.getColor());
         }
         if (event == null) {
             return getPlayerRepresentation(player);
         }
         if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
-            return getColourAsMention(event.getGuild(), player.getColor());
+            return getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName());
+            //return getColourAsMention(event.getGuild(), player.getColor());
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
     @Nullable
-    public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player) {
+    public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player) { 
+        return getPlayerRepresentation(event, player, false);
+    }
+    
+    @Nullable
+    public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player, boolean overrideFow) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
-        if (privateGame != null && privateGame){
+        if (privateGame != null && privateGame && !overrideFow){
             return getColourAsMention(event.getGuild(), player.getColor());
         }
         if (event == null) {
             return getPlayerRepresentation(player);
         }
         if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
-            return getColourAsMention(event.getGuild(), player.getColor());
+            return getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName());
+            //return getColourAsMention(event.getGuild(), player.getColor());
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
     @Nullable
-    public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player) {
+    public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player) { 
+        return getPlayerRepresentation(event, player, false);
+    }
+    
+    @Nullable
+    public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player, boolean overrideFow) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
-        if (privateGame != null && privateGame){
+        if (privateGame != null && privateGame && !overrideFow){
             return getColourAsMention(event.getGuild(), player.getColor());
         }
         if (event == null) {
             return getPlayerRepresentation(player);
         }
         if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
-            return getColourAsMention(event.getGuild(), player.getColor());
+            return getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName());
+            //return getColourAsMention(event.getGuild(), player.getColor());
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }
@@ -932,10 +950,10 @@ public class Helper {
     public static void checkThreadLimitAndArchive(Guild guild) {
         int threadCount = guild.getThreadChannels().size();
         int closeCount = 10;
-        String mention = guild.getMemberById("150809002974904321").getAsMention(); //@HolyTispoon
+        // String mention = guild.getMemberById("150809002974904321").getAsMention(); //@HolyTispoon
 
         if (threadCount > 980) {
-            BotLogger.log(mention + " `Helper.checkThreadLimitAndArchive:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
+            BotLogger.log("`Helper.checkThreadLimitAndArchive:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
             BotLogger.log(ListOldChannels.getOldThreadsMessage(guild, closeCount));
             ArchiveOldThreads.archiveOldThreads(guild, closeCount);
         }

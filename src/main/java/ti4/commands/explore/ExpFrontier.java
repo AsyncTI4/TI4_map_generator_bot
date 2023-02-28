@@ -23,14 +23,19 @@ public class ExpFrontier extends ExploreSubcommandData {
         String tileName = event.getOption(Constants.TILE_NAME).getAsString();
         Map activeMap = getActiveMap();
         Tile tile = getTile(event, tileName, activeMap);
+        
+        Player player = activeMap.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeMap, player, event, null);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            return;
+        }
 
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename)) {
             space.removeToken(frontierFilename);
             String cardID = activeMap.drawExplore(Constants.FRONTIER);
-            Player player = activeMap.getPlayer(getUser().getId());
-            player = Helper.getPlayer(activeMap, player, event);
             StringBuilder messageText = new StringBuilder(Emojis.Frontier);
             messageText.append("Frontier *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(event, player)).append(":\n");
             messageText.append(displayExplore(cardID));

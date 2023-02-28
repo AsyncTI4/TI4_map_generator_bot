@@ -44,6 +44,8 @@ public class AddUnits extends AddRemoveUnits {
                 MapManager mapManager = MapManager.getInstance();
                 Map activeMap = mapManager.getUserActiveMap(userID);
                 Player player = activeMap.getPlayer(userID);
+                player = Helper.getPlayer(activeMap, player, event);
+                player = Helper.getGamePlayer(activeMap, player, event, null);
                 if (player != null) {
                     player.exhaustTech("sr");
                 }

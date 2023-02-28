@@ -22,8 +22,8 @@ public class SCFollow extends PlayerSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
+        player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "You're not a player of this game");
             return;

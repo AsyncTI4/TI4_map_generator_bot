@@ -235,6 +235,22 @@ public class GenerateMap {
                     tilesWithPlayerUnitsPlanets.add(tileID);
                     continue;
                 }
+                if ("18".equals(tile.getTileID()) && fowPlayer.getTechs().contains("iihq")) {
+                    tilesWithPlayerUnitsPlanets.add(tileID);
+                    continue;
+                }
+                if ("s11".equals(tile.getTileID()) && "cabal".equals(fowPlayer.getFaction())) {
+                    tilesWithPlayerUnitsPlanets.add(tileID);
+                    continue;
+                }
+                if ("s12".equals(tile.getTileID()) && "nekro".equals(fowPlayer.getFaction())) {
+                    tilesWithPlayerUnitsPlanets.add(tileID);
+                    continue;
+                }
+                if ("s13".equals(tile.getTileID()) && "yssaril".equals(fowPlayer.getFaction())) {
+                    tilesWithPlayerUnitsPlanets.add(tileID);
+                    continue;
+                }
                 unitCheck(fowPlayer, tilesWithPlayerUnitsPlanets, colorToId, unitRepresentation, tile, tileID);
             }
             Set<String> tileIDsToShow = new HashSet<>(tilesWithPlayerUnitsPlanets);
@@ -257,8 +273,20 @@ public class GenerateMap {
                     for (String token : tokenList) {
                         if (token.contains(Constants.ALPHA)) {
                             wormholeIDs.add(Constants.ALPHA);
+                            if ("ghost".equals(fowPlayer.getFaction()) 
+                                || map.getLaws().keySet().contains("wormhole_recon") 
+                                || map.getLaws().keySet().contains("absol_recon")) 
+                            {
+                                wormholeIDs.add(Constants.BETA);
+                            }
                         } else if (token.contains(Constants.BETA)) {
                             wormholeIDs.add(Constants.BETA);
+                            if ("ghost".equals(fowPlayer.getFaction()) 
+                                || map.getLaws().keySet().contains("wormhole_recon") 
+                                || map.getLaws().keySet().contains("absol_recon")) 
+                            {
+                                wormholeIDs.add(Constants.ALPHA);
+                            }
                         } else if (token.contains(Constants.GAMMA)) {
                             wormholeIDs.add(Constants.GAMMA);
                         } else if (token.contains(Constants.DELTA)) {
@@ -2317,6 +2345,21 @@ public class GenerateMap {
         LinkedHashMap<String, Integer> units = new LinkedHashMap<>();
         HashMap<String, Point> unitOffset = new HashMap<>();
         boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
+        
+        boolean isCabalJail = "s11".equals(tile.getTileID());
+        boolean isNekroJail = "s12".equals(tile.getTileID());
+        boolean isYssarilJail = "s13".equals(tile.getTileID());
+        
+        boolean isJail = isCabalJail || isNekroJail || isYssarilJail;
+        boolean showJail = false;
+        if (fowPlayer == null || 
+            (isCabalJail && "cabal".equals(fowPlayer.getFaction()) 
+                || (isNekroJail && "nekro".equals(fowPlayer.getFaction()))
+                || (isYssarilJail && "yssaril".equals(fowPlayer.getFaction()))
+            )) 
+        {
+            showJail = true;
+        }
 
         Point unitOffsetValue = map.isAllianceMode() ? PositionMapper.getAllianceUnitOffset() : PositionMapper.getUnitOffset();
         int spaceX = unitOffsetValue != null ? unitOffsetValue.x : 10;
@@ -2351,6 +2394,13 @@ public class GenerateMap {
         for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
             String unitID = unitEntry.getKey();
             Integer unitCount = unitEntry.getValue();
+
+            if (isJail && fowPlayer != null) {
+                String colorID = Mapper.getColorID(fowPlayer.getColor());
+                if (!showJail && fowPlayer != null && !unitID.startsWith(colorID)) {
+                    continue;
+                }
+            }
 
             Integer unitDamageCount = unitDamage.get(unitID);
 

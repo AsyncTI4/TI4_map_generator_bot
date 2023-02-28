@@ -19,7 +19,7 @@ public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         Player activePlayer = activeMap.getPlayer(getUser().getId());
-        activePlayer = Helper.getPlayer(activeMap, activePlayer, event);
+        activePlayer = Helper.getGamePlayer(activeMap, activePlayer, event, null);
         if (activePlayer == null) {
             MessageHelper.replyToMessage(event, "Player not found in game.");
             return;
