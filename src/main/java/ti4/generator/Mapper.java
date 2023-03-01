@@ -37,6 +37,7 @@ public class Mapper {
     private static final HashMap<String, String> techList = new HashMap<>();
     private static final HashMap<String, String[]> techListInfo = new HashMap<>();
     private static final Properties planets = new Properties();
+    private static final Properties faction_representation = new Properties();
     private static final Properties planet_representation = new Properties();
     private static final Properties leader_representation = new Properties();
     private static final Properties tile_representation = new Properties();
@@ -72,6 +73,7 @@ public class Mapper {
         readData("tech.properties", techs, "Could not read tech file");
         readData("planets.properties", planets, "Could not read planets file");
         readData("attachments_info.properties", attachmentInfo, "Could not read attachment info file");
+        readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
         readData("planets_representation.properties", planet_representation, "Could not read planet representation file");
         readData("tile_representation.properties", tile_representation, "Could not read tile representation file");
         readData("leader_representation.properties", leader_representation, "Could not read leader representation file");
@@ -423,6 +425,14 @@ public class Mapper {
             planets.put((String) entry.getKey(), (String) entry.getValue());
         }
         return planets;
+    }
+
+    public static HashMap<String, String> getFactionRepresentations() {
+        HashMap<String, String> factions = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : faction_representation.entrySet()) {
+            factions.put((String) entry.getKey(), (String) entry.getValue());
+        }
+        return factions;
     }
 
     public static HashMap<String, String> getLeaderRepresentations() {
