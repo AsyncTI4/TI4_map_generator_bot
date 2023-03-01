@@ -163,6 +163,7 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
                 case "votes" -> {
                     message.append(" votes").toString();
                 }
+                case "techskip" -> message.append(" a tech skip").toString();
                 default -> message.append(spendAs).toString();
             };
             return message.toString();

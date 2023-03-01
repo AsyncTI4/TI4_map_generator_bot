@@ -11,7 +11,7 @@ import ti4.message.BotLogger;
 public class PlanetExhaust extends PlanetAddRemove {
     public PlanetExhaust() {
         super(Constants.PLANET_EXHAUST, "Exhaust Planet");
-        addOptions(new OptionData(OptionType.STRING, Constants.SPEND_AS, "Spend the planets as Resources/Influence/Votes").setRequired(false).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.SPEND_AS, "Spend the planets as Resources/Influence/Votes/TechSkip or enter your own description").setRequired(false).setAutoComplete(true));
     }
 
     @Override
