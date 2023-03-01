@@ -46,9 +46,7 @@ public class Info extends GameSubcommandData{
         sb.append("Game status: " + map.getMapStatus());
         if (map.isHasEnded()) sb.append(" - GAME HAS ENDED");
         sb.append(NEW_LINE);
-        sb.append("Community Mode: " + map.isCommunityMode()).append(NEW_LINE);
-        sb.append("Alliance Mode: " + map.isAllianceMode()).append(NEW_LINE);
-        sb.append("FoW Mode: " + map.isFoWMode()).append(NEW_LINE);
+        sb.append("Game Modes: " + map.getGameModesText()).append(NEW_LINE);
         sb.append("Created: " + map.getCreationDate()).append(NEW_LINE);
         sb.append("Last Modified: " + Helper.getDateRepresentation(map.getLastModifiedDate())).append(NEW_LINE);
         sb.append("Map String: `" + Helper.getMapString(map)).append("`").append(NEW_LINE);
