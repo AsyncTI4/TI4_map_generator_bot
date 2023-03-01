@@ -14,6 +14,7 @@ import ti4.message.BotLogger;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.*;
 
@@ -36,6 +37,7 @@ public class Map {
     private boolean allianceMode = false;
     private boolean fowMode = false;
     private boolean absolMode = false;
+    private boolean discordantStarsMode = false;
     private boolean hasEnded = false;
 
     @Nullable
@@ -182,16 +184,29 @@ public class Map {
         this.customName = customName;
     }
 
+    //GAME MODES
     public boolean isCommunityMode() {
         return communityMode;
+    }
+
+    public void setCommunityMode(boolean communityMode) {
+        this.communityMode = communityMode;
     }
 
     public boolean isAllianceMode() {
         return allianceMode;
     }
 
+    public void setAllianceMode(boolean allianceMode) {
+        this.allianceMode = allianceMode;
+    }
+
     public boolean isFoWMode() {
         return fowMode;
+    }
+
+    public void setFoWMode(boolean fowMode) {
+        this.fowMode = fowMode;
     }
 
     public boolean isAbsolMode() {
@@ -202,23 +217,35 @@ public class Map {
         this.absolMode = absolMode;
     }
 
+    public boolean isDiscordantStarsMode() {
+        return discordantStarsMode;
+    }
+
+    public void setDiscordantStarsMode(boolean discordantStarsMode) {
+        this.discordantStarsMode = discordantStarsMode;
+    }
+
+    public String getGameModesText() {
+        HashMap<String,Boolean> gameModes = new HashMap<>() {{
+            put("CommunityMode", isCommunityMode());
+            put("AllianceMode", isAllianceMode());
+            put("FoWMode", isFoWMode());
+            put("AbsolMode", isAbsolMode());
+        }};
+        
+        StringBuilder sb = new StringBuilder();
+        for (Entry<String,Boolean> gameMode : gameModes.entrySet()) {
+            if (gameMode.getValue()) sb.append(gameMode.getKey()).append(", ");
+        }
+        return sb.toString();
+    }
+
     public void setMainGameChannel(MessageChannel channel) {
         mainChannel = channel;
     }
 
     public MessageChannel getMainGameChannel() {
         return mainChannel;
-    }
-
-    public void setAllianceMode(boolean allianceMode) {
-        this.allianceMode = allianceMode;
-    }
-    public void setFoWMode(boolean fowMode) {
-        this.fowMode = fowMode;
-    }
-
-    public void setCommunityMode(boolean communityMode) {
-        this.communityMode = communityMode;
     }
 
     public boolean isHasEnded() {

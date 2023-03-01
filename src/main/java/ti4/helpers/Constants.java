@@ -13,6 +13,7 @@ public class Constants {
     public static final String ALLIANCE_MODE = "alliance_mode";
     public static final String FOW_MODE = "fow_mode";
     public static final String ABSOL_MODE = "absol_mode";
+    public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
@@ -522,4 +523,5 @@ public class Constants {
     public static final String CARDS_INFO_THREAD_PREFIX = "Cards Info-";
     public static final String BOT_CHANNEL_SUFFIX = "-bot-map-updates";
     public static final String PING = "ping";
+
 }
