@@ -949,7 +949,7 @@ public class Helper {
 
     public static void checkThreadLimitAndArchive(Guild guild) {
         int threadCount = guild.getThreadChannels().size();
-        int closeCount = 25;
+        int closeCount = 20;
 
         if (threadCount >= 980) {
             BotLogger.log("`Helper.checkThreadLimitAndArchive:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
