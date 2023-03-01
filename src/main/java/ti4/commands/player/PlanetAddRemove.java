@@ -80,6 +80,7 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
                     return;
                 }
                 String planet = possiblePlanets.get(0);
+                BotLogger.log(event, "`PlanetAddRemove.parseParameter - " + getActionID() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet);
                 doAction(player, planet, map);
                 MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planet));
             }
