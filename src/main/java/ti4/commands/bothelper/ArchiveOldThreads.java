@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
@@ -23,8 +22,7 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
             MessageHelper.replyToMessage(event, "Please choose a number between 1 and 100");
             return;
         }
-        String mention = event.getGuild().getMemberById("150809002974904321").getAsMention(); //@HolyTispoon
-        MessageHelper.replyToMessage(event, "Archiving " + threadCount + " threads - " + mention);
+        MessageHelper.replyToMessage(event, "Archiving " + threadCount + " threads");
         MessageHelper.sendMessageToChannel(event.getChannel(), ListOldChannels.getOldThreadsMessage(event.getGuild(), threadCount));
         archiveOldThreads(event.getGuild(), threadCount);
     }
