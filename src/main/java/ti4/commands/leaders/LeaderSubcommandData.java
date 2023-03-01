@@ -36,7 +36,7 @@ public abstract class LeaderSubcommandData extends SubcommandData {
      * @param messageText new message
      */
     public void sendMessage(String messageText) {
-        if (this.replyHasBeenEdited && messageText.length() > 2000) {
+        if (this.replyHasBeenEdited) {
             MessageHelper.sendMessageToChannel(this.event.getChannel(), messageText);
         } else if (messageText.length() >= 2000) {
             this.event.getHook().editOriginal("_ _").queue();
