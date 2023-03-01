@@ -283,6 +283,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + map.isAbsolMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.DISCORDANT_STARS_MODE + " " + map.isDiscordantStarsMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
         writer.write(System.lineSeparator());
         writer.write(ENDGAMEINFO);
@@ -832,6 +834,14 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         map.setAbsolMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.DISCORDANT_STARS_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setDiscordantStarsMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

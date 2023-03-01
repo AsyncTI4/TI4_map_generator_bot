@@ -22,6 +22,7 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.ALLIANCE_MODE, "Set to YES if want to allow Alliance Mode for map, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FOW_MODE, "Set to YES if want to allow FoW Mode for map, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's - do NOT change this mid-game"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
     }
 
     @Override
@@ -106,6 +107,11 @@ public class Setup extends GameSubcommandData {
             getActiveMap().setAbsolMode(absolModeOption.getAsBoolean());
             getActiveMap().resetAgendas();
             getActiveMap().resetRelics();
+        }
+
+        OptionMapping discordantStarsOption = event.getOption(Constants.DISCORDANT_STARS_MODE);
+        if (discordantStarsOption != null) {
+            activeMap.setDiscordantStarsMode(discordantStarsOption.getAsBoolean());
         }
 
         if (displayType != null) {
