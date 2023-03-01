@@ -14,7 +14,7 @@ import java.util.List;
 public class AddRelicBackIntoDeck extends GenericRelicAction {
 
     public AddRelicBackIntoDeck() {
-        super(Constants.ADD_BACK_INTO_DECK, "Add relic back into deck", true);
+        super(Constants.ADD_BACK_INTO_DECK, "Add relic back into deck if already purged", true);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to add back into deck").setAutoComplete(true).setRequired(true));
     }
 

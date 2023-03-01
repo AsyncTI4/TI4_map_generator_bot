@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 public class ShuffleRelicBack extends GenericRelicAction {
 
     public ShuffleRelicBack() {
-        super(Constants.SHUFFLE_BACK, "Shuffle relic back into deck", true);
+        super(Constants.SHUFFLE_BACK, "Shuffle relic back into deck from player area", true);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to shuffle back into deck").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you do edit").setRequired(false));
     }
