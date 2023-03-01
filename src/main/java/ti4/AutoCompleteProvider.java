@@ -203,12 +203,22 @@ public class AutoCompleteProvider {
             case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 HashMap<String, String> techs = Mapper.getTechs();
-                List<Command.Choice> options = techs.entrySet().stream()
+                if (activeMap.isDiscordantStarsMode()) {
+                    List<Command.Choice> options = techs.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getValue(), value.getKey()))
                         .collect(Collectors.toList());
-                event.replyChoices(options).queue();
+                    event.replyChoices(options).queue();
+                } else {
+                    List<Command.Choice> options = techs.entrySet().stream()
+                        .filter(Predicate.not(value -> value.getKey().toLowerCase().startsWith("ds")))
+                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
             }
             case Constants.PLANET, Constants.PLANET2, Constants.PLANET3, Constants.PLANET4, Constants.PLANET5, Constants.PLANET6 -> {
                 MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName());
