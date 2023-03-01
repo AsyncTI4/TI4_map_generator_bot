@@ -16,6 +16,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.Map.Entry;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.*;
 
 public class Map {
@@ -227,17 +228,13 @@ public class Map {
 
     public String getGameModesText() {
         HashMap<String,Boolean> gameModes = new HashMap<>() {{
-            put("CommunityMode", isCommunityMode());
-            put("AllianceMode", isAllianceMode());
-            put("FoWMode", isFoWMode());
-            put("AbsolMode", isAbsolMode());
+            put("Community", isCommunityMode());
+            put("Alliance", isAllianceMode());
+            put("FoW", isFoWMode());
+            put("Absol", isAbsolMode());
+            put("DiscordantStars", isDiscordantStarsMode());
         }};
-        
-        StringBuilder sb = new StringBuilder();
-        for (Entry<String,Boolean> gameMode : gameModes.entrySet()) {
-            if (gameMode.getValue()) sb.append(gameMode.getKey()).append(", ");
-        }
-        return sb.toString();
+        return gameModes.entrySet().stream().filter(gm -> gm.getValue()).map(java.util.Map.Entry::getKey).collect(Collectors.joining(", "));
     }
 
     public void setMainGameChannel(MessageChannel channel) {
