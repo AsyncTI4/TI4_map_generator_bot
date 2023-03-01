@@ -40,31 +40,23 @@ public class AutoCompleteProvider {
             case Constants.FACTION -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 HashMap<String, String> factions = Mapper.getFactionRepresentations();
-                List<Command.Choice> options = factions.entrySet().stream()
-                        .filter(token -> token.getValue().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(token -> new Command.Choice(token.getValue(), token.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
+                if (activeMap.isDiscordantStarsMode()) {
+                    List<Command.Choice> options = factions.entrySet().stream()
+                            .filter(token -> token.getValue().toLowerCase().contains(enteredValue))
+                            .limit(25)
+                            .map(token -> new Command.Choice(token.getValue(), token.getKey()))
+                            .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                } else {
+                    List<Command.Choice> options = factions.entrySet().stream()
+                            .filter(Predicate.not(token -> token.getValue().toUpperCase().endsWith("(DS)")))
+                            .filter(token -> token.getValue().toLowerCase().contains(enteredValue))
+                            .limit(25)
+                            .map(token -> new Command.Choice(token.getValue(), token.getKey()))
+                            .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
             }
-                    // case Constants.PLANET, Constants.PLANET2, Constants.PLANET3, Constants.PLANET4, Constants.PLANET5, Constants.PLANET6 -> {
-                    //     MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName());
-                    //     String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                    //     Set<String> planetIDs;
-                    //     if (activeMap != null) {
-                    //         planetIDs = activeMap.getPlanets();
-                    //     } else {
-                    //         planetIDs = Collections.emptySet();
-                    //     }
-                    //     HashMap<String, String> planets = Mapper.getPlanetRepresentations();
-                    //     List<Command.Choice> options = planets.entrySet().stream()
-                    //             .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                    //             .filter(value -> planetIDs.isEmpty() || planetIDs.contains(value.getKey()))
-                    //             .limit(25)
-                    //             .map(value -> new Command.Choice(value.getValue(), value.getKey()))
-                    //             .collect(Collectors.toList());
-                    //     event.replyChoices(options).queue();
-                    // }
             case Constants.FACTION_COLOR, Constants.FACTION_COLOR_1, Constants.FACTION_COLOR_2 -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<String> factionColors = new ArrayList<>(Mapper.getFactions());
