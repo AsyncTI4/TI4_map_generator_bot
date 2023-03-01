@@ -25,12 +25,12 @@ public class AddUnits extends AddRemoveUnits {
         if (option != null){
             String value = option.getAsString().toLowerCase();
             switch (value) {
-                case "t", "tactics", "tac", "tact" -> {
+                case "t/tactics", "t", "tactics", "tac", "tact" -> {
                     MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
                     AddCC.addCC(event, color, tile);
                     Helper.isCCCountCorrect(event, map, color);
                 }
-                case "r", "retreat", "reinforcements" -> {
+                case "r/retreat/reinforcements", "r", "retreat", "reinforcements" -> {
                     AddCC.addCC(event, color, tile);
                     Helper.isCCCountCorrect(event, map, color);
                 }
