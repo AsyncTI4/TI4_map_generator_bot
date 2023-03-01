@@ -983,33 +983,35 @@ public class Helper {
     }
 
     public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Map activeMap) {
-        String gameName = activeMap.getName();
-        List<Role> roles = guild.getRolesByName(gameName, true);
-        Role role = null;
-        if (!roles.isEmpty()) {
-            if (roles.size() > 1) {
-                BotLogger.log("There are " + roles.size() + " roles that match the game name: `" + gameName + "` - please investigate, as this may cause issues.");
-                return;
-            } 
-            role = roles.get(0);
-        }
+        if (!activeMap.isFoWMode() && !activeMap.isCommunityMode()) {
+            String gameName = activeMap.getName();
+            List<Role> roles = guild.getRolesByName(gameName, true);
+            Role role = null;
+            if (!roles.isEmpty()) {
+                if (roles.size() > 1) {
+                    BotLogger.log("There are " + roles.size() + " roles that match the game name: `" + gameName + "` - please investigate, as this may cause issues.");
+                    return;
+                } 
+                role = roles.get(0);
+            }
 
-        if (role == null) { //make sure players have access to the game channels
-            List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
-            for (GuildChannel channel : channels) {
-                TextChannel textChannel = guild.getTextChannelById(channel.getId());
-                if (textChannel != null) {
-                    for (String playerID : activeMap.getPlayerIDs()) {
-                        Member member = guild.getMemberById(playerID);
-                        long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-                        textChannel.getManager().putMemberPermissionOverride(member.getIdLong(), allow, 0).queue();
+            if (role == null) { //make sure players have access to the game channels
+                List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
+                for (GuildChannel channel : channels) {
+                    TextChannel textChannel = guild.getTextChannelById(channel.getId());
+                    if (textChannel != null) {
+                        for (String playerID : activeMap.getPlayerIDs()) {
+                            Member member = guild.getMemberById(playerID);
+                            long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+                            textChannel.getManager().putMemberPermissionOverride(member.getIdLong(), allow, 0).queue();
+                        }
                     }
                 }
-            }
-        } else { //make sure players have the role
-            for (String playerID : activeMap.getPlayerIDs()) {
-                Member member = guild.getMemberById(playerID);
-                if (member != null) guild.addRoleToMember(member, role).queue();
+            } else { //make sure players have the role
+                for (String playerID : activeMap.getPlayerIDs()) {
+                    Member member = guild.getMemberById(playerID);
+                    if (member != null) guild.addRoleToMember(member, role).queue();
+                }
             }
         }
     }
