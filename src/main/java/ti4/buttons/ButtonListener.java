@@ -14,6 +14,7 @@ import ti4.commands.cards.CardsInfo;
 import ti4.commands.cards.PlayAC;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.status.ScorePublic;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -412,7 +413,8 @@ public class ButtonListener extends ListenerAdapter {
             String faction = player.getFaction();
             if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
             MessageReaction reaction = mainMessage.getReaction(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction)));
-            if (reaction != null) matchingFactionReactions++;
+            String reactionName = AliasHandler.resolveFaction(reaction.getEmoji().getName());
+            if (reactionName.equals(faction)) matchingFactionReactions++;
         }
 
         int numberOfPlayers = activeMap.getPlayers().size();
