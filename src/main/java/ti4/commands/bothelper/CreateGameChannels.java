@@ -140,6 +140,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         botGetStartedMessage.append("> `/so deal_to_all (count:2)` to deal two" + Emojis.SecretObjective + " to all players\n");
         // botGetStartedMessage.append("> `/status po_reveal_stage1` to reveal the first" + Emojis.Public1 + "Stage 1 Public Objective\n");
         MessageHelper.sendMessageToChannel((MessageChannel) botThread, botGetStartedMessage.toString());
+        MessageHelper.sendMessageToChannelAndPin((MessageChannel) botThread, "Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
         message.append("> " + botThread.getAsMention()).append("\n");
         
         MessageHelper.replyToMessage(event, message.toString());
