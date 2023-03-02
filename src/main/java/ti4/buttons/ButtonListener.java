@@ -411,6 +411,11 @@ public class ButtonListener extends ListenerAdapter {
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         int matchingFactionReactions = 0;
         for (Player player : activeMap.getPlayers().values()) {
+            if (player.isDummy()) {
+                matchingFactionReactions++;
+                continue;
+            }
+
             String faction = player.getFaction();
             if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
 
