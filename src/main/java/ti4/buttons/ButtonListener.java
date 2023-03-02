@@ -306,9 +306,9 @@ public class ButtonListener extends ListenerAdapter {
     }
 
     private void addReaction(@NotNull ButtonInteractionEvent event, boolean skipReaction, boolean sendPublic, String message, String additionalMessage) {
-        String id = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(id);
-        Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
+        String userID = event.getUser().getId();
+        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), userID);
         if (player == null) {
             event.getChannel().sendMessage("You're not a player of the game").queue();
             return;
@@ -410,15 +410,17 @@ public class ButtonListener extends ListenerAdapter {
         
         int matchingFactionReactions = 0;
         for (Player player : activeMap.getPlayers().values()) {
-            MessageReaction reaction = mainMessage.getReaction(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(player.getFaction())));
+            String faction = player.getFaction();
+            if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
+            MessageReaction reaction = mainMessage.getReaction(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction)));
             if (reaction != null) matchingFactionReactions++;
         }
 
         int numberOfPlayers = activeMap.getPlayers().size();
         BotLogger.log(event, matchingFactionReactions + "/" + numberOfPlayers + " factions have reacted");
         if (matchingFactionReactions >= numberOfPlayers) {
-            BotLogger.log(event, "All Factions Have Reacted");
-            // mainMessage.reply("All Factions Have Reacted").queue();
+            BotLogger.log(event, "all factions have reacted");
+            // mainMessage.reply(Helper.getGamePing(event.getGuild(), activeMap) + " - all factions have reacted").queue();
         }
     }
 }
