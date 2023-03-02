@@ -356,7 +356,7 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 event.getChannel().addReactionById(messageId, emojiToUse).queue();
             }
-            checkForAllReactions(event);
+            if (!activeMap.isFoWMode()) checkForAllReactions(event);
             return;
         } 
         
@@ -407,7 +407,6 @@ public class ButtonListener extends ListenerAdapter {
 
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        
         int matchingFactionReactions = 0;
         for (Player player : activeMap.getPlayers().values()) {
             String faction = player.getFaction();
