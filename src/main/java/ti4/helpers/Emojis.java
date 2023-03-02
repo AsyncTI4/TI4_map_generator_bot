@@ -7,7 +7,7 @@ public class Emojis {
     //FACTIONS
     public static final String Arborec = "<:Arborec:946891797567799356>";
     public static final String Argent = "<:Argent:946891797366472725>";
-    public static final String Cabal = "<:VuilRaith:946891797236441089>";
+    public static final String Cabal = "<:cabal:946891797236441089>";
     public static final String Empyrean = "<:Empyrean:946891797257404466>";
     public static final String Ghost = "<:Creuss:946891797609721866>";
     public static final String Hacan = "<:Hacan:946891797228060684>";
@@ -19,7 +19,7 @@ public class Emojis {
     public static final String Mentak = "<:Mentak:946891797395800084>";
     public static final String Muaat = "<:Muaat:946891797177716777>";
     public static final String Naalu = "<:Naalu:946891797412601926>";
-    public static final String Naaz = "<:NaazRokha:946891797437747200>";
+    public static final String Naaz = "<:Naaz:946891797437747200>";
     public static final String Nekro = "<:Nekro:946891797681025054>";
     public static final String Nomad = "<:Nomad:946891797400002561>";
     public static final String Saar = "<:Saar:946891797366472735>";

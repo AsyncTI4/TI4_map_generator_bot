@@ -413,19 +413,16 @@ public class ButtonListener extends ListenerAdapter {
         for (Player player : activeMap.getPlayers().values()) {
             String faction = player.getFaction();
             if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
+
             MessageReaction reaction = mainMessage.getReaction(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction)));
-            if (reaction == null) continue;
-            String reactionName = AliasHandler.resolveFaction(reaction.getEmoji().getName());
-            if (reactionName.equals(faction)) matchingFactionReactions++;
+            if (reaction != null) matchingFactionReactions++;
         }
 
         int numberOfPlayers = activeMap.getPlayers().size();
         BotLogger.log(event, matchingFactionReactions + "/" + numberOfPlayers + " factions have reacted");
         if (matchingFactionReactions >= numberOfPlayers) {
-
             BotLogger.log(event, "**all factions have reacted**");
-
-            // mainMessage.reply(Helper.getGamePing(event.getGuild(), activeMap) + " - all factions have reacted").queue();
+            mainMessage.reply(Helper.getGamePing(event.getGuild(), activeMap) + " - all factions have reacted").queue();
         }
     }
 }
