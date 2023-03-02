@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.*;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.*;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -17,7 +16,6 @@ import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.status.ScorePublic;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -27,18 +25,17 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 public class ButtonListener extends ListenerAdapter {
     public static HashMap<Guild, HashMap<String, Emoji>> emoteMap = new HashMap<>();
     private static HashMap<String, Set<Player>> playerUsedSC = new HashMap<>();
-    private static HashMap<String, HashMap<Player, Integer>> playerReacted = new HashMap<>();
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
@@ -166,7 +163,7 @@ public class ButtonListener extends ListenerAdapter {
                         break;
                     }
                     String message = deductCC(player, event);
-                    addReaction(event, true, false, message, "");
+                    addReaction(event, false, false, message, "");
                 }
                 case "sc_ac_draw" -> {
                     boolean used = addUsedSCPlayer(messageID + "ac", activeMap, player, event, "");
@@ -180,7 +177,7 @@ public class ButtonListener extends ListenerAdapter {
                         activeMap.drawActionCard(player.getUserID());
                     }
                     CardsInfo.sentUserCardInfo(null, activeMap, player, event);
-                    addReaction(event, true, false, message, "");
+                    addReaction(event, false, false, message, "");
                 }
                 case "sc_draw_so" -> {
                     boolean used = addUsedSCPlayer(messageID + "so", activeMap, player, event, "");
@@ -190,7 +187,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = "Drew Secret Objective";
                     activeMap.drawSecretObjective(player.getUserID());
                     CardsInfo.sentUserCardInfo(null, activeMap, player, event);
-                    addReaction(event, true, false, message, "");
+                    addReaction(event, false, false, message, "");
                 }
                 case "sc_follow_trade" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
@@ -199,12 +196,12 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String message = deductCC(player, event);
                     player.setCommodities(player.getCommoditiesTotal());
-                    addReaction(event, true, false, message, "");
-                    addReaction(event, true, false, "Replenishing Commodities", "");
+                    addReaction(event, false, false, message, "");
+                    addReaction(event, false, false, "Replenishing Commodities", "");
                 }
                 case "sc_follow_leadership" -> {
                     String message = Helper.getPlayerPing(player) + " following.";
-                    addReaction(event, true, false, message, "");
+                    addReaction(event, false, false, message, "");
                 }
                 case "sc_no_follow" -> {
                     addReaction(event, false, false, "Not Following", "");
@@ -231,7 +228,7 @@ public class ButtonListener extends ListenerAdapter {
                         break;
                     }
                     player.setCommodities(player.getCommoditiesTotal());
-                    addReaction(event, true, false, "Replenishing Commodities", "");
+                    addReaction(event, false, false, "Replenishing Commodities", "");
                 }
                 case "sc_refresh_and_wash" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "Replenish and Wash");
@@ -242,7 +239,7 @@ public class ButtonListener extends ListenerAdapter {
                     int tg = player.getTg();
                     player.setTg(tg + commoditiesTotal);
                     player.setCommodities(0);
-                    addReaction(event, true, false, "Replenishing and washing", "");
+                    addReaction(event, false, false, "Replenishing and washing", "");
                 }
                 case "trade_primary" -> {
                     if (5 != player.getSC()){
@@ -255,7 +252,7 @@ public class ButtonListener extends ListenerAdapter {
                     int tg = player.getTg();
                     player.setTg(tg + 3);
                     player.setCommodities(player.getCommoditiesTotal());
-                    addReaction(event, true, false, "gained 3" + Emojis.tg + " and replenished commodities (" + String.valueOf(player.getCommodities()) + Emojis.comm + ")", "");
+                    addReaction(event, false, false, "gained 3" + Emojis.tg + " and replenished commodities (" + String.valueOf(player.getCommodities()) + Emojis.comm + ")", "");
                 }
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
@@ -309,9 +306,9 @@ public class ButtonListener extends ListenerAdapter {
     }
 
     private void addReaction(@NotNull ButtonInteractionEvent event, boolean skipReaction, boolean sendPublic, String message, String additionalMessage) {
-        String id = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(id);
-        Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
+        String userID = event.getUser().getId();
+        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), userID);
         if (player == null) {
             event.getChannel().sendMessage("You're not a player of the game").queue();
             return;
@@ -334,6 +331,7 @@ public class ButtonListener extends ListenerAdapter {
             }
         }
         Emoji emojiToUse = emojiMap.get(playerFaction.toLowerCase());
+        if (emojiToUse == null) emojiToUse = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(playerFaction));
         Message mainMessage = event.getInteraction().getMessage();
         String messageId = mainMessage.getId();
 
@@ -354,9 +352,11 @@ public class ButtonListener extends ListenerAdapter {
         if (!skipReaction) {
             if (emojiToUse == null) {
                 event.getChannel().sendMessage("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
+                return;
             } else {
                 event.getChannel().addReactionById(messageId, emojiToUse).queue();
             }
+            if (!activeMap.isFoWMode()) checkForAllReactions(event);
             return;
         } 
         
@@ -399,5 +399,27 @@ public class ButtonListener extends ListenerAdapter {
         
         String emote = symbols.get(value);
         return emote == null ? null : Emoji.fromFormatted(emote);
+    }
+
+    private void checkForAllReactions(@NotNull ButtonInteractionEvent event) {
+        String messageId = event.getInteraction().getMessage().getId();
+        Message mainMessage = event.getMessageChannel().retrieveMessageById(messageId).completeAfter(250, TimeUnit.MILLISECONDS);
+
+        String userID = event.getUser().getId();
+        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        int matchingFactionReactions = 0;
+        for (Player player : activeMap.getPlayers().values()) {
+            String faction = player.getFaction();
+            if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
+            MessageReaction reaction = mainMessage.getReaction(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction)));
+            if (reaction != null) matchingFactionReactions++;
+        }
+
+        int numberOfPlayers = activeMap.getPlayers().size();
+        BotLogger.log(event, matchingFactionReactions + "/" + numberOfPlayers + " factions have reacted");
+        if (matchingFactionReactions >= numberOfPlayers) {
+            BotLogger.log(event, "all factions have reacted");
+            // mainMessage.reply(Helper.getGamePing(event.getGuild(), activeMap) + " - all factions have reacted").queue();
+        }
     }
 }
