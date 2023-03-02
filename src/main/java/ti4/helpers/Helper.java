@@ -715,4 +715,24 @@ public class Helper {
             ul.unlockLeader(event, "hero", activeMap, player);
         }
     }
+
+    public static void checkIfHeroUnlocked(ButtonInteractionEvent event, Map activeMap, Player player) {
+        int scoredSOCount = player.getSecretsScored().size();
+        
+        int scoredPOCount = 0;
+        HashMap<String, List<String>> playerScoredPublics = activeMap.getScoredPublicObjectives();
+        for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
+            if (Mapper.getPublicObjectivesState1().keySet().contains(scoredPublic.getKey()) || Mapper.getPublicObjectivesState2().keySet().contains(scoredPublic.getKey())) {
+                if (scoredPublic.getValue().contains(player.getUserID())) {
+                    scoredPOCount++;
+                }
+            }
+        
+        }
+        int scoredObjectiveCount = scoredPOCount + scoredSOCount;
+        if (scoredObjectiveCount >= 3) {
+            UnlockLeader ul = new UnlockLeader();
+            ul.unlockLeader(event, "hero", activeMap, player);
+        }
+    }
 }
