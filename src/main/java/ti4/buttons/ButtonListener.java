@@ -404,7 +404,7 @@ public class ButtonListener extends ListenerAdapter {
 
     private void checkForAllReactions(@NotNull ButtonInteractionEvent event) {
         String messageId = event.getInteraction().getMessage().getId();
-        Message mainMessage = event.getMessageChannel().retrieveMessageById(messageId).completeAfter(250, TimeUnit.MILLISECONDS);
+        Message mainMessage = event.getMessageChannel().retrieveMessageById(messageId).completeAfter(500, TimeUnit.MILLISECONDS);
 
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
@@ -420,7 +420,7 @@ public class ButtonListener extends ListenerAdapter {
         int numberOfPlayers = activeMap.getPlayers().size();
         BotLogger.log(event, matchingFactionReactions + "/" + numberOfPlayers + " factions have reacted");
         if (matchingFactionReactions >= numberOfPlayers) {
-            BotLogger.log(event, "all factions have reacted");
+            BotLogger.log(event, "**all factions have reacted**");
             // mainMessage.reply(Helper.getGamePing(event.getGuild(), activeMap) + " - all factions have reacted").queue();
         }
     }
