@@ -414,7 +414,7 @@ public class ButtonListener extends ListenerAdapter {
             String faction = player.getFaction();
             if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
             MessageReaction reaction = mainMessage.getReaction(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction)));
-
+            if (reaction == null) continue;
             String reactionName = AliasHandler.resolveFaction(reaction.getEmoji().getName());
             if (reactionName.equals(faction)) matchingFactionReactions++;
         }
