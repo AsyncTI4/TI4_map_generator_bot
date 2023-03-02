@@ -14,6 +14,7 @@ import ti4.commands.cards.CardsInfo;
 import ti4.commands.cards.PlayAC;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.status.ScorePublic;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -403,7 +404,8 @@ public class ButtonListener extends ListenerAdapter {
 
     private void checkForAllReactions(@NotNull ButtonInteractionEvent event) {
         String messageId = event.getInteraction().getMessage().getId();
-        Message mainMessage = event.getMessageChannel().retrieveMessageById(messageId).completeAfter(250, TimeUnit.MILLISECONDS);
+
+        Message mainMessage = event.getMessageChannel().retrieveMessageById(messageId).completeAfter(500, TimeUnit.MILLISECONDS);
 
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
@@ -412,13 +414,17 @@ public class ButtonListener extends ListenerAdapter {
             String faction = player.getFaction();
             if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
             MessageReaction reaction = mainMessage.getReaction(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction)));
-            if (reaction != null) matchingFactionReactions++;
+
+            String reactionName = AliasHandler.resolveFaction(reaction.getEmoji().getName());
+            if (reactionName.equals(faction)) matchingFactionReactions++;
         }
 
         int numberOfPlayers = activeMap.getPlayers().size();
         BotLogger.log(event, matchingFactionReactions + "/" + numberOfPlayers + " factions have reacted");
         if (matchingFactionReactions >= numberOfPlayers) {
-            BotLogger.log(event, "all factions have reacted");
+
+            BotLogger.log(event, "**all factions have reacted**");
+
             // mainMessage.reply(Helper.getGamePing(event.getGuild(), activeMap) + " - all factions have reacted").queue();
         }
     }
