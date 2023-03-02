@@ -41,7 +41,7 @@ public class BotLogger {
         if (channel != null) {
             if (event != null) {
                 String channelName = event.getChannel().getName();
-                channel.sendMessage(channelName + " [button pressed] " + msg).queue();
+                channel.sendMessage(channelName + " [button: `" + event.getButton().getId() + "` pressed] " + msg).queue();
             } else {
                 channel.sendMessage(msg).queue();
             }

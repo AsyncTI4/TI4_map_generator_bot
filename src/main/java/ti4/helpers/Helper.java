@@ -226,7 +226,7 @@ public class Helper {
     }
 
     public static String getFactionIconFromDiscord(String faction) {
-        return switch (faction) {
+        return switch (faction.toLowerCase()) {
             case "arborec" -> Emojis.Arborec;
             case "argent" -> Emojis.Argent;
             case "cabal" -> Emojis.Cabal;
