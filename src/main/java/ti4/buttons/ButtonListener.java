@@ -358,7 +358,7 @@ public class ButtonListener extends ListenerAdapter {
                 event.getChannel().addReactionById(messageId, emojiToUse).queue();
             }
             if (!activeMap.isFoWMode()) checkForAllReactions(event);
-            return;
+            if (activeMap.isFoWMode()) return;
         } 
         
 
