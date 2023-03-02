@@ -427,7 +427,7 @@ public class ButtonListener extends ListenerAdapter {
         // BotLogger.log(event, matchingFactionReactions + "/" + numberOfPlayers + " factions have reacted");
         if (matchingFactionReactions >= numberOfPlayers) {
             // BotLogger.log(event, "**all factions have reacted**");
-            mainMessage.reply(Helper.getGamePing(event.getGuild(), activeMap) + " - all factions have reacted").queue();
+            addReaction(event, true, false, " was last to react\n", " - all factions have reacted");
         }
     }
 }
