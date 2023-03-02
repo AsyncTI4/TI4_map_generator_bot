@@ -33,7 +33,6 @@ public class ShowAllPN extends PNCardsSubcommandData {
             return;
         }
 
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
         OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
         boolean longPNDisplay = false;
         if (longPNOption != null) {
@@ -62,7 +61,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
             return;
         }
-        MessageHelper.sentToMessageToUser(event, sb.toString(), user);
+        MessageHelper.sendMessageToUser(sb.toString(), user);
         CardsInfo.sentUserCardInfo(event, activeMap, player);
 
 

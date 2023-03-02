@@ -1,5 +1,6 @@
 package ti4.commands.player;
 
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.User;
@@ -53,6 +54,9 @@ public class Turn extends PlayerSubcommandData {
         int naaluSC = 0;
         Integer max = Collections.max(map.getScTradeGoods().keySet());
 
+        Boolean privateGame = FoWHelper.isPrivateGame(map, event);
+        boolean isFowPrivateGame = privateGame != null && privateGame;
+
         for (Player player : map.getPlayers().values()) {
             if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")){
                 player.setPassed(true);
@@ -97,10 +101,11 @@ public class Turn extends PlayerSubcommandData {
                 scPassed.put(sc, player.isPassed());
             }
         }
+
+        MessageChannel gameChannel = map.getMainGameChannel() == null ? event.getChannel() : map.getMainGameChannel();
         if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value) || map.getPlayers().values().stream().allMatch(Player::isPassed)) {
             String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, map);
-            MessageHelper.sendMessageToChannel(event.getChannel(), message);
-
+            
             LinkedHashMap<String, Integer> revealedPublicObjectives = map.getRevealedPublicObjectives();
 
             HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
@@ -122,7 +127,7 @@ public class Turn extends PlayerSubcommandData {
                 if (po_name == null) {
                     Integer integer = customPublicVP.get(key);
                     if (integer != null) {
-                        if (key.toLowerCase().contains("custodian") || key.toLowerCase().contains("imperial")) {
+                        if (key.toLowerCase().contains("custodian") || key.toLowerCase().contains("imperial") ||  key.contains("Shard of the Throne")) {
                             //Don't add it for now
                         } else {
                             po_name = key;
@@ -164,8 +169,8 @@ public class Turn extends PlayerSubcommandData {
             MessageCreateData messageObject = new MessageCreateBuilder()
                     .addContent(message)
                     .addComponents(actionRows).build();
-            MessageChannel channel = event.getChannel();
-            channel.sendMessage(messageObject).queue();
+            
+            gameChannel.sendMessage(messageObject).queue();
 
 
             MessageHelper.replyToMessageTI4Logo(event);
@@ -184,21 +189,19 @@ public class Turn extends PlayerSubcommandData {
             }
             tempProtection++;
         }
-        Boolean privateGame = FoWHelper.isPrivateGame(map, event);
+
+        
         for (Player player : map.getPlayers().values()) {
             int sc = player.getSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
-                String text = "";
-                text += Helper.getPlayerRepresentation(event, player) + " UP NEXT";
-                if (privateGame != null && privateGame){
-                    User user = MapGenerator.jda.getUserById(player.getUserID());
-                    if (user == null) {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
-                    } else {
-                        MessageHelper.sentToMessageToUser(event, map.getName() + " " + text, user);
-                    }
+                String text = Helper.getPlayerRepresentation(event, player, true) + " UP NEXT";
+                if (isFowPrivateGame) {
+                    String fail = "User for next faction not found. Report to ADMIN";
+                    String success = "The next player has been notified";
+                    MessageHelper.sendPrivateMessageToPlayer(player, map, event, text, fail, success);
+                } else {
+                    MessageHelper.sendMessageToChannel(gameChannel, text);
                 }
-                MessageHelper.sendMessageToChannel(event.getChannel(), text);
                 return;
             }
         }

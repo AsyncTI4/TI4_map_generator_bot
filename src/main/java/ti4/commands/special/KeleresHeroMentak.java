@@ -27,6 +27,7 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
+        player = Helper.getPlayer(activeMap, player, event);
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
@@ -83,5 +84,6 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
         if (noMoreComponentActionCards) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "**All action cards in the deck have been revealed. __No component action cards remain.__**");
         }
+        BotLogger.log(event, "DEBUG: **Keleres Hero Mentak used**");
     }
 } 

@@ -21,11 +21,12 @@ public class ResetLeader extends LeaderSubcommandData {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getPlayer(activeMap, player, event);
+        player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            editReplyMessage("Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         player.initLeaders();
-        editReplyMessage("Leaders were reset");
+        sendMessage("Leaders were reset");
     }
 }

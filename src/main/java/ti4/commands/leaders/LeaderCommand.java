@@ -104,6 +104,7 @@ public class LeaderCommand implements Command {
 
     private Collection<LeaderSubcommandData> getSubcommands() {
         Collection<LeaderSubcommandData> subcommands = new HashSet<>();
+        subcommands.add(new LeaderInfo());
         subcommands.add(new UnlockLeader());
         subcommands.add(new LockLeader());
         subcommands.add(new RefreshLeader());

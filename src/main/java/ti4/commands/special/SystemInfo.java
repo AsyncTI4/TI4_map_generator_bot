@@ -58,7 +58,7 @@ public class SystemInfo extends SpecialSubcommandData {
                 }
                 UnitHolder unitHolder = entry.getValue();
                 if (unitHolder instanceof Planet planet) {
-                    sb.append(Helper.getPlanetRepresentationPlusEmojis(representation));
+                    sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(representation, activeMap));
                     sb.append(" Resources: ").append(planet.getResources()).append("/").append(planet.getInfluence());
 
                     //commented as not all planets get traits still

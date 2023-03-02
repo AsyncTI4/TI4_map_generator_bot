@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cards.CardsInfo;
-import ti4.commands.player.SendTG;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -92,13 +91,22 @@ public class PlayPN extends PNCardsSubcommandData {
                     break;
                 }
             }
-        } 
+        }
 
         StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(event, player) + " played promissory note:\n");
         sb.append(Helper.getFactionIconFromDiscord(pnOwner) + Emojis.PN);
-        sb.append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
+        String pnText = "";
+
+        //Handle AbsolMode Political Secret
+        if (activeMap.isAbsolMode() && id.endsWith("_ps")) {
+            pnText = "Political Secret" + Emojis.Absol + ":  *When you cast votes:* You may exhaust up to 3 of the {colour} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {colour} player.";
+        } else {
+            pnText = Mapper.getPromissoryNote(id, longPNDisplay);
+        }
+        sb.append(pnText).append("\n");
         
-        if (id.equalsIgnoreCase("titanspn")) {
+        //TERRAFORM TIP
+        if (id.equalsIgnoreCase("terraform")) {
             sb.append("`/add_token token:titanspn`\n");
         }
 

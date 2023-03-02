@@ -19,22 +19,21 @@ public class RefreshLeader extends LeaderAction {
         Leader playerLeader = player.getLeader(leader);    
         if (playerLeader != null){
             if (playerLeader.isLocked()){
-                editReplyMessage("Leader is locked");
+                sendMessage("Leader is locked");
                 return;
             }
             int tgCount = playerLeader.getTgCount();
             refreshLeader(player, playerLeader);
-            editReplyMessage(Helper.getPlayerFactionLeaderEmoji(player, leader));
+            sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
             StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
                     .append(" readied ")
-                    .append(playerLeader.getId()). append(" ")
-                    .append(playerLeader.getName());
+                    .append(Helper.getLeaderShortRepresentation(player, playerLeader));
             if (tgCount > 0) {
                 message.append(" - ").append(String.valueOf(tgCount)).append(Emojis.tg).append(" transferred from leader to player");
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
+            sendMessage(message.toString());
         } else {
-            editReplyMessage("Leader not found");
+            sendMessage("Leader not found");
         }
     }
 

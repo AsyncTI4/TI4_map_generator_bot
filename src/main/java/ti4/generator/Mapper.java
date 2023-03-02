@@ -37,7 +37,10 @@ public class Mapper {
     private static final HashMap<String, String> techList = new HashMap<>();
     private static final HashMap<String, String[]> techListInfo = new HashMap<>();
     private static final Properties planets = new Properties();
+    private static final Properties faction_representation = new Properties();
     private static final Properties planet_representation = new Properties();
+    private static final Properties leader_representation = new Properties();
+    private static final Properties tile_representation = new Properties();
     private static final Properties unit_representation = new Properties();
     private static final Properties attachmentInfo = new Properties();
     private static final Properties leaders = new Properties();
@@ -59,18 +62,21 @@ public class Mapper {
         readData("special_case.properties", special_case, "Could not read token name file");
         readData("general.properties", general, "Could not read general token name file");
         readData("factions.properties", factions, "Could not read factions name file");
-        readData("Secret_objectives.properties", secretObjectives, "Could not read secret objectives file");
+        readData("secret_objectives.properties", secretObjectives, "Could not read secret objectives file");
         readData("action_cards.properties", actionCards, "Could not read action cards file");
-        readData("Agendas.properties", agendas, "Could not read agendas file");
+        readData("agendas.properties", agendas, "Could not read agendas file");
         readData("public_objective.properties", publicObjectives, "Could not read public objective file");
-        readData("Promissory_Notes.properties", promissoryNotes, "Could not read promissory notes file");
+        readData("promissory_notes.properties", promissoryNotes, "Could not read promissory notes file");
         readData("exploration.properties", explore, "Could not read explore file");
         readData("leaders.properties", leaders, "Could not read leaders file");
-        readData("Relics.properties", relics, "Could not read relic file");
+        readData("relics.properties", relics, "Could not read relic file");
         readData("tech.properties", techs, "Could not read tech file");
         readData("planets.properties", planets, "Could not read planets file");
         readData("attachments_info.properties", attachmentInfo, "Could not read attachment info file");
+        readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
         readData("planets_representation.properties", planet_representation, "Could not read planet representation file");
+        readData("tile_representation.properties", tile_representation, "Could not read tile representation file");
+        readData("leader_representation.properties", leader_representation, "Could not read leader representation file");
         readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
         readData("faction_setup.properties", playerSetup, "Could not read player setup file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
@@ -419,6 +425,30 @@ public class Mapper {
             planets.put((String) entry.getKey(), (String) entry.getValue());
         }
         return planets;
+    }
+
+    public static HashMap<String, String> getFactionRepresentations() {
+        HashMap<String, String> factions = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : faction_representation.entrySet()) {
+            factions.put((String) entry.getKey(), (String) entry.getValue());
+        }
+        return factions;
+    }
+
+    public static HashMap<String, String> getLeaderRepresentations() {
+        HashMap<String, String> leaders = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : leader_representation.entrySet()) {
+            leaders.put((String) entry.getKey(), (String) entry.getValue());
+        }
+        return leaders;
+    }
+
+    public static HashMap<String, String> getTileRepresentations() {
+        HashMap<String, String> tiles = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : tile_representation.entrySet()) {
+            tiles.put((String) entry.getKey(), (String) entry.getValue());
+        }
+        return tiles;
     }
 
     public static HashMap<String, String> getMiltyDraftTiles() {

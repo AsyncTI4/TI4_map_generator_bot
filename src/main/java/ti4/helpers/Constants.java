@@ -12,8 +12,11 @@ public class Constants {
     public static final String COMMUNITY_MODE = "community_mode";
     public static final String ALLIANCE_MODE = "alliance_mode";
     public static final String FOW_MODE = "fow_mode";
+    public static final String ABSOL_MODE = "absol_mode";
+    public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
-    public static final String CHANNLE_FOR_COMMUNITY = "channelForCommunity";
+    public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
+    public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
     public static final String DISPLAY_TYPE = "display_type";
     public static final String GAME_STATUS = "game_status";
     public static final String CONFIRM = "confirm";
@@ -132,8 +135,13 @@ public class Constants {
     public static final String NOVA_SEED = "nova_seed";
     public static final String DESTROY_OTHER_UNITS = "destroy_other_units";
     public static final String RISE_OF_A_MESSIAH = "rise_of_a_messiah";
+    public static final String FIGHTER_CONSCRIPTION = "fighter_conscription";
     public static final String SLEEPER_TOKEN = "sleeper_token";
     public static final String STELLAR_CONVERTER = "stellar_converter";
+    public static final String SEND_DEBT = "send_debt";
+    public static final String DEBT_COUNT = "debt_count";
+    public static final String REMOVE_DEBT = "remove_debt";
+    public static final String DEBT = "debt";
     public static final String ION_TOKEN_FLIP = "ion_storm_flip";
     public static final String TOKEN_SLEEPER_PNG = "token_sleeper.png";
     public static final String WORLD_DESTROYED_PNG = "token_worlddestroyed.png";
@@ -209,7 +217,8 @@ public class Constants {
     public static final String PASS = "pass";
     public static final String TURN = "turn_end";
     public static final String SPEAKER = "speaker";
-
+    
+    public static final String MAIN_GAME_CHANNEL = "main_game_channel";
     public static final String CHANNEL1 = "channel1";
     public static final String CHANNEL2 = "channel2";
     public static final String CHANNEL3 = "channel3";
@@ -248,7 +257,7 @@ public class Constants {
     public static final String SEND_TG = "send_tg";
     public static final String SEND_COMMODITIES = "send_commodities";
     public static final String SETUP = "setup";
-    public static final String COMMUNITY_SETUP = "community_setup";
+    public static final String GAME_CHANNEL_SETUP = "game_channel_setup";
     public static final String PLANETS = "planets";
     public static final String PLANETS_EXHAUSTED = "planets_exhausted";
     public static final String PLANETS_ABILITY_EXHAUSTED = "planets_ability_exhausted";
@@ -504,5 +513,15 @@ public class Constants {
     public static final String GAME_FUN_NAME = "game_fun_name";
     public static final String SPEND_AS = "spend_as";
     public static final String CATEGORY = "category";
+    public static final String SERVER_LIMIT_STATS = "server_limit_stats";
+    public static final String GAME_END = "end";
+    public static final String GAME_HAS_ENDED = "game_has_ended";
+    public static final String ARCHIVE_OLD_THREADS = "archive_old_threads";
+    public static final String THREAD_COUNT = "thread_count";
+    public static final String LIST_OLD_CHANNELS = "list_old_channels";
+    public static final String ACTIONS_CHANNEL_SUFFIX = "-actions";
+    public static final String CARDS_INFO_THREAD_PREFIX = "Cards Info-";
+    public static final String BOT_CHANNEL_SUFFIX = "-bot-map-updates";
+    public static final String PING = "ping";
 
 }

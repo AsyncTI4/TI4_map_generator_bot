@@ -27,8 +27,9 @@ abstract public class LeaderAction extends LeaderSubcommandData {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getPlayer(activeMap, player, event);
+        player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            editReplyMessage("Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
 
@@ -36,7 +37,7 @@ abstract public class LeaderAction extends LeaderSubcommandData {
         if (leader != null) {
             action(event, leader.getAsString(), activeMap, player);
         } else {
-            editReplyMessage("Need to specify leader");
+            sendMessage("Need to specify leader");
         }
     }
 

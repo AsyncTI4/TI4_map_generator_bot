@@ -1,18 +1,25 @@
 package ti4.helpers;
 
+import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import ti4.MapGenerator;
 import ti4.ResourceHelper;
+import ti4.commands.bothelper.ArchiveOldThreads;
+import ti4.commands.bothelper.ListOldChannels;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
 import ti4.map.*;
@@ -219,7 +226,7 @@ public class Helper {
     }
 
     public static String getFactionIconFromDiscord(String faction) {
-        return switch (faction) {
+        return switch (faction.toLowerCase()) {
             case "arborec" -> Emojis.Arborec;
             case "argent" -> Emojis.Argent;
             case "cabal" -> Emojis.Cabal;
@@ -251,7 +258,7 @@ public class Helper {
     }
 
     public static String getPlanetEmoji(String planet) {
-        return switch (planet) {
+        return switch (planet.toLowerCase()) {
             case "mr" -> Emojis.MecatolRex;
             case "hopesend" -> Emojis.HopesEnd;
             case "primor" -> Emojis.Primor;
@@ -263,9 +270,91 @@ public class Helper {
         };
     }
 
-    public static String getPlanetRepresentationPlusEmojis (String planet) {
+    public static String getPlanetRepresentationPlusEmoji(String planet) {
         String planetProper = Mapper.getPlanetRepresentations().get(planet);
         return Helper.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
+    }
+
+    public static String getPlanetRepresentationPlusEmojiPlusResourceInfluence(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return getPlanetRepresentationPlusEmoji(planetID);
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + getResourceEmoji(planet.getResources()) + getInfluenceEmoji(planet.getInfluence());
+        }        
+    }
+
+    public static String getPlanetRepresentationPlusEmojiPlusInfluence(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return getPlanetRepresentationPlusEmoji(planetID);
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + getInfluenceEmoji(planet.getInfluence());
+        }        
+    }
+
+    public static String getPlanetRepresentationPlusEmojiPlusResources(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return getPlanetRepresentationPlusEmoji(planetID);
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return getPlanetRepresentationPlusEmoji(planetID) + " " + getResourceEmoji(planet.getResources());
+        }        
+    }
+
+    public static int getPlanetResources(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return -1;
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return planet.getResources();
+        }        
+    }
+
+    public static int getPlanetInfluence(String planetID, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
+        if (unitHolder == null) {
+            return -1;
+        } else {
+            Planet planet = (Planet) unitHolder;
+            return planet.getInfluence();
+        }        
+    }
+
+    public static String getInfluenceEmoji(int count) {
+        return switch (count) {
+            case 0 -> Emojis.Influence_0;
+            case 1 -> Emojis.Influence_1;
+            case 2 -> Emojis.Influence_2;
+            case 3 -> Emojis.Influence_3;
+            case 4 -> Emojis.Influence_4;
+            case 5 -> Emojis.Influence_5;
+            case 6 -> Emojis.Influence_6;
+            case 7 -> Emojis.Influence_7;
+            case 8 -> Emojis.Influence_8;
+            case 9 -> Emojis.Influence_9;
+            default -> Emojis.influence + count;
+        };
+    }
+
+    public static String getResourceEmoji(int count) {
+        return switch (count) {
+            case 0 -> Emojis.Resources_0;
+            case 1 -> Emojis.Resources_1;
+            case 2 -> Emojis.Resources_2;
+            case 3 -> Emojis.Resources_3;
+            case 4 -> Emojis.Resources_4;
+            case 5 -> Emojis.Resources_5;
+            case 6 -> Emojis.Resources_6;
+            case 7 -> Emojis.Resources_7;
+            case 8 -> Emojis.Resources_8;
+            case 9 -> Emojis.Resources_9;
+            default -> Emojis.resources + count;
+        };
     }
 
     /**
@@ -439,16 +528,21 @@ public class Helper {
         return getGamePing(event.getGuild(), activeMap);
     }
 
-    public static String getGamePing(Guild guild, Map activeMap) {
-        String categoryForPlayers = "";
+    public static String getGamePing(@NotNull Guild guild, @NotNull Map activeMap) {
         if (guild != null) {
             for (Role role : guild.getRoles()) {
                 if (activeMap.getName().equals(role.getName().toLowerCase())) {
-                    categoryForPlayers = role.getAsMention();
+                    return role.getAsMention();
                 }
             }
+            StringBuilder sb = new StringBuilder(activeMap.getName()).append(" ");
+            for (String playerID : activeMap.getPlayerIDs()) {
+                Member member = guild.getMemberById(playerID);
+                if (member != null) sb.append(guild.getMemberById(playerID).getAsMention()).append(" ");
+            }
+            return sb.toString();
         }
-        return categoryForPlayers;
+        return "";
     }
 
     public static String getPlayerPing(Player player) {
@@ -456,7 +550,11 @@ public class Helper {
         if (userById == null) {
             return "";
         }
-        return userById.getAsMention();
+        String mention = userById.getAsMention();
+        if (player.getUserID() == "154000388121559040") {
+            mention += " " + Emoji.fromFormatted(Emojis.BortWindow);
+        }
+        return mention;
     }
 
     public static String getPlayerRepresentation(Player player) {
@@ -479,71 +577,125 @@ public class Helper {
 
     @Nullable
     public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player) {
+        return getPlayerRepresentation(event, player, false);
+    }
+
+    @Nullable
+    public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player, boolean overrideFow) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
-        if (privateGame != null && privateGame){
+        if (privateGame != null && privateGame && !overrideFow){
             return getColourAsMention(event.getGuild(), player.getColor());
         }
         if (event == null) {
             return getPlayerRepresentation(player);
         }
         if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
-            return getColourAsMention(event.getGuild(), player.getColor());
+            return getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName());
+            //return getColourAsMention(event.getGuild(), player.getColor());
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
     @Nullable
-    public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player) {
+    public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player) { 
+        return getPlayerRepresentation(event, player, false);
+    }
+    
+    @Nullable
+    public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player, boolean overrideFow) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
-        if (privateGame != null && privateGame){
+        if (privateGame != null && privateGame && !overrideFow){
             return getColourAsMention(event.getGuild(), player.getColor());
         }
         if (event == null) {
             return getPlayerRepresentation(player);
         }
         if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
-            return getColourAsMention(event.getGuild(), player.getColor());
+            return getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName());
+            //return getColourAsMention(event.getGuild(), player.getColor());
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
     @Nullable
-    public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player) {
+    public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player) { 
+        return getPlayerRepresentation(event, player, false);
+    }
+    
+    @Nullable
+    public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player, boolean overrideFow) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
-        if (privateGame != null && privateGame){
+        if (privateGame != null && privateGame && !overrideFow){
             return getColourAsMention(event.getGuild(), player.getColor());
         }
         if (event == null) {
             return getPlayerRepresentation(player);
         }
         if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
-            return getColourAsMention(event.getGuild(), player.getColor());
+            return getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName());
+            //return getColourAsMention(event.getGuild(), player.getColor());
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }
+    
+    public static String getFactionLeaderEmoji(String faction, Leader leader) {
+        return getEmojiFromDiscord(faction + leader.getId() + leader.getName());
+    }
 
-    public static String getPlayerFactionLeaderEmoji(Player player, String leader) {
-        String playerFaction = player.getFaction();
-        if (playerFaction.equals("nomad") && !leader.equals("commander") && !leader.equals("hero")) {
-            return switch (leader) {
-                case "artuno" -> Emojis.NomadAgentArtuno;
-                case "mercer" -> Emojis.NomadAgentMercer;
-                case "thundarian" -> Emojis.NomadAgentThundarian;
-                case "agent" -> Emojis.GoodDog;
-                default -> " ";
-            };
-        } else if (playerFaction.equals("keleres") && !leader.equals("agent") && !leader.equals("commander")) {
-            return switch (leader) {
-                case "kuuasi" -> Emojis.KeleresHeroKuuasi;
-                case "odlynn" -> Emojis.KeleresHeroOdlynn;
-                case "harka" -> Emojis.KeleresHeroHarka;
-                case "hero" -> Emojis.GoodDog;
-                default -> " ";
-            };
-        } else {
-            StringBuilder sb = new StringBuilder(playerFaction).append(leader);
-            return getEmojiFromDiscord(sb.toString());
+    public static String getFactionLeaderEmoji(Player player, Leader leader) {
+        return getFactionLeaderEmoji(player.getFaction(), leader);
+    }
+    
+    public static String getLeaderRepresentation(String faction, Leader leader, boolean includeTitle, boolean includeAbility, boolean includeUnlockCondition) {
+        String leaderID = faction + leader.getId() + leader.getName();
+
+        String leaderRep =  Mapper.getLeaderRepresentations().get(leaderID.toString());
+        if (leaderRep == null) {
+            BotLogger.log("Invalid `leaderID=" + leaderID.toString() + "` caught within `Helper.getLeaderRepresentation`");
+            return leader.getId();
         }
+
+        //leaderID = 0:LeaderName ; 1:LeaderTitle ; 2:BacksideTitle/HeroAbility ; 3:AbilityWindow ; 4:AbilityText 
+        String[] leaderRepSplit = leaderRep.split(";");
+        String leaderName = leaderRepSplit[0];
+        String leaderTitle = leaderRepSplit[1];
+        String heroAbilityName = leaderRepSplit[2];
+        String leaderAbilityWindow = leaderRepSplit[3];
+        String leaderAbilityText = leaderRepSplit[4];
+        String leaderUnlockCondition = leaderRepSplit[5];
+        
+        StringBuilder representation = new StringBuilder();
+        representation.append(getFactionLeaderEmoji(faction, leader)).append(" **").append(leaderName).append("**");
+        if (includeTitle) representation.append(": ").append(leaderTitle); //add title
+        if (includeAbility && leader.getId().equals(Constants.HERO)) representation.append(" - ").append("__**").append(heroAbilityName).append("**__"); //add hero ability name
+        if (includeAbility) representation.append(" - *").append(leaderAbilityWindow).append("* ").append(leaderAbilityText); //add ability
+        if (includeUnlockCondition) representation.append(" *Unlock:* ").append(leaderUnlockCondition);
+
+        return representation.toString();
+    }
+    
+    public static String getLeaderRepresentation(Player player, String leader, boolean includeTitle, boolean includeAbility) {
+        return getLeaderRepresentation(player.getFaction(), player.getLeader(leader), includeTitle, includeAbility, false);
+    }
+
+    public static String getLeaderRepresentation(Player player, Leader leader, boolean includeTitle, boolean includeAbility) {
+        return getLeaderRepresentation(player.getFaction(), leader, includeTitle, includeAbility, false);
+    }
+    
+    public static String getLeaderShortRepresentation(Player player, Leader leader) {
+        return getLeaderRepresentation(player.getFaction(), leader, false, false, false);
+    }
+
+    public static String getLeaderMediumRepresentation(Player player, Leader leader) {
+        return getLeaderRepresentation(player.getFaction(), leader, true, false, false);
+    }
+
+    public static String getLeaderFullRepresentation(Player player, Leader leader) {
+        return getLeaderRepresentation(player.getFaction(), leader, true, true, false);
+    }
+
+    public static String getLeaderLockedRepresentation(Player player, Leader leader) {
+        return getLeaderRepresentation(player.getFaction(), leader, false, false, true);
     }
 
     public static String getSCEmojiFromInteger(Integer strategy_card) {
@@ -658,6 +810,112 @@ public class Helper {
         return sb.toString().trim();
     }
 
+    public static Integer getPlayerResourcesAvailable(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        int resourcesCount = 0;
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+                resourcesCount += resourcesCountFromPlanetsRes;
+            }
+        } 
+
+        int resourcesCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+
+        resourcesCount += resourcesCountFromPlanets;
+        return resourcesCount;
+    }
+
+    public static Integer getPlayerResourcesTotal(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        int resourcesCount = 0;
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+                resourcesCount += resourcesCountFromPlanetsRes;
+            }
+        } 
+
+        int resourcesCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+
+        resourcesCount += resourcesCountFromPlanets;
+        return resourcesCount;
+    }
+
+    public static Integer getPlayerInfluenceAvailable(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        int influenceCount = 0;
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+                influenceCount += influenceCountFromPlanetsRes;
+            }
+        } 
+
+        int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+
+        influenceCount += influenceCountFromPlanets;
+        return influenceCount;
+    }
+    
+    public static Integer getPlayerInfluenceTotal(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        int influenceCount = 0;
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+                influenceCount += influenceCountFromPlanetsRes;
+            }
+        } 
+
+        int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+
+        influenceCount += influenceCountFromPlanets;
+        return influenceCount;
+    }
+
+    public static String getPlayerResourceInfluenceRepresentation(Player player, Map map) {
+        StringBuilder sb = new StringBuilder(getPlayerRepresentation(player)).append(":\n");
+        sb.append("Resources: ").append(getPlayerResourcesAvailable(player, map)).append("/").append(getPlayerResourcesTotal(player, map)).append("\n");
+        sb.append("Influence: ").append(getPlayerInfluenceAvailable(player, map)).append("/").append(getPlayerInfluenceTotal(player, map)).append("\n");
+        return sb.toString();
+    }
+
     public static HashMap<String, Integer> getLastEntryInHashMap(LinkedHashMap<String, Integer> linkedHashMap) {
         int count = 1;
         for (java.util.Map.Entry<String, Integer> it : linkedHashMap.entrySet()) {
@@ -681,11 +939,80 @@ public class Helper {
     }
     
     /**
-     * @param text string to add spaced on the right
+     * @param text string to add spaces on the right
      * @param length minimum length of string
      * @return right padded string
      */
     public static String rightpad(String text, int length) {
         return String.format("%-" + length + "." + length + "s", text);
+    }
+
+    public static void checkThreadLimitAndArchive(Guild guild) {
+        int threadCount = guild.getThreadChannels().size();
+        int closeCount = 10;
+
+        if (threadCount >= 980) {
+            BotLogger.log("`Helper.checkThreadLimitAndArchive:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
+            BotLogger.log(ListOldChannels.getOldThreadsMessage(guild, closeCount));
+            ArchiveOldThreads.archiveOldThreads(guild, closeCount);
+        }
+    }
+
+    public static boolean isInteger(String str) {
+        if (str == null) {
+            return false;
+        }
+        int length = str.length();
+        if (length == 0) {
+            return false;
+        }
+        int i = 0;
+        if (str.charAt(0) == '-') {
+            if (length == 1) {
+                return false;
+            }
+            i = 1;
+        }
+        for (; i < length; i++) {
+            char c = str.charAt(i);
+            if (c < '0' || c > '9') {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Map activeMap) {
+        if (!activeMap.isFoWMode() && !activeMap.isCommunityMode()) {
+            String gameName = activeMap.getName();
+            List<Role> roles = guild.getRolesByName(gameName, true);
+            Role role = null;
+            if (!roles.isEmpty()) {
+                if (roles.size() > 1) {
+                    BotLogger.log("There are " + roles.size() + " roles that match the game name: `" + gameName + "` - please investigate, as this may cause issues.");
+                    return;
+                } 
+                role = roles.get(0);
+            }
+
+            if (role == null) { //make sure players have access to the game channels
+                List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
+                for (GuildChannel channel : channels) {
+                    TextChannel textChannel = guild.getTextChannelById(channel.getId());
+                    if (textChannel != null) {
+                        for (String playerID : activeMap.getPlayerIDs()) {
+                            Member member = guild.getMemberById(playerID);
+                            long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+                            textChannel.getManager().putMemberPermissionOverride(member.getIdLong(), allow, 0).queue();
+                        }
+                    }
+                }
+            } else { //make sure players have the role
+                for (String playerID : activeMap.getPlayerIDs()) {
+                    Member member = guild.getMemberById(playerID);
+                    if (member != null) guild.addRoleToMember(member, role).queue();
+                }
+            }
+        }
     }
 }

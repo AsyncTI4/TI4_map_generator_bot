@@ -47,7 +47,15 @@ public class SendCommodities extends PlayerSubcommandData {
             int targetTG = player_.getTg();
             targetTG += sendCommodities;
             player_.setTg(targetTG);
-            MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(event, player) + " sent " + sendCommodities + Emojis.comm + " commodities to " + Helper.getPlayerRepresentation(event, player_));
+
+            String message = Helper.getPlayerRepresentation(event, player) + " sent " + sendCommodities + Emojis.comm + " commodities to " + Helper.getPlayerRepresentation(event, player_);
+            if (activeMap.isFoWMode()) {
+                String fail = "Could not notify recieving player.";
+                String success = message + "\nThe other player has been notified";
+                MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
+            } else {
+                MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            }
         }
     }
 

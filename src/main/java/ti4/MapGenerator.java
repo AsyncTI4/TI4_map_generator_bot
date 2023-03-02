@@ -125,20 +125,23 @@ public class MapGenerator {
         commands.queue();
 
        //TI Community game
-       if (args.length == 4) {
+       if (args.length >= 4) {
 	       Guild guild2 = jda.getGuildById(args[3]);
+           BotLogger.log("BOT STARTED UP: " + guild2.getName());
 	       CommandListUpdateAction commandsC = guild2.updateCommands();
 	       commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
 	       commandsC.queue();
        }
 
-       if (args.length == 5) {
+       //FOW game
+       if (args.length >= 5) {
 	       Guild guild3 = jda.getGuildById(args[4]);
+           BotLogger.log("BOT STARTED UP: " + guild3.getName());
 	       CommandListUpdateAction commandsD = guild3.updateCommands();
 	       commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
 	       commandsD.queue();
        }
-       BotLogger.log("BOT STARTED UP");
+       BotLogger.log("BOT STARTED UP: " + guild.getName());
         //------------------------------------------------
 
 //        CommandListUpdateAction commands_ = jda.updateCommands();

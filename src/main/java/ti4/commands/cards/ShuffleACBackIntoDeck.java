@@ -6,9 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class ShuffleACBackIntoDeck extends CardsSubcommandData {
@@ -20,12 +18,7 @@ public class ShuffleACBackIntoDeck extends CardsSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
+        
         OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to draw from discard pile");
@@ -50,7 +43,7 @@ public class ShuffleACBackIntoDeck extends CardsSubcommandData {
         }
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(activeMap.getName()).append(" ");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
+        sb.append("Player: ").append(getUser().getName()).append("\n");
         sb.append("Card shuffled back into deck from discards: ");
         sb.append(Mapper.getActionCard(acID)).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());

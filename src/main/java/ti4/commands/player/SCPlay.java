@@ -36,24 +36,32 @@ public class SCPlay extends PlayerSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
-        MessageChannel channel = event.getChannel();
+        player = Helper.getGamePlayer(activeMap, player, event, null);
+
+        Helper.checkThreadLimitAndArchive(event.getGuild());
+
+        MessageChannel eventChannel = event.getChannel();
+        MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? eventChannel : activeMap.getMainGameChannel();
+
         if (player == null) {
-            MessageHelper.sendMessageToChannel(channel, "You're not a player of this game");
+            MessageHelper.sendMessageToChannel(eventChannel, "You're not a player of this game");
             return;
         }
+
         int sc = player.getSC();
         String emojiName = "SC" + String.valueOf(sc);
         if (sc == 0) {
-            MessageHelper.sendMessageToChannel(channel, "No SC selected by player");
+            MessageHelper.sendMessageToChannel(eventChannel, "No SC selected by player");
             return;
         }
+
         Boolean isSCPlayed = activeMap.getScPlayed().get(sc);
         if (isSCPlayed != null && isSCPlayed) {
-            MessageHelper.sendMessageToChannel(channel, "SC already played");
+            MessageHelper.sendMessageToChannel(eventChannel, "SC already played");
             return;
         }
+        
         activeMap.setSCPlayed(sc, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
         String message = "";
@@ -61,58 +69,46 @@ public class SCPlay extends PlayerSubcommandData {
             message += categoryForPlayers + "\n";
         }
         message += "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc) + " played. Please react with your faction symbol to pass or post in thread for secondaries.";
-        String name = channel.getName();
-        if (name.contains("-")) {
-            String threadName = name.substring(0, name.indexOf("-")) + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
-            TextChannel textChannel = event.getChannel().asTextChannel();
-            Button followButton;
-            if (sc == 1) {
-                followButton = Button.success("sc_follow_leadership", "SC Follow");
-            } else {
-                if (sc == 5) {
-                    followButton = Button.success("sc_follow_trade", "SC Follow");
-                } else {
-                    followButton = Button.success("sc_follow", "SC Follow");
-                }
-            }
-            Button noFollowButton = Button.primary("sc_no_follow", "Not Following");
-            Button trade_primary = Button.success("trade_primary", "Resolve Primary");
-            Button refresh = Button.secondary("sc_refresh", "Replenish Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
-            Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash").withEmoji(Emoji.fromFormatted(Emojis.Wash));
-            Button draw_2_ac = Button.secondary("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
-            Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective));
-            ActionRow of;
+
+        String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
+        TextChannel textChannel = event.getChannel().asTextChannel();
+        MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
+
+        Button followButton;
+        if (sc == 1) {
+            followButton = Button.success("sc_follow_leadership", "SC Follow");
+        } else {
             if (sc == 5) {
-                of = ActionRow.of(trade_primary, followButton, noFollowButton, refresh, refresh_and_wash);
-            } else if (sc == 3) {
-                of = ActionRow.of(followButton, noFollowButton, draw_2_ac);
-            } else if (sc == 8) {
-                of = ActionRow.of(followButton, noFollowButton, draw_so);
+                followButton = Button.success("sc_follow_trade", "SC Follow");
             } else {
-                of = ActionRow.of(followButton, noFollowButton);
+                followButton = Button.success("sc_follow", "SC Follow");
             }
-
-            Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
-            if (privateGame != null && privateGame) {
-                for (Player player_ : activeMap.getPlayers().values()) {
-                    User user = MapGenerator.jda.getUserById(player_.getUserID());
-                    if (user == null) {
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
-                    } else {
-                        MessageHelper.sentToMessageToUser(event, activeMap.getName() + " " + message, user);
-                    }
-                }
-            }
-
-            MessageCreateData messageObject = new MessageCreateBuilder()
-                    .addContent(message)
-                    .addComponents(of).build();
-            channel.sendMessage(messageObject).queue(message_ -> {
-                ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
-                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
-                threadChannel.queue();
-            });
         }
+        Button noFollowButton = Button.primary("sc_no_follow", "Not Following");
+        Button trade_primary = Button.success("trade_primary", "Resolve Primary");
+        Button refresh = Button.secondary("sc_refresh", "Replenish Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
+        Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash").withEmoji(Emoji.fromFormatted(Emojis.Wash));
+        Button draw_2_ac = Button.secondary("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
+        Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective));
+
+        ActionRow of;
+        if (sc == 5) {
+            of = ActionRow.of(trade_primary, followButton, noFollowButton, refresh, refresh_and_wash);
+        } else if (sc == 3) {
+            of = ActionRow.of(followButton, noFollowButton, draw_2_ac);
+        } else if (sc == 8) {
+            of = ActionRow.of(followButton, noFollowButton, draw_so);
+        } else {
+            of = ActionRow.of(followButton, noFollowButton);
+        }
+        baseMessageObject.addComponents(of);
+
+        mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
+            ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
+            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
+            threadChannel.queue();
+        });
+        
     }
 
     @Override

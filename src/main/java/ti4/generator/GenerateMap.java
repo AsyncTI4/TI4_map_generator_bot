@@ -1,13 +1,10 @@
 package ti4.generator;
 
 import com.pngencoder.PngEncoder;
-
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import ti4.ResourceHelper;
 import ti4.helpers.*;
 import ti4.map.Map;
@@ -135,16 +132,19 @@ public class GenerateMap {
             isFoWPrivate = false;
             if (event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
                 isFoWPrivate = true;
-                Set<String> tilesToShow = fowFilter(map, event);
+                Player player = getFowPlayer(map, event);
+                fowPlayer = Helper.getGamePlayer(map, player, event, null);
+
+                Set<String> tilesToShow = fowFilter(map);
                 Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
                 keys.removeAll(tilesToShow);
                 updatePlayerFogFilter(map, fowPlayer, tilesToShow);
-                
+
                 for (String key : keys) {
                     tilesToDisplay.remove(key);
                     tilesToDisplay.put(key, fowPlayer.buildFogTile(key));
                 }
-                
+
             }
         }
         File file = Storage.getMapImageStorage("temp.png");
@@ -215,9 +215,13 @@ public class GenerateMap {
         return jpgFile;
     }
 
-    private Set<String> fowFilter(Map map, @Nullable SlashCommandInteractionEvent event) {
-        User user = event.getUser();
-        fowPlayer = map.getPlayer(user.getId());
+    private Player getFowPlayer(Map map, @Nullable SlashCommandInteractionEvent event) {
+        String user = event.getUser().getId();
+        return map.getPlayer(user);
+    }
+
+    private Set<String> fowFilter(Map map) {
+        
         Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
         if (fowPlayer != null) {
             java.util.Map<String, String> colorToId = Mapper.getColorToId();
@@ -228,6 +232,22 @@ public class GenerateMap {
                 Set<String> unitHolderNames = tile.getUnitHolders().keySet();
                 List<String> playerPlanets = fowPlayer.getPlanets();
                 if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
+                    tilesWithPlayerUnitsPlanets.add(tileID);
+                    continue;
+                }
+                if ("18".equals(tile.getTileID()) && fowPlayer.getTechs().contains("iihq")) {
+                    tilesWithPlayerUnitsPlanets.add(tileID);
+                    continue;
+                }
+                if ("s11".equals(tile.getTileID()) && "cabal".equals(fowPlayer.getFaction())) {
+                    tilesWithPlayerUnitsPlanets.add(tileID);
+                    continue;
+                }
+                if ("s12".equals(tile.getTileID()) && "nekro".equals(fowPlayer.getFaction())) {
+                    tilesWithPlayerUnitsPlanets.add(tileID);
+                    continue;
+                }
+                if ("s13".equals(tile.getTileID()) && "yssaril".equals(fowPlayer.getFaction())) {
                     tilesWithPlayerUnitsPlanets.add(tileID);
                     continue;
                 }
@@ -253,8 +273,20 @@ public class GenerateMap {
                     for (String token : tokenList) {
                         if (token.contains(Constants.ALPHA)) {
                             wormholeIDs.add(Constants.ALPHA);
+                            if ("ghost".equals(fowPlayer.getFaction()) 
+                                || map.getLaws().keySet().contains("wormhole_recon") 
+                                || map.getLaws().keySet().contains("absol_recon")) 
+                            {
+                                wormholeIDs.add(Constants.BETA);
+                            }
                         } else if (token.contains(Constants.BETA)) {
                             wormholeIDs.add(Constants.BETA);
+                            if ("ghost".equals(fowPlayer.getFaction()) 
+                                || map.getLaws().keySet().contains("wormhole_recon") 
+                                || map.getLaws().keySet().contains("absol_recon")) 
+                            {
+                                wormholeIDs.add(Constants.ALPHA);
+                            }
                         } else if (token.contains(Constants.GAMMA)) {
                             wormholeIDs.add(Constants.GAMMA);
                         } else if (token.contains(Constants.DELTA)) {
@@ -293,31 +325,35 @@ public class GenerateMap {
 
     private Set<String> traverseAdjacencies(Map map, String tileID, Integer sourceDirection, Set<String> exploredSet, String prevTile) {
         Set<String> tiles = new HashSet<>();
-        if(exploredSet.contains(tileID + sourceDirection)) return tiles; // We already explored this tile from this direction!
+        if (exploredSet.contains(tileID + sourceDirection))
+            return tiles; // We already explored this tile from this direction!
         exploredSet.add(tileID + sourceDirection); // mark it as explored
 
         Tile currentTile = map.getTileByPosition(tileID);
         if (currentTile == null) return tiles; //could not load the requested tile
         List<Boolean> hyperlaneData = currentTile.getHyperlaneData(sourceDirection);
-        if (hyperlaneData != null && hyperlaneData.size() == 0) return tiles; // We could not load the hyperlane data correctly, quit
-        
+        if (hyperlaneData != null && hyperlaneData.size() == 0)
+            return tiles; // We could not load the hyperlane data correctly, quit
+
         tiles.add(tileID); // we are allowed to at least *see* this tile!!
-        if (hyperlaneData == null && sourceDirection != -1) return tiles; //do not explore non-hyperlanes except for your starting space
+        if (hyperlaneData == null && sourceDirection != -1)
+            return tiles; //do not explore non-hyperlanes except for your starting space
         List<String> directlyAdjacentTiles = Mapper.getAdjacentTilesIDs(tileID);
 
-        if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) return tiles; //adjacency file for this tile is not filled in
+        if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6)
+            return tiles; //adjacency file for this tile is not filled in
         // for each adjacent tile...
-        for (int i=0; i<6; i++) {
+        for (int i = 0; i < 6; i++) {
             String tileID_ = directlyAdjacentTiles.get(i);
-            
-            if (tileID_ == "x") 
+
+            if (tileID_ == "x")
                 continue; // the tile doesn't exist, skip.
 
             if (hyperlaneData != null && !hyperlaneData.get(i))
                 continue; // the hyperlane doesn't go that direction, skip.
-            
+
             // explore that tile now!
-            Set<String> newTiles = traverseAdjacencies(map, tileID_, (i+3) % 6, exploredSet, tileID+sourceDirection);
+            Set<String> newTiles = traverseAdjacencies(map, tileID_, (i + 3) % 6, exploredSet, tileID + sourceDirection);
             tiles.addAll(newTiles);
         }
         return tiles;
@@ -326,8 +362,8 @@ public class GenerateMap {
     private void updatePlayerFogFilter(Map map, Player player, Set<String> tileKeys) {
         for (String key_ : tileKeys) {
             Tile tileToUpdate = map.getTileByPosition(key_);
-            
-            if(tileToUpdate != null) {
+
+            if (tileToUpdate != null) {
                 player.updateFogFilter(tileToUpdate);
             }
         }
@@ -537,7 +573,7 @@ public class GenerateMap {
                 reinforcements(player, map, width - 450, yPlayAreaSecondRow, unitCount);
 
                 if (!player.getLeaders().isEmpty()) {
-                    xDelta = leaderInfo(player, xDelta, yPlayArea);
+                    xDelta = leaderInfo(player, xDelta, yPlayArea, map);
                 }
 
                 if (!player.getRelics().isEmpty()) {
@@ -574,6 +610,7 @@ public class GenerateMap {
             graphics.setColor(Color.WHITE);
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
 
+            boolean commanderUnlocked = false;
             String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(pn);
             for (Player player_ : players) {
                 if (player_ != player) {
@@ -586,6 +623,10 @@ public class GenerateMap {
 
                         String pnFactionIcon = "pa_tech_factionicon_" + playerFaction + "_rdy.png";
                         drawPAImage(x + deltaX, y, pnFactionIcon);
+                        Leader leader = player_.getLeader(Constants.COMMANDER);
+                        if (leader != null) {
+                            commanderUnlocked = !leader.isLocked();
+                        }
                         break;
                     }
                 }
@@ -595,6 +636,9 @@ public class GenerateMap {
                 pn = "sftt";
             } else if (pn.endsWith("_an")) {
                 pn = "alliance";
+                if (!commanderUnlocked) {
+                    pn += "_exh";
+                }
             }
 
             String pnName = "pa_pn_name_" + pn + ".png";
@@ -638,7 +682,7 @@ public class GenerateMap {
         return x + deltaX + 20;
     }
 
-    private int leaderInfo(Player player, int x, int y) {
+    private int leaderInfo(Player player, int x, int y, Map map) {
         int deltaX = 0;
 
         Graphics2D g2 = (Graphics2D) graphics;
@@ -682,8 +726,40 @@ public class GenerateMap {
             String extraInfo = leader.getName().isEmpty() ? "" : "_" + leader.getName();
             String leaderInfoFileName = "pa_leaders_" + leader.getId() + "_" + player.getFaction() + extraInfo + status + ".png";
             drawPAImage(x + deltaX, y, leaderInfoFileName);
-
             deltaX += 48;
+            if (leader.getId().equals(Constants.COMMANDER) && player.getFaction().equals("mahact")) {
+                List<String> mahactCCs = player.getMahactCC();
+
+                Collection<Player> players = map.getPlayers().values();
+                for (Player player_ : players) {
+                    if (player_ != player) {
+                        String playerColor = player_.getColor();
+                        String playerFaction = player_.getFaction();
+                        if (playerColor != null && mahactCCs.contains(playerColor)) {
+                            Leader leader_ = player_.getLeader(Constants.COMMANDER);
+                            if (leader_ != null) {
+                                boolean locked = leader_.isLocked();
+                                String imperiaColorFile = "pa_leaders_imperia";
+                                if (locked) {
+                                    imperiaColorFile += "_exh";
+                                } else {
+                                    imperiaColorFile += "_rdy";
+                                }
+                                imperiaColorFile += ".png";
+                                String leaderFileName_ = "pa_leaders_factionicon_" + playerFaction + "_rdy.png";
+                                graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+                                drawPAImage(x + deltaX, y, leaderFileName_);
+
+                                drawPAImage(x + deltaX, y, imperiaColorFile);
+                                String status_ = locked ? "_exh" : "_rdy";
+                                String leaderPipInfo = "pa_leaders_pips_ii" + status_ + ".png";
+                                drawPAImage(x + deltaX, y, leaderPipInfo);
+                                deltaX += 48;
+                            }
+                        }
+                    }
+                }
+            }
         }
         return x + deltaX + 20;
     }
@@ -1276,10 +1352,10 @@ public class GenerateMap {
             return true;
         }
 
-        return viewingPlayer != null && player != null && 
-            ( hasHomeSystemInView(player)
-                || hasPlayersPromInPlayArea(player, viewingPlayer) 
-                || hasMahactCCInFleet(player, viewingPlayer));
+        return viewingPlayer != null && player != null &&
+                (hasHomeSystemInView(player)
+                        || hasPlayersPromInPlayArea(player, viewingPlayer)
+                        || hasMahactCCInFleet(player, viewingPlayer));
     }
 
     private boolean hasHomeSystemInView(@NotNull Player player) {
@@ -1931,15 +2007,15 @@ public class GenerateMap {
 
                 graphics.setFont(Storage.getFont20());
                 graphics.setColor(Color.WHITE);
-                if(tileIsFoggy) {
+                if (tileIsFoggy) {
                     graphics.drawImage(fogOfWar, tileX, tileY, null);
                     graphics.drawString(tile.getFogLabel(), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
                 }
                 graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x, tileY + tilePositionPoint.y);
                 return;
             }
-            
-            if(tileIsFoggy) return;
+
+            if (tileIsFoggy) return;
 
             ArrayList<Rectangle> rectangles = new ArrayList<>();
 
@@ -2269,6 +2345,21 @@ public class GenerateMap {
         LinkedHashMap<String, Integer> units = new LinkedHashMap<>();
         HashMap<String, Point> unitOffset = new HashMap<>();
         boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
+        
+        boolean isCabalJail = "s11".equals(tile.getTileID());
+        boolean isNekroJail = "s12".equals(tile.getTileID());
+        boolean isYssarilJail = "s13".equals(tile.getTileID());
+        
+        boolean isJail = isCabalJail || isNekroJail || isYssarilJail;
+        boolean showJail = false;
+        if (fowPlayer == null || 
+            (isCabalJail && "cabal".equals(fowPlayer.getFaction()) 
+                || (isNekroJail && "nekro".equals(fowPlayer.getFaction()))
+                || (isYssarilJail && "yssaril".equals(fowPlayer.getFaction()))
+            )) 
+        {
+            showJail = true;
+        }
 
         Point unitOffsetValue = map.isAllianceMode() ? PositionMapper.getAllianceUnitOffset() : PositionMapper.getUnitOffset();
         int spaceX = unitOffsetValue != null ? unitOffsetValue.x : 10;
@@ -2303,6 +2394,13 @@ public class GenerateMap {
         for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
             String unitID = unitEntry.getKey();
             Integer unitCount = unitEntry.getValue();
+
+            if (isJail && fowPlayer != null) {
+                String colorID = Mapper.getColorID(fowPlayer.getColor());
+                if (!showJail && fowPlayer != null && !unitID.startsWith(colorID)) {
+                    continue;
+                }
+            }
 
             Integer unitDamageCount = unitDamage.get(unitID);
 

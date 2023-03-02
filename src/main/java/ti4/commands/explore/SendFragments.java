@@ -34,8 +34,10 @@ public class SendFragments extends ExploreSubcommandData {
 	public void execute(SlashCommandInteractionEvent event) {
 		Map activeMap = getActiveMap();
 		User activeUser = getUser();
-		Player reciever = Helper.getPlayer(activeMap, null, event);
         Player sender = activeMap.getPlayers().get(activeUser.getId());
+        sender = Helper.getGamePlayer(activeMap, sender, event, null);
+
+		Player reciever = Helper.getPlayer(activeMap, null, event);
         if (reciever == null) {
         	MessageHelper.sendMessageToChannel(event.getChannel(), "Target player could not be found in game:" + activeMap.getName());
             return;
@@ -75,6 +77,13 @@ public class SendFragments extends ExploreSubcommandData {
 		};
 
 		MessageHelper.replyToMessageTI4Logo(event);
-		MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(sender) + " sent " + trait + " " + Helper.getEmojiFromDiscord(emojiName) + " relic fragments to: " + Helper.getPlayerRepresentation(reciever));
+		String message = Helper.getPlayerRepresentation(event, sender) + " sent " + trait + " " + Helper.getEmojiFromDiscord(emojiName) + " relic fragments to: " + Helper.getPlayerRepresentation(event, reciever);
+		if (activeMap.isFoWMode()) {
+			String fail = "User for faction not found. Report to ADMIN";
+			String success = message + "\nThe other player has been notified";
+			MessageHelper.sendPrivateMessageToPlayer(reciever, activeMap, event, message, fail, success);
+		} else {
+			MessageHelper.sendMessageToChannel(event.getChannel(), message);
+		}
 	}
 }

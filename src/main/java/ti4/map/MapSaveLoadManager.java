@@ -2,7 +2,10 @@ package ti4.map;
 
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+
 import org.jetbrains.annotations.Nullable;
 import ti4.MapGenerator;
 import ti4.helpers.Constants;
@@ -268,13 +271,22 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.GAME_CUSTOM_NAME + " " + map.getCustomName());
         writer.write(System.lineSeparator());
+
+        MessageChannel mainGameChannel = map.getMainGameChannel();
+        writer.write(Constants.MAIN_GAME_CHANNEL + " " + (mainGameChannel == null ? "" : mainGameChannel.getId()));
+        writer.write(System.lineSeparator());
         writer.write(Constants.COMMUNITY_MODE + " " + map.isCommunityMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.ALLIANCE_MODE + " " + map.isAllianceMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.FOW_MODE + " " + map.isFoWMode());
         writer.write(System.lineSeparator());
-
+        writer.write(Constants.ABSOL_MODE + " " + map.isAbsolMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.DISCORDANT_STARS_MODE + " " + map.isDiscordantStarsMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
+        writer.write(System.lineSeparator());
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -308,9 +320,9 @@ public class MapSaveLoadManager {
                 writer.write(System.lineSeparator());
             }
 
-            Channel channelForCommunity = player.getChannelForCommunity();
+            Channel channelForCommunity = player.getPrivateChannel();
             if (channelForCommunity != null) {
-                writer.write(Constants.CHANNLE_FOR_COMMUNITY + " " + channelForCommunity.getId());
+                writer.write(Constants.PLAYER_PRIVATE_CHANNEL + " " + channelForCommunity.getId());
                 writer.write(System.lineSeparator());
             }
 
@@ -703,147 +715,163 @@ public class MapSaveLoadManager {
         String[] tokenizer = data.split(" ", 2);
         if (tokenizer.length == 2) {
             String identification = tokenizer[0];
-            if (Constants.SO.equals(identification)) {
-                map.setSecretObjectives(getCardList(tokenizer[1]));
-            } else if (Constants.AC.equals(identification)) {
-                map.setActionCards(getCardList(tokenizer[1]));
-            } else if (Constants.PO1.equals(identification)) {
-                map.setPublicObjectives1(getCardList(tokenizer[1]));
-            } else if (Constants.PO2.equals(identification)) {
-                map.setPublicObjectives2(getCardList(tokenizer[1]));
-            } else if (Constants.SO_TO_PO.equals(identification)) {
-                map.setSoToPoList(getCardList(tokenizer[1]));
-            } else if (Constants.PURGED_PN.equals(identification)) {
-                map.setPurgedPNs(getCardList(tokenizer[1]));
-            } else if (Constants.REVEALED_PO.equals(identification)) {
-                map.setRevealedPublicObjectives(getParsedCards(tokenizer[1]));
-                //temp code to migrate round numbers
-//                Set<String> strings = new HashSet<>(map.getRevealedPublicObjectives().keySet());
-//                Set<String> strings2 = new HashSet<>(map.getRevealedPublicObjectives().keySet());
-//                strings.retainAll(map.getPublicObjectives1());
-//                strings2.retainAll(map.getPublicObjectives2());
-//                map.setRound((strings.size() + strings2.size())-1);
-            } else if (Constants.CUSTOM_PO_VP.equals(identification)) {
-                map.setCustomPublicVP(getParsedCards(tokenizer[1]));
-            } else if (Constants.SCORED_PO.equals(identification)) {
-                map.setScoredPublicObjectives(getParsedCardsForScoredPO(tokenizer[1]));
-            } else if (Constants.CUSTOM_ADJACENT_TILES.equals(identification)) {
-                map.setCustomAdjacentTiles(getParsedCardsForScoredPO(tokenizer[1]));
-            } else if (Constants.AGENDAS.equals(identification)) {
-                map.setAgendas(getCardList(tokenizer[1]));
-            } else if (Constants.AC_DISCARDED.equals(identification)) {
-                map.setDiscardActionCards(getParsedCards(tokenizer[1]));
-            } else if (Constants.DISCARDED_AGENDAS.equals(identification)) {
-                map.setDiscardAgendas(getParsedCards(tokenizer[1]));
-            } else if (Constants.SENT_AGENDAS.equals(identification)) {
-                map.setSentAgendas(getParsedCards(tokenizer[1]));
-            } else if (Constants.LAW.equals(identification)) {
-                map.setLaws(getParsedCards(tokenizer[1]));
-            } else if (Constants.EXPLORE.equals(identification)) {
-                map.setExploreDeck(getCardList(tokenizer[1]));
-            } else if (Constants.RELICS.equals(identification)) {
-                map.setRelics(getCardList(tokenizer[1]));
-            } else if (Constants.DISCARDED_EXPLORES.equals(identification)) {
-                map.setExploreDiscard(getCardList(tokenizer[1]));
-            } else if (Constants.LAW_INFO.equals(identification)) {
-                StringTokenizer actionCardToken = new StringTokenizer(tokenizer[1], ";");
-                LinkedHashMap<String, String> cards = new LinkedHashMap<>();
-                while (actionCardToken.hasMoreTokens()) {
-                    StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
-                    String id = cardInfo.nextToken();
-                    String value = cardInfo.nextToken();
-                    cards.put(id, value);
+            String info = tokenizer[1];
+            switch (identification) {
+                case Constants.SO -> map.setSecretObjectives(getCardList(info));
+                case Constants.AC -> map.setActionCards(getCardList(info));
+                case Constants.PO1 -> map.setPublicObjectives1(getCardList(info));
+                case Constants.PO2 -> map.setPublicObjectives2(getCardList(info));
+                case Constants.SO_TO_PO -> map.setSoToPoList(getCardList(info));
+                case Constants.PURGED_PN -> map.setPurgedPNs(getCardList(info));
+                case Constants.REVEALED_PO -> map.setRevealedPublicObjectives(getParsedCards(info));
+                case Constants.CUSTOM_PO_VP -> map.setCustomPublicVP(getParsedCards(info));
+                case Constants.SCORED_PO -> map.setScoredPublicObjectives(getParsedCardsForScoredPO(info));
+                case Constants.CUSTOM_ADJACENT_TILES -> map.setCustomAdjacentTiles(getParsedCardsForScoredPO(info));
+                case Constants.AGENDAS -> map.setAgendas(getCardList(info));
+                case Constants.AC_DISCARDED -> map.setDiscardActionCards(getParsedCards(info));
+                case Constants.DISCARDED_AGENDAS -> map.setDiscardAgendas(getParsedCards(info));
+                case Constants.SENT_AGENDAS -> map.setSentAgendas(getParsedCards(info));
+                case Constants.LAW -> map.setLaws(getParsedCards(info));
+                case Constants.EXPLORE -> map.setExploreDeck(getCardList(info));
+                case Constants.RELICS -> map.setRelics(getCardList(info));
+                case Constants.DISCARDED_EXPLORES -> map.setExploreDiscard(getCardList(info));
+                case Constants.LAW_INFO -> {
+                    StringTokenizer actionCardToken = new StringTokenizer(info, ";");
+                    LinkedHashMap<String, String> cards = new LinkedHashMap<>();
+                    while (actionCardToken.hasMoreTokens()) {
+                        StringTokenizer cardInfo = new StringTokenizer(actionCardToken.nextToken(), ",");
+                        String id = cardInfo.nextToken();
+                        String value = cardInfo.nextToken();
+                        cards.put(id, value);
+                    }
+                    map.setLawsInfo(cards);
                 }
-                map.setLawsInfo(cards);
-            } else if (Constants.SC_TRADE_GOODS.equals(identification)) {
-                StringTokenizer scTokenizer = new StringTokenizer(tokenizer[1], ";");
-                while (scTokenizer.hasMoreTokens()) {
-                    StringTokenizer cardInfo = new StringTokenizer(scTokenizer.nextToken(), ",");
-                    Integer id = Integer.parseInt(cardInfo.nextToken());
-                    Integer value = Integer.parseInt(cardInfo.nextToken());
-                    map.setScTradeGood(id, value);
+                case Constants.SC_TRADE_GOODS -> {
+                    StringTokenizer scTokenizer = new StringTokenizer(info, ";");
+                    while (scTokenizer.hasMoreTokens()) {
+                        StringTokenizer cardInfo = new StringTokenizer(scTokenizer.nextToken(), ",");
+                        Integer id = Integer.parseInt(cardInfo.nextToken());
+                        Integer value = Integer.parseInt(cardInfo.nextToken());
+                        map.setScTradeGood(id, value);
+                    }
                 }
-            } else if (Constants.SPEAKER.equals(identification)) {
-                map.setSpeaker(tokenizer[1]);
-            } else if (Constants.PLAYER_COUNT_FOR_MAP.equals(identification)) {
-                String count = tokenizer[1];
-                try {
-                    int playerCount = Integer.parseInt(count);
-                    if (playerCount == 6 || playerCount == 8) {
-                        map.setPlayerCountForMap(playerCount);
-                    } else {
+                case Constants.SPEAKER -> map.setSpeaker(info);
+                case Constants.PLAYER_COUNT_FOR_MAP -> {
+                    String count = info;
+                    try {
+                        int playerCount = Integer.parseInt(count);
+                        if (playerCount == 6 || playerCount == 8) {
+                            map.setPlayerCountForMap(playerCount);
+                        } else {
+                            map.setPlayerCountForMap(6);
+                        }
+                    } catch (Exception e) {
                         map.setPlayerCountForMap(6);
                     }
-                } catch (Exception e) {
-                    map.setPlayerCountForMap(6);
                 }
-            } else if (Constants.VP_COUNT.equals(identification)) {
-                String count = tokenizer[1];
-                try {
-                    int vpCount = Integer.parseInt(count);
-                    map.setVp(vpCount);
-                } catch (Exception e) {
-                    map.setVp(10);
+                case Constants.VP_COUNT -> {
+                    String count = info;
+                    try {
+                        int vpCount = Integer.parseInt(count);
+                        map.setVp(vpCount);
+                    } catch (Exception e) {
+                        map.setVp(10);
+                    }
                 }
-            } else if (Constants.DISPLAY_TYPE.equals(identification)) {
-                String displayType = tokenizer[1];
-                if (displayType.equals(DisplayType.stats.getValue())) {
-                    map.setDisplayTypeForced(DisplayType.stats);
-                } else if (displayType.equals(DisplayType.map.getValue())) {
-                    map.setDisplayTypeForced(DisplayType.map);
-                } else if (displayType.equals(DisplayType.all.getValue())) {
-                    map.setDisplayTypeForced(DisplayType.all);
+                case Constants.DISPLAY_TYPE -> {
+                    String displayType = info;
+                    if (displayType.equals(DisplayType.stats.getValue())) {
+                        map.setDisplayTypeForced(DisplayType.stats);
+                    } else if (displayType.equals(DisplayType.map.getValue())) {
+                        map.setDisplayTypeForced(DisplayType.map);
+                    } else if (displayType.equals(DisplayType.all.getValue())) {
+                        map.setDisplayTypeForced(DisplayType.all);
+                    }
                 }
-
-            } else if (Constants.SC_PLAYED.equals(identification)) {
-                StringTokenizer scPlayed = new StringTokenizer(tokenizer[1], ";");
-                while (scPlayed.hasMoreTokens()) {
-                    StringTokenizer dataInfo = new StringTokenizer(scPlayed.nextToken(), ",");
-                    Integer scID = Integer.parseInt(dataInfo.nextToken());
-                    Boolean status = Boolean.parseBoolean(dataInfo.nextToken());
-                    map.setSCPlayed(scID, status);
+                case Constants.SC_PLAYED -> {
+                    StringTokenizer scPlayed = new StringTokenizer(info, ";");
+                    while (scPlayed.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(scPlayed.nextToken(), ",");
+                        Integer scID = Integer.parseInt(dataInfo.nextToken());
+                        Boolean status = Boolean.parseBoolean(dataInfo.nextToken());
+                        map.setSCPlayed(scID, status);
+                    }                    
                 }
-            } else if (Constants.GAME_CUSTOM_NAME.equals(identification)) {
-                map.setCustomName(tokenizer[1]);
-            } else if (Constants.COMMUNITY_MODE.equals(identification)) {
-                try {
-                    boolean value = Boolean.parseBoolean(tokenizer[1]);
-                    map.setCommunityMode(value);
-                } catch (Exception e) {
-                    //Do nothing
+                case Constants.GAME_CUSTOM_NAME -> map.setCustomName(info);
+                case Constants.MAIN_GAME_CHANNEL -> {
+                    try {
+                        TextChannel channelById = MapGenerator.jda.getTextChannelById(info);
+                        map.setMainGameChannel(channelById);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
                 }
-            } else if (Constants.ALLIANCE_MODE.equals(identification)) {
-                try {
-                    boolean value = Boolean.parseBoolean(tokenizer[1]);
-                    map.setAllianceMode(value);
-                } catch (Exception e) {
-                    //Do nothing
+                case Constants.COMMUNITY_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setCommunityMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
                 }
-            } else if (Constants.FOW_MODE.equals(identification)) {
-                try {
-                    boolean value = Boolean.parseBoolean(tokenizer[1]);
-                    map.setFoWMode(value);
-                } catch (Exception e) {
-                    //Do nothing
+                case Constants.ALLIANCE_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setAllianceMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
                 }
-            } else if (Constants.CREATION_DATE.equals(identification)) {
-                map.setCreationDate(tokenizer[1]);
-            } else if (Constants.ROUND.equals(identification)) {
-                String roundNumber = tokenizer[1];
-                try {
-                    map.setRound(Integer.parseInt(roundNumber));
-                } catch (Exception exception) {
-                    BotLogger.log("Could not parse round number");
+                case Constants.FOW_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setFoWMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
                 }
-            } else if (Constants.LAST_MODIFIED_DATE.equals(identification)) {
-                String lastModificationDate = tokenizer[1];
-                try {
-                    map.setLastModifiedDate(Long.parseLong(lastModificationDate));
-                } catch (Exception exception) {
-                    BotLogger.log("Could not parse last modified date");
+                case Constants.ABSOL_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setAbsolMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.DISCORDANT_STARS_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setDiscordantStarsMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.GAME_HAS_ENDED -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setHasEnded(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.CREATION_DATE -> map.setCreationDate(info);
+                case Constants.ROUND -> {
+                    String roundNumber = info;
+                    try {
+                        map.setRound(Integer.parseInt(roundNumber));
+                    } catch (Exception exception) {
+                        BotLogger.log("Could not parse round number");
+                    }
+                }
+                case Constants.LAST_MODIFIED_DATE -> {
+                    String lastModificationDate = info;
+                    try {
+                        map.setLastModifiedDate(Long.parseLong(lastModificationDate));
+                    } catch (Exception exception) {
+                        BotLogger.log("Could not parse last modified date");
+                    }
                 }
             }
-
         }
     }
 
@@ -895,7 +923,9 @@ public class MapSaveLoadManager {
                 case Constants.FACTION -> player.setFaction(tokenizer.nextToken());
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> setRole(player, tokenizer);
-                case Constants.CHANNLE_FOR_COMMUNITY -> setChannel(player, tokenizer);
+                case Constants.PLAYER_PRIVATE_CHANNEL -> setChannel(player, tokenizer);
+                //TODO: Constants.CHANNEL_FOR_COMMUNITY is duplicative for renaming the property in the save file. Delete later
+                case Constants.CHANNEL_FOR_COMMUNITY -> setChannel(player, tokenizer);
                 case Constants.TACTICAL -> player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
@@ -998,8 +1028,8 @@ public class MapSaveLoadManager {
 
     private static void setChannel(Player player, StringTokenizer tokenizer) {
         String id = tokenizer.nextToken();
-        GuildChannel guildChannelById = MapGenerator.jda.getGuildChannelById(id);
-        player.setChannelForCommunity(guildChannelById);
+        TextChannel channelById = MapGenerator.jda.getTextChannelById(id);
+        player.setPrivateChannel(channelById);
     }
 
     private static void setRole(Player player, StringTokenizer tokenizer) {

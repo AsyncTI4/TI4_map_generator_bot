@@ -42,8 +42,9 @@ public class ListGames extends HelpSubcommandData {
             }
         }
         representationText.append(": ").append(map.getMapStatus());
-        representationText.append("        Created:").append(map.getCreationDate());
+        representationText.append("        Created: ").append(map.getCreationDate());
         representationText.append("     Last Modified: ").append(Helper.getDateRepresentation(map.getLastModifiedDate()));
+        representationText.append("     Has Ended: ").append(map.isHasEnded());
         return representationText.toString();
     }
 }

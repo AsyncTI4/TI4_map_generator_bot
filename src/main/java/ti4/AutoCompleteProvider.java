@@ -13,6 +13,7 @@ import ti4.message.BotLogger;
 
 import java.io.File;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -38,12 +39,23 @@ public class AutoCompleteProvider {
             }
             case Constants.FACTION -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Mapper.getFactions().stream()
-                        .filter(token -> token.contains(enteredValue))
-                        .limit(25)
-                        .map(token -> new Command.Choice(token, token))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
+                HashMap<String, String> factions = Mapper.getFactionRepresentations();
+                if (activeMap.isDiscordantStarsMode()) {
+                    List<Command.Choice> options = factions.entrySet().stream()
+                            .filter(token -> token.getValue().toLowerCase().contains(enteredValue))
+                            .limit(25)
+                            .map(token -> new Command.Choice(token.getValue(), token.getKey()))
+                            .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                } else {
+                    List<Command.Choice> options = factions.entrySet().stream()
+                            .filter(Predicate.not(token -> token.getValue().toUpperCase().endsWith("(DS)")))
+                            .filter(token -> token.getValue().toLowerCase().contains(enteredValue))
+                            .limit(25)
+                            .map(token -> new Command.Choice(token.getValue(), token.getKey()))
+                            .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
             }
             case Constants.FACTION_COLOR, Constants.FACTION_COLOR_1, Constants.FACTION_COLOR_2 -> {
                 String enteredValue = event.getFocusedOption().getValue();
@@ -66,19 +78,9 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.CC -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<String> values = Arrays.asList("no", "retreat", "reinforcements");
-                List<Command.Choice> options = values.stream()
-                        .filter(token -> token.contains(enteredValue))
-                        .limit(25)
-                        .map(token -> new Command.Choice(token, token))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
-            }
             case Constants.CC_USE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<String> values = Arrays.asList("tactics", "t", "retreat", "reinforcements", "r", "no");
+                List<String> values = Arrays.asList("t/tactics","r/retreat/reinforcements","no");
                 List<Command.Choice> options = values.stream()
                         .filter(token -> token.contains(enteredValue))
                         .limit(25)
@@ -106,7 +108,7 @@ public class AutoCompleteProvider {
             }
             case Constants.DISPLAY_TYPE -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of("all", "map", "stats", "none", "split")
+                List<Command.Choice> options = Stream.of("all", "map", "stats", "split", "none")
                         .filter(value -> value.contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))
@@ -116,12 +118,23 @@ public class AutoCompleteProvider {
             case Constants.RELIC -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 HashMap<String, String> relics = Mapper.getRelics();
-                List<Command.Choice> options = relics.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
+                if (activeMap.isAbsolMode()){
+                    List<Command.Choice> options = relics.entrySet().stream()
+                            .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                            .filter(value -> value.getKey().startsWith("absol_"))
+                            .limit(25)
+                            .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                            .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                } else {
+                    List<Command.Choice> options = relics.entrySet().stream()
+                            .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                            .filter(Predicate.not(value -> value.getKey().startsWith("absol_")))
+                            .limit(25)
+                            .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                            .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
             }
             case Constants.KELERES_HS -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
@@ -190,12 +203,22 @@ public class AutoCompleteProvider {
             case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 HashMap<String, String> techs = Mapper.getTechs();
-                List<Command.Choice> options = techs.entrySet().stream()
+                if (activeMap.isDiscordantStarsMode()) {
+                    List<Command.Choice> options = techs.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getValue(), value.getKey()))
                         .collect(Collectors.toList());
-                event.replyChoices(options).queue();
+                    event.replyChoices(options).queue();
+                } else {
+                    List<Command.Choice> options = techs.entrySet().stream()
+                        .filter(Predicate.not(value -> value.getKey().toLowerCase().startsWith("ds")))
+                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
             }
             case Constants.PLANET, Constants.PLANET2, Constants.PLANET3, Constants.PLANET4, Constants.PLANET5, Constants.PLANET6 -> {
                 MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName());
@@ -251,7 +274,7 @@ public class AutoCompleteProvider {
             }
             case Constants.SPEND_AS -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of("Resources", "Influence", "Votes")
+                List<Command.Choice> options = Stream.of("Resources", "Influence", "Votes", "TechSkip", "Other")
                         .filter(value -> value.contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))

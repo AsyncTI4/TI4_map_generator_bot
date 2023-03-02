@@ -8,6 +8,7 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapStringMapper;
 import ti4.map.Player;
@@ -49,19 +50,11 @@ public class Setup extends PlayerSubcommandData {
             return;
         }
         Player player = activeMap.getPlayer(getUser().getId());
+        player = Helper.getPlayer(activeMap, player, event);
+        player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
-        }
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        if (playerOption != null) {
-            String playerID = playerOption.getAsUser().getId();
-            if (activeMap.getPlayer(playerID) != null) {
-                player = activeMap.getPlayers().get(playerID);
-            } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerOption.getAsUser().getName() + " could not be found in map:" + activeMap.getName());
-                return;
-            }
         }
 
         LinkedHashMap<String, Player> players = activeMap.getPlayers();

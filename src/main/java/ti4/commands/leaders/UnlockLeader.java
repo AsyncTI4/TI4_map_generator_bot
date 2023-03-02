@@ -6,7 +6,6 @@ import ti4.helpers.Helper;
 import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class UnlockLeader extends LeaderAction {
     public UnlockLeader() {
@@ -18,17 +17,16 @@ public class UnlockLeader extends LeaderAction {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null){
             playerLeader.setLocked(false);
-            editReplyMessage(Helper.getPlayerFactionLeaderEmoji(player, leader));
+            sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
             StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
                     .append(" unlocked ")
-                    .append(playerLeader.getId()).append(" ")
-                    .append(playerLeader.getName());
-            MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
+                    .append(Helper.getLeaderFullRepresentation(player, playerLeader));
+            sendMessage(message.toString());
             if (playerLeader.isExhausted()){
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Leader is also exhausted");
+                sendMessage("Leader is also exhausted");
             }
         } else {
-            editReplyMessage("Leader not found");
+            sendMessage("Leader not found");
         }
     }
 }
