@@ -24,15 +24,15 @@ public class SaveMap extends AdminSubcommandData {
         if (option != null) {
             String mapName = option.getAsString();
             if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-                MessageHelper.replyToMessage(event, "Game with such name does not exists, use /list_games");
+                sendMessage("Game with such name does not exists, use /list_games");
                 return;
             }
             Map map = MapManager.getInstance().getMap(mapName);
             MapSaveLoadManager.saveMap(map);
-            MessageHelper.replyToMessage(event, "Save map: " + map.getName());
+            sendMessage("Save map: " + map.getName());
 
         } else {
-            MessageHelper.replyToMessage(event, "No Game specified.");
+            sendMessage("No Game specified.");
         }
     }
 }

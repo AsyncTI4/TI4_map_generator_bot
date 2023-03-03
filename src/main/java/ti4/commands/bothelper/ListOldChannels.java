@@ -23,12 +23,12 @@ public class ListOldChannels extends BothelperSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Integer channelCount = event.getOption(Constants.COUNT).getAsInt();
         if (channelCount < 1 || channelCount > 100) {
-            MessageHelper.replyToMessage(event, "Please choose a number between 1 and 100");
+            sendMessage("Please choose a number between 1 and 100");
             return;
         }
         Guild guild = event.getGuild();
-        MessageHelper.replyToMessage(event, getOldChannelsMessage(guild, channelCount));
-        MessageHelper.sendMessageToChannel(event, getOldThreadsMessage(guild, channelCount));
+        sendMessage(getOldChannelsMessage(guild, channelCount));
+        sendMessage(getOldThreadsMessage(guild, channelCount));
     }
 
     public static String getOldChannelsMessage(Guild guild, Integer channelCount) {
