@@ -31,19 +31,21 @@ public class DrawSpecificSOForPlayer extends AdminSubcommandData {
         OptionMapping playerOption = event.getOption(Constants.PLAYER);
         OptionMapping option = event.getOption(Constants.SO_ID);
         if (option == null) {
-            MessageHelper.replyToMessage(event, "SO ID needs to be specified");
+            sendMessage("SO ID needs to be specified");
             return;
         }
-        if (playerOption != null) {
-            User user = playerOption.getAsUser();
-            LinkedHashMap<String, Integer> secrets = activeMap.drawSpecificSecretObjective(option.getAsString(), user.getId());
-            if (secrets == null){
-                MessageHelper.replyToMessage(event, "SO not retrieved");
-                return;
-            }
-            MapSaveLoadManager.saveMap(activeMap);
+        if (playerOption == null) {
+            sendMessage("Player option was null");
             return;
         }
-        MessageHelper.replyToMessageTI4Logo(event);
+
+        User user = playerOption.getAsUser();
+        LinkedHashMap<String, Integer> secrets = activeMap.drawSpecificSecretObjective(option.getAsString(), user.getId());
+        if (secrets == null){
+            sendMessage("SO not retrieved");
+            return;
+        }
+        MapSaveLoadManager.saveMap(activeMap);
+        sendMessage("SO sent to user's hand - please check `/ac info`");
     }
 }

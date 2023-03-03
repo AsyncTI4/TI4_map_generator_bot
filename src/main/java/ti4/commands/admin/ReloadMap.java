@@ -26,7 +26,7 @@ public class ReloadMap extends AdminSubcommandData {
         if (option != null) {
             String mapName = option.getAsString();
             if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-                MessageHelper.replyToMessage(event, "Game with such name does not exists, use /list_games");
+                sendMessage("Game with such name does not exists, use /list_games");
 
                 return;
             }
@@ -37,7 +37,7 @@ public class ReloadMap extends AdminSubcommandData {
             MessageHelper.replyToMessage(event, file);
 
         } else {
-            MessageHelper.replyToMessage(event, "No Game specified.");
+            sendMessage("No Game specified.");
             return;
         }
     }
