@@ -19,11 +19,11 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Integer threadCount = event.getOption(Constants.THREAD_COUNT).getAsInt();
         if (threadCount < 1 || threadCount > 100) {
-            MessageHelper.replyToMessage(event, "Please choose a number between 1 and 100");
+            sendMessage("Please choose a number between 1 and 100");
             return;
         }
-        MessageHelper.replyToMessage(event, "Archiving " + threadCount + " threads");
-        MessageHelper.sendMessageToChannel(event.getChannel(), ListOldChannels.getOldThreadsMessage(event.getGuild(), threadCount));
+        sendMessage("Archiving " + threadCount + " threads");
+        sendMessage(ListOldChannels.getOldThreadsMessage(event.getGuild(), threadCount));
         archiveOldThreads(event.getGuild(), threadCount);
     }
 

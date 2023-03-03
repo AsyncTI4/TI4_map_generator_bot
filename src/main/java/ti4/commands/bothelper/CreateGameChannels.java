@@ -55,13 +55,13 @@ public class CreateGameChannels extends BothelperSubcommandData {
         
         //CHECK ROLE IS VALID
         if (guild.getRolesByName(gameName, false).size() > 0) {
-            MessageHelper.replyToMessage(event, "Role: **" + gameName + "** already exists. Try again with a new name.");
+            sendMessage("Role: **" + gameName + "** already exists. Try again with a new name.");
             return;
         }
 
         //CHECK ROLE COUNT
         if (guild.getRoles().size() >= 250) {
-            MessageHelper.replyToMessage(event, "Server is at the role limit - please contact @Admin to resolve.");
+            sendMessage("Server is at the role limit - please contact @Admin to resolve.");
             BotLogger.log(event, "Cannot create a new role. Server is currently has " + guild.getRoles().size() + " roles.");
             return;
         }
@@ -69,13 +69,13 @@ public class CreateGameChannels extends BothelperSubcommandData {
         //CHECK CATEGORY IS VALID
         GuildChannelUnion categoryChannel = event.getOption(Constants.CATEGORY).getAsChannel();
         if (categoryChannel == null || categoryChannel.getType() != ChannelType.CATEGORY) {
-            MessageHelper.replyToMessage(event, "Category: **" + categoryChannel.getName() + "** does not exist. Create the category or pick a different category, then try again.");
+            sendMessage("Category: **" + categoryChannel.getName() + "** does not exist. Create the category or pick a different category, then try again.");
             return;
         } 
         
         Category category = categoryChannel.asCategory();
         if (category.getChannels().size() > 48) {
-            MessageHelper.replyToMessage(event, "Category: **" + category.getName() + "** is full. Create a new category then try again.");
+            sendMessage("Category: **" + category.getName() + "** is full. Create a new category then try again.");
             return;
         }
 
@@ -143,7 +143,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         MessageHelper.sendMessageToChannelAndPin((MessageChannel) botThread, "Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
         message.append("> " + botThread.getAsMention()).append("\n");
         
-        MessageHelper.replyToMessage(event, message.toString());
+        sendMessage(message.toString());
     }
 
     private static String getNextGameName(Guild guild) {
