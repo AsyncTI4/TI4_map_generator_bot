@@ -14,6 +14,6 @@ public class SaveMaps extends AdminSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         MapSaveLoadManager.saveMaps();
-        MessageHelper.replyToMessage(event, "Saved all maps");
+        sendMessage("Saved all maps");
     }
 }

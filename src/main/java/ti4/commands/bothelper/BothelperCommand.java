@@ -78,6 +78,7 @@ public class BothelperCommand implements Command {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
                 subCommandExecuted = subcommand;
+                break;
             }
         }
     }

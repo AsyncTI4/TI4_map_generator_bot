@@ -78,7 +78,7 @@ public class ServerLimitStats extends BothelperSubcommandData {
             sb.append("     - ").append(inLimboChannelCount).append("   " + getPercentage(inLimboChannelCount, channelCount) + "  'in-limbo' channels").append("\n");
             sb.append("     - ").append(inLimboThreadCount).append("   " + getPercentage(inLimboThreadCount, threadCount) + "  'in-limbo' threads").append("\n");
         }
-        MessageHelper.replyToMessage(event, sb.toString());
+        sendMessage(sb.toString());
     }
 
     private String getPercentage(double numerator, double denominator) {
