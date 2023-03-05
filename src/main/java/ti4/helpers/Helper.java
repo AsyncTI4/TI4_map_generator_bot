@@ -520,7 +520,7 @@ public class Helper {
             case "biotictech" -> Emojis.BioticTech;
             case "warfaretech" -> Emojis.WarfareTech;
 
-            default -> "";
+            default -> Emojis.GoodDog;
         };
     }
 
