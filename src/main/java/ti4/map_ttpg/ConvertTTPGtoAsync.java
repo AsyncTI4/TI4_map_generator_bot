@@ -215,10 +215,14 @@ public class ConvertTTPGtoAsync {
             asyncPlayer.setStrategicCC(ttpgPlayer.getCommandTokens().getStrategy());
 
             //PLAYER STRATEGY CARDS
-            String ttpgSC = (String) ttpgPlayer.getStrategyCards().get(0);
-            String ttpgSCplayed = (String) ttpgPlayer.getStrategyCardsFaceDown().get(0);
-            if (Objects.nonNull(ttpgSC)) asyncPlayer.setSC(Helper.getSCNumber(ttpgSC));
-            if (Objects.nonNull(ttpgSCplayed)) asyncMap.setSCPlayed(Helper.getSCNumber(ttpgSCplayed), true);
+            if (!ttpgPlayer.getStrategyCards().isEmpty()) {
+                String ttpgSC = (String) ttpgPlayer.getStrategyCards().get(0);
+                if (Objects.nonNull(ttpgSC)) asyncPlayer.setSC(Helper.getSCNumber(ttpgSC));
+            }
+            if (!ttpgPlayer.getStrategyCardsFaceDown().isEmpty()) {
+                String ttpgSCplayed = (String) ttpgPlayer.getStrategyCardsFaceDown().get(0);
+                if (Objects.nonNull(ttpgSCplayed)) asyncMap.setSCPlayed(Helper.getSCNumber(ttpgSCplayed), true);
+            }
 
             //PLAYER SCORED OBJECTIVES
             for (String ttpgScoredObjective : ttpgPlayer.getObjectives()) {
