@@ -233,6 +233,10 @@ public class Emojis {
     //GOOD DOGS
     public static final String GoodDog = "<:GoodDog:1068567308819255316>";
     public static final String Ozzie = "<:Ozzie:1069446695689134140>";
+    public static final String Summer = "<:Summer:1070283656037412884>";
+    
+    //LIST OF GOOD DOGS
+    public static List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer);
 
     //OTHER
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";

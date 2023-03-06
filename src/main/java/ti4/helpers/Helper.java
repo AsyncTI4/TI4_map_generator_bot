@@ -240,6 +240,13 @@ public class Helper {
         return emote;
     }
 
+    public static String getRandomGoodDog() {
+        List<String> goodDogs = new ArrayList<>(Emojis.GoodDogs);
+        Random seed = new Random();
+        Collections.shuffle(goodDogs, seed);
+        return goodDogs.get(0);
+    }
+
     public static String getFactionIconFromDiscord(String faction) {
         if (faction == null) {
             return getRandomizedEmoji(0, null);
@@ -538,7 +545,7 @@ public class Helper {
             case "biotictech" -> Emojis.BioticTech;
             case "warfaretech" -> Emojis.WarfareTech;
 
-            default -> Emojis.GoodDog;
+            default -> getRandomGoodDog();
         };
     }
 
