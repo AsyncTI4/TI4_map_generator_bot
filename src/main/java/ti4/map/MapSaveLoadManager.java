@@ -426,7 +426,7 @@ public class MapSaveLoadManager {
             for (String key : fow_systems.keySet()) {
                 String system = fow_systems.get(key);
                 String label = fow_labels.get(key);
-                if (label != null) label.replaceAll(" ", "—"); //replace spaces with em dash
+                if (label != null) label = label.replaceAll(" ", "—"); //replace spaces with em dash
                 fogOfWarSystems.append(key);
                 fogOfWarSystems.append(",");
                 fogOfWarSystems.append(system);
@@ -1005,7 +1005,7 @@ public class MapSaveLoadManager {
                             String position = system[0];
                             String tileID = system[1];
                             String label = system[2];
-                            if (label != null) label.replaceAll("—", " "); //replace em dash with spaces
+                            if (label != null) label = label.replaceAll("—", " "); //replace em dash with spaces
                             player.addFogTile(tileID, position, label);
                         }
                     } catch (Exception e) {

@@ -267,6 +267,8 @@ public class FoWHelper {
      * @return
      */
     public static boolean playerHasUnitsInSystem(Player player, Tile tile) {
+        if (!player.isActivePlayer()) return false;
+        
         String colorID = Mapper.getColorID(player.getColor());
         HashMap<String, Integer> units = new HashMap<>();
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -289,7 +291,7 @@ public class FoWHelper {
      */
     public static void pingSystem(Map activeMap, SlashCommandInteractionEvent event, String position, String message) {
         //get players adjacent
-        List<Player> players = FoWHelper.getAdjacentPlayers(activeMap, position);
+        List<Player> players = getAdjacentPlayers(activeMap, position);
         int successfulCount = 0;
         for (Player player_ : players) {
             String playerMessage = Helper.getPlayerRepresentation(event, player_, true) + " - System " + position + " has been pinged:\n> " + message;
