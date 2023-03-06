@@ -192,6 +192,9 @@ public class ConvertTTPGtoAsync {
         //     asyncMap.addCustomPO(objective, 1);
         // }
 
+        //EMPTY MAP FOR <AgendaName, Faction> to add Laws later
+        HashMap<String, String> electedPlayers = new HashMap<>();
+
         //PLAYER ORDER MAPPING
         // TTPG player array starts in bottom right and goes clockwise
         // Async player array starts at top and goes clockwise
@@ -249,6 +252,13 @@ public class ConvertTTPGtoAsync {
                         }
                     }
                 }
+            }
+
+            //PLAYER LAWS ELECTED
+            for (String ttpgLaw : ttpgPlayer.getLaws()) {
+                String asyncLaw = AliasHandler.resolveAgenda(ttpgLaw);
+                electedPlayers.put(asyncLaw, asyncPlayer.getFaction());
+                if (asyncLaw.equals("warrant")) asyncPlayer.setSearchWarrant();
             }
 
             //PLAYER SUPPORT FOR THE THRONE
@@ -413,12 +423,21 @@ public class ConvertTTPGtoAsync {
         asyncMap.setAgendas(agendaCards);
 
         // AGENDA DISCARD
-        ArrayList<String> ttpgAgendaDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardAction().getDiscard();
+        ArrayList<String> ttpgAgendaDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardAgenda().getDiscard();
+        ArrayList<String> ttpgLawsInPlay = (ArrayList<String>) ttpgMap.getLaws();
         ArrayList<String> agendaDiscards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgAgendaDiscards)) addAll(ttpgAgendaDiscards);
+            if (Objects.nonNull(ttpgLawsInPlay)) addAll(ttpgLawsInPlay);
             replaceAll(card -> AliasHandler.resolveAgenda(card));
         }};
         asyncMap.setDiscardAgendas(agendaDiscards);
+
+        //ADD LAWS
+        for (String law : ttpgLawsInPlay) {
+            int agendaID = asyncMap.getDiscardAgendas().get(AliasHandler.resolveAgenda(law));
+            String electedFaction = electedPlayers.get(AliasHandler.resolveAgenda(law));
+            asyncMap.addLaw(agendaID, electedFaction);
+        }
 
         // EXPLORATION DECK
         ArrayList<String> ttpgExploreCulturalCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDeck();
