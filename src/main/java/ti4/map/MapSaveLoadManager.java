@@ -7,6 +7,9 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 
 import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -23,6 +26,7 @@ import java.util.*;
 public class MapSaveLoadManager {
 
     public static final String TXT = ".txt";
+    public static final String JSON = ".json";
     public static final String TILE = "-tile-";
     public static final String UNITS = "-units-";
     public static final String UNITHOLDER = "-unitholder-";
@@ -57,6 +61,14 @@ public class MapSaveLoadManager {
     }
 
     public static void saveMap(Map map, boolean keepModifiedDate) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.writeValue(Storage.getMapsJSONStorage(map.getName() + JSON), map);
+        } catch (IOException e) {
+            // Do nothing
+            // e.printStackTrace();
+        }       
+        
         File mapFile = Storage.getMapImageStorage(map.getName() + TXT);
         if (mapFile != null) {
             saveUndo(map, mapFile);
