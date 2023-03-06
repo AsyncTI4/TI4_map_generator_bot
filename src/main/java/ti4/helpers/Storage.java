@@ -12,6 +12,7 @@ public class Storage {
 
     public static final String MAPS_UNDO = "/maps/undo/";
     public static final String MAPS = "/maps/";
+    public static final String MAPS_JSON = "/maps_json/";
     public static final String DELETED_MAPS = "/deletedmaps/";
     public static final String TTPG_EXPORTS = "/ttpg_exports/";
     private static Font TI_FONT_20 = null;
@@ -153,11 +154,22 @@ public class Storage {
         return new File(getStoragePath() + TTPG_EXPORTS + fileName);
     }
 
+    @Nullable
+    public static File getMapsJSONDirectory() {
+        return new File(getStoragePath() + MAPS_JSON);
+    }
+
+    @Nullable
+    public static File getMapsJSONStorage(String fileName) {
+        return new File(getStoragePath() + MAPS_JSON + fileName);
+    }
+
     public static void init() {
         String resource = getStoragePath();
         if(resource!=null) {
             createDirectory(resource, DELETED_MAPS);
             createDirectory(resource, MAPS);
+            createDirectory(resource, MAPS_JSON);
             createDirectory(resource, TTPG_EXPORTS);
         }
     }
