@@ -436,10 +436,10 @@ public class ConvertTTPGtoAsync {
         asyncMap.setExploreDeck(exploreCards);
 
         // EXPLORATION DISCARD        
-        ArrayList<String> ttpgExploreCulturalDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDeck();
-        ArrayList<String> ttpgExploreHazardousDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationHazardous().getDeck();
-        ArrayList<String> ttpgExploreIndustrialDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationIndustrial().getDeck();
-        ArrayList<String> ttpgExploreFrontierDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationFrontier().getDeck();
+        ArrayList<String> ttpgExploreCulturalDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDiscard();
+        ArrayList<String> ttpgExploreHazardousDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationHazardous().getDiscard();
+        ArrayList<String> ttpgExploreIndustrialDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard();
+        ArrayList<String> ttpgExploreFrontierDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationFrontier().getDiscard();
         ArrayList<String> exploreDiscards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgExploreCulturalDiscards)) addAll(ttpgExploreCulturalDiscards);
             if (Objects.nonNull(ttpgExploreHazardousDiscards)) addAll(ttpgExploreHazardousDiscards);
