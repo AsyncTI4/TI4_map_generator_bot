@@ -363,7 +363,7 @@ public class ButtonListener extends ListenerAdapter {
         if (activeMap.isFoWMode() && sendPublic) {
             text = message;
         } else if (activeMap.isFoWMode() && !sendPublic) {
-            text = Helper.getPlayerRepresentation(event, player, false) + " " + emojiToUse.getFormatted() + " " + message;
+            text = Helper.getPlayerRepresentation(event, player, true) + " " + emojiToUse.getFormatted() + " " + message;
         }
 
         if (!additionalMessage.isEmpty()) {
