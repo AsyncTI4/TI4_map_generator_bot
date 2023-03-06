@@ -382,6 +382,22 @@ public class Helper {
         };
     }
 
+    public static String getToesEmoji(int count) {
+        return switch (count) {
+            case 0 -> Emojis.NoToes;
+            case 1 -> Emojis.OneToe;
+            case 2 -> Emojis.TwoToes;
+            case 3 -> Emojis.ThreeToes;
+            case 4 -> Emojis.FourToes;
+            case 5 -> Emojis.FiveToes;
+            case 6 -> Emojis.SixToes;
+            case 7 -> Emojis.SevenToes;
+            case 8 -> Emojis.EightToes;
+            case 9 -> Emojis.NineToes;
+            default -> Emojis.NoToes + count;
+        };
+    }
+
     /**
      * Takes an emoji's name string and returns its full name including ID.
      * @emojiName the name of the emoji as entered on the Emoji section of the server
