@@ -164,6 +164,12 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
                     message.append(" votes").toString();
                 }
                 case "techskip" -> message.append(" a tech skip").toString();
+                case "toes" -> { //For HolyT
+                    for (String planetID : planetIDs) {
+                        sum += Helper.getPlanetInfluence(planetID, getActiveMap());
+                    }
+                    message.append(Helper.getToesEmoji(sum) + " toes").toString();
+                }
                 default -> message.append(spendAs).toString();
             };
             return message.toString();
