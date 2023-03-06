@@ -426,6 +426,7 @@ public class MapSaveLoadManager {
             for (String key : fow_systems.keySet()) {
                 String system = fow_systems.get(key);
                 String label = fow_labels.get(key);
+                label.replaceAll(" ", "—"); //replace spaces with em dash
                 fogOfWarSystems.append(key);
                 fogOfWarSystems.append(",");
                 fogOfWarSystems.append(system);
@@ -940,8 +941,6 @@ public class MapSaveLoadManager {
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> setRole(player, tokenizer);
                 case Constants.PLAYER_PRIVATE_CHANNEL -> setChannel(player, tokenizer);
-                //TODO: Constants.CHANNEL_FOR_COMMUNITY is duplicative for renaming the property in the save file. Delete later
-                case Constants.CHANNEL_FOR_COMMUNITY -> setChannel(player, tokenizer);
                 case Constants.TACTICAL -> player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
@@ -1006,6 +1005,7 @@ public class MapSaveLoadManager {
                             String position = system[0];
                             String tileID = system[1];
                             String label = system[2];
+                            label.replaceAll("—", " "); //replace em dash with spaces
                             player.addFogTile(tileID, position, label);
                         }
                     } catch (Exception e) {
@@ -1060,11 +1060,6 @@ public class MapSaveLoadManager {
         String id = tokenizer.nextToken();
         Role roleById = MapGenerator.jda.getRoleById(id);
         player.setRoleForCommunity(roleById);
-        
-        //TODO: REMOVE THIS ONCE PRANK IS COMPLETE
-        if (id.equals("1078097405611872358")) { //green team in CPTI
-            player.setFogFilter("frog");
-        }
     }
 
     private static Tile readTile(String tileData) {
