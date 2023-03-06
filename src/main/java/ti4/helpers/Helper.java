@@ -570,7 +570,7 @@ public class Helper {
         }
         String mention = userById.getAsMention();
         if (player.getUserID().equals("154000388121559040")) {
-            mention += " " + Emoji.fromFormatted(Emojis.BortWindow);
+            mention += " " + Emojis.BortWindow;
         }
         return mention;
     }
