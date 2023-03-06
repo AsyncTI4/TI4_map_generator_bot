@@ -240,6 +240,13 @@ public class Helper {
         return emote;
     }
 
+    public static String getRandomGoodDog() {
+        List<String> goodDogs = new ArrayList<>(Emojis.GoodDogs);
+        Random seed = new Random();
+        Collections.shuffle(goodDogs, seed);
+        return goodDogs.get(0);
+    }
+
     public static String getFactionIconFromDiscord(String faction) {
         if (faction == null) {
             return getRandomizedEmoji(0, null);
@@ -372,6 +379,22 @@ public class Helper {
             case 8 -> Emojis.Resources_8;
             case 9 -> Emojis.Resources_9;
             default -> Emojis.resources + count;
+        };
+    }
+
+    public static String getToesEmoji(int count) {
+        return switch (count) {
+            case 0 -> Emojis.NoToes;
+            case 1 -> Emojis.OneToe;
+            case 2 -> Emojis.TwoToes;
+            case 3 -> Emojis.ThreeToes;
+            case 4 -> Emojis.FourToes;
+            case 5 -> Emojis.FiveToes;
+            case 6 -> Emojis.SixToes;
+            case 7 -> Emojis.SevenToes;
+            case 8 -> Emojis.EightToes;
+            case 9 -> Emojis.NineToes;
+            default -> Emojis.NoToes + count;
         };
     }
 
@@ -538,7 +561,7 @@ public class Helper {
             case "biotictech" -> Emojis.BioticTech;
             case "warfaretech" -> Emojis.WarfareTech;
 
-            default -> Emojis.GoodDog;
+            default -> getRandomGoodDog();
         };
     }
 

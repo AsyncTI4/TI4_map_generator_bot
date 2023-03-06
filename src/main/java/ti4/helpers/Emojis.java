@@ -233,6 +233,22 @@ public class Emojis {
     //GOOD DOGS
     public static final String GoodDog = "<:GoodDog:1068567308819255316>";
     public static final String Ozzie = "<:Ozzie:1069446695689134140>";
+    public static final String Summer = "<:Summer:1070283656037412884>";
+    
+    //LIST OF GOOD DOGS
+    public static List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer);
+
+    //TOES
+    public static final String NoToes = "<:NoToes:1082312430706774016>";
+    public static final String OneToe = "<:OneToe:1082312540450734111>";
+    public static final String TwoToes = "<:TwoToes:1082312612978634793>";
+    public static final String ThreeToes = "<:ThreeToes:1082312642275852420>";
+    public static final String FourToes = "<:FourToes:1082312665982054421>";
+    public static final String FiveToes = "<:FiveToes:1082312691697332254>";
+    public static final String SixToes = "<:SixToes:1082312718666694737>";
+    public static final String SevenToes = "<:SevenToes:1082312739952808017>";
+    public static final String EightToes = "<:EightToes:1082312762572685352>";
+    public static final String NineToes = "<:NineToes:1082312788241817661>";
 
     //OTHER
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
