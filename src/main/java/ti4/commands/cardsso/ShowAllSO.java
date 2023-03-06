@@ -1,10 +1,8 @@
 package ti4.commands.cardsso;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.MapGenerator;
 import ti4.commands.cards.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -13,7 +11,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.LinkedHashMap;
+import java.util.*;
 
 public class ShowAllSO extends SOCardsSubcommandData {
     public ShowAllSO() {
@@ -35,9 +33,10 @@ public class ShowAllSO extends SOCardsSubcommandData {
         sb.append("Game: ").append(activeMap.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Showed Secret Objectives:").append("\n");
-        LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>(player.getSecrets());
+        List<String> secrets = new ArrayList<>(player.getSecrets().keySet());
         LinkedHashMap<String, Integer> secretsScored = player.getSecretsScored();
-        for (String id : secrets.keySet()) {
+        Collections.shuffle(secrets);
+        for (String id : secrets) {
             sb.append(Mapper.getSecretObjective(id)).append("\n");
             if (!secretsScored.containsKey(id)) {
                 player.setSecret(id);
@@ -49,12 +48,8 @@ public class ShowAllSO extends SOCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
         }
-        User user = MapGenerator.jda.getUserById(player_.getUserID());
-        if (user == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
-            return;
-        }
-        MessageHelper.sendMessageToUser(sb.toString(), user);
+
+        MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
 }

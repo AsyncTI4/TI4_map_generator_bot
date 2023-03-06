@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -14,7 +13,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.MapGenerator;
 import ti4.commands.cards.CardsInfo;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
@@ -205,18 +203,48 @@ public class MessageHelper {
         }
     }
 
-    public static void sendPrivateMessageToPlayer(Player player, Map map, SlashCommandInteractionEvent event, String messageText, String failText, String successText) {
-        sendPrivateMessageToPlayer(player, map, event.getChannel(), messageText, failText, successText);
+    /** Send a private message to the player.
+     * 
+     * @param player Player to send a message to
+     * @param map Active map
+     * @param event Event that caused the message
+     * @param messageText Message to send
+     * @param failText Feedback if the message failed to send
+     * @param successText Feedback if the message successfully sent
+     * @return True if the message was send successfully, false otherwise
+     */
+    public static boolean sendPrivateMessageToPlayer(Player player, Map map, SlashCommandInteractionEvent event, String messageText, String failText, String successText) {
+        return sendPrivateMessageToPlayer(player, map, event.getChannel(), messageText, failText, successText);
     }
 
-    public static void sendPrivateMessageToPlayer(Player player, Map map, String messageText, String failText, String successText) {
-        sendPrivateMessageToPlayer(player, map, (MessageChannel) null, messageText, failText, successText);
+    /** Send a private message to the player. 
+     * <p>
+     * This implementation does not provide feedback
+     *
+     * @param player Player to send a message to
+     * @param map Active map
+     * @param messageText Message to send
+     * @return True if the message was send successfully, false otherwise
+     */
+    public static boolean sendPrivateMessageToPlayer(Player player, Map map, String messageText) {
+        return sendPrivateMessageToPlayer(player, map, (MessageChannel) null, messageText, null, null);
     }
 
-    public static void sendPrivateMessageToPlayer(Player player, Map map, MessageChannel feedbackChannel, String messageText, String failText, String successText) {
+    /** Send a private message to the player.
+     * 
+     * @param player Player to send a message to
+     * @param map Active map
+     * @param feedbackChannel Channel to send feedback to
+     * @param messageText Message to send
+     * @param failText Feedback if the message failed to send
+     * @param successText Feedback if the message successfully sent
+     * @return True if the message was send successfully, false otherwise
+     */
+    public static boolean sendPrivateMessageToPlayer(Player player, Map map, MessageChannel feedbackChannel, String messageText, String failText, String successText) {
         User user = MapGenerator.jda.getUserById(player.getUserID());
         if (user == null) {
             sendMessageToChannel(feedbackChannel, failText);
+            return false;
         } else {
             MessageChannel privateChannel = player.getPrivateChannel();
             if (privateChannel == null) {
@@ -225,6 +253,7 @@ public class MessageHelper {
                 sendMessageToChannel(privateChannel, messageText);
             }
             sendMessageToChannel(feedbackChannel, successText);
+            return true;
         }
     }
 

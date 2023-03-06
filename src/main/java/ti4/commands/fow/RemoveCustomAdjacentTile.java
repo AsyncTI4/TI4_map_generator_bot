@@ -8,9 +8,6 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
 
-import java.util.Arrays;
-import java.util.List;
-
 public class RemoveCustomAdjacentTile extends FOWSubcommandData {
     public RemoveCustomAdjacentTile() {
         super(Constants.REMOVE_CUSTOM_ADJACENT_TILES, "Remove Custom Adjacent Tiles. ");

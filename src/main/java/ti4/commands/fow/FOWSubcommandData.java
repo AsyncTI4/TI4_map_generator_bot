@@ -3,9 +3,15 @@ package ti4.commands.fow;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+
+import java.io.File;
+
 import org.jetbrains.annotations.NotNull;
+
+import ti4.generator.GenerateMap;
 import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
 public abstract class FOWSubcommandData extends SubcommandData {
@@ -37,6 +43,11 @@ public abstract class FOWSubcommandData extends SubcommandData {
     }
 
     public void reply(SlashCommandInteractionEvent event) {
-        MessageHelper.replyToMessageTI4Logo(event);
+        String userID = event.getUser().getId();
+        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        MapSaveLoadManager.saveMap(activeMap);
+
+        File file = GenerateMap.getInstance().saveImage(activeMap, event);
+        MessageHelper.replyToMessage(event, file);
     }
 }

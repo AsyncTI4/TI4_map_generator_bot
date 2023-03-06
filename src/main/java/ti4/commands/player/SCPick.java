@@ -57,7 +57,7 @@ public class SCPick extends PlayerSubcommandData {
             Queue<Player> players = new ArrayDeque<>(activePlayers);
             while (players.iterator().hasNext()) {
                 Player player_ = players.poll();
-                if (player_ == null || player_.getFaction() == null || "null".equals(player_.getFaction())) {
+                if (player_ == null || !player_.isActivePlayer()) {
                     continue;
                 }
                 if (nextCorrectPing && player_.getSC() == 0 && player_.getFaction() != null) {

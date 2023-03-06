@@ -9,7 +9,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.LinkedHashMap;
+import java.util.*;
 
 public class ShowAllSOToAll extends SOCardsSubcommandData {
     public ShowAllSOToAll() {
@@ -32,7 +32,8 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
         sb.append("Game: ").append(activeMap.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
 
-        LinkedHashMap<String, Integer> secretObjective = activeMap.getSecretObjective(player.getUserID());
+        List<String> secretObjectives = new ArrayList<>(activeMap.getSecretObjective(player.getUserID()).keySet());
+        Collections.shuffle(secretObjectives);
         LinkedHashMap<String, Integer> scoredSecretObjective = new LinkedHashMap<>(activeMap.getScoredSecretObjective(player.getUserID()));
         for (String id : activeMap.getSoToPoList()) {
             scoredSecretObjective.remove(id);
@@ -42,10 +43,10 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
         sb.append("\n");
         sb.append("**Secret Objectives:**").append("\n");
         int index = 1;
-        if (secretObjective != null) {
-            for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
-                sb.append(index).append(" - ").append(Mapper.getSecretObjective(so.getKey())).append("\n");
-                player.setSecret(so.getKey());
+        if (secretObjectives != null) {
+            for (String so : secretObjectives) {
+                sb.append(index).append(" - ").append(Mapper.getSecretObjective(so)).append("\n");
+                player.setSecret(so);
                 index++;
             }
         }

@@ -25,13 +25,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 public class ButtonListener extends ListenerAdapter {
@@ -147,7 +141,6 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(event.getChannel(), message);
                     }
                     addReaction(event, false, false, null, "");
-                    
                 }
                 case Constants.SO_NO_SCORING -> {
                     String message = Helper.getPlayerRepresentation(event, player) + " - no Secret Objective scored.";
@@ -273,7 +266,7 @@ public class ButtonListener extends ListenerAdapter {
             String defaultText = text.isEmpty() ? "Secondary of Strategy Card" : text;
             String message = "Player: " + Helper.getPlayerPing(player) + " already used " + defaultText;
             if (map.isFoWMode()) {
-                MessageHelper.sendPrivateMessageToPlayer(player, map, message, null, null);
+                MessageHelper.sendPrivateMessageToPlayer(player, map, message);
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), message);
             }
@@ -310,8 +303,8 @@ public class ButtonListener extends ListenerAdapter {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), userID);
-        if (player == null) {
-            event.getChannel().sendMessage("You're not a player of the game").queue();
+        if (player == null || !player.isActivePlayer()) {
+            event.getChannel().sendMessage("You're not an active player of the game").queue();
             return;
         }
         String playerFaction = player.getFaction();
@@ -331,6 +324,7 @@ public class ButtonListener extends ListenerAdapter {
                 emojiMap.put(emoji.getName().toLowerCase(), emoji);
             }
         }
+        
         Emoji emojiToUse = emojiMap.get(playerFaction.toLowerCase());
         if (emojiToUse == null) emojiToUse = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(playerFaction));
         Message mainMessage = event.getInteraction().getMessage();
@@ -338,72 +332,52 @@ public class ButtonListener extends ListenerAdapter {
 
         if (activeMap.isFoWMode()) {
             int index = 0;
-            for(java.util.Map.Entry<String, Player> entry : activeMap.getPlayers().entrySet()) {
-                if (entry.getValue() == player) break;
+            for (Player player_ : activeMap.getPlayers().values()) {
+                if (player_ == player) break;
                 index++;
             }
-            emojiToUse = getRandomizedEmoji(index, messageId);
-            if (emojiToUse == null) {
-                event.getChannel().sendMessage("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
-            } else {
-                event.getChannel().addReactionById(messageId, emojiToUse).queue();
-            }
+            emojiToUse = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, messageId));
+            event.getChannel().addReactionById(messageId, emojiToUse).queue();
         }
         
         if (!skipReaction) {
-            if (emojiToUse == null) {
-                event.getChannel().sendMessage("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
-                return;
-            } else {
-                event.getChannel().addReactionById(messageId, emojiToUse).queue();
-            }
-            if (!activeMap.isFoWMode()) checkForAllReactions(event);
-            if (activeMap.isFoWMode()) return;
+            event.getChannel().addReactionById(messageId, emojiToUse).queue();
+            checkForAllReactions(event, activeMap);
             if (message == null || message.isEmpty()) return;
         } 
         
 
         boolean foundThread = false;
-        String text = Helper.getPlayerRepresentation(event, player, !sendPublic) + " " + message;
-        if (activeMap.isFoWMode()) {
+        String text = Helper.getPlayerRepresentation(event, player) + " " + message;
+        if (activeMap.isFoWMode() && sendPublic) {
             text = message;
+        } else if (activeMap.isFoWMode() && !sendPublic) {
+            text = Helper.getPlayerRepresentation(event, player, false) + " " + emojiToUse.getFormatted() + " " + message;
         }
 
         if (!additionalMessage.isEmpty()) {
             text += Helper.getGamePing(event.getGuild(), activeMap) + " " + additionalMessage;
         }
+
+        if (activeMap.isFoWMode() && !sendPublic) {
+            MessageHelper.sendPrivateMessageToPlayer(player, activeMap, text);
+            return;
+        }
         List<ThreadChannel> threadChannels = guild.getThreadChannels();
         for (ThreadChannel threadChannel : threadChannels) {
             if (threadChannel.getId().equals(messageId)) {
-                if (activeMap.isFoWMode() && !sendPublic) {
-                    MessageHelper.sendPrivateMessageToPlayer(player, activeMap, text, null, null);
-                } else {
-                    MessageHelper.sendMessageToChannel(threadChannel, text);
-                }
+                MessageHelper.sendMessageToChannel(threadChannel, text);
                 foundThread = true;
                 break;
             }
         }
 
         if (!foundThread) {
-            if (activeMap.isFoWMode() && !sendPublic) {
-                MessageHelper.sendPrivateMessageToPlayer(player, activeMap, text, null, null);
-            } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), text);
-            }
+            MessageHelper.sendMessageToChannel(event.getChannel(), text);
         }
     }
 
-    public Emoji getRandomizedEmoji(int value, String messageID) {
-        List<String> symbols = new ArrayList<>(Emojis.symbols);
-        Random seed = new Random(messageID.hashCode());
-        Collections.shuffle(symbols, seed);
-        
-        String emote = symbols.get(value);
-        return emote == null ? null : Emoji.fromFormatted(emote);
-    }
-
-    private void checkForAllReactions(@NotNull ButtonInteractionEvent event) {
+    private void checkForAllReactions(@NotNull ButtonInteractionEvent event, Map map) {
         String messageId = event.getInteraction().getMessage().getId();
 
         Message mainMessage = event.getMessageChannel().retrieveMessageById(messageId).completeAfter(500, TimeUnit.MILLISECONDS);
@@ -412,7 +386,7 @@ public class ButtonListener extends ListenerAdapter {
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         int matchingFactionReactions = 0;
         for (Player player : activeMap.getPlayers().values()) {
-            if (player.isDummy()) {
+            if (!player.isActivePlayer()) {
                 matchingFactionReactions++;
                 continue;
             }
@@ -420,15 +394,28 @@ public class ButtonListener extends ListenerAdapter {
             String faction = player.getFaction();
             if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
 
-            MessageReaction reaction = mainMessage.getReaction(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction)));
+            Emoji reactionEmoji = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction));
+            if (map.isFoWMode()) {
+                int index = 0;
+                for (Player player_ : activeMap.getPlayers().values()) {
+                    if (player_ == player) break;
+                    index++;
+                }
+                reactionEmoji = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, event.getMessageId()));
+            }
+            MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
             if (reaction != null) matchingFactionReactions++;
         }
 
         int numberOfPlayers = activeMap.getPlayers().size();
         // BotLogger.log(event, matchingFactionReactions + "/" + numberOfPlayers + " factions have reacted");
         if (matchingFactionReactions >= numberOfPlayers) {
-            // BotLogger.log(event, "**all factions have reacted**");
-            addReaction(event, true, false, " was last to react\n", " - all factions have reacted");
+            String message = " was last to react\n";
+            String additionalMessage = " - all factions have reacted";
+            if (map.isFoWMode()) {
+                message = "";
+            }
+            addReaction(event, true, true, message, additionalMessage);
         }
     }
 }

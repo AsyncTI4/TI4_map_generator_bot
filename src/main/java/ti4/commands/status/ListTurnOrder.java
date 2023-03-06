@@ -28,8 +28,7 @@ public class ListTurnOrder extends StatusSubcommandData {
             HashMap<Integer, String> order = new HashMap<>();
             int naaluSC = 0;
             for (Player player : map.getPlayers().values()) {
-                if (player.getFaction() == null || "null".equals(player.getFaction()) ||
-                    player.getColor() == null || player.getColor().equals("null")){
+                if (!player.isActivePlayer()){
                     continue;
                 }
                 int sc = player.getSC();
@@ -38,8 +37,6 @@ public class ListTurnOrder extends StatusSubcommandData {
                     naaluSC = sc;
                 }
                 boolean passed = player.isPassed();
-                String userName = player.getUserName();
-                String color = player.getColor();
                 HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
                 Boolean found = scPlayed.get(sc);
                 boolean isPlayed = found != null ? found : false;

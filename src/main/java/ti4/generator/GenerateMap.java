@@ -136,10 +136,10 @@ public class GenerateMap {
                 fowPlayer = Helper.getGamePlayer(map, player, event, null);
 
                 Set<String> tilesToShow = fowFilter(map);
+                updatePlayerFogTiles(map, fowPlayer, tilesToShow);
+                
                 Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
                 keys.removeAll(tilesToShow);
-                updatePlayerFogFilter(map, fowPlayer, tilesToShow);
-
                 for (String key : keys) {
                     tilesToDisplay.remove(key);
                     tilesToDisplay.put(key, fowPlayer.buildFogTile(key));
@@ -221,174 +221,31 @@ public class GenerateMap {
     }
 
     private Set<String> fowFilter(Map map) {
-        
         Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
         if (fowPlayer != null) {
-            java.util.Map<String, String> colorToId = Mapper.getColorToId();
-            java.util.Map<String, String> unitRepresentation = Mapper.getUnits();
+            // Get all tiles with the player in it
             for (java.util.Map.Entry<String, Tile> tileEntry : tilesToDisplay.entrySet()) {
-                Tile tile = tileEntry.getValue();
-                String tileID = tileEntry.getKey();
-                Set<String> unitHolderNames = tile.getUnitHolders().keySet();
-                List<String> playerPlanets = fowPlayer.getPlanets();
-                if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
-                    tilesWithPlayerUnitsPlanets.add(tileID);
-                    continue;
+                if (FoWHelper.playerIsInSystem(map, tileEntry.getValue(), fowPlayer)) {
+                    tilesWithPlayerUnitsPlanets.add(tileEntry.getKey());
                 }
-                if ("18".equals(tile.getTileID()) && fowPlayer.getTechs().contains("iihq")) {
-                    tilesWithPlayerUnitsPlanets.add(tileID);
-                    continue;
-                }
-                if ("s11".equals(tile.getTileID()) && "cabal".equals(fowPlayer.getFaction())) {
-                    tilesWithPlayerUnitsPlanets.add(tileID);
-                    continue;
-                }
-                if ("s12".equals(tile.getTileID()) && "nekro".equals(fowPlayer.getFaction())) {
-                    tilesWithPlayerUnitsPlanets.add(tileID);
-                    continue;
-                }
-                if ("s13".equals(tile.getTileID()) && "yssaril".equals(fowPlayer.getFaction())) {
-                    tilesWithPlayerUnitsPlanets.add(tileID);
-                    continue;
-                }
-                unitCheck(fowPlayer, tilesWithPlayerUnitsPlanets, colorToId, unitRepresentation, tile, tileID);
             }
+            
             Set<String> tileIDsToShow = new HashSet<>(tilesWithPlayerUnitsPlanets);
             for (String tileID : tilesWithPlayerUnitsPlanets) {
-                Set<String> hyperlaneAdjacentTiles = traverseAdjacencies(map, tileID, -1, new HashSet<>(), null);
-
-                for (String tileID_ : hyperlaneAdjacentTiles) {
-                    if (tileID_ != "x") {
-                        tileIDsToShow.add(tileID_);
-                    }
-                }
-                List<String> adjacentCustomTiles = map.getCustomAdjacentTiles().get(tileID);
-                if (adjacentCustomTiles != null) {
-                    tileIDsToShow.addAll(adjacentCustomTiles);
-                }
-                Tile tile = tilesToDisplay.get(tileID);
-                Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
-                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    HashSet<String> tokenList = unitHolder.getTokenList();
-                    for (String token : tokenList) {
-                        if (token.contains(Constants.ALPHA)) {
-                            wormholeIDs.add(Constants.ALPHA);
-                            if ("ghost".equals(fowPlayer.getFaction()) 
-                                || map.getLaws().keySet().contains("wormhole_recon") 
-                                || map.getLaws().keySet().contains("absol_recon")) 
-                            {
-                                wormholeIDs.add(Constants.BETA);
-                            }
-                        } else if (token.contains(Constants.BETA)) {
-                            wormholeIDs.add(Constants.BETA);
-                            if ("ghost".equals(fowPlayer.getFaction()) 
-                                || map.getLaws().keySet().contains("wormhole_recon") 
-                                || map.getLaws().keySet().contains("absol_recon")) 
-                            {
-                                wormholeIDs.add(Constants.ALPHA);
-                            }
-                        } else if (token.contains(Constants.GAMMA)) {
-                            wormholeIDs.add(Constants.GAMMA);
-                        } else if (token.contains(Constants.DELTA)) {
-                            wormholeIDs.add(Constants.DELTA);
-                        }
-                    }
-                }
-
-                for (String wormholeID : wormholeIDs) {
-                    Set<String> wormholesTiles = Mapper.getWormholesTiles(wormholeID);
-                    for (java.util.Map.Entry<String, Tile> tileEntry : tilesToDisplay.entrySet()) {
-                        String position = tileEntry.getKey();
-                        if (tileIDsToShow.contains(position)) {
-                            continue;
-                        }
-                        Tile tile_ = tileEntry.getValue();
-                        if (wormholesTiles.contains(tile_.getTileID())) {
-                            tileIDsToShow.add(position);
-                            continue;
-                        }
-                        for (UnitHolder unitHolder : tile_.getUnitHolders().values()) {
-                            HashSet<String> tokenList = unitHolder.getTokenList();
-                            for (String token : tokenList) {
-                                if (token.contains(wormholeID)) {
-                                    tileIDsToShow.add(position);
-                                }
-                            }
-                        }
-                    }
-                }
+                Set<String> adjacentTiles = FoWHelper.getAdjacentTiles(map, tileID, fowPlayer);
+                tileIDsToShow.addAll(adjacentTiles);
             }
             return tileIDsToShow;
         }
         return Collections.emptySet();
     }
 
-    private Set<String> traverseAdjacencies(Map map, String tileID, Integer sourceDirection, Set<String> exploredSet, String prevTile) {
-        Set<String> tiles = new HashSet<>();
-        if (exploredSet.contains(tileID + sourceDirection))
-            return tiles; // We already explored this tile from this direction!
-        exploredSet.add(tileID + sourceDirection); // mark it as explored
-
-        Tile currentTile = map.getTileByPosition(tileID);
-        if (currentTile == null) return tiles; //could not load the requested tile
-        List<Boolean> hyperlaneData = currentTile.getHyperlaneData(sourceDirection);
-        if (hyperlaneData != null && hyperlaneData.size() == 0)
-            return tiles; // We could not load the hyperlane data correctly, quit
-
-        tiles.add(tileID); // we are allowed to at least *see* this tile!!
-        if (hyperlaneData == null && sourceDirection != -1)
-            return tiles; //do not explore non-hyperlanes except for your starting space
-        List<String> directlyAdjacentTiles = Mapper.getAdjacentTilesIDs(tileID);
-
-        if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6)
-            return tiles; //adjacency file for this tile is not filled in
-        // for each adjacent tile...
-        for (int i = 0; i < 6; i++) {
-            String tileID_ = directlyAdjacentTiles.get(i);
-
-            if (tileID_ == "x")
-                continue; // the tile doesn't exist, skip.
-
-            if (hyperlaneData != null && !hyperlaneData.get(i))
-                continue; // the hyperlane doesn't go that direction, skip.
-
-            // explore that tile now!
-            Set<String> newTiles = traverseAdjacencies(map, tileID_, (i + 3) % 6, exploredSet, tileID + sourceDirection);
-            tiles.addAll(newTiles);
-        }
-        return tiles;
-    }
-
-    private void updatePlayerFogFilter(Map map, Player player, Set<String> tileKeys) {
+    private void updatePlayerFogTiles(Map map, Player player, Set<String> tileKeys) {
         for (String key_ : tileKeys) {
             Tile tileToUpdate = map.getTileByPosition(key_);
 
             if (tileToUpdate != null) {
-                player.updateFogFilter(tileToUpdate);
-            }
-        }
-    }
-
-    private static void unitCheck(Player player, Set<String> tilesWithPlayerUnitsAndAdjacent, java.util.Map<String, String> colorToId, java.util.Map<String, String> unitRepresentation, Tile tile, String tileID) {
-        units_break:
-        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            HashMap<String, Integer> units = unitHolder.getUnits();
-            for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-                String key = unitEntry.getKey();
-                for (String unitRepresentationKey : unitRepresentation.keySet()) {
-                    if (key.endsWith(unitRepresentationKey)) {
-                        for (java.util.Map.Entry<String, String> colorEntry : colorToId.entrySet()) {
-                            String colorKey = colorEntry.getKey();
-                            String color = colorEntry.getValue();
-                            if (key.contains(colorKey)) {
-                                if (Objects.equals(player.getColor(), color)) {
-                                    tilesWithPlayerUnitsAndAdjacent.add(tileID);
-                                    break units_break;
-                                }
-                            }
-                        }
-                    }
-                }
+                player.updateFogTile(tileToUpdate, "Round " + map.getRound());
             }
         }
     }
@@ -411,15 +268,6 @@ public class GenerateMap {
             BotLogger.log("Could not find faction: " + factionID);
         }
         return factionFile;
-    }
-
-    private String getGeneralPath(String tokenID) {
-        String fileName = Mapper.getGeneralFileName(tokenID);
-        String filePath = ResourceHelper.getInstance().getGeneralFile(fileName);
-        if (filePath == null) {
-            BotLogger.log("Could not find general token: " + tokenID);
-        }
-        return filePath;
     }
 
     private void gameInfo(Map map, DisplayType displayType) throws IOException {
@@ -1153,13 +1001,17 @@ public class GenerateMap {
             g2.drawRect(i * width, y, width, height);
         }
 
-        Collection<Player> players = map.getPlayers().values();
+        List<Player> players = new ArrayList<>(map.getPlayers().values());
         int tempCounter = 0;
         int tempX = 0;
         int tempWidth = 0;
         BufferedImage factionImage = null;
 
+        if(isFoWPrivate != null && isFoWPrivate) {
+            Collections.shuffle(players);
+        }
         for (Player player : players) {
+            if(!player.isActivePlayer()) continue;
             try {
                 boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !canSeeStatsOfPlayer(player, fowPlayer);
                 String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
@@ -1212,8 +1064,7 @@ public class GenerateMap {
     public static String getSCNumberIfNaaluInPlay(Player player, Map map, String scText) {
         if (Constants.NAALU.equals(player.getFaction())) {
             boolean giftPlayed = false;
-            Collection<Player> activePlayers = map.getPlayers().values().stream()
-                    .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("null")).toList();
+            Collection<Player> activePlayers = map.getPlayers().values().stream().filter(player_ -> player_.isActivePlayer()).toList();
             for (Player player_ : activePlayers) {
                 if (player != player_ && player_.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
                     giftPlayed = true;
@@ -1265,13 +1116,16 @@ public class GenerateMap {
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
         Player speaker = map.getPlayer(map.getSpeaker());
+        List<Player> players = new ArrayList<>(map.getPlayers().values());
+        if (isFoWPrivate != null && isFoWPrivate) {
+            Collections.shuffle(players);
+        }
 
-        for (java.util.Map.Entry<String, Player> playerEntry : map.getPlayers().entrySet()) {
+        for (Player player : players) {
             ArrayList<Point> points = PositionMapper.getPlayerPosition(playerPosition, map);
             if (points.isEmpty()) {
                 continue;
             }
-            Player player = playerEntry.getValue();
             String userName = player.getUserName();
 
             boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !canSeeStatsOfPlayer(player, fowPlayer);
@@ -1345,6 +1199,15 @@ public class GenerateMap {
         }
 
 
+    }
+
+    private boolean canSeeStatsOfFaction(Map map, String faction, Player viewingPlayer) {
+        for (Player player : map.getPlayers().values()) {
+            if (faction.equals(player.getFaction())) {
+                return canSeeStatsOfPlayer(player, viewingPlayer);
+            }
+        }
+        return false;
     }
 
     private boolean canSeeStatsOfPlayer(Player player, Player viewingPlayer) {
@@ -1760,16 +1623,24 @@ public class GenerateMap {
         return y;
     }
 
-    private int displayObjectives(int y, int x, LinkedHashMap<String, List<String>> scoredPublicObjectives, LinkedHashMap<String, Integer> revealedPublicObjectives,
-                                  LinkedHashMap<String, Player> players, HashMap<String, String> publicObjectivesState, Set<String> po, Integer objectiveWorth,
-                                  Integer[] column, LinkedHashMap<String, Integer> customPublicVP, boolean justCalculate, boolean fixedColumn, Graphics graphics, HashMap<Player, Integer> userVPs) {
+    private int displayObjectives(
+        int y,
+        int x,
+        LinkedHashMap<String, List<String>> scoredPublicObjectives,
+        LinkedHashMap<String, Integer> revealedPublicObjectives,
+        LinkedHashMap<String, Player> players,
+        HashMap<String, String> publicObjectivesState,
+        Set<String> po,
+        Integer objectiveWorth,
+        Integer[] column,
+        LinkedHashMap<String, Integer> customPublicVP,
+        boolean justCalculate,
+        boolean fixedColumn,
+        Graphics graphics,
+        HashMap<Player, Integer> userVPs
+    ) {
         Set<String> keysToRemove = new HashSet<>();
         for (java.util.Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
-//            switch (column[0]) {
-//                case 0 -> x = 5;
-//                case 1 -> x = 801;
-//                case 2 -> x = 1598;
-//            }
             if (fixedColumn) {
                 x = 50;
             }
@@ -1798,7 +1669,7 @@ public class GenerateMap {
                 }
             }
             List<String> scoredPlayerID = scoredPublicObjectives.get(key);
-            boolean multiScoring = Constants.CUSTODIAN.equals(key);
+            boolean multiScoring = Constants.CUSTODIAN.equals(key) || (isFoWPrivate != null && isFoWPrivate);
             if (scoredPlayerID != null) {
                 if (fixedColumn) {
                     drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, false, objectiveWorth, justCalculate, true, graphics, userVPs);
@@ -1821,13 +1692,32 @@ public class GenerateMap {
         return y;
     }
 
-    private void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID,
-                                         boolean multiScoring, Integer objectiveWorth, boolean justCalculate, Graphics graphics, HashMap<Player, Integer> userVPs) {
+    private void drawScoreControlMarkers(
+        int x,
+        int y,
+        LinkedHashMap<String, Player> players,
+        List<String> scoredPlayerID,
+        boolean multiScoring,
+        Integer objectiveWorth,
+        boolean justCalculate,
+        Graphics graphics,
+        HashMap<Player, Integer> userVPs
+    ) {
         drawScoreControlMarkers(x, y, players, scoredPlayerID, multiScoring, objectiveWorth, justCalculate, false, graphics, userVPs);
     }
 
-    private void drawScoreControlMarkers(int x, int y, LinkedHashMap<String, Player> players, List<String> scoredPlayerID,
-                                         boolean multiScoring, Integer objectiveWorth, boolean justCalculate, boolean fixedColumn, Graphics graphics, HashMap<Player, Integer> userVPs) {
+    private void drawScoreControlMarkers(
+        int x,
+        int y,
+        LinkedHashMap<String, Player> players,
+        List<String> scoredPlayerID,
+        boolean multiScoring,
+        Integer objectiveWorth,
+        boolean justCalculate,
+        boolean fixedColumn,
+        Graphics graphics,
+        HashMap<Player, Integer> userVPs
+    ) {
         try {
             int tempX = 0;
             BufferedImage factionImage = null;
@@ -1993,7 +1883,7 @@ public class GenerateMap {
     private void addTile(Tile tile, Map map, boolean justTile) {
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
-            BufferedImage fogOfWar = ImageIO.read(new File(tile.getFowTilePath()));
+            BufferedImage fogOfWar = ImageIO.read(new File(tile.getFowTilePath(fowPlayer)));
             boolean tileIsFoggy = isFoWPrivate != null && isFoWPrivate && tile.hasFog();
 
             Point positionPoint = PositionMapper.getTilePosition(tile.getPosition(), map);
@@ -2016,7 +1906,7 @@ public class GenerateMap {
             }
 
             if (tileIsFoggy) return;
-
+            
             ArrayList<Rectangle> rectangles = new ArrayList<>();
 
             Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
@@ -2352,11 +2242,11 @@ public class GenerateMap {
         
         boolean isJail = isCabalJail || isNekroJail || isYssarilJail;
         boolean showJail = false;
-        if (fowPlayer == null || 
-            (isCabalJail && "cabal".equals(fowPlayer.getFaction()) 
-                || (isNekroJail && "nekro".equals(fowPlayer.getFaction()))
-                || (isYssarilJail && "yssaril".equals(fowPlayer.getFaction()))
-            )) 
+        if (fowPlayer == null 
+            || (isCabalJail && canSeeStatsOfFaction(map, "cabal", fowPlayer))
+            || (isNekroJail && canSeeStatsOfFaction(map, "nekro", fowPlayer))
+            || (isYssarilJail && canSeeStatsOfFaction(map, "yssaril", fowPlayer))
+            )
         {
             showJail = true;
         }

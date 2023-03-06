@@ -38,9 +38,9 @@ public class Turn extends PlayerSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map map = getActiveMap();
         Player mainPlayer = map.getPlayer(getUser().getId());
-
         mainPlayer = Helper.getGamePlayer(map, mainPlayer, event, null);
         mainPlayer = Helper.getPlayer(map, mainPlayer, event);
+        
         if (mainPlayer == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player/Faction/Color could not be found in map:" + map.getName());
             return;
@@ -58,7 +58,7 @@ public class Turn extends PlayerSubcommandData {
         boolean isFowPrivateGame = privateGame != null && privateGame;
 
         for (Player player : map.getPlayers().values()) {
-            if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")){
+            if (!player.isActivePlayer()){
                 player.setPassed(true);
             }
         }
