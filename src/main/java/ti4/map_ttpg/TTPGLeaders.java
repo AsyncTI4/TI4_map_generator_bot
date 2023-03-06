@@ -20,9 +20,9 @@ import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 public class TTPGLeaders {
 
     @JsonProperty("agent")
-    private String agent = "purged";
+    private String agent = "unlocked";
     @JsonProperty("commander")
-    private String commander = "purged";
+    private String commander = "locked";
     @JsonProperty("hero")
     private String hero = "purged";
     @JsonIgnore

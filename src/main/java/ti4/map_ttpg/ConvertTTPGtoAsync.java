@@ -26,7 +26,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import ti4.commands.tokens.AddToken;
 import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -275,7 +274,7 @@ public class ConvertTTPGtoAsync {
 
             //PLAYER LEADERS
             if (!asyncPlayer.getFaction().equals("keleres") && !asyncPlayer.getFaction().equals("nomad")) {
-                asyncPlayer.getLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked") ? false : true);
+                // asyncPlayer.getLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked") ? false : true);
                 asyncPlayer.getLeader("commander").setLocked(ttpgPlayer.getLeaders().getCommander().equals("unlocked") ? false : true);
                 asyncPlayer.getLeader("hero").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
             } else if (asyncPlayer.getFaction().equals("keleres")) {
@@ -301,8 +300,13 @@ public class ConvertTTPGtoAsync {
                         break;
                 }
             } else if (asyncPlayer.getFaction().equals("nomad")) { //need an example before we do this
-                
+                // asyncPlayer.getLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked") ? false : true);
+                asyncPlayer.getLeader("commander").setLocked(ttpgPlayer.getLeaders().getCommander().equals("unlocked") ? false : true);
+                asyncPlayer.getLeader("hero").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
             }
+
+            //PURGE HERO IF PURGED
+            if (ttpgPlayer.getLeaders().getHero().equals("purged")) asyncPlayer.removeLeader(Constants.HERO);
 
             //PLAYER CUSTODIAN POINTS
             Integer ttpgCustodianPoints = ttpgPlayer.getCustodiansPoints();
@@ -324,11 +328,8 @@ public class ConvertTTPGtoAsync {
                 asyncMap.getAllRelics().remove(AliasHandler.resolveRelic(relic));
             }
 
-
-            // //CLEAN PLAYER HANDCARDS
-            // for (Integer cardID : asyncPlayer.getPromissoryNotes().values()) {
-            //     asyncPlayer.removePromissoryNote(cardID);
-            // }
+            //CLEAN PLAYER HANDCARDS
+            asyncPlayer.clearPromissoryNotes();
 
             //PLAYER HANDCARDS and TABLECARDS
             ArrayList<String> handAndTableCards = new ArrayList<>(){{
