@@ -48,10 +48,11 @@ public class AddCC extends AddRemoveToken {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
 
-        if (activeMap.isFoWMode()) {
-            String colorMention = Helper.getColourAsMention(color);
-            FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has placed a token in the system");
-        }
+        // DISABLED PER @Jazzxhands: https://discord.com/channels/943410040369479690/947520255826198549/1082304906255421480
+        // if (activeMap.isFoWMode()) {
+        //     String colorMention = Helper.getColourAsMention(color);
+        //     FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has placed a token in the system");
+        // }
 
         tile.addCC(ccID);
     }
