@@ -7,7 +7,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class ResetLeader extends LeaderSubcommandData {
     public ResetLeader() {
@@ -20,8 +19,8 @@ public class ResetLeader extends LeaderSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getPlayer(activeMap, player, event);
         player = Helper.getGamePlayer(activeMap, player, event, null);
+        player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
             sendMessage("Player could not be found");
             return;

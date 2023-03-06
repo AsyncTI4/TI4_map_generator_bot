@@ -157,7 +157,18 @@ public class Constants {
     public static final String SPECIAL = "special";
     public static final String FOW = "fow";
     public static final String FOW_SYSTEMS = "fow_systems";
+    public static final String FOG_FILTER = "fog_filter";
+    public static final String SET_FOG_FILTER = "set_fog_filter";
+    public static final String PING_SYSTEM = "ping_system";
     public static final String LABEL = "label";
+    public static final String MESSAGE = "message";
+
+    public static final String FOW_FILTER_DARK_GREY = "Dark grey (default)";
+    public static final String FOW_FILTER_FROG = "Frog";
+    public static final String FOW_FILTER_SEPIA = "Sepia";
+    public static final String FOW_FILTER_WHITE = "White";
+    public static final String FOW_FILTER_PINK = "Pink";
+    public static final String FOW_FILTER_PURPLE = "Purple";
     
     public static final String MILTY = "milty";
     public static final String START = "start";

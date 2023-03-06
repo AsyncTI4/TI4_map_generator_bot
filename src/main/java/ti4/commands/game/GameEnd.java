@@ -52,7 +52,7 @@ public class GameEnd extends GameSubcommandData {
             //POST GAME INFO
             userActiveMap.setHasEnded(true);
             MapSaveLoadManager.saveMap(userActiveMap);
-            MessageHelper.sendMessageToChannel(event.getChannel(), Info.getGameInfo(null, null, userActiveMap).toString());           
+            MessageHelper.sendMessageToChannel(event.getChannel(), Info.getGameInfo(null, null, userActiveMap, null).toString());
 
             //SEND THE MAP IMAGE
             File file = GenerateMap.getInstance().saveImage(userActiveMap, DisplayType.map, event);

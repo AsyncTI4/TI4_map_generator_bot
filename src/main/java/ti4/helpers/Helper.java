@@ -29,12 +29,15 @@ import ti4.message.MessageHelper;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Helper {
@@ -225,7 +228,22 @@ public class Helper {
         };
     }
 
+    //private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
+
+    public static String getRandomizedEmoji(int value, String messageID) {
+        List<String> symbols = new ArrayList<>(Emojis.symbols);
+        //symbols = new ArrayList<>(testingEmoji);
+        Random seed = messageID == null ? new Random() : new Random(messageID.hashCode());
+        Collections.shuffle(symbols, seed);
+        value = value % symbols.size();
+        String emote = symbols.get(value);
+        return emote;
+    }
+
     public static String getFactionIconFromDiscord(String faction) {
+        if (faction == null) {
+            return getRandomizedEmoji(0, null);
+        }
         return switch (faction.toLowerCase()) {
             case "arborec" -> Emojis.Arborec;
             case "argent" -> Emojis.Argent;
@@ -253,7 +271,7 @@ public class Helper {
             case "yin" -> Emojis.Yin;
             case "lazax" -> Emojis.Lazax;
             case "keleres" -> Emojis.Keleres;
-            default -> "";
+            default -> getRandomizedEmoji(0, null);
         };
     }
 
@@ -551,7 +569,7 @@ public class Helper {
             return "";
         }
         String mention = userById.getAsMention();
-        if (player.getUserID() == "154000388121559040") {
+        if (player.getUserID().equals("154000388121559040")) {
             mention += " " + Emoji.fromFormatted(Emojis.BortWindow);
         }
         return mention;
@@ -560,7 +578,7 @@ public class Helper {
     public static String getPlayerRepresentation(Player player) {
         StringBuilder sb = new StringBuilder(Helper.getFactionIconFromDiscord(player.getFaction()));
         sb.append(" ").append(Helper.getPlayerPing(player));
-        if (player.getColor() != null) {
+        if (player.getColor() != null && !"null".equals(player.getColor())) {
             sb.append(" _").append(getColourAsMention(player.getColor())).append("_");
         }
         return sb.toString();
@@ -569,7 +587,7 @@ public class Helper {
     public static String getPlayerRepresentation(Guild guild, Player player) {
         StringBuilder sb = new StringBuilder(Helper.getFactionIconFromDiscord(player.getFaction()));
         sb.append(" ").append(Helper.getPlayerPing(player));
-        if (player.getColor() != null) {
+        if (player.getColor() != null && !"null".equals(player.getColor())) {
             sb.append(" _").append(getColourAsMention(guild, player.getColor())).append("_");
         }
         return sb.toString();

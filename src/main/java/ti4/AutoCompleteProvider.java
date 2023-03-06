@@ -224,7 +224,7 @@ public class AutoCompleteProvider {
                 MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName());
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Set<String> planetIDs;
-                if (activeMap != null) {
+                if (activeMap != null && !activeMap.isFoWMode()) {
                     planetIDs = activeMap.getPlanets();
                 } else {
                     planetIDs = Collections.emptySet();
@@ -275,6 +275,15 @@ public class AutoCompleteProvider {
             case Constants.SPEND_AS -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Stream.of("Resources", "Influence", "Votes", "TechSkip", "Other")
+                        .filter(value -> value.contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.FOG_FILTER -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of("Dark Grey (default)", "Sepia", "White", "Pink", "Purple")
                         .filter(value -> value.contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))

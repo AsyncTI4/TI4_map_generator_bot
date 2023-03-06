@@ -142,7 +142,7 @@ public class Mapper {
         return tiles.getProperty(tileID);
     }
 
-    public static List<String> getAdjacentTilesIDs(String tileID) {
+    public static List<String> getAdjacentTilePositions(String tileID) {
         String property = adjacentTiles.getProperty(tileID);
         if (property == null){
             return Collections.emptyList();

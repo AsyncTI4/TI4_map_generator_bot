@@ -265,15 +265,22 @@ public class Tile {
         this.fogLabel = fogLabel_;
     }
 
-    public String getFowTilePath() {
-        String tileName = Mapper.getTileID("fow");
-        if(this.tileID.equals("82a") || this.tileID.equals("82b") || this.tileID.equals("51")) {
-            tileName = Mapper.getTileID("fowb");
-        }
+    public String getFowTilePath(Player player) {
+        String fogTileColor = player == null ? "default" : player.getFogFilter();
+        String fogTileColorSuffix = "_" + fogTileColor;
+        String fowTileID = "fow" + fogTileColorSuffix;
         
+        if(this.tileID.equals("82b") || this.tileID.equals("51")) { //mallice || creuss
+            fowTileID = "fowb" + fogTileColorSuffix;
+        }
+        if(this.tileID.equals("82a")) { //mallicelocked
+            fowTileID = "fowc" + fogTileColorSuffix;
+        }
+
+        String tileName = Mapper.getTileID(fowTileID);
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
         if (tilePath == null) {
-            BotLogger.log("Could not find tile: " + tileID);
+            BotLogger.log("Could not find tile: " + fowTileID);
         }
         return tilePath;
     }
@@ -281,6 +288,5 @@ public class Tile {
     public HashMap<String, UnitHolder> getUnitHolders() {
         return unitHolders;
     }
-
 
 }

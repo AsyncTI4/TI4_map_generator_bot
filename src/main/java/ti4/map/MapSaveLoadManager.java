@@ -325,6 +325,10 @@ public class MapSaveLoadManager {
                 writer.write(Constants.PLAYER_PRIVATE_CHANNEL + " " + channelForCommunity.getId());
                 writer.write(System.lineSeparator());
             }
+            
+            String fogColor = player.getFogFilter() == null ? "" : player.getFogFilter();
+            writer.write(Constants.FOG_FILTER + " " + fogColor);
+            writer.write(System.lineSeparator());
 
             writer.write(Constants.PASSED + " " + player.isPassed());
             writer.write(System.lineSeparator());
@@ -405,7 +409,7 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
 
             StringBuilder fogOfWarSystems = new StringBuilder();
-            HashMap<String, String> fow_systems = player.getFogFilter();
+            HashMap<String, String> fow_systems = player.getFogTiles();
             HashMap<String, String> fow_labels = player.getFogLabels();
             for (String key : fow_systems.keySet()) {
                 String system = fow_systems.get(key);
@@ -983,13 +987,17 @@ public class MapSaveLoadManager {
                     }
                 }
                 case Constants.FOW_SYSTEMS -> {
-                    StringTokenizer fow_systems = new StringTokenizer(tokenizer.nextToken(), ";");
-                    while (fow_systems.hasMoreTokens()) {
-                        String[] system = fow_systems.nextToken().split(",");
-                        String position = system[0];
-                        String tileID = system[1];
-                        String label = system[2];
-                        player.addFogTile(tileID, position, label);
+                    try {
+                        StringTokenizer fow_systems = new StringTokenizer(tokenizer.nextToken(), ";");
+                        while (fow_systems.hasMoreTokens()) {
+                            String[] system = fow_systems.nextToken().split(",");
+                            String position = system[0];
+                            String tileID = system[1];
+                            String label = system[2];
+                            player.addFogTile(tileID, position, label);
+                        }
+                    } catch (Exception e) {
+                        BotLogger.log("Could not parse fog of war systems for player when loading the map: " + player.getColor());
                     }
                 }
                 case Constants.SO_SCORED -> {
@@ -1019,6 +1027,10 @@ public class MapSaveLoadManager {
                 }
 
                 case Constants.STRATEGY_CARD -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.FOG_FILTER -> {
+                    String filter = tokenizer.nextToken();
+                    player.setFogFilter(filter);
+                }
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
@@ -1036,6 +1048,11 @@ public class MapSaveLoadManager {
         String id = tokenizer.nextToken();
         Role roleById = MapGenerator.jda.getRoleById(id);
         player.setRoleForCommunity(roleById);
+        
+        //TODO: REMOVE THIS ONCE PRANK IS COMPLETE
+        if (id.equals("1078097405611872358")) { //green team in CPTI
+            player.setFogFilter("frog");
+        }
     }
 
     private static Tile readTile(String tileData) {
