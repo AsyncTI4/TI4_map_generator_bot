@@ -701,8 +701,8 @@ public class GenerateMap {
                         BotLogger.log("Could not parse file for CC: " + playerColor);
                     }
                 }
-                paintNumber(CC_TAG, x, y, remainingReinforcements, playerColor);
             }
+            if (-5 <= remainingReinforcements) paintNumber(CC_TAG, x, y, remainingReinforcements, playerColor);
         }
 
     }
