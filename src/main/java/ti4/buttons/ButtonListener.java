@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.entities.emoji.*;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
+
 import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
 import ti4.MessageListener;
@@ -14,7 +15,6 @@ import ti4.commands.cards.CardsInfo;
 import ti4.commands.cards.PlayAC;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.status.ScorePublic;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -358,7 +358,6 @@ public class ButtonListener extends ListenerAdapter {
         } 
         
 
-        boolean foundThread = false;
         String text = Helper.getPlayerRepresentation(event, player) + " " + message;
         if (activeMap.isFoWMode() && sendPublic) {
             text = message;
@@ -374,18 +373,8 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendPrivateMessageToPlayer(player, activeMap, text);
             return;
         }
-        List<ThreadChannel> threadChannels = guild.getThreadChannels();
-        for (ThreadChannel threadChannel : threadChannels) {
-            if (threadChannel.getId().equals(messageId)) {
-                MessageHelper.sendMessageToChannel(threadChannel, text);
-                foundThread = true;
-                break;
-            }
-        }
 
-        if (!foundThread) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), text);
-        }
+        MessageHelper.sendMessageToChannel(Helper.getThreadChannelIfExists(event), text);
     }
 
     private void checkForAllReactions(@NotNull ButtonInteractionEvent event, Map map) {
@@ -419,14 +408,25 @@ public class ButtonListener extends ListenerAdapter {
         }
 
         int numberOfPlayers = activeMap.getPlayers().size();
-        // BotLogger.log(event, matchingFactionReactions + "/" + numberOfPlayers + " factions have reacted");
-        if (matchingFactionReactions >= numberOfPlayers) {
-            String message = " was last to react\n";
-            String additionalMessage = " - all factions have reacted";
-            if (map.isFoWMode()) {
-                message = "";
+        if (matchingFactionReactions >= numberOfPlayers && !activeMap.isFoWMode()) { //TODO: @Jazzxhands to verify this will work for FoW
+            respondAllPlayersReacted(event);
+        }
+    }
+
+    private static void respondAllPlayersReacted(ButtonInteractionEvent event) {
+        switch (event.getButton().getId()) {
+            case Constants.SC_FOLLOW, "sc_no_follow", "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so", "sc_follow_leadership" -> {
+                Helper.getThreadChannelIfExists(event).sendMessage("All players have reacted to this Strategy Card").queueAfter(5, TimeUnit.SECONDS);
             }
-            addReaction(event, true, true, message, additionalMessage);
+            case "no_when" -> {
+                event.getInteraction().getMessage().reply("All players have indicated 'No Whens'").queueAfter(1, TimeUnit.SECONDS);
+            }
+            case "no_after" -> {
+                event.getInteraction().getMessage().reply("All players have indicated 'No Afters'").queueAfter(1, TimeUnit.SECONDS);
+            }
+            case "no_sabotage" -> {
+                event.getInteraction().getMessage().reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
+            }
         }
     }
 }
