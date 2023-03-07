@@ -296,6 +296,9 @@ public class Map {
         return speaker;
     }
 
+    /**
+     * @param speaker - The player's userID: player.getID()
+     */
     public void setSpeaker(String speaker) {
         this.speaker = speaker;
     }

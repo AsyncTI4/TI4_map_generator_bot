@@ -71,6 +71,7 @@ public class Replace extends GameSubcommandData {
                 }
                 player.setUserName(addedUser.getName());
                 player.setUserID(addedUser.getId());
+                map.setSpeaker(addedUser.getId());
             } else {
                 MessageHelper.replyToMessage(event, "Specify player that is in game to be removed and player that is not in game to be replacement");
                 return;
