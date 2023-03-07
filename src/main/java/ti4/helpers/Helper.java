@@ -6,13 +6,16 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -29,7 +32,6 @@ import ti4.message.MessageHelper;
 import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -1054,6 +1056,25 @@ public class Helper {
                     if (member != null) guild.addRoleToMember(member, role).queue();
                 }
             }
+        }
+    }
+
+    public static GuildMessageChannel getThreadChannelIfExists(ButtonInteractionEvent event) {
+        String messageID = event.getInteraction().getMessage().getId();
+        MessageChannel messageChannel = event.getMessageChannel();
+        List<ThreadChannel> threadChannels = event.getGuild().getThreadChannels();
+        try {
+        for (ThreadChannel threadChannel : threadChannels) {
+            if (threadChannel.getId().equals(messageID)) {
+                    GuildMessageChannel returnChannel = (GuildMessageChannel) threadChannel;
+                    return returnChannel;
+                }
+            }
+            return (GuildMessageChannel) messageChannel;
+        }
+        catch (Exception e) {
+            BotLogger.log(event, ExceptionUtils.getStackTrace(e));
+            return null;
         }
     }
 }

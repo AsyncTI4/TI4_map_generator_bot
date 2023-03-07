@@ -119,6 +119,7 @@ public class MessageHelper {
 
     private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, Boolean pinMessages, String... reaction) {
         if (messageText == null || channel == null) {
+            BotLogger.log("`splitAndSent` - `messageText` or `channel` was null");
             return;
         }
 
@@ -172,6 +173,11 @@ public class MessageHelper {
     }
 
     private static void  splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, Guild guild, Button... buttons) {
+        if (messageText == null || channel == null) {
+            BotLogger.log("`splitAndSent` - `messageText` or `channel` was null");
+            return;
+        }
+        
         Integer messageLength = messageText.length();
         if (messageLength > 1500) {
             List<String> texts = new ArrayList<>();
