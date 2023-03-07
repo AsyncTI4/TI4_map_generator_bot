@@ -32,6 +32,42 @@ public class Emojis {
     public static final String Lazax = "<:Lazax:946891797639073884>";
     public static final String Keleres = "<:Keleres:968233661654765578>";
 
+    //FACTIONS - DISCORDANT STARS
+    public static final String augers = "<:augurs:1082705489722363904>";
+    public static final String axis = "<:axis:1082705549092737044>";
+    public static final String bentor = "<:bentor:1082705559897264199>";
+    public static final String blex = "<:blex:1082705569351204995>";
+    public static final String celdauri = "<:celdauri:1082705576691253288>";
+    public static final String cheiran = "<:cheiran:1082705584886915204>";
+    public static final String cymiae = "<:cymiae:1082705596836487238>";
+    public static final String dihmohn = "<:dihmohn:1082705607624233041>";
+    public static final String edyn = "<:edyn:1082705616415502396>";
+    public static final String florzen = "<:florzen:1082705625018024010>";
+    public static final String freesystems = "<:freesystems:1082705633352089620>";
+    public static final String ghemina = "<:ghemina:1082705641904279612>";
+    public static final String ghoti = "<:ghoti:1082705649076543580>";
+    public static final String gledge = "<:gledge:1082705658052366346>";
+    public static final String khrask = "<:khrask:1082705665715359786>";
+    public static final String kjalengard = "<:kjalengard:1082705673596448778>";
+    public static final String kollecc = "<:kollecc:1082705681108447313> ";
+    public static final String kolume = "<:kolume:1082724367575814245>";
+    public static final String kortali = "<:kortali:1082724379114340392>";
+    public static final String lanefir = "<:lanefir:1082724385598742599>";
+    public static final String lizho = "<:lizho:1082724396235497552>";
+    public static final String mirveda = "<:mirveda:1082724403076411472>";
+    public static final String mortheus = "<:mortheus:1082724410290610186>";
+    public static final String mykomentori = "<:mykomentori:1082724417412530197>";
+    public static final String nivyn = "<:nivyn:1082724425851482282>";
+    public static final String nokar = "<:nokar:1082724447162728558>";
+    public static final String olradin = "<:olradin:1082724458189570238>";
+    public static final String rohdhna = "<:rohdhna:1082724463767998564>";
+    public static final String tnelis = "<:tnelis:1082724470311112756>";
+    public static final String vaden = "<:vaden:1082724476287975486>";
+    public static final String vaylerian = "<:vaylerian:1082724483200196720>";
+    public static final String veldyr = "<:veldyr:1082724490049491026>";
+    public static final String zealots = "<:zealots:1082724497083334827>";
+    public static final String zelian = "<:zelian:1082724503190249547>";
+
     //EXPLORATION
     public static final String HFrag = "<:HFrag:1053857012766752788>";
     public static final String CFrag = "<:CFrag:1053856733849722880>";
