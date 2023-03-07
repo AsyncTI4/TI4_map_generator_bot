@@ -358,7 +358,6 @@ public class ButtonListener extends ListenerAdapter {
         } 
         
 
-        boolean foundThread = false;
         String text = Helper.getPlayerRepresentation(event, player) + " " + message;
         if (activeMap.isFoWMode() && sendPublic) {
             text = message;
@@ -374,18 +373,8 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendPrivateMessageToPlayer(player, activeMap, text);
             return;
         }
-        List<ThreadChannel> threadChannels = guild.getThreadChannels();
-        for (ThreadChannel threadChannel : threadChannels) {
-            if (threadChannel.getId().equals(messageId)) {
-                MessageHelper.sendMessageToChannel(threadChannel, text);
-                foundThread = true;
-                break;
-            }
-        }
 
-        if (!foundThread) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), text);
-        }
+        MessageHelper.sendMessageToChannel(Helper.getThreadChannelIfExists(event), text);
     }
 
     private void checkForAllReactions(@NotNull ButtonInteractionEvent event, Map map) {
