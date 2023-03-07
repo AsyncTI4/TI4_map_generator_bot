@@ -30,4 +30,5 @@ jobs:
           ./docker_run.sh
           docker rm $(docker ps --filter status=exited -q)
           docker rmi -f $(docker images --filter "dangling=true" -q)
+          wget -O /tmp/netdata-kickstart.sh https://my-netdata.io/kickstart.sh && sh /tmp/netdata-kickstart.sh --stable-channel --claim-token plxgcfBFK0_YYrcbLUU1ugJ-4trSn26PEe9GX_YJgAJq0b86ANw1ISTeqMMpj6_CWUXbBdyJ_em8UWZDi6ScFBtaCW0IpNMuzlVNz_WSQwOtFFGMbDF0hCInlS9kjPikbBTAAcs --claim-url https://app.netdata.cloud --dont-wait --reinstall
 
