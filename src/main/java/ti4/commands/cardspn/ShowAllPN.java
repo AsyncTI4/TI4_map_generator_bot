@@ -27,7 +27,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
 
@@ -40,7 +40,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
 
         Player targetPlayer = Helper.getPlayer(activeMap, null, event);
         if (targetPlayer == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Target player not found");
+            sendMessage("Target player not found");
             return;
         }
         StringBuilder sb = new StringBuilder();
@@ -56,6 +56,7 @@ public class ShowAllPN extends PNCardsSubcommandData {
         }
 
         MessageHelper.sendPrivateMessageToPlayer(targetPlayer, activeMap, sb.toString());
+        sendMessage("all PNs shown");
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
 }

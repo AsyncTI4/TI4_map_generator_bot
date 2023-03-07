@@ -28,12 +28,12 @@ public class ShowPN extends PNCardsSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Promissory Note to show");
+            sendMessage("Please select what Promissory Note to show");
             return;
         }
         OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
@@ -51,13 +51,13 @@ public class ShowPN extends PNCardsSubcommandData {
         }
 
         if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Promissory Note ID found, please retry");
+            sendMessage("No such Promissory Note ID found, please retry");
             return;
         }
 
         Player targetPlayer = Helper.getPlayer(activeMap, null, event);
         if (targetPlayer == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Target player not found");
+            sendMessage("Target player not found");
             return;
         }
 
@@ -71,10 +71,11 @@ public class ShowPN extends PNCardsSubcommandData {
         player.setPromissoryNote(acID);
         User user = MapGenerator.jda.getUserById(targetPlayer.getUserID());
         if (user == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
+            sendMessage("User for faction not found. Report to ADMIN");
             return;
         }
         MessageHelper.sendMessageToUser(sb.toString(), user);
+        sendMessage("PN shown");
         CardsInfo.sentUserCardInfo(event, activeMap, player);
 
 

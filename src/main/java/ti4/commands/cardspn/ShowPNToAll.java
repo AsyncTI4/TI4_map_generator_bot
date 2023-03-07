@@ -25,12 +25,12 @@ public class ShowPNToAll extends PNCardsSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Promissory Note to show to All");
+            sendMessage("Please select what Promissory Note to show to All");
             return;
         }
 
@@ -45,7 +45,7 @@ public class ShowPNToAll extends PNCardsSubcommandData {
         }
 
         if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Promissory Note ID found, please retry");
+            sendMessage("No such Promissory Note ID found, please retry");
             return;
         }
 
@@ -58,7 +58,7 @@ public class ShowPNToAll extends PNCardsSubcommandData {
         if (!scored) {
             player.setPromissoryNote(acID);
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        sendMessage(sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
 }
