@@ -675,8 +675,8 @@ public class GenerateMap {
                             BotLogger.log("Could not parse unit file for reinforcements: " + unitID);
                         }
                     }
-                    paintNumber(unitID, x, y, remainingReinforcements, playerColor);
                 }
+                if (-5 <= remainingReinforcements) paintNumber(unitID, x, y, remainingReinforcements, playerColor);
             }
         }
 
