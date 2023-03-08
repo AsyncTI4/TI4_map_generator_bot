@@ -659,7 +659,7 @@ public class Mapper {
     }
 
     public static String getTilesList() {
-        return "Tiles: " + tiles.values().stream()
+        return "__**Tiles:**__\n" + tiles.values().stream()
                 .sorted()
                 .filter(value -> value instanceof String)
                 .map(value -> (String) value)
@@ -667,16 +667,16 @@ public class Mapper {
     }
 
     public static String getPlanetList() {
-        return "Planets: " + AliasHandler.getPlanetList().stream()
+        return "__**Planets:**__\n" + AliasHandler.getPlanetList().stream()
                 .sorted()
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(", "));
     }
 
     public static String getUnitList() {
-        return "Units: " + AliasHandler.getUnitList().stream()
+        return "__**Units:**__\n> " + AliasHandler.getUnitList().stream()
                 .sorted()
                 .filter(Objects::nonNull)
-                .collect(Collectors.joining("\n "));
+                .collect(Collectors.joining("\n> "));
     }
 }

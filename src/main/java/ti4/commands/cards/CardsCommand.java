@@ -104,6 +104,7 @@ public class CardsCommand implements Command {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
                 subCommandExecuted = subcommand;
+                break;
             }
         }
         String userID = event.getUser().getId();

@@ -24,29 +24,22 @@ public class UnscoreSO extends SOCardsSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Secret Objective to unscore");
+            sendMessage("Please select what Secret Objective to unscore");
             return;
         }
 
         boolean scored = activeMap.unscoreSecretObjective(getUser().getId(), option.getAsInt());
         if (!scored) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Secret Objective ID found, please retry");
+            sendMessage("No such Secret Objective ID found, please retry");
             return;
         }
-        StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeMap.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Scored Secret Objectives:").append("\n");
-        for (String id : player.getSecretsScored().keySet()) {
-            sb.append(Mapper.getSecretObjective(id)).append("\n");
 
-        }
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        sendMessage("Unscored SO " + option.getAsInt());
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
 }

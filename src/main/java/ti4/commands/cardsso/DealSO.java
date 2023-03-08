@@ -11,7 +11,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class DealSO extends SOCardsSubcommandData {
     public DealSO() {
@@ -32,18 +31,19 @@ public class DealSO extends SOCardsSubcommandData {
 
         Player player_ = Helper.getPlayer(activeMap, null, event);
         if (player_ == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
+            sendMessage("Player not found");
             return;
         }
         User user = MapGenerator.jda.getUserById(player_.getUserID());
         if (user == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
+            sendMessage("User for faction not found. Report to ADMIN");
             return;
         }
 
         for (int i = 0; i < count; i++) {
             activeMap.drawSecretObjective(player_.getUserID());
         }
+        sendMessage(count + " SO Dealt");
         CardsInfo.sentUserCardInfo(event, activeMap, player_);
     }
 }

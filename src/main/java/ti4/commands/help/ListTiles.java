@@ -17,6 +17,6 @@ public class ListTiles extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String tilesList = Mapper.getTilesList();
-        MessageHelper.replyToMessage(event, tilesList);
+        MessageHelper.sendMessageToChannel(event.getChannel(), tilesList);
     }
 }

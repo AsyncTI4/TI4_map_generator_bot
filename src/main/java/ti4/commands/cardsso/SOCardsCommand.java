@@ -97,19 +97,20 @@ public class SOCardsCommand implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        SOCardsSubcommandData subCommandExecuted = null;
         String subcommandName = event.getInteraction().getSubcommandName();
+        SOCardsSubcommandData subCommandExecuted = null;
         for (SOCardsSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
                 subCommandExecuted = subcommand;
+                break;
             }
         }
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
-        MessageHelper.replyToMessage(event, "Card action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
+        // MessageHelper.replyToMessage(event, "Card action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
     }
 
 

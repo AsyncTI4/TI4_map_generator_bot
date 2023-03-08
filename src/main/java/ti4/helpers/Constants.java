@@ -534,5 +534,6 @@ public class Constants {
     public static final String CARDS_INFO_THREAD_PREFIX = "Cards Info-";
     public static final String BOT_CHANNEL_SUFFIX = "-bot-map-updates";
     public static final String PING = "ping";
+    public static final String ENDED_GAMES = "ended_games";
 
 }

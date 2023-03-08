@@ -113,7 +113,8 @@ public class ButtonListener extends ListenerAdapter {
             if (channel != null) {
                 try {
                     int soIndex = Integer.parseInt(soID);
-                    ScoreSO.scoreSO(null, activeMap, player, soIndex, channel, event);
+                    ScoreSO object = new ScoreSO();
+                    object.scoreSO(null, activeMap, player, soIndex, channel, event);
                 } catch (Exception e) {
                     BotLogger.log(event, "Could not parse SO ID: " + soID);
                     event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.").queue();

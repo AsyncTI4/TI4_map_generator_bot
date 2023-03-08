@@ -13,7 +13,7 @@ import java.util.*;
 
 public class ShowAllSOToAll extends SOCardsSubcommandData {
     public ShowAllSOToAll() {
-        super(Constants.SHOW_ALL_SO_TO_ALL, "Show Secret Objective to player");
+        super(Constants.SHOW_ALL_SO_TO_ALL, "Show all Secret Objectives to all players");
     }
 
     @Override
@@ -22,14 +22,13 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
 
 
             StringBuilder sb = new StringBuilder();
 
-        sb.append("Game: ").append(activeMap.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
 
         List<String> secretObjectives = new ArrayList<>(activeMap.getSecretObjective(player.getUserID()).keySet());
@@ -55,8 +54,6 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
             sb.append(index).append(". (").append(so.getValue()).append(") - ").append(Mapper.getSecretObjective(so.getKey())).append("\n");
             index++;
         }
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        sendMessage(sb.toString());
     }
 }
