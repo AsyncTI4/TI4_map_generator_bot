@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.cards.CardsCommand;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
