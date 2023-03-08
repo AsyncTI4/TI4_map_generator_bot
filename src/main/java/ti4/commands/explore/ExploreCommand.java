@@ -38,6 +38,7 @@ public class ExploreCommand implements Command {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
+                break;
             }
         }
         String userID = event.getUser().getId();

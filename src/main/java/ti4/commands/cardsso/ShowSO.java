@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 
 public class ShowSO extends SOCardsSubcommandData {
     public ShowSO() {
-        super(Constants.SHOW_SO, "Show Secret Objective to player");
+        super(Constants.SHOW_SO, "Show a Secret Objective to a player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.SECRET_OBJECTIVE_ID, "Secret objective ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
@@ -27,12 +27,12 @@ public class ShowSO extends SOCardsSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Secret Objective to show");
+            sendMessage("Please select what Secret Objective to show");
             return;
         }
 
@@ -45,7 +45,7 @@ public class ShowSO extends SOCardsSubcommandData {
         }
 
         if (soID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Secret Objective ID found, please retry");
+            sendMessage("No such Secret Objective ID found, please retry");
             return;
         }
 
@@ -58,18 +58,16 @@ public class ShowSO extends SOCardsSubcommandData {
 
         Player player_ = Helper.getPlayer(activeMap, null, event);
         if (player_ == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
+            sendMessage("Player not found");
             return;
         }
         User user = MapGenerator.jda.getUserById(player_.getUserID());
         if (user == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
+            sendMessage("User for faction not found. Report to ADMIN");
             return;
         }
 
+        sendMessage("SO shown to player - check DMs");
         MessageHelper.sendMessageToUser(sb.toString(), user);
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
-
-
     }
 }

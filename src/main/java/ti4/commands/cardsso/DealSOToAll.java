@@ -32,5 +32,6 @@ public class DealSOToAll extends SOCardsSubcommandData {
                 CardsInfo.sentUserCardInfo(event, activeMap, player);
             }
         }
+        sendMessage(count + " SO Dealt to All");
     }
 }

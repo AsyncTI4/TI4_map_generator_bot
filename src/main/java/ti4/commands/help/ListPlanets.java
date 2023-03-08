@@ -17,6 +17,6 @@ public class ListPlanets extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String tilesList = Mapper.getPlanetList();
-        MessageHelper.replyToMessage(event, tilesList);
+        MessageHelper.sendMessageToChannel(event.getChannel(), tilesList);
     }
 }

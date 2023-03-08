@@ -63,7 +63,7 @@ public class ListTurnOrder extends StatusSubcommandData {
                 
                 order.put(sc, text);
             }
-            StringBuilder msg = new StringBuilder();
+            StringBuilder msg = new StringBuilder("__**Turn Order:**__\n");
 
 
             if (naaluSC != 0) {
@@ -80,6 +80,7 @@ public class ListTurnOrder extends StatusSubcommandData {
                     msg.append("`").append(i).append(".`").append(text).append("\n");
                 }
             }
+            msg.append("_ _"); //forced extra line
             MessageHelper.replyToMessage(event, msg.toString());
         } else {
             MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup community_mode:YES` or `/game setup fow_mode:YES`");
