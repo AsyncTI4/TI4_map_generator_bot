@@ -67,6 +67,7 @@ public class AgendaCommand implements Command {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
                 executedCommand = subcommand;
+                break;
             }
         }
 
