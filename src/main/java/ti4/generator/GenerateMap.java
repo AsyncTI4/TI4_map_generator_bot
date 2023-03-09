@@ -1,7 +1,6 @@
 package ti4.generator;
 
 import com.pngencoder.PngEncoder;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -2385,10 +2384,9 @@ public class GenerateMap {
                     int imageDmgX = position != null ? tileX + position.x + (image.getWidth() / 2) - (dmgImage.getWidth() / 2) : xOriginal - (dmgImage.getWidth() / 2);
                     int imageDmgY = position != null ? tileY + position.y + (image.getHeight() / 2) - (dmgImage.getHeight() / 2) : yOriginal - (dmgImage.getHeight() / 2);
                     if (isMirage) {
-                        imageDmgX = imageX + (int) (numberPositionPoint.x * scaleOfUnit) - dmgImage.getWidth();
-                        imageDmgY = imageY + (int) (numberPositionPoint.y * scaleOfUnit) - dmgImage.getHeight();
-                    }
-                    if (unitID.contains("_mf")) {
+                        imageDmgX = imageX;
+                        imageDmgY = imageY;
+                    } else if (unitID.contains("_mf")) {
                         imageDmgX = position != null ? tileX + position.x : xOriginal - (dmgImage.getWidth());
                         imageDmgY = position != null ? tileY + position.y : yOriginal - (dmgImage.getHeight());
 
