@@ -230,6 +230,7 @@ public class Constants {
     public static final String SPEAKER = "speaker";
     
     public static final String MAIN_GAME_CHANNEL = "main_game_channel";
+    public static final String BOT_MAP_CHANNEL = "bot_map_channel";
     public static final String CHANNEL1 = "channel1";
     public static final String CHANNEL2 = "channel2";
     public static final String CHANNEL3 = "channel3";
@@ -535,5 +536,6 @@ public class Constants {
     public static final String BOT_CHANNEL_SUFFIX = "-bot-map-updates";
     public static final String PING = "ping";
     public static final String ENDED_GAMES = "ended_games";
+
 
 }
