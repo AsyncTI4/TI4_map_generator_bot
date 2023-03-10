@@ -31,6 +31,10 @@ public abstract class PlayerSubcommandData extends SubcommandData {
         return user;
     }
 
+    public SlashCommandInteractionEvent getEvent() {
+        return this.event;
+    }
+
     /**
      * Edits the original message after submitting a slash command
      * @param messageText new message
