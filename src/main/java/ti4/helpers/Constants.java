@@ -182,7 +182,7 @@ public class Constants {
     public static final String AGENDA_REMOVE_FROM_GAME = "agenda_remove_from_game";
     public static final String AC_REMOVE_FROM_GAME = "ac_remove_from_game";
     public static final String SO_ID = "so_id";
-    public static final String AEGNDA_ID = "agenda_id";
+    public static final String AGENDA_ID = "agenda_id";
     public static final String AC_ID = "ac_id";
 
     public static final String INACTIVE_LEADER = "hero_unplay";
@@ -336,7 +336,6 @@ public class Constants {
     public static final String ADD_LAW = "add_law";
     public static final String REMOVE_LAW = "remove_law";
     public static final String SHOW_DISCARDED = "show_discarded";
-    public static final String AGENDA_ID = "agenda_id";
     public static final String ELECTED = "elected";
 
 
