@@ -207,9 +207,4 @@ public class Turn extends PlayerSubcommandData {
         }
         sendMessage("Next Player not found");
     }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        MessageHelper.replyToMessageTI4Logo(event);
-    }
 }

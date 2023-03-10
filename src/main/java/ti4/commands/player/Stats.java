@@ -168,9 +168,8 @@ public class Stats extends PlayerSubcommandData {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
-        MessageHelper.replyToMessageTI4Logo(event);
-        //code to add info to website
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
+        
+        GenerateMap.getInstance().saveImage(activeMap, event);
     }
 
     public void pickSC(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping optionSC) {
@@ -181,18 +180,18 @@ public class Stats extends PlayerSubcommandData {
             int scNumber = optionSC.getAsInt();
             LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
             if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
-                sendMessage("Can pick SC only if faction and color picked");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Can pick SC only if faction and color picked");
                 return;
             }
             if (!scTradeGoods.containsKey(scNumber) && scNumber != 0) {
-                sendMessage("Strategy Card must be from possible ones in Game");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card must be from possible ones in Game");
             } else {
                 if (scNumber > 0) {
                     LinkedHashMap<String, Player> players = activeMap.getPlayers();
                     boolean scPickedAlready = false;
                     for (Player playerStats : players.values()) {
                         if (playerStats.getSC() == scNumber) {
-                            sendMessage("SC is already picked.");
+                            MessageHelper.sendMessageToChannel(event.getChannel(), "SC is already picked.");
                             scPickedAlready = true;
                             break;
                         }
