@@ -41,20 +41,20 @@ public class SCPlay extends PlayerSubcommandData {
         MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? eventChannel : activeMap.getMainGameChannel();
 
         if (player == null) {
-            MessageHelper.sendMessageToChannel(eventChannel, "You're not a player of this game");
+            sendMessage("You're not a player of this game");
             return;
         }
 
         int sc = player.getSC();
         String emojiName = "SC" + String.valueOf(sc);
         if (sc == 0) {
-            MessageHelper.sendMessageToChannel(eventChannel, "No SC selected by player");
+            sendMessage("No SC selected by player");
             return;
         }
 
         Boolean isSCPlayed = activeMap.getScPlayed().get(sc);
         if (isSCPlayed != null && isSCPlayed) {
-            MessageHelper.sendMessageToChannel(eventChannel, "SC already played");
+            sendMessage("SC already played");
             return;
         }
         
@@ -101,7 +101,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
-            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
+            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             threadChannel.queue();
         });
         

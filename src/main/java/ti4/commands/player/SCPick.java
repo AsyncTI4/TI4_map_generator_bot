@@ -36,11 +36,12 @@ public class SCPick extends PlayerSubcommandData {
         MessageChannel eventChannel = event.getChannel();
 
         if (player == null) {
-            MessageHelper.sendMessageToChannel(eventChannel, "You're not a player of this game");
+            sendMessage("You're not a player of this game");
             return;
         }
         
-        Stats.pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
+        Stats stats = new Stats();
+        stats.pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
         int sc = player.getSC();
         String msg = "";
         String msgExtra = "";
@@ -108,7 +109,7 @@ public class SCPick extends PlayerSubcommandData {
         } else {
             msg = "No SC picked.";
         }
-        MessageHelper.replyToMessage(event, msg);
+        sendMessage(msg);
         
         if (isFowPrivateGame) {
             if (allPicked) {
@@ -122,7 +123,7 @@ public class SCPick extends PlayerSubcommandData {
                 ListTurnOrder.turnOrder(event, activeMap);
             }
             if (!msgExtra.isEmpty()) {
-                MessageHelper.sendMessageToChannel(eventChannel, msgExtra);
+                sendMessage(msgExtra);
             }
         }
     }

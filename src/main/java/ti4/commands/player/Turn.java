@@ -42,13 +42,13 @@ public class Turn extends PlayerSubcommandData {
         mainPlayer = Helper.getPlayer(map, mainPlayer, event);
         
         if (mainPlayer == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player/Faction/Color could not be found in map:" + map.getName());
+            sendMessage("Player/Faction/Color could not be found in map:" + map.getName());
             return;
         }
         pingNextPlayer(event, map, mainPlayer);
     }
 
-    public static void pingNextPlayer(SlashCommandInteractionEvent event, Map map, Player mainPlayer) {
+    public void pingNextPlayer(SlashCommandInteractionEvent event, Map map, Player mainPlayer) {
         int scNext = -1;
         boolean naaluPresent = false;
         int naaluSC = 0;
@@ -205,7 +205,7 @@ public class Turn extends PlayerSubcommandData {
                 return;
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Next Player not found");
+        sendMessage("Next Player not found");
     }
 
     @Override

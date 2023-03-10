@@ -99,7 +99,7 @@ public class PlayerCommand implements Command {
         MapSaveLoadManager.saveMap(activeMap);
 
         File file = GenerateMap.getInstance().saveImage(activeMap, event);
-        MessageHelper.replyToMessage(event, file);
+        // MessageHelper.replyToMessage(event, file);
     }
 
 

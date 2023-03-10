@@ -24,8 +24,9 @@ public class Pass extends PlayerSubcommandData {
         }
         player.setPassed(true);
         String text = Helper.getPlayerRepresentation(event, player) + " PASSED";
-        MessageHelper.sendMessageToChannel(event.getChannel(), text);
-        Turn.pingNextPlayer(event, activeMap, player);
+        sendMessage(text);
+        Turn turn = new Turn();
+        turn.pingNextPlayer(event, activeMap, player);
     }
 
     @Override

@@ -25,18 +25,18 @@ public class SCFollow extends PlayerSubcommandData {
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "You're not a player of this game");
+            sendMessage("You're not a player of this game");
             return;
         }
         int strategicCC = player.getStrategicCC();
         if (strategicCC == 0){
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Have 0 CC in Strategy, can't follow");
+            sendMessage("Have 0 CC in Strategy, can't follow");
             return;
         }
         strategicCC--;
         player.setStrategicCC(strategicCC);
         String message = Helper.getPlayerRepresentation(event, player) + " following SC, deducted 1 CC from Strategy Tokens";
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        sendMessage(message);
     }
 
     @Override

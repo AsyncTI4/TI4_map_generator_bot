@@ -27,12 +27,12 @@ public class SendCommodities extends PlayerSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         Player player_ = Helper.getPlayer(activeMap, player, event);
         if (player_ == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player to send TG/Commodities could not be found");
+            sendMessage("Player to send TG/Commodities could not be found");
             return;
         }
         
@@ -54,7 +54,7 @@ public class SendCommodities extends PlayerSubcommandData {
                 String success = message + "\nThe other player has been notified";
                 MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
             } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), message);
+                sendMessage(message);
             }
         }
     }
