@@ -75,7 +75,7 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
             if (allPicked) {
-                msgExtra += Helper.getGamePing(event, activeMap) + "All players picked SC";
+                msgExtra += Helper.getGamePing(event, activeMap) + "\nAll players picked SC";
 
                 LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
                 Set<Integer> scPickedList = activePlayers.stream().map(Player::getSC).collect(Collectors.toSet());
@@ -126,12 +126,5 @@ public class SCPick extends PlayerSubcommandData {
                 sendMessage(msgExtra);
             }
         }
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
     }
 }

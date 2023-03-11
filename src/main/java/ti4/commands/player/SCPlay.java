@@ -61,10 +61,11 @@ public class SCPlay extends PlayerSubcommandData {
         activeMap.setSCPlayed(sc, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
         String message = "";
+        message += "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc) + " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
         if (!categoryForPlayers.isEmpty()) {
             message += categoryForPlayers + "\n";
         }
-        message += "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc) + " played. Please react with your faction symbol to pass or post in thread for secondaries.";
+        message += "Please indicate your choice by pressing a button below and post additional details in the thread.";
 
         String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
         TextChannel textChannel = event.getChannel().asTextChannel();
@@ -98,20 +99,14 @@ public class SCPlay extends PlayerSubcommandData {
             of = ActionRow.of(followButton, noFollowButton);
         }
         baseMessageObject.addComponents(of);
-
+        
+        String playerFaction = player.getFaction();
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             threadChannel.queue();
+            message_.addReaction(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(playerFaction))).queue();
         });
-        
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
-        MessageHelper.replyToMessageTI4Logo(event);
+        event.getHook().deleteOriginal().queue();
     }
 }

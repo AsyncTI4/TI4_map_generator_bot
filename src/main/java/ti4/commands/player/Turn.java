@@ -171,9 +171,6 @@ public class Turn extends PlayerSubcommandData {
                     .addComponents(actionRows).build();
             
             gameChannel.sendMessage(messageObject).queue();
-
-
-            MessageHelper.replyToMessageTI4Logo(event);
             return;
         }
 
@@ -200,7 +197,7 @@ public class Turn extends PlayerSubcommandData {
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, map, event, text, fail, success);
                 } else {
-                    MessageHelper.sendMessageToChannel(gameChannel, text);
+                    sendMessage(text);
                 }
                 return;
             }
