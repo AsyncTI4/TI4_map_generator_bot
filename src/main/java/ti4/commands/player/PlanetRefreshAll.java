@@ -31,5 +31,6 @@ public class PlanetRefreshAll extends PlayerSubcommandData {
         for (String planet : player.getPlanets()) {
             player.refreshPlanet(planet);
         }
+        sendMessage(Helper.getPlayerRepresentation(event, player) + " readied all planets.");
     }
 }

@@ -70,7 +70,6 @@ public class Setup extends PlayerSubcommandData {
             }
         }
 
-
         player.setColor(color);
         player.setFaction(faction);
         player.getPlanets().clear();
