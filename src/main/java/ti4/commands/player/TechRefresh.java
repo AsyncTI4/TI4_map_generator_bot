@@ -1,6 +1,7 @@
 package ti4.commands.player;
 
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Player;
 
 public class TechRefresh extends TechAddRemove {
@@ -11,5 +12,6 @@ public class TechRefresh extends TechAddRemove {
     @Override
     public void doAction(Player player, String techID) {
         player.refreshTech(techID);
+        sendMessage(Helper.getPlayerRepresentation(getEvent(), player) + " readied tech: " + techID);
     }
 }

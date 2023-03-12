@@ -6,6 +6,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
@@ -223,6 +224,8 @@ public class AutoCompleteProvider {
             case Constants.PLANET, Constants.PLANET2, Constants.PLANET3, Constants.PLANET4, Constants.PLANET5, Constants.PLANET6 -> {
                 MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName());
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                System.out.println(event.getName());
+                System.out.println(event.getSubcommandName());
                 Set<String> planetIDs;
                 if (activeMap != null && !activeMap.isFoWMode()) {
                     planetIDs = activeMap.getPlanets();
@@ -234,7 +237,7 @@ public class AutoCompleteProvider {
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .filter(value -> planetIDs.isEmpty() || planetIDs.contains(value.getKey()))
                         .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .map(value -> new Command.Choice(value.getValue() + " (" + Helper.getPlanetResources(value.getKey(), activeMap) + "/" + Helper.getPlanetInfluence(value.getKey(), activeMap) + ")", value.getKey()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }

@@ -34,7 +34,8 @@ public class ExhaustLeader extends LeaderAction {
                     .append(Helper.getLeaderFullRepresentation(player, playerLeader));
             OptionMapping optionTG = event.getOption(Constants.TG);
             if (optionTG != null) {
-                Stats.setValue(event, player, optionTG, playerLeader::setTgCount, playerLeader::getTgCount);
+                Stats stats = new Stats();
+                stats.setValue(event, player, optionTG, playerLeader::setTgCount, playerLeader::getTgCount);
                 messageText.append(" - ").append(optionTG.getAsString()).append(Emojis.tg).append(" placed on top of the leader");
                 if (playerLeader.getTgCount() != optionTG.getAsInt()) {
                     messageText.append(" _(").append(String.valueOf(playerLeader.getTgCount())).append(Emojis.tg).append(" total)_\n");
