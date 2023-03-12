@@ -41,30 +41,31 @@ public class SCPlay extends PlayerSubcommandData {
         MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? eventChannel : activeMap.getMainGameChannel();
 
         if (player == null) {
-            MessageHelper.sendMessageToChannel(eventChannel, "You're not a player of this game");
+            sendMessage("You're not a player of this game");
             return;
         }
 
         int sc = player.getSC();
         String emojiName = "SC" + String.valueOf(sc);
         if (sc == 0) {
-            MessageHelper.sendMessageToChannel(eventChannel, "No SC selected by player");
+            sendMessage("No SC selected by player");
             return;
         }
 
         Boolean isSCPlayed = activeMap.getScPlayed().get(sc);
         if (isSCPlayed != null && isSCPlayed) {
-            MessageHelper.sendMessageToChannel(eventChannel, "SC already played");
+            sendMessage("SC already played");
             return;
         }
         
         activeMap.setSCPlayed(sc, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
         String message = "";
+        message += "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc) + " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
         if (!categoryForPlayers.isEmpty()) {
             message += categoryForPlayers + "\n";
         }
-        message += "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc) + " played. Please react with your faction symbol to pass or post in thread for secondaries.";
+        message += "Please indicate your choice by pressing a button below and post additional details in the thread.";
 
         String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
         TextChannel textChannel = event.getChannel().asTextChannel();
@@ -98,20 +99,14 @@ public class SCPlay extends PlayerSubcommandData {
             of = ActionRow.of(followButton, noFollowButton);
         }
         baseMessageObject.addComponents(of);
-
+        
+        String playerFaction = player.getFaction();
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
-            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
+            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             threadChannel.queue();
+            message_.addReaction(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(playerFaction))).queue();
         });
-        
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
-        MessageHelper.replyToMessageTI4Logo(event);
+        event.getHook().deleteOriginal().queue();
     }
 }

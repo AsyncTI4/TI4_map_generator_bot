@@ -24,12 +24,13 @@ public class PlanetRefreshAll extends PlayerSubcommandData {
         player = Helper.getPlayer(activeMap, player, event);
 
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
 
         for (String planet : player.getPlanets()) {
             player.refreshPlanet(planet);
         }
+        sendMessage(Helper.getPlayerRepresentation(event, player) + " readied all planets.");
     }
 }

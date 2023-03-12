@@ -11,6 +11,6 @@ public class Planets extends PlayerSubcommandData{
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Player Planets info received");
+        sendMessage("Player Planets info received");
     }
 }

@@ -1,6 +1,7 @@
 package ti4.commands.player;
 
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Player;
 
 public class TechExhaust extends TechAddRemove {
@@ -11,5 +12,6 @@ public class TechExhaust extends TechAddRemove {
     @Override
     public void doAction(Player player, String techID) {
         player.exhaustTech(techID);
+        sendMessage(Helper.getPlayerRepresentation(getEvent(), player) + " exhausted tech: " + techID);
     }
 }

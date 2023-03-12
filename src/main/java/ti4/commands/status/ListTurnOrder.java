@@ -81,7 +81,11 @@ public class ListTurnOrder extends StatusSubcommandData {
                 }
             }
             msg.append("_ _"); //forced extra line
-            MessageHelper.replyToMessage(event, msg.toString());
+            if (event.getName().equals(Constants.PLAYER)) { //catch if called from /player sc_pick
+                MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
+            } else {
+                MessageHelper.replyToMessage(event, msg.toString());
+            }
         } else {
             MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup community_mode:YES` or `/game setup fow_mode:YES`");
         }

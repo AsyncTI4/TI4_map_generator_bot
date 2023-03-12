@@ -19,18 +19,13 @@ public class Pass extends PlayerSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.replyToMessage(event, "You're not a player of this game");
+            sendMessage("You're not a player of this game");
             return;
         }
         player.setPassed(true);
         String text = Helper.getPlayerRepresentation(event, player) + " PASSED";
-        MessageHelper.sendMessageToChannel(event.getChannel(), text);
-        Turn.pingNextPlayer(event, activeMap, player);
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        MapSaveLoadManager.saveMap(getActiveMap());
-        MessageHelper.replyToMessageTI4Logo(event);
+        sendMessage(text);
+        Turn turn = new Turn();
+        sendMessage(turn.pingNextPlayer(event, activeMap, player));
     }
 }
