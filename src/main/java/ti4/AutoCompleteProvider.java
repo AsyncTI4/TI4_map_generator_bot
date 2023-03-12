@@ -278,7 +278,7 @@ public class AutoCompleteProvider {
             case Constants.SPEND_AS -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Stream.of("Resources", "Influence", "Votes", "TechSkip", "Other")
-                        .filter(value -> value.contains(enteredValue))
+                        .filter(value -> value.toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))
                         .collect(Collectors.toList());
