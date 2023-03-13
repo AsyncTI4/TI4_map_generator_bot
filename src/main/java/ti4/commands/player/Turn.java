@@ -45,7 +45,11 @@ public class Turn extends PlayerSubcommandData {
             sendMessage("Player/Faction/Color could not be found in map:" + map.getName());
             return;
         }
-        sendMessage(Helper.getPlayerRepresentation(event, mainPlayer) + " ENDED TURN");
+        if(map.isFoWMode()) {
+            sendMessage("_ _");
+        } else {
+            sendMessage(Helper.getPlayerRepresentation(event, mainPlayer) + " ended turn");
+        }
         String nextMessage = pingNextPlayer(event, map, mainPlayer);
         if (!nextMessage.isEmpty()) sendMessage(nextMessage);
     }
