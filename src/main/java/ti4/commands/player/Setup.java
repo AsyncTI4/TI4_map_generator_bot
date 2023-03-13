@@ -198,7 +198,11 @@ public class Setup extends PlayerSubcommandData {
         }
         player.getExhaustedPlanets().clear();
         addUnits(setupInfo, tile, color, event);
-        sendMessage("Player: " + Helper.getPlayerRepresentation(event, player) + " has been set up");
+        if(!activeMap.isFoWMode()) {
+            sendMessage("Player: " + Helper.getPlayerRepresentation(event, player) + " has been set up");
+        } else {
+            sendMessage("Player was set up.");
+        }
     }
 
     private void addUnits(String[] setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {
