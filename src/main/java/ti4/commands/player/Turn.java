@@ -127,7 +127,6 @@ public class Turn extends PlayerSubcommandData {
             tempProtection++;
         }
 
-        
         for (Player player : map.getPlayers().values()) {
             int sc = player.getSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
@@ -137,7 +136,8 @@ public class Turn extends PlayerSubcommandData {
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, map, event, text, fail, success);
                 } else {
-                    return text;
+                    MessageHelper.sendMessageToChannel(gameChannel, text);
+                    return "";
                 }
             }
         }
