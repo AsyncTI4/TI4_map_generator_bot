@@ -61,7 +61,8 @@ public class SCPlay extends PlayerSubcommandData {
         activeMap.setSCPlayed(sc, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
         String message = "";
-        message += "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc) + " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
+        message += "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc);
+        if (!activeMap.isFoWMode()) message += " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
         if (!categoryForPlayers.isEmpty()) {
             message += categoryForPlayers + "\n";
         }
