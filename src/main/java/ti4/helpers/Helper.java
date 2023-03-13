@@ -315,6 +315,7 @@ public class Helper {
             case "veldyr" -> Emojis.veldyr;
             case "zealots" -> Emojis.zealots;
             case "zelian" -> Emojis.zelian;
+            case "admins" -> Emojis.AdminsFaction;
             default -> getRandomizedEmoji(0, null);
         };
     }

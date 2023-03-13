@@ -68,6 +68,9 @@ public class Emojis {
     public static final String zealots = "<:zealots:1082724497083334827>";
     public static final String zelian = "<:zelian:1082724503190249547>";
 
+    //FACTIONS - OTHER
+    public static final String AdminsFaction = "<:Admins:1084476380584083527>";
+
     //EXPLORATION
     public static final String HFrag = "<:HFrag:1053857012766752788>";
     public static final String CFrag = "<:CFrag:1053856733849722880>";
