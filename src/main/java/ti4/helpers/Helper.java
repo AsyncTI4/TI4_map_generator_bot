@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 public class Helper {
@@ -242,6 +244,13 @@ public class Helper {
         return emote;
     }
 
+    public static String getRandomSemLore() {
+        List<String> semLores = new ArrayList<>(Emojis.SemLores);
+        Random seed = new Random();
+        Collections.shuffle(semLores, seed);
+        return semLores.get(0);
+    }
+
     public static String getRandomGoodDog() {
         List<String> goodDogs = new ArrayList<>(Emojis.GoodDogs);
         Random seed = new Random();
@@ -314,6 +323,7 @@ public class Helper {
             case "veldyr" -> Emojis.veldyr;
             case "zealots" -> Emojis.zealots;
             case "zelian" -> Emojis.zelian;
+            case "admins" -> Emojis.AdminsFaction;
             default -> getRandomizedEmoji(0, null);
         };
     }
@@ -326,7 +336,7 @@ public class Helper {
             case "meharxull" -> Emojis.PlanetMeharXull;
             case "perimeter" -> Emojis.PlanetPerimeter;
             case "archonvail" -> Emojis.PlanetArchonVail;
-            case "semlore" -> Emojis.SemLord;
+            case "semlore" -> getRandomSemLore();
             default -> Emojis.SemLor;
         };
     }
@@ -596,6 +606,7 @@ public class Helper {
             case "propulsiontech" -> Emojis.PropulsionTech;
             case "biotictech" -> Emojis.BioticTech;
             case "warfaretech" -> Emojis.WarfareTech;
+            case "unitupgradetech" -> Emojis.UnitUpgradeTech;
 
             default -> getRandomGoodDog();
         };
@@ -1073,26 +1084,37 @@ public class Helper {
             }
 
             if (role == null) { //make sure players have access to the game channels
-                List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
-                for (GuildChannel channel : channels) {
-                    TextChannel textChannel = guild.getTextChannelById(channel.getId());
-                    if (textChannel != null) {
-                        for (String playerID : activeMap.getPlayerIDs()) {
-                            Member member = guild.getMemberById(playerID);
-                            long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-                            textChannel.getManager().putMemberPermissionOverride(member.getIdLong(), allow, 0).queue();
-                        }
-                    }
-                }
+                addMapPlayerPermissionsToChannel(guild, activeMap);
             } else { //make sure players have the role
+                addGameRoleToMapPlayers(guild, activeMap, role);
+            }
+        }
+    }
+    
+    public static void addMapPlayerPermissionsToChannel(Guild guild, Map activeMap) {
+        String gameName = activeMap.getName();
+        List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
+        for (GuildChannel channel : channels) {
+            TextChannel textChannel = guild.getTextChannelById(channel.getId());
+            if (textChannel != null) {
+                TextChannelManager textChannelManager = textChannel.getManager();
                 for (String playerID : activeMap.getPlayerIDs()) {
                     Member member = guild.getMemberById(playerID);
-                    if (member != null) guild.addRoleToMember(member, role).queue();
+                    long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+                    textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
                 }
+                textChannelManager.queue();
             }
         }
     }
 
+    private static void addGameRoleToMapPlayers(Guild guild, Map activeMap, Role role) {
+        for (String playerID : activeMap.getPlayerIDs()) {
+            Member member = guild.getMemberById(playerID);
+            if (member != null) guild.addRoleToMember(member, role).queue();
+        }
+    }
+    
     public static GuildMessageChannel getThreadChannelIfExists(ButtonInteractionEvent event) {
         String messageID = event.getInteraction().getMessage().getId();
         MessageChannel messageChannel = event.getMessageChannel();
@@ -1110,5 +1132,18 @@ public class Helper {
             BotLogger.log(event, ExceptionUtils.getStackTrace(e));
             return null;
         }
+    }
+
+    public static String getTechRepresentation(String techID) {
+        String techRep = Mapper.getTechRepresentations().get(techID);
+
+        //Columns: key = Proper Name | type | prerequisites | text
+        StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
+        String techName = techRepTokenizer.nextToken();
+        String techType = techRepTokenizer.nextToken();
+        String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
+        String techPrerequisites = techRepTokenizer.nextToken();
+        String techText = techRepTokenizer.nextToken();
+        return techEmoji + "**" + techName + "**";
     }
 }

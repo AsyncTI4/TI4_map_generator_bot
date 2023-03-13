@@ -12,6 +12,6 @@ public class TechExhaust extends TechAddRemove {
     @Override
     public void doAction(Player player, String techID) {
         player.exhaustTech(techID);
-        sendMessage(Helper.getPlayerRepresentation(getEvent(), player) + " exhausted tech: " + techID);
+        sendMessage(Helper.getPlayerRepresentation(getEvent(), player) + " exhausted tech: " + Helper.getTechRepresentation(techID));
     }
 }

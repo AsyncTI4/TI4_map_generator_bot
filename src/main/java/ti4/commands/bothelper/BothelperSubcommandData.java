@@ -11,6 +11,7 @@ import ti4.message.MessageHelper;
 public abstract class BothelperSubcommandData extends SubcommandData {
 
     private SlashCommandInteractionEvent event;
+    private Map activeMap;
     private User user;
     private boolean replyHasBeenEdited;
 
@@ -20,6 +21,10 @@ public abstract class BothelperSubcommandData extends SubcommandData {
 
     public User getUser() {
         return user;
+    }
+
+    public Map getActiveMap() {
+        return activeMap;
     }
 
     /**
@@ -44,5 +49,6 @@ public abstract class BothelperSubcommandData extends SubcommandData {
         this.event = event;
         replyHasBeenEdited = false;
         user = event.getUser();
+        activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
     }
 }

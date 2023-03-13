@@ -13,6 +13,6 @@ public class TechRemove extends TechAddRemove {
     @Override
     public void doAction(Player player, String techID) {
         player.removeTech(techID);
-        sendMessage(Helper.getPlayerRepresentation(getEvent(), player) + " removed tech: " + techID);
+        sendMessage(Helper.getPlayerRepresentation(getEvent(), player) + " removed tech: " + Helper.getTechRepresentation(techID));
     }
 }
