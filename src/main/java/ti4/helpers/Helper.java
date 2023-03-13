@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -1077,11 +1078,13 @@ public class Helper {
                 for (GuildChannel channel : channels) {
                     TextChannel textChannel = guild.getTextChannelById(channel.getId());
                     if (textChannel != null) {
+                        TextChannelManager textChannelManager = textChannel.getManager();
                         for (String playerID : activeMap.getPlayerIDs()) {
                             Member member = guild.getMemberById(playerID);
                             long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-                            textChannel.getManager().putMemberPermissionOverride(member.getIdLong(), allow, 0).queue();
+                            textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
                         }
+                        textChannelManager.queue();
                     }
                 }
             } else { //make sure players have the role
