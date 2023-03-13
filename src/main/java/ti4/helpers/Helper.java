@@ -1077,28 +1077,37 @@ public class Helper {
             }
 
             if (role == null) { //make sure players have access to the game channels
-                List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
-                for (GuildChannel channel : channels) {
-                    TextChannel textChannel = guild.getTextChannelById(channel.getId());
-                    if (textChannel != null) {
-                        TextChannelManager textChannelManager = textChannel.getManager();
-                        for (String playerID : activeMap.getPlayerIDs()) {
-                            Member member = guild.getMemberById(playerID);
-                            long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-                            textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
-                        }
-                        textChannelManager.queue();
-                    }
-                }
+                addMapPlayerPermissionsToChannel(guild, activeMap);
             } else { //make sure players have the role
+                addGameRoleToMapPlayers(guild, activeMap, role);
+            }
+        }
+    }
+    
+    public static void addMapPlayerPermissionsToChannel(Guild guild, Map activeMap) {
+        String gameName = activeMap.getName();
+        List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
+        for (GuildChannel channel : channels) {
+            TextChannel textChannel = guild.getTextChannelById(channel.getId());
+            if (textChannel != null) {
+                TextChannelManager textChannelManager = textChannel.getManager();
                 for (String playerID : activeMap.getPlayerIDs()) {
                     Member member = guild.getMemberById(playerID);
-                    if (member != null) guild.addRoleToMember(member, role).queue();
+                    long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+                    textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
                 }
+                textChannelManager.queue();
             }
         }
     }
 
+    private static void addGameRoleToMapPlayers(Guild guild, Map activeMap, Role role) {
+        for (String playerID : activeMap.getPlayerIDs()) {
+            Member member = guild.getMemberById(playerID);
+            if (member != null) guild.addRoleToMember(member, role).queue();
+        }
+    }
+    
     public static GuildMessageChannel getThreadChannelIfExists(ButtonInteractionEvent event) {
         String messageID = event.getInteraction().getMessage().getId();
         MessageChannel messageChannel = event.getMessageChannel();
