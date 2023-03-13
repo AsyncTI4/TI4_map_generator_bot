@@ -41,6 +41,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Random;
+import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 public class Helper {
@@ -598,6 +599,7 @@ public class Helper {
             case "propulsiontech" -> Emojis.PropulsionTech;
             case "biotictech" -> Emojis.BioticTech;
             case "warfaretech" -> Emojis.WarfareTech;
+            case "unitupgradetech" -> Emojis.UnitUpgradeTech;
 
             default -> getRandomGoodDog();
         };
@@ -1114,5 +1116,18 @@ public class Helper {
             BotLogger.log(event, ExceptionUtils.getStackTrace(e));
             return null;
         }
+    }
+
+    public static String getTechRepresentation(String techID) {
+        String techRep = Mapper.getTechRepresentations().get(techID);
+
+        //Columns: key = Proper Name | type | prerequisites | text
+        StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
+        String techName = techRepTokenizer.nextToken();
+        String techType = techRepTokenizer.nextToken();
+        String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
+        String techPrerequisites = techRepTokenizer.nextToken();
+        String techText = techRepTokenizer.nextToken();
+        return techEmoji + "**" + techName + "**";
     }
 }

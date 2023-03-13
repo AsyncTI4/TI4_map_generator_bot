@@ -268,6 +268,7 @@ public class Emojis {
     public static final String PropulsionTech = "<:Propulsiontech:947250608145068074>";
     public static final String BioticTech = "<:Biotictech:947250608107315210>";
     public static final String WarfareTech = "<:Warfaretech:947250607855644743>";
+    public static final String UnitUpgradeTech = "<:UnitUpgradeTech:1084898673869209630>";
     
     //GOOD DOGS
     public static final String GoodDog = "<:GoodDog:1068567308819255316>";

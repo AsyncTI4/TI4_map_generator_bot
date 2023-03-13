@@ -76,6 +76,8 @@ public class MapGenerator {
         adminRole = jda.getRoleById("943596173896323072");
         developerRole = jda.getRoleById("947648366056185897");
         bothelperRole = jda.getRoleById("970033771179028531");
+        
+        adminRole = jda.getRoleById("1067866210865250445"); //DEBUG OVERRIDE - PrisonerOne's Test Server Admin Role
 
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddTile());
