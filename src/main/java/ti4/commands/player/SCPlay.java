@@ -105,7 +105,7 @@ public class SCPlay extends PlayerSubcommandData {
             ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
             threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
             threadChannel.queue();
-            message_.addReaction(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(playerFaction))).queue();
+            if (!getActiveMap().isFoWMode()) message_.addReaction(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(playerFaction))).queue();
         });
         event.getHook().deleteOriginal().queue();
     }
