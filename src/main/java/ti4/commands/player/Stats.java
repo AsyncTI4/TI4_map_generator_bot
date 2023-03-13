@@ -219,7 +219,8 @@ public class Stats extends PlayerSubcommandData {
     }
 
     public void setValue(SlashCommandInteractionEvent event, Player player, String optionName, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
-            try {
+        if (event.getSubcommandName().equals(Constants.EXHAUST_LEADER)) return; //exit when adding TG to Artuno
+        try {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             int number = Integer.parseInt(value);
             int existingNumber = supplier.get();

@@ -21,7 +21,6 @@ public class ExhaustLeader extends LeaderAction {
 
     @Override
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-        preExecute(event);
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null) {
             if (playerLeader.isLocked()) {
@@ -36,8 +35,9 @@ public class ExhaustLeader extends LeaderAction {
             OptionMapping optionTG = event.getOption(Constants.TG);
             if (optionTG != null) {
                 Stats stats = new Stats();
+                stats.preExecute(event);
                 stats.setValue(event, player, optionTG, playerLeader::setTgCount, playerLeader::getTgCount);
-                messageText.append(" - ").append(optionTG.getAsString()).append(Emojis.tg).append(" placed on top of the leader");
+                messageText.append("\n").append(optionTG.getAsString()).append(Emojis.tg).append(" was placed on top of the leader");
                 if (playerLeader.getTgCount() != optionTG.getAsInt()) {
                     messageText.append(" _(").append(String.valueOf(playerLeader.getTgCount())).append(Emojis.tg).append(" total)_\n");
                 }
