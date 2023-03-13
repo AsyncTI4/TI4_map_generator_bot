@@ -256,6 +256,9 @@ public class Emojis {
     public static final String SemLord = "<:SemLord:1072076401462738965>";
     public static final String SemiLor = "<:SemiLor:1072076567053869106>";
 
+    //LIST OF SEM-LORES
+    public static List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor);
+
 
     //ANOMOLIES
     public static final String Supernova = "<:Supernova:1068081584978284635>";

@@ -244,6 +244,13 @@ public class Helper {
         return emote;
     }
 
+    public static String getRandomSemLore() {
+        List<String> semLores = new ArrayList<>(Emojis.SemLores);
+        Random seed = new Random();
+        Collections.shuffle(semLores, seed);
+        return semLores.get(0);
+    }
+
     public static String getRandomGoodDog() {
         List<String> goodDogs = new ArrayList<>(Emojis.GoodDogs);
         Random seed = new Random();
@@ -329,7 +336,7 @@ public class Helper {
             case "meharxull" -> Emojis.PlanetMeharXull;
             case "perimeter" -> Emojis.PlanetPerimeter;
             case "archonvail" -> Emojis.PlanetArchonVail;
-            case "semlore" -> Emojis.SemLord;
+            case "semlore" -> getRandomSemLore();
             default -> Emojis.SemLor;
         };
     }
