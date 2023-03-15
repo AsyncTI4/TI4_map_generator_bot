@@ -2,7 +2,9 @@
 
 Hello Async TI Developers!
 
-Please test your changes before making a PR. See below for methods and examples of how to test:
+Please test your changes before making a PR.
+See below for methods and examples of how to test.
+If you have a different way, please share!
 
 ## 1.0 - Locally
 
