@@ -224,22 +224,27 @@ public class AutoCompleteProvider {
             case Constants.PLANET, Constants.PLANET2, Constants.PLANET3, Constants.PLANET4, Constants.PLANET5, Constants.PLANET6 -> {
                 MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName());
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                // System.out.println(event.getName());
-                // System.out.println(event.getSubcommandName());
                 Set<String> planetIDs;
+                HashMap<String, String> planets = Mapper.getPlanetRepresentations();
                 if (activeMap != null && !activeMap.isFoWMode()) {
                     planetIDs = activeMap.getPlanets();
-                } else {
+                    List<Command.Choice> options = planets.entrySet().stream()
+                            .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                            .filter(value ->  planetIDs.isEmpty() || planetIDs.contains(value.getKey()))
+                            .limit(25)
+                            .map(value -> new Command.Choice(value.getValue() + " (" + Helper.getPlanetResources(value.getKey(), activeMap) + "/" + Helper.getPlanetInfluence(value.getKey(), activeMap) + ")", value.getKey()))
+                            .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                } else if (activeMap != null && activeMap.isFoWMode()) {
                     planetIDs = Collections.emptySet();
+                    List<Command.Choice> options = planets.entrySet().stream()
+                            .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                            .filter(value ->  planetIDs.isEmpty() || planetIDs.contains(value.getKey()))
+                            .limit(25)
+                            .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                            .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
                 }
-                HashMap<String, String> planets = Mapper.getPlanetRepresentations();
-                List<Command.Choice> options = planets.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                        .filter(value -> planetIDs.contains(value.getKey()))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue() + " (" + Helper.getPlanetResources(value.getKey(), activeMap) + "/" + Helper.getPlanetInfluence(value.getKey(), activeMap) + ")", value.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
             }
             case Constants.TRAIT -> {
                 String enteredValue = event.getFocusedOption().getValue();
