@@ -535,5 +535,6 @@ public class Constants {
     public static final String PING = "ping";
     public static final String ENDED_GAMES = "ended_games";
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
+    public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
 
 }
