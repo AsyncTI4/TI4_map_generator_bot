@@ -135,6 +135,7 @@ public class Turn extends PlayerSubcommandData {
                     String fail = "User for next faction not found. Report to ADMIN";
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, map, event, text, fail, success);
+                    return "";
                 } else {
                     MessageHelper.sendMessageToChannel(gameChannel, text);
                     return "";
