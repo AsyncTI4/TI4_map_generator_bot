@@ -62,19 +62,9 @@ public class CreateGame implements Command {
         if (!setMapSuccessful) {
             MessageHelper.replyToMessage(event, "Could not assign active Game " + mapName);
         }
-        OptionMapping vpOption = event.getOption(Constants.VP_COUNT);
-        if (vpOption != null) {
-            int count = vpOption.getAsInt();
-            if (count < 1){
-                count = 1;
-            } else if (count > 20){
-                count = 20;
-            }
-            map.setVp(count);
-        }
 
-        MessageHelper.replyToMessage(event, "Game created with name: " + mapName);
         MapSaveLoadManager.saveMap(map);
+        MessageHelper.replyToMessage(event, "Game created with name: " + mapName);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -84,7 +74,6 @@ public class CreateGame implements Command {
         commands.addCommands(
                 Commands.slash(getActionID(), "Shows selected Game")
                         .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setRequired(true))
-                        .addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Specify game VP count").setRequired(false))
         );
     }
 }
