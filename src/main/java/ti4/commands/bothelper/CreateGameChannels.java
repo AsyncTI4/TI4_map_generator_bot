@@ -60,10 +60,13 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         //CHECK ROLE COUNT
-        if (guild.getRoles().size() >= 250) {
+        int roleCount = guild.getRoles().size();
+        if (roleCount >= 250) {
             sendMessage("Server is at the role limit - please contact @Admin to resolve.");
-            BotLogger.log(event, "Cannot create a new role. Server is currently has " + guild.getRoles().size() + " roles.");
+            BotLogger.log(event, "Cannot create a new role. Server is currently has " + roleCount + " roles.");
             return;
+        } else if (roleCount >= 247) {
+            BotLogger.log(event, "Warning: Server is at " + (roleCount + 1) + " roles");
         }
 
         //CHECK CATEGORY IS VALID
@@ -77,6 +80,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         if (category.getChannels().size() > 48) {
             sendMessage("Category: **" + category.getName() + "** is full. Create a new category then try again.");
             return;
+        } else if (category.getChannels().size() > 45) {
+            BotLogger.log(event, "Warning: Category: **" + category.getName() + "** is almost full.");
         }
 
         StringBuilder message = new StringBuilder("Role and Channels have been set up:\n");
@@ -130,7 +135,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         StringBuilder botGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - bot/map channel\n");
         botGetStartedMessage.append("Use the following commands to get started:\n");
         botGetStartedMessage.append("> `/create_game game_name:" + gameName + "`\n");
-        botGetStartedMessage.append("> `/game setup game_custom_name:" + gameName + "-" + gameFunName + "` to set player count and additional options\n");
+        botGetStartedMessage.append("> `/game setup` to set player count and additional options\n");
         botGetStartedMessage.append("> `/add_tile_list {mapString}`, replacing {mapString} with the actual map string\n");
         botGetStartedMessage.append("> `/game add` to add players to the game - do this in speaker order (starting at top of map going clockwise)\n");
         botGetStartedMessage.append("> `/game set_order` to fix the order if incorrect\n");
