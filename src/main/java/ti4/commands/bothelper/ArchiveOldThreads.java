@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
 
 public class ArchiveOldThreads extends BothelperSubcommandData {
     public ArchiveOldThreads(){
@@ -24,6 +23,7 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
         }
         sendMessage("Archiving " + threadCount + " threads");
         sendMessage(ListOldChannels.getOldThreadsMessage(event.getGuild(), threadCount));
+
         archiveOldThreads(event.getGuild(), threadCount);
     }
 
