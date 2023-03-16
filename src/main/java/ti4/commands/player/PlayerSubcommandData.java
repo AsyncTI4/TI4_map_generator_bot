@@ -36,19 +36,12 @@ public abstract class PlayerSubcommandData extends SubcommandData {
     }
 
     /**
-     * Edits the original message after submitting a slash command
+     * After submitting a slash command, will either edit the original message, or send following messages
      * @param messageText new message
      */
     public void sendMessage(String messageText) {
-        if (this.replyHasBeenEdited) {
-            MessageHelper.sendMessageToChannel(this.event.getChannel(), messageText);
-        } else if (messageText.length() >= 2000) {
-            this.event.getHook().editOriginal("_ _").queue();
-            MessageHelper.sendMessageToChannel(this.event.getChannel(), messageText);
-        } else {
-            this.event.getHook().editOriginal(messageText).queue();
-            this.replyHasBeenEdited = true;
-        }
+        MessageHelper.replyToSlashCommand(event, messageText);
+        if (!this.replyHasBeenEdited) this.replyHasBeenEdited = true;
     }
     
     abstract public void execute(SlashCommandInteractionEvent event);

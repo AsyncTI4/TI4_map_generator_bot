@@ -1,6 +1,7 @@
 package ti4.message;
 
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -20,6 +21,8 @@ import ti4.map.Player;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.jetbrains.annotations.NotNull;
 
 public class MessageHelper {
 
@@ -272,5 +275,51 @@ public class MessageHelper {
             splitAndSent(messageText, channel);
         });
     }
+
+    public static void replyToSlashCommand(@NotNull SlashCommandInteractionEvent event, String messageText) {
+        if (messageText == null || messageText.isEmpty()) {
+            BotLogger.log(event, "`MessageHelper.replyToSlashCommand` : `messageText` was null or empty");
+            return;
+        }
+        sendMessageSplitLarge(event, messageText);
+    }
+
+    private static void sendMessageSplitLarge(SlashCommandInteractionEvent event, String messageText) {
+        for (String text : splitLargeText(messageText, 1500)) {
+            event.getChannel().sendMessage(text).queue();
+        }
+        // Integer messageLength = messageText.length();
+        // int maxLength = 1500;
+        // if (messageLength > maxLength) {
+        //     List<String> texts = splitLargeText(messageText, maxLength);
+        //     for (String text : texts) {
+        //         event.getChannel().sendMessage(text).queue();
+        //     }
+        // } else {
+        //     event.getChannel().sendMessage(messageText).queue();
+
+        // }
+    }
+
+    private static List<String> splitLargeText(String messageText, int maxLength) {
+        List<String> texts = new ArrayList<>();
+        Integer messageLength = messageText.length();
+        int index = 0;
+        while (index < messageLength) {
+            String nextChars = messageText.substring(index, Math.min(index + maxLength, messageLength));
+            Integer lastNewLineIndex = nextChars.lastIndexOf("\n") + 1; // number of chars until right after the last \n
+            String textToAdd = "";
+            if (lastNewLineIndex > 0) {
+                textToAdd = nextChars.substring(0, lastNewLineIndex);
+                index += lastNewLineIndex;
+            } else {
+                textToAdd = nextChars;
+                index += nextChars.length();
+            }
+            texts.add(textToAdd);
+        }
+        return texts;
+    }
+
 
 }
