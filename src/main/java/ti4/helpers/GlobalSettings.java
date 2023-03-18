@@ -16,6 +16,11 @@ public class GlobalSettings {
         return clazz.cast(settings.get(attr));
     }
 
+    public static <T> T getSetting(String attr, Class<T> clazz, T def) {
+        if(!settings.containsKey(attr))
+            return def;
+        return clazz.cast(settings.get(attr));
+    }
     public static <T> void setSetting(String attr, T val) {
         settings.put(attr, (Object) val);
     }
