@@ -98,7 +98,7 @@ public class AdminCommand implements Command {
         subcommands.add(new CardsInfoForPlayer());
         subcommands.add(new DrawSpecificSOForPlayer());
         subcommands.add(new Statistics());
-        //subcommands.add(new SetGlobalSetting());
+        subcommands.add(new SetGlobalSetting());
         return subcommands;
     }
 
