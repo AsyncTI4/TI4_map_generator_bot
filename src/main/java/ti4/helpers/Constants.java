@@ -36,7 +36,7 @@ public class Constants {
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
 
-    public static final String SET_SETTING = "setting_name";
+    public static final String SET_SETTING = "Set an admin value";
     public static final String SETTING_NAME = "setting_name";
     public static final String SETTING_VALUE = "setting_value";
 
