@@ -35,7 +35,6 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Storage;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.BotLogger;
-import ti4.helpers.GlobalSettings;
 
 import javax.security.auth.login.LoginException;
 
@@ -52,8 +51,6 @@ public class MapGenerator {
     public static void main(String[] args)
             throws LoginException {
 
-
-        //GlobalSettings.loadSettings();
         jda = JDABuilder.createDefault(args[0])
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
