@@ -1,4 +1,4 @@
-package ti4.commands.admin;
+package ti4.commands.help;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -12,9 +12,10 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 import java.util.HashMap;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-public class ListGames extends AdminSubcommandData {
+public class ListGames extends HelpSubcommandData {
 
     public ListGames() {
         super(Constants.LIST_GAMES, "List all games");
