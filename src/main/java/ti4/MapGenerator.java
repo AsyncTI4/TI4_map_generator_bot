@@ -53,7 +53,7 @@ public class MapGenerator {
             throws LoginException {
 
 
-        GlobalSettings.loadSettings();
+        //GlobalSettings.loadSettings();
         jda = JDABuilder.createDefault(args[0])
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
