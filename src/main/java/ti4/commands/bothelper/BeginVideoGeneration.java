@@ -23,7 +23,7 @@ public class BeginVideoGeneration extends BothelperSubcommandData {
         AWSBatch client = AWSBatchClientBuilder.standard().withRegion("us-east-1").build();
         SubmitJobRequest sjr = new SubmitJobRequest();
         sjr.setJobName("video-" + game );
-        sjr.setJobDefinition("getting-started-wizard-job-definition:10");
+        sjr.setJobDefinition("getting-started-wizard-job-definition:11");
         sjr.setJobQueue("ti4-video-queue");
         HashMap<String, String> hm = new HashMap<String,String>();
         hm.put("game", game);
