@@ -13,7 +13,7 @@ import ti4.helpers.Constants;
 
 public class BeginVideoGeneration extends BothelperSubcommandData {
     public BeginVideoGeneration (){
-        super(Constants.BEGIN_VIDEO_GEN, "Archive a number of the oldest active threads");
+        super(Constants.BEGIN_VIDEO_GEN, "Kickoff Video Process in AWS");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Name of the Game to video-ize.").setRequired(true));
     }
 
