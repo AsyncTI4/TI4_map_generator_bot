@@ -29,8 +29,6 @@ public class BeginVideoGeneration extends BothelperSubcommandData {
         hm.put("game", game);
         sjr.setParameters(hm);
         client.submitJob(sjr);
-
-
     }
 
 }
