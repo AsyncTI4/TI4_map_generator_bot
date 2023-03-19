@@ -36,6 +36,9 @@ public class Constants {
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
 
+
+    
+
     public static final String SET_SETTING = "setting_name";
     public static final String SETTING_NAME = "setting_name";
     public static final String SETTING_VALUE = "setting_value";
@@ -540,5 +543,5 @@ public class Constants {
     public static final String ENDED_GAMES = "ended_games";
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
     public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
-
+    public static final String BEGIN_VIDEO_GEN = "begin_video_gen";
 }
