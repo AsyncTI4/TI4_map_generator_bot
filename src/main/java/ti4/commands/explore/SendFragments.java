@@ -78,12 +78,11 @@ public class SendFragments extends ExploreSubcommandData {
 
 		MessageHelper.replyToMessageTI4Logo(event);
 		String message = Helper.getPlayerRepresentation(event, sender) + " sent " + trait + " " + Helper.getEmojiFromDiscord(emojiName) + " relic fragments to: " + Helper.getPlayerRepresentation(event, reciever);
+		MessageHelper.sendMessageToChannel(event.getChannel(), message);
 		if (activeMap.isFoWMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
-			String success = message + "\nThe other player has been notified";
+			String success = "The other player has been notified";
 			MessageHelper.sendPrivateMessageToPlayer(reciever, activeMap, event, message, fail, success);
-		} else {
-			MessageHelper.sendMessageToChannel(event.getChannel(), message);
 		}
 	}
 }

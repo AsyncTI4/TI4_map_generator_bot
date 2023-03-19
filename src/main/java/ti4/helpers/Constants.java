@@ -235,6 +235,9 @@ public class Constants {
     public static final String PASS = "pass";
     public static final String TURN = "turn_end";
     public static final String SPEAKER = "speaker";
+    public static final String ACTIVE_PLAYER = "active_player";
+    public static final String LAST_ACTIVE_PLAYER_PING = "last_active_player_ping";
+    public static final String LAST_ACTIVE_PLAYER_CHANGE = "last_active_player_change";
     
     public static final String MAIN_GAME_CHANNEL = "main_game_channel";
     public static final String CHANNEL1 = "channel1";
@@ -307,6 +310,9 @@ public class Constants {
     public static final String VRF = "void_relic_fragment";
     public static final String STRATEGY_CARD = "strategy_card";
     public static final String DUMMY = "dummy";
+    
+    public static final String NUMBER_OF_TURNS = "number_of_turns";
+    public static final String TOTAL_TURN_TIME = "total_turn_time";
 
     public static final String TXT = ".txt";
     public static final String JPG = ".jpg";
@@ -373,6 +379,7 @@ public class Constants {
     public static final String PO2 = "publicObjectives2";
 
     public static final String TURN_ORDER = "turn_order";
+    public static final String TURN_STATS = "turn_stats";
     public static final String VOTE_COUNT = "vote_count";
     public static final String SC_TRADE_GOODS = "sc_trade_goods";
     public static final String SC_COUNT = "sc_count";
@@ -540,6 +547,7 @@ public class Constants {
     public static final String CARDS_INFO_THREAD_PREFIX = "Cards Info-";
     public static final String BOT_CHANNEL_SUFFIX = "-bot-map-updates";
     public static final String PING = "ping";
+    public static final String PING_ACTIVE_PLAYER = "ping_active_player";
     public static final String ENDED_GAMES = "ended_games";
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
     public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";

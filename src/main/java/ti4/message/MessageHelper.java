@@ -59,13 +59,10 @@ public class MessageHelper {
             event.getHook().sendMessage("Message to long for replay, sent all information in base messages").queue();
         } else {
             if (!messageText.isEmpty()) {
-                splitAndSent(messageText, event.getChannel());
+                event.getHook().sendMessage(messageText).queue();
+            } else {
+                event.getHook().sendMessage("-").queue();
             }
-            event.getHook().sendMessage("-").queue();
-            //Deletes slash command
-//            event.getHook().sendMessage("-").queue(msg -> {
-//                msg.delete().queueAfter(1, TimeUnit.SECONDS);
-//            });
         }
     }
 

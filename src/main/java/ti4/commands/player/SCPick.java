@@ -104,6 +104,7 @@ public class SCPick extends PlayerSubcommandData {
                 if (nextPlayer != null) {
                     msgExtra += " " + Helper.getPlayerRepresentation(event, nextPlayer) + " is up for an action";
                     privatePlayer = nextPlayer;
+                    activeMap.updateActivePlayer(nextPlayer);
                 }
             }
         } else {

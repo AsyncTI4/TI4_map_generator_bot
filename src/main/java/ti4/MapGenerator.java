@@ -58,9 +58,7 @@ public class MapGenerator {
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.ALL)
-//                .enableIntents(Arrays.asList(GatewayIntent.values()))
                 .build();
-
 	    
         jda.addEventListener(new MessageListener(), new ButtonListener());
         try {
@@ -68,7 +66,7 @@ public class MapGenerator {
         } catch (InterruptedException e) {
             BotLogger.log("Error waiting for bot to get ready");
         }
-//        User user = event.getJDA().getUserById();
+
         userID = args[1];
         PositionMapper.init();
         Mapper.init();
@@ -78,7 +76,7 @@ public class MapGenerator {
         adminRole = jda.getRoleById("943596173896323072");
         developerRole = jda.getRoleById("947648366056185897");
         bothelperRole = jda.getRoleById("970033771179028531");
-    
+
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddTile());
         commandManager.addCommand(new RemoveTile());
@@ -126,32 +124,24 @@ public class MapGenerator {
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
         commands.queue();
 
-       //TI Community game
-       if (args.length >= 4) {
-	       Guild guild2 = jda.getGuildById(args[3]);
-           BotLogger.log("BOT STARTED UP: " + guild2.getName());
-	       CommandListUpdateAction commandsC = guild2.updateCommands();
-	       commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
-	       commandsC.queue();
-       }
+        //TI Community game
+        if (args.length >= 4) {
+            Guild guild2 = jda.getGuildById(args[3]);
+            BotLogger.log("BOT STARTED UP: " + guild2.getName());
+            CommandListUpdateAction commandsC = guild2.updateCommands();
+            commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
+            commandsC.queue();
+        }
 
-       //FOW game
-       if (args.length >= 5) {
-	       Guild guild3 = jda.getGuildById(args[4]);
-           BotLogger.log("BOT STARTED UP: " + guild3.getName());
-	       CommandListUpdateAction commandsD = guild3.updateCommands();
-	       commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
-	       commandsD.queue();
-       }
-       BotLogger.log("BOT STARTED UP: " + guild.getName());
-        //------------------------------------------------
-
-//        CommandListUpdateAction commands_ = jda.updateCommands();
-//        commandManager.getCommandList().forEach(command -> command.registerCommands(commands_));
-//        commands_.queue();
-
-//        guild.updateCommands().queue();
-//        jda.updateCommands().queue();
+        //FOW game
+        if (args.length >= 5) {
+            Guild guild3 = jda.getGuildById(args[4]);
+            BotLogger.log("BOT STARTED UP: " + guild3.getName());
+            CommandListUpdateAction commandsD = guild3.updateCommands();
+            commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
+            commandsD.queue();
+        }
+        BotLogger.log("BOT STARTED UP: " + guild.getName());
         MapSaveLoadManager.loadMaps();
     }
 }

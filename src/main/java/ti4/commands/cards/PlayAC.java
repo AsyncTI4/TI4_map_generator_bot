@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -31,19 +30,23 @@ public class PlayAC extends CardsSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
+
         OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to discard");
+            sendMessage("Please select what Action Card to discard");
             return;
         }
-
-        playAC(event, activeMap, player, option.getAsString().toLowerCase(), event.getChannel(), event.getGuild(), null);
+        
+        String reply = playAC(event, activeMap, player, option.getAsString().toLowerCase(), event.getChannel(), event.getGuild(), null);
+        if (reply != null) {
+            sendMessage(reply);
+        }
     }
 
-    public static void playAC(SlashCommandInteractionEvent event, Map activeMap, Player player, String value, MessageChannel channel, Guild guild, ButtonInteractionEvent buttonInteractionEvent) {
+    public static String playAC(SlashCommandInteractionEvent event, Map activeMap, Player player, String value, MessageChannel channel, Guild guild, ButtonInteractionEvent buttonInteractionEvent) {
         MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? channel : activeMap.getMainGameChannel();
         
         String acID = null;
@@ -64,8 +67,7 @@ public class PlayAC extends CardsSubcommandData {
                     actionCardName = actionCardName.toLowerCase();
                     if (actionCardName.contains(value)) {
                         if (foundSimilarName && !cardName.equals(actionCardName)) {
-                            MessageHelper.sendMessageToChannel(channel, "Multiple cards with similar name founds, please use ID");
-                            return;
+                            return "Multiple cards with similar name founds, please use ID";
                         }
                         acID = ac.getKey();
                         acIndex = ac.getValue();
@@ -76,14 +78,22 @@ public class PlayAC extends CardsSubcommandData {
             }
         }
         if (acID == null) {
-            MessageHelper.sendMessageToChannel(channel, "No such Action Card ID found, please retry");
-            return;
+            //sendMessage();
+            return "No such Action Card ID found, please retry";
         }
         String[] actionCard = Mapper.getActionCard(acID).split(";");
         String actionCardTitle = actionCard[0];
         String actionCardPhase = actionCard[1];
         String actionCardWindow = actionCard[2];
         String actionCardText = actionCard[3];
+
+        String activePlayerID = activeMap.getActivePlayer();
+        if (player.isPassed() && activePlayerID != null) {
+            Player activePlayer = activeMap.getPlayer(activePlayerID);
+            if (activePlayer != null && activePlayer.getTechs().contains("tp")) {
+                return "You are passed and the active player has researched Transparasteel Plating. AC Play command cancelled.";
+            }
+        }
 
         activeMap.discardActionCard(player.getUserID(), acIndex);
         StringBuilder sb = new StringBuilder();
@@ -106,5 +116,6 @@ public class PlayAC extends CardsSubcommandData {
             MessageHelper.sendMessageToChannelWithButtons(mainGameChannel, sb.toString(), guild, sabotageButton, noSabotageButton);
         }
         CardsInfo.sentUserCardInfo(event, activeMap, player, buttonInteractionEvent);
+        return null;
     }
 }

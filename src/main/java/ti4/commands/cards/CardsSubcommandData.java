@@ -44,6 +44,7 @@ public abstract class CardsSubcommandData extends SubcommandData {
         } else if (messageText.length() >= 2000) {
             this.event.getHook().editOriginal("_ _").queue();
             MessageHelper.sendMessageToChannel(this.event.getChannel(), messageText);
+            this.replyHasBeenEdited = true;
         } else {
             this.event.getHook().editOriginal(messageText).queue();
             this.replyHasBeenEdited = true;

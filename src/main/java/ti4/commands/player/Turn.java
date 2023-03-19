@@ -110,6 +110,7 @@ public class Turn extends PlayerSubcommandData {
 
         MessageChannel gameChannel = map.getMainGameChannel() == null ? event.getChannel() : map.getMainGameChannel();
         if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value) || map.getPlayers().values().stream().allMatch(Player::isPassed)) {
+            map.updateActivePlayer(null);
             showPublicObjectivesWhenAllPassed(event, map, gameChannel);
             return "";
         }
@@ -131,6 +132,7 @@ public class Turn extends PlayerSubcommandData {
             int sc = player.getSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
                 String text = Helper.getPlayerRepresentation(event, player, true) + " UP NEXT";
+                map.updateActivePlayer(player);
                 if (isFowPrivateGame) {
                     String fail = "User for next faction not found. Report to ADMIN";
                     String success = "The next player has been notified";
