@@ -213,7 +213,7 @@ public class AutoCompleteProvider {
                     event.replyChoices(options).queue();
                 } else {
                     List<Command.Choice> options = techs.entrySet().stream()
-                        .filter(Predicate.not(value -> value.getKey().toLowerCase().startsWith("ds")))
+                        .filter(Predicate.not(value -> value.getKey().toLowerCase().startsWith("ds") && !value.getKey().equals("ds")))
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getValue(), value.getKey()))
@@ -236,10 +236,8 @@ public class AutoCompleteProvider {
                             .collect(Collectors.toList());
                     event.replyChoices(options).queue();
                 } else if (activeMap != null && activeMap.isFoWMode()) {
-                    planetIDs = Collections.emptySet();
                     List<Command.Choice> options = planets.entrySet().stream()
                             .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                            .filter(value ->  planetIDs.isEmpty() || planetIDs.contains(value.getKey()))
                             .limit(25)
                             .map(value -> new Command.Choice(value.getValue(), value.getKey()))
                             .collect(Collectors.toList());
@@ -292,7 +290,7 @@ public class AutoCompleteProvider {
             case Constants.FOG_FILTER -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Stream.of("Dark Grey (default)", "Sepia", "White", "Pink", "Purple")
-                        .filter(value -> value.contains(enteredValue))
+                        .filter(value -> value.toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))
                         .collect(Collectors.toList());

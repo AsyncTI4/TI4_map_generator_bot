@@ -16,8 +16,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -60,9 +58,10 @@ public class SCPlay extends PlayerSubcommandData {
         
         activeMap.setSCPlayed(sc, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
-        String message = "";
-        message += "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc);
-        if (!activeMap.isFoWMode()) message += " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
+        String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc) + " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
+        if (activeMap.isFoWMode()) {
+            message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc) + " played.\n\n";
+        }
         if (!categoryForPlayers.isEmpty()) {
             message += categoryForPlayers + "\n";
         }
@@ -101,12 +100,24 @@ public class SCPlay extends PlayerSubcommandData {
         }
         baseMessageObject.addComponents(of);
         
-        String playerFaction = player.getFaction();
+        final Player player_ = player;
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
-            ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
-            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
-            threadChannel.queue();
-            if (!getActiveMap().isFoWMode()) message_.addReaction(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(playerFaction))).queue();
+            Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player_, message_); 
+            if (reactionEmoji != null) {
+                message_.addReaction(reactionEmoji).queue();
+            }
+
+            if (getActiveMap().isFoWMode()) {
+                //in fow, send a message back to the player that includes their emoji
+                String response = "SC played.";
+                response += reactionEmoji != null ? " " + reactionEmoji.getFormatted() : "\nUnable to generate initial reaction, please click \"Not Following\" to add your reaction.";
+                MessageHelper.sendPrivateMessageToPlayer(player_, getActiveMap(), response);
+            } else {
+                //only do thread in non-fow games
+                ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
+                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
+                threadChannel.queue();
+            }
         });
         event.getHook().deleteOriginal().queue();
     }
