@@ -1,5 +1,7 @@
 package ti4.commands.bothelper;
 
+import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 import java.util.HashMap;
 
 import com.amazonaws.services.batch.AWSBatch;
@@ -21,8 +23,10 @@ public class BeginVideoGeneration extends BothelperSubcommandData {
         String game = event.getOption(Constants.GAME_NAME).getAsString();
         sendMessage("Launching Video Creation for:" + game);
         AWSBatch client = AWSBatchClientBuilder.standard().withRegion("us-east-1").build();
-
+        SimpleDateFormat sdf1 = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
+        Timestamp timestamp = new Timestamp(System.currentTimeMillis());
         SubmitJobRequest sjr = new SubmitJobRequest();
+        sjr.setJobName("Run Game: " + game + sdf1.format(timestamp));
         sjr.setJobDefinition("getting-started-wizard-job-definition:10");
         sjr.setJobQueue("ti4-video-queue");
         HashMap<String, String> hm = new HashMap<String,String>();
