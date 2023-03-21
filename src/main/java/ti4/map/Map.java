@@ -811,8 +811,9 @@ public class Map {
         return agendas.get(agendas.size() - 1 - indexFromEnd);
     }
 
-    public String revealAgenda() {
-        String id = agendas.remove(0);
+    public String revealAgenda(boolean revealFromBottom) {
+        int index = revealFromBottom ? agendas.size() - 1 : 0;
+        String id = agendas.remove(index);
         addDiscardAgenda(id);
         return id;
     }
