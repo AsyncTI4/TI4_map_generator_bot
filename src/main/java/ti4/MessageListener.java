@@ -40,7 +40,8 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        event.getInteraction().deferReply().queue();
+        // event.getInteraction().deferReply().queue();
+        event.getInteraction().reply("_ _").queue();
         String userID = event.getUser().getId();
 
         // CHECK IF CHANNEL IS MATCHED TO A GAME
