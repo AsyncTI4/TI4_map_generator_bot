@@ -73,11 +73,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //CHECK SERVER CHANNEL COUNT
         int channelCount = guild.getChannels().size();
-        if (channelCount >=500) {
+        if (channelCount > 498) {
             sendMessage("Server is at the channel limit - please contact @Admin to resolve.");
             BotLogger.log(event, "Cannot create new channels. Server is currently has " + channelCount + " channels.");
             return;
-        } else if (channelCount >= 496) {
+        } else if (channelCount >= 495) {
             BotLogger.log(event, "Warning: Server is at " + (channelCount + 2) + " channels");
         }
 
