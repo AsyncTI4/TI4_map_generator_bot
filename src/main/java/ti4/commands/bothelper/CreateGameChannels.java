@@ -32,7 +32,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         super(Constants.CREATE_GAME_CHANNELS, "Create Role and Game Channels for a New Game");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here").setRequired(true));
         addOptions(new OptionData(OptionType.CHANNEL, Constants.CATEGORY, "Category #category-name - only select a category").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName").setRequired(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName - this will be the game owner, who will complete /game setup").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player4 @playerName"));
@@ -69,6 +69,16 @@ public class CreateGameChannels extends BothelperSubcommandData {
             return;
         } else if (roleCount >= 247) {
             BotLogger.log(event, "Warning: Server is at " + (roleCount + 1) + " roles");
+        }
+
+        //CHECK SERVER CHANNEL COUNT
+        int channelCount = guild.getChannels().size();
+        if (channelCount >=500) {
+            sendMessage("Server is at the channel limit - please contact @Admin to resolve.");
+            BotLogger.log(event, "Cannot create new channels. Server is currently has " + channelCount + " channels.");
+            return;
+        } else if (channelCount >= 496) {
+            BotLogger.log(event, "Warning: Server is at " + (channelCount + 2) + " channels");
         }
 
         //CHECK CATEGORY IS VALID
