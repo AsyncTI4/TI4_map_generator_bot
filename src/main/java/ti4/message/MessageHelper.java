@@ -63,11 +63,11 @@ public class MessageHelper {
             if (!messageText.isEmpty()) {
                 splitAndSent(messageText, event.getChannel());
             }
-            event.getHook().sendMessage("-").queue();
+            // event.getHook().sendMessage("-").queue();
             //Deletes slash command
-//            event.getHook().sendMessage("-").queue(msg -> {
-//                msg.delete().queueAfter(1, TimeUnit.SECONDS);
-//            });
+           event.getHook().sendMessage("-").queue(msg -> {
+               msg.delete().queue();
+           });
         }
     }
 
