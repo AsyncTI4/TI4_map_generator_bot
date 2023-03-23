@@ -61,6 +61,10 @@ public class Map {
     @ExportableField
     private int round = 1;
 
+    private String activePlayer = null;
+    private Date lastActivePlayerPing = new Date(0);
+    private Date lastActivePlayerChange = new Date(0);
+
     private List<String> secretObjectives;
     private List<String> actionCards;
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
@@ -301,6 +305,50 @@ public class Map {
      */
     public void setSpeaker(String speaker) {
         this.speaker = speaker;
+    }
+
+    public String getActivePlayer() {
+        return activePlayer;
+    }
+
+    public void updateActivePlayer(Player player) {
+        /// update previous active player stats
+        Date newTime = new Date();
+        if (activePlayer != null) {
+            Player prevPlayer = getPlayer(activePlayer);
+            if (prevPlayer != null) {
+                long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
+                prevPlayer.updateTurnStats(elapsedTime);
+            }
+        }
+
+        // reset timers for ping and stats
+        setActivePlayer(player == null ? null : player.getUserID());
+        setLastActivePlayerChange(newTime);
+        setLastActivePlayerPing(newTime);
+    }
+
+    /**
+     * @param player - The player's userID: player.getID()
+     */
+    public void setActivePlayer(String player) {
+        this.activePlayer = player;
+    }
+
+    public Date getLastActivePlayerPing() {
+        return lastActivePlayerPing;
+    }
+
+    public void setLastActivePlayerPing(Date time) {
+        this.lastActivePlayerPing = time;
+    }
+
+    public Date getLastActivePlayerChange() {
+        return lastActivePlayerChange;
+    }
+
+    public void setLastActivePlayerChange(Date time) {
+        this.lastActivePlayerChange = time;
     }
 
     public void setSentAgenda(String id) {
@@ -755,16 +803,17 @@ public class Map {
         return null;
     }
 
-    public String lookAtTopAgenda() {
-        return agendas.get(0);
+    public String lookAtTopAgenda(int index) {
+        return agendas.get(index);
     }
 
-    public String lookAtBottomAgenda() {
-        return agendas.get(agendas.size() - 1);
+    public String lookAtBottomAgenda(int indexFromEnd) {
+        return agendas.get(agendas.size() - 1 - indexFromEnd);
     }
 
-    public String revealAgenda() {
-        String id = agendas.remove(0);
+    public String revealAgenda(boolean revealFromBottom) {
+        int index = revealFromBottom ? agendas.size() - 1 : 0;
+        String id = agendas.remove(index);
         addDiscardAgenda(id);
         return id;
     }

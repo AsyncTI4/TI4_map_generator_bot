@@ -19,9 +19,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.map.CreateGame;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.map.MapManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -30,7 +32,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         super(Constants.CREATE_GAME_CHANNELS, "Create Role and Game Channels for a New Game");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here").setRequired(true));
         addOptions(new OptionData(OptionType.CHANNEL, Constants.CATEGORY, "Category #category-name - only select a category").setRequired(true));
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName"));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName - this will be the game owner, who will complete /game setup").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Player4 @playerName"));
@@ -60,10 +62,23 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         //CHECK ROLE COUNT
-        if (guild.getRoles().size() >= 250) {
+        int roleCount = guild.getRoles().size();
+        if (roleCount >= 250) {
             sendMessage("Server is at the role limit - please contact @Admin to resolve.");
-            BotLogger.log(event, "Cannot create a new role. Server is currently has " + guild.getRoles().size() + " roles.");
+            BotLogger.log(event, "Cannot create a new role. Server is currently has " + roleCount + " roles.");
             return;
+        } else if (roleCount >= 247) {
+            BotLogger.log(event, "Warning: Server is at " + (roleCount + 1) + " roles");
+        }
+
+        //CHECK SERVER CHANNEL COUNT
+        int channelCount = guild.getChannels().size();
+        if (channelCount > 498) {
+            sendMessage("Server is at the channel limit - please contact @Admin to resolve.");
+            BotLogger.log(event, "Cannot create new channels. Server is currently has " + channelCount + " channels.");
+            return;
+        } else if (channelCount >= 495) {
+            BotLogger.log(event, "Warning: Server is at " + (channelCount + 2) + " channels");
         }
 
         //CHECK CATEGORY IS VALID
@@ -77,6 +92,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         if (category.getChannels().size() > 48) {
             sendMessage("Category: **" + category.getName() + "** is full. Create a new category then try again.");
             return;
+        } else if (category.getChannels().size() > 45) {
+            BotLogger.log(event, "Warning: Category: **" + category.getName() + "** is almost full.");
         }
 
         StringBuilder message = new StringBuilder("Role and Channels have been set up:\n");
@@ -89,9 +106,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
         message.append("> " + role.getAsMention() + "\n");
 
         //ADD PLAYERS TO ROLE
+        Member gameOwner = null;
         for (int i = 1; i <= 8; i++) {
             if (Objects.nonNull(event.getOption("player" + i))) {
                 Member member = event.getOption("player" + i).getAsMember();
+                if (gameOwner == null) gameOwner = member;
                 guild.addRoleToMember(member, role).complete();
             } else {
                 break;
@@ -129,8 +148,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         StringBuilder botGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - bot/map channel\n");
         botGetStartedMessage.append("Use the following commands to get started:\n");
-        botGetStartedMessage.append("> `/create_game game_name:" + gameName + "`\n");
-        botGetStartedMessage.append("> `/game setup game_custom_name:" + gameName + "-" + gameFunName + "` to set player count and additional options\n");
+        botGetStartedMessage.append("> `/game setup` to set player count and additional options\n");
         botGetStartedMessage.append("> `/add_tile_list {mapString}`, replacing {mapString} with the actual map string\n");
         botGetStartedMessage.append("> `/game add` to add players to the game - do this in speaker order (starting at top of map going clockwise)\n");
         botGetStartedMessage.append("> `/game set_order` to fix the order if incorrect\n");
@@ -142,6 +160,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
         MessageHelper.sendMessageToChannel((MessageChannel) botThread, botGetStartedMessage.toString());
         MessageHelper.sendMessageToChannelAndPin((MessageChannel) botThread, "Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
         message.append("> " + botThread.getAsMention()).append("\n");
+
+        CreateGame createGame = new CreateGame();
+        createGame.createNewGame(event, gameName, gameOwner);
         
         sendMessage(message.toString());
     }
@@ -150,7 +171,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         List<Role> pbdRoles = guild.getRoles().stream()
             .filter(r -> r.getName().startsWith("pbd"))
             .toList();
-
+        
+        //EXISTING ROLE NAMES
         ArrayList<Integer> pbdNumbers = new ArrayList<>();
         for (Role role : pbdRoles) {
             String pbdNum = role.getName().replace("pbd", "");
@@ -158,6 +180,18 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }
         }
+
+        //EXISTING MAP NAMES
+        List<String> mapNames = MapManager.getInstance().getMapList().keySet().stream()
+            .filter(mapName -> mapName.startsWith("pbd"))
+            .toList();
+        for (String mapName : mapNames) {
+            String pbdNum = mapName.replace("pbd", "");
+            if (Helper.isInteger(pbdNum)) {
+                pbdNumbers.add(Integer.parseInt(pbdNum));
+            }
+        }
+
         int nextPBDNumber = Collections.max(pbdNumbers) + 1;
         return "pbd" + nextPBDNumber;
     }

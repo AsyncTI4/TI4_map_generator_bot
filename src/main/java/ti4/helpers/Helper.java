@@ -3,6 +3,7 @@ package ti4.helpers;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -10,6 +11,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -233,6 +235,25 @@ public class Helper {
     }
 
     //private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
+
+    @NotNull
+    public static Emoji getPlayerEmoji(Map activeMap, Player player, Message message) {
+        Emoji emojiToUse = null;
+        String playerFaction = player.getFaction();
+        if (emojiToUse == null) emojiToUse = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(playerFaction));
+        String messageId = message.getId();
+
+        if (activeMap.isFoWMode()) {
+            int index = 0;
+            for (Player player_ : activeMap.getPlayers().values()) {
+                if (player_ == player) break;
+                index++;
+            }
+            emojiToUse = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, messageId));
+        }
+
+        return emojiToUse;
+    }
 
     public static String getRandomizedEmoji(int value, String messageID) {
         List<String> symbols = new ArrayList<>(Emojis.symbols);
@@ -645,6 +666,11 @@ public class Helper {
         return mention;
     }
 
+    /**
+     * Get the player's in-game representation. ":Faction: @player _@color_"
+     * <p>
+     * Does not resolve community mode or fog of war
+     */
     public static String getPlayerRepresentation(Player player) {
         StringBuilder sb = new StringBuilder(Helper.getFactionIconFromDiscord(player.getFaction()));
         sb.append(" ").append(Helper.getPlayerPing(player));
@@ -654,6 +680,11 @@ public class Helper {
         return sb.toString();
     }
 
+    /**
+     * Get the player's in-game representation. ":Faction: @player _@color_"
+     * <p>
+     * Does not resolve community mode or fog of war
+     */
     public static String getPlayerRepresentation(Guild guild, Player player) {
         StringBuilder sb = new StringBuilder(Helper.getFactionIconFromDiscord(player.getFaction()));
         sb.append(" ").append(Helper.getPlayerPing(player));
@@ -663,11 +694,21 @@ public class Helper {
         return sb.toString();
     }
 
+    /**
+     * Get the player's in-game representation.
+     * <p>
+     * Resolves community mode & handles fog of war
+     */
     @Nullable
     public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player) {
         return getPlayerRepresentation(event, player, false);
     }
 
+    /**
+     * Get the player's in-game representation.
+     * <p>
+     * Resolves community mode & handles fog of war
+     */
     @Nullable
     public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player, boolean overrideFow) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
@@ -684,11 +725,21 @@ public class Helper {
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
+    /**
+     * Get the player's in-game representation.
+     * <p>
+     * Resolves community mode & handles fog of war
+     */
     @Nullable
     public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player) { 
         return getPlayerRepresentation(event, player, false);
     }
     
+    /**
+     * Get the player's in-game representation.
+     * <p>
+     * Resolves community mode & handles fog of war
+     */
     @Nullable
     public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player, boolean overrideFow) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
@@ -700,16 +751,25 @@ public class Helper {
         }
         if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
             return getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName());
-            //return getColourAsMention(event.getGuild(), player.getColor());
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
+    /**
+     * Get the player's in-game representation.
+     * <p>
+     * Resolves community mode & handles fog of war
+     */
     @Nullable
     public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player) { 
         return getPlayerRepresentation(event, player, false);
     }
     
+    /**
+     * Get the player's in-game representation.
+     * <p>
+     * Resolves community mode & handles fog of war
+     */
     @Nullable
     public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player, boolean overrideFow) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
@@ -721,7 +781,6 @@ public class Helper {
         }
         if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
             return getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName());
-            //return getColourAsMention(event.getGuild(), player.getColor());
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }
@@ -1041,8 +1100,11 @@ public class Helper {
 
         if (threadCount >= 980) {
             BotLogger.log("`Helper.checkThreadLimitAndArchive:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
-            if(false) // Here to keep in case it's needed.
+            if(false) { // Here to keep in case it's needed.
                 BotLogger.log(ListOldChannels.getOldThreadsMessage(guild, closeCount));
+            } else {
+                BotLogger.log("> The oldest thread was " + ListOldChannels.getHowOldOldestThreadIs(guild));
+            }
             ArchiveOldThreads.archiveOldThreads(guild, closeCount);
         }
     }

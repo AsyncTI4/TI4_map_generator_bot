@@ -67,6 +67,9 @@ public class Player {
     private List<String> exhaustedRelics = new ArrayList<>();
     private int SC = 0;
 
+    // Statistics
+    private int numberOfTurns = 0;
+    private long totalTimeSpent = 0;
 
     public Player(String userID, String userName) {
         this.userID = userID;
@@ -721,5 +724,26 @@ public class Player {
 
     public String getFogFilter() {
         return fowFogFilter == null ? "default" : fowFogFilter;
+    }
+
+    public void updateTurnStats(long turnTime) {
+        numberOfTurns++;
+        totalTimeSpent += turnTime;
+    }
+
+    public int getNumberTurns() {
+        return numberOfTurns;
+    }
+    
+    public void setNumberTurns(int numTurns) {
+        numberOfTurns = numTurns;
+    }
+
+    public long getTotalTurnTime() {
+        return totalTimeSpent;
+    }
+    
+    public void setTotalTurnTime(long totalTime) {
+        totalTimeSpent = totalTime;
     }
 }

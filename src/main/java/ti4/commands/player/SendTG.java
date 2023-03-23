@@ -49,12 +49,11 @@ public class SendTG extends PlayerSubcommandData {
             player_.setTg(targetTG);
 
             String message = Helper.getPlayerRepresentation(event, player) + " sent " + sendTG + Emojis.tg + " trade goods to " + Helper.getPlayerRepresentation(event, player_);
+            sendMessage(message);
             if (activeMap.isFoWMode()) {
                 String fail = "Could not notify recieving player.";
-                String success = message + "\nThe other player has been notified";
+                String success = "The other player has been notified";
                 MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
-            } else {
-                sendMessage(message);
             }
         }
     }
