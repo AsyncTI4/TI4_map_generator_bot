@@ -1,7 +1,6 @@
 package ti4.message;
 
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -276,32 +275,32 @@ public class MessageHelper {
         });
     }
 
+    /**
+     * Sends a basic message to the event channel, handles large text
+     * @param event
+     * @param messageText
+     */
     public static void replyToSlashCommand(@NotNull SlashCommandInteractionEvent event, String messageText) {
         if (messageText == null || messageText.isEmpty()) {
-            BotLogger.log(event, "`MessageHelper.replyToSlashCommand` : `messageText` was null or empty");
+            // BotLogger.log(event, "`MessageHelper.replyToSlashCommand` : `messageText` was null or empty");
             return;
         }
         sendMessageSplitLarge(event, messageText);
     }
 
     private static void sendMessageSplitLarge(SlashCommandInteractionEvent event, String messageText) {
-        for (String text : splitLargeText(messageText, 1500)) {
+        for (String text : splitLargeText(messageText, 2000)) {
             event.getChannel().sendMessage(text).queue();
         }
-        // Integer messageLength = messageText.length();
-        // int maxLength = 1500;
-        // if (messageLength > maxLength) {
-        //     List<String> texts = splitLargeText(messageText, maxLength);
-        //     for (String text : texts) {
-        //         event.getChannel().sendMessage(text).queue();
-        //     }
-        // } else {
-        //     event.getChannel().sendMessage(messageText).queue();
-
-        // }
     }
 
-    private static List<String> splitLargeText(String messageText, int maxLength) {
+    /**
+     * Given a text string and a maximum length, will return a List<String> split by either the max length or the last newline "\n"
+     * @param messageText any non-null, non-empty string
+     * @param maxLength maximum length, any positive integer
+     * @return
+     */
+    private static List<String> splitLargeText(@NotNull String messageText, @NotNull int maxLength) {
         List<String> texts = new ArrayList<>();
         Integer messageLength = messageText.length();
         int index = 0;
