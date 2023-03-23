@@ -2,6 +2,7 @@ package ti4;
 
 import net.dv8tion.jda.api.entities.channel.*;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -10,6 +11,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.MapFileDeleter;
@@ -40,9 +42,10 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        // event.getInteraction().deferReply().queue();
-        event.getInteraction().reply("_ _").queue();
+        event.getInteraction().reply("-").queue(m -> m.deleteOriginal().queue());
         String userID = event.getUser().getId();
+        Member member = event.getMember();
+        if (member != null) event.getChannel().sendMessage(Emojis.AsyncTI4Logo + "||" + member.getEffectiveName() + " used `" + event.getCommandString() + "`||").queue();
 
         // CHECK IF CHANNEL IS MATCHED TO A GAME
         if (!event.getInteraction().getName().equals("help")) { //SKIP /help COMMANDS
