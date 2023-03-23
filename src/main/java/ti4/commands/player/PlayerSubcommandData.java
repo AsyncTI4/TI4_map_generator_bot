@@ -13,7 +13,6 @@ public abstract class PlayerSubcommandData extends SubcommandData {
     private SlashCommandInteractionEvent event;
     private Map activeMap;
     private User user;
-    private boolean replyHasBeenEdited;
 
     public String getActionID() {
         return getName();
@@ -36,19 +35,17 @@ public abstract class PlayerSubcommandData extends SubcommandData {
     }
 
     /**
-     * After submitting a slash command, will either edit the original message, or send following messages
+     * Send a message to the event's channel, handles large text
      * @param messageText new message
      */
     public void sendMessage(String messageText) {
         MessageHelper.replyToSlashCommand(event, messageText);
-        if (!this.replyHasBeenEdited) this.replyHasBeenEdited = true;
     }
     
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void preExecute(SlashCommandInteractionEvent event) {
         this.event = event;
-        replyHasBeenEdited = false;
         user = event.getUser();
         activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
     }

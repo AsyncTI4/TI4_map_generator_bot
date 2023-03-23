@@ -42,11 +42,10 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        // event.getInteraction().deferReply().queue();
-        event.getInteraction().reply("_ _").queue(m -> m.deleteOriginal().queue());
+        event.getInteraction().reply("-").queue(m -> m.deleteOriginal().queue());
         String userID = event.getUser().getId();
         Member member = event.getMember();
-        event.getChannel().sendMessage(Emojis.AsyncTI4Logo + "||" + member.getEffectiveName() + " used `" + event.getCommandString() + "`||").queue();
+        if (member != null) event.getChannel().sendMessage(Emojis.AsyncTI4Logo + "||" + member.getEffectiveName() + " used `" + event.getCommandString() + "`||").queue();
 
         // CHECK IF CHANNEL IS MATCHED TO A GAME
         if (!event.getInteraction().getName().equals("help")) { //SKIP /help COMMANDS
