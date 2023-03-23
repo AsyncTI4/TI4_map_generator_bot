@@ -45,7 +45,7 @@ public class MessageListener extends ListenerAdapter {
         event.getInteraction().reply("-").queue(m -> m.deleteOriginal().queue());
         String userID = event.getUser().getId();
         Member member = event.getMember();
-        if (member != null) event.getChannel().sendMessage(Emojis.AsyncTI4Logo + "||" + member.getEffectiveName() + " used `" + event.getCommandString() + "`||").queue();
+        if (member != null) event.getChannel().sendMessage("```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```").queue();
 
         // CHECK IF CHANNEL IS MATCHED TO A GAME
         if (!event.getInteraction().getName().equals("help")) { //SKIP /help COMMANDS
