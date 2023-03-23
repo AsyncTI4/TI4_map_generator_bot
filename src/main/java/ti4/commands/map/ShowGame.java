@@ -77,8 +77,7 @@ public class ShowGame implements Command {
             }
         }
         File file = GenerateMap.getInstance().saveImage(map, displayType, event);
-        FileUpload fileUpload = FileUpload.fromData(file);
-        event.getHook().editOriginalAttachments(fileUpload).queue();
+        MessageHelper.sendFileToChannel(event.getChannel(), file);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

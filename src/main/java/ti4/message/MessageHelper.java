@@ -21,6 +21,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
+
 public class MessageHelper {
 
     public static void sendMessageToChannel(SlashCommandInteractionEvent event, String messageText, String... reaction) {
@@ -63,6 +65,11 @@ public class MessageHelper {
             } else {
                 event.getHook().sendMessage("-").queue();
             }
+            // event.getHook().sendMessage("-").queue();
+            //Deletes slash command
+           event.getHook().sendMessage("-").queue(msg -> {
+               msg.delete().queue();
+           });
         }
     }
 
@@ -269,5 +276,51 @@ public class MessageHelper {
             splitAndSent(messageText, channel);
         });
     }
+
+    /**
+     * Sends a basic message to the event channel, handles large text
+     * @param event
+     * @param messageText
+     */
+    public static void replyToSlashCommand(@NotNull SlashCommandInteractionEvent event, String messageText) {
+        if (messageText == null || messageText.isEmpty()) {
+            // BotLogger.log(event, "`MessageHelper.replyToSlashCommand` : `messageText` was null or empty");
+            return;
+        }
+        sendMessageSplitLarge(event, messageText);
+    }
+
+    private static void sendMessageSplitLarge(SlashCommandInteractionEvent event, String messageText) {
+        for (String text : splitLargeText(messageText, 2000)) {
+            event.getChannel().sendMessage(text).queue();
+        }
+    }
+
+    /**
+     * Given a text string and a maximum length, will return a List<String> split by either the max length or the last newline "\n"
+     * @param messageText any non-null, non-empty string
+     * @param maxLength maximum length, any positive integer
+     * @return
+     */
+    private static List<String> splitLargeText(@NotNull String messageText, @NotNull int maxLength) {
+        List<String> texts = new ArrayList<>();
+        Integer messageLength = messageText.length();
+        int index = 0;
+        while (index < messageLength) {
+            String nextChars = messageText.substring(index, Math.min(index + maxLength, messageLength));
+            Integer lastNewLineIndex = nextChars.lastIndexOf("\n") + 1; // number of chars until right after the last \n
+            String textToAdd = "";
+            if (lastNewLineIndex > 0) {
+                textToAdd = nextChars.substring(0, lastNewLineIndex);
+                index += lastNewLineIndex;
+            } else {
+                textToAdd = nextChars;
+                index += nextChars.length();
+            }
+            texts.add(textToAdd);
+        }
+        return texts;
+    }
+
 
 }
