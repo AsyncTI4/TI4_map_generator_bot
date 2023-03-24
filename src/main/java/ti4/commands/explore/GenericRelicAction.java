@@ -29,7 +29,7 @@ abstract class GenericRelicAction extends ExploreSubcommandData {
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         doAction(player, event);
