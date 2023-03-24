@@ -19,7 +19,7 @@ public class ListFragments extends ExploreSubcommandData {
 		Player player = activeMap.getPlayer(getUser().getId());
 		player = Helper.getGamePlayer(activeMap, player, event, null);
 
-		MessageHelper.replyToMessage(event, player.getFragments().toString());
+		sendMessage(player.getFragments().toString());
 	}
 	
 }

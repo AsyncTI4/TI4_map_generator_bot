@@ -21,7 +21,7 @@ public class ShuffleRelicBack extends GenericRelicAction {
     public void doAction(Player player, SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.RELIC);
         if (option == null) {
-            MessageHelper.replyToMessage(event, "Specify relic");
+            sendMessage("Specify relic");
             return;
         }
         String relicId = option.getAsString();
@@ -31,12 +31,12 @@ public class ShuffleRelicBack extends GenericRelicAction {
             boolean success = getActiveMap().shuffleRelicBack(relicId);
             if (success) {
                 String relicName = Mapper.getRelic(relicId).split(";")[0];
-                MessageHelper.replyToMessage(event, "Shuffled relic back: " + relicName);
+                sendMessage("Shuffled relic back: " + relicName);
             } else {
-                MessageHelper.replyToMessage(event, "Could not shuffle relic back into deck.");
+                sendMessage("Could not shuffle relic back into deck.");
             }
         } else {
-            MessageHelper.replyToMessage(event, "Invalid relic or player does not have specified relic");
+            sendMessage("Invalid relic or player does not have specified relic");
         }
     }
 }
