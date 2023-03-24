@@ -207,6 +207,15 @@ public class MapSaveLoadManager {
         writer.write(Constants.SPEAKER + " " + map.getSpeaker());
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.ACTIVE_PLAYER + " " + map.getActivePlayer());
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.LAST_ACTIVE_PLAYER_PING + " " + map.getLastActivePlayerPing().getTime());
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " " + map.getLastActivePlayerChange().getTime());
+        writer.write(System.lineSeparator());
+
         HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
         StringBuilder sb = new StringBuilder();
         for (java.util.Map.Entry<Integer, Boolean> entry : scPlayed.entrySet()) {
@@ -405,7 +414,12 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.STRATEGY_CARD + " " + player.getSC());
             writer.write(System.lineSeparator());
-
+            
+            writer.write(Constants.NUMBER_OF_TURNS + " " + player.getNumberTurns());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.TOTAL_TURN_TIME + " " + player.getTotalTurnTime());
+            writer.write(System.lineSeparator());
+            
             StringBuilder leaderInfo = new StringBuilder();
             for (Leader leader : player.getLeaders()) {
                 leaderInfo.append(leader.getId());
@@ -778,6 +792,25 @@ public class MapSaveLoadManager {
                     }
                 }
                 case Constants.SPEAKER -> map.setSpeaker(info);
+                case Constants.ACTIVE_PLAYER -> map.setActivePlayer(info);
+                case Constants.LAST_ACTIVE_PLAYER_PING -> {
+                    try {
+                        Long millis = Long.parseLong(info);
+                        Date lastPing = new Date(millis);
+                        map.setLastActivePlayerPing(lastPing);
+                    } catch (Exception e) {
+                        // do nothing
+                    }
+                }
+                case Constants.LAST_ACTIVE_PLAYER_CHANGE -> {
+                    try {
+                        Long millis = Long.parseLong(info);
+                        Date lastChange = new Date(millis);
+                        map.setLastActivePlayerChange(lastChange);
+                    } catch (Exception e) {
+                        // do nothing
+                    }
+                }
                 case Constants.PLAYER_COUNT_FOR_MAP -> {
                     String count = info;
                     try {
@@ -1070,6 +1103,8 @@ public class MapSaveLoadManager {
                 }
 
                 case Constants.STRATEGY_CARD -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.NUMBER_OF_TURNS -> player.setNumberTurns(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.TOTAL_TURN_TIME -> player.setTotalTurnTime(Long.parseLong(tokenizer.nextToken()));
                 case Constants.FOG_FILTER -> {
                     String filter = tokenizer.nextToken();
                     player.setFogFilter(filter);

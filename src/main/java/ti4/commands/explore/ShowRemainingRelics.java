@@ -38,6 +38,6 @@ public class ShowRemainingRelics extends GenericRelicAction {
                 text.append("- ").append(relicData[0]).append("\n");
             }
         }
-        MessageHelper.replyToMessage(event, text.toString());
+        sendMessage(text.toString());
     }
 }

@@ -94,6 +94,9 @@ public class BothelperCommand implements Command {
         subcommands.add(new ServerLimitStats());
         subcommands.add(new ListOldChannels());
         subcommands.add(new ArchiveOldThreads());
+        subcommands.add(new FixGameChannelPermissions());
+        subcommands.add(new ListCategoryChannelCounts());
+        subcommands.add(new BeginVideoGeneration());
         return subcommands;
     }
 

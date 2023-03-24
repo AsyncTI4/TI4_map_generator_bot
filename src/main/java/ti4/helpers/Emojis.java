@@ -68,6 +68,9 @@ public class Emojis {
     public static final String zealots = "<:zealots:1082724497083334827>";
     public static final String zelian = "<:zelian:1082724503190249547>";
 
+    //FACTIONS - OTHER
+    public static final String AdminsFaction = "<:Admins:1084476380584083527>";
+
     //EXPLORATION
     public static final String HFrag = "<:HFrag:1053857012766752788>";
     public static final String CFrag = "<:CFrag:1053856733849722880>";
@@ -253,6 +256,9 @@ public class Emojis {
     public static final String SemLord = "<:SemLord:1072076401462738965>";
     public static final String SemiLor = "<:SemiLor:1072076567053869106>";
 
+    //LIST OF SEM-LORES
+    public static List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor);
+
 
     //ANOMOLIES
     public static final String Supernova = "<:Supernova:1068081584978284635>";
@@ -265,6 +271,7 @@ public class Emojis {
     public static final String PropulsionTech = "<:Propulsiontech:947250608145068074>";
     public static final String BioticTech = "<:Biotictech:947250608107315210>";
     public static final String WarfareTech = "<:Warfaretech:947250607855644743>";
+    public static final String UnitUpgradeTech = "<:UnitUpgradeTech:1085495745018331146>";
     
     //GOOD DOGS
     public static final String GoodDog = "<:GoodDog:1068567308819255316>";
@@ -301,6 +308,7 @@ public class Emojis {
     public static final String BortWindow = "<:bortwindow:1032312829585399880>";
     public static final String Absol = "<:Absol:1079473959248068701>";
     public static final String DiscordantStars = "<:DS:1081308924084506706>";
+    public static final String AsyncTI4Logo = "<:asyncti4:959703535258333264>";
 
     //LIST OF SYMBOLS FOR FOG STUFF
     public static List<String> symbols = Arrays.asList(warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag, CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2, tg, comm, Sleeper, influence, resources, SemLord, Supernova, Asteroid, GravRift, Nebula, CyberneticTech, PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken, BortWindow);

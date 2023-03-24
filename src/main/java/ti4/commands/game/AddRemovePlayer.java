@@ -51,14 +51,14 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
         }
         MapManager mapManager = MapManager.getInstance();
         Map map = mapManager.getMap(mapName);
-        Member member = event.getMember();
-        boolean isAdmin = false;
-        if (member != null) {
-            java.util.List<Role> roles = member.getRoles();
-            if (roles.contains(MapGenerator.adminRole)) {
-                isAdmin = true;
-            }
-        }
+        // Member member = event.getMember();
+        // boolean isAdmin = false;
+        // if (member != null) {
+        //     java.util.List<Role> roles = member.getRoles();
+        //     if (roles.contains(MapGenerator.adminRole)) {
+        //         isAdmin = true;
+        //     }
+        // }
 //        if (!map.getOwnerID().equals(callerUser.getId()) && !isAdmin){
 //            MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game owner can add/remove players.");
 //            return;

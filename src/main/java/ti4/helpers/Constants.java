@@ -36,6 +36,13 @@ public class Constants {
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
 
+
+    
+
+    public static final String SET_SETTING = "setting_name";
+    public static final String SETTING_NAME = "setting_name";
+    public static final String SETTING_VALUE = "setting_value";
+
     public static String ALPHA = "alpha";
     public static String BETA = "beta";
     public static String GAMMA = "gamma";
@@ -182,7 +189,7 @@ public class Constants {
     public static final String AGENDA_REMOVE_FROM_GAME = "agenda_remove_from_game";
     public static final String AC_REMOVE_FROM_GAME = "ac_remove_from_game";
     public static final String SO_ID = "so_id";
-    public static final String AEGNDA_ID = "agenda_id";
+    public static final String AGENDA_ID = "agenda_id";
     public static final String AC_ID = "ac_id";
 
     public static final String INACTIVE_LEADER = "hero_unplay";
@@ -228,6 +235,9 @@ public class Constants {
     public static final String PASS = "pass";
     public static final String TURN = "turn_end";
     public static final String SPEAKER = "speaker";
+    public static final String ACTIVE_PLAYER = "active_player";
+    public static final String LAST_ACTIVE_PLAYER_PING = "last_active_player_ping";
+    public static final String LAST_ACTIVE_PLAYER_CHANGE = "last_active_player_change";
     
     public static final String MAIN_GAME_CHANNEL = "main_game_channel";
     public static final String BOT_MAP_CHANNEL = "bot_map_channel";
@@ -301,6 +311,9 @@ public class Constants {
     public static final String VRF = "void_relic_fragment";
     public static final String STRATEGY_CARD = "strategy_card";
     public static final String DUMMY = "dummy";
+    
+    public static final String NUMBER_OF_TURNS = "number_of_turns";
+    public static final String TOTAL_TURN_TIME = "total_turn_time";
 
     public static final String TXT = ".txt";
     public static final String JPG = ".jpg";
@@ -334,10 +347,10 @@ public class Constants {
     public static final String LOOK_AT_TOP = "look_at_top";
     public static final String LOOK_AT_BOTTOM = "look_at_bottom";
     public static final String REVEAL = "reveal";
+    public static final String REVEAL_FROM_BOTTOM = "reveal_from_bottom";
     public static final String ADD_LAW = "add_law";
     public static final String REMOVE_LAW = "remove_law";
     public static final String SHOW_DISCARDED = "show_discarded";
-    public static final String AGENDA_ID = "agenda_id";
     public static final String ELECTED = "elected";
 
 
@@ -368,6 +381,7 @@ public class Constants {
     public static final String PO2 = "publicObjectives2";
 
     public static final String TURN_ORDER = "turn_order";
+    public static final String TURN_STATS = "turn_stats";
     public static final String VOTE_COUNT = "vote_count";
     public static final String SC_TRADE_GOODS = "sc_trade_goods";
     public static final String SC_COUNT = "sc_count";
@@ -535,7 +549,9 @@ public class Constants {
     public static final String CARDS_INFO_THREAD_PREFIX = "Cards Info-";
     public static final String BOT_CHANNEL_SUFFIX = "-bot-map-updates";
     public static final String PING = "ping";
+    public static final String PING_ACTIVE_PLAYER = "ping_active_player";
     public static final String ENDED_GAMES = "ended_games";
-
-
+    public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
+    public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
+    public static final String BEGIN_VIDEO_GEN = "begin_video_gen";
 }

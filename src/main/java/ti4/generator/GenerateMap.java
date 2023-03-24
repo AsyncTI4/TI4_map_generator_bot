@@ -1,7 +1,6 @@
 package ti4.generator;
 
 import com.pngencoder.PngEncoder;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -282,10 +281,8 @@ public class GenerateMap {
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
         graphics.drawString(map.getCustomName(), 0, y);
-        boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
-        if (!convertToGenericSC) {
-            y = strategyCards(map, y);
-        }
+        
+        y = strategyCards(map, y);
 
         int tempY = y;
         userVPs = new HashMap<>();
@@ -730,12 +727,16 @@ public class GenerateMap {
         List<String> planets = player.getPlanets();
         List<String> exhaustedPlanets = player.getExhaustedPlanets();
         List<String> exhaustedPlanetsAbilities = player.getExhaustedPlanetsAbilities();
-
+        
         int deltaX = 0;
-
+        
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
 
+        boolean randomizeList = player != fowPlayer && isFoWPrivate != null && isFoWPrivate;
+        if(randomizeList) {
+            Collections.shuffle(planets);
+        }
         for (String planet : planets) {
             try {
                 UnitHolder unitHolder = planetsInfo.get(planet);
@@ -1081,17 +1082,19 @@ public class GenerateMap {
     }
 
     private int strategyCards(Map map, int y) {
+        boolean convertToGenericSC = isFoWPrivate != null && isFoWPrivate;
         y += 80;
         LinkedHashMap<Integer, Integer> scTradeGoods = map.getScTradeGoods();
         Collection<Player> players = map.getPlayers().values();
         Set<Integer> scPicked = players.stream().map(Player::getSC).collect(Collectors.toSet());
+        HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
         int x = 20;
         for (java.util.Map.Entry<Integer, Integer> scTGs : scTradeGoods.entrySet()) {
             Integer sc = scTGs.getKey();
             if (sc == 0) {
                 continue;
             }
-            if (!scPicked.contains(sc)) {
+            if (!convertToGenericSC && !scPicked.contains(sc)) {
                 graphics.setColor(getSCColor(sc));
                 graphics.setFont(Storage.getFont64());
                 graphics.drawString(Integer.toString(sc), x, y);
@@ -1101,6 +1104,11 @@ public class GenerateMap {
                     graphics.setColor(Color.WHITE);
                     graphics.drawString("TG:" + tg, x, y + 30);
                 }
+            }
+            if (convertToGenericSC && scPlayed.getOrDefault(sc, false)) {
+                graphics.setColor(Color.GRAY);
+                graphics.setFont(Storage.getFont64());
+                graphics.drawString(Integer.toString(sc), x, y);
             }
             x += 80;
         }
@@ -2385,10 +2393,9 @@ public class GenerateMap {
                     int imageDmgX = position != null ? tileX + position.x + (image.getWidth() / 2) - (dmgImage.getWidth() / 2) : xOriginal - (dmgImage.getWidth() / 2);
                     int imageDmgY = position != null ? tileY + position.y + (image.getHeight() / 2) - (dmgImage.getHeight() / 2) : yOriginal - (dmgImage.getHeight() / 2);
                     if (isMirage) {
-                        imageDmgX = imageX + (int) (numberPositionPoint.x * scaleOfUnit) - dmgImage.getWidth();
-                        imageDmgY = imageY + (int) (numberPositionPoint.y * scaleOfUnit) - dmgImage.getHeight();
-                    }
-                    if (unitID.contains("_mf")) {
+                        imageDmgX = imageX;
+                        imageDmgY = imageY;
+                    } else if (unitID.contains("_mf")) {
                         imageDmgX = position != null ? tileX + position.x : xOriginal - (dmgImage.getWidth());
                         imageDmgY = position != null ? tileY + position.y : yOriginal - (dmgImage.getHeight());
 

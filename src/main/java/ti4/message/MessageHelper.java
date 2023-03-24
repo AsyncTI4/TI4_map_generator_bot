@@ -21,6 +21,8 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.jetbrains.annotations.NotNull;
+
 public class MessageHelper {
 
     public static void sendMessageToChannel(SlashCommandInteractionEvent event, String messageText, String... reaction) {
@@ -54,19 +56,7 @@ public class MessageHelper {
     }
 
     public static void replyToMessage(SlashCommandInteractionEvent event, String messageText) {
-        if (messageText.length() > 1500) {
-            splitAndSent(messageText, event.getChannel());
-            event.getHook().sendMessage("Message to long for replay, sent all information in base messages").queue();
-        } else {
-            if (!messageText.isEmpty()) {
-                splitAndSent(messageText, event.getChannel());
-            }
-            event.getHook().sendMessage("-").queue();
-            //Deletes slash command
-//            event.getHook().sendMessage("-").queue(msg -> {
-//                msg.delete().queueAfter(1, TimeUnit.SECONDS);
-//            });
-        }
+        replyToSlashCommand(event, messageText);
     }
 
     public static void replyToMessage(SlashCommandInteractionEvent event, File file) {
@@ -118,7 +108,7 @@ public class MessageHelper {
     }
 
     private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, Boolean pinMessages, String... reaction) {
-        if (messageText == null || channel == null) {
+        if (messageText == null || channel == null || messageText.isEmpty()) {
             // BotLogger.log("`splitAndSent` - `messageText` or `channel` was null");
             return;
         }
@@ -173,7 +163,7 @@ public class MessageHelper {
     }
 
     private static void  splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, Guild guild, Button... buttons) {
-        if (messageText == null || channel == null) {
+        if (messageText == null || channel == null || messageText.isEmpty()) {
             // BotLogger.log("`splitAndSent` - `messageText` or `channel` was null");
             return;
         }
@@ -272,5 +262,51 @@ public class MessageHelper {
             splitAndSent(messageText, channel);
         });
     }
+
+    /**
+     * Sends a basic message to the event channel, handles large text
+     * @param event
+     * @param messageText
+     */
+    public static void replyToSlashCommand(@NotNull SlashCommandInteractionEvent event, String messageText) {
+        if (messageText == null || messageText.isEmpty()) {
+            // BotLogger.log(event, "`MessageHelper.replyToSlashCommand` : `messageText` was null or empty");
+            return;
+        }
+        sendMessageSplitLarge(event, messageText);
+    }
+
+    private static void sendMessageSplitLarge(SlashCommandInteractionEvent event, String messageText) {
+        for (String text : splitLargeText(messageText, 2000)) {
+            event.getChannel().sendMessage(text).queue();
+        }
+    }
+
+    /**
+     * Given a text string and a maximum length, will return a List<String> split by either the max length or the last newline "\n"
+     * @param messageText any non-null, non-empty string
+     * @param maxLength maximum length, any positive integer
+     * @return
+     */
+    private static List<String> splitLargeText(@NotNull String messageText, @NotNull int maxLength) {
+        List<String> texts = new ArrayList<>();
+        Integer messageLength = messageText.length();
+        int index = 0;
+        while (index < messageLength) {
+            String nextChars = messageText.substring(index, Math.min(index + maxLength, messageLength));
+            Integer lastNewLineIndex = nextChars.lastIndexOf("\n") + 1; // number of chars until right after the last \n
+            String textToAdd = "";
+            if (lastNewLineIndex > 0) {
+                textToAdd = nextChars.substring(0, lastNewLineIndex);
+                index += lastNewLineIndex;
+            } else {
+                textToAdd = nextChars;
+                index += nextChars.length();
+            }
+            texts.add(textToAdd);
+        }
+        return texts;
+    }
+
 
 }
