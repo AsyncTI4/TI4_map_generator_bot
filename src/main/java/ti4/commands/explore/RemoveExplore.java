@@ -29,6 +29,6 @@ public class RemoveExplore extends ExploreSubcommandData {
                 sb.append("Removed id without matching card: ").append(id).append(System.lineSeparator());
             }
         }
-        MessageHelper.replyToMessage(event, sb.toString());
+        sendMessage(sb.toString());
     }
 }

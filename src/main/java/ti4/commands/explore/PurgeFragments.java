@@ -31,7 +31,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 		activePlayer = Helper.getGamePlayer(activeMap, activePlayer, event, null);
 		activePlayer = Helper.getPlayer(activeMap, activePlayer, event);
 		if (activePlayer == null){
-			MessageHelper.replyToMessage(event, "Player not found in game.");
+			sendMessage("Player not found in game.");
 			return;
 		}
 		String color = event.getOption(Constants.TRAIT).getAsString();
@@ -58,7 +58,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 		
 		while (fragmentsToPurge.size() < count) {
 			if (unknowns.size() == 0) {
-				MessageHelper.replyToMessage(event, "Not enough fragments");
+				sendMessage("Not enough fragments");
 				return;
 			}
 			fragmentsToPurge.add(unknowns.remove(0));
@@ -69,7 +69,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 		}
 
 		String message = Helper.getPlayerRepresentation(event, activePlayer) + " purged fragments: " + fragmentsToPurge.toString();
-		MessageHelper.replyToMessage(event, message);
+		sendMessage(message);
 
 		OptionMapping drawRelicOption = event.getOption(Constants.ALSO_DRAW_RELIC);
 		if (drawRelicOption != null) {

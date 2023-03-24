@@ -47,7 +47,7 @@ public class UseExplore extends ExploreSubcommandData {
                     }
                 }
                 if (tile == null) {
-                    MessageHelper.replyToMessage(event, "System not found that contains planet");
+                    sendMessage("System not found that contains planet");
                     return;
                 }
             }
@@ -56,7 +56,7 @@ public class UseExplore extends ExploreSubcommandData {
             String messageText = "Used card: " + id + " by player: " + player.getUserName();
             resolveExplore(event, id, tile, planetName, messageText, ExpFrontier.checkIfEngimaticDevice(player, id));
         } else {
-            MessageHelper.replyToMessage(event, "Invalid card ID");
+            sendMessage("Invalid card ID");
         }
     }
 

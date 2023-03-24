@@ -719,8 +719,12 @@ public class Helper {
             return getPlayerRepresentation(player);
         }
         if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
-            return getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName());
-            //return getColourAsMention(event.getGuild(), player.getColor());
+            Role roleForCommunity = player.getRoleForCommunity();
+            if (roleForCommunity == null) {
+                return "[No Community Role Found]";
+            } else {
+                return getRoleMentionByName(event.getGuild(), roleForCommunity.getName());
+            }
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }
@@ -750,7 +754,12 @@ public class Helper {
             return getPlayerRepresentation(player);
         }
         if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
-            return getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName());
+            Role roleForCommunity = player.getRoleForCommunity();
+            if (roleForCommunity == null) {
+                return "[No Community Role Found]";
+            } else {
+                return getRoleMentionByName(event.getGuild(), roleForCommunity.getName());
+            }
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }
@@ -780,7 +789,12 @@ public class Helper {
             return getPlayerRepresentation(player);
         }
         if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
-            return getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName());
+            Role roleForCommunity = player.getRoleForCommunity();
+            if (roleForCommunity == null) {
+                return "[No Community Role Found]";
+            } else {
+                return getRoleMentionByName(event.getGuild(), roleForCommunity.getName());
+            }
         }
         return getPlayerRepresentation(event.getGuild(), player);
     }

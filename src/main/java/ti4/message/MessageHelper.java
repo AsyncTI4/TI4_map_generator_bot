@@ -56,21 +56,7 @@ public class MessageHelper {
     }
 
     public static void replyToMessage(SlashCommandInteractionEvent event, String messageText) {
-        if (messageText.length() > 1500) {
-            splitAndSent(messageText, event.getChannel());
-            event.getHook().sendMessage("Message to long for replay, sent all information in base messages").queue();
-        } else {
-            if (!messageText.isEmpty()) {
-                event.getHook().sendMessage(messageText).queue();
-            } else {
-                event.getHook().sendMessage("-").queue();
-            }
-            // event.getHook().sendMessage("-").queue();
-            //Deletes slash command
-           event.getHook().sendMessage("-").queue(msg -> {
-               msg.delete().queue();
-           });
-        }
+        replyToSlashCommand(event, messageText);
     }
 
     public static void replyToMessage(SlashCommandInteractionEvent event, File file) {
