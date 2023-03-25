@@ -81,6 +81,9 @@ public class Constants {
     public static final String SEARCH_WARRANT = "search_warrant";
     public static final String ADD_CUSTOM_ADJACENT_TILES = "add_custom_adjacent_tiles";
     public static final String ADD_FOG_TILE = "add_fog_tile";
+    public static final String ADD_ADJACENCY_OVERRIDE = "add_adjacency_override";
+    public static final String REMOVE_ADJACENCY_OVERRIDE = "remove_adjacency_override";
+    public static final String REMOVE_ALL_ADJACENCY_OVERRIDES = "remove_all_adjacency_overrides";
     public static final String REMOVE_FOG_TILE = "remove_fog_tile";
     public static final String REMOVE_CUSTOM_ADJACENT_TILES = "remove_custom_adjacent_tiles";
     public static final String REMOVE_ALL_CUSTOM_ADJACENT_TILES = "remove_all_custom_adjacent_tiles";
@@ -373,11 +376,14 @@ public class Constants {
     public static final String CUSTOM_PO_VP = "customPublicVP";
     public static final String SCORED_PO = "scoredPublicObjectives";
     public static final String CUSTOM_ADJACENT_TILES = "customAdjacentTiles";
+    public static final String ADJACENCY_OVERRIDES = "adjacencyOverrides";
     public static final String PRIMARY_TILE = "primary_tile";
+    public static final String SECONDARY_TILE = "secondary_tile";
     public static final String ADJACENT_TILES = "adjacent_tiles";
     public static final String TWO_WAY = "two_way";
     public static final String PO1 = "publicObjectives1";
     public static final String PO2 = "publicObjectives2";
+    public static final String PRIMARY_TILE_DIRECTION = "primary_tile_direction";
 
     public static final String TURN_ORDER = "turn_order";
     public static final String TURN_STATS = "turn_stats";

@@ -117,6 +117,10 @@ public class FoWHelper {
         // for each adjacent tile...
         for (int i = 0; i < 6; i++) {
             String position_ = directlyAdjacentTiles.get(i);
+			String override = map.getAdjacentTileOverride(position, i);
+			if (override != null) {
+				position_ = override;
+			}
 
             if (position_.equals("x") || (hyperlaneData != null && !hyperlaneData.get(i))) {
                 // the hyperlane doesn't exist & doesn't go that direction, skip.

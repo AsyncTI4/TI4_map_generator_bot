@@ -3,6 +3,8 @@ package ti4.map;
 import org.jetbrains.annotations.Nullable;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.player.PlanetRemove;
 import ti4.generator.Mapper;
@@ -79,6 +81,7 @@ public class Map {
     private LinkedHashMap<String, Integer> customPublicVP = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
+    private LinkedHashMap<Pair<String, Integer>, String> adjacencyOverrides = new LinkedHashMap<>();
     private ArrayList<String> publicObjectives1 = new ArrayList<>();
     private ArrayList<String> publicObjectives2 = new ArrayList<>();
     private ArrayList<String> soToPoList = new ArrayList<>();
@@ -614,6 +617,55 @@ public class Map {
 
     public LinkedHashMap<String, List<String>> getCustomAdjacentTiles() {
         return customAdjacentTiles;
+    }
+
+    public LinkedHashMap<Pair<String, Integer>, String> getAdjacentTileOverrides() {
+        return adjacencyOverrides;
+    }
+
+    public void addAdjacentTileOverride(String primaryTile, int direction, String secondaryTile) {
+        Pair<String, Integer> primary = new ImmutablePair<String,Integer>(primaryTile, direction);
+        Pair<String, Integer> secondary = new ImmutablePair<String,Integer>(secondaryTile, (direction + 3) % 6);
+
+        adjacencyOverrides.put(primary, secondaryTile);
+        adjacencyOverrides.put(secondary, primaryTile);
+    }
+
+    public void setAdjacentTileOverride(LinkedHashMap<Pair<String, Integer>, String> overrides) {
+        adjacencyOverrides = overrides;
+    }
+
+    public void clearAdjacentTileOverrides() {
+        adjacencyOverrides.clear();
+    }
+
+    public void removeAdjacentTileOverrides(String primary) {
+        for (int i = 0; i < 6; i++) {
+            String secondary = getAdjacentTileOverride(primary, i);
+            int j = (i + 3) % 6;
+
+            if (secondary != null) {
+                adjacencyOverrides.remove(new ImmutablePair<String, Integer>(primary, i));
+                adjacencyOverrides.remove(new ImmutablePair<String, Integer>(secondary, j));
+            }
+        }
+    }
+
+    public List<String> getAdjacentTileOverrides(String position) {
+        List<String> output = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            String secondary = getAdjacentTileOverride(position, i);
+            output.add(secondary);
+        }
+        return output;
+    }
+
+    public String getAdjacentTileOverride(String position, int direction) {
+        Pair<String, Integer> primary = new ImmutablePair<String, Integer>(position, direction);
+        if (adjacencyOverrides.containsKey(primary)) {
+            return adjacencyOverrides.get(primary);
+        }
+        return null;
     }
 
     public LinkedHashMap<String, Integer> getLaws() {

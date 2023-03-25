@@ -142,6 +142,25 @@ public class Helper {
         return tokenPath;
     }
 
+    @Nullable
+    public static String getAdjacencyOverridePath(int direction) {
+        String file = "adjacent_";
+        switch (direction) {
+            case 0 -> file += "north.png";
+            case 1 -> file += "northeast.png";
+            case 2 -> file += "southeast.png";
+            case 3 -> file += "south.png";
+            case 4 -> file += "southwest.png";
+            case 5 -> file += "northwest.png";
+        }
+        String tokenPath = ResourceHelper.getInstance().getResourceFromFolder("extra/", file, "Could not find adjacency file for direction: " + direction);
+        if (tokenPath == null) {
+            BotLogger.log("Could not find token: " + file);
+            return null;
+        }
+        return tokenPath;
+    }
+
     public static void addMirageToTile(Tile tile) {
         HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
         if (unitHolders.get(Constants.MIRAGE) == null) {
