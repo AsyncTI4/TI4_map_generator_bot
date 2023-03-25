@@ -222,25 +222,6 @@ public class GenerateMap {
         return map.getPlayer(user);
     }
 
-//    private Set<String> fowFilter(Map map) {
-//        Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
-//        if (fowPlayer != null) {
-//            // Get all tiles with the player in it
-//            for (java.util.Map.Entry<String, Tile> tileEntry : tilesToDisplay.entrySet()) {
-//                if (FoWHelper.playerIsInSystem(map, tileEntry.getValue(), fowPlayer)) {
-//                    tilesWithPlayerUnitsPlanets.add(tileEntry.getKey());
-//                }
-//            }
-//            
-//            Set<String> tileIDsToShow = new HashSet<>(tilesWithPlayerUnitsPlanets);
-//            for (String tileID : tilesWithPlayerUnitsPlanets) {
-//                Set<String> adjacentTiles = FoWHelper.getAdjacentTiles(map, tileID, fowPlayer);
-//                tileIDsToShow.addAll(adjacentTiles);
-//            }
-//            return tileIDsToShow;
-//        }
-//        return Collections.emptySet();
-//    }
 
     private void updatePlayerFogTiles(Map map, Player player, Set<String> tileKeys) {
         for (String key_ : tileKeys) {
