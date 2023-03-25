@@ -24,7 +24,9 @@ public class ListVoteCount extends AgendaSubcommandData {
     }
 
     public static void turnOrder(SlashCommandInteractionEvent event, Map map) {
-        Boolean privateGame = FoWHelper.isPrivateGame(event);
+        Boolean isPrivateFogGame = FoWHelper.isPrivateGame(event);
+        boolean privateGame = isPrivateFogGame != null && isPrivateFogGame;
+
         StringBuilder msg = new StringBuilder();
         int i = 1;
         List<Player> orderList = new ArrayList<>();
@@ -101,7 +103,7 @@ public class ListVoteCount extends AgendaSubcommandData {
                     .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
             influenceCount += influenceCountFromPlanets;
             
-            if (privateGame != null && privateGame) {
+            if (privateGame) {
                 text += " vote count: **???";
             } else if (player.getFaction().equals("nekro") && !hasXxchaAlliance) {
                 text += " NOT VOTING.: **0";
@@ -124,7 +126,7 @@ public class ListVoteCount extends AgendaSubcommandData {
             }
 
             text += "**";
-            if (player.getUserID().equals(speakerName)) {
+            if (!privateGame && !player.getUserID().equals(speakerName)) {
                 text += " " + Emojis.SpeakerToken;
             }
             msg.append(i).append(". ").append(text).append("\n");
