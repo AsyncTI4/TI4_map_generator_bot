@@ -1,5 +1,6 @@
 package ti4.map;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import ti4.ResourceHelper;
@@ -19,8 +20,8 @@ public class Tile {
     private String position;
     private HashMap<String, UnitHolder> unitHolders = new HashMap<>();
     
-    private Boolean fog = false;
-    private String fogLabel = "";
+    private HashMap<Player,Boolean> fog = new HashMap<>();
+    private HashMap<Player,String> fogLabel = new HashMap<>();
 
     public Tile(String tileID, String position) {
         this.tileID = tileID;
@@ -28,11 +29,14 @@ public class Tile {
         initPlanetsAndSpace(tileID);
     }
 
-    public Tile(String tileID, String position, Boolean fog_, String fogLabel_) {
+    public Tile(String tileID, String position, Player player, Boolean fog_, String fogLabel_) {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
-        this.fog = fog_;
-        this.fogLabel = fogLabel_;
+        if(player != null)
+        {
+        	fog.put(player, fog_);
+        	fogLabel.put(player, fogLabel_);
+        }
         initPlanetsAndSpace(tileID);
     }
 
@@ -249,20 +253,20 @@ public class Tile {
         return tilePath;
     }
 
-    public boolean hasFog() {
-        return fog;
+    public boolean hasFog(Player player) {
+        return fog.get(player);
     }
 
-    public void setFogOfWar(Boolean fog_) {
-        fog = fog_;
+    public void setFogOfWar(@NotNull Player player, Boolean fog_) {
+        fog.put(player, fog_);
     }
 
-    public String getFogLabel() {
-        return fogLabel;
+    public String getFogLabel(Player player) {
+        return fogLabel.get(player);
     }
 
-    public void setFogLabel(String fogLabel_) {
-        this.fogLabel = fogLabel_;
+    public void setFogLabel(@NotNull Player player, String fogLabel_) {
+        fogLabel.put(player, fogLabel_);
     }
 
     public String getFowTilePath(Player player) {
