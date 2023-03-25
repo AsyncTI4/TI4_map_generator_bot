@@ -126,7 +126,7 @@ public class ListVoteCount extends AgendaSubcommandData {
             }
 
             text += "**";
-            if (!privateGame && !player.getUserID().equals(speakerName)) {
+            if (!privateGame && player.getUserID().equals(speakerName)) {
                 text += " " + Emojis.SpeakerToken;
             }
             msg.append(i).append(". ").append(text).append("\n");
