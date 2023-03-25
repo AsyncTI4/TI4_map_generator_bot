@@ -688,14 +688,14 @@ public class Player {
         fow_customLabels.remove(position);
     }
 
-    public Tile buildFogTile(String position) {
+    public Tile buildFogTile(String position, Player player) {
         String tileID = fow_seenTiles.get(position);
         if (tileID == null) tileID = "0b";
 
         String label = fow_customLabels.get(position);
         if (label == null) label = "";
 
-        return new Tile(tileID, position, true, label);
+        return new Tile(tileID, position, player, true, label);
     }
 
     public HashMap<String,String> getFogTiles() {
