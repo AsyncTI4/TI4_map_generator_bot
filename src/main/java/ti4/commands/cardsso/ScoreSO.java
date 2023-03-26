@@ -11,6 +11,7 @@ import ti4.commands.cards.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -70,6 +71,13 @@ public class ScoreSO extends SOCardsSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(channel, message.toString());
         }
+        
+        // FoW logic, specific for players with visilibty, generic for the rest
+        if(activeMap.isFoWMode())
+        {
+        	FoWHelper.pingPlayersDifferentMessages(activeMap, event, player, message.toString(), "Scores changed");
+        }
+        
         CardsInfo.sentUserCardInfo(event, activeMap, player, buttonInteractionEvent);
     }
 }
