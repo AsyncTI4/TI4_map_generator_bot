@@ -42,7 +42,7 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        event.getInteraction().reply("-").queue(m -> m.deleteOriginal().queue());
+        event.getInteraction().deferReply().queue();
         String userID = event.getUser().getId();
         Member member = event.getMember();
         if (member != null) event.getChannel().sendMessage("```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```").queue();
@@ -62,10 +62,11 @@ public class MessageListener extends ListenerAdapter {
             if (command.accept(event)) {
                 try {
                     command.execute(event);
+                    command.postExecute(event);
                 } catch (Exception e) {
                     String messageText = "Error trying to execute command: " + command.getActionID();
                     String errorMessage = ExceptionUtils.getMessage(e);
-                    MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
+                    event.getHook().editOriginal(errorMessage).queue();
                     BotLogger.log(messageText);
                     BotLogger.log(errorMessage.substring(0, Math.min(1500, errorMessage.length())));
                 }
