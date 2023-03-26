@@ -29,6 +29,15 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
 
     public static void archiveOldThreads(Guild guild, Integer threadCount) {
         List<ThreadChannel> threadChannels = guild.getThreadChannels();
+        List<ThreadChannel> threadChannelsBlank = guild.getThreadChannels();
+
+        threadChannelsBlank = threadChannelsBlank.stream()
+            .filter(c -> c.getLatestMessageIdLong() == 0)
+            .toList();
+        for (ThreadChannel threadChannel : threadChannelsBlank) {
+            threadChannel.getManager().setArchived(true).queue();
+        }
+
         threadChannels = threadChannels.stream()
             .filter(c -> c.getLatestMessageIdLong() != 0)
             .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
