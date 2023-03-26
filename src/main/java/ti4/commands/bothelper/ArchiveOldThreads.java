@@ -47,8 +47,6 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
         for (ThreadChannel threadChannel : threadChannelsBlank) {
             threadChannel.getManager().setArchived(true).queue();
         }
-
-        sendMessage("Blank Channels:" + threadChannelsBlank.size());
         
         threadChannels = threadChannels.stream()
             .filter(c -> c.getLatestMessageIdLong() != 0)
