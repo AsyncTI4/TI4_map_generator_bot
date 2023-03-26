@@ -3,10 +3,16 @@ package ti4.map;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -23,6 +29,7 @@ import java.util.*;
 public class MapSaveLoadManager {
 
     public static final String TXT = ".txt";
+    public static final String JSON = ".json";
     public static final String TILE = "-tile-";
     public static final String UNITS = "-units-";
     public static final String UNITHOLDER = "-unitholder-";
@@ -57,6 +64,14 @@ public class MapSaveLoadManager {
     }
 
     public static void saveMap(Map map, boolean keepModifiedDate) {
+        ObjectMapper mapper = new ObjectMapper();
+        try {
+            mapper.writeValue(Storage.getMapsJSONStorage(map.getName() + JSON), map);
+        } catch (IOException e) {
+            // Do nothing
+            // e.printStackTrace();
+        }       
+        
         File mapFile = Storage.getMapImageStorage(map.getName() + TXT);
         if (mapFile != null) {
             saveUndo(map, mapFile);
@@ -194,6 +209,15 @@ public class MapSaveLoadManager {
         writer.write(Constants.SPEAKER + " " + map.getSpeaker());
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.ACTIVE_PLAYER + " " + map.getActivePlayer());
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.LAST_ACTIVE_PLAYER_PING + " " + map.getLastActivePlayerPing().getTime());
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " " + map.getLastActivePlayerChange().getTime());
+        writer.write(System.lineSeparator());
+
         HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
         StringBuilder sb = new StringBuilder();
         for (java.util.Map.Entry<Integer, Boolean> entry : scPlayed.entrySet()) {
@@ -262,6 +286,15 @@ public class MapSaveLoadManager {
         writer.write(Constants.CUSTOM_ADJACENT_TILES + " " + adjacentTiles);
         writer.write(System.lineSeparator());
 
+        StringBuilder adjacencyOverrides = new StringBuilder();
+        for (java.util.Map.Entry<Pair<String, Integer>, String> entry : map.getAdjacentTileOverrides().entrySet()) {
+            adjacencyOverrides.append(entry.getKey().getLeft() + "-");
+            adjacencyOverrides.append(entry.getKey().getRight() + "-");
+            adjacencyOverrides.append(entry.getValue() + ";");
+        }
+        writer.write(Constants.ADJACENCY_OVERRIDES + " " + adjacencyOverrides);
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.CREATION_DATE + " " + map.getCreationDate());
         writer.write(System.lineSeparator());
         long time = keepModifiedDate ? map.getLastModifiedDate() : new Date().getTime();
@@ -275,11 +308,19 @@ public class MapSaveLoadManager {
         MessageChannel mainGameChannel = map.getMainGameChannel();
         writer.write(Constants.MAIN_GAME_CHANNEL + " " + (mainGameChannel == null ? "" : mainGameChannel.getId()));
         writer.write(System.lineSeparator());
+        ThreadChannel botMapChannel = map.getBotMapChannel();
+        writer.write(Constants.BOT_MAP_CHANNEL + " " + (botMapChannel == null ? "" : botMapChannel.getId()));
+
+        writer.write(System.lineSeparator());
         writer.write(Constants.COMMUNITY_MODE + " " + map.isCommunityMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.ALLIANCE_MODE + " " + map.isAllianceMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.FOW_MODE + " " + map.isFoWMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.ABSOL_MODE + " " + map.isAbsolMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.DISCORDANT_STARS_MODE + " " + map.isDiscordantStarsMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
         writer.write(System.lineSeparator());
@@ -321,6 +362,10 @@ public class MapSaveLoadManager {
                 writer.write(Constants.PLAYER_PRIVATE_CHANNEL + " " + channelForCommunity.getId());
                 writer.write(System.lineSeparator());
             }
+            
+            String fogColor = player.getFogFilter() == null ? "" : player.getFogFilter();
+            writer.write(Constants.FOG_FILTER + " " + fogColor);
+            writer.write(System.lineSeparator());
 
             writer.write(Constants.PASSED + " " + player.isPassed());
             writer.write(System.lineSeparator());
@@ -380,7 +425,12 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.STRATEGY_CARD + " " + player.getSC());
             writer.write(System.lineSeparator());
-
+            
+            writer.write(Constants.NUMBER_OF_TURNS + " " + player.getNumberTurns());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.TOTAL_TURN_TIME + " " + player.getTotalTurnTime());
+            writer.write(System.lineSeparator());
+            
             StringBuilder leaderInfo = new StringBuilder();
             for (Leader leader : player.getLeaders()) {
                 leaderInfo.append(leader.getId());
@@ -401,11 +451,12 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
 
             StringBuilder fogOfWarSystems = new StringBuilder();
-            HashMap<String, String> fow_systems = player.getFogFilter();
+            HashMap<String, String> fow_systems = player.getFogTiles();
             HashMap<String, String> fow_labels = player.getFogLabels();
             for (String key : fow_systems.keySet()) {
                 String system = fow_systems.get(key);
                 String label = fow_labels.get(key);
+                if (label != null) label = label.replaceAll(" ", "—"); //replace spaces with em dash
                 fogOfWarSystems.append(key);
                 fogOfWarSystems.append(",");
                 fogOfWarSystems.append(system);
@@ -723,6 +774,13 @@ public class MapSaveLoadManager {
                 case Constants.CUSTOM_PO_VP -> map.setCustomPublicVP(getParsedCards(info));
                 case Constants.SCORED_PO -> map.setScoredPublicObjectives(getParsedCardsForScoredPO(info));
                 case Constants.CUSTOM_ADJACENT_TILES -> map.setCustomAdjacentTiles(getParsedCardsForScoredPO(info));
+                case Constants.ADJACENCY_OVERRIDES -> {
+                    try {
+                        map.setAdjacentTileOverride(getParsedAdjacencyOverrides(info));
+                    } catch (Exception e) {
+                        BotLogger.log("Failed to load adjacency overrides");
+                    }
+                }
                 case Constants.AGENDAS -> map.setAgendas(getCardList(info));
                 case Constants.AC_DISCARDED -> map.setDiscardActionCards(getParsedCards(info));
                 case Constants.DISCARDED_AGENDAS -> map.setDiscardAgendas(getParsedCards(info));
@@ -752,6 +810,25 @@ public class MapSaveLoadManager {
                     }
                 }
                 case Constants.SPEAKER -> map.setSpeaker(info);
+                case Constants.ACTIVE_PLAYER -> map.setActivePlayer(info);
+                case Constants.LAST_ACTIVE_PLAYER_PING -> {
+                    try {
+                        Long millis = Long.parseLong(info);
+                        Date lastPing = new Date(millis);
+                        map.setLastActivePlayerPing(lastPing);
+                    } catch (Exception e) {
+                        // do nothing
+                    }
+                }
+                case Constants.LAST_ACTIVE_PLAYER_CHANGE -> {
+                    try {
+                        Long millis = Long.parseLong(info);
+                        Date lastChange = new Date(millis);
+                        map.setLastActivePlayerChange(lastChange);
+                    } catch (Exception e) {
+                        // do nothing
+                    }
+                }
                 case Constants.PLAYER_COUNT_FOR_MAP -> {
                     String count = info;
                     try {
@@ -795,9 +872,35 @@ public class MapSaveLoadManager {
                 }
                 case Constants.GAME_CUSTOM_NAME -> map.setCustomName(info);
                 case Constants.MAIN_GAME_CHANNEL -> {
+                    String id = info.isEmpty() ? "1234" : info; //getTextChannelById can't handle ""
                     try {
-                        TextChannel channelById = MapGenerator.jda.getTextChannelById(info);
-                        map.setMainGameChannel(channelById);
+                        TextChannel mainGameChannel = MapGenerator.jda.getTextChannelById(id);
+                        if (mainGameChannel == null) {
+                            List<TextChannel> gameChannels = MapGenerator.jda.getTextChannelsByName(map.getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
+                            if (!gameChannels.isEmpty() && gameChannels.size() == 1) mainGameChannel = gameChannels.get(0);
+                        }
+                        map.setMainGameChannel(mainGameChannel);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.BOT_MAP_CHANNEL -> {
+                    String id = info.isEmpty() ? "1234" : info; //getThreadChannelById can't handle ""
+                    try {
+                        ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(id); //exists and is not locked
+                        if (threadChannel == null) { 
+                            List<ThreadChannel> botChannels = MapGenerator.jda.getThreadChannelsByName(map.getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+                            if (!botChannels.isEmpty() && botChannels.size() == 1) { //found a matching thread
+                                threadChannel = botChannels.get(0);
+                            } else { //can't find it, might be archived
+                                for (ThreadChannel tc : MapGenerator.jda.getTextChannelById(map.getMainGameChannel().getId()).retrieveArchivedPublicThreadChannels()) {
+                                    if (tc.getName().equals(map.getName() + Constants.BOT_CHANNEL_SUFFIX)) {
+                                        threadChannel = tc;
+                                    }
+                                }
+                            }
+                        }
+                        map.setBotMapChannel(threadChannel);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -822,6 +925,22 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         map.setFoWMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.ABSOL_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setAbsolMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.DISCORDANT_STARS_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setDiscordantStarsMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -895,6 +1014,21 @@ public class MapSaveLoadManager {
         return scoredPOs;
     }
 
+    private static LinkedHashMap<Pair<String, Integer>, String> getParsedAdjacencyOverrides(String tokenizer) {
+        StringTokenizer override = new StringTokenizer(tokenizer, ";");
+        LinkedHashMap<Pair<String, Integer>, String> overrides = new LinkedHashMap<>();
+        while (override.hasMoreTokens()) {
+            String[] overrideInfo = override.nextToken().split("-");
+            String primaryTile = overrideInfo[0];
+            String direction = overrideInfo[1];
+            String secondaryTile = overrideInfo[2];
+
+            Pair<String, Integer> primary = new ImmutablePair<String, Integer>(primaryTile, Integer.parseInt(direction));
+            overrides.put(primary, secondaryTile);
+        }
+        return overrides;
+    }
+
     private static void readPlayerInfo(Player player, String data) {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.countTokens() == 2) {
@@ -904,8 +1038,6 @@ public class MapSaveLoadManager {
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> setRole(player, tokenizer);
                 case Constants.PLAYER_PRIVATE_CHANNEL -> setChannel(player, tokenizer);
-                //TODO: Constants.CHANNEL_FOR_COMMUNITY is duplicative for renaming the property in the save file. Delete later
-                case Constants.CHANNEL_FOR_COMMUNITY -> setChannel(player, tokenizer);
                 case Constants.TACTICAL -> player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
@@ -963,13 +1095,18 @@ public class MapSaveLoadManager {
                     }
                 }
                 case Constants.FOW_SYSTEMS -> {
-                    StringTokenizer fow_systems = new StringTokenizer(tokenizer.nextToken(), ";");
-                    while (fow_systems.hasMoreTokens()) {
-                        String[] system = fow_systems.nextToken().split(",");
-                        String position = system[0];
-                        String tileID = system[1];
-                        String label = system[2];
-                        player.addFogTile(tileID, position, label);
+                    try {
+                        StringTokenizer fow_systems = new StringTokenizer(tokenizer.nextToken(), ";");
+                        while (fow_systems.hasMoreTokens()) {
+                            String[] system = fow_systems.nextToken().split(",");
+                            String position = system[0];
+                            String tileID = system[1];
+                            String label = system[2];
+                            if (label != null) label = label.replaceAll("—", " "); //replace em dash with spaces
+                            player.addFogTile(tileID, position, label);
+                        }
+                    } catch (Exception e) {
+                        BotLogger.log("Could not parse fog of war systems for player when loading the map: " + player.getColor());
                     }
                 }
                 case Constants.SO_SCORED -> {
@@ -999,6 +1136,12 @@ public class MapSaveLoadManager {
                 }
 
                 case Constants.STRATEGY_CARD -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.NUMBER_OF_TURNS -> player.setNumberTurns(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.TOTAL_TURN_TIME -> player.setTotalTurnTime(Long.parseLong(tokenizer.nextToken()));
+                case Constants.FOG_FILTER -> {
+                    String filter = tokenizer.nextToken();
+                    player.setFogFilter(filter);
+                }
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));

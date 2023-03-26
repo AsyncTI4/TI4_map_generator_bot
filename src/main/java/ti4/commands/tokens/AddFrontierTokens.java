@@ -36,8 +36,12 @@ public class AddFrontierTokens implements Command {
         Collection<Tile> tileList = map.getTileMap().values();
         String frontierTileList = Mapper.getSpecialCaseValues(Constants.FRONTIER);
         for (Tile tile : tileList) {
-            if (frontierTileList.contains(tile.getTileID())){
-                AddToken.addToken(event, tile, Constants.FRONTIER, map);
+            if (frontierTileList.contains(tile.getTileID())) {
+                boolean hasMirage = false;
+                for (UnitHolder unitholder : tile.getUnitHolders().values()) {
+                    if (unitholder.getName().equals(Constants.MIRAGE)) hasMirage = true;
+                }
+                if (!hasMirage) AddToken.addToken(event, tile, Constants.FRONTIER, map);
             }
         }
     }

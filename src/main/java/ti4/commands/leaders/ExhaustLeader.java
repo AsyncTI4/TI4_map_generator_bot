@@ -24,27 +24,27 @@ public class ExhaustLeader extends LeaderAction {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null) {
             if (playerLeader.isLocked()) {
-                editReplyMessage("Leader '" + leader + "' is locked");
+                sendMessage("Leader '" + leader + "' is locked");
                 return;
             }
             playerLeader.setExhausted(true);
-
-            editReplyMessage(Helper.getPlayerFactionLeaderEmoji(player, leader));
+            sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
             StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(event, player))
                     .append(" exhausted ")
-                    .append(playerLeader.getId()).append(" ")
-                    .append(playerLeader.getName());
+                    .append(Helper.getLeaderFullRepresentation(player, playerLeader));
             OptionMapping optionTG = event.getOption(Constants.TG);
             if (optionTG != null) {
-                Stats.setValue(event, player, optionTG, playerLeader::setTgCount, playerLeader::getTgCount);
-                messageText.append(" - ").append(optionTG.getAsString()).append(Emojis.tg).append(" placed on top of the leader");
+                Stats stats = new Stats();
+                stats.preExecute(event);
+                stats.setValue(event, player, optionTG, playerLeader::setTgCount, playerLeader::getTgCount);
+                messageText.append("\n").append(optionTG.getAsString()).append(Emojis.tg).append(" was placed on top of the leader");
                 if (playerLeader.getTgCount() != optionTG.getAsInt()) {
                     messageText.append(" _(").append(String.valueOf(playerLeader.getTgCount())).append(Emojis.tg).append(" total)_\n");
                 }
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), messageText.toString());
+            sendMessage(messageText.toString());
         } else {
-            editReplyMessage("Leader '" + leader + "'' not found");
+            sendMessage("Leader '" + leader + "'' not found");
         }
     }
 }

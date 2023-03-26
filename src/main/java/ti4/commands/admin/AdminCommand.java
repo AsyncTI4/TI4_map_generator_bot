@@ -79,6 +79,7 @@ public class AdminCommand implements Command {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
                 subCommandExecuted = subcommand;
+                break;
             }
         }
     }
@@ -97,6 +98,7 @@ public class AdminCommand implements Command {
         subcommands.add(new CardsInfoForPlayer());
         subcommands.add(new DrawSpecificSOForPlayer());
         subcommands.add(new Statistics());
+        subcommands.add(new SetGlobalSetting());
         return subcommands;
     }
 

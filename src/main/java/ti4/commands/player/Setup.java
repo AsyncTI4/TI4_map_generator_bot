@@ -8,6 +8,7 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapStringMapper;
 import ti4.map.Player;
@@ -32,51 +33,42 @@ public class Setup extends PlayerSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         if (!activeMap.isMapOpen()) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Can do faction setup only when map is open and not locked");
+            sendMessage("Can do faction setup only when map is open and not locked");
             return;
         }
 
         @SuppressWarnings("ConstantConditions")
         String faction = AliasHandler.resolveFaction(event.getOption(Constants.FACTION).getAsString().toLowerCase());
         if (!Mapper.isFaction(faction)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Faction not valid");
+            sendMessage("Faction not valid");
             return;
         }
         @SuppressWarnings("ConstantConditions")
         String color = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
         if (!Mapper.isColorValid(color)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Color not valid");
+            sendMessage("Color not valid");
             return;
         }
         Player player = activeMap.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeMap, player, event, null);
+        player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
-        }
-        OptionMapping playerOption = event.getOption(Constants.PLAYER);
-        if (playerOption != null) {
-            String playerID = playerOption.getAsUser().getId();
-            if (activeMap.getPlayer(playerID) != null) {
-                player = activeMap.getPlayers().get(playerID);
-            } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerOption.getAsUser().getName() + " could not be found in map:" + activeMap.getName());
-                return;
-            }
         }
 
         LinkedHashMap<String, Player> players = activeMap.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
                 if (color.equals(playerInfo.getColor())) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerInfo.getUserName() + " already uses color:" + color);
+                    sendMessage("Player:" + playerInfo.getUserName() + " already uses color:" + color);
                     return;
                 } else if (faction.equals(playerInfo.getFaction())) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
+                    sendMessage("Player:" + playerInfo.getUserName() + " already uses faction:" + faction);
                     return;
                 }
             }
         }
-
 
         player.setColor(color);
         player.setFaction(faction);
@@ -96,7 +88,7 @@ public class Setup extends PlayerSubcommandData {
             if (option != null) {
                 playerSetup = Mapper.getPlayerSetup(option.getAsString());
             } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Could not setup Keleres. Please select subfaction with the `keleres_hs` option");
+                sendMessage("Could not setup Keleres. Please select subfaction with the `keleres_hs` option");
                 return;
             }
         } else {
@@ -104,7 +96,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         if (playerSetup == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not setup faction. Report to ADMIN");
+            sendMessage("Could not setup faction. Report to ADMIN");
             return;
         }
 
@@ -133,7 +125,7 @@ public class Setup extends PlayerSubcommandData {
             }
         }
         if (!positionHS.isEmpty() && !useSpecified){
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile position: " + positionHS + " not found in map. Stopping setup");
+            sendMessage("Tile position: " + positionHS + " not found in map. Stopping setup");
             return;
         }
         String position = useSpecified && !positionHS.isEmpty() ? positionHS : setup.get(index);
@@ -206,6 +198,11 @@ public class Setup extends PlayerSubcommandData {
         }
         player.getExhaustedPlanets().clear();
         addUnits(setupInfo, tile, color, event);
+        if(!activeMap.isFoWMode()) {
+            sendMessage("Player: " + Helper.getPlayerRepresentation(event, player) + " has been set up");
+        } else {
+            sendMessage("Player was set up.");
+        }
     }
 
     private void addUnits(String[] setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {
@@ -234,7 +231,7 @@ public class Setup extends PlayerSubcommandData {
             String unitID = Mapper.getUnitID(unit, color);
             String unitPath = tile.getUnitPath(unitID);
             if (unitPath == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit: " + unit + " is not valid and not supported.");
+                sendMessage("Unit: " + unit + " is not valid and not supported.");
                 continue;
             }
             if (unitInfoTokenizer.hasMoreTokens()) {

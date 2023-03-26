@@ -9,9 +9,11 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public abstract class CardsSubcommandData extends SubcommandData {
-
+    
+    private SlashCommandInteractionEvent event;
     private Map activeMap;
     private User user;
 
@@ -31,11 +33,21 @@ public abstract class CardsSubcommandData extends SubcommandData {
         return user;
     }
 
+    /**
+     * Send a message to the event's channel, handles large text
+     * @param messageText new message
+     */
+    public void sendMessage(String messageText) {
+        MessageHelper.replyToSlashCommand(event, messageText);
+    }
+
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void preExecute(SlashCommandInteractionEvent event) {
+        this.event = event;
         user = event.getUser();
         activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
+        Helper.checkThreadLimitAndArchive(event.getGuild());
 
         Player player = Helper.getGamePlayer(activeMap, null, event, user.getId());
         if (player != null) {

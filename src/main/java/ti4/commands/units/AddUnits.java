@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.tokens.AddCC;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.*;
@@ -25,12 +24,12 @@ public class AddUnits extends AddRemoveUnits {
         if (option != null){
             String value = option.getAsString().toLowerCase();
             switch (value) {
-                case "t", "tactics" -> {
+                case "t/tactics", "t", "tactics", "tac", "tact" -> {
                     MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
                     AddCC.addCC(event, color, tile);
                     Helper.isCCCountCorrect(event, map, color);
                 }
-                case "r", "retreat", "reinforcements" -> {
+                case "r/retreat/reinforcements", "r", "retreat", "reinforcements" -> {
                     AddCC.addCC(event, color, tile);
                     Helper.isCCCountCorrect(event, map, color);
                 }
@@ -44,6 +43,8 @@ public class AddUnits extends AddRemoveUnits {
                 MapManager mapManager = MapManager.getInstance();
                 Map activeMap = mapManager.getUserActiveMap(userID);
                 Player player = activeMap.getPlayer(userID);
+                player = Helper.getGamePlayer(activeMap, player, event, null);
+                player = Helper.getPlayer(activeMap, player, event);
                 if (player != null) {
                     player.exhaustTech("sr");
                 }

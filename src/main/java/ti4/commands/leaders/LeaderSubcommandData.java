@@ -1,19 +1,18 @@
 package ti4.commands.leaders;
 
-import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 import ti4.map.Map;
 import ti4.map.MapManager;
-import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 
 public abstract class LeaderSubcommandData extends SubcommandData {
 
+    private SlashCommandInteractionEvent event;
     private Map activeMap;
     private User user;
-    protected Message replyMessage;
     
     public String getActionID() {
         return getName();
@@ -31,18 +30,18 @@ public abstract class LeaderSubcommandData extends SubcommandData {
         return user;
     }
     
-    public void editReplyMessage(String messageText) {
-        if (this.replyMessage != null) {
-            this.replyMessage.editMessage(messageText).queue();
-        } else {
-            BotLogger.log("replyMessage was null when attempting to edit");
-        }
+    /**
+     * Send a message to the event's channel, handles large text
+     * @param messageText new message
+     */
+    public void sendMessage(String messageText) {
+        MessageHelper.replyToSlashCommand(event, messageText);
     }
 
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void preExecute(SlashCommandInteractionEvent event) {
-        replyMessage = event.getHook().sendMessage("Executing: `" + event.getCommandString() + "`").complete();
+        this.event = event;
         user = event.getUser();
         activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
     }

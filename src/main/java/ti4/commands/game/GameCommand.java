@@ -74,7 +74,7 @@ public class GameCommand implements Command {
             MapSaveLoadManager.saveMap(activeMap);
         }
         File file = GenerateMap.getInstance().saveImage(activeMap, event);
-        if (!subcommandName.equalsIgnoreCase(Constants.GAME_END)) {
+        if (!subcommandName.equalsIgnoreCase(Constants.GAME_END) && !subcommandName.equalsIgnoreCase(Constants.PING)) {
             MessageHelper.replyToMessage(event, file);
         }
     }
@@ -98,6 +98,7 @@ public class GameCommand implements Command {
         subcommands.add(new Replace());
         subcommands.add(new SetupGameChannels());
         subcommands.add(new GameEnd());
+        subcommands.add(new Ping());
         return subcommands;
     }
 

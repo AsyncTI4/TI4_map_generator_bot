@@ -50,6 +50,7 @@ public class Player {
     private HashMap<String,String> debt_tokens = new HashMap<>();
     private HashMap<String,String> fow_seenTiles = new HashMap<>();
     private HashMap<String,String> fow_customLabels = new HashMap<>();
+    private String fowFogFilter = null;
 
     @Nullable
     private Role roleForCommunity = null;
@@ -66,6 +67,9 @@ public class Player {
     private List<String> exhaustedRelics = new ArrayList<>();
     private int SC = 0;
 
+    // Statistics
+    private int numberOfTurns = 0;
+    private long totalTimeSpent = 0;
 
     public Player(String userID, String userName) {
         this.userID = userID;
@@ -592,18 +596,20 @@ public class Player {
     }
 
     public void exhaustTech(String tech) {
-        if (techs.contains(tech)) {
+        if (techs.contains(tech) && !exhaustedTechs.contains(tech)) {
             exhaustedTechs.add(tech);
         }
     }
 
     public void refreshTech(String tech) {
-        exhaustedTechs.remove(tech);
+        boolean isRemoved = exhaustedTechs.remove(tech);
+        if (isRemoved) refreshTech(tech);
     }
 
     public void removeTech(String tech) {
-        techs.remove(tech);
-        exhaustedTechs.remove(tech);
+        boolean isRemoved = techs.remove(tech);
+        if (isRemoved) removeTech(tech);
+        refreshTech(tech);
     }
 
     public void addPlanet(String planet) {
@@ -613,29 +619,31 @@ public class Player {
     }
 
     public void exhaustPlanet(String planet) {
-        if (planets.contains(planet)) {
+        if (planets.contains(planet) && !exhaustedPlanets.contains(planet)) {
             exhaustedPlanets.add(planet);
         }
     }
 
     public void exhaustPlanetAbility(String planet) {
-        if (planets.contains(planet)) {
+        if (planets.contains(planet) && !exhaustedPlanetsAbilities.contains(planet)) {
             exhaustedPlanetsAbilities.add(planet);
         }
     }
 
     public void refreshPlanet(String planet) {
-        exhaustedPlanets.remove(planet);
+        boolean isRemoved = exhaustedPlanets.remove(planet);
+        if(isRemoved) refreshPlanet(planet);
     }
 
     public void refreshPlanetAbility(String planet) {
-        exhaustedPlanetsAbilities.remove(planet);
+        boolean isRemoved = exhaustedPlanetsAbilities.remove(planet);
+        if (isRemoved) refreshPlanetAbility(planet);
     }
 
     public void removePlanet(String planet) {
         planets.remove(planet);
-        exhaustedPlanets.remove(planet);
-        exhaustedPlanetsAbilities.remove(planet);
+        refreshPlanet(planet);
+        refreshPlanetAbility(planet);
     }
 
 
@@ -659,9 +667,13 @@ public class Player {
         return searchWarrant;
     }
 
-    public void updateFogFilter(@NotNull Tile tile) {
+    public void updateFogTile(@NotNull Tile tile, String label) {
         fow_seenTiles.put(tile.getPosition(), tile.getTileID());
-        fow_customLabels.remove(tile.getPosition());
+        if (label == null) {
+            fow_customLabels.remove(tile.getPosition());
+        } else {
+            fow_customLabels.put(tile.getPosition(), label);
+        }
     }
 
     public void addFogTile(String tileID, String position, String label) {
@@ -683,10 +695,10 @@ public class Player {
         String label = fow_customLabels.get(position);
         if (label == null) label = "";
 
-        return new Tile(tileID, position, !tileID.equals("0b"), label);
+        return new Tile(tileID, position, true, label);
     }
 
-    public HashMap<String,String> getFogFilter() {
+    public HashMap<String,String> getFogTiles() {
         return fow_seenTiles;
     }
 
@@ -700,5 +712,38 @@ public class Player {
     
     public void setDummy(boolean isDummy) {
         this.isDummy = isDummy;
+    }
+
+    public boolean isActivePlayer() {
+        return !(isDummy || faction == null || color == null || color.equals("null"));
+    }
+
+    public void setFogFilter(String preference) {
+        fowFogFilter = preference;
+    }
+
+    public String getFogFilter() {
+        return fowFogFilter == null ? "default" : fowFogFilter;
+    }
+
+    public void updateTurnStats(long turnTime) {
+        numberOfTurns++;
+        totalTimeSpent += turnTime;
+    }
+
+    public int getNumberTurns() {
+        return numberOfTurns;
+    }
+    
+    public void setNumberTurns(int numTurns) {
+        numberOfTurns = numTurns;
+    }
+
+    public long getTotalTurnTime() {
+        return totalTimeSpent;
+    }
+    
+    public void setTotalTurnTime(long totalTime) {
+        totalTimeSpent = totalTime;
     }
 }

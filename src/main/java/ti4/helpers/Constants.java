@@ -12,6 +12,8 @@ public class Constants {
     public static final String COMMUNITY_MODE = "community_mode";
     public static final String ALLIANCE_MODE = "alliance_mode";
     public static final String FOW_MODE = "fow_mode";
+    public static final String ABSOL_MODE = "absol_mode";
+    public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";
     public static final String PLAYER_PRIVATE_CHANNEL = "playerPrivateChannel";
     public static final String CHANNEL_FOR_COMMUNITY = "channelForCommunity";
@@ -33,6 +35,13 @@ public class Constants {
     public static final String REPLACE = "replace";
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
+
+
+    
+
+    public static final String SET_SETTING = "setting_name";
+    public static final String SETTING_NAME = "setting_name";
+    public static final String SETTING_VALUE = "setting_value";
 
     public static String ALPHA = "alpha";
     public static String BETA = "beta";
@@ -72,6 +81,9 @@ public class Constants {
     public static final String SEARCH_WARRANT = "search_warrant";
     public static final String ADD_CUSTOM_ADJACENT_TILES = "add_custom_adjacent_tiles";
     public static final String ADD_FOG_TILE = "add_fog_tile";
+    public static final String ADD_ADJACENCY_OVERRIDE = "add_adjacency_override";
+    public static final String REMOVE_ADJACENCY_OVERRIDE = "remove_adjacency_override";
+    public static final String REMOVE_ALL_ADJACENCY_OVERRIDES = "remove_all_adjacency_overrides";
     public static final String REMOVE_FOG_TILE = "remove_fog_tile";
     public static final String REMOVE_CUSTOM_ADJACENT_TILES = "remove_custom_adjacent_tiles";
     public static final String REMOVE_ALL_CUSTOM_ADJACENT_TILES = "remove_all_custom_adjacent_tiles";
@@ -155,7 +167,18 @@ public class Constants {
     public static final String SPECIAL = "special";
     public static final String FOW = "fow";
     public static final String FOW_SYSTEMS = "fow_systems";
+    public static final String FOG_FILTER = "fog_filter";
+    public static final String SET_FOG_FILTER = "set_fog_filter";
+    public static final String PING_SYSTEM = "ping_system";
     public static final String LABEL = "label";
+    public static final String MESSAGE = "message";
+
+    public static final String FOW_FILTER_DARK_GREY = "Dark grey (default)";
+    public static final String FOW_FILTER_FROG = "Frog";
+    public static final String FOW_FILTER_SEPIA = "Sepia";
+    public static final String FOW_FILTER_WHITE = "White";
+    public static final String FOW_FILTER_PINK = "Pink";
+    public static final String FOW_FILTER_PURPLE = "Purple";
     
     public static final String MILTY = "milty";
     public static final String START = "start";
@@ -169,7 +192,7 @@ public class Constants {
     public static final String AGENDA_REMOVE_FROM_GAME = "agenda_remove_from_game";
     public static final String AC_REMOVE_FROM_GAME = "ac_remove_from_game";
     public static final String SO_ID = "so_id";
-    public static final String AEGNDA_ID = "agenda_id";
+    public static final String AGENDA_ID = "agenda_id";
     public static final String AC_ID = "ac_id";
 
     public static final String INACTIVE_LEADER = "hero_unplay";
@@ -215,8 +238,12 @@ public class Constants {
     public static final String PASS = "pass";
     public static final String TURN = "turn_end";
     public static final String SPEAKER = "speaker";
+    public static final String ACTIVE_PLAYER = "active_player";
+    public static final String LAST_ACTIVE_PLAYER_PING = "last_active_player_ping";
+    public static final String LAST_ACTIVE_PLAYER_CHANGE = "last_active_player_change";
     
     public static final String MAIN_GAME_CHANNEL = "main_game_channel";
+    public static final String BOT_MAP_CHANNEL = "bot_map_channel";
     public static final String CHANNEL1 = "channel1";
     public static final String CHANNEL2 = "channel2";
     public static final String CHANNEL3 = "channel3";
@@ -287,6 +314,9 @@ public class Constants {
     public static final String VRF = "void_relic_fragment";
     public static final String STRATEGY_CARD = "strategy_card";
     public static final String DUMMY = "dummy";
+    
+    public static final String NUMBER_OF_TURNS = "number_of_turns";
+    public static final String TOTAL_TURN_TIME = "total_turn_time";
 
     public static final String TXT = ".txt";
     public static final String JPG = ".jpg";
@@ -320,10 +350,10 @@ public class Constants {
     public static final String LOOK_AT_TOP = "look_at_top";
     public static final String LOOK_AT_BOTTOM = "look_at_bottom";
     public static final String REVEAL = "reveal";
+    public static final String REVEAL_FROM_BOTTOM = "reveal_from_bottom";
     public static final String ADD_LAW = "add_law";
     public static final String REMOVE_LAW = "remove_law";
     public static final String SHOW_DISCARDED = "show_discarded";
-    public static final String AGENDA_ID = "agenda_id";
     public static final String ELECTED = "elected";
 
 
@@ -347,13 +377,17 @@ public class Constants {
     public static final String CUSTOM_PO_VP = "customPublicVP";
     public static final String SCORED_PO = "scoredPublicObjectives";
     public static final String CUSTOM_ADJACENT_TILES = "customAdjacentTiles";
+    public static final String ADJACENCY_OVERRIDES = "adjacencyOverrides";
     public static final String PRIMARY_TILE = "primary_tile";
+    public static final String SECONDARY_TILE = "secondary_tile";
     public static final String ADJACENT_TILES = "adjacent_tiles";
     public static final String TWO_WAY = "two_way";
     public static final String PO1 = "publicObjectives1";
     public static final String PO2 = "publicObjectives2";
+    public static final String PRIMARY_TILE_DIRECTION = "primary_tile_direction";
 
     public static final String TURN_ORDER = "turn_order";
+    public static final String TURN_STATS = "turn_stats";
     public static final String VOTE_COUNT = "vote_count";
     public static final String SC_TRADE_GOODS = "sc_trade_goods";
     public static final String SC_COUNT = "sc_count";
@@ -517,4 +551,13 @@ public class Constants {
     public static final String ARCHIVE_OLD_THREADS = "archive_old_threads";
     public static final String THREAD_COUNT = "thread_count";
     public static final String LIST_OLD_CHANNELS = "list_old_channels";
+    public static final String ACTIONS_CHANNEL_SUFFIX = "-actions";
+    public static final String CARDS_INFO_THREAD_PREFIX = "Cards Info-";
+    public static final String BOT_CHANNEL_SUFFIX = "-bot-map-updates";
+    public static final String PING = "ping";
+    public static final String PING_ACTIVE_PLAYER = "ping_active_player";
+    public static final String ENDED_GAMES = "ended_games";
+    public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
+    public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
+    public static final String BEGIN_VIDEO_GEN = "begin_video_gen";
 }

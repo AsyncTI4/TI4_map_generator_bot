@@ -23,7 +23,7 @@ public class DrawSO extends SOCardsSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.COUNT);
@@ -35,6 +35,7 @@ public class DrawSO extends SOCardsSubcommandData {
         for (int i = 0; i < count; i++) {
             activeMap.drawSecretObjective(player.getUserID());
         }
+        sendMessage("Drew " + count + " SO");
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
 }

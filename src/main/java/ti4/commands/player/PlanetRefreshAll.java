@@ -1,7 +1,6 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
@@ -21,14 +20,17 @@ public class PlanetRefreshAll extends PlayerSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
+        player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
+
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
 
         for (String planet : player.getPlanets()) {
             player.refreshPlanet(planet);
         }
+        sendMessage(Helper.getPlayerRepresentation(event, player) + " readied all planets.");
     }
 }

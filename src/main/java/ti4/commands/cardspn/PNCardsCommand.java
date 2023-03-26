@@ -88,21 +88,28 @@ public class PNCardsCommand implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        PNCardsSubcommandData subCommandExecuted = null;
         String subcommandName = event.getInteraction().getSubcommandName();
+        PNCardsSubcommandData subCommandExecuted = null;
         for (PNCardsSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
                 subCommandExecuted = subcommand;
+                break;
             }
         }
+        if (subCommandExecuted == null) {
+            reply(event);
+        } else {
+            subCommandExecuted.reply(event);
+        }
+    }
+
+    public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
-        MessageHelper.replyToMessage(event, "Promissory Notes action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
     }
-
 
     protected String getActionDescription() {
         return "Promissory Notes";

@@ -27,12 +27,12 @@ public class SendTG extends PlayerSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         Player player_ = Helper.getPlayer(activeMap, player, event);
         if (player_ == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player to send TG/Commodities could not be found");
+            sendMessage("Player to send TG/Commodities could not be found");
             return;
         }
 
@@ -48,15 +48,13 @@ public class SendTG extends PlayerSubcommandData {
             targetTG += sendTG;
             player_.setTg(targetTG);
 
-            MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(event, player) + " sent " + sendTG + Emojis.tg + " trade goods to " + Helper.getPlayerRepresentation(event, player_));
+            String message = Helper.getPlayerRepresentation(event, player) + " sent " + sendTG + Emojis.tg + " trade goods to " + Helper.getPlayerRepresentation(event, player_);
+            sendMessage(message);
+            if (activeMap.isFoWMode()) {
+                String fail = "Could not notify recieving player.";
+                String success = "The other player has been notified";
+                MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
+            }
         }
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
-        MessageHelper.replyToMessageTI4Logo(event);
     }
 }

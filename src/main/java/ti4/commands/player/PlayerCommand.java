@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands.status.StatusSubcommandData;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -99,8 +98,7 @@ public class PlayerCommand implements Command {
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
 
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
-        MessageHelper.replyToMessage(event, file);
+        GenerateMap.getInstance().saveImage(activeMap, event);
     }
 
 
@@ -132,7 +130,6 @@ public class PlayerCommand implements Command {
         subcommands.add(new Speaker());
         subcommands.add(new SendTG());
         subcommands.add(new SendCommodities());
-        subcommands.add(new SCFollow());
         return subcommands;
     }
 

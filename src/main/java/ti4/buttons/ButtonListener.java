@@ -4,10 +4,10 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.*;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.*;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
+
 import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
 import ti4.MessageListener;
@@ -17,7 +17,6 @@ import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.status.ScorePublic;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -26,19 +25,12 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Random;
-import java.util.Set;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class ButtonListener extends ListenerAdapter {
     public static HashMap<Guild, HashMap<String, Emoji>> emoteMap = new HashMap<>();
     private static HashMap<String, Set<Player>> playerUsedSC = new HashMap<>();
-    private static HashMap<String, HashMap<Player, Integer>> playerReacted = new HashMap<>();
 
     @Override
     public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
@@ -81,7 +73,7 @@ public class ButtonListener extends ListenerAdapter {
 
         MessageChannel actionsChannel = null;
         for (TextChannel textChannel_ : MapGenerator.jda.getTextChannels()) {
-            if (textChannel_.getName().equals(gameName + "-actions")) {
+            if (textChannel_.getName().equals(gameName + Constants.ACTIONS_CHANNEL_SUFFIX)) {
                 actionsChannel = textChannel_;
                 break;
             }
@@ -98,10 +90,13 @@ public class ButtonListener extends ListenerAdapter {
 
             if (channel != null) {
                 try {
-                    PlayAC.playAC(null, activeMap, player, acID, channel, event.getGuild(), event);
+                    String error = PlayAC.playAC(null, activeMap, player, acID, channel, event.getGuild(), event);
+                    if (error != null) {
+                        event.getChannel().sendMessage(error).queue();
+                    }
                 } catch (Exception e) {
                     BotLogger.log(event, "Could not parse AC ID: " + acID);
-                    event.getChannel().sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
+                    event.getChannel().asThreadChannel().sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
                     return;
                 }
             } else {
@@ -121,7 +116,8 @@ public class ButtonListener extends ListenerAdapter {
             if (channel != null) {
                 try {
                     int soIndex = Integer.parseInt(soID);
-                    ScoreSO.scoreSO(event, activeMap, player, soIndex, channel, event);
+                    ScoreSO object = new ScoreSO();
+                    object.scoreSO(null, activeMap, player, soIndex, channel, event);
                 } catch (Exception e) {
                     BotLogger.log(event, "Could not parse SO ID: " + soID);
                     event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.").queue();
@@ -135,7 +131,7 @@ public class ButtonListener extends ListenerAdapter {
             try {
                 int poIndex = Integer.parseInt(poID);
                 ScorePublic.scorePO(event, privateChannel, activeMap, player, poIndex, inform);
-                addReaction(event, false, false, "", "");
+                addReaction(event, false, false, null, "");
             } catch (Exception e) {
                 BotLogger.log("Could not parse PO ID: " + poID);
                 event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.").queue();
@@ -148,25 +144,29 @@ public class ButtonListener extends ListenerAdapter {
                     if (!activeMap.isFoWMode()) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), message);
                     }
-                    addReaction(event, false, false, "", "");
-                    
+                    String reply = activeMap.isFoWMode() ? "No public objective scored" : null;
+                    addReaction(event, false, false, reply, "");
                 }
                 case Constants.SO_NO_SCORING -> {
                     String message = Helper.getPlayerRepresentation(event, player) + " - no Secret Objective scored.";
                     if (!activeMap.isFoWMode()) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), message);
                     }
-                    addReaction(event, false, false, "", "");
+                    String reply = activeMap.isFoWMode() ? "No secret objective scored" : null;
+                    addReaction(event, false, false, reply, "");
                 }
                 case "sabotage" -> addReaction(event, true, true, "Sabotaging Action Card Play", " Sabotage played");
-                case "no_sabotage" -> addReaction(event, false, false, "No Sabotage", "");
+                case "no_sabotage" -> {
+                    String message = activeMap.isFoWMode() ? "No sabotage" : null;
+                    addReaction(event, false, false, message, "");
+                }
                 case "sc_follow" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
                     if (used) {
                         break;
                     }
                     String message = deductCC(player, event);
-                    addReaction(event, true, false, message, "");
+                    addReaction(event, false, false, message, "");
                 }
                 case "sc_ac_draw" -> {
                     boolean used = addUsedSCPlayer(messageID + "ac", activeMap, player, event, "");
@@ -180,7 +180,7 @@ public class ButtonListener extends ListenerAdapter {
                         activeMap.drawActionCard(player.getUserID());
                     }
                     CardsInfo.sentUserCardInfo(null, activeMap, player, event);
-                    addReaction(event, true, false, message, "");
+                    addReaction(event, false, false, message, "");
                 }
                 case "sc_draw_so" -> {
                     boolean used = addUsedSCPlayer(messageID + "so", activeMap, player, event, "");
@@ -190,7 +190,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = "Drew Secret Objective";
                     activeMap.drawSecretObjective(player.getUserID());
                     CardsInfo.sentUserCardInfo(null, activeMap, player, event);
-                    addReaction(event, true, false, message, "");
+                    addReaction(event, false, false, message, "");
                 }
                 case "sc_follow_trade" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
@@ -199,12 +199,12 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String message = deductCC(player, event);
                     player.setCommodities(player.getCommoditiesTotal());
-                    addReaction(event, true, false, message, "");
-                    addReaction(event, true, false, "Replenishing Commodities", "");
+                    addReaction(event, false, false, message, "");
+                    addReaction(event, false, false, "Replenishing Commodities", "");
                 }
                 case "sc_follow_leadership" -> {
                     String message = Helper.getPlayerPing(player) + " following.";
-                    addReaction(event, true, false, message, "");
+                    addReaction(event, false, false, message, "");
                 }
                 case "sc_no_follow" -> {
                     addReaction(event, false, false, "Not Following", "");
@@ -219,19 +219,25 @@ public class ButtonListener extends ListenerAdapter {
                     clearAllReactions(event);
                     addReaction(event, true, true, "Playing When", "When Played");
                 }
-                case "no_when" -> addReaction(event, false, false, "No Whens", "");
+                case "no_when" -> {
+                    String message = activeMap.isFoWMode() ? "No whens" : null;
+                    addReaction(event, false, false, message, "");
+                }
                 case "play_after" -> {
                     clearAllReactions(event);
                     addReaction(event, true, true, "Playing After", "After Played");
                 }
-                case "no_after" -> addReaction(event, false, false, "No Afters", "");
+                case "no_after" -> {
+                    String message = activeMap.isFoWMode() ? "No afters" : null;
+                    addReaction(event, false, false, message, "");
+                }
                 case "sc_refresh" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "Replenish");
                     if (used) {
                         break;
                     }
                     player.setCommodities(player.getCommoditiesTotal());
-                    addReaction(event, true, false, "Replenishing Commodities", "");
+                    addReaction(event, false, false, "Replenishing Commodities", "");
                 }
                 case "sc_refresh_and_wash" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "Replenish and Wash");
@@ -242,7 +248,7 @@ public class ButtonListener extends ListenerAdapter {
                     int tg = player.getTg();
                     player.setTg(tg + commoditiesTotal);
                     player.setCommodities(0);
-                    addReaction(event, true, false, "Replenishing and washing", "");
+                    addReaction(event, false, false, "Replenishing and washing", "");
                 }
                 case "trade_primary" -> {
                     if (5 != player.getSC()){
@@ -255,7 +261,7 @@ public class ButtonListener extends ListenerAdapter {
                     int tg = player.getTg();
                     player.setTg(tg + 3);
                     player.setCommodities(player.getCommoditiesTotal());
-                    addReaction(event, true, false, "gained 3" + Emojis.tg + " and replenished commodities (" + String.valueOf(player.getCommodities()) + Emojis.comm + ")", "");
+                    addReaction(event, false, false, "gained 3" + Emojis.tg + " and replenished commodities (" + String.valueOf(player.getCommodities()) + Emojis.comm + ")", "");
                 }
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
@@ -275,7 +281,7 @@ public class ButtonListener extends ListenerAdapter {
             String defaultText = text.isEmpty() ? "Secondary of Strategy Card" : text;
             String message = "Player: " + Helper.getPlayerPing(player) + " already used " + defaultText;
             if (map.isFoWMode()) {
-                MessageHelper.sendPrivateMessageToPlayer(player, map, message, null, null);
+                MessageHelper.sendPrivateMessageToPlayer(player, map, message);
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), message);
             }
@@ -309,11 +315,11 @@ public class ButtonListener extends ListenerAdapter {
     }
 
     private void addReaction(@NotNull ButtonInteractionEvent event, boolean skipReaction, boolean sendPublic, String message, String additionalMessage) {
-        String id = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(id);
-        Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), id);
-        if (player == null) {
-            event.getChannel().sendMessage("You're not a player of the game").queue();
+        String userID = event.getUser().getId();
+        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), userID);
+        if (player == null || !player.isActivePlayer()) {
+            event.getChannel().sendMessage("You're not an active player of the game").queue();
             return;
         }
         String playerFaction = player.getFaction();
@@ -333,71 +339,91 @@ public class ButtonListener extends ListenerAdapter {
                 emojiMap.put(emoji.getName().toLowerCase(), emoji);
             }
         }
-        Emoji emojiToUse = emojiMap.get(playerFaction.toLowerCase());
+        
         Message mainMessage = event.getInteraction().getMessage();
+        Emoji emojiToUse = Helper.getPlayerEmoji(activeMap, player, mainMessage);
         String messageId = mainMessage.getId();
 
         if (activeMap.isFoWMode()) {
-            int index = 0;
-            for(java.util.Map.Entry<String, Player> entry : activeMap.getPlayers().entrySet()) {
-                if (entry.getValue() == player) break;
-                index++;
-            }
-            emojiToUse = getRandomizedEmoji(index, messageId);
-            if (emojiToUse == null) {
-                event.getChannel().sendMessage("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
-            } else {
-                event.getChannel().addReactionById(messageId, emojiToUse).queue();
-            }
+            event.getChannel().addReactionById(messageId, emojiToUse).queue();
         }
         
-        if (!skipReaction) {
-            if (emojiToUse == null) {
-                event.getChannel().sendMessage("Could not find faction (" + playerFaction + ") symbol for reaction").queue();
-            } else {
-                event.getChannel().addReactionById(messageId, emojiToUse).queue();
-            }
-            return;
+        if (!skipReaction || activeMap.isFoWMode()) {
+            event.getChannel().addReactionById(messageId, emojiToUse).queue();
+            checkForAllReactions(event, activeMap);
+            if (message == null || message.isEmpty()) return;
         } 
         
 
-        boolean foundThread = false;
         String text = Helper.getPlayerRepresentation(event, player) + " " + message;
-        if (activeMap.isFoWMode()) {
+        if (activeMap.isFoWMode() && sendPublic) {
             text = message;
+        } else if (activeMap.isFoWMode() && !sendPublic) {
+            text = Helper.getPlayerRepresentation(event, player, true) + " " + emojiToUse.getFormatted() + " " + message;
         }
 
         if (!additionalMessage.isEmpty()) {
             text += Helper.getGamePing(event.getGuild(), activeMap) + " " + additionalMessage;
         }
-        List<ThreadChannel> threadChannels = guild.getThreadChannels();
-        for (ThreadChannel threadChannel : threadChannels) {
-            if (threadChannel.getId().equals(messageId)) {
-                if (activeMap.isFoWMode() && !sendPublic) {
-                    MessageHelper.sendPrivateMessageToPlayer(player, activeMap, text, null, null);
-                } else {
-                    MessageHelper.sendMessageToChannel(threadChannel, text);
-                }
-                foundThread = true;
-                break;
-            }
+
+        if (activeMap.isFoWMode() && !sendPublic) {
+            MessageHelper.sendPrivateMessageToPlayer(player, activeMap, text);
+            return;
         }
 
-        if (!foundThread) {
-            if (activeMap.isFoWMode() && !sendPublic) {
-                MessageHelper.sendPrivateMessageToPlayer(player, activeMap, text, null, null);
-            } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), text);
+        MessageHelper.sendMessageToChannel(Helper.getThreadChannelIfExists(event), text);
+    }
+
+    private void checkForAllReactions(@NotNull ButtonInteractionEvent event, Map map) {
+        String messageId = event.getInteraction().getMessage().getId();
+
+        Message mainMessage = event.getMessageChannel().retrieveMessageById(messageId).completeAfter(500, TimeUnit.MILLISECONDS);
+
+        String userID = event.getUser().getId();
+        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        int matchingFactionReactions = 0;
+        for (Player player : activeMap.getPlayers().values()) {
+            if (!player.isActivePlayer()) {
+                matchingFactionReactions++;
+                continue;
             }
+
+            String faction = player.getFaction();
+            if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
+
+            Emoji reactionEmoji = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction));
+            if (map.isFoWMode()) {
+                int index = 0;
+                for (Player player_ : activeMap.getPlayers().values()) {
+                    if (player_ == player) break;
+                    index++;
+                }
+                reactionEmoji = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, event.getMessageId()));
+            }
+            MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+            if (reaction != null) matchingFactionReactions++;
+        }
+
+        int numberOfPlayers = activeMap.getPlayers().size();
+        if (matchingFactionReactions >= numberOfPlayers && !activeMap.isFoWMode()) { //TODO: @Jazzxhands to verify this will work for FoW
+            respondAllPlayersReacted(event);
         }
     }
 
-    public Emoji getRandomizedEmoji(int value, String messageID) {
-        List<String> symbols = new ArrayList<>(Emojis.symbols);
-        Random seed = new Random(messageID.hashCode());
-        Collections.shuffle(symbols, seed);
-        
-        String emote = symbols.get(value);
-        return emote == null ? null : Emoji.fromFormatted(emote);
+    private static void respondAllPlayersReacted(ButtonInteractionEvent event) {
+        switch (event.getButton().getId()) {
+            case Constants.SC_FOLLOW, "sc_no_follow", "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so", "sc_follow_leadership" -> {
+                Helper.getThreadChannelIfExists(event).sendMessage("All players have reacted to this Strategy Card").queueAfter(5, TimeUnit.SECONDS);
+            }
+            case "no_when" -> {
+                event.getInteraction().getMessage().reply("All players have indicated 'No Whens'").queueAfter(1, TimeUnit.SECONDS);
+            }
+            case "no_after" -> {
+                event.getInteraction().getMessage().reply("All players have indicated 'No Afters'").queueAfter(1, TimeUnit.SECONDS);
+            }
+            case "no_sabotage" -> {
+                event.getInteraction().getMessage().reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
+            }
+        }
     }
 }

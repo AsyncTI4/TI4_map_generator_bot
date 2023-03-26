@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -57,7 +58,6 @@ public class ShowGame implements Command {
         } else {
             map = mapManager.getUserActiveMap(event.getUser().getId());
         }
-
         DisplayType displayType = null;
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);
         if (statsOption != null) {
@@ -69,15 +69,15 @@ public class ShowGame implements Command {
             } else if (temp.equals(DisplayType.stats.getValue())) {
                 displayType = DisplayType.stats;
             } else if (temp.equals(DisplayType.split.getValue())) {
-                displayType = DisplayType.map;
-                File map_file = GenerateMap.getInstance().saveImage(map, displayType, event);
-                MessageHelper.replyToMessage(event, map_file);
-                
                 displayType = DisplayType.stats;
+                File stats_file = GenerateMap.getInstance().saveImage(map, displayType, event);
+                MessageHelper.sendFileToChannel(event.getChannel(), stats_file);
+                
+                displayType = DisplayType.map;
             }
         }
         File file = GenerateMap.getInstance().saveImage(map, displayType, event);
-        MessageHelper.replyToMessage(event, file, true);
+        MessageHelper.sendFileToChannel(event.getChannel(), file);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

@@ -2,6 +2,8 @@ package ti4.commands.agenda;
 
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import ti4.generator.Mapper;
@@ -16,22 +18,35 @@ import java.util.LinkedHashMap;
 public class RevealAgenda extends AgendaSubcommandData {
     public RevealAgenda() {
         super(Constants.REVEAL, "Reveal top Agenda from deck");
+        addOption(OptionType.BOOLEAN, Constants.REVEAL_FROM_BOTTOM, "Reveal the agenda from the bottom of the deck instead of the top");
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
+
+        OptionMapping revealFromBottomOption = event.getOption(Constants.REVEAL_FROM_BOTTOM);
+        boolean revealFromBottom = false;
+        if (revealFromBottomOption != null) {
+            revealFromBottom = revealFromBottomOption.getAsBoolean();
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append("-----------");
         sb.append("Agenda:\n");
-        String id = activeMap.revealAgenda();
+        String id = activeMap.revealAgenda(revealFromBottom);
         LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(id);
         if (uniqueID != null) {
             sb.append("(").append(uniqueID).append(") - ");
         }
-        sb.append(Mapper.getAgenda(id));
-        sb.append("\n-----------\n");
+        sb.append(Mapper.getAgenda(id)).append("\n");
+        switch (id) {
+            case ("mutiny") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Mutiny public_vp_worth:1`").append("\n");
+            case ("seed_empire") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Seed of an Empire public_vp_worth:1`").append("\n");
+            case ("censure") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`").append("\n");
+        }
+        sb.append("-----------\n");
         MessageHelper.sendMessageToChannel(event, sb.toString());
         String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you will **Play a When** or **Play an After** or not by pressing the buttons below:";
 

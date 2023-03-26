@@ -28,8 +28,7 @@ public class ListTurnOrder extends StatusSubcommandData {
             HashMap<Integer, String> order = new HashMap<>();
             int naaluSC = 0;
             for (Player player : map.getPlayers().values()) {
-                if (player.getFaction() == null || "null".equals(player.getFaction()) ||
-                    player.getColor() == null || player.getColor().equals("null")){
+                if (!player.isActivePlayer()){
                     continue;
                 }
                 int sc = player.getSC();
@@ -38,8 +37,6 @@ public class ListTurnOrder extends StatusSubcommandData {
                     naaluSC = sc;
                 }
                 boolean passed = player.isPassed();
-                String userName = player.getUserName();
-                String color = player.getColor();
                 HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
                 Boolean found = scPlayed.get(sc);
                 boolean isPlayed = found != null ? found : false;
@@ -66,7 +63,7 @@ public class ListTurnOrder extends StatusSubcommandData {
                 
                 order.put(sc, text);
             }
-            StringBuilder msg = new StringBuilder();
+            StringBuilder msg = new StringBuilder("__**Turn Order:**__\n");
 
 
             if (naaluSC != 0) {
@@ -83,7 +80,12 @@ public class ListTurnOrder extends StatusSubcommandData {
                     msg.append("`").append(i).append(".`").append(text).append("\n");
                 }
             }
-            MessageHelper.replyToMessage(event, msg.toString());
+            msg.append("_ _"); //forced extra line
+            if (event.getName().equals(Constants.PLAYER)) { //catch if called from /player sc_pick
+                MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
+            } else {
+                MessageHelper.replyToMessage(event, msg.toString());
+            }
         } else {
             MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup community_mode:YES` or `/game setup fow_mode:YES`");
         }

@@ -5,12 +5,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.RefreshLeader;
-import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 
@@ -66,5 +64,13 @@ public class Cleanup extends StatusSubcommandData {
         int round = activeMap.getRound();
         round++;
         activeMap.setRound(round);
+    }
+
+    @Override
+    public void reply(SlashCommandInteractionEvent event) {
+        Map activeMap = getActiveMap();
+        int prevRound = activeMap.getRound() - 1;
+
+        StatusCommand.reply(event, "End of round " + prevRound + " status phase.");
     }
 }

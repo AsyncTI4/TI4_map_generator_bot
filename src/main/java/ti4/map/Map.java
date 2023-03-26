@@ -2,11 +2,13 @@ package ti4.map;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.player.PlanetRemove;
 import ti4.generator.Mapper;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
@@ -15,6 +17,8 @@ import ti4.message.BotLogger;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.List;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.*;
 
 public class Map {
@@ -35,11 +39,15 @@ public class Map {
     private boolean communityMode = false;
     private boolean allianceMode = false;
     private boolean fowMode = false;
+    private boolean absolMode = false;
+    private boolean discordantStarsMode = false;
     private boolean hasEnded = false;
 
     @Nullable
     private MessageChannel mainChannel = null;
-
+    @Nullable
+    private ThreadChannel botMapChannel = null;
+    
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
     @ExportableField
@@ -57,6 +65,10 @@ public class Map {
     @ExportableField
     private int round = 1;
 
+    private String activePlayer = null;
+    private Date lastActivePlayerPing = new Date(0);
+    private Date lastActivePlayerChange = new Date(0);
+
     private List<String> secretObjectives;
     private List<String> actionCards;
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
@@ -71,6 +83,7 @@ public class Map {
     private LinkedHashMap<String, Integer> customPublicVP = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
+    private LinkedHashMap<Pair<String, Integer>, String> adjacencyOverrides = new LinkedHashMap<>();
     private ArrayList<String> publicObjectives1 = new ArrayList<>();
     private ArrayList<String> publicObjectives2 = new ArrayList<>();
     private ArrayList<String> soToPoList = new ArrayList<>();
@@ -93,9 +106,7 @@ public class Map {
         this.actionCards = new ArrayList<>(actionCards.keySet());
         Collections.shuffle(this.actionCards);
 
-        HashMap<String, String> agendas = Mapper.getAgendas();
-        this.agendas = new ArrayList<>(agendas.keySet());
-        Collections.shuffle(this.agendas);
+        resetAgendas();
 
         Set<String> po1 = Mapper.getPublicObjectivesState1().keySet();
         Set<String> po2 = Mapper.getPublicObjectivesState2().keySet();
@@ -106,11 +117,9 @@ public class Map {
         addCustomPO(Constants.CUSTODIAN, 1);
 
         Set<String> exp = Mapper.getExplores().keySet();
-        Set<String> rel = Mapper.getRelics().keySet();
         explore.addAll(exp);
-        relics.addAll(rel);
         Collections.shuffle(explore);
-        Collections.shuffle(relics);
+        resetRelics();
 
         //Default SC initialization
         for (int i = 0; i < 8; i++) {
@@ -185,16 +194,56 @@ public class Map {
         this.customName = customName;
     }
 
+    //GAME MODES
     public boolean isCommunityMode() {
         return communityMode;
+    }
+
+    public void setCommunityMode(boolean communityMode) {
+        this.communityMode = communityMode;
     }
 
     public boolean isAllianceMode() {
         return allianceMode;
     }
 
+    public void setAllianceMode(boolean allianceMode) {
+        this.allianceMode = allianceMode;
+    }
+
     public boolean isFoWMode() {
         return fowMode;
+    }
+
+    public void setFoWMode(boolean fowMode) {
+        this.fowMode = fowMode;
+    }
+
+    public boolean isAbsolMode() {
+        return absolMode;
+    }
+
+    public void setAbsolMode(boolean absolMode) {
+        this.absolMode = absolMode;
+    }
+
+    public boolean isDiscordantStarsMode() {
+        return discordantStarsMode;
+    }
+
+    public void setDiscordantStarsMode(boolean discordantStarsMode) {
+        this.discordantStarsMode = discordantStarsMode;
+    }
+
+    public String getGameModesText() {
+        HashMap<String,Boolean> gameModes = new HashMap<>() {{
+            put("Community", isCommunityMode());
+            put("Alliance", isAllianceMode());
+            put("FoW", isFoWMode());
+            put("Absol", isAbsolMode());
+            put("DiscordantStars", isDiscordantStarsMode());
+        }};
+        return gameModes.entrySet().stream().filter(gm -> gm.getValue()).map(java.util.Map.Entry::getKey).collect(Collectors.joining(", "));
     }
 
     public void setMainGameChannel(MessageChannel channel) {
@@ -205,15 +254,12 @@ public class Map {
         return mainChannel;
     }
 
-    public void setAllianceMode(boolean allianceMode) {
-        this.allianceMode = allianceMode;
-    }
-    public void setFoWMode(boolean fowMode) {
-        this.fowMode = fowMode;
+    public void setBotMapChannel(ThreadChannel channel) {
+        botMapChannel = channel;
     }
 
-    public void setCommunityMode(boolean communityMode) {
-        this.communityMode = communityMode;
+    public ThreadChannel getBotMapChannel() {
+        return botMapChannel;
     }
 
     public boolean isHasEnded() {
@@ -267,8 +313,55 @@ public class Map {
         return speaker;
     }
 
+    /**
+     * @param speaker - The player's userID: player.getID()
+     */
     public void setSpeaker(String speaker) {
         this.speaker = speaker;
+    }
+
+    public String getActivePlayer() {
+        return activePlayer;
+    }
+
+    public void updateActivePlayer(Player player) {
+        /// update previous active player stats
+        Date newTime = new Date();
+        if (activePlayer != null) {
+            Player prevPlayer = getPlayer(activePlayer);
+            if (prevPlayer != null) {
+                long elapsedTime = newTime.getTime() - lastActivePlayerChange.getTime();
+                prevPlayer.updateTurnStats(elapsedTime);
+            }
+        }
+
+        // reset timers for ping and stats
+        setActivePlayer(player == null ? null : player.getUserID());
+        setLastActivePlayerChange(newTime);
+        setLastActivePlayerPing(newTime);
+    }
+
+    /**
+     * @param player - The player's userID: player.getID()
+     */
+    public void setActivePlayer(String player) {
+        this.activePlayer = player;
+    }
+
+    public Date getLastActivePlayerPing() {
+        return lastActivePlayerPing;
+    }
+
+    public void setLastActivePlayerPing(Date time) {
+        this.lastActivePlayerPing = time;
+    }
+
+    public Date getLastActivePlayerChange() {
+        return lastActivePlayerChange;
+    }
+
+    public void setLastActivePlayerChange(Date time) {
+        this.lastActivePlayerChange = time;
     }
 
     public void setSentAgenda(String id) {
@@ -536,6 +629,55 @@ public class Map {
         return customAdjacentTiles;
     }
 
+    public LinkedHashMap<Pair<String, Integer>, String> getAdjacentTileOverrides() {
+        return adjacencyOverrides;
+    }
+
+    public void addAdjacentTileOverride(String primaryTile, int direction, String secondaryTile) {
+        Pair<String, Integer> primary = new ImmutablePair<String,Integer>(primaryTile, direction);
+        Pair<String, Integer> secondary = new ImmutablePair<String,Integer>(secondaryTile, (direction + 3) % 6);
+
+        adjacencyOverrides.put(primary, secondaryTile);
+        adjacencyOverrides.put(secondary, primaryTile);
+    }
+
+    public void setAdjacentTileOverride(LinkedHashMap<Pair<String, Integer>, String> overrides) {
+        adjacencyOverrides = overrides;
+    }
+
+    public void clearAdjacentTileOverrides() {
+        adjacencyOverrides.clear();
+    }
+
+    public void removeAdjacentTileOverrides(String primary) {
+        for (int i = 0; i < 6; i++) {
+            String secondary = getAdjacentTileOverride(primary, i);
+            int j = (i + 3) % 6;
+
+            if (secondary != null) {
+                adjacencyOverrides.remove(new ImmutablePair<String, Integer>(primary, i));
+                adjacencyOverrides.remove(new ImmutablePair<String, Integer>(secondary, j));
+            }
+        }
+    }
+
+    public List<String> getAdjacentTileOverrides(String position) {
+        List<String> output = new ArrayList<>();
+        for (int i = 0; i < 6; i++) {
+            String secondary = getAdjacentTileOverride(position, i);
+            output.add(secondary);
+        }
+        return output;
+    }
+
+    public String getAdjacentTileOverride(String position, int direction) {
+        Pair<String, Integer> primary = new ImmutablePair<String, Integer>(position, direction);
+        if (adjacencyOverrides.containsKey(primary)) {
+            return adjacencyOverrides.get(primary);
+        }
+        return null;
+    }
+
     public LinkedHashMap<String, Integer> getLaws() {
         return laws;
     }
@@ -553,8 +695,12 @@ public class Map {
     }
 
     public void resetAgendas() {
-        HashMap<String, String> agendas = Mapper.getAgendas();
-        this.agendas = new ArrayList<>(agendas.keySet());
+        HashMap<String, String> agendas = Mapper.getAgendas(); //ALL agendas, including absol
+        if (this.absolMode) {
+            this.agendas = new ArrayList<>(agendas.keySet().stream().filter(a -> a.startsWith("absol_")).toList());
+        } else { //ALL agendas, except absol - if more decks get added, this will need to be rebuilt
+            this.agendas = new ArrayList<>(agendas.keySet().stream().filter(Predicate.not(a -> a.startsWith("absol_"))).toList());
+        }
         Collections.shuffle(this.agendas);
         discardAgendas = new LinkedHashMap<>();
     }
@@ -719,16 +865,17 @@ public class Map {
         return null;
     }
 
-    public String lookAtTopAgenda() {
-        return agendas.get(0);
+    public String lookAtTopAgenda(int index) {
+        return agendas.get(index);
     }
 
-    public String lookAtBottomAgenda() {
-        return agendas.get(agendas.size() - 1);
+    public String lookAtBottomAgenda(int indexFromEnd) {
+        return agendas.get(agendas.size() - 1 - indexFromEnd);
     }
 
-    public String revealAgenda() {
-        String id = agendas.remove(0);
+    public String revealAgenda(boolean revealFromBottom) {
+        int index = revealFromBottom ? agendas.size() - 1 : 0;
+        String id = agendas.remove(index);
         addDiscardAgenda(id);
         return id;
     }
@@ -1086,6 +1233,17 @@ public class Map {
     public void setRelics(ArrayList<String> deck) {
         deck = new ArrayList<>(new HashSet<>(deck));
         relics = deck;
+    }
+
+    public void resetRelics() {
+        HashMap<String, String> relics = Mapper.getRelics(); //ALL agendas including absol
+        if (this.absolMode) {
+            this.relics = new ArrayList<>(relics.keySet().stream().filter(r -> r.startsWith("absol_")).toList());
+            this.relics.add(Constants.ENIGMATIC_DEVICE);
+        } else { //ALL relics, except absol - if more decks get added, this will need to be rebuilt
+            this.relics = new ArrayList<>(relics.keySet().stream().filter(Predicate.not(r -> r.startsWith("absol_"))).toList());
+        }
+        Collections.shuffle(this.relics);
     }
 
     public void setSecretObjectives(List<String> secretObjectives) {

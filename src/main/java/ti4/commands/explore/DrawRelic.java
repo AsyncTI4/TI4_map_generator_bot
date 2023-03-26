@@ -24,7 +24,7 @@ public class DrawRelic extends GenericRelicAction {
     public static void drawRelicAndNotify(Player player, SlashCommandInteractionEvent event, Map activeMap) {
         String relicID = activeMap.drawRelic();
         if (relicID.isEmpty()) {
-            MessageHelper.replyToMessage(event, "Relic deck is empty");
+            MessageHelper.replyToSlashCommand(event, "Relic deck is empty");
             return;
         }
         player.addRelic(relicID);
@@ -34,19 +34,19 @@ public class DrawRelic extends GenericRelicAction {
        
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
-            case ("nanoforge"):
+            case "nanoforge" -> {
                 message.append("Run the following commands to use Nanoforge:\n")
                        .append("     `/explore relic_purge relic: nanoforge`\n")
                        .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
-                break;
-            case ("shard"):
-                 Integer poIndex = activeMap.addCustomPO("Shard of the Throne", 1);
+            }
+            case "shard" -> {
+                Integer poIndex = activeMap.addCustomPO("Shard of the Throne", 1);
                 activeMap.scorePublicObjective(player.getUserID(), poIndex);
                 message.append("Custom PO 'Shard of the Throne' has been added.\n")
                        .append(Helper.getPlayerRepresentation(event, player)).append(" scored 'Shard of the Throne'");
-                break;
             }
+        }
 
-        MessageHelper.replyToMessage(event, message.toString());
+        MessageHelper.replyToSlashCommand(event, message.toString());
     }
 }

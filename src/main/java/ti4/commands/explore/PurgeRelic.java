@@ -23,7 +23,7 @@ public class PurgeRelic extends GenericRelicAction {
     public void doAction(Player player, SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.RELIC);
         if (option == null) {
-            MessageHelper.replyToMessage(event, "Specify relic");
+            sendMessage("Specify relic");
             return;
         }
         String relicId = option.getAsString();
@@ -31,9 +31,9 @@ public class PurgeRelic extends GenericRelicAction {
             player.removeRelic(relicId);
             player.removeExhaustedRelic(relicId);
             String relicName = Mapper.getRelic(relicId).split(";")[0];
-            MessageHelper.replyToMessage(event, "Purged " + Emojis.Relic + " relic: " + relicName);
+            sendMessage("Purged " + Emojis.Relic + " relic: " + relicName);
         } else {
-            MessageHelper.replyToMessage(event, "Invalid relic or player does not have specified relic");
+            sendMessage("Invalid relic or player does not have specified relic");
         }
     }
 }

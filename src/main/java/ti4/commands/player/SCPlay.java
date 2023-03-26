@@ -1,6 +1,5 @@
 package ti4.commands.player;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -12,16 +11,11 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
-import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -39,34 +33,39 @@ public class SCPlay extends PlayerSubcommandData {
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
 
+        Helper.checkThreadLimitAndArchive(event.getGuild());
+
         MessageChannel eventChannel = event.getChannel();
         MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? eventChannel : activeMap.getMainGameChannel();
 
         if (player == null) {
-            MessageHelper.sendMessageToChannel(eventChannel, "You're not a player of this game");
+            sendMessage("You're not a player of this game");
             return;
         }
 
         int sc = player.getSC();
         String emojiName = "SC" + String.valueOf(sc);
         if (sc == 0) {
-            MessageHelper.sendMessageToChannel(eventChannel, "No SC selected by player");
+            sendMessage("No SC selected by player");
             return;
         }
 
         Boolean isSCPlayed = activeMap.getScPlayed().get(sc);
         if (isSCPlayed != null && isSCPlayed) {
-            MessageHelper.sendMessageToChannel(eventChannel, "SC already played");
+            sendMessage("SC already played");
             return;
         }
         
         activeMap.setSCPlayed(sc, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
-        String message = "";
+        String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc) + " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
+        if (activeMap.isFoWMode()) {
+            message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc) + " played.\n\n";
+        }
         if (!categoryForPlayers.isEmpty()) {
             message += categoryForPlayers + "\n";
         }
-        message += "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc) + " played. Please react with your faction symbol to pass or post in thread for secondaries.";
+        message += "Please indicate your choice by pressing a button below and post additional details in the thread.";
 
         String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
         TextChannel textChannel = event.getChannel().asTextChannel();
@@ -100,20 +99,26 @@ public class SCPlay extends PlayerSubcommandData {
             of = ActionRow.of(followButton, noFollowButton);
         }
         baseMessageObject.addComponents(of);
-
-        mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
-            ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
-            threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
-            threadChannel.queue();
-        });
         
-    }
+        final Player player_ = player;
+        mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
+            Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player_, message_); 
+            if (reactionEmoji != null) {
+                message_.addReaction(reactionEmoji).queue();
+            }
 
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
-        MessageHelper.replyToMessageTI4Logo(event);
+            if (getActiveMap().isFoWMode()) {
+                //in fow, send a message back to the player that includes their emoji
+                String response = "SC played.";
+                response += reactionEmoji != null ? " " + reactionEmoji.getFormatted() : "\nUnable to generate initial reaction, please click \"Not Following\" to add your reaction.";
+                MessageHelper.sendPrivateMessageToPlayer(player_, getActiveMap(), response);
+            } else {
+                //only do thread in non-fow games
+                ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
+                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
+                threadChannel.queue();
+            }
+        });
+        event.getHook().deleteOriginal().queue();
     }
 }

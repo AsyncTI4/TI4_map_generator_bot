@@ -3,6 +3,7 @@
 /storage/
 .idea/
 /log/*
+/bin/
 localtesting.sh
 tibot.jar
 .vscode/settings.json

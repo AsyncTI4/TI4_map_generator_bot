@@ -16,9 +16,9 @@ public class LockLeader extends LeaderAction {
         Leader playerLeader = player.getLeader(leader);
         if (playerLeader != null){
             playerLeader.setLocked(true);
-            editReplyMessage("Leader '" + leader + "'' locked");
+            sendMessage("Leader '" + leader + "'' locked");
         } else {
-            editReplyMessage("Leader not found");
+            sendMessage("Leader not found");
         }
     }
 }

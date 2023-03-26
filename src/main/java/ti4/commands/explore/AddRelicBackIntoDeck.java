@@ -14,7 +14,7 @@ import java.util.List;
 public class AddRelicBackIntoDeck extends GenericRelicAction {
 
     public AddRelicBackIntoDeck() {
-        super(Constants.ADD_BACK_INTO_DECK, "Add relic back into deck", true);
+        super(Constants.ADD_BACK_INTO_DECK, "Add relic back into deck if already purged", true);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to add back into deck").setAutoComplete(true).setRequired(true));
     }
 
@@ -22,16 +22,16 @@ public class AddRelicBackIntoDeck extends GenericRelicAction {
     public void doAction(Player player, SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.RELIC);
         if (option == null) {
-            MessageHelper.replyToMessage(event, "Specify relic");
+            sendMessage("Specify relic");
             return;
         }
         String relicId = option.getAsString();
         List<String> allRelics = getActiveMap().getAllRelics();
         if (!allRelics.contains(relicId)){
             getActiveMap().shuffleRelicBack(relicId);
-            MessageHelper.replyToMessage(event, "Relic " + relicId + " added back into deck");
+            sendMessage("Relic " + relicId + " added back into deck");
         } else {
-            MessageHelper.replyToMessage(event, "Invalid relic or specified relic exists in deck");
+            sendMessage("Invalid relic or specified relic exists in deck");
         }
     }
 }

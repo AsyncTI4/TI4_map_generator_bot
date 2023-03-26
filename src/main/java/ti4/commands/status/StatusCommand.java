@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.cards.CardsCommand;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -79,12 +78,16 @@ public class StatusCommand implements Command {
     }
 
     public static void reply(SlashCommandInteractionEvent event) {
+        reply(event, null);
+    }
+
+    public static void reply(SlashCommandInteractionEvent event, String message) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
 
         File file = GenerateMap.getInstance().saveImage(activeMap, event);
-        MessageHelper.replyToMessage(event, file);
+        MessageHelper.replyToMessage(event, file, false, message, message != null);
     }
 
 
@@ -104,6 +107,7 @@ public class StatusCommand implements Command {
         subcommands.add(new RemoveCustomPO());
         subcommands.add(new SCTradeGoods());
         subcommands.add(new ListTurnOrder());
+        subcommands.add(new ListTurnStats());
         return subcommands;
     }
 

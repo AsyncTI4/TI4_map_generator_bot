@@ -37,9 +37,9 @@ public class ShowAC extends CardsSubcommandData {
 
         int acIndex = option.getAsInt();
         String acID = null;
-        for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
-            if (so.getValue().equals(acIndex)) {
-                acID = so.getKey();
+        for (java.util.Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+            if (ac.getValue().equals(acIndex)) {
+                acID = ac.getKey();
             }
         }
 
@@ -69,9 +69,7 @@ public class ShowAC extends CardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
             return;
         }
-        MessageHelper.sendMessageToUser(sb.toString(), user);
+        MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);
-
-
     }
 }

@@ -26,19 +26,13 @@ public class Speaker extends PlayerSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
+        
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         activeMap.setSpeaker(player.getUserID());
-        String msg = Emojis.SpeakerToken + "Speaker assigned to: " + Helper.getPlayerRepresentation(event, player);
-        MessageHelper.replyToMessage(event, msg);
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        String msg = Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(event, player);
+        sendMessage(msg);
     }
 }

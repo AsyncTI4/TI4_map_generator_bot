@@ -19,6 +19,8 @@ import ti4.message.MessageHelper;
 import java.util.HashSet;
 import java.util.Set;
 
+import kotlin.OverloadResolutionByLambdaReturnType;
+
 public class ScoreSO extends SOCardsSubcommandData {
     public ScoreSO() {
         super(Constants.SCORE_SO, "Score Secret Objective");
@@ -31,12 +33,12 @@ public class ScoreSO extends SOCardsSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select which Secret Objective to score");
+            sendMessage("Please select which Secret Objective to score");
             return;
         }
 
@@ -44,7 +46,7 @@ public class ScoreSO extends SOCardsSubcommandData {
         scoreSO(event, activeMap, player, soID, event.getChannel(), null);
     }
 
-    public static void scoreSO(SlashCommandInteractionEvent event, Map activeMap, Player player, int soID, MessageChannel channel, ButtonInteractionEvent buttonInteractionEvent) {
+    public void scoreSO(SlashCommandInteractionEvent event, Map activeMap, Player player, int soID, MessageChannel channel, ButtonInteractionEvent buttonInteractionEvent) {
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
         boolean scored = activeMap.scoreSecretObjective(player.getUserID(), soID, activeMap);
         if (!scored) {
@@ -63,7 +65,11 @@ public class ScoreSO extends SOCardsSubcommandData {
             String soDescription = soText[2];
             message.append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
         }
-        MessageHelper.sendMessageToChannel(channel, message.toString());
+        if (event != null && channel.getName().equalsIgnoreCase(event.getChannel().getName())) {
+            sendMessage(message.toString());
+        } else {
+            MessageHelper.sendMessageToChannel(channel, message.toString());
+        }
         CardsInfo.sentUserCardInfo(event, activeMap, player, buttonInteractionEvent);
         Helper.checkIfHeroUnlocked(event, activeMap, player);
     }

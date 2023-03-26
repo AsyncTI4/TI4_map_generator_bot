@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -28,12 +29,13 @@ public class Info extends GameSubcommandData{
         OptionMapping gameOption = event.getOption(Constants.GAME_NAME);
         MapManager mapManager = MapManager.getInstance();
         Map activeMap = mapManager.getUserActiveMap(event.getUser().getId());
-        StringBuilder sb = getGameInfo(gameOption, mapManager, activeMap);
+        StringBuilder sb = getGameInfo(gameOption, mapManager, activeMap, event);
         MessageHelper.replyToMessage(event, sb.toString());
     }
 
-    public static StringBuilder getGameInfo(OptionMapping gameOption, MapManager mapManager, Map map) {
+    public static StringBuilder getGameInfo(OptionMapping gameOption, MapManager mapManager, Map map, SlashCommandInteractionEvent event) {
         StringBuilder sb = new StringBuilder();
+        Boolean privateGame = FoWHelper.isPrivateGame(map, event);
         if (map == null && gameOption == null){
             sb.append("Game not specified");
             return sb;
@@ -46,22 +48,28 @@ public class Info extends GameSubcommandData{
         sb.append("Game status: " + map.getMapStatus());
         if (map.isHasEnded()) sb.append(" - GAME HAS ENDED");
         sb.append(NEW_LINE);
-        sb.append("Community Mode: " + map.isCommunityMode()).append(NEW_LINE);
-        sb.append("Alliance Mode: " + map.isAllianceMode()).append(NEW_LINE);
-        sb.append("FoW Mode: " + map.isFoWMode()).append(NEW_LINE);
+        sb.append("Game Modes: " + map.getGameModesText()).append(NEW_LINE);
         sb.append("Created: " + map.getCreationDate()).append(NEW_LINE);
         sb.append("Last Modified: " + Helper.getDateRepresentation(map.getLastModifiedDate())).append(NEW_LINE);
-        sb.append("Map String: `" + Helper.getMapString(map)).append("`").append(NEW_LINE);
+        if (privateGame == null || privateGame == false) {
+            sb.append("Map String: `" + Helper.getMapString(map)).append("`").append(NEW_LINE);
+        } else {
+            sb.append("Map String: Cannot show map string for private games").append(NEW_LINE);
+        }
         sb.append("Game player count: " + map.getPlayerCountForMap()).append(NEW_LINE);
-        sb.append("Players: ").append(NEW_LINE);
-        HashMap<String, Player> players = map.getPlayers();
-        int index = 1;
-        ArrayList<Player> playerNames = new ArrayList<>(players.values());
-        for (Player value : playerNames) {
-            if (value.getFaction() != null) {
-                sb.append(index).append(". ").append(value.getUserName()).append(Helper.getFactionIconFromDiscord(value.getFaction())).append(NEW_LINE);
-                index++;
+        if (privateGame == null || privateGame == false) {
+            sb.append("Players: ").append(NEW_LINE);
+            HashMap<String, Player> players = map.getPlayers();
+            int index = 1;
+            ArrayList<Player> playerNames = new ArrayList<>(players.values());
+            for (Player value : playerNames) {
+                if (value.getFaction() != null) {
+                    sb.append(index).append(". ").append(value.getUserName()).append(Helper.getFactionIconFromDiscord(value.getFaction())).append(NEW_LINE);
+                    index++;
+                }
             }
+        } else {
+            sb.append("Players: Cannot show players for private games").append(NEW_LINE);
         }
         return sb;
     }

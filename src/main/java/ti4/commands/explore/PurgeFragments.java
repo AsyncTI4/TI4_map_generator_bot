@@ -1,20 +1,16 @@
 package ti4.commands.explore;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.explore.DrawRelic;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.generator.Mapper;
 
@@ -32,9 +28,10 @@ public class PurgeFragments extends ExploreSubcommandData {
 	public void execute(SlashCommandInteractionEvent event) {
 		Map activeMap = getActiveMap();
 		Player activePlayer = activeMap.getPlayer(getUser().getId());
+		activePlayer = Helper.getGamePlayer(activeMap, activePlayer, event, null);
 		activePlayer = Helper.getPlayer(activeMap, activePlayer, event);
 		if (activePlayer == null){
-			MessageHelper.replyToMessage(event, "Player not found in game.");
+			sendMessage("Player not found in game.");
 			return;
 		}
 		String color = event.getOption(Constants.TRAIT).getAsString();
@@ -61,7 +58,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 		
 		while (fragmentsToPurge.size() < count) {
 			if (unknowns.size() == 0) {
-				MessageHelper.replyToMessage(event, "Not enough fragments");
+				sendMessage("Not enough fragments");
 				return;
 			}
 			fragmentsToPurge.add(unknowns.remove(0));
@@ -72,7 +69,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 		}
 
 		String message = Helper.getPlayerRepresentation(event, activePlayer) + " purged fragments: " + fragmentsToPurge.toString();
-		MessageHelper.replyToMessage(event, message);
+		sendMessage(message);
 
 		OptionMapping drawRelicOption = event.getOption(Constants.ALSO_DRAW_RELIC);
 		if (drawRelicOption != null) {

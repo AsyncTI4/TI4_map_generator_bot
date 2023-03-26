@@ -1,15 +1,16 @@
 package ti4.commands.bothelper;
 
+import java.time.Duration;
+import java.time.OffsetDateTime;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.TimeUtil;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
 
@@ -22,21 +23,63 @@ public class ListOldChannels extends BothelperSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Integer channelCount = event.getOption(Constants.COUNT).getAsInt();
         if (channelCount < 1 || channelCount > 100) {
-            MessageHelper.replyToMessage(event, "Please choose a number between 1 and 100");
+            sendMessage("Please choose a number between 1 and 100");
             return;
         }
-        
-        List<TextChannel> channels = event.getGuild().getTextChannels();
+        Guild guild = event.getGuild();
+        sendMessage(getOldChannelsMessage(guild, channelCount));
+        sendMessage(getOldThreadsMessage(guild, channelCount));
+    }
+
+    public static String getOldChannelsMessage(Guild guild, Integer channelCount) {
+        List<TextChannel> channels = guild.getTextChannels();
         channels = channels.stream()
-                            .filter(c -> c.getLatestMessageId() != "0")
+                            .filter(c -> c.getLatestMessageIdLong() != 0)
                             .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
                             .limit(channelCount)
                             .toList();
         
-        StringBuilder sb = new StringBuilder("Least Active Channels:\n>>> ");
+        StringBuilder sb = new StringBuilder("Least Active Channels:\n");
         for (TextChannel channel : channels) {
-            sb.append("`" + channel.getLatestMessageId() + "`  " + channel.getAsMention()).append("\n");
+            OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(channel.getLatestMessageIdLong());
+            Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
+            sb.append("> `" + latestActivityTime.toString() + " (" + duration.toDays() + " days ago)`  " + channel.getAsMention()).append("\n");
         }
-        MessageHelper.replyToMessage(event, sb.toString());
+        return sb.toString();
+    }
+
+    public static String getOldThreadsMessage(Guild guild, Integer channelCount) {
+        StringBuilder sb;
+        List<ThreadChannel> threadChannels = guild.getThreadChannels();
+        threadChannels = threadChannels.stream()
+                            .filter(c -> c.getLatestMessageIdLong() != 0)
+                            .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
+                            .limit(channelCount)
+                            .toList();
+        
+        sb = new StringBuilder("Least Active Threads:\n");
+        for (ThreadChannel threadChannel : threadChannels) {
+            OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
+            Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
+            sb.append("> `" + latestActivityTime.toString() + " (" + duration.toHours() + " hours ago)`  " + threadChannel.getAsMention() + " **" + threadChannel.getName() + "** from channel **" + threadChannel.getParentChannel().getName()).append("**\n");
+        }
+        return sb.toString();
+    }
+
+    public static String getHowOldOldestThreadIs(Guild guild) {
+        List<ThreadChannel> threadChannels = guild.getThreadChannels();
+        threadChannels = threadChannels.stream()
+                            .filter(c -> c.getLatestMessageIdLong() != 0)
+                            .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
+                            .limit(1)
+                            .toList();
+        
+        String durationText = "";
+        for (ThreadChannel threadChannel : threadChannels) {
+            OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
+            Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
+            durationText =  duration.toHours() + " hours old";
+        }
+        return durationText;
     }
 }

@@ -34,5 +34,6 @@ public class CardsInfoForPlayer extends AdminSubcommandData {
             CardsInfo.sentUserCardInfo(event, activeMap, player);
         }
         MapSaveLoadManager.saveMap(activeMap);
+        sendMessage("Info sent");
     }
 }

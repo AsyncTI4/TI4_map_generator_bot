@@ -26,7 +26,6 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import ti4.commands.tokens.AddToken;
 import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -192,6 +191,9 @@ public class ConvertTTPGtoAsync {
         //     asyncMap.addCustomPO(objective, 1);
         // }
 
+        //EMPTY MAP FOR <AgendaName, Faction> to add Laws later
+        HashMap<String, String> electedPlayers = new HashMap<>();
+
         //PLAYER ORDER MAPPING
         // TTPG player array starts in bottom right and goes clockwise
         // Async player array starts at top and goes clockwise
@@ -215,10 +217,14 @@ public class ConvertTTPGtoAsync {
             asyncPlayer.setStrategicCC(ttpgPlayer.getCommandTokens().getStrategy());
 
             //PLAYER STRATEGY CARDS
-            String ttpgSC = (String) ttpgPlayer.getStrategyCards().get(0);
-            String ttpgSCplayed = (String) ttpgPlayer.getStrategyCardsFaceDown().get(0);
-            if (Objects.nonNull(ttpgSC)) asyncPlayer.setSC(Helper.getSCNumber(ttpgSC));
-            if (Objects.nonNull(ttpgSCplayed)) asyncMap.setSCPlayed(Helper.getSCNumber(ttpgSCplayed), true);
+            if (!ttpgPlayer.getStrategyCards().isEmpty()) {
+                String ttpgSC = (String) ttpgPlayer.getStrategyCards().get(0);
+                if (Objects.nonNull(ttpgSC)) asyncPlayer.setSC(Helper.getSCNumber(ttpgSC));
+            }
+            if (!ttpgPlayer.getStrategyCardsFaceDown().isEmpty()) {
+                String ttpgSCplayed = (String) ttpgPlayer.getStrategyCardsFaceDown().get(0);
+                if (Objects.nonNull(ttpgSCplayed)) asyncMap.setSCPlayed(Helper.getSCNumber(ttpgSCplayed), true);
+            }
 
             //PLAYER SCORED OBJECTIVES
             for (String ttpgScoredObjective : ttpgPlayer.getObjectives()) {
@@ -247,6 +253,13 @@ public class ConvertTTPGtoAsync {
                 }
             }
 
+            //PLAYER LAWS ELECTED
+            for (String ttpgLaw : ttpgPlayer.getLaws()) {
+                String asyncLaw = AliasHandler.resolveAgenda(ttpgLaw);
+                electedPlayers.put(asyncLaw, asyncPlayer.getFaction());
+                if (asyncLaw.equals("warrant")) asyncPlayer.setSearchWarrant();
+            }
+
             //PLAYER SUPPORT FOR THE THRONE
             for (String objective : ttpgPlayer.getObjectives()) {
                 if (objective.startsWith("Support for the Throne")) {
@@ -261,7 +274,7 @@ public class ConvertTTPGtoAsync {
 
             //PLAYER LEADERS
             if (!asyncPlayer.getFaction().equals("keleres") && !asyncPlayer.getFaction().equals("nomad")) {
-                asyncPlayer.getLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked") ? false : true);
+                // asyncPlayer.getLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked") ? false : true);
                 asyncPlayer.getLeader("commander").setLocked(ttpgPlayer.getLeaders().getCommander().equals("unlocked") ? false : true);
                 asyncPlayer.getLeader("hero").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
             } else if (asyncPlayer.getFaction().equals("keleres")) {
@@ -287,8 +300,13 @@ public class ConvertTTPGtoAsync {
                         break;
                 }
             } else if (asyncPlayer.getFaction().equals("nomad")) { //need an example before we do this
-                
+                // asyncPlayer.getLeader("agent").setLocked(ttpgPlayer.getLeaders().getAgent().equals("unlocked") ? false : true);
+                asyncPlayer.getLeader("commander").setLocked(ttpgPlayer.getLeaders().getCommander().equals("unlocked") ? false : true);
+                asyncPlayer.getLeader("hero").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
             }
+
+            //PURGE HERO IF PURGED
+            if (ttpgPlayer.getLeaders().getHero().equals("purged")) asyncPlayer.removeLeader(Constants.HERO);
 
             //PLAYER CUSTODIAN POINTS
             Integer ttpgCustodianPoints = ttpgPlayer.getCustodiansPoints();
@@ -310,11 +328,8 @@ public class ConvertTTPGtoAsync {
                 asyncMap.getAllRelics().remove(AliasHandler.resolveRelic(relic));
             }
 
-
-            // //CLEAN PLAYER HANDCARDS
-            // for (Integer cardID : asyncPlayer.getPromissoryNotes().values()) {
-            //     asyncPlayer.removePromissoryNote(cardID);
-            // }
+            //CLEAN PLAYER HANDCARDS
+            asyncPlayer.clearPromissoryNotes();
 
             //PLAYER HANDCARDS and TABLECARDS
             ArrayList<String> handAndTableCards = new ArrayList<>(){{
@@ -409,12 +424,21 @@ public class ConvertTTPGtoAsync {
         asyncMap.setAgendas(agendaCards);
 
         // AGENDA DISCARD
-        ArrayList<String> ttpgAgendaDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardAction().getDiscard();
+        ArrayList<String> ttpgAgendaDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardAgenda().getDiscard();
+        ArrayList<String> ttpgLawsInPlay = (ArrayList<String>) ttpgMap.getLaws();
         ArrayList<String> agendaDiscards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgAgendaDiscards)) addAll(ttpgAgendaDiscards);
+            if (Objects.nonNull(ttpgLawsInPlay)) addAll(ttpgLawsInPlay);
             replaceAll(card -> AliasHandler.resolveAgenda(card));
         }};
         asyncMap.setDiscardAgendas(agendaDiscards);
+
+        //ADD LAWS
+        for (String law : ttpgLawsInPlay) {
+            int agendaID = asyncMap.getDiscardAgendas().get(AliasHandler.resolveAgenda(law));
+            String electedFaction = electedPlayers.get(AliasHandler.resolveAgenda(law));
+            asyncMap.addLaw(agendaID, electedFaction);
+        }
 
         // EXPLORATION DECK
         ArrayList<String> ttpgExploreCulturalCards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDeck();
@@ -432,10 +456,10 @@ public class ConvertTTPGtoAsync {
         asyncMap.setExploreDeck(exploreCards);
 
         // EXPLORATION DISCARD        
-        ArrayList<String> ttpgExploreCulturalDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDeck();
-        ArrayList<String> ttpgExploreHazardousDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationHazardous().getDeck();
-        ArrayList<String> ttpgExploreIndustrialDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationIndustrial().getDeck();
-        ArrayList<String> ttpgExploreFrontierDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationFrontier().getDeck();
+        ArrayList<String> ttpgExploreCulturalDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDiscard();
+        ArrayList<String> ttpgExploreHazardousDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationHazardous().getDiscard();
+        ArrayList<String> ttpgExploreIndustrialDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard();
+        ArrayList<String> ttpgExploreFrontierDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationFrontier().getDiscard();
         ArrayList<String> exploreDiscards = new ArrayList<>() {{
             if (Objects.nonNull(ttpgExploreCulturalDiscards)) addAll(ttpgExploreCulturalDiscards);
             if (Objects.nonNull(ttpgExploreHazardousDiscards)) addAll(ttpgExploreHazardousDiscards);

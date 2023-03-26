@@ -29,7 +29,7 @@ public class ExpPlanet extends ExploreSubcommandData {
         String planetName = planetOption.getAsString();
         Map activeMap = getActiveMap();
         if (!activeMap.getPlanets().contains(planetName)) {
-            MessageHelper.replyToMessage(event, "Planet not found in map");
+            sendMessage("Planet not found in map");
             return;
         }
         Tile tile = null;
@@ -45,13 +45,13 @@ public class ExpPlanet extends ExploreSubcommandData {
             }
         }
         if (tile == null) {
-            MessageHelper.replyToMessage(event, "System not found that contains planet");
+            sendMessage("System not found that contains planet");
             return;
         }
         planetName = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planetName));
         String planet = Mapper.getPlanet(planetName);
         if (planet == null) {
-            MessageHelper.replyToMessage(event, "Invalid planet");
+            sendMessage("Invalid planet");
             return;
         }
         String[] planetInfo = planet.split(",");
@@ -62,13 +62,15 @@ public class ExpPlanet extends ExploreSubcommandData {
         }
         String cardID = activeMap.drawExplore(drawColor);
         if (cardID == null) {
-            MessageHelper.replyToMessage(event, "Planet cannot be explored");
+            sendMessage("Planet cannot be explored");
             return;
         }
         Player player = activeMap.getPlayer(event.getUser().getId());
+        player = Helper.getGamePlayer(activeMap, player, event, null);
+        player = Helper.getPlayer(activeMap, player, event);
 
         StringBuilder messageText = new StringBuilder(Helper.getEmojiFromDiscord(drawColor));
-        messageText.append("Planet "+ Helper.getPlanetRepresentationPlusEmojis(planetName) +" *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(event, player)).append(":\n");
+        messageText.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(planetName) +" *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(event, player)).append(":\n");
         messageText.append(displayExplore(cardID));
         resolveExplore(event, cardID, tile, planetName, messageText.toString(), false);
     }

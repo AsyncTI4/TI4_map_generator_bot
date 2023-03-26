@@ -18,6 +18,7 @@ import ti4.message.MessageHelper;
 
 public abstract class ExploreSubcommandData extends SubcommandData {
 
+    private SlashCommandInteractionEvent event;
     private Map activeMap;
     private User user;
     protected final OptionData typeOption = new OptionData(OptionType.STRING, Constants.TRAIT, "Cultural, Industrial, Hazardous, or Frontier.").setAutoComplete(true);
@@ -38,10 +39,19 @@ public abstract class ExploreSubcommandData extends SubcommandData {
     public User getUser() {
         return user;
     }
+    
+    /**
+     * Send a message to the event's channel, handles large text
+     * @param messageText new message
+     */
+    public void sendMessage(String messageText) {
+        MessageHelper.replyToSlashCommand(event, messageText);
+    }
 
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void preExecute(SlashCommandInteractionEvent event) {
+        this.event = event;
         user = event.getUser();
         activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
     }
@@ -85,8 +95,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         String card = Mapper.getExplore(cardID);
         String[] cardInfo = card.split(";");
         Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getPlayer(activeMap, player, event);
         player = Helper.getGamePlayer(activeMap, player, event, null);
+        player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;

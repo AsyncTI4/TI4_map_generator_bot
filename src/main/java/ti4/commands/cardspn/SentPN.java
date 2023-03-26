@@ -30,12 +30,12 @@ public class SentPN extends PNCardsSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Promissory Note to send");
+            sendMessage("Please select what Promissory Note to send");
             return;
         }
 
@@ -58,7 +58,7 @@ public class SentPN extends PNCardsSubcommandData {
                     pnName = pnName.toLowerCase();
                     if (pnName.contains(value) || pn.getKey().contains(value)) {
                         if (foundSimilarName && !cardName.equals(pnName)) {
-                            MessageHelper.sendMessageToChannel(event.getChannel(), "Multiple cards with similar name founds, please use ID");
+                            sendMessage("Multiple cards with similar name founds, please use ID");
                             return;
                         }
                         id = pn.getKey();
@@ -70,14 +70,14 @@ public class SentPN extends PNCardsSubcommandData {
         }
 
         if (id == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Promissory Note ID found, please retry");
+            sendMessage("No such Promissory Note ID found, please retry");
             return;
         }
         boolean areaPN = false;
         Player targetPlayer = Helper.getPlayer(activeMap, null, event);
 
         if (targetPlayer == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Player in game");
+            sendMessage("No such Player in game");
             return;
         }
 
@@ -87,7 +87,7 @@ public class SentPN extends PNCardsSubcommandData {
             String playerFaction = targetPlayer.getFaction();
             if (!(playerColor != null && playerColor.equals(promissoryNoteOwner)) &&
                     !(playerFaction != null && playerFaction.equals(promissoryNoteOwner))) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Can send Promissory Notes from Play Area just to Owner of the Note");
+                sendMessage("Can send Promissory Notes from Play Area just to Owner of the Note");
                 return;
             }
         }
@@ -115,8 +115,9 @@ public class SentPN extends PNCardsSubcommandData {
             String fail = "User for faction not found. Report to ADMIN";
             String success = message + "\nThe other player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(targetPlayer, activeMap, event, message, fail, success);
+            sendMessage("PN sent");
         } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            sendMessage(message);
         }
 
         //Turned off, as we might change back

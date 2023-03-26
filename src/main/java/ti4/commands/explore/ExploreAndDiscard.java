@@ -36,6 +36,6 @@ public class ExploreAndDiscard extends ExploreSubcommandData {
         }
         sb.append("Cards have been discarded. Resolve effects and/or purge manually.\n");
         sb.append("To choose a card to keep/use, run this command: `/explore use explore_card_id:{ID}`");
-        MessageHelper.replyToMessage(event, sb.toString());
+        sendMessage(sb.toString());
     }
 }

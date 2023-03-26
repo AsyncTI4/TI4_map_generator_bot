@@ -5,14 +5,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cards.CardsInfo;
-import ti4.commands.player.SendTG;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class PlayPN extends PNCardsSubcommandData {
     public PlayPN() {
@@ -27,12 +25,12 @@ public class PlayPN extends PNCardsSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.PROMISSORY_NOTE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Promissory Note to play");
+            sendMessage("Please select what Promissory Note to play");
             return;
         }
         OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
@@ -60,7 +58,7 @@ public class PlayPN extends PNCardsSubcommandData {
                     pnName = pnName.toLowerCase();
                     if (pnName.contains(value) || pn.getKey().contains(value)) {
                         if (foundSimilarName && !cardName.equals(pnName)) {
-                            MessageHelper.sendMessageToChannel(event.getChannel(), "Multiple cards with similar name founds, please use ID");
+                            sendMessage("Multiple cards with similar name founds, please use ID");
                             return;
                         }
                         id = pn.getKey();
@@ -72,7 +70,7 @@ public class PlayPN extends PNCardsSubcommandData {
         }
 
         if (id == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Promissory Note ID found, please retry");
+            sendMessage("No such Promissory Note ID found, please retry");
             return;
         }
 
@@ -92,17 +90,26 @@ public class PlayPN extends PNCardsSubcommandData {
                     break;
                 }
             }
-        } 
+        }
 
         StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(event, player) + " played promissory note:\n");
         sb.append(Helper.getFactionIconFromDiscord(pnOwner) + Emojis.PN);
-        sb.append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
+        String pnText = "";
+
+        //Handle AbsolMode Political Secret
+        if (activeMap.isAbsolMode() && id.endsWith("_ps")) {
+            pnText = "Political Secret" + Emojis.Absol + ":  *When you cast votes:* You may exhaust up to 3 of the {colour} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {colour} player.";
+        } else {
+            pnText = Mapper.getPromissoryNote(id, longPNDisplay);
+        }
+        sb.append(pnText).append("\n");
         
-        if (id.equalsIgnoreCase("titanspn")) {
+        //TERRAFORM TIP
+        if (id.equalsIgnoreCase("terraform")) {
             sb.append("`/add_token token:titanspn`\n");
         }
 
-        MessageHelper.sendMessageToChannel(event, sb.toString());
+        sendMessage(sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);
     }
 }
