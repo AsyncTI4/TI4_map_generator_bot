@@ -217,7 +217,12 @@ public class FoWHelper {
 		// for each adjacent tile...
 		for (int i = 0; i < 6; i++) {
 			String position_ = directlyAdjacentTiles.get(i);
-
+			
+			String override = map.getAdjacentTileOverride(position, i);
+			if (override != null) {
+				position_ = override;
+			}
+			
 			if (position_.equals("x") || (hyperlaneData != null && !hyperlaneData.get(i))) {
 				// the hyperlane doesn't exist & doesn't go that direction, skip.
 				continue;
@@ -484,18 +489,18 @@ public class FoWHelper {
 				.collect(Collectors.toSet());
 		Set<Player> playersWithoutVisiblity = activeMap.getPlayers().values().stream()
 				.filter(player -> !playersWithVisiblity.contains(player)).collect(Collectors.toSet());
-		
+
 		int succesfulCount = 0;
-		
-		for(Player player_ : playersWithVisiblity) {
+
+		for (Player player_ : playersWithVisiblity) {
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, messageForFullInfo);
 			succesfulCount += success ? 1 : 0;
 		}
-		for(Player player_ : playersWithoutVisiblity) {
+		for (Player player_ : playersWithoutVisiblity) {
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, messageForAll);
 			succesfulCount += success ? 1 : 0;
 		}
-		
+
 		if (succesfulCount < activeMap.getPlayers().values().size()) {
 			MessageHelper.replyToMessage(event,
 					"One more more pings failed to send.  Please follow up with game's GM.");
@@ -503,7 +508,7 @@ public class FoWHelper {
 		} else {
 			MessageHelper.replyToMessage(event, "Succesfully sent all pings.");
 		}
-		
+
 	}
 
 }
