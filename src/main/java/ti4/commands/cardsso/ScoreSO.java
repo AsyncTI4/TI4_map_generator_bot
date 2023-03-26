@@ -74,7 +74,7 @@ public class ScoreSO extends SOCardsSubcommandData {
         Helper.checkIfHeroUnlocked(event, activeMap, player);
     }
 
-    public static void scoreSO(ButtonInteractionEvent event, Map activeMap, Player player, int soID, MessageChannel channel, ButtonInteractionEvent buttonInteractionEvent) {
+    public static void scoreSO(Map activeMap, Player player, int soID, MessageChannel channel, ButtonInteractionEvent buttonInteractionEvent) {
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
         boolean scored = activeMap.scoreSecretObjective(player.getUserID(), soID, activeMap);
         if (!scored) {
@@ -82,7 +82,7 @@ public class ScoreSO extends SOCardsSubcommandData {
             return;
         }
 
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player) + " scored " + Emojis.SecretObjectiveAlt + " ");
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(buttonInteractionEvent, player) + " scored " + Emojis.SecretObjectiveAlt + " ");
         for (java.util.Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
@@ -95,6 +95,6 @@ public class ScoreSO extends SOCardsSubcommandData {
         }
         MessageHelper.sendMessageToChannel(channel, message.toString());
         CardsInfo.sentUserCardInfo(null, activeMap, player, buttonInteractionEvent);
-        Helper.checkIfHeroUnlocked(event, activeMap, player);
+        Helper.checkIfHeroUnlocked(buttonInteractionEvent, activeMap, player);
     }
 }

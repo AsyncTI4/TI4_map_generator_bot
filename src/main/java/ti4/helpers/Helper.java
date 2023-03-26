@@ -1247,7 +1247,6 @@ public class Helper {
 
     public static void checkIfHeroUnlocked(SlashCommandInteractionEvent event, Map activeMap, Player player) {
         int scoredSOCount = player.getSecretsScored().size();
-        
         int scoredPOCount = 0;
         HashMap<String, List<String>> playerScoredPublics = activeMap.getScoredPublicObjectives();
         for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
@@ -1267,7 +1266,6 @@ public class Helper {
 
     public static void checkIfHeroUnlocked(ButtonInteractionEvent event, Map activeMap, Player player) {
         int scoredSOCount = player.getSecretsScored().size();
-        
         int scoredPOCount = 0;
         HashMap<String, List<String>> playerScoredPublics = activeMap.getScoredPublicObjectives();
         for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
