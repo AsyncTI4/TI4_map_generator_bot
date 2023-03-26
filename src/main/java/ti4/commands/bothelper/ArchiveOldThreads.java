@@ -24,6 +24,16 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
         sendMessage("Archiving " + threadCount + " threads");
         sendMessage(ListOldChannels.getOldThreadsMessage(event.getGuild(), threadCount));
 
+        List<ThreadChannel> threadChannelsBlank = event.getGuild().getThreadChannels();
+
+        threadChannelsBlank = threadChannelsBlank.stream()
+                .filter(c -> c.getLatestMessageIdLong() == 0)
+                .toList();
+        for (ThreadChannel threadChannel : threadChannelsBlank) {
+            threadChannel.getManager().setArchived(true).queue();
+        }
+
+        sendMessage("Blank Channels:" + threadChannelsBlank.size());
         archiveOldThreads(event.getGuild(), threadCount);
     }
 
@@ -38,6 +48,8 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
             threadChannel.getManager().setArchived(true).queue();
         }
 
+        sendMessage("Blank Channels:" + threadChannelsBlank.size());
+        
         threadChannels = threadChannels.stream()
             .filter(c -> c.getLatestMessageIdLong() != 0)
             .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
