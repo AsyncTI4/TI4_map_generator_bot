@@ -2,6 +2,7 @@ package ti4.map;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -16,7 +17,6 @@ import ti4.message.BotLogger;
 import java.awt.*;
 import java.lang.reflect.Field;
 import java.util.List;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.*;
@@ -45,7 +45,9 @@ public class Map {
 
     @Nullable
     private MessageChannel mainChannel = null;
-
+    @Nullable
+    private ThreadChannel botMapChannel = null;
+    
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
     @ExportableField
@@ -250,6 +252,14 @@ public class Map {
 
     public MessageChannel getMainGameChannel() {
         return mainChannel;
+    }
+
+    public void setBotMapChannel(ThreadChannel channel) {
+        botMapChannel = channel;
+    }
+
+    public ThreadChannel getBotMapChannel() {
+        return botMapChannel;
     }
 
     public boolean isHasEnded() {
