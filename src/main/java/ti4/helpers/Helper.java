@@ -24,6 +24,7 @@ import org.jetbrains.annotations.Nullable;
 
 import ti4.MapGenerator;
 import ti4.ResourceHelper;
+import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldChannels;
 import ti4.commands.tokens.AddCC;
@@ -42,6 +43,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
@@ -1241,5 +1243,43 @@ public class Helper {
         String techPrerequisites = techRepTokenizer.nextToken();
         String techText = techRepTokenizer.nextToken();
         return techEmoji + "**" + techName + "**";
+    }
+
+    public static void checkIfHeroUnlocked(SlashCommandInteractionEvent event, Map activeMap, Player player) {
+        int scoredSOCount = player.getSecretsScored().size();
+        int scoredPOCount = 0;
+        HashMap<String, List<String>> playerScoredPublics = activeMap.getScoredPublicObjectives();
+        for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
+            if (Mapper.getPublicObjectivesState1().keySet().contains(scoredPublic.getKey()) || Mapper.getPublicObjectivesState2().keySet().contains(scoredPublic.getKey())) {
+                if (scoredPublic.getValue().contains(player.getUserID())) {
+                    scoredPOCount++;
+                }
+            }
+        
+        }
+        int scoredObjectiveCount = scoredPOCount + scoredSOCount;
+        if (scoredObjectiveCount >= 3) {
+            UnlockLeader ul = new UnlockLeader();
+            ul.unlockLeader(event, "hero", activeMap, player);
+        }
+    }
+
+    public static void checkIfHeroUnlocked(ButtonInteractionEvent event, Map activeMap, Player player) {
+        int scoredSOCount = player.getSecretsScored().size();
+        int scoredPOCount = 0;
+        HashMap<String, List<String>> playerScoredPublics = activeMap.getScoredPublicObjectives();
+        for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
+            if (Mapper.getPublicObjectivesState1().keySet().contains(scoredPublic.getKey()) || Mapper.getPublicObjectivesState2().keySet().contains(scoredPublic.getKey())) {
+                if (scoredPublic.getValue().contains(player.getUserID())) {
+                    scoredPOCount++;
+                }
+            }
+        
+        }
+        int scoredObjectiveCount = scoredPOCount + scoredSOCount;
+        if (scoredObjectiveCount >= 3) {
+            UnlockLeader ul = new UnlockLeader();
+            ul.unlockLeader(event, "hero", activeMap, player);
+        }
     }
 }
