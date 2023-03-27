@@ -5,6 +5,7 @@ import java.util.List;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -55,7 +56,7 @@ public class GameEnd extends GameSubcommandData {
             deleteRole = false;
         }
         //ADD USER PERMISSIONS DIRECTLY TO CHANNEL
-        Helper.addMapPlayerPermissionsToChannel(event.getGuild(), getActiveMap());
+        Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), getActiveMap());
 
         //DELETE THE ROLE
         if (deleteRole) {
@@ -90,5 +91,12 @@ public class GameEnd extends GameSubcommandData {
         // TextChannel bothelperLoungeChannel = event.getGuild().getTextChannelById(1029569891193331712l);
         TextChannel bothelperLoungeChannel = event.getGuild().getTextChannelsByName("bothelper-lounge", true).get(0);
         if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, event.getChannel().getAsMention() + " - Game: " + gameName + " has concluded.\nReact here when a post has been made in " + channelMention + ", and channels moved to the 'In Limbo Archive' category.");      
+    
+        //MOVE CHANNELS TO IN-LIMBO
+        Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
+        TextChannel tableTalkChannel = (TextChannel) userActiveMap.getTableTalkChannel();
+        if (inLimboCategory != null && tableTalkChannel != null) tableTalkChannel.getManager().setParent(inLimboCategory).queue();
+        TextChannel actionsChannel = (TextChannel) userActiveMap.getMainGameChannel();
+        if (inLimboCategory != null && actionsChannel != null) actionsChannel.getManager().setParent(inLimboCategory).queue();
     }
 }
