@@ -1197,12 +1197,11 @@ public class Helper {
         TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
         if (actionsChannel != null) {
             addPlayerPermissionsToGameChannel(guild, activeMap, actionsChannel);
-        } else {
-            String gameName = activeMap.getName();
-            List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
-            for (GuildChannel channel : channels) {
-                addPlayerPermissionsToGameChannel(guild, activeMap, channel);
-            }
+        }
+        String gameName = activeMap.getName();
+        List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
+        for (GuildChannel channel : channels) {
+            addPlayerPermissionsToGameChannel(guild, activeMap, channel);
         }
     }
 
