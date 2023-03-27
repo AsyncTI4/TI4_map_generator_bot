@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -25,6 +24,7 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class MapSaveLoadManager {
 
@@ -305,6 +305,9 @@ public class MapSaveLoadManager {
         writer.write(Constants.GAME_CUSTOM_NAME + " " + map.getCustomName());
         writer.write(System.lineSeparator());
 
+        MessageChannel tableTalkChannel = map.getTableTalkChannel();
+        writer.write(Constants.TABLE_TALK_CHANNEL + " " + (tableTalkChannel == null ? "" : tableTalkChannel.getId()));
+        writer.write(System.lineSeparator());
         MessageChannel mainGameChannel = map.getMainGameChannel();
         writer.write(Constants.MAIN_GAME_CHANNEL + " " + (mainGameChannel == null ? "" : mainGameChannel.getId()));
         writer.write(System.lineSeparator());
@@ -880,6 +883,22 @@ public class MapSaveLoadManager {
                             if (!gameChannels.isEmpty() && gameChannels.size() == 1) mainGameChannel = gameChannels.get(0);
                         }
                         map.setMainGameChannel(mainGameChannel);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.TABLE_TALK_CHANNEL -> {
+                    String id = info.isEmpty() ? "1234" : info; //getTextChannelById can't handle ""
+                    try {
+                        TextChannel tableTalkChannel = MapGenerator.jda.getTextChannelById(id);
+                        if (tableTalkChannel == null) {
+                            List<TextChannel> gameChannels = MapGenerator.jda.getTextChannels().stream()
+                                        .filter(c -> c.getName().startsWith(map.getName()))
+                                        .filter(Predicate.not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
+                                        .toList();
+                            if (!gameChannels.isEmpty() && gameChannels.size() == 1) tableTalkChannel = gameChannels.get(0);
+                        }
+                        map.setTableTalkChannel(tableTalkChannel);
                     } catch (Exception e) {
                         //Do nothing
                     }

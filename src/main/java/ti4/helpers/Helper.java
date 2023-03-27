@@ -421,7 +421,7 @@ public class Helper {
     public static int getPlanetResources(String planetID, Map map) {
         UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
-            return -1;
+            return 0;
         } else {
             Planet planet = (Planet) unitHolder;
             return planet.getResources();
@@ -431,7 +431,7 @@ public class Helper {
     public static int getPlanetInfluence(String planetID, Map map) {
         UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
-            return -1;
+            return 0;
         } else {
             Planet planet = (Planet) unitHolder;
             return planet.getInfluence();
@@ -1182,27 +1182,40 @@ public class Helper {
             }
 
             if (role == null) { //make sure players have access to the game channels
-                addMapPlayerPermissionsToChannel(guild, activeMap);
+                addMapPlayerPermissionsToGameChannels(guild, activeMap);
             } else { //make sure players have the role
                 addGameRoleToMapPlayers(guild, activeMap, role);
             }
         }
     }
     
-    public static void addMapPlayerPermissionsToChannel(Guild guild, Map activeMap) {
-        String gameName = activeMap.getName();
-        List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
-        for (GuildChannel channel : channels) {
-            TextChannel textChannel = guild.getTextChannelById(channel.getId());
-            if (textChannel != null) {
-                TextChannelManager textChannelManager = textChannel.getManager();
-                for (String playerID : activeMap.getPlayerIDs()) {
-                    Member member = guild.getMemberById(playerID);
-                    long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-                    textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
-                }
-                textChannelManager.queue();
+    public static void addMapPlayerPermissionsToGameChannels(Guild guild, Map activeMap) {
+        TextChannel tableTalkChannel = (TextChannel) activeMap.getTableTalkChannel();
+        if (tableTalkChannel != null) {
+            addPlayerPermissionsToGameChannel(guild, activeMap, tableTalkChannel);
+        }
+        TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
+        if (actionsChannel != null) {
+            addPlayerPermissionsToGameChannel(guild, activeMap, actionsChannel);
+        } else {
+            String gameName = activeMap.getName();
+            List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
+            for (GuildChannel channel : channels) {
+                addPlayerPermissionsToGameChannel(guild, activeMap, channel);
             }
+        }
+    }
+
+    private static void addPlayerPermissionsToGameChannel(Guild guild, Map activeMap, GuildChannel channel) {
+        TextChannel textChannel = guild.getTextChannelById(channel.getId());
+        if (textChannel != null) {
+            TextChannelManager textChannelManager = textChannel.getManager();
+            for (String playerID : activeMap.getPlayerIDs()) {
+                Member member = guild.getMemberById(playerID);
+                long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+                textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
+            }
+            textChannelManager.queue();
         }
     }
 
@@ -1246,40 +1259,46 @@ public class Helper {
     }
 
     public static void checkIfHeroUnlocked(SlashCommandInteractionEvent event, Map activeMap, Player player) {
-        int scoredSOCount = player.getSecretsScored().size();
-        int scoredPOCount = 0;
-        HashMap<String, List<String>> playerScoredPublics = activeMap.getScoredPublicObjectives();
-        for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
-            if (Mapper.getPublicObjectivesState1().keySet().contains(scoredPublic.getKey()) || Mapper.getPublicObjectivesState2().keySet().contains(scoredPublic.getKey())) {
-                if (scoredPublic.getValue().contains(player.getUserID())) {
-                    scoredPOCount++;
+        Leader playerLeader = player.getLeader(Constants.HERO);
+        if (playerLeader != null && playerLeader.isLocked()) {
+            int scoredSOCount = player.getSecretsScored().size();
+            int scoredPOCount = 0;
+            HashMap<String, List<String>> playerScoredPublics = activeMap.getScoredPublicObjectives();
+            for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
+                if (Mapper.getPublicObjectivesState1().keySet().contains(scoredPublic.getKey()) || Mapper.getPublicObjectivesState2().keySet().contains(scoredPublic.getKey())) {
+                    if (scoredPublic.getValue().contains(player.getUserID())) {
+                        scoredPOCount++;
+                    }
                 }
+            
             }
-        
+            int scoredObjectiveCount = scoredPOCount + scoredSOCount;
+            if (scoredObjectiveCount >= 3) {
+                UnlockLeader ul = new UnlockLeader();
+                ul.unlockLeader(event, "hero", activeMap, player);
+            }
         }
-        int scoredObjectiveCount = scoredPOCount + scoredSOCount;
-        // if (scoredObjectiveCount >= 3) {
-        //     UnlockLeader ul = new UnlockLeader();
-        //     ul.unlockLeader(event, "hero", activeMap, player);
-        // }
     }
 
     public static void checkIfHeroUnlocked(ButtonInteractionEvent event, Map activeMap, Player player) {
-        int scoredSOCount = player.getSecretsScored().size();
-        int scoredPOCount = 0;
-        HashMap<String, List<String>> playerScoredPublics = activeMap.getScoredPublicObjectives();
-        for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
-            if (Mapper.getPublicObjectivesState1().keySet().contains(scoredPublic.getKey()) || Mapper.getPublicObjectivesState2().keySet().contains(scoredPublic.getKey())) {
-                if (scoredPublic.getValue().contains(player.getUserID())) {
-                    scoredPOCount++;
+        Leader playerLeader = player.getLeader(Constants.HERO);
+        if (playerLeader != null && playerLeader.isLocked()) {
+            int scoredSOCount = player.getSecretsScored().size();
+            int scoredPOCount = 0;
+            HashMap<String, List<String>> playerScoredPublics = activeMap.getScoredPublicObjectives();
+            for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
+                if (Mapper.getPublicObjectivesState1().keySet().contains(scoredPublic.getKey()) || Mapper.getPublicObjectivesState2().keySet().contains(scoredPublic.getKey())) {
+                    if (scoredPublic.getValue().contains(player.getUserID())) {
+                        scoredPOCount++;
+                    }
                 }
+            
             }
-        
+            int scoredObjectiveCount = scoredPOCount + scoredSOCount;
+            if (scoredObjectiveCount >= 3) {
+                UnlockLeader ul = new UnlockLeader();
+                ul.unlockLeader(event, "hero", activeMap, player);
+            }
         }
-        int scoredObjectiveCount = scoredPOCount + scoredSOCount;
-        // if (scoredObjectiveCount >= 3) {
-        //     UnlockLeader ul = new UnlockLeader();
-        //     ul.unlockLeader(event, "hero", activeMap, player);
-        // }
     }
 }

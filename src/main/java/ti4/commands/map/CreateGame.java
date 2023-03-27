@@ -52,7 +52,7 @@ public class CreateGame implements Command {
         MessageHelper.replyToMessage(event, "Game created with name: " + mapName);
     }
 
-    public void createNewGame(SlashCommandInteractionEvent event, String mapName, Member gameOwner) {
+    public Map createNewGame(SlashCommandInteractionEvent event, String mapName, Member gameOwner) {
         Map map = new Map();
         String ownerID = gameOwner.getId();
         map.setOwnerID(ownerID);
@@ -67,6 +67,7 @@ public class CreateGame implements Command {
             MessageHelper.replyToMessage(event, "Could not assign active Game " + mapName);
         }
         MapSaveLoadManager.saveMap(map);
+        return map;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

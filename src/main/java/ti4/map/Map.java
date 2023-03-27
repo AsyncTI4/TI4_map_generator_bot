@@ -44,6 +44,8 @@ public class Map {
     private boolean hasEnded = false;
 
     @Nullable
+    private MessageChannel tableTalkChannel = null;
+    @Nullable
     private MessageChannel mainChannel = null;
     @Nullable
     private ThreadChannel botMapChannel = null;
@@ -244,6 +246,14 @@ public class Map {
             put("DiscordantStars", isDiscordantStarsMode());
         }};
         return gameModes.entrySet().stream().filter(gm -> gm.getValue()).map(java.util.Map.Entry::getKey).collect(Collectors.joining(", "));
+    }
+
+    public void setTableTalkChannel(MessageChannel channel) {
+        tableTalkChannel = channel;
+    }
+
+    public MessageChannel getTableTalkChannel() {
+        return tableTalkChannel;
     }
 
     public void setMainGameChannel(MessageChannel channel) {

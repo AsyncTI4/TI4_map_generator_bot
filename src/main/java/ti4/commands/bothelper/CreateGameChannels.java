@@ -23,7 +23,9 @@ import ti4.commands.map.CreateGame;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
+import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.map.MapSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
@@ -117,6 +119,10 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
 
+        //CREATE GAME
+        CreateGame createGame = new CreateGame();
+        Map map = createGame.createNewGame(event, gameName, gameOwner);
+
         //CREATE CHANNELS
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
         String newChatChannelName = gameName + "-" + gameFunName;
@@ -132,6 +138,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .complete();
         MessageHelper.sendMessageToChannel((MessageChannel) chatChannel, role.getAsMention()+ " - table talk channel");
         message.append("> " + chatChannel.getAsMention()).append("\n");
+        map.setTableTalkChannel(chatChannel);
 
         //ACTIONS CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
@@ -140,6 +147,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .complete();
         MessageHelper.sendMessageToChannel((MessageChannel) actionsChannel, role.getAsMention() + " - actions channel");
         message.append("> " + actionsChannel.getAsMention()).append("\n");
+        map.setMainGameChannel(actionsChannel);
 
         //BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
@@ -160,11 +168,9 @@ public class CreateGameChannels extends BothelperSubcommandData {
         MessageHelper.sendMessageToChannel((MessageChannel) botThread, botGetStartedMessage.toString());
         MessageHelper.sendMessageToChannelAndPin((MessageChannel) botThread, "Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
         message.append("> " + botThread.getAsMention()).append("\n");
-
-        CreateGame createGame = new CreateGame();
-        createGame.createNewGame(event, gameName, gameOwner);
         
         sendMessage(message.toString());
+        MapSaveLoadManager.saveMap(map);
     }
 
     private static String getNextGameName(Guild guild) {

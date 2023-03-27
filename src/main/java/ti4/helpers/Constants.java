@@ -242,6 +242,7 @@ public class Constants {
     public static final String LAST_ACTIVE_PLAYER_PING = "last_active_player_ping";
     public static final String LAST_ACTIVE_PLAYER_CHANGE = "last_active_player_change";
     
+    public static final String TABLE_TALK_CHANNEL = "table_talk_channel";
     public static final String MAIN_GAME_CHANNEL = "main_game_channel";
     public static final String BOT_MAP_CHANNEL = "bot_map_channel";
     public static final String CHANNEL1 = "channel1";
