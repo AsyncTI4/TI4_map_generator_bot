@@ -1258,10 +1258,10 @@ public class Helper {
         
         }
         int scoredObjectiveCount = scoredPOCount + scoredSOCount;
-        if (scoredObjectiveCount >= 3) {
-            UnlockLeader ul = new UnlockLeader();
-            ul.unlockLeader(event, "hero", activeMap, player);
-        }
+        // if (scoredObjectiveCount >= 3) {
+        //     UnlockLeader ul = new UnlockLeader();
+        //     ul.unlockLeader(event, "hero", activeMap, player);
+        // }
     }
 
     public static void checkIfHeroUnlocked(ButtonInteractionEvent event, Map activeMap, Player player) {
@@ -1277,9 +1277,9 @@ public class Helper {
         
         }
         int scoredObjectiveCount = scoredPOCount + scoredSOCount;
-        if (scoredObjectiveCount >= 3) {
-            UnlockLeader ul = new UnlockLeader();
-            ul.unlockLeader(event, "hero", activeMap, player);
-        }
+        // if (scoredObjectiveCount >= 3) {
+        //     UnlockLeader ul = new UnlockLeader();
+        //     ul.unlockLeader(event, "hero", activeMap, player);
+        // }
     }
 }
