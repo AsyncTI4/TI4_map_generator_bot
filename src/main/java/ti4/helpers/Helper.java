@@ -421,7 +421,7 @@ public class Helper {
     public static int getPlanetResources(String planetID, Map map) {
         UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
-            return -1;
+            return 0;
         } else {
             Planet planet = (Planet) unitHolder;
             return planet.getResources();
@@ -431,7 +431,7 @@ public class Helper {
     public static int getPlanetInfluence(String planetID, Map map) {
         UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
-            return -1;
+            return 0;
         } else {
             Planet planet = (Planet) unitHolder;
             return planet.getInfluence();
