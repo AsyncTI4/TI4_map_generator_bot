@@ -40,7 +40,7 @@ public class AdminCommand implements Command {
                         return true;
                     }
                 }
-                MessageHelper.replyToMessage(event, "Not Authorized command attempt");
+                MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have the @Admin role.");
                 return false;
             }
         }
