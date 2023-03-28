@@ -37,6 +37,9 @@ import ti4.helpers.Storage;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.BotLogger;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.security.auth.login.LoginException;
 
 public class MapGenerator {
@@ -45,9 +48,12 @@ public class MapGenerator {
     public static String userID;
     public static Guild guild;
     public static String adminID;
-    public static Role adminRole;
-    public static Role developerRole;
-    public static Role bothelperRole;
+    public static List<Role> adminRoles = new ArrayList<>();
+    public static List<Role> developerRoles = new ArrayList<>();
+    public static List<Role> bothelperRoles = new ArrayList<>();
+    // public static Role adminRole;
+    // public static Role developerRole;
+    // public static Role bothelperRole;
 
     public static void main(String[] args)
             throws LoginException {
@@ -73,9 +79,25 @@ public class MapGenerator {
         AliasHandler.init();
         Storage.init();
 
-        adminRole = jda.getRoleById("943596173896323072");
-        developerRole = jda.getRoleById("947648366056185897");
-        bothelperRole = jda.getRoleById("970033771179028531");
+        //ROLES - FOR COMMAND PERMISSIONS
+        //ADMIN ROLES
+        adminRoles.add(jda.getRoleById("943596173896323072")); // Async TI4 Server
+        adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
+        adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
+        adminRoles.removeIf(r -> r == null);
+        
+        //DEVELOPER ROLES
+        developerRoles.addAll(adminRoles); //admins can also execute developer commands
+        developerRoles.add(jda.getRoleById("947648366056185897")); // Async TI4 Server
+        developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
+        developerRoles.removeIf(r -> r == null);
+
+        //BOTHELPER ROLES
+        bothelperRoles.addAll(developerRoles); //admins and developers can also execute bothelper commands
+        bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server
+        bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
+        bothelperRoles.removeIf(r -> r == null);
+        
 
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddTile());
