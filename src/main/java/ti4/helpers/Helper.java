@@ -1022,7 +1022,6 @@ public class Helper {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
         int resourcesCount = 0;
