@@ -363,8 +363,6 @@ public class GenerateMap {
                 String pnImage = "pa_cardbacks_pn.png";
                 String tradeGoodImage = "pa_cardbacks_tradegoods.png";
                 String commoditiesImage = "pa_cardbacks_commodities.png";
-                String resourcesImage = "pa_cardbacks_resources.png";
-                String influenceImage = "pa_cardbacks_influence.png";
                 drawPAImage(x + 150, y + yDelta, soImage);
                 graphics.drawString(Integer.toString(player.getSo()), x + 170, y + deltaY + 50);
 
@@ -382,18 +380,6 @@ public class GenerateMap {
                 drawPAImage(x + 410, y + yDelta, commoditiesImage);
                 String comms = player.getCommodities() + "/" + player.getCommoditiesTotal();
                 graphics.drawString(comms, x + 415, y + deltaY + 50);
-
-                //RESOURCE/INFLUENCE TOTALS
-                int totalPlayerResources = Helper.getPlayerResourcesTotal(player, map);
-                int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, map);
-                int totalPlayerInfluence = Helper.getPlayerInfluenceTotal(player, map);
-                int availablePlayerInfluence = Helper.getPlayerInfluenceAvailable(player, map);
-                drawGeneralImage(x - 25, y + 59, "Ressources.png");
-                drawGeneralImage(x - 25, y + 59, "pc_res_" + totalPlayerResources + "_rdy" + ".png");
-                drawGeneralImage(x - 25, y + 81, "pc_res_" + availablePlayerResources + "_rdy" + ".png");
-                drawGeneralImage(x - 25, y + 103, "Influence.png");
-                drawGeneralImage(x - 25, y + 103, "pc_inf_" + totalPlayerInfluence + "_rdy" + ".png");
-                drawGeneralImage(x - 25, y + 125, "pc_inf_" + availablePlayerInfluence + "_rdy" + ".png");
 
                 int vrf = player.getVrf();
                 int irf = player.getIrf();
@@ -828,6 +814,29 @@ public class GenerateMap {
                 BotLogger.log("could not print out planet: " + planet.toLowerCase());
             }
         }
+
+        //RESOURCE/INFLUENCE TOTALS
+        int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, map);
+        int totalPlayerResources = Helper.getPlayerResourcesTotal(player, map);
+        int availablePlayerResourcesOptimal = 0; //Helper.getPlayerResourcesAvailable(player, map);
+        int totalPlayerResourcesOptimal = 0; //Helper.getPlayerResourcesTotal(player, map);
+        int availablePlayerInfluence = Helper.getPlayerInfluenceAvailable(player, map);
+        int totalPlayerInfluence = Helper.getPlayerInfluenceTotal(player, map);
+        int availablePlayerInfluenceOptimal = 0; //Helper.getPlayerInfluenceAvailable(player, map);
+        int totalPlayerInfluenceOptimal = 0; //Helper.getPlayerInfluenceTotal(player, map);
+        drawPAImage(x + deltaX, y - 2, "pa_resinf_info.png");
+        graphics.setColor(Color.WHITE);
+        graphics.setFont(Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(availablePlayerResources), new Rectangle(x + deltaX + 34, y + 7, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(totalPlayerResources), new Rectangle(x + deltaX + 34, y + 41, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(availablePlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 75, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(totalPlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 109, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(availablePlayerInfluence), new Rectangle(x + deltaX + 185, y + 7, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(totalPlayerInfluence), new Rectangle(x + deltaX + 185, y + 41, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(availablePlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 75, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(totalPlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 109, 32, 32), Storage.getFont32());
+        deltaX += 250;
+
         return x + deltaX + 20;
     }
 
@@ -2415,5 +2424,25 @@ public class GenerateMap {
             }
         }
         return image;
+    }
+
+    /**
+     * Draw a String centered in the middle of a Rectangle.
+     *
+     * @param g The Graphics instance.
+     * @param text The String to draw.
+     * @param rect The Rectangle to center the text in.
+     */
+    public void drawCenteredString(Graphics g, String text, Rectangle rect, Font font) {
+        // Get the FontMetrics
+        FontMetrics metrics = g.getFontMetrics(font);
+        // Determine the X coordinate for the text
+        int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
+        // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
+        int y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
+        // Set the font
+        g.setFont(font);
+        // Draw the String
+        g.drawString(text, x, y);
     }
 }
