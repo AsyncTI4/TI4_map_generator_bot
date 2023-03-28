@@ -39,8 +39,10 @@ public class SetGame implements Command {
         Member member = event.getMember();
         if (member != null) {
             java.util.List<Role> roles = member.getRoles();
-            if (roles.contains(MapGenerator.adminRole)) {
-                return true;
+            for (Role role : MapGenerator.adminRoles) {
+                if (roles.contains(role)) {
+                    return true;
+                }
             }
         }
         if (!map.getPlayerIDs().contains(userID) && !userID.equals(map.getOwnerID())){
