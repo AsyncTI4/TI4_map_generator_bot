@@ -1,6 +1,7 @@
 package ti4.map;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import ti4.MapGenerator;
@@ -358,6 +359,8 @@ public class Player {
         User userById = MapGenerator.jda.getUserById(userID);
         if (userById != null) {
             userName = userById.getName();
+            Member member = MapGenerator.guild.getMemberById(userID);
+            if (member != null) userName = member.getEffectiveName();
         }
         return userName;
     }
