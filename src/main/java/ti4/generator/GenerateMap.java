@@ -363,6 +363,8 @@ public class GenerateMap {
                 String pnImage = "pa_cardbacks_pn.png";
                 String tradeGoodImage = "pa_cardbacks_tradegoods.png";
                 String commoditiesImage = "pa_cardbacks_commodities.png";
+                String resourcesImage = "pa_cardbacks_resources.png";
+                String influenceImage = "pa_cardbacks_influence.png";
                 drawPAImage(x + 150, y + yDelta, soImage);
                 graphics.drawString(Integer.toString(player.getSo()), x + 170, y + deltaY + 50);
 
@@ -380,6 +382,18 @@ public class GenerateMap {
                 drawPAImage(x + 410, y + yDelta, commoditiesImage);
                 String comms = player.getCommodities() + "/" + player.getCommoditiesTotal();
                 graphics.drawString(comms, x + 415, y + deltaY + 50);
+
+                //RESOURCE/INFLUENCE TOTALS
+                int totalPlayerResources = Helper.getPlayerResourcesTotal(player, map);
+                int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, map);
+                int totalPlayerInfluence = Helper.getPlayerInfluenceTotal(player, map);
+                int availablePlayerInfluence = Helper.getPlayerInfluenceAvailable(player, map);
+                drawGeneralImage(x - 25, y + 59, "Ressources.png");
+                drawGeneralImage(x - 25, y + 59, "pc_res_" + totalPlayerResources + "_rdy" + ".png");
+                drawGeneralImage(x - 25, y + 81, "pc_res_" + availablePlayerResources + "_rdy" + ".png");
+                drawGeneralImage(x - 25, y + 103, "Influence.png");
+                drawGeneralImage(x - 25, y + 103, "pc_inf_" + totalPlayerInfluence + "_rdy" + ".png");
+                drawGeneralImage(x - 25, y + 125, "pc_inf_" + availablePlayerInfluence + "_rdy" + ".png");
 
                 int vrf = player.getVrf();
                 int irf = player.getIrf();
@@ -725,7 +739,7 @@ public class GenerateMap {
         List<String> planets = player.getPlanets();
         List<String> exhaustedPlanets = player.getExhaustedPlanets();
         List<String> exhaustedPlanetsAbilities = player.getExhaustedPlanetsAbilities();
-        
+
         int deltaX = 0;
         
         Graphics2D g2 = (Graphics2D) graphics;
@@ -957,6 +971,17 @@ public class GenerateMap {
         graphics.drawRect(x + deltaX - 2, y - 2, 224, 152);
         deltaX += 228;
         return deltaX;
+    }
+
+    private void drawGeneralImage(int x, int y, String resourceName) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getGeneralFile(resourceName);
+            @SuppressWarnings("ConstantConditions")
+            BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
+            graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            BotLogger.log("Could not display General image: " + resourceName);
+        }
     }
 
     private void drawPlanetImage(int x, int y, String resourceName) {
