@@ -88,7 +88,7 @@ public class ResourceHelper {
         {
             return unitPath;
         }
-        String tile = getResourceFromFolder("general/", name, "Could not find faction file");
+        String tile = getResourceFromFolder("general/", name, "Could not find general file");
         generalCache.put(name, tile);
         return tile;
     }
