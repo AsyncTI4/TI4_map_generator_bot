@@ -725,8 +725,29 @@ public class GenerateMap {
         List<String> planets = player.getPlanets();
         List<String> exhaustedPlanets = player.getExhaustedPlanets();
         List<String> exhaustedPlanetsAbilities = player.getExhaustedPlanetsAbilities();
-        
+
         int deltaX = 0;
+        //RESOURCE/INFLUENCE TOTALS
+        int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, map);
+        int totalPlayerResources = Helper.getPlayerResourcesTotal(player, map);
+        int availablePlayerResourcesOptimal = Helper.getPlayerOptimalResourcesAvailable(player, map);
+        int totalPlayerResourcesOptimal = Helper.getPlayerOptimalResourcesTotal(player, map);
+        int availablePlayerInfluence = Helper.getPlayerInfluenceAvailable(player, map);
+        int totalPlayerInfluence = Helper.getPlayerInfluenceTotal(player, map);
+        int availablePlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceAvailable(player, map);
+        int totalPlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceTotal(player, map);
+        drawPAImage(x + deltaX, y - 2, "pa_resinf_info.png");
+        graphics.setColor(Color.WHITE);
+        graphics.setFont(Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(availablePlayerResources), new Rectangle(x + deltaX + 34, y + 7, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(totalPlayerResources), new Rectangle(x + deltaX + 34, y + 41, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(availablePlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 75, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(totalPlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 109, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(availablePlayerInfluence), new Rectangle(x + deltaX + 185, y + 7, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(totalPlayerInfluence), new Rectangle(x + deltaX + 185, y + 41, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(availablePlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 75, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(totalPlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 109, 32, 32), Storage.getFont32());
+        deltaX += 254;
         
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
@@ -814,6 +835,7 @@ public class GenerateMap {
                 BotLogger.log("could not print out planet: " + planet.toLowerCase());
             }
         }
+
         return x + deltaX + 20;
     }
 
@@ -957,6 +979,17 @@ public class GenerateMap {
         graphics.drawRect(x + deltaX - 2, y - 2, 224, 152);
         deltaX += 228;
         return deltaX;
+    }
+
+    private void drawGeneralImage(int x, int y, String resourceName) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getGeneralFile(resourceName);
+            @SuppressWarnings("ConstantConditions")
+            BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
+            graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            BotLogger.log("Could not display General image: " + resourceName);
+        }
     }
 
     private void drawPlanetImage(int x, int y, String resourceName) {
@@ -2390,5 +2423,25 @@ public class GenerateMap {
             }
         }
         return image;
+    }
+
+    /**
+     * Draw a String centered in the middle of a Rectangle.
+     *
+     * @param g The Graphics instance.
+     * @param text The String to draw.
+     * @param rect The Rectangle to center the text in.
+     */
+    public void drawCenteredString(Graphics g, String text, Rectangle rect, Font font) {
+        // Get the FontMetrics
+        FontMetrics metrics = g.getFontMetrics(font);
+        // Determine the X coordinate for the text
+        int x = rect.x + (rect.width - metrics.stringWidth(text)) / 2;
+        // Determine the Y coordinate for the text (note we add the ascent, as in java 2d 0 is top of the screen)
+        int y = rect.y + ((rect.height - metrics.getHeight()) / 2) + metrics.getAscent();
+        // Set the font
+        g.setFont(font);
+        // Draw the String
+        g.drawString(text, x, y);
     }
 }
