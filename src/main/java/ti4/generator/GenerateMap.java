@@ -727,6 +727,27 @@ public class GenerateMap {
         List<String> exhaustedPlanetsAbilities = player.getExhaustedPlanetsAbilities();
 
         int deltaX = 0;
+        //RESOURCE/INFLUENCE TOTALS
+        int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, map);
+        int totalPlayerResources = Helper.getPlayerResourcesTotal(player, map);
+        int availablePlayerResourcesOptimal = Helper.getPlayerOptimalResourcesAvailable(player, map);
+        int totalPlayerResourcesOptimal = Helper.getPlayerOptimalResourcesTotal(player, map);
+        int availablePlayerInfluence = Helper.getPlayerInfluenceAvailable(player, map);
+        int totalPlayerInfluence = Helper.getPlayerInfluenceTotal(player, map);
+        int availablePlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceAvailable(player, map);
+        int totalPlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceTotal(player, map);
+        drawPAImage(x + deltaX, y - 2, "pa_resinf_info.png");
+        graphics.setColor(Color.WHITE);
+        graphics.setFont(Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(availablePlayerResources), new Rectangle(x + deltaX + 34, y + 7, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(totalPlayerResources), new Rectangle(x + deltaX + 34, y + 41, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(availablePlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 75, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(totalPlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 109, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(availablePlayerInfluence), new Rectangle(x + deltaX + 185, y + 7, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(totalPlayerInfluence), new Rectangle(x + deltaX + 185, y + 41, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(availablePlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 75, 32, 32), Storage.getFont32());
+        drawCenteredString(graphics, String.valueOf(totalPlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 109, 32, 32), Storage.getFont32());
+        deltaX += 254;
         
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
@@ -814,28 +835,6 @@ public class GenerateMap {
                 BotLogger.log("could not print out planet: " + planet.toLowerCase());
             }
         }
-
-        //RESOURCE/INFLUENCE TOTALS
-        int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, map);
-        int totalPlayerResources = Helper.getPlayerResourcesTotal(player, map);
-        int availablePlayerResourcesOptimal = 0; //Helper.getPlayerResourcesAvailable(player, map);
-        int totalPlayerResourcesOptimal = 0; //Helper.getPlayerResourcesTotal(player, map);
-        int availablePlayerInfluence = Helper.getPlayerInfluenceAvailable(player, map);
-        int totalPlayerInfluence = Helper.getPlayerInfluenceTotal(player, map);
-        int availablePlayerInfluenceOptimal = 0; //Helper.getPlayerInfluenceAvailable(player, map);
-        int totalPlayerInfluenceOptimal = 0; //Helper.getPlayerInfluenceTotal(player, map);
-        drawPAImage(x + deltaX, y - 2, "pa_resinf_info.png");
-        graphics.setColor(Color.WHITE);
-        graphics.setFont(Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(availablePlayerResources), new Rectangle(x + deltaX + 34, y + 7, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(totalPlayerResources), new Rectangle(x + deltaX + 34, y + 41, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(availablePlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 75, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(totalPlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 109, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(availablePlayerInfluence), new Rectangle(x + deltaX + 185, y + 7, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(totalPlayerInfluence), new Rectangle(x + deltaX + 185, y + 41, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(availablePlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 75, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(totalPlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 109, 32, 32), Storage.getFont32());
-        deltaX += 250;
 
         return x + deltaX + 20;
     }
