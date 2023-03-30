@@ -359,7 +359,7 @@ public class Player {
         User userById = MapGenerator.jda.getUserById(userID);
         if (userById != null) {
             userName = userById.getName();
-            Member member = MapGenerator.guild.getMemberById(userID);
+            Member member = MapGenerator.guildPrimary.getMemberById(userID);
             if (member != null) userName = member.getEffectiveName();
         }
         return userName;

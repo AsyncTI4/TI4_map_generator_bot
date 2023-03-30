@@ -46,7 +46,10 @@ public class MapGenerator {
 
     public static JDA jda;
     public static String userID;
-    public static Guild guild;
+    public static Guild guildPrimary = null;
+    public static Guild guildSecondary = null;
+    public static Guild guildFogOfWar = null;
+    public static Guild guildCommunityPlays = null;
     public static String adminID;
     public static List<Role> adminRoles = new ArrayList<>();
     public static List<Role> developerRoles = new ArrayList<>();
@@ -137,39 +140,39 @@ public class MapGenerator {
         commandManager.addCommand(new FOWCommand());
         commandManager.addCommand(new MiltyCommand());
 
-        guild = jda.getGuildById(args[2]);
+        guildPrimary = jda.getGuildById(args[2]);
 
-        CommandListUpdateAction commands = guild.updateCommands();
+        CommandListUpdateAction commands = guildPrimary.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
         commands.queue();
 
         //TI Community game
         if (args.length >= 4) {
-            Guild guild2 = jda.getGuildById(args[3]);
-            BotLogger.log("BOT STARTED UP: " + guild2.getName());
-            CommandListUpdateAction commandsC = guild2.updateCommands();
+            guildCommunityPlays = jda.getGuildById(args[3]);
+            BotLogger.log("BOT STARTED UP: " + guildCommunityPlays.getName());
+            CommandListUpdateAction commandsC = guildCommunityPlays.updateCommands();
             commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
             commandsC.queue();
         }
 
         //FOW game
         if (args.length >= 5) {
-            Guild guild3 = jda.getGuildById(args[4]);
-            BotLogger.log("BOT STARTED UP: " + guild3.getName());
-            CommandListUpdateAction commandsD = guild3.updateCommands();
+            Guild guildFogOfWar = jda.getGuildById(args[4]);
+            BotLogger.log("BOT STARTED UP: " + guildFogOfWar.getName());
+            CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
             commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
             commandsD.queue();
         }
 
         //Async Secondary
         if (args.length >= 6) {
-            Guild guild4 = jda.getGuildById(args[5]);
-            BotLogger.log("BOT STARTED UP: " + guild4.getName());
-            CommandListUpdateAction commandsD = guild4.updateCommands();
+            guildSecondary = jda.getGuildById(args[5]);
+            BotLogger.log("BOT STARTED UP: " + guildSecondary.getName());
+            CommandListUpdateAction commandsD = guildSecondary.updateCommands();
             commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
             commandsD.queue();
         }
-        BotLogger.log("BOT STARTED UP: " + guild.getName());
+        BotLogger.log("BOT STARTED UP: " + guildPrimary.getName());
         MapSaveLoadManager.loadMaps();
     }
 }
