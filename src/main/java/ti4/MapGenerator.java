@@ -175,6 +175,7 @@ public class MapGenerator {
             commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
             commandsD.queue();
         }
+
         BotLogger.log("BOT STARTED UP: " + guildPrimary.getName());
         MapSaveLoadManager.loadMaps();
     }
