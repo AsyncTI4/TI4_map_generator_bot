@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.MapGenerator;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
@@ -87,9 +88,9 @@ public class GameEnd extends GameSubcommandData {
         MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         
         //INFORM BOTHELPER
-        MessageHelper.sendMessageToChannel(event.getChannel(), event.getGuild().getRolesByName("Bothelper", true).get(0).getAsMention() + " - this game has concluded");
+        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getEventGuildRole(event, "bothelper").getAsMention() + " - this game has concluded");
         // TextChannel bothelperLoungeChannel = event.getGuild().getTextChannelById(1029569891193331712l);
-        TextChannel bothelperLoungeChannel = event.getGuild().getTextChannelsByName("bothelper-lounge", true).get(0);
+        TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
         if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, event.getChannel().getAsMention() + " - Game: " + gameName + " has concluded.\nReact here when a post has been made in " + channelMention + ", and channels moved to the 'In Limbo Archive' category.");      
     
         //MOVE CHANNELS TO IN-LIMBO
