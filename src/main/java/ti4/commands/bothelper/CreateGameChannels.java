@@ -2,6 +2,7 @@ package ti4.commands.bothelper;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
@@ -50,7 +51,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Guild guild = null;
-
+        
+        
         //SERVER TO CREATE ON
         OptionMapping serverOption = event.getOption(Constants.SERVER);
         if (serverOption != null ) {
@@ -59,7 +61,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
             } else if (serverOption.getAsString().equalsIgnoreCase("Secondary")) {
                 guild = MapGenerator.guildSecondary;
             } else {
-                sendMessage("Bad server. Try again.");
+                sendMessage("Bad server **" + serverOption.getAsString() + "**. Try again.");
+                return;
+            }
+            if (!serverCanHostNewGame(guild)) {
+                sendMessage("Server **" + guild.getName() + "** is not available for new games.");
                 return;
             }
         } else {
@@ -68,16 +74,20 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 sendMessage("No server available for new games.");
                 return;
             }
-        }     
+        }
 
         //GAME NAME
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
         String gameName = null;
         if (gameNameOption != null) {
             gameName = gameNameOption.getAsString();
+            if (gameOrRoleAlreadyExists(gameName)) {
+                sendMessage("Role or Game: **" + gameName + "** already exists accross all supported servers. Try again with a new name.");
+                return;
+            }
         } else {
-            gameName = getNextGameName(guild);
-        }        
+            gameName = getNextGameName();
+        }
         
         //CHECK ROLE IS VALID
         if (guild.getRolesByName(gameName, false).size() > 0) {
@@ -87,7 +97,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //CHECK ROLE COUNT
         int roleCount = guild.getRoles().size();
-        if (roleCount >= 250) {
+        if (!serverHasRoomForNewRole(guild)) {
             sendMessage("Server **" + guild.getName() + "** is at the role limit - please contact @Admin to resolve.");
             BotLogger.log(event, "Cannot create a new role. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return;
@@ -97,7 +107,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //CHECK SERVER CHANNEL COUNT
         int channelCount = guild.getChannels().size();
-        if (channelCount > 498) {
+        if (!serverHasRoomForNewChannels(guild)) {
             sendMessage("Server **" + guild.getName() + "** is at the channel limit - please contact @Admin to resolve.");
             BotLogger.log(event, "Cannot create new channels. Server **" + guild.getName() + "** currently has " + channelCount + " channels.");
             return;
@@ -110,7 +120,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         if (categoryChannel == null || categoryChannel.getType() != ChannelType.CATEGORY) {
             sendMessage("Category: **" + categoryChannel.getName() + "** does not exist on server **" + guild.getName() + "**. Create the category or pick a different category, then try again.");
             return;
-        } 
+        }
         
         //CHECK IF CATEGORY HAS ROOM
         Category category = categoryChannel.asCategory();
@@ -204,21 +214,55 @@ public class CreateGameChannels extends BothelperSubcommandData {
         MapSaveLoadManager.saveMap(map);
     }
 
-    private static String getNextGameName(Guild guild) {
-        List<Role> pbdRoles = guild.getRoles().stream()
-            .filter(r -> r.getName().startsWith("pbd"))
-            .toList();
-        
-        //EXISTING ROLE NAMES
-        ArrayList<Integer> pbdNumbers = new ArrayList<>();
-        for (Role role : pbdRoles) {
-            String pbdNum = role.getName().replace("pbd", "");
-            if (Helper.isInteger(pbdNum)) {
-                pbdNumbers.add(Integer.parseInt(pbdNum));
-            }
-        }
+    private static String getNextGameName() {
+        int nextPBDNumber = Collections.max(getAllExistingPBDNumbers()) + 1;
+        return "pbd" + nextPBDNumber;
+    }
 
-        //EXISTING MAP NAMES
+    private static boolean gameOrRoleAlreadyExists(String name) {
+        List<Guild> guilds = MapGenerator.jda.getGuilds();
+        ArrayList<String> gameAndRoleNames = new ArrayList<>();
+
+        // GET ALL PBD ROLES FROM ALL GUILDS
+        for (Guild guild : guilds) {
+            //EXISTING ROLE NAMES
+            for (Role role : guild.getRoles()) {
+                gameAndRoleNames.add(role.getName());
+            }
+        }           
+        
+        // GET ALL EXISTING PBD MAP NAMES
+        HashSet<String> mapNames = new HashSet<>(MapManager.getInstance().getMapList().keySet());
+        gameAndRoleNames.addAll(mapNames);
+
+        if (mapNames.contains(name)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private static ArrayList<Integer> getAllExistingPBDNumbers() {
+        List<Guild> guilds = MapGenerator.jda.getGuilds();
+        ArrayList<Integer> pbdNumbers = new ArrayList<>();
+
+        // GET ALL PBD ROLES FROM ALL GUILDS
+        for (Guild guild : guilds) {
+            System.out.println(guild.getName());
+            List<Role> pbdRoles = guild.getRoles().stream()
+                .filter(r -> r.getName().startsWith("pbd"))
+                .toList();
+
+            //EXISTING ROLE NAMES
+            for (Role role : pbdRoles) {
+                String pbdNum = role.getName().replace("pbd", "");
+                if (Helper.isInteger(pbdNum)) {
+                    pbdNumbers.add(Integer.parseInt(pbdNum));
+                }
+            }
+        }           
+        
+        // GET ALL EXISTING PBD MAP NAMES
         List<String> mapNames = MapManager.getInstance().getMapList().keySet().stream()
             .filter(mapName -> mapName.startsWith("pbd"))
             .toList();
@@ -228,29 +272,44 @@ public class CreateGameChannels extends BothelperSubcommandData {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }
         }
-
-        int nextPBDNumber = Collections.max(pbdNumbers) + 1;
-        return "pbd" + nextPBDNumber;
+        return pbdNumbers;
     }
 
     private static Guild getNextAvailableServer() {
-        if (isServerAvailable(MapGenerator.guildPrimary)) {
+        if (serverCanHostNewGame(MapGenerator.guildPrimary)) {
             return MapGenerator.guildPrimary;
-        } else if (isServerAvailable(MapGenerator.guildSecondary)) {
+        } else if (serverCanHostNewGame(MapGenerator.guildSecondary)) {
             return MapGenerator.guildSecondary;
         } else {
             return null;
         }        
     }
 
-    private static boolean isServerAvailable(Guild guild) {
-        if (guild == null) return false;
-
-
-
-
-        
+    private static boolean serverCanHostNewGame(Guild guild) {
+        if (guild != null   && serverHasRoomForNewRole(guild)
+                            && serverHasRoomForNewChannels(guild))
+                            {
+            return true;
+        }         
         return false;
+    }
+
+    private static boolean serverHasRoomForNewRole(Guild guild) {
+        int roleCount = guild.getRoles().size();
+        if (roleCount >= 250) {
+            return false;
+        }
+        return true;
+    }
+
+    private static boolean serverHasRoomForNewChannels(Guild guild) {
+        int channelCount = guild.getChannels().size();
+        int channelMax = 500;
+        int channelsCountRequiredForNewGame = 2;
+        if (channelCount > (channelMax - channelsCountRequiredForNewGame)) {
+            return false;
+        }
+        return true;
     }
 
     private static Category getNextAvailableCategory(Guild guild) {
