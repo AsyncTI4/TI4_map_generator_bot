@@ -561,4 +561,5 @@ public class Constants {
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
     public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
     public static final String BEGIN_VIDEO_GEN = "begin_video_gen";
+    public static final String SERVER = "server";
 }

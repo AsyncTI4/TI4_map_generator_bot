@@ -12,6 +12,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -1382,6 +1383,14 @@ public class Helper {
                 UnlockLeader ul = new UnlockLeader();
                 ul.unlockLeader(event, "hero", activeMap, player);
             }
+        }
+    }
+
+    public static Role getEventGuildRole(GenericInteractionCreateEvent event, String roleName) {
+        try {
+            return event.getGuild().getRolesByName(roleName, true).get(0);
+        } catch (Exception e) {
+            return null;
         }
     }
 }
