@@ -51,9 +51,6 @@ public class MapGenerator {
     public static List<Role> adminRoles = new ArrayList<>();
     public static List<Role> developerRoles = new ArrayList<>();
     public static List<Role> bothelperRoles = new ArrayList<>();
-    // public static Role adminRole;
-    // public static Role developerRole;
-    // public static Role bothelperRole;
 
     public static void main(String[] args)
             throws LoginException {
@@ -160,6 +157,15 @@ public class MapGenerator {
             Guild guild3 = jda.getGuildById(args[4]);
             BotLogger.log("BOT STARTED UP: " + guild3.getName());
             CommandListUpdateAction commandsD = guild3.updateCommands();
+            commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
+            commandsD.queue();
+        }
+
+        //Async Secondary
+        if (args.length >= 6) {
+            Guild guild4 = jda.getGuildById(args[5]);
+            BotLogger.log("BOT STARTED UP: " + guild4.getName());
+            CommandListUpdateAction commandsD = guild4.updateCommands();
             commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
             commandsD.queue();
         }
