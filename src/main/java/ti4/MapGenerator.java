@@ -160,7 +160,7 @@ public class MapGenerator {
 
         //FOW game
         if (args.length >= 5) {
-            Guild guildFogOfWar = jda.getGuildById(args[4]);
+            guildFogOfWar = jda.getGuildById(args[4]);
             BotLogger.log("BOT STARTED UP: " + guildFogOfWar.getName());
             CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
             commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));

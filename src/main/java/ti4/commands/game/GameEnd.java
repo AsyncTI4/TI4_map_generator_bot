@@ -76,7 +76,7 @@ public class GameEnd extends GameSubcommandData {
         MessageHelper.replyToMessage(event, file);
         
         //ASK USERS FOR SUMMARY
-        TextChannel pbdChroniclesChannel = event.getGuild().getTextChannelsByName("the-pbd-chronicles", true).get(0);
+        TextChannel pbdChroniclesChannel = event.getJDA().getTextChannelsByName("the-pbd-chronicles", true).get(0);
         String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles" : pbdChroniclesChannel.getAsMention();
         StringBuilder message = new StringBuilder();
         for (String playerID : userActiveMap.getPlayerIDs()) {
@@ -89,9 +89,8 @@ public class GameEnd extends GameSubcommandData {
         
         //INFORM BOTHELPER
         MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getEventGuildRole(event, "bothelper").getAsMention() + " - this game has concluded");
-        // TextChannel bothelperLoungeChannel = event.getGuild().getTextChannelById(1029569891193331712l);
         TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
-        if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, event.getChannel().getAsMention() + " - Game: " + gameName + " has concluded.\nReact here when a post has been made in " + channelMention + ", and channels moved to the 'In Limbo Archive' category.");      
+        if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, event.getChannel().getAsMention() + " - Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.\nReact here when a post has been made in " + channelMention);      
     
         //MOVE CHANNELS TO IN-LIMBO
         Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
