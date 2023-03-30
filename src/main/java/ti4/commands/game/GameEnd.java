@@ -1,7 +1,10 @@
 package ti4.commands.game;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -18,6 +21,7 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
+import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class GameEnd extends GameSubcommandData {
@@ -87,16 +91,68 @@ public class GameEnd extends GameSubcommandData {
         MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
         
         //INFORM BOTHELPER
-        MessageHelper.sendMessageToChannel(event.getChannel(), event.getGuild().getRolesByName("Bothelper", true).get(0).getAsMention() + " - this game has concluded");
+        MessageHelper.sendMessageToChannel(event.getChannel(), event.getGuild().getRolesByName("Bothelper", true).get(0).getAsMention() + " - this game has concluded.");
         // TextChannel bothelperLoungeChannel = event.getGuild().getTextChannelById(1029569891193331712l);
         TextChannel bothelperLoungeChannel = event.getGuild().getTextChannelsByName("bothelper-lounge", true).get(0);
-        if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, event.getChannel().getAsMention() + " - Game: " + gameName + " has concluded.\nReact here when a post has been made in " + channelMention + ", and channels moved to the 'In Limbo Archive' category.");      
+        if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, event.getChannel().getAsMention() + " - Game: " + gameName + " has concluded.\nReact here when a post has been made in " + channelMention);      
     
         //MOVE CHANNELS TO IN-LIMBO
         Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
         TextChannel tableTalkChannel = (TextChannel) userActiveMap.getTableTalkChannel();
-        if (inLimboCategory != null && tableTalkChannel != null) tableTalkChannel.getManager().setParent(inLimboCategory).queue();
-        TextChannel actionsChannel = (TextChannel) userActiveMap.getMainGameChannel();
-        if (inLimboCategory != null && actionsChannel != null) actionsChannel.getManager().setParent(inLimboCategory).queue();
+        if (inLimboCategory != null) {
+            if (tableTalkChannel != null) {
+                tableTalkChannel.getManager().setParent(inLimboCategory).queue();
+                MessageHelper.sendMessageToChannel(tableTalkChannel, "Channel has been moved to Category: " + inLimboCategory.getName());
+            }
+            TextChannel actionsChannel = (TextChannel) userActiveMap.getMainGameChannel();
+            if (actionsChannel != null) {
+                actionsChannel.getManager().setParent(inLimboCategory).queue();
+                MessageHelper.sendMessageToChannel(actionsChannel, "Channel has been moved to Category: " + inLimboCategory.getName());
+            }
+        }
+    }
+
+    public static String getGameEndText(Map map, SlashCommandInteractionEvent event) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("__**").append(map.getName()).append(" - ").append(map.getCustomName()).append("\n");
+        sb.append(map.getCreationDate()).append(" - ").append(map.getLastModifiedDate());
+        sb.append("\n");
+        sb.append("Players: ").append("\n");
+        HashMap<String, Player> players = map.getPlayers();
+        int index = 1;
+        for (Player player : players.values()) {
+            if (player.getFaction() != null && !player.isDummy()) {
+                sb.append("`").append(index).append(".` ").append(event.getJDA().getUserById(player.getUserID()).getAsMention()).append(Helper.getFactionIconFromDiscord(player.getFaction())).append("\n");
+                index++;
+            }
+        }
+        
+
+        sb.append("Game Info:").append("\n");
+        sb.append("Game name: " + map.getName()).append("\n");
+        sb.append("Game owner: " + map.getOwnerName()).append("\n");
+        sb.append("Game status: " + map.getMapStatus());
+        if (map.isHasEnded()) sb.append(" - GAME HAS ENDED");
+        sb.append("\n");
+        sb.append("Game Modes: " + map.getGameModesText()).append("\n");
+        sb.append("Created: " + map.getCreationDate()).append("\n");
+        sb.append("Last Modified: " + Helper.getDateRepresentation(map.getLastModifiedDate())).append("\n");
+
+        sb.append("Map String: `" + Helper.getMapString(map)).append("`").append("\n");
+
+        sb.append("Game player count: " + map.getPlayerCountForMap()).append("\n");
+
+            sb.append("Players: ").append("\n");
+            HashMap<String, Player> players = map.getPlayers();
+            int index = 1;
+            ArrayList<Player> playerNames = new ArrayList<>(players.values());
+            for (Player value : playerNames) {
+                if (value.getFaction() != null) {
+                    sb.append(index).append(". ").append(value.getUserName()).append(Helper.getFactionIconFromDiscord(value.getFaction())).append("\n");
+                    index++;
+                }
+            }
+
+        return sb.toString();
     }
 }
