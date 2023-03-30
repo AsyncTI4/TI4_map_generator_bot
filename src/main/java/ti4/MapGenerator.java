@@ -46,7 +46,10 @@ public class MapGenerator {
 
     public static JDA jda;
     public static String userID;
-    public static Guild guild;
+    public static Guild guildPrimary = null;
+    public static Guild guildSecondary = null;
+    public static Guild guildFogOfWar = null;
+    public static Guild guildCommunityPlays = null;
     public static String adminID;
     public static List<Role> adminRoles = new ArrayList<>();
     public static List<Role> developerRoles = new ArrayList<>();
@@ -78,20 +81,23 @@ public class MapGenerator {
 
         //ROLES - FOR COMMAND PERMISSIONS
         //ADMIN ROLES
-        adminRoles.add(jda.getRoleById("943596173896323072")); // Async TI4 Server
+        adminRoles.add(jda.getRoleById("943596173896323072")); // Async TI4 Server (Hub)
+        adminRoles.add(jda.getRoleById("1090914497352446042")); // Async Secondary
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
         adminRoles.removeIf(r -> r == null);
 
         //DEVELOPER ROLES
         developerRoles.addAll(adminRoles); //admins can also execute developer commands
-        developerRoles.add(jda.getRoleById("947648366056185897")); // Async TI4 Server
+        developerRoles.add(jda.getRoleById("947648366056185897")); // Async TI4 Server (Hub)
+        developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.removeIf(r -> r == null);
 
         //BOTHELPER ROLES
         bothelperRoles.addAll(developerRoles); //admins and developers can also execute bothelper commands
-        bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server
+        bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server (Hub)
+        bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.removeIf(r -> r == null);
 
@@ -137,40 +143,40 @@ public class MapGenerator {
         commandManager.addCommand(new FOWCommand());
         commandManager.addCommand(new MiltyCommand());
 
-        guild = jda.getGuildById(args[2]);
+        guildPrimary = jda.getGuildById(args[2]);
 
-        CommandListUpdateAction commands = guild.updateCommands();
+        CommandListUpdateAction commands = guildPrimary.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
         commands.queue();
 
         //TI Community game
         if (args.length >= 4) {
-            Guild guild2 = jda.getGuildById(args[3]);
-            BotLogger.log("BOT STARTED UP: " + guild2.getName());
-            CommandListUpdateAction commandsC = guild2.updateCommands();
+            guildCommunityPlays = jda.getGuildById(args[3]);
+            BotLogger.log("BOT STARTED UP: " + guildCommunityPlays.getName());
+            CommandListUpdateAction commandsC = guildCommunityPlays.updateCommands();
             commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
             commandsC.queue();
         }
 
         //FOW game
         if (args.length >= 5) {
-            Guild guild3 = jda.getGuildById(args[4]);
-            BotLogger.log("BOT STARTED UP: " + guild3.getName());
-            CommandListUpdateAction commandsD = guild3.updateCommands();
+            Guild guildFogOfWar = jda.getGuildById(args[4]);
+            BotLogger.log("BOT STARTED UP: " + guildFogOfWar.getName());
+            CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
             commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
             commandsD.queue();
         }
 
         //Async Secondary
         if (args.length >= 6) {
-            Guild guild4 = jda.getGuildById(args[5]);
-            BotLogger.log("BOT STARTED UP: " + guild4.getName());
-            CommandListUpdateAction commandsD = guild4.updateCommands();
+            guildSecondary = jda.getGuildById(args[5]);
+            BotLogger.log("BOT STARTED UP: " + guildSecondary.getName());
+            CommandListUpdateAction commandsD = guildSecondary.updateCommands();
             commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
             commandsD.queue();
         }
 
-        BotLogger.log("BOT STARTED UP: " + guild.getName());
+        BotLogger.log("BOT STARTED UP: " + guildPrimary.getName());
         MapSaveLoadManager.loadMaps();
     }
 }

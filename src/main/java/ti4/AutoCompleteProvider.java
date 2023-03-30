@@ -1,5 +1,7 @@
 package ti4;
 
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import ti4.generator.Mapper;
@@ -302,6 +304,28 @@ public class AutoCompleteProvider {
                         .filter(value -> value.toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.SERVER -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of("Primary", "Secondary")
+                        .filter(value -> value.toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.CATEGORY -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Category> categories = new ArrayList<>();
+                for (Guild guild : MapGenerator.jda.getGuilds()) {
+                    categories.addAll(guild.getCategories());
+                }
+                List<Command.Choice> options = categories.stream()
+                        .filter(c -> c.getName().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(c -> new Command.Choice(c.getGuild().getName() + ": #" + c.getName(), c.getName()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
