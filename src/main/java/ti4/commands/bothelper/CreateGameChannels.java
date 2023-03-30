@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.MapGenerator;
 import ti4.commands.map.CreateGame;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -43,12 +44,33 @@ public class CreateGameChannels extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next pbd###)"));
+        addOptions(new OptionData(OptionType.STRING, Constants.SERVER, "Server to create the channels on (Primary or Secondary) - default is smart selection").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Guild guild = event.getGuild();
+        Guild guild = null;
 
+        //SERVER TO CREATE ON
+        OptionMapping serverOption = event.getOption(Constants.SERVER);
+        if (serverOption != null ) {
+            if (serverOption.getAsString().equalsIgnoreCase("Primary")) {
+                guild = MapGenerator.guildPrimary;
+            } else if (serverOption.getAsString().equalsIgnoreCase("Secondary")) {
+                guild = MapGenerator.guildSecondary;
+            } else {
+                sendMessage("Bad server. Try again.");
+                return;
+            }
+        } else {
+            guild = getNextAvailableServer();
+            if (guild == null) {
+                sendMessage("No server available for new games.");
+                return;
+            }
+        }     
+
+        //GAME NAME
         OptionMapping gameNameOption = event.getOption(Constants.GAME_NAME);
         String gameName = null;
         if (gameNameOption != null) {
@@ -59,43 +81,44 @@ public class CreateGameChannels extends BothelperSubcommandData {
         
         //CHECK ROLE IS VALID
         if (guild.getRolesByName(gameName, false).size() > 0) {
-            sendMessage("Role: **" + gameName + "** already exists. Try again with a new name.");
+            sendMessage("Role: **" + gameName + "** already exists on server **" + guild.getName() + "**. Try again with a new name.");
             return;
         }
 
         //CHECK ROLE COUNT
         int roleCount = guild.getRoles().size();
         if (roleCount >= 250) {
-            sendMessage("Server is at the role limit - please contact @Admin to resolve.");
-            BotLogger.log(event, "Cannot create a new role. Server is currently has " + roleCount + " roles.");
+            sendMessage("Server **" + guild.getName() + "** is at the role limit - please contact @Admin to resolve.");
+            BotLogger.log(event, "Cannot create a new role. Server **" + guild.getName() + "** currently has **" + roleCount + "** roles.");
             return;
         } else if (roleCount >= 247) {
-            BotLogger.log(event, "Warning: Server is at " + (roleCount + 1) + " roles");
+            BotLogger.log(event, "Warning: server **" + guild.getName() + "** is at " + (roleCount + 1) + " roles");
         }
 
         //CHECK SERVER CHANNEL COUNT
         int channelCount = guild.getChannels().size();
         if (channelCount > 498) {
-            sendMessage("Server is at the channel limit - please contact @Admin to resolve.");
-            BotLogger.log(event, "Cannot create new channels. Server is currently has " + channelCount + " channels.");
+            sendMessage("Server **" + guild.getName() + "** is at the channel limit - please contact @Admin to resolve.");
+            BotLogger.log(event, "Cannot create new channels. Server **" + guild.getName() + "** currently has " + channelCount + " channels.");
             return;
         } else if (channelCount >= 495) {
-            BotLogger.log(event, "Warning: Server is at " + (channelCount + 2) + " channels");
+            BotLogger.log(event, "Warning: Server **" + guild.getName() + "** is at " + (channelCount + 2) + " channels");
         }
 
         //CHECK CATEGORY IS VALID
         GuildChannelUnion categoryChannel = event.getOption(Constants.CATEGORY).getAsChannel();
         if (categoryChannel == null || categoryChannel.getType() != ChannelType.CATEGORY) {
-            sendMessage("Category: **" + categoryChannel.getName() + "** does not exist. Create the category or pick a different category, then try again.");
+            sendMessage("Category: **" + categoryChannel.getName() + "** does not exist on server **" + guild.getName() + "**. Create the category or pick a different category, then try again.");
             return;
         } 
         
+        //CHECK IF CATEGORY HAS ROOM
         Category category = categoryChannel.asCategory();
         if (category.getChannels().size() > 48) {
-            sendMessage("Category: **" + category.getName() + "** is full. Create a new category then try again.");
+            sendMessage("Category: **" + category.getName() + "** is full on server **" + guild.getName() + "**. Create a new category then try again.");
             return;
         } else if (category.getChannels().size() > 45) {
-            BotLogger.log(event, "Warning: Category: **" + category.getName() + "** is almost full.");
+            BotLogger.log(event, "Warning: Category: **" + category.getName() + "** is almost full on server **" + guild.getName() + "**.");
         }
 
         StringBuilder message = new StringBuilder("Role and Channels have been set up:\n");
@@ -107,16 +130,24 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .complete();
         message.append("> " + role.getAsMention() + "\n");
 
-        //ADD PLAYERS TO ROLE
+        //PLAYERS
+        ArrayList<Member> members = new ArrayList<>();
         Member gameOwner = null;
         for (int i = 1; i <= 8; i++) {
             if (Objects.nonNull(event.getOption("player" + i))) {
                 Member member = event.getOption("player" + i).getAsMember();
+                if (member != null) members.add(member);
                 if (gameOwner == null) gameOwner = member;
-                guild.addRoleToMember(member, role).complete();
             } else {
                 break;
             }
+        }
+
+        //CHECK IF GUILD HAS ALL PLAYERS LISTED
+
+        //ADD PLAYERS TO ROLE
+        for (Member member : members) {
+            guild.addRoleToMember(member, role).complete();
         }
 
         //CREATE GAME
@@ -200,5 +231,29 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         int nextPBDNumber = Collections.max(pbdNumbers) + 1;
         return "pbd" + nextPBDNumber;
+    }
+
+    private static Guild getNextAvailableServer() {
+        if (isServerAvailable(MapGenerator.guildPrimary)) {
+            return MapGenerator.guildPrimary;
+        } else if (isServerAvailable(MapGenerator.guildSecondary)) {
+            return MapGenerator.guildSecondary;
+        } else {
+            return null;
+        }        
+    }
+
+    private static boolean isServerAvailable(Guild guild) {
+        if (guild == null) return false;
+
+
+
+
+        
+        return false;
+    }
+
+    private static Category getNextAvailableCategory(Guild guild) {
+        return null;
     }
 }
