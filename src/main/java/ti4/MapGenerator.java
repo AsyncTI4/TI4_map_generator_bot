@@ -81,20 +81,23 @@ public class MapGenerator {
 
         //ROLES - FOR COMMAND PERMISSIONS
         //ADMIN ROLES
-        adminRoles.add(jda.getRoleById("943596173896323072")); // Async TI4 Server
+        adminRoles.add(jda.getRoleById("943596173896323072")); // Async TI4 Server (Hub)
+        adminRoles.add(jda.getRoleById("1090914497352446042")); // Async Secondary
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
         adminRoles.removeIf(r -> r == null);
         
         //DEVELOPER ROLES
         developerRoles.addAll(adminRoles); //admins can also execute developer commands
-        developerRoles.add(jda.getRoleById("947648366056185897")); // Async TI4 Server
+        developerRoles.add(jda.getRoleById("947648366056185897")); // Async TI4 Server (Hub)
+        developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.removeIf(r -> r == null);
 
         //BOTHELPER ROLES
         bothelperRoles.addAll(developerRoles); //admins and developers can also execute bothelper commands
-        bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server
+        bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server (Hub)
+        bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.removeIf(r -> r == null);
         
