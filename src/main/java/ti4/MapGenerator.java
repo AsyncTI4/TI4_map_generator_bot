@@ -82,7 +82,7 @@ public class MapGenerator {
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
         adminRoles.removeIf(r -> r == null);
-        
+
         //DEVELOPER ROLES
         developerRoles.addAll(adminRoles); //admins can also execute developer commands
         developerRoles.add(jda.getRoleById("947648366056185897")); // Async TI4 Server
@@ -94,7 +94,7 @@ public class MapGenerator {
         bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.removeIf(r -> r == null);
-        
+
 
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddTile());
