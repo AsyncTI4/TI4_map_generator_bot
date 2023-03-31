@@ -6,8 +6,8 @@ COPY ./src ./src
 COPY pom.xml pom.xml
 COPY .classpath .classpath
 COPY .project .project
-RUN mvn --no-transfer-progress clean compile assembly:single && \
-    mvn --no-transfer-progress package && \
+RUN mvn --batch-mode clean compile assembly:single && \
+    mvn --batch-mode package && \
     cp $(pwd)/target/TI4_map_generator_discord_bot-1.0-SNAPSHOT-jar-with-dependencies.jar tibot.jar
 COPY ./src/main/resources /opt/resources
 ENV DB_PATH=/opt/STORAGE
