@@ -208,12 +208,10 @@ public class GenerateMap {
         } catch (IOException e) {
             BotLogger.log("Could not save jpg file");
         }
-        //noinspection ResultOfMethodCallIgnored
-        file.delete();
         File jpgFile = new File(absolutePath);
         MapFileDeleter.addFileToDelete(jpgFile);
         long time = System.currentTimeMillis() - startup;
-//        BotLogger.log("Image for game: " + map.getName() + " Generation took: " + time + " ms");
+        BotLogger.log("Image for game: " + map.getName() + " Generation took: " + time + " ms");
         return jpgFile;
     }
 
