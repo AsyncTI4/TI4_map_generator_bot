@@ -13,6 +13,8 @@ import ti4.message.BotLogger;
 import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -146,8 +148,8 @@ public class GenerateMap {
                 }
             }
         }
-        File file = Storage.getMapImageStorage("temp.png");
-        try (FileOutputStream outputStream = new FileOutputStream(file)) {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        try {
             if (displayType == DisplayType.all || displayType == DisplayType.map) {
                 HashMap<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
                 String setup = tileMap.keySet().stream()
@@ -182,18 +184,18 @@ public class GenerateMap {
             new PngEncoder()
                     .withBufferedImage(mainImage)
                     .withCompressionLevel(1)
-                    .toFile(file);
+                    .toStream(outputStream);
         } catch (IOException e) {
             BotLogger.log(map.getName() + ": Could not save generated map");
         }
 
         String timeStamp = getTimeStamp();
-        String absolutePath = file.getParent() + "/" + map.getName() + "_" + timeStamp + ".jpg";
-        try (FileInputStream fileInputStream = new FileInputStream(file);
+        String absolutePath = Storage.getMapImageDirectory() + "/" + map.getName() + "_" + timeStamp + ".jpg";
+        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
              FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
 
-            final BufferedImage image = ImageIO.read(fileInputStream);
-            fileInputStream.close();
+            final BufferedImage image = ImageIO.read(inputStream);
+            inputStream.close();
 
             final BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             convertedImage.createGraphics().drawImage(image, 0, 0, Color.black, null);
