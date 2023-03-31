@@ -219,19 +219,24 @@ public class Stats extends PlayerSubcommandData {
     }
 
     public void setValue(SlashCommandInteractionEvent event, Player player, String optionName, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
-        if (event.getSubcommandName().equals(Constants.EXHAUST_LEADER)) return; //exit when adding TG to Artuno
+        //SKIP THE MESSAGE IF ADDING TG TO LEADER
+        boolean skipMessage = false;
+        if (event.getSubcommandName().equals(Constants.EXHAUST_LEADER)) {
+            skipMessage = true;
+        }
+
         try {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             int number = Integer.parseInt(value);
             int existingNumber = supplier.get();
             if (setValue) {
                 consumer.accept(number);
-                sendMessage(getSetValueMessage(event, player, optionName, number, existingNumber));
+                if (!skipMessage) sendMessage(getSetValueMessage(event, player, optionName, number, existingNumber));
             } else {
                 int newNumber = existingNumber + number;
                 newNumber = Math.max(newNumber, 0);
                 consumer.accept(newNumber);
-                sendMessage(getChangeValueMessage(event, player, optionName, number, existingNumber, newNumber));
+                if (!skipMessage) sendMessage(getChangeValueMessage(event, player, optionName, number, existingNumber, newNumber));
             }
         } catch (Exception e) {
             sendMessage("Could not parse number for: " + optionName);
