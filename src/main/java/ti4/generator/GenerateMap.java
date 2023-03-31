@@ -147,7 +147,6 @@ public class GenerateMap {
                 }
             }
         }
-        //ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             if (displayType == DisplayType.all || displayType == DisplayType.map) {
                 HashMap<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
@@ -179,11 +178,6 @@ public class GenerateMap {
                     WebHelper.putData(map.getName(), map);
                 }).start();
             }
-
-            //  new PngEncoder()
-            //        .withBufferedImage(mainImage)
-            //        .withCompressionLevel(1)
-            //        .toStream(outputStream);
         } catch (IOException e) {
             BotLogger.log(map.getName() + ": Could not save generated map");
         }
@@ -191,18 +185,11 @@ public class GenerateMap {
         String timeStamp = getTimeStamp();
         String absolutePath = Storage.getMapImageDirectory() + "/" + map.getName() + "_" + timeStamp + ".jpg";
         try (
-             //ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
              FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)
              ) {
-
-            //final BufferedImage image = ImageIO.read(inputStream);
-            //inputStream.close();
-
             final BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
-
             final boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
-
             if (!canWrite) {
                 throw new IllegalStateException("Failed to write image.");
             }
@@ -212,7 +199,7 @@ public class GenerateMap {
         File jpgFile = new File(absolutePath);
         MapFileDeleter.addFileToDelete(jpgFile);
         long time = System.currentTimeMillis() - startup;
-        BotLogger.log("Image for game: " + map.getName() + " Generation took: " + time + " ms");
+        //BotLogger.log("Image for game: " + map.getName() + " Generation took: " + time + " ms");
         return jpgFile;
     }
 
