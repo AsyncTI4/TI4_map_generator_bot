@@ -16,7 +16,6 @@ import java.awt.image.BufferedImage;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.ZoneOffset;
@@ -148,7 +147,7 @@ public class GenerateMap {
                 }
             }
         }
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        //ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         try {
             if (displayType == DisplayType.all || displayType == DisplayType.map) {
                 HashMap<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
@@ -181,24 +180,26 @@ public class GenerateMap {
                 }).start();
             }
 
-            new PngEncoder()
-                    .withBufferedImage(mainImage)
-                    .withCompressionLevel(1)
-                    .toStream(outputStream);
+            //  new PngEncoder()
+            //        .withBufferedImage(mainImage)
+            //        .withCompressionLevel(1)
+            //        .toStream(outputStream);
         } catch (IOException e) {
             BotLogger.log(map.getName() + ": Could not save generated map");
         }
 
         String timeStamp = getTimeStamp();
         String absolutePath = Storage.getMapImageDirectory() + "/" + map.getName() + "_" + timeStamp + ".jpg";
-        try (ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
-             FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
+        try (
+             //ByteArrayInputStream inputStream = new ByteArrayInputStream(outputStream.toByteArray());
+             FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)
+             ) {
 
-            final BufferedImage image = ImageIO.read(inputStream);
-            inputStream.close();
+            //final BufferedImage image = ImageIO.read(inputStream);
+            //inputStream.close();
 
             final BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-            convertedImage.createGraphics().drawImage(image, 0, 0, Color.black, null);
+            convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
 
             final boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
 
@@ -211,7 +212,7 @@ public class GenerateMap {
         File jpgFile = new File(absolutePath);
         MapFileDeleter.addFileToDelete(jpgFile);
         long time = System.currentTimeMillis() - startup;
-        //BotLogger.log("Image for game: " + map.getName() + " Generation took: " + time + " ms");
+        BotLogger.log("Image for game: " + map.getName() + " Generation took: " + time + " ms");
         return jpgFile;
     }
 
