@@ -2,7 +2,6 @@ package ti4.generator;
 
 import com.pngencoder.PngEncoder;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
@@ -104,6 +103,7 @@ public class GenerateMap {
     }
 
     public File saveImage(Map map, @Nullable DisplayType displayType, @Nullable SlashCommandInteractionEvent event) {
+        long startup = System.currentTimeMillis();
         init(map);
         if (map.getDisplayTypeForced() != null) {
             displayType = map.getDisplayTypeForced();
@@ -137,7 +137,7 @@ public class GenerateMap {
 
                 Set<String> tilesToShow = fowFilter(map);
                 updatePlayerFogTiles(map, fowPlayer, tilesToShow);
-                
+
                 Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
                 keys.removeAll(tilesToShow);
                 for (String key : keys) {
@@ -210,6 +210,7 @@ public class GenerateMap {
         file.delete();
         File jpgFile = new File(absolutePath);
         MapFileDeleter.addFileToDelete(jpgFile);
+        BotLogger.log("Image for game" + map.getName() + " Generation took: " + (System.currentTimeMillis() - startup) + " ms");
         return jpgFile;
     }
 
@@ -227,7 +228,7 @@ public class GenerateMap {
                     tilesWithPlayerUnitsPlanets.add(tileEntry.getKey());
                 }
             }
-            
+
             Set<String> tileIDsToShow = new HashSet<>(tilesWithPlayerUnitsPlanets);
             for (String tileID : tilesWithPlayerUnitsPlanets) {
                 Set<String> adjacentTiles = FoWHelper.getAdjacentTiles(map, tileID, fowPlayer);
@@ -279,7 +280,7 @@ public class GenerateMap {
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
         graphics.drawString(map.getCustomName(), 0, y);
-        
+
         y = strategyCards(map, y);
 
         int tempY = y;
@@ -748,12 +749,12 @@ public class GenerateMap {
         drawCenteredString(graphics, String.valueOf(availablePlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 75, 32, 32), Storage.getFont32());
         drawCenteredString(graphics, String.valueOf(totalPlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 109, 32, 32), Storage.getFont32());
         deltaX += 254;
-        
+
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
 
         boolean randomizeList = player != fowPlayer && isFoWPrivate != null && isFoWPrivate;
-        if(randomizeList) {
+        if (randomizeList) {
             Collections.shuffle(planets);
         }
         for (String planet : planets) {
@@ -1037,11 +1038,11 @@ public class GenerateMap {
         int tempWidth = 0;
         BufferedImage factionImage = null;
 
-        if(isFoWPrivate != null && isFoWPrivate) {
+        if (isFoWPrivate != null && isFoWPrivate) {
             Collections.shuffle(players);
         }
         for (Player player : players) {
-            if(!player.isActivePlayer()) continue;
+            if (!player.isActivePlayer()) continue;
             try {
                 boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !canSeeStatsOfPlayer(player, fowPlayer);
                 String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
@@ -1617,20 +1618,20 @@ public class GenerateMap {
     }
 
     private int displayObjectives(
-        int y,
-        int x,
-        LinkedHashMap<String, List<String>> scoredPublicObjectives,
-        LinkedHashMap<String, Integer> revealedPublicObjectives,
-        LinkedHashMap<String, Player> players,
-        HashMap<String, String> publicObjectivesState,
-        Set<String> po,
-        Integer objectiveWorth,
-        Integer[] column,
-        LinkedHashMap<String, Integer> customPublicVP,
-        boolean justCalculate,
-        boolean fixedColumn,
-        Graphics graphics,
-        HashMap<Player, Integer> userVPs
+            int y,
+            int x,
+            LinkedHashMap<String, List<String>> scoredPublicObjectives,
+            LinkedHashMap<String, Integer> revealedPublicObjectives,
+            LinkedHashMap<String, Player> players,
+            HashMap<String, String> publicObjectivesState,
+            Set<String> po,
+            Integer objectiveWorth,
+            Integer[] column,
+            LinkedHashMap<String, Integer> customPublicVP,
+            boolean justCalculate,
+            boolean fixedColumn,
+            Graphics graphics,
+            HashMap<Player, Integer> userVPs
     ) {
         Set<String> keysToRemove = new HashSet<>();
         for (java.util.Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
@@ -1686,30 +1687,30 @@ public class GenerateMap {
     }
 
     private void drawScoreControlMarkers(
-        int x,
-        int y,
-        LinkedHashMap<String, Player> players,
-        List<String> scoredPlayerID,
-        boolean multiScoring,
-        Integer objectiveWorth,
-        boolean justCalculate,
-        Graphics graphics,
-        HashMap<Player, Integer> userVPs
+            int x,
+            int y,
+            LinkedHashMap<String, Player> players,
+            List<String> scoredPlayerID,
+            boolean multiScoring,
+            Integer objectiveWorth,
+            boolean justCalculate,
+            Graphics graphics,
+            HashMap<Player, Integer> userVPs
     ) {
         drawScoreControlMarkers(x, y, players, scoredPlayerID, multiScoring, objectiveWorth, justCalculate, false, graphics, userVPs);
     }
 
     private void drawScoreControlMarkers(
-        int x,
-        int y,
-        LinkedHashMap<String, Player> players,
-        List<String> scoredPlayerID,
-        boolean multiScoring,
-        Integer objectiveWorth,
-        boolean justCalculate,
-        boolean fixedColumn,
-        Graphics graphics,
-        HashMap<Player, Integer> userVPs
+            int x,
+            int y,
+            LinkedHashMap<String, Player> players,
+            List<String> scoredPlayerID,
+            boolean multiScoring,
+            Integer objectiveWorth,
+            boolean justCalculate,
+            boolean fixedColumn,
+            Graphics graphics,
+            HashMap<Player, Integer> userVPs
     ) {
         try {
             int tempX = 0;
@@ -1877,7 +1878,8 @@ public class GenerateMap {
             int tileY = positionPoint.y;
 
             switch (step) {
-                case Setup -> {} //do nothing
+                case Setup -> {
+                } //do nothing
                 case Tile -> {
                     graphics.drawImage(image, tileX, tileY, null);
 
@@ -1954,24 +1956,55 @@ public class GenerateMap {
         int textOffsetY = 0;
         BufferedImage arrowImage = null;
         switch (direction) {
-            case 0 -> { deltaX = 128; deltaY = -18; textOffsetX = 5; textOffsetY = 30; }
-            case 1 -> { deltaX = 267; deltaY = 36;  textOffsetX = 6; textOffsetY = 21; }
-            case 2 -> { deltaX = 293; deltaY = 177; textOffsetX = 7; textOffsetY = 32; }
-            case 3 -> { deltaX = 177; deltaY = 283; textOffsetX = 5; textOffsetY = 20; }
-            case 4 -> { deltaX = 38;  deltaY = 220; textOffsetX = 5; textOffsetY = 30; }
-            case 5 -> { deltaX = 40;  deltaY = 34;  textOffsetX = 5; textOffsetY = 25; }
+            case 0 -> {
+                deltaX = 128;
+                deltaY = -18;
+                textOffsetX = 5;
+                textOffsetY = 30;
+            }
+            case 1 -> {
+                deltaX = 267;
+                deltaY = 36;
+                textOffsetX = 6;
+                textOffsetY = 21;
+            }
+            case 2 -> {
+                deltaX = 293;
+                deltaY = 177;
+                textOffsetX = 7;
+                textOffsetY = 32;
+            }
+            case 3 -> {
+                deltaX = 177;
+                deltaY = 283;
+                textOffsetX = 5;
+                textOffsetY = 20;
+            }
+            case 4 -> {
+                deltaX = 38;
+                deltaY = 220;
+                textOffsetX = 5;
+                textOffsetY = 30;
+            }
+            case 5 -> {
+                deltaX = 40;
+                deltaY = 34;
+                textOffsetX = 5;
+                textOffsetY = 25;
+            }
         }
         try {
             BufferedImage outputImage = ImageIO.read(new File(Helper.getAdjacencyOverridePath(direction)));
             arrowImage = outputImage;
-            
+
             Graphics arrow = arrowImage.getGraphics();
             arrow.setFont(Storage.getFont20());
             arrow.setColor(Color.BLACK);
             arrow.drawString(secondaryTile, textOffsetX, textOffsetY);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+        }
         graphics.drawImage(arrowImage, tileX + deltaX, tileY + deltaY, null);
-        
+
         return image;
     }
 
@@ -2259,19 +2292,18 @@ public class GenerateMap {
         LinkedHashMap<String, Integer> units = new LinkedHashMap<>();
         HashMap<String, Point> unitOffset = new HashMap<>();
         boolean isSpace = unitHolder.getName().equals(Constants.SPACE);
-        
+
         boolean isCabalJail = "s11".equals(tile.getTileID());
         boolean isNekroJail = "s12".equals(tile.getTileID());
         boolean isYssarilJail = "s13".equals(tile.getTileID());
-        
+
         boolean isJail = isCabalJail || isNekroJail || isYssarilJail;
         boolean showJail = false;
-        if (fowPlayer == null 
-            || (isCabalJail && canSeeStatsOfFaction(map, "cabal", fowPlayer))
-            || (isNekroJail && canSeeStatsOfFaction(map, "nekro", fowPlayer))
-            || (isYssarilJail && canSeeStatsOfFaction(map, "yssaril", fowPlayer))
-            )
-        {
+        if (fowPlayer == null
+                || (isCabalJail && canSeeStatsOfFaction(map, "cabal", fowPlayer))
+                || (isNekroJail && canSeeStatsOfFaction(map, "nekro", fowPlayer))
+                || (isYssarilJail && canSeeStatsOfFaction(map, "yssaril", fowPlayer))
+        ) {
             showJail = true;
         }
 
@@ -2428,7 +2460,7 @@ public class GenerateMap {
     /**
      * Draw a String centered in the middle of a Rectangle.
      *
-     * @param g The Graphics instance.
+     * @param g    The Graphics instance.
      * @param text The String to draw.
      * @param rect The Rectangle to center the text in.
      */
