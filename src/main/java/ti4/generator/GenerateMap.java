@@ -211,7 +211,7 @@ public class GenerateMap {
         File jpgFile = new File(absolutePath);
         MapFileDeleter.addFileToDelete(jpgFile);
         long time = System.currentTimeMillis() - startup;
-        BotLogger.log("Image for game: " + map.getName() + " Generation took: " + time + " ms");
+        //BotLogger.log("Image for game: " + map.getName() + " Generation took: " + time + " ms");
         return jpgFile;
     }
 
