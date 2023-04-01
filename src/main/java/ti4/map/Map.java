@@ -19,6 +19,10 @@ import java.lang.reflect.Field;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import java.util.*;
 
 public class Map {
@@ -35,11 +39,17 @@ public class Map {
     private DisplayType displayTypeForced = null;
     @ExportableField
     private int playerCountForMap = 6;
+    @ExportableField
     private int vp = 10;
+    @ExportableField
     private boolean communityMode = false;
+    @ExportableField
     private boolean allianceMode = false;
+    @ExportableField
     private boolean fowMode = false;
+    @ExportableField
     private boolean absolMode = false;
+    @ExportableField
     private boolean discordantStarsMode = false;
     private boolean hasEnded = false;
 
@@ -67,6 +77,7 @@ public class Map {
     @ExportableField
     private int round = 1;
 
+    @ExportableField
     private String activePlayer = null;
     private Date lastActivePlayerPing = new Date(0);
     private Date lastActivePlayerChange = new Date(0);
@@ -81,6 +92,7 @@ public class Map {
     private LinkedHashMap<String, Integer> sentAgendas = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> laws = new LinkedHashMap<>();
     private LinkedHashMap<String, String> lawsInfo = new LinkedHashMap<>();
+    @ExportableField
     private LinkedHashMap<String, Integer> revealedPublicObjectives = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> customPublicVP = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
@@ -135,13 +147,17 @@ public class Map {
         HashMap<String, String> returnValue = new HashMap<>();
 
         for (Field field : fields) {
-            if(field.getDeclaredAnnotation(ExportableField.class) != null) {
+            if (field.getDeclaredAnnotation(ExportableField.class) != null) {
                 try {
-                    returnValue.put(field.getName(), field.get(this).toString());
+                    ObjectMapper mapper = new ObjectMapper();
+                    returnValue.put(field.getName(), mapper.writeValueAsString(field.get(this).toString()));
                 } catch (IllegalAccessException e) {
                     // This shouldn't really happen since we
                     // can even see private fields.
                     BotLogger.log("Unknown error exporting fields from map.");
+                } catch (JsonProcessingException e) {
+                    // TODO Auto-generated catch block
+                    e.printStackTrace();
                 }
             }
         }
