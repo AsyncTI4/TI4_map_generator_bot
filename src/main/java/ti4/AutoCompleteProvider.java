@@ -31,6 +31,9 @@ public class AutoCompleteProvider {
         Map activeMap = MapManager.getInstance().getUserActiveMap(id);
 
         switch (optionName) {
+            case Constants.SETTING_TYPE -> {
+                event.replyChoiceStrings("string","number","bool");
+            }
             case Constants.COLOR -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Mapper.getColors().stream()
