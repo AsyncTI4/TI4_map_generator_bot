@@ -32,7 +32,7 @@ public class AutoCompleteProvider {
 
         switch (optionName) {
             case Constants.SETTING_TYPE -> {
-                event.replyChoiceStrings("string","number","bool");
+                event.replyChoiceStrings("string","number","bool").queue();
             }
             case Constants.COLOR -> {
                 String enteredValue = event.getFocusedOption().getValue();
