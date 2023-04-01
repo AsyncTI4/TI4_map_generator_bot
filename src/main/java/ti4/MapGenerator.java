@@ -58,7 +58,10 @@ public class MapGenerator {
     public static void main(String[] args)
             throws LoginException {
 
-        //GlobalSettings.loadSettings();
+
+        // Load settings
+        GlobalSettings.loadSettings();
+
         jda = JDABuilder.createDefault(args[0])
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
@@ -85,6 +88,7 @@ public class MapGenerator {
         adminRoles.add(jda.getRoleById("1090914497352446042")); // Async Secondary
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
+        adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
         adminRoles.removeIf(r -> r == null);
 
         //DEVELOPER ROLES

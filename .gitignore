@@ -15,3 +15,5 @@ docker_run.ps1
 TI4_map_generator_discord_bot.iml
 .project
 .settings
+/runbot.sh
+/.DS_Store

@@ -37,11 +37,10 @@ public class Constants {
     public static final String REMOVE = "remove";
 
 
-    
-
-    public static final String SET_SETTING = "setting_name";
+    public static final String SET_SETTING = "setting";
     public static final String SETTING_NAME = "setting_name";
     public static final String SETTING_VALUE = "setting_value";
+    public static final String SETTING_TYPE = "setting_type";
 
     public static String ALPHA = "alpha";
     public static String BETA = "beta";
