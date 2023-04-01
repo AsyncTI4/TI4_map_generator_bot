@@ -141,26 +141,20 @@ public class Map {
         }
     }
 
-    public HashMap<String, String> getExportableFieldMap() {
+    public HashMap<String, Object> getExportableFieldMap() {
         Class<? extends Map> aClass = this.getClass();
         Field[] fields = aClass.getDeclaredFields();
-        HashMap<String, String> returnValue = new HashMap<>();
+        HashMap<String, Object> returnValue = new HashMap<>();
 
         for (Field field : fields) {
             if (field.getDeclaredAnnotation(ExportableField.class) != null) {
                 try {
                     ObjectMapper mapper = new ObjectMapper();
-                    if(field.getDeclaringClass() == String.class)
-                        returnValue.put(field.getName(), field.get(this).toString());
-                    else
-                        returnValue.put(field.getName(), mapper.writeValueAsString(field.get(this)));
+                    returnValue.put(field.getName(), field.get(this).toString());
                 } catch (IllegalAccessException e) {
                     // This shouldn't really happen since we
                     // can even see private fields.
                     BotLogger.log("Unknown error exporting fields from map.");
-                } catch (JsonProcessingException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
                 }
             }
         }
