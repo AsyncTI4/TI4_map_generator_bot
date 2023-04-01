@@ -150,7 +150,10 @@ public class Map {
             if (field.getDeclaredAnnotation(ExportableField.class) != null) {
                 try {
                     ObjectMapper mapper = new ObjectMapper();
-                    returnValue.put(field.getName(), mapper.writeValueAsString(field.get(this).toString()));
+                    if(field.getDeclaringClass() == String.class)
+                        returnValue.put(field.getName(), field.get(this).toString());
+                    else
+                        returnValue.put(field.getName(), mapper.writeValueAsString(field.get(this)));
                 } catch (IllegalAccessException e) {
                     // This shouldn't really happen since we
                     // can even see private fields.
