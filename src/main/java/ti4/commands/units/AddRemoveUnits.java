@@ -88,10 +88,10 @@ abstract public class AddRemoveUnits implements Command {
             String unitListToken = unitListTokenizer.nextToken();
             StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
             
-            // int tokenCount = unitInfoTokenizer.countTokens();
-            // if (tokenCount > 3) {
-            //     MessageHelper.sendMessageToChannel(event.getChannel(), "Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts");
-            // }
+            int tokenCount = unitInfoTokenizer.countTokens();
+            if (tokenCount > 3) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
+            }
 
             int count = 1;
             boolean numberIsSet = false;

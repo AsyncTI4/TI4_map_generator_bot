@@ -121,6 +121,26 @@ public class Planet extends UnitHolder {
         return influence;
     }
 
+    public int getOptimalResources() {
+        if (resources >= influence) {
+            return resources;
+        } else {
+            return 0;
+        }
+    }
+
+    public int getOptimalInfluence() {
+        if (influence >= resources) {
+            return influence;
+        } else {
+            return 0;
+        }
+    }
+
+    public int getSumResourcesInfluence() {
+        return resources + influence;
+    }
+
     public String getOriginalPlanetType() {
         return originalPlanetType;
     }

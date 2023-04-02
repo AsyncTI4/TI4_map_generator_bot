@@ -58,8 +58,10 @@ public class DeleteGame implements Command {
         boolean isAdmin = false;
         if (member_ != null) {
             java.util.List<Role> roles = member_.getRoles();
-            if (roles.contains(MapGenerator.adminRole)) {
-                isAdmin = true;
+            for (Role role : MapGenerator.adminRoles) {
+                if (roles.contains(role)) {
+                    isAdmin = true;
+                }
             }
         }
         if (!map.getOwnerID().equals(member.getId()) && !isAdmin){

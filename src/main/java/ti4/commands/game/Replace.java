@@ -39,8 +39,10 @@ public class Replace extends GameSubcommandData {
         boolean isAdmin = false;
         if (member != null) {
             java.util.List<Role> roles = member.getRoles();
-            if (roles.contains(MapGenerator.adminRole)) {
-                isAdmin = true;
+            for (Role role : MapGenerator.adminRoles) {
+                if (roles.contains(role)) {
+                    isAdmin = true;
+                }
             }
         }
         if (players.stream().noneMatch(player -> player.getUserID().equals(callerUser.getId())) && !isAdmin) {

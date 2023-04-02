@@ -73,38 +73,59 @@ public class ScorePublic extends StatusSubcommandData {
 		}
 	}
 
-	public static void informAboutScoring(GenericInteractionCreateEvent event, MessageChannel channel, Map activeMap,
-			Player player, int poID) {
-		LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
-		String id = "";
-		for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
-			if (po.getValue().equals(poID)) {
-				id = po.getKey();
-				break;
-			}
-		}
-		HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
-		HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
-		String poName1 = publicObjectivesState1.get(id);
-		String poName2 = publicObjectivesState2.get(id);
-		String poName = id;
-		String emojiName = "";
-		if (poName1 != null) {
-			poName = poName1;
-			emojiName = Emojis.Public1alt;
-		} else if (poName2 != null) {
-			poName = poName2;
-			emojiName = Emojis.Public2alt;
-		}
-		String message = Helper.getPlayerRepresentation(event, player) + " scored " + emojiName + " __**" + poName
-				+ "**__";
-		MessageHelper.sendMessageToChannel(channel, message);
-		if (activeMap.isFoWMode()) {
-			String limitedMessage = "Scores changed";
-			FoWHelper.pingPlayersDifferentMessages(activeMap, event, player, message, limitedMessage);
-		}
-	}
+    public static void informAboutScoring(SlashCommandInteractionEvent event, MessageChannel channel, Map activeMap, Player player, int poID) {
+        LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(poID)) {
+                id = po.getKey();
+                break;
+            }
+        }
+        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
+        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
+        String poName1 = publicObjectivesState1.get(id);
+        String poName2 = publicObjectivesState2.get(id);
+        String poName = id;
+        String emojiName = "";
+        if (poName1 != null) {
+            poName = poName1;
+            emojiName = Emojis.Public1alt;
+        } else if (poName2 != null){
+            poName = poName2;
+            emojiName = Emojis.Public2alt;
+        }
+        String message = Helper.getPlayerRepresentation(event, player) + " scored " + emojiName + " __**" + poName + "**__";
+        MessageHelper.sendMessageToChannel(channel, message);
+        Helper.checkIfHeroUnlocked(event, activeMap, player);
+    }
 
+    public static void informAboutScoring(ButtonInteractionEvent event, MessageChannel channel, Map activeMap, Player player, int poID) {
+        LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(poID)) {
+                id = po.getKey();
+                break;
+            }
+        }
+        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
+        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
+        String poName1 = publicObjectivesState1.get(id);
+        String poName2 = publicObjectivesState2.get(id);
+        String poName = id;
+        String emojiName = "";
+        if (poName1 != null) {
+            poName = poName1;
+            emojiName = Emojis.Public1alt;
+        } else if (poName2 != null){
+            poName = poName2;
+            emojiName = Emojis.Public2alt;
+        }
+        String message = Helper.getPlayerRepresentation(event, player) + " scored " + emojiName + " __**" + poName + "**__";
+        MessageHelper.sendMessageToChannel(channel, message);
+        Helper.checkIfHeroUnlocked(event, activeMap, player);
+    }
 
 	@Override
 	public void reply(SlashCommandInteractionEvent event) {

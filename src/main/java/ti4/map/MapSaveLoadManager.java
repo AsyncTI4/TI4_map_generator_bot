@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
@@ -25,6 +24,7 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class MapSaveLoadManager {
 
@@ -305,6 +305,9 @@ public class MapSaveLoadManager {
         writer.write(Constants.GAME_CUSTOM_NAME + " " + map.getCustomName());
         writer.write(System.lineSeparator());
 
+        MessageChannel tableTalkChannel = map.getTableTalkChannel();
+        writer.write(Constants.TABLE_TALK_CHANNEL + " " + (tableTalkChannel == null ? "" : tableTalkChannel.getId()));
+        writer.write(System.lineSeparator());
         MessageChannel mainGameChannel = map.getMainGameChannel();
         writer.write(Constants.MAIN_GAME_CHANNEL + " " + (mainGameChannel == null ? "" : mainGameChannel.getId()));
         writer.write(System.lineSeparator());
@@ -884,27 +887,44 @@ public class MapSaveLoadManager {
                         //Do nothing
                     }
                 }
-                case Constants.BOT_MAP_CHANNEL -> {
-                    String id = info.isEmpty() ? "1234" : info; //getThreadChannelById can't handle ""
+                case Constants.TABLE_TALK_CHANNEL -> {
+                    String id = info.isEmpty() ? "1234" : info; //getTextChannelById can't handle ""
                     try {
-                        ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(id); //exists and is not locked
-                        if (threadChannel == null) { 
-                            List<ThreadChannel> botChannels = MapGenerator.jda.getThreadChannelsByName(map.getName() + Constants.BOT_CHANNEL_SUFFIX, true);
-                            if (!botChannels.isEmpty() && botChannels.size() == 1) { //found a matching thread
-                                threadChannel = botChannels.get(0);
-                            } else { //can't find it, might be archived
-                                for (ThreadChannel tc : MapGenerator.jda.getTextChannelById(map.getMainGameChannel().getId()).retrieveArchivedPublicThreadChannels()) {
-                                    if (tc.getName().equals(map.getName() + Constants.BOT_CHANNEL_SUFFIX)) {
-                                        threadChannel = tc;
-                                    }
-                                }
-                            }
+                        TextChannel tableTalkChannel = MapGenerator.jda.getTextChannelById(id);
+                        if (tableTalkChannel == null) {
+                            List<TextChannel> gameChannels = MapGenerator.jda.getTextChannels().stream()
+                                        .filter(c -> c.getName().startsWith(map.getName()))
+                                        .filter(Predicate.not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
+                                        .toList();
+                            if (!gameChannels.isEmpty() && gameChannels.size() == 1) tableTalkChannel = gameChannels.get(0);
                         }
-                        map.setBotMapChannel(threadChannel);
+                        map.setTableTalkChannel(tableTalkChannel);
                     } catch (Exception e) {
                         //Do nothing
                     }
                 }
+                //DISABLED - POTENTIALLY OPENING THREADS
+                // case Constants.BOT_MAP_CHANNEL -> {
+                //     String id = info.isEmpty() ? "1234" : info; //getThreadChannelById can't handle ""
+                //     try {
+                //         ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(id); //exists and is not locked
+                //         if (threadChannel == null) { 
+                //             List<ThreadChannel> botChannels = MapGenerator.jda.getThreadChannelsByName(map.getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+                //             if (!botChannels.isEmpty() && botChannels.size() == 1) { //found a matching thread
+                //                 threadChannel = botChannels.get(0);
+                //             } else { //can't find it, might be archived
+                //                 for (ThreadChannel tc : MapGenerator.jda.getTextChannelById(map.getMainGameChannel().getId()).retrieveArchivedPublicThreadChannels()) {
+                //                     if (tc.getName().equals(map.getName() + Constants.BOT_CHANNEL_SUFFIX)) {
+                //                         threadChannel = tc;
+                //                     }
+                //                 }
+                //             }
+                //         }
+                //         map.setBotMapChannel(threadChannel);
+                //     } catch (Exception e) {
+                //         //Do nothing
+                //     }
+                // }
                 case Constants.COMMUNITY_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);

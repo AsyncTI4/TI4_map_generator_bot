@@ -13,7 +13,7 @@ public class BotLogger {
     private static TextChannel channel;
 
     static {
-        Guild guild = MapGenerator.guild;
+        Guild guild = MapGenerator.guildPrimary;
         List<TextChannel> textChannels = MapGenerator.jda.getTextChannels();
         for (TextChannel textChannel : textChannels) {
             if ("bot-log".equals(textChannel.getName()) && (textChannel.getGuild() == guild) || textChannel.getGuild().getName().equals("Bot Test Server")) {
