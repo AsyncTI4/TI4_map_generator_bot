@@ -148,22 +148,22 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
             String spendAs = option.getAsString();
             int sum = 0;
             switch (spendAs.toLowerCase()) {
-                case "resources" -> {
+                case "r", "resources" -> {
                     for (String planetID : planetIDs) {
                         sum += Helper.getPlanetResources(planetID, getActiveMap());
                     }
                     message.append(Helper.getResourceEmoji(sum) + " resources").toString();
                 }
-                case "influence" -> {
+                case "i", "influence" -> {
                     for (String planetID : planetIDs) {
                         sum += Helper.getPlanetInfluence(planetID, getActiveMap());
                     }
                     message.append(Helper.getInfluenceEmoji(sum) + " influence").toString();
                 }
-                case "votes" -> {
+                case "v", "votes" -> {
                     message.append(" votes").toString();
                 }
-                case "techskip" -> message.append(" a tech skip").toString();
+                case "t", "techskip" -> message.append(" a tech skip").toString();
                 case "toes" -> { //For HolyT
                     for (String planetID : planetIDs) {
                         sum += Helper.getPlanetInfluence(planetID, getActiveMap());

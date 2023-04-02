@@ -37,11 +37,10 @@ public class Constants {
     public static final String REMOVE = "remove";
 
 
-    
-
-    public static final String SET_SETTING = "setting_name";
+    public static final String SET_SETTING = "setting";
     public static final String SETTING_NAME = "setting_name";
     public static final String SETTING_VALUE = "setting_value";
+    public static final String SETTING_TYPE = "setting_type";
 
     public static String ALPHA = "alpha";
     public static String BETA = "beta";
@@ -242,6 +241,7 @@ public class Constants {
     public static final String LAST_ACTIVE_PLAYER_PING = "last_active_player_ping";
     public static final String LAST_ACTIVE_PLAYER_CHANGE = "last_active_player_change";
     
+    public static final String TABLE_TALK_CHANNEL = "table_talk_channel";
     public static final String MAIN_GAME_CHANNEL = "main_game_channel";
     public static final String BOT_MAP_CHANNEL = "bot_map_channel";
     public static final String CHANNEL1 = "channel1";
@@ -560,4 +560,5 @@ public class Constants {
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
     public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
     public static final String BEGIN_VIDEO_GEN = "begin_video_gen";
+    public static final String SERVER = "server";
 }

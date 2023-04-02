@@ -66,25 +66,3 @@ docker run -v ${PWD}/storage:/opt/STORAGE tibot $discordBotKey $discordUserID $d
 
 Bot should now be running and able to receive commands on your test server!
 
-## 3.0 - Softnum's VPS
-
-Do steps 1 & 2 from here: https://support.hostway.com/hc/en-us/articles/115001509884-How-To-Use-SSH-Keys-on-Windows-Clients-with-PuTTY-
-
-Tell Softnum the **public** key
-
-Load the **private** key into pageant
-
-On vps, use these commands to try your code:
-
-```bash
-cd /opt/TI4_map_generator_bot
-git status
-git config --global --add safe.directory /opt/TI4_map_generator_bot
-git status
-git checkout (yourbranch)
-./build
-cd /opt/ti4bot
-runbot.sh
-```
-
-Ask Softnum for invite to test Discord server.

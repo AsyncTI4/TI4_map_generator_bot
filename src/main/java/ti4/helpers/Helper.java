@@ -25,6 +25,7 @@ import org.jetbrains.annotations.Nullable;
 
 import ti4.MapGenerator;
 import ti4.ResourceHelper;
+import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldChannels;
 import ti4.commands.tokens.AddCC;
@@ -43,6 +44,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
@@ -420,7 +422,7 @@ public class Helper {
     public static int getPlanetResources(String planetID, Map map) {
         UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
-            return -1;
+            return 0;
         } else {
             Planet planet = (Planet) unitHolder;
             return planet.getResources();
@@ -430,7 +432,7 @@ public class Helper {
     public static int getPlanetInfluence(String planetID, Map map) {
         UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
         if (unitHolder == null) {
-            return -1;
+            return 0;
         } else {
             Planet planet = (Planet) unitHolder;
             return planet.getInfluence();
@@ -952,7 +954,6 @@ public class Helper {
             return null;
         }
         List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
         int resourcesCount = 0;
@@ -969,6 +970,49 @@ public class Helper {
                 .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
 
         resourcesCount += resourcesCountFromPlanets;
+        return resourcesCount;
+    }
+
+    public static Integer getPlayerOptimalResourcesAvailable(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
+            }
+        } 
+
+        int resourcesCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getOptimalResources).sum();
+
+        return resourcesCount;
+    }
+
+    public static Integer getPlayerOptimalResourcesTotal(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
+            }
+        } 
+
+        int resourcesCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getOptimalResources).sum();
+
         return resourcesCount;
     }
 
@@ -1021,10 +1065,52 @@ public class Helper {
         return influenceCount;
     }
 
+    public static Integer getPlayerOptimalInfluenceAvailable(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
+            }
+        } 
+
+        int influenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getOptimalInfluence).sum();
+
+        return influenceCount;
+    }
+
+    public static Integer getPlayerOptimalInfluenceTotal(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                        .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
+            }
+        } 
+
+        int influenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getOptimalInfluence).sum();
+
+        return influenceCount;
+    }
+
     public static String getPlayerResourceInfluenceRepresentation(Player player, Map map) {
         StringBuilder sb = new StringBuilder(getPlayerRepresentation(player)).append(":\n");
-        sb.append("Resources: ").append(getPlayerResourcesAvailable(player, map)).append("/").append(getPlayerResourcesTotal(player, map)).append("\n");
-        sb.append("Influence: ").append(getPlayerInfluenceAvailable(player, map)).append("/").append(getPlayerInfluenceTotal(player, map)).append("\n");
+        sb.append("Resources: ").append(getPlayerResourcesAvailable(player, map)).append("/").append(getPlayerResourcesTotal(player, map)).append("  Optimal: " + getPlayerOptimalResourcesAvailable(player, map)).append("/").append(getPlayerOptimalResourcesTotal(player, map)).append("\n");
+        sb.append("Influence: ").append(getPlayerInfluenceAvailable(player, map)).append("/").append(getPlayerInfluenceTotal(player, map)).append("  Optimal: " + getPlayerOptimalInfluenceAvailable(player, map)).append("/").append(getPlayerOptimalInfluenceTotal(player, map)).append("\n");
         return sb.toString();
     }
 
@@ -1061,7 +1147,7 @@ public class Helper {
 
     public static void checkThreadLimitAndArchive(Guild guild) {
         int threadCount = guild.getThreadChannels().size();
-        int closeCount = 10;
+        int closeCount = GlobalSettings.getSetting("thread_close_count", Integer.class, 10);
 
         if (threadCount >= 980) {
             BotLogger.log("`Helper.checkThreadLimitAndArchive:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
@@ -1112,27 +1198,39 @@ public class Helper {
             }
 
             if (role == null) { //make sure players have access to the game channels
-                addMapPlayerPermissionsToChannel(guild, activeMap);
+                addMapPlayerPermissionsToGameChannels(guild, activeMap);
             } else { //make sure players have the role
                 addGameRoleToMapPlayers(guild, activeMap, role);
             }
         }
     }
     
-    public static void addMapPlayerPermissionsToChannel(Guild guild, Map activeMap) {
+    public static void addMapPlayerPermissionsToGameChannels(Guild guild, Map activeMap) {
+        TextChannel tableTalkChannel = (TextChannel) activeMap.getTableTalkChannel();
+        if (tableTalkChannel != null) {
+            addPlayerPermissionsToGameChannel(guild, activeMap, tableTalkChannel);
+        }
+        TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
+        if (actionsChannel != null) {
+            addPlayerPermissionsToGameChannel(guild, activeMap, actionsChannel);
+        }
         String gameName = activeMap.getName();
         List<GuildChannel> channels = guild.getChannels().stream().filter(c -> c.getName().startsWith(gameName)).toList();
         for (GuildChannel channel : channels) {
-            TextChannel textChannel = guild.getTextChannelById(channel.getId());
-            if (textChannel != null) {
-                TextChannelManager textChannelManager = textChannel.getManager();
-                for (String playerID : activeMap.getPlayerIDs()) {
-                    Member member = guild.getMemberById(playerID);
-                    long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-                    textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
-                }
-                textChannelManager.queue();
+            addPlayerPermissionsToGameChannel(guild, activeMap, channel);
+        }
+    }
+
+    private static void addPlayerPermissionsToGameChannel(Guild guild, Map activeMap, GuildChannel channel) {
+        TextChannel textChannel = guild.getTextChannelById(channel.getId());
+        if (textChannel != null) {
+            TextChannelManager textChannelManager = textChannel.getManager();
+            for (String playerID : activeMap.getPlayerIDs()) {
+                Member member = guild.getMemberById(playerID);
+                long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
+                textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
             }
+            textChannelManager.queue();
         }
     }
 
@@ -1173,5 +1271,57 @@ public class Helper {
         String techPrerequisites = techRepTokenizer.nextToken();
         String techText = techRepTokenizer.nextToken();
         return techEmoji + "**" + techName + "**";
+    }
+
+    public static void checkIfHeroUnlocked(SlashCommandInteractionEvent event, Map activeMap, Player player) {
+        Leader playerLeader = player.getLeader(Constants.HERO);
+        if (playerLeader != null && playerLeader.isLocked()) {
+            int scoredSOCount = player.getSecretsScored().size();
+            int scoredPOCount = 0;
+            HashMap<String, List<String>> playerScoredPublics = activeMap.getScoredPublicObjectives();
+            for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
+                if (Mapper.getPublicObjectivesState1().keySet().contains(scoredPublic.getKey()) || Mapper.getPublicObjectivesState2().keySet().contains(scoredPublic.getKey())) {
+                    if (scoredPublic.getValue().contains(player.getUserID())) {
+                        scoredPOCount++;
+                    }
+                }
+            
+            }
+            int scoredObjectiveCount = scoredPOCount + scoredSOCount;
+            if (scoredObjectiveCount >= 3) {
+                UnlockLeader ul = new UnlockLeader();
+                ul.unlockLeader(event, "hero", activeMap, player);
+            }
+        }
+    }
+
+    public static void checkIfHeroUnlocked(ButtonInteractionEvent event, Map activeMap, Player player) {
+        Leader playerLeader = player.getLeader(Constants.HERO);
+        if (playerLeader != null && playerLeader.isLocked()) {
+            int scoredSOCount = player.getSecretsScored().size();
+            int scoredPOCount = 0;
+            HashMap<String, List<String>> playerScoredPublics = activeMap.getScoredPublicObjectives();
+            for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
+                if (Mapper.getPublicObjectivesState1().keySet().contains(scoredPublic.getKey()) || Mapper.getPublicObjectivesState2().keySet().contains(scoredPublic.getKey())) {
+                    if (scoredPublic.getValue().contains(player.getUserID())) {
+                        scoredPOCount++;
+                    }
+                }
+            
+            }
+            int scoredObjectiveCount = scoredPOCount + scoredSOCount;
+            if (scoredObjectiveCount >= 3) {
+                UnlockLeader ul = new UnlockLeader();
+                ul.unlockLeader(event, "hero", activeMap, player);
+            }
+        }
+    }
+
+    public static Role getEventGuildRole(GenericInteractionCreateEvent event, String roleName) {
+        try {
+            return event.getGuild().getRolesByName(roleName, true).get(0);
+        } catch (Exception e) {
+            return null;
+        }
     }
 }
