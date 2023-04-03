@@ -27,7 +27,6 @@ public class UnlockLeader extends LeaderAction {
             channel = player.getPrivateChannel();
         }
 
-        if (channel == null || activeMap.isFoWMode()) channel = event.getChannel();
         if (playerLeader != null){
             playerLeader.setLocked(false);
             MessageHelper.sendMessageToChannel(channel, Helper.getFactionLeaderEmoji(player, playerLeader));
