@@ -38,6 +38,9 @@ public class Map {
     private DisplayType displayTypeForced = null;
     @ExportableField
     private int playerCountForMap = 6;
+
+    @ExportableField
+    private int ringCount = 0;
     @ExportableField
     private int vp = 10;
     @ExportableField
@@ -325,6 +328,14 @@ public class Map {
 
     public void setPlayerCountForMap(int playerCountForMap) {
         this.playerCountForMap = playerCountForMap;
+    }
+
+    public int getRingCount() {
+        return ringCount;
+    }
+
+    public void setRingCount(int ringCount) {
+        this.ringCount = ringCount;
     }
 
     public void setSCPlayed(Integer scNumber, Boolean playedStatus) {
