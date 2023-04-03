@@ -73,10 +73,10 @@ public class Replace extends GameSubcommandData {
                 }
                 player.setUserName(addedUser.getName());
                 player.setUserID(addedUser.getId());
-                if (map.getSpeaker().equals(removedPlayer.getUserID())) {
+                if (removedPlayer.getUserID().equals(map.getSpeaker())) {
                     map.setSpeaker(addedUser.getId());
                 }
-                if (map.getActivePlayer().equals(removedPlayer.getUserID())) {
+                if (removedPlayer.getUserID().equals(map.getActivePlayer())) {
                     // do not update stats for this action
                     map.setActivePlayer(addedUser.getId());
                 }
