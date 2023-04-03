@@ -258,7 +258,7 @@ public class Tile {
         return hasFog != null && hasFog;
     }
 
-    public void setFogOfWar(@NotNull Player player, Boolean fog_) {
+    public void setTileFog(@NotNull Player player, Boolean fog_) {
         fog.put(player, fog_);
     }
 
