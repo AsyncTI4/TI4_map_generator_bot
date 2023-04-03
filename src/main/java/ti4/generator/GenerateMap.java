@@ -137,8 +137,6 @@ public class GenerateMap {
                 fowPlayer = Helper.getGamePlayer(map, player, event, null);
 
                 Set<String> tilesToShow = FoWHelper.fowFilter(map, fowPlayer);
-                updatePlayerFogTiles(map, fowPlayer, tilesToShow);
-
                 Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
                 keys.removeAll(tilesToShow);
                 for (String key : keys) {
@@ -206,17 +204,6 @@ public class GenerateMap {
     private Player getFowPlayer(Map map, @Nullable SlashCommandInteractionEvent event) {
         String user = event.getUser().getId();
         return map.getPlayer(user);
-    }
-
-
-    private void updatePlayerFogTiles(Map map, Player player, Set<String> tileKeys) {
-        for (String key_ : tileKeys) {
-            Tile tileToUpdate = map.getTileByPosition(key_);
-
-            if (tileToUpdate != null) {
-                player.updateFogTile(tileToUpdate, "Round " + map.getRound());
-            }
-        }
     }
 
     @NotNull

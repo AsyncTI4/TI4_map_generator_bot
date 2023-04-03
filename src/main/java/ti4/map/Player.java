@@ -52,6 +52,7 @@ public class Player {
     private HashMap<String,String> fow_seenTiles = new HashMap<>();
     private HashMap<String,String> fow_customLabels = new HashMap<>();
     private String fowFogFilter = null;
+    private boolean fogInitialized = false;
 
     @Nullable
     private Role roleForCommunity = null;
@@ -707,6 +708,14 @@ public class Player {
 
     public HashMap<String,String> getFogLabels() {
         return fow_customLabels;
+    }
+
+    public boolean hasFogInitialized() {
+        return fogInitialized;
+    }
+
+    public void setFogInitialized(boolean init) {
+        fogInitialized = init;
     }
 
     public boolean isDummy() {
