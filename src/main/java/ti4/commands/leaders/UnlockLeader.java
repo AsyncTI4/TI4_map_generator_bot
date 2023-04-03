@@ -23,6 +23,10 @@ public class UnlockLeader extends LeaderAction {
     public void unlockLeader(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(leader);
         MessageChannel channel = activeMap.getMainGameChannel();
+        if (activeMap.isFoWMode()) {
+            channel = player.getPrivateChannel();
+        }
+
         if (channel == null || activeMap.isFoWMode()) channel = event.getChannel();
         if (playerLeader != null){
             playerLeader.setLocked(false);
