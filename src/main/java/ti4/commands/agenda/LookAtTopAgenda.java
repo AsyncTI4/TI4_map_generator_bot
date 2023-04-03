@@ -60,9 +60,12 @@ public class LookAtTopAgenda extends AgendaSubcommandData {
                     MessageHelper.sendMessageToChannel((MessageChannel) player.getPrivateChannel(), sb.toString());
                 } else {
                     MessageHelper.sendMessageToUser(sb.toString(), userById);
+                    MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
                 }
             } else {
                 MessageHelper.sendMessageToUser(sb.toString(), event);
+                MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
+
             }
         }
     }
