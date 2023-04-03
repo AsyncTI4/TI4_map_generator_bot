@@ -55,7 +55,7 @@ public class RevealAgenda extends AgendaSubcommandData {
             sb.append(agendaName).append("__** ");
             switch (agendaSource) {
                 case "absol" -> sb.append(Emojis.Absol);
-                case "PoK" -> sb.append(Emojis.Relic);
+                case "PoK" -> sb.append(Emojis.AgendaWhite);
                 default -> sb.append(Emojis.AsyncTI4Logo);
             }
             sb.append("\n");
