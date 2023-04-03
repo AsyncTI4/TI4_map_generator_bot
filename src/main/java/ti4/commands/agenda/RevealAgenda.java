@@ -11,6 +11,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import java.util.LinkedHashMap;
@@ -32,21 +33,50 @@ public class RevealAgenda extends AgendaSubcommandData {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append("-----------");
-        sb.append("Agenda:\n");
         String id = activeMap.revealAgenda(revealFromBottom);
         LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(id);
-        if (uniqueID != null) {
-            sb.append("(").append(uniqueID).append(") - ");
+        String[] agendaDetails = Mapper.getAgenda(id).split(";");
+        String agendaName = agendaDetails[0];
+        String agendaType = agendaDetails[1];
+        String agendaTarget = agendaDetails[2];
+        String arg1 = agendaDetails[3];
+        String arg2 = agendaDetails[4];
+        String agendaSource = agendaDetails[5];
+
+        if (agendaName == null || agendaType == null || agendaTarget == null || arg1 == null || arg2 == null || agendaSource == null) {
+            BotLogger.log("Agenda improperly formatted: " + id);
+            sb.append("Agenda ----------\n").append(Mapper.getAgenda(id)).append("\n------------------");
+        } else {
+            sb.append("**__");
+            if (uniqueID != null) {
+                sb.append("(").append(uniqueID).append(") - ");
+            }
+            sb.append(agendaName).append("__** ");
+            switch (agendaSource) {
+                case "absol" -> sb.append(Emojis.Absol);
+                case "PoK" -> sb.append(Emojis.Relic);
+                default -> sb.append(Emojis.AsyncTI4Logo);
+            }
+            sb.append("\n");
+
+            sb.append("> **").append(agendaType).append(":** *").append(agendaTarget).append("*\n");
+            if (arg1.length() > 0) {
+                arg1 = arg1.replace("For:", "**For:**");
+                sb.append("> ").append(arg1).append("\n");
+            }
+            if (arg2.length() > 0) {
+                arg2 = arg2.replace("Against:", "**Against:**");
+                sb.append("> ").append(arg2).append("\n");
+            }
         }
-        sb.append(Mapper.getAgenda(id)).append("\n");
+
         switch (id) {
             case ("mutiny") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Mutiny public_vp_worth:1`").append("\n");
             case ("seed_empire") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Seed of an Empire public_vp_worth:1`").append("\n");
             case ("censure") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`").append("\n");
         }
-        sb.append("-----------\n");
+
         MessageHelper.sendMessageToChannel(event, sb.toString());
         String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you will **Play a When** or **Play an After** or not by pressing the buttons below:";
 
