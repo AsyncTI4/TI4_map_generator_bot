@@ -1,18 +1,23 @@
 package ti4.message;
 
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.MapGenerator;
 import ti4.commands.cards.CardsInfo;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
@@ -256,11 +261,48 @@ public class MessageHelper {
     public static void sendMessageToUser(String messageText, GenericInteractionCreateEvent event) {
         sendMessageToUser(messageText, event.getUser());
     }
-
+    
     public static void sendMessageToUser(String messageText, User user) {
         user.openPrivateChannel().queue(channel -> {
             splitAndSent(messageText, channel);
         });
+    }
+
+    public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, @NotNull Map activeMap, String messageText) {
+        if(activeMap.isFoWMode()) {
+            sendPrivateMessageToPlayer(player, activeMap, messageText);
+        } else {
+            boolean threadFound = false;
+            TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
+            List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+
+            String threadName = "Cards Info-" + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
+
+            for (ThreadChannel threadChannel : threadChannels) {
+                if (threadChannel.getName().equals(threadName)) {
+                    for (String text : splitLargeText(messageText, 2000)) {
+                        threadChannel.sendMessage(text).queue();
+                    }
+                    threadFound = true;
+                    break;
+                }
+            }
+            if (!threadFound) {
+                //Make card info thread a public thread in community mode
+                boolean isPrivateChannel = !activeMap.isCommunityMode();
+                ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
+                threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
+                if (isPrivateChannel) {
+                    threadAction.setInvitable(false);
+                }
+                threadAction.queue(t -> {
+                    t.sendMessage("New Thead: " + threadName).queue();
+                    for (String text : splitLargeText(messageText, 2000)) {
+                        t.sendMessage(text).queue();
+                    }
+                });
+            }
+        }
     }
 
     /**

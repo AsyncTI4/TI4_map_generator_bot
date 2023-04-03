@@ -31,6 +31,7 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");
         sb.append("Game: ").append(activeMap.getName()).append("\n");
+        sb.append(event.getUser().getAsMention()).append("\n");
         sb.append("`").append(event.getCommandString()).append("`").append("\n");
         if (count > 1) {
             sb.append("__**Bottom " + count + " agendas:**__\n");
@@ -59,7 +60,7 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
                 if (activeMap.isCommunityMode() && player.getPrivateChannel() instanceof MessageChannel) {
                     MessageHelper.sendMessageToChannel((MessageChannel) player.getPrivateChannel(), sb.toString());
                 } else {
-                    MessageHelper.sendMessageToUser(sb.toString(), userById);
+                    MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
                 }
             } else {
                 MessageHelper.sendMessageToUser(sb.toString(), event);
