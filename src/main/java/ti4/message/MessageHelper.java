@@ -268,8 +268,8 @@ public class MessageHelper {
         });
     }
 
-    public static void sendMessageToPlayerCardsInfoThread(Player player, Map activeMap, String messageText) {
-        if(activeMap.isFoWMode() || activeMap.isCommunityMode()) {
+    public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, @NotNull Map activeMap, String messageText) {
+        if(activeMap.isFoWMode()) {
             sendPrivateMessageToPlayer(player, activeMap, messageText);
         } else {
             boolean threadFound = false;
