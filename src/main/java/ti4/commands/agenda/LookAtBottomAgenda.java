@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -32,10 +31,11 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");
         sb.append("Game: ").append(activeMap.getName()).append("\n");
+        sb.append("`").append(event.getCommandString()).append("`").append("\n");
         if (count > 1) {
-            sb.append("Bottom " + count + " agendas:\n");
+            sb.append("__**Bottom " + count + " agendas:**__\n");
         } else {
-            sb.append("Bottom agenda:\n");
+            sb.append("__**Bottom agenda:**__\n");
         }
         for (int i = 0; i < count; i++) {
             String agendaID = activeMap.lookAtBottomAgenda(i);
@@ -43,7 +43,7 @@ public class LookAtBottomAgenda extends AgendaSubcommandData {
             if (activeMap.getSentAgendas().get(agendaID) != null) {
                 sb.append("This agenda is currently in somebody's hand.");
             } else {
-                sb.append(Mapper.getAgenda(agendaID));
+                sb.append(Helper.getAgendaRepresentation(agendaID));
             }
             sb.append("\n");
         }

@@ -32,12 +32,13 @@ public class DrawAgenda extends AgendaSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");
         sb.append("Game: ").append(activeMap.getName()).append("\n");
-        sb.append("Agendas:\n");
+        sb.append("`").append(event.getCommandString()).append("`").append("\n");
+        sb.append("Drawn Agendas:\n");
         int index = 1;
         for (int i = 0; i < count; i++) {
             java.util.Map.Entry<String, Integer> entry = activeMap.drawAgenda();
             if (entry != null) {
-                sb.append(index).append(". (").append(entry.getValue()).append(") ").append(Mapper.getAgenda(entry.getKey()));
+                sb.append(index).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
                 index++;
                 sb.append("\n");
             }

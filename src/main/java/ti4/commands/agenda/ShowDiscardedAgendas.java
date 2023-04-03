@@ -1,8 +1,8 @@
 package ti4.commands.agenda;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
 
@@ -17,15 +17,13 @@ public class ShowDiscardedAgendas extends AgendaSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         StringBuilder sb = new StringBuilder();
-        sb.append("-----------");
-        sb.append("Agendas:\n");
+        sb.append("__**Discarded Agendas:**__\n");
         LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
         int index = 1;
         for (java.util.Map.Entry<String, Integer> entry : discardAgendas.entrySet()) {
-            sb.append(index).append(". (").append(entry.getValue()).append(") ").append(Mapper.getAgenda(entry.getKey()));
+            sb.append(index).append(". ").append(Helper.getAgendaRepresentation(entry.getKey(), entry.getValue()));
             index++;
         }
-        sb.append("\n-----------\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 }
