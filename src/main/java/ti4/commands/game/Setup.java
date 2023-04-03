@@ -16,6 +16,7 @@ public class Setup extends GameSubcommandData {
     public Setup() {
         super(Constants.SETUP, "Game Setup");
         addOptions(new OptionData(OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Specify player map size: 6 or 8. Default 6").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.RING_COUNT_FOR_MAP, "Specify ring count for map: Default: 0 use standard map, 8 - for max map size").setRequired(false));
         addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Specify game VP count").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Add Custom description to game").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.COMMUNITY_MODE, "Set to YES if want to allow Community Mode for map, FALSE to disable it").setRequired(false));
@@ -36,6 +37,16 @@ public class Setup extends GameSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify 6 or 8 player.");
             } else {
                 activeMap.setPlayerCountForMap(count);
+            }
+        }
+
+        OptionMapping ringCount = event.getOption(Constants.RING_COUNT_FOR_MAP);
+        if (ringCount != null) {
+            int count = ringCount.getAsInt();
+            if (count != 0 && count != 8) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify 0 or 8 rings.");
+            } else {
+                activeMap.setRingCount(count);
             }
         }
 

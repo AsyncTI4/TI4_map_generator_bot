@@ -46,6 +46,9 @@ public class GenerateMap {
     private final int width8 = 2500;
     private final int heght8 = 3350;
 
+    private final int width8ring = 4700;
+    private final int height8ring = 5450;
+
     private Boolean isFoWPrivate = null;
     private Player fowPlayer = null;
     private HashMap<String, Tile> tilesToDisplay = new HashMap<>();
@@ -72,6 +75,10 @@ public class GenerateMap {
         if (map != null && map.getPlayerCountForMap() == 8) {
             mapWidth = width8;
             mapHeight = heght8;
+        }
+        if (map != null && map.getRingCount() == 8) {
+            mapWidth = width8ring;
+            mapHeight = height8ring;
         }
         width = mapWidth + (extraWidth * 2);
         heightForGameInfo = mapHeight;
@@ -148,11 +155,17 @@ public class GenerateMap {
             if (displayType == DisplayType.all || displayType == DisplayType.map) {
                 HashMap<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
                 String setup = tileMap.keySet().stream()
-                        .filter(key -> key.startsWith("setup"))
+                        .filter(key -> key.equals("0"))
                         .findFirst()
                         .orElse(null);
                 if (setup != null) {
-                    addTile(tileMap.get(setup), map, TileStep.Setup);
+                    if (tileMap.get(setup).getTileID().equals("setup8ring")) {
+                        for (String position : PositionMapper.get8RingTiles()) {
+                            addTile(new Tile("0gray", position), map, TileStep.Tile);
+                        }
+                    } else {
+                        addTile(tileMap.get(setup), map, TileStep.Setup);
+                    }
                     tileMap.remove(setup);
                 }
 
