@@ -184,10 +184,8 @@ public class GenerateMap {
             String testing = System.getenv("TESTING");
             if (testing == null && displayType == DisplayType.all && (isFoWPrivate == null || !isFoWPrivate)) {
                 new Thread(() -> {
-                    BufferedImage img = mainImage;
-                    Map mp = map;
-                    WebHelper.putMap(map.getName(), img);
-                    WebHelper.putData(map.getName(), mp);
+                    WebHelper.putMap(map.getName(), mainImage);
+                    WebHelper.putData(map.getName(), map.copy());
                 }).start();
             }
         } catch (IOException e) {
