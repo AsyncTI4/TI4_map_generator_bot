@@ -342,6 +342,7 @@ public class Constants {
     public static final String RELIC_PURGE = "relic_purge";
     public static final String SHUFFLE_BACK = "relic_shuffle_back";
     public static final String ADD_BACK_INTO_DECK = "relic_add_back_into_deck";
+    public static final String RELIC_INFO = "relic_info";
     public static final String PUT_TOP = "put_top";
     public static final String PUT_BOTTOM = "put_bottom";
     public static final String SHUFFLE_AGENDAS = "shuffle_deck";
