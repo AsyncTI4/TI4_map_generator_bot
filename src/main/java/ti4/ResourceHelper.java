@@ -1,5 +1,6 @@
 package ti4;
 
+import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 
 import org.jetbrains.annotations.Nullable;
@@ -7,6 +8,7 @@ import org.jetbrains.annotations.Nullable;
 import java.io.File;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.Random;
 
 public class ResourceHelper {
     private static ResourceHelper resourceHelper = null;
@@ -95,6 +97,11 @@ public class ResourceHelper {
 
     @Nullable
     public String getUnitFile(String name) {
+        if (name.endsWith(Constants.UNIT_DD)) {
+            if (new Random().nextInt(Constants.EYE_CHANCE) == 0) {
+                return getResourceFromFolder("units/new_units/", name.replaceFirst(Constants.UNIT_DD,Constants.UNIT_DD_EYE ), "Could not find eye file");
+            }
+        }
         String unitPath = unitCache.get(name);
         if (unitPath != null) {
             return unitPath;
