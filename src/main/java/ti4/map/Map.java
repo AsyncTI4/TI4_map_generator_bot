@@ -143,6 +143,11 @@ public class Map {
         }
     }
 
+    synchronized public Map copy() {
+        Map m = this;
+        return m;
+    }
+
     public HashMap<String, Object> getExportableFieldMap() {
         Class<? extends Map> aClass = this.getClass();
         Field[] fields = aClass.getDeclaredFields();
