@@ -279,11 +279,6 @@ public class MessageHelper {
                 return;
             }
 
-            //ADD A PING IF BASE MESSAGE DOES NOT ALREADY HAVE ONE
-            if (messageText.contains(Helper.getPlayerPing(player))) {
-                threadChannel.sendMessage(Helper.getPlayerPing(player)).queue();
-            }
-
             //SEND MESSAGES
             for (String text : splitLargeText(messageText, 2000)) {
                 threadChannel.sendMessage(text).queue();
