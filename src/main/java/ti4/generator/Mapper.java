@@ -2,7 +2,6 @@ package ti4.generator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -49,6 +48,7 @@ public class Mapper {
     private static final Properties miltyDraft = new Properties();
     private static final Properties agendaRepresentation = new Properties();
     private static final Properties adjacentTiles = new Properties();
+    private static final Properties adjacent8RingTiles = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties wormholes = new Properties();
     private static final HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = new HashMap<>();
@@ -84,7 +84,8 @@ public class Mapper {
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("agenda_representation.properties", agendaRepresentation, "Could not read agenda representaion file");
         readData("adjacent.properties", adjacentTiles, "Could not read adjacent tiles file");
-        readData("hyperlanes.properties",hyperlaneAdjacencies,"Could not read hyperlanes file");
+        readData("adjacent8ring.properties", adjacent8RingTiles, "Could not read adjacent tiles file");
+        readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
         readData("wormholes.properties", wormholes, "Could not read wormholes file");
     }
 
@@ -107,14 +108,14 @@ public class Mapper {
                 String value = (String) entry.getValue();
                 String[] pns = value.split(";");
                 String id = pns[1].toLowerCase();
-                if (id.equals(color) || (isFaction(id) && AliasHandler.resolveFaction(id).equals(faction))) { 
+                if (id.equals(color) || (isFaction(id) && AliasHandler.resolveFaction(id).equals(faction))) {
                     pnList.add((String) entry.getKey());
                 }
             }
         }
         return pnList;
     }
-    
+
     public static List<String> getPromissoryNotes() {
         List<String> pnList = new ArrayList<>();
         for (Map.Entry<Object, Object> entry : promissoryNotes.entrySet()) {
@@ -122,6 +123,7 @@ public class Mapper {
         }
         return pnList;
     }
+
     public static boolean isColorValid(String color) {
         String property = colors.getProperty(color);
         return property != null && !property.equals("null");
@@ -144,9 +146,15 @@ public class Mapper {
         return tiles.getProperty(tileID);
     }
 
-    public static List<String> getAdjacentTilePositions(String tileID) {
-        String property = adjacentTiles.getProperty(tileID);
-        if (property == null){
+    public static List<String> getAdjacentTilePositions(ti4.map.Map map, String tileID) {
+
+        String property;
+        if (map.getRingCount() == 8) {
+            property = adjacent8RingTiles.getProperty(tileID);
+        } else {
+            property = adjacentTiles.getProperty(tileID);
+        }
+        if (property == null) {
             return Collections.emptyList();
         }
         return Arrays.stream(property.split(",")).toList();
@@ -169,7 +177,7 @@ public class Mapper {
 
     public static Set<String> getWormholes(String tileID) {
         String property = wormholes.getProperty(tileID);
-        if (property == null){
+        if (property == null) {
             return new HashSet<>();
         }
         return Arrays.stream(property.split(",")).collect(Collectors.toSet());
@@ -179,9 +187,9 @@ public class Mapper {
         Set<String> tileIDs = new HashSet<>();
         for (Map.Entry<Object, Object> wormholeEntry : wormholes.entrySet()) {
             Object value = wormholeEntry.getValue();
-            if (value instanceof String){
-                if (Arrays.asList(((String) value).split(",")).contains(wormholeID)){
-                    tileIDs.add((String)wormholeEntry.getKey());
+            if (value instanceof String) {
+                if (Arrays.asList(((String) value).split(",")).contains(wormholeID)) {
+                    tileIDs.add((String) wormholeEntry.getKey());
                 }
             }
         }
@@ -199,8 +207,8 @@ public class Mapper {
     public static Map<String, String> getUnits() {
         Map<String, String> unitMap = new HashMap<>();
         for (Map.Entry<Object, Object> entry : units.entrySet()) {
-            String representation = (String)unit_representation.get(entry.getKey());
-            unitMap.put((String)entry.getValue(), representation);
+            String representation = (String) unit_representation.get(entry.getKey());
+            unitMap.put((String) entry.getValue(), representation);
         }
         return unitMap;
     }
@@ -208,7 +216,7 @@ public class Mapper {
     public static Map<String, String> getColorToId() {
         Map<String, String> unitMap = new HashMap<>();
         for (Map.Entry<Object, Object> entry : colors.entrySet()) {
-            unitMap.put((String)entry.getValue(), (String)entry.getKey());
+            unitMap.put((String) entry.getValue(), (String) entry.getKey());
         }
         return unitMap;
     }
@@ -270,14 +278,14 @@ public class Mapper {
     public static Map<String, String> getTokensToName() {
         Map<String, String> tokensToName = new HashMap<>();
         for (Map.Entry<Object, Object> attachment : attachment_tokens.entrySet()) {
-            String key = (String)attachment.getKey();
-            String value = (String)attachment.getValue();
+            String key = (String) attachment.getKey();
+            String value = (String) attachment.getValue();
             tokensToName.put(value, key);
         }
 
         for (Map.Entry<Object, Object> tokens : tokens.entrySet()) {
-            String key = (String)tokens.getKey();
-            String value = (String)tokens.getValue();
+            String key = (String) tokens.getKey();
+            String value = (String) tokens.getValue();
             tokensToName.put(value, key);
         }
         return tokensToName;
@@ -386,8 +394,8 @@ public class Mapper {
 
     @Nullable
     public static String getAgendaTitle(String id) {
-        String agendaInfo = (String)agendaRepresentation.get(id);
-        if (agendaInfo == null){
+        String agendaInfo = (String) agendaRepresentation.get(id);
+        if (agendaInfo == null) {
             return null;
         }
         String[] split = agendaInfo.split(";");
@@ -395,8 +403,8 @@ public class Mapper {
     }
 
     public static String getAgendaType(String id) {
-        String agendaInfo = (String)agendaRepresentation.get(id);
-        if (agendaInfo == null){
+        String agendaInfo = (String) agendaRepresentation.get(id);
+        if (agendaInfo == null) {
             return "1";
         }
         String[] split = agendaInfo.split(";");
@@ -405,8 +413,8 @@ public class Mapper {
 
     @Nullable
     public static String getAgendaText(String id) {
-        String agendaInfo = (String)agendaRepresentation.get(id);
-        if (agendaInfo == null){
+        String agendaInfo = (String) agendaRepresentation.get(id);
+        if (agendaInfo == null) {
             return null;
         }
         String[] split = agendaInfo.split(";");
@@ -579,9 +587,8 @@ public class Mapper {
                         if (names.length > 1) {
                             for (String name : names) {
                                 if (!name.equals(Constants.AGENT) &&
-                                    !name.equals(Constants.COMMANDER) &&
-                                    !name.equals(Constants.HERO))
-                                {
+                                        !name.equals(Constants.COMMANDER) &&
+                                        !name.equals(Constants.HERO)) {
                                     filteredNames.add(name);
                                 }
                             }
@@ -591,7 +598,7 @@ public class Mapper {
                         leaderMap.put(leader, filteredNames);
                     }
                 }
-                leadersInfo.put((String)entry.getKey(), leaderMap);
+                leadersInfo.put((String) entry.getKey(), leaderMap);
             }
         }
         return leadersInfo;
