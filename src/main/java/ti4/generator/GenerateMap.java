@@ -47,7 +47,7 @@ public class GenerateMap {
     private final int heght8 = 3350;
 
     private final int width8ring = 4700;
-    private final int height8ring = 5450;
+    private final int height8ring = 5750;
 
     private Boolean isFoWPrivate = null;
     private Player fowPlayer = null;
