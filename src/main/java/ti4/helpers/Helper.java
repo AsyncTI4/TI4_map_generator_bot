@@ -1510,7 +1510,7 @@ public class Helper {
 
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
-        boolean isPrivateChannel = !activeMap.isCommunityMode();
+        boolean isPrivateChannel = true; // TEMP DISABLE: !activeMap.isCommunityMode();
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
         threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
         if (isPrivateChannel) {
