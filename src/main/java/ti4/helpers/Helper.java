@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -1442,5 +1443,37 @@ public class Helper {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static ThreadChannel getPlayerCardsInfoThread(Map activeMap, Player player) {
+        TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
+        if (actionsChannel == null) return null;
+
+        List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+        if (threadChannels == null || threadChannels.isEmpty()) return null;
+
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
+
+        // SEARCH FOR EXISTING OPEN THREAD
+        for (ThreadChannel threadChannel : threadChannels) {
+            if (threadChannel.getName().equals(threadName)) {
+                return threadChannel;
+            }
+        }
+
+        // TODO: SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+
+        // CREATE NEW THREAD
+        //Make card info thread a public thread in community mode
+        boolean isPrivateChannel = !activeMap.isCommunityMode();
+        ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
+        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
+        if (isPrivateChannel) {
+            threadAction.setInvitable(false);
+        }
+        threadAction.queue(t -> {
+            t.sendMessage("New Thead: " + threadName).queue();
+        });
+        return threadAction.complete();
     }
 }

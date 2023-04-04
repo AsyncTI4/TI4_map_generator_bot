@@ -1,16 +1,13 @@
 package ti4.message;
 
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -25,7 +22,9 @@ import ti4.map.Player;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
+import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class MessageHelper {
@@ -272,35 +271,15 @@ public class MessageHelper {
         if(activeMap.isFoWMode()) {
             sendPrivateMessageToPlayer(player, activeMap, messageText);
         } else {
-            boolean threadFound = false;
-            TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
-            List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
 
-            String threadName = "Cards Info-" + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
+            ThreadChannel threadChannel = Helper.getPlayerCardsInfoThread(activeMap, player);
 
-            for (ThreadChannel threadChannel : threadChannels) {
-                if (threadChannel.getName().equals(threadName)) {
-                    for (String text : splitLargeText(messageText, 2000)) {
-                        threadChannel.sendMessage(text).queue();
-                    }
-                    threadFound = true;
-                    break;
-                }
+            if (threadChannel == null) {
+                BotLogger.log("`MessageHelper.sendMessageToPlayerCardsInfoThread` - could not find or create Cards Info thread for player " + player.getUserName() + " in game " + activeMap.getName());
+                return;
             }
-            if (!threadFound) {
-                //Make card info thread a public thread in community mode
-                boolean isPrivateChannel = !activeMap.isCommunityMode();
-                ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
-                threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
-                if (isPrivateChannel) {
-                    threadAction.setInvitable(false);
-                }
-                threadAction.queue(t -> {
-                    t.sendMessage("New Thead: " + threadName).queue();
-                    for (String text : splitLargeText(messageText, 2000)) {
-                        t.sendMessage(text).queue();
-                    }
-                });
+            for (String text : splitLargeText(messageText, 2000)) {
+                threadChannel.sendMessage(text).queue();
             }
         }
     }
@@ -348,6 +327,24 @@ public class MessageHelper {
             texts.add(textToAdd);
         }
         return texts;
+    }
+
+    public static List<MessageCreateData> getMessageObject(String message, List<Button> buttons) {
+        buttons.removeIf(Objects::isNull);
+        List<List<Button>> partitions = ListUtils.partition(buttons, 5);
+        List<ActionRow> actionRows = new ArrayList<>();
+        for (List<Button> partition : partitions) {
+            actionRows.add(ActionRow.of(partition));
+        }
+        List<List<ActionRow>> partitionActionRows = ListUtils.partition(actionRows, 5);
+        List<MessageCreateData> buttonMessages = new ArrayList<>();
+
+        for (List<ActionRow> partitionActionRow : partitionActionRows) {
+            buttonMessages.add(new MessageCreateBuilder()
+                    .addContent(message)
+                    .addComponents(partitionActionRow).build());
+        }
+        return buttonMessages;
     }
 
 
