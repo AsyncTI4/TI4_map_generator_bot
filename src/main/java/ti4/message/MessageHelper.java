@@ -272,12 +272,19 @@ public class MessageHelper {
             sendPrivateMessageToPlayer(player, activeMap, messageText);
         } else {
 
+            //GET CARDS INFO THREAD
             ThreadChannel threadChannel = Helper.getPlayerCardsInfoThread(activeMap, player);
-
             if (threadChannel == null) {
                 BotLogger.log("`MessageHelper.sendMessageToPlayerCardsInfoThread` - could not find or create Cards Info thread for player " + player.getUserName() + " in game " + activeMap.getName());
                 return;
             }
+
+            //ADD A PING IF BASE MESSAGE DOES NOT ALREADY HAVE ONE
+            if (messageText.contains(Helper.getPlayerPing(player))) {
+                threadChannel.sendMessage(Helper.getPlayerPing(player)).queue();
+            }
+
+            //SEND MESSAGES
             for (String text : splitLargeText(messageText, 2000)) {
                 threadChannel.sendMessage(text).queue();
             }

@@ -1450,7 +1450,7 @@ public class Helper {
         if (actionsChannel == null) return null;
 
         List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-        if (threadChannels == null || threadChannels.isEmpty()) return null;
+        if (threadChannels == null) return null;
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
 
@@ -1471,9 +1471,6 @@ public class Helper {
         if (isPrivateChannel) {
             threadAction.setInvitable(false);
         }
-        threadAction.queue(t -> {
-            t.sendMessage("New Thead: " + threadName).queue();
-        });
         return threadAction.complete();
     }
 }
