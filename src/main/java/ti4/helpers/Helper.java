@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.NotNull;
@@ -1332,14 +1333,38 @@ public class Helper {
     public static String getTechRepresentation(String techID) {
         String techRep = Mapper.getTechRepresentations().get(techID);
 
-        //Columns: key = Proper Name | type | prerequisites | text
+        //Columns: key = Proper Name | type | prerequisites | faction | text
         StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
         String techName = techRepTokenizer.nextToken();
         String techType = techRepTokenizer.nextToken();
-        String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
         String techPrerequisites = techRepTokenizer.nextToken();
+        String techFaction = techRepTokenizer.nextToken();
+        String factionEmoji = "";
+        if (!techFaction.equals(" ")) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
+        String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
+        if(!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.length() + 1);
         String techText = techRepTokenizer.nextToken();
-        return techEmoji + "**" + techName + "**";
+        return techEmoji + "**" + techName + "**" + factionEmoji + "\n";
+    }
+
+    public static String getTechRepresentationLong(String techID) {
+        String techRep = Mapper.getTechRepresentations().get(techID);
+
+        //Columns: key = Proper Name | type | prerequisites | faction | text
+        StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
+        String techName = techRepTokenizer.nextToken();
+        String techType = techRepTokenizer.nextToken();
+        String techPrerequisites = techRepTokenizer.nextToken();
+        String techFaction = techRepTokenizer.nextToken();
+        String factionEmoji = "";
+        if (!techFaction.equals(" ")) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
+        String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
+        if(!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.replace(" ","").length() + 1);
+        String techText = techRepTokenizer.nextToken();
+        StringBuilder sb = new StringBuilder();
+        sb.append(techEmoji + "**" + techName + "**" + factionEmoji + "\n");
+        sb.append("> ").append(techText).append("\n");
+        return sb.toString();
     }
 
     public static String getAgendaRepresentation(@NotNull String agendaID) {
@@ -1392,6 +1417,27 @@ public class Helper {
         return sb.toString();
     }
 
+    public static String getRelicRepresentation(String relicID) {
+        String relicText = Mapper.getRelic(relicID);
+        if (relicText == null) {
+            BotLogger.log("`Helper.getRelicRepresentation` failed to find `relicID = " + relicID + "`");
+            return "RelicID not found: `" + relicID + "`\n";
+        }
+        String[] relicData = relicText.split(";");
+        StringBuilder message = new StringBuilder();
+        message.append(Emojis.Relic).append(" __**").append(relicData[0]).append("**__\n> ").append(relicData[1]).append("\n");
+       
+        //Append helpful commands after relic draws and resolve effects:
+        switch (relicID) {
+            case "nanoforge" -> {
+                message.append("Run the following commands to use Nanoforge:\n")
+                       .append("     `/explore relic_purge relic: nanoforge`\n")
+                       .append("     `/add_token token:nanoforge tile_name:{TILE} planet_name:{PLANET}`");
+            }
+        }
+        return message.toString();
+    }
+
     public static void checkIfHeroUnlocked(SlashCommandInteractionEvent event, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(Constants.HERO);
         if (playerLeader != null && playerLeader.isLocked()) {
@@ -1442,5 +1488,34 @@ public class Helper {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static ThreadChannel getPlayerCardsInfoThread(Map activeMap, Player player) {
+        TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
+        if (actionsChannel == null) return null;
+
+        List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+        if (threadChannels == null) return null;
+
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
+
+        // SEARCH FOR EXISTING OPEN THREAD
+        for (ThreadChannel threadChannel : threadChannels) {
+            if (threadChannel.getName().equals(threadName)) {
+                return threadChannel;
+            }
+        }
+
+        // TODO: SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+
+        // CREATE NEW THREAD
+        //Make card info thread a public thread in community mode
+        boolean isPrivateChannel = !activeMap.isCommunityMode();
+        ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
+        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
+        if (isPrivateChannel) {
+            threadAction.setInvitable(false);
+        }
+        return threadAction.complete();
     }
 }
