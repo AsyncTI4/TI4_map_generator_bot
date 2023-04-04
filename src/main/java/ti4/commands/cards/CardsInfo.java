@@ -23,6 +23,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.Nullable;
 
 import ti4.MapGenerator;
+import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -234,7 +235,7 @@ public class CardsInfo extends CardsSubcommandData {
         String acPlayMsg = "_ _\nClick a button below to play an Action Card";
         String text = ping == null ? null : ping + "\n";
         MessageHelper.sendMessageToChannel(privateChannel, text);
-        ti4.commands.cardsso.CardsInfo.sendSecretObjectiveInfo(activeMap, player);
+        SOInfo.sendSecretObjectiveInfo(activeMap, player);
         MessageHelper.sendMessageToChannel(privateChannel, ac);
         List<MessageCreateData> messageList = MessageHelper.getMessageObject(acPlayMsg, acButtons);
         for (MessageCreateData message : messageList) {

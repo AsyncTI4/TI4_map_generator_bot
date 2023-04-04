@@ -17,8 +17,8 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class CardsInfo extends SOCardsSubcommandData {
-    public CardsInfo() {
+public class SOInfo extends SOCardsSubcommandData {
+    public SOInfo() {
         super(Constants.INFO, "Resent all my cards in Private Message");
     }
 
@@ -31,8 +31,9 @@ public class CardsInfo extends SOCardsSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
-        sendMessage("SO Info Sent");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, Helper.getPlayerRepresentation(event, player));
         sendSecretObjectiveInfo(activeMap, player);
+        sendMessage("SO Info Sent");
     }
 
     public static void sendSecretObjectiveInfo(Map activeMap, Player player) {
