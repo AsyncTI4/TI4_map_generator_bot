@@ -1342,7 +1342,7 @@ public class Helper {
         String factionEmoji = "";
         if (!techFaction.equals(" ")) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
         String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
-        if(!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.length() + 1);
+        // if(!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.length() + 1);
         String techText = techRepTokenizer.nextToken();
         return techEmoji + "**" + techName + "**" + factionEmoji + "\n";
     }
@@ -1359,7 +1359,7 @@ public class Helper {
         String factionEmoji = "";
         if (!techFaction.equals(" ")) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
         String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
-        if(!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.replace(" ","").length() + 1);
+        // if(!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.replace(" ","").length() + 1);
         String techText = techRepTokenizer.nextToken();
         StringBuilder sb = new StringBuilder();
         sb.append(techEmoji + "**" + techName + "**" + factionEmoji + "\n");
