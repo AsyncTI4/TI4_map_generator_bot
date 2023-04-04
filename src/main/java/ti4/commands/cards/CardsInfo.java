@@ -23,6 +23,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.Nullable;
 
 import ti4.MapGenerator;
+import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -71,55 +72,15 @@ public class CardsInfo extends CardsSubcommandData {
         if (longPNOption != null) {
             longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
         }
-        LinkedHashMap<String, Integer> secretObjective = activeMap.getSecretObjective(player.getUserID());
-        LinkedHashMap<String, Integer> scoredSecretObjective = new LinkedHashMap<>(activeMap.getScoredSecretObjective(player.getUserID()));
         String soText;
         String acText;
         String pnText;
-        for (String id : activeMap.getSoToPoList()) {
-            scoredSecretObjective.remove(id);
-        }
+
         StringBuilder sb = new StringBuilder();
         sb.append("--------------------\n");
         sb.append("**Game: **`").append(activeMap.getName()).append("`\n");
         sb.append(Helper.getPlayerRepresentation(event, player, true));
-        int index = 1;
-        sb.append("\n");
 
-        //SCORED SECRET OBJECTIVES
-        sb.append("**Scored Secret Objectives:**").append("\n");
-        if (scoredSecretObjective != null) {
-            for (java.util.Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
-                String[] soSplit = Mapper.getSecretObjective(so.getKey()).split(";");
-                String soName = soSplit[0];
-                String soPhase = soSplit[1];
-                String soDescription = soSplit[2];
-                sb.append("`").append(index).append(".").append(Helper.leftpad("(" + so.getValue(), 4)).append(")`");
-                sb.append(Emojis.SecretObjective).append("__" + soName + "__"); //.append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
-                sb.append("\n");
-                index++;
-            }
-        }
-        sb.append("\n");
-
-        //UNSCORED SECRET OBJECTIVES
-        sb.append("**Unscored Secret Objectives:**").append("\n");
-        List<Button> soButtons = new ArrayList<>();
-        if (secretObjective != null) {
-            for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
-                String[] soSplit = Mapper.getSecretObjective(so.getKey()).split(";");
-                String soName = soSplit[0];
-                String soPhase = soSplit[1];
-                String soDescription = soSplit[2];
-                Integer idValue = so.getValue();
-                sb.append("`").append(index).append(".").append(Helper.leftpad("(" + idValue, 4)).append(")`");
-                sb.append(Emojis.SecretObjective).append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
-                index++;
-                if (soName != null) {
-                    soButtons.add(Button.primary(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
-                }
-            }
-        }
         soText = sb.toString();
         sb = new StringBuilder();
 
@@ -127,7 +88,7 @@ public class CardsInfo extends CardsSubcommandData {
 
         //ACTION CARDS
         sb.append("**Action Cards:**").append("\n");
-        index = 1;
+        int index = 1;
 
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
@@ -244,10 +205,9 @@ public class CardsInfo extends CardsSubcommandData {
                 boolean threadFound = false;
                 String threadName = CARDS_INFO + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
                 String playerPing = threadName + " " + Helper.getPlayerPing(player);
-
                 for (ThreadChannel threadChannel : threadChannels) {
                     if (threadChannel.getName().equals(threadName)) {
-                        sendCardInfoToChannel(threadChannel, playerPing, soText, soButtons, acText, acButtons, pnText);
+                        sendCardInfoToChannel(threadChannel, playerPing, soText, acText, acButtons, pnText, activeMap, player);
                         threadFound = true;
                         break;
                     }
@@ -261,7 +221,7 @@ public class CardsInfo extends CardsSubcommandData {
                     }
                     ThreadChannel new_thread = thread.complete();
                     
-                    sendCardInfoToChannel(new_thread, playerPing, soText, soButtons, acText, acButtons, pnText);
+                    sendCardInfoToChannel(new_thread, playerPing, soText, acText, acButtons, pnText, activeMap, player);
                 }
             } catch (Exception e) {
                 BotLogger.log("Could not create Private Thread");
@@ -271,40 +231,17 @@ public class CardsInfo extends CardsSubcommandData {
         }
     }
 
-    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String so, List<Button> soButtons, String ac, List<Button> acButtons, String pn) {
-        String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
+    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String so, String ac, List<Button> acButtons, String pn, Map activeMap, Player player) {
         String acPlayMsg = "_ _\nClick a button below to play an Action Card";
         String text = ping == null ? null : ping + "\n";
         MessageHelper.sendMessageToChannel(privateChannel, text);
-        MessageHelper.sendMessageToChannel(privateChannel, so);
-        List<MessageCreateData> messageList = getMessageObject(secretScoreMsg, soButtons);
-        for (MessageCreateData message : messageList) {
-            privateChannel.sendMessage(message).queue();
-        }
+        SOInfo.sendSecretObjectiveInfo(activeMap, player);
         MessageHelper.sendMessageToChannel(privateChannel, ac);
-        messageList = getMessageObject(acPlayMsg, acButtons);
+        List<MessageCreateData> messageList = MessageHelper.getMessageObject(acPlayMsg, acButtons);
         for (MessageCreateData message : messageList) {
             privateChannel.sendMessage(message).queue();
         }
         MessageHelper.sendMessageToChannel(privateChannel, pn);
-    }
-
-    private static List<MessageCreateData> getMessageObject(String message, List<Button> buttons) {
-        buttons.removeIf(Objects::isNull);
-        List<List<Button>> partitions = ListUtils.partition(buttons, 5);
-        List<ActionRow> actionRows = new ArrayList<>();
-        for (List<Button> partition : partitions) {
-            actionRows.add(ActionRow.of(partition));
-        }
-        List<List<ActionRow>> partitionActionRows = ListUtils.partition(actionRows, 5);
-        List<MessageCreateData> buttonMessages = new ArrayList<>();
-
-        for (List<ActionRow> partitionActionRow : partitionActionRows) {
-            buttonMessages.add(new MessageCreateBuilder()
-                    .addContent(message)
-                    .addComponents(partitionActionRow).build());
-        }
-        return buttonMessages;
     }
 
     private static void checkAndAddPNs(Map activeMap, Player player) {
