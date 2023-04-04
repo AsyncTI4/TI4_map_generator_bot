@@ -1333,14 +1333,38 @@ public class Helper {
     public static String getTechRepresentation(String techID) {
         String techRep = Mapper.getTechRepresentations().get(techID);
 
-        //Columns: key = Proper Name | type | prerequisites | text
+        //Columns: key = Proper Name | type | prerequisites | faction | text
         StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
         String techName = techRepTokenizer.nextToken();
         String techType = techRepTokenizer.nextToken();
-        String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
         String techPrerequisites = techRepTokenizer.nextToken();
+        String techFaction = techRepTokenizer.nextToken();
+        String factionEmoji = "";
+        if (!techFaction.equals(" ")) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
+        String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
+        if(!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.length() + 1);
         String techText = techRepTokenizer.nextToken();
-        return techEmoji + "**" + techName + "**";
+        return techEmoji + "**" + techName + "**" + factionEmoji + "\n";
+    }
+
+    public static String getTechRepresentationLong(String techID) {
+        String techRep = Mapper.getTechRepresentations().get(techID);
+
+        //Columns: key = Proper Name | type | prerequisites | faction | text
+        StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
+        String techName = techRepTokenizer.nextToken();
+        String techType = techRepTokenizer.nextToken();
+        String techPrerequisites = techRepTokenizer.nextToken();
+        String techFaction = techRepTokenizer.nextToken();
+        String factionEmoji = "";
+        if (!techFaction.equals(" ")) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
+        String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
+        if(!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.replace(" ","").length() + 1);
+        String techText = techRepTokenizer.nextToken();
+        StringBuilder sb = new StringBuilder();
+        sb.append(techEmoji + "**" + techName + "**" + factionEmoji + "\n");
+        sb.append("> ").append(techText).append("\n");
+        return sb.toString();
     }
 
     public static String getAgendaRepresentation(@NotNull String agendaID) {
