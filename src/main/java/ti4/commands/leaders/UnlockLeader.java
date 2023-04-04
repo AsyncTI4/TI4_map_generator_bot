@@ -23,9 +23,7 @@ public class UnlockLeader extends LeaderAction {
     public void unlockLeader(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(leader);
         MessageChannel channel = activeMap.getMainGameChannel();
-        if (activeMap.isFoWMode()) {
-            channel = player.getPrivateChannel();
-        }
+        if (activeMap.isFoWMode()) channel = player.getPrivateChannel();
 
         if (playerLeader != null){
             playerLeader.setLocked(false);
@@ -45,7 +43,8 @@ public class UnlockLeader extends LeaderAction {
     public void unlockLeader(ButtonInteractionEvent event, String leader, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(leader);
         MessageChannel channel = activeMap.getMainGameChannel();
-        if (channel == null || activeMap.isFoWMode()) channel = event.getChannel();
+        if (activeMap.isFoWMode()) channel = player.getPrivateChannel();
+
         if (playerLeader != null){
             playerLeader.setLocked(false);
             MessageHelper.sendMessageToChannel(channel, Helper.getFactionLeaderEmoji(player, playerLeader));

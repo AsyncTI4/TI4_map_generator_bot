@@ -268,21 +268,16 @@ public class MessageHelper {
     }
 
     public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, @NotNull Map activeMap, String messageText) {
-        if(activeMap.isFoWMode()) {
-            sendPrivateMessageToPlayer(player, activeMap, messageText);
-        } else {
+        //GET CARDS INFO THREAD
+        ThreadChannel threadChannel = Helper.getPlayerCardsInfoThread(activeMap, player);
+        if (threadChannel == null) {
+            BotLogger.log("`MessageHelper.sendMessageToPlayerCardsInfoThread` - could not find or create Cards Info thread for player " + player.getUserName() + " in game " + activeMap.getName());
+            return;
+        }
 
-            //GET CARDS INFO THREAD
-            ThreadChannel threadChannel = Helper.getPlayerCardsInfoThread(activeMap, player);
-            if (threadChannel == null) {
-                BotLogger.log("`MessageHelper.sendMessageToPlayerCardsInfoThread` - could not find or create Cards Info thread for player " + player.getUserName() + " in game " + activeMap.getName());
-                return;
-            }
-
-            //SEND MESSAGES
-            for (String text : splitLargeText(messageText, 2000)) {
-                threadChannel.sendMessage(text).queue();
-            }
+        //SEND MESSAGES
+        for (String text : splitLargeText(messageText, 2000)) {
+            threadChannel.sendMessage(text).queue();
         }
     }
 
