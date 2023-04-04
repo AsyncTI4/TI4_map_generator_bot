@@ -35,8 +35,6 @@ public class LeaderInfo extends LeaderSubcommandData {
            sendMessage("Player could not be found");
             return;
         }
-        sendMessage(Helper.getPlayerRepresentation(event, player) + " Leader Info:");
-
         String leaderInfo = getLeaderInfo(activeMap, player);
 
         if (event != null) {
