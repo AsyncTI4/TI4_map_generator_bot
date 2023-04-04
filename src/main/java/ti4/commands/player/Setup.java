@@ -26,7 +26,6 @@ public class Setup extends PlayerSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
         addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position"));
-        addOptions(new OptionData(OptionType.STRING, Constants.KELERES_HS, "Keleres HS").setAutoComplete(true));
     }
 
     @Override
@@ -82,27 +81,12 @@ public class Setup extends PlayerSubcommandData {
                 break;
             }
         }
-        String playerSetup = null;
-        if ("keleres".equals(faction)) {
-            OptionMapping option = event.getOption(Constants.KELERES_HS);
-            if (option != null) {
-                playerSetup = Mapper.getPlayerSetup(option.getAsString());
-            } else {
-                sendMessage("Could not setup Keleres. Please select subfaction with the `keleres_hs` option");
-                return;
-            }
-        } else {
-            playerSetup = Mapper.getPlayerSetup(faction);
-        }
+        String playerSetup = Mapper.getPlayerSetup(faction);
 
         if (playerSetup == null) {
             sendMessage("Could not setup faction. Report to ADMIN");
             return;
         }
-
-
-
-
         String[] setupInfo = playerSetup.split(";");
         String hsTile = setupInfo[1];
 
@@ -113,7 +97,6 @@ public class Setup extends PlayerSubcommandData {
         boolean is6playerMap = true;
         if (activeMap.getPlayerCountForMap() == 6){
             setup = Constants.setup6p;
-            is6playerMap = true;
             if (MapStringMapper.mapFor6Player.contains(positionHS)){
                 useSpecified = true;
             }
