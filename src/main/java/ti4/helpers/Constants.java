@@ -118,6 +118,11 @@ public class Constants {
     public static final String BULK_FF = "_tkn_ff.png";
     public static final String COLOR_GF = "_gf.png";
     public static final String COLOR_FF = "_ff.png";
+
+    public static final String UNIT_DD = "_dd.png";
+    public static final String UNIT_DD_EYE = "_dd_eyes.png";
+    public static final int EYE_CHANCE = 1000;
+
     public static final String SETUP6 = "setup6";
     public static final String SETUP8 = "setup8";
     public static final String MALLICE = "mallicelocked";
