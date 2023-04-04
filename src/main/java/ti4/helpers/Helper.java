@@ -1492,6 +1492,7 @@ public class Helper {
 
     public static ThreadChannel getPlayerCardsInfoThread(Map activeMap, Player player) {
         TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
+        if (activeMap.isFoWMode()) actionsChannel = (TextChannel) player.getPrivateChannel();
         if (actionsChannel == null) return null;
 
         List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
@@ -1510,7 +1511,7 @@ public class Helper {
 
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
-        boolean isPrivateChannel = true; // TEMP DISABLE: !activeMap.isCommunityMode();
+        boolean isPrivateChannel = !activeMap.isCommunityMode();
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
         threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
         if (isPrivateChannel) {
