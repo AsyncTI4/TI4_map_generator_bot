@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -62,16 +61,20 @@ public class ACInfo extends CardsSubcommandData {
 
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
         if (actionCards != null) {
-            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
-                String[] acSplit = Mapper.getActionCard(ac.getKey()).split(";");
-                String acName = acSplit[0];
-                String acPhase = acSplit[1];
-                String acWindow = acSplit[2];
-                String acDescription = acSplit[3];
-                Integer value = ac.getValue();
-                sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
-                sb.append(Emojis.ActionCard).append("__**" + acName + "**__").append(" *(").append(acPhase).append(" Phase)*: _").append(acWindow).append(":_ ").append(acDescription).append("\n");
-                index++;
+            if (actionCards.isEmpty()) {
+                sb.append("> None");
+            } else {
+                for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                    String[] acSplit = Mapper.getActionCard(ac.getKey()).split(";");
+                    String acName = acSplit[0];
+                    String acPhase = acSplit[1];
+                    String acWindow = acSplit[2];
+                    String acDescription = acSplit[3];
+                    Integer value = ac.getValue();
+                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
+                    sb.append(Emojis.ActionCard).append("__**" + acName + "**__").append(" *(").append(acPhase).append(" Phase)*: _").append(acWindow).append(":_ ").append(acDescription).append("\n");
+                    index++;
+                }
             }
         }
 
@@ -81,7 +84,7 @@ public class ACInfo extends CardsSubcommandData {
     private static List<Button> getPlayActionCardButtons(Map activeMap, Player player) {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
-        if (actionCards != null) {
+        if (actionCards != null && !actionCards.isEmpty()) {
             for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();

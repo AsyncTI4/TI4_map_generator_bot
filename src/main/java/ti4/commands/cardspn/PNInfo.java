@@ -52,7 +52,9 @@ public class PNInfo extends PNCardsSubcommandData {
     }
 
     private static List<Button> getPlayablePNButtons(Map activeMap, Player player) {
-        return null;
+        List<Button> pnButtons = new ArrayList<>();
+        //TODO: PN BUTTONS
+        return pnButtons;
     }
 
     public static String getPromissoryNoteCardInfo(Map activeMap, Player player, boolean longFormat) {
@@ -65,23 +67,27 @@ public class PNInfo extends PNCardsSubcommandData {
         LinkedHashMap<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
         if (promissoryNotes != null) {
-            for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
-                if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`");
-                    sb.append(getPromissoryNoteRepresentation(pn.getKey(), longFormat));
-                    index++;
+            if (promissoryNotes.isEmpty()) {
+                sb.append("> None");
+            } else {
+                for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
+                    if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
+                        sb.append("`").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`");
+                        sb.append(getPromissoryNoteRepresentation(pn.getKey(), longFormat));
+                        index++;
+                    }
                 }
-            }
-            sb.append("\n");
-
-            //PLAY AREA PROMISSORY NOTES
-            sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
-            for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
-                if (promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    sb.append("`").append(index).append(".");
-                    sb.append("(" + pn.getValue()).append(")`");
-                    sb.append(getPromissoryNoteRepresentation(pn.getKey(), longFormat));
-                    index++;
+                sb.append("\n");
+                
+                //PLAY AREA PROMISSORY NOTES
+                sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
+                for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
+                    if (promissoryNotesInPlayArea.contains(pn.getKey())) {
+                        sb.append("`").append(index).append(".");
+                        sb.append("(" + pn.getValue()).append(")`");
+                        sb.append(getPromissoryNoteRepresentation(pn.getKey(), longFormat));
+                        index++;
+                    }
                 }
             }
         }
