@@ -73,19 +73,18 @@ public class CardsInfo extends CardsSubcommandData {
         if (longPNOption != null) {
             longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
         }
-        String soText;
-        String acText;
-
+        String headerText;
+        
         StringBuilder sb = new StringBuilder();
         sb.append("--------------------\n");
         sb.append("**Game: **`").append(activeMap.getName()).append("`\n");
         sb.append(Helper.getPlayerRepresentation(event, player, true));
-
-        soText = sb.toString();
+        
+        headerText = sb.toString();
         sb = new StringBuilder();
-
+        
         sb.append("_ _\n");
-
+        
         //ACTION CARDS
         sb.append("**Action Cards:**").append("\n");
         int index = 1;
@@ -110,11 +109,11 @@ public class CardsInfo extends CardsSubcommandData {
                 }
             }
         }
-        acText = sb.toString();
+        String acText = sb.toString();
 
         User userById = event != null ? event.getJDA().getUserById(player.getUserID()) : (buttonEvent != null ? buttonEvent.getJDA().getUserById(player.getUserID()) : null);
         if (userById != null) {
-            String cardInfo = soText + "\n" + acText;
+            String cardInfo = headerText + "\n" + acText;
 
             try {
                 MessageChannel channel = event != null ? event.getChannel() : buttonEvent.getChannel();
@@ -175,7 +174,7 @@ public class CardsInfo extends CardsSubcommandData {
                 String playerPing = threadName + " " + Helper.getPlayerPing(player);
                 for (ThreadChannel threadChannel : threadChannels) {
                     if (threadChannel.getName().equals(threadName)) {
-                        sendCardInfoToChannel(threadChannel, playerPing, soText, acText, acButtons, activeMap, player, longPNDisplay);
+                        sendCardInfoToChannel(threadChannel, playerPing, headerText, acText, acButtons, activeMap, player, longPNDisplay);
                         threadFound = true;
                         break;
                     }
@@ -189,7 +188,7 @@ public class CardsInfo extends CardsSubcommandData {
                     }
                     ThreadChannel new_thread = thread.complete();
                     
-                    sendCardInfoToChannel(new_thread, playerPing, soText, acText, acButtons, activeMap, player, longPNDisplay);
+                    sendCardInfoToChannel(new_thread, playerPing, headerText, acText, acButtons, activeMap, player, longPNDisplay);
                 }
             } catch (Exception e) {
                 BotLogger.log("Could not create Private Thread");
@@ -199,9 +198,10 @@ public class CardsInfo extends CardsSubcommandData {
         }
     }
 
-    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String so, String ac, List<Button> acButtons, Map activeMap, Player player, boolean longPNDisplay) {
+    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String header, String ac, List<Button> acButtons, Map activeMap, Player player, boolean longPNDisplay) {
         String acPlayMsg = "_ _\nClick a button below to play an Action Card";
         String text = ping == null ? null : ping + "\n";
+        MessageHelper.sendMessageToChannel(privateChannel, header);
         MessageHelper.sendMessageToChannel(privateChannel, text);
         SOInfo.sendSecretObjectiveInfo(activeMap, player);
         MessageHelper.sendMessageToChannel(privateChannel, ac);
