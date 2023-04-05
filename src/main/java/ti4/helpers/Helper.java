@@ -333,6 +333,9 @@ public class Helper {
             case "yin" -> Emojis.Yin;
             case "lazax" -> Emojis.Lazax;
             case "keleres" -> Emojis.Keleres;
+            case "keleresa" -> Emojis.Keleres;
+            case "keleresm" -> Emojis.Keleres;
+            case "keleresx" -> Emojis.Keleres;
             case "augers" -> Emojis.augers;
             case "axis" -> Emojis.axis;
             case "bentor" -> Emojis.bentor;
