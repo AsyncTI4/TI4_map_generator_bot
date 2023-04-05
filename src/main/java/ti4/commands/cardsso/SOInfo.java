@@ -20,7 +20,7 @@ import ti4.message.MessageHelper;
 
 public class SOInfo extends SOCardsSubcommandData {
     public SOInfo() {
-        super(Constants.INFO, "Resent all my cards in Private Message");
+        super(Constants.INFO, "Sent scored and unscored Secret Objectives to your Cards Info thread");
     }
 
     @Override

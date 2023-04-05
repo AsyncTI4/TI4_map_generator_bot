@@ -43,7 +43,7 @@ public class CardsInfo extends CardsSubcommandData {
     private static HashMap<Map, TextChannel> threadTextChannels = new HashMap<>();
 
     public CardsInfo() {
-        super(Constants.INFO, "Resent all my cards in Private Message");
+        super(Constants.INFO, "Send all your cards to your Cards Info thread");
         addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false));
     }
