@@ -71,7 +71,7 @@ public class SOInfo extends SOCardsSubcommandData {
         String soName = soSplit[0];
         String soPhase = soSplit[1];
         String soDescription = soSplit[2];
-        sb.append(Emojis.SecretObjective).append("__" + soName + "__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
+        sb.append(Emojis.SecretObjective).append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
         return sb.toString();
     }
 
