@@ -23,6 +23,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.Nullable;
 
 import ti4.MapGenerator;
+import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -74,7 +75,6 @@ public class CardsInfo extends CardsSubcommandData {
         }
         String soText;
         String acText;
-        String pnText;
 
         StringBuilder sb = new StringBuilder();
         sb.append("--------------------\n");
@@ -111,42 +111,10 @@ public class CardsInfo extends CardsSubcommandData {
             }
         }
         acText = sb.toString();
-        sb = new StringBuilder();
-        sb.append("_ _\n");
-       
-        //PROMISSORY NOTES
-        sb.append("**Promissory Notes:**").append("\n");
-        index = 1;
-        LinkedHashMap<String, Integer> promissoryNotes = player.getPromissoryNotes();
-        List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
-        if (promissoryNotes != null) {
-            for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
-                if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`");
-                    sb.append(Emojis.PN).append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
-                    sb.append("\n");
-                    index++;
-                }
-            }
-            sb.append("\n");
-
-            //PLAY AREA PROMISSORY NOTES
-            sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
-            for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
-                if (promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    String pnData = Mapper.getPromissoryNote(pn.getKey(), longPNDisplay);
-                    sb.append("`").append(index).append(".").append("(" + pn.getValue()).append(")`");
-                    sb.append(Emojis.PN).append(pnData);
-                    sb.append("\n");
-                    index++;
-                }
-            }
-        }
-        pnText = sb.toString();
 
         User userById = event != null ? event.getJDA().getUserById(player.getUserID()) : (buttonEvent != null ? buttonEvent.getJDA().getUserById(player.getUserID()) : null);
         if (userById != null) {
-            String cardInfo = soText + "\n" + acText + "\n" + pnText;
+            String cardInfo = soText + "\n" + acText;
 
             try {
                 MessageChannel channel = event != null ? event.getChannel() : buttonEvent.getChannel();
@@ -207,7 +175,7 @@ public class CardsInfo extends CardsSubcommandData {
                 String playerPing = threadName + " " + Helper.getPlayerPing(player);
                 for (ThreadChannel threadChannel : threadChannels) {
                     if (threadChannel.getName().equals(threadName)) {
-                        sendCardInfoToChannel(threadChannel, playerPing, soText, acText, acButtons, pnText, activeMap, player);
+                        sendCardInfoToChannel(threadChannel, playerPing, soText, acText, acButtons, activeMap, player, longPNDisplay);
                         threadFound = true;
                         break;
                     }
@@ -221,7 +189,7 @@ public class CardsInfo extends CardsSubcommandData {
                     }
                     ThreadChannel new_thread = thread.complete();
                     
-                    sendCardInfoToChannel(new_thread, playerPing, soText, acText, acButtons, pnText, activeMap, player);
+                    sendCardInfoToChannel(new_thread, playerPing, soText, acText, acButtons, activeMap, player, longPNDisplay);
                 }
             } catch (Exception e) {
                 BotLogger.log("Could not create Private Thread");
@@ -231,7 +199,7 @@ public class CardsInfo extends CardsSubcommandData {
         }
     }
 
-    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String so, String ac, List<Button> acButtons, String pn, Map activeMap, Player player) {
+    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String so, String ac, List<Button> acButtons, Map activeMap, Player player, boolean longPNDisplay) {
         String acPlayMsg = "_ _\nClick a button below to play an Action Card";
         String text = ping == null ? null : ping + "\n";
         MessageHelper.sendMessageToChannel(privateChannel, text);
@@ -241,7 +209,7 @@ public class CardsInfo extends CardsSubcommandData {
         for (MessageCreateData message : messageList) {
             privateChannel.sendMessage(message).queue();
         }
-        MessageHelper.sendMessageToChannel(privateChannel, pn);
+        PNInfo.sendPromissoryNoteInfo(activeMap, player, longPNDisplay);
     }
 
     private static void checkAndAddPNs(Map activeMap, Player player) {

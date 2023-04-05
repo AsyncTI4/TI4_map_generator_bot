@@ -31,13 +31,13 @@ public class PNInfo extends PNCardsSubcommandData {
             return;
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, Helper.getPlayerRepresentation(event, player));
-        sendPromissoryNoteInfo(activeMap, player);
+        sendPromissoryNoteInfo(activeMap, player, true);
         sendMessage("PN Info Sent");
     }
 
-    public static void sendPromissoryNoteInfo(Map activeMap, Player player) {
+    public static void sendPromissoryNoteInfo(Map activeMap, Player player, boolean longFormat) {
         //CARDS INFO
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getPromissoryNoteCardInfo(activeMap, player));
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getPromissoryNoteCardInfo(activeMap, player, longFormat));
 
         //BUTTONS
         String pnPlayMessage = "_ _\nClick a button below to play a Promissory Note";
@@ -53,7 +53,7 @@ public class PNInfo extends PNCardsSubcommandData {
         return null;
     }
 
-    public static String getPromissoryNoteCardInfo(Map activeMap, Player player) {
+    public static String getPromissoryNoteCardInfo(Map activeMap, Player player, boolean longFormat) {
         StringBuilder sb = new StringBuilder();
 
         //PROMISSORY NOTES
@@ -65,8 +65,7 @@ public class PNInfo extends PNCardsSubcommandData {
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`");
-                    sb.append(Emojis.PN).append(Mapper.getPromissoryNote(pn.getKey(), true));
-                    sb.append("\n");
+                    sb.append(getPromissoryNoteRepresentation(pn.getKey(), longFormat));
                     index++;
                 }
             }
@@ -76,14 +75,39 @@ public class PNInfo extends PNCardsSubcommandData {
             sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 if (promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    String pnData = Mapper.getPromissoryNote(pn.getKey(), true);
-                    sb.append("`").append(index).append(".").append("(" + pn.getValue()).append(")`");
-                    sb.append(Emojis.PN).append(pnData);
-                    sb.append("\n");
+                    sb.append("`").append(index).append(".");
+                    sb.append("(" + pn.getValue()).append(")`");
+                    sb.append(getPromissoryNoteRepresentation(pn.getKey(), longFormat));
                     index++;
                 }
             }
         }
         return sb.toString();
-    }   
+    } 
+
+    private static String getPromissoryNoteRepresentationShort(String pnID) {
+        return getPromissoryNoteRepresentation(pnID, null, false);
+    }
+
+    private static String getPromissoryNoteRepresentation(String pnID) {
+        return getPromissoryNoteRepresentation(pnID, null, true);
+    }
+
+    private static String getPromissoryNoteRepresentation(String pnID, boolean longFormat) {
+        return getPromissoryNoteRepresentation(pnID, null, longFormat);
+    }
+
+    private static String getPromissoryNoteRepresentation(String pnID, Integer pnUniqueID, boolean longFormat) {
+        StringBuilder sb = new StringBuilder();
+        String[] pnSplit = Mapper.getPromissoryNote(pnID, true).split(";");
+        //#Columns:  Name ; colour/faction ; Text
+        String pnName = pnSplit[0];
+        String pnFactionOrColour = pnSplit[1];
+        String pnText = pnSplit[2];
+        sb.append(Emojis.PN).append("__**" + pnName + "**__");
+        sb.append(" *(").append(pnFactionOrColour).append(")*");
+        if (longFormat) sb.append("   ").append(pnText);
+        sb.append("\n");
+        return sb.toString();
+    }
 }
