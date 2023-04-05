@@ -58,7 +58,8 @@ public class CardsInfo extends CardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-
+        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sentUserCardInfo(event, activeMap, player);
     }
 

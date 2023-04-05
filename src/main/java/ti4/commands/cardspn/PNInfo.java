@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -32,7 +33,8 @@ public class PNInfo extends PNCardsSubcommandData {
             return;
         }
         checkAndAddPNs(activeMap, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, Helper.getPlayerRepresentation(event, player));
+        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendPromissoryNoteInfo(activeMap, player, true);
         sendMessage("PN Info Sent");
     }
@@ -81,12 +83,16 @@ public class PNInfo extends PNCardsSubcommandData {
                 
                 //PLAY AREA PROMISSORY NOTES
                 sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
-                for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
-                    if (promissoryNotesInPlayArea.contains(pn.getKey())) {
-                        sb.append("`").append(index).append(".");
-                        sb.append("(" + pn.getValue()).append(")`");
-                        sb.append(getPromissoryNoteRepresentation(pn.getKey(), longFormat));
-                        index++;
+                if (promissoryNotesInPlayArea.isEmpty()) {
+                    sb.append("> None");
+                } else {
+                    for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
+                        if (promissoryNotesInPlayArea.contains(pn.getKey())) {
+                            sb.append("`").append(index).append(".");
+                            sb.append("(" + pn.getValue()).append(")`");
+                            sb.append(getPromissoryNoteRepresentation(pn.getKey(), longFormat));
+                            index++;
+                        }
                     }
                 }
             }
