@@ -31,7 +31,8 @@ public class SOInfo extends SOCardsSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, Helper.getPlayerRepresentation(event, player));
+        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendSecretObjectiveInfo(activeMap, player);
         sendMessage("SO Info Sent");
     }
