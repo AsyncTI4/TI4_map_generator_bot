@@ -80,40 +80,11 @@ public class CardsInfo extends CardsSubcommandData {
         sb.append("**Game: **`").append(activeMap.getName()).append("`\n");
         sb.append(Helper.getPlayerRepresentation(event, player, true));
         
-        headerText = sb.toString();
-        sb = new StringBuilder();
-        
-        sb.append("_ _\n");
-        
-        //ACTION CARDS
-        sb.append("**Action Cards:**").append("\n");
-        int index = 1;
-
-        List<Button> acButtons = new ArrayList<>();
-        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
-        if (actionCards != null) {
-            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
-                String[] acSplit = Mapper.getActionCard(ac.getKey()).split(";");
-                String acName = acSplit[0];
-                String acPhase = acSplit[1];
-                String acWindow = acSplit[2];
-                String acDescription = acSplit[3];
-                Integer value = ac.getValue();
-                String key = ac.getKey();
-                sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
-                sb.append(Emojis.ActionCard).append("__**" + acName + "**__").append(" *(").append(acPhase).append(" Phase)*: _").append(acWindow).append(":_ ").append(acDescription).append("\n");
-                index++;
-                String ac_name = Mapper.getActionCardName(key);
-                if (ac_name != null) {
-                    acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
-                }
-            }
-        }
-        String acText = sb.toString();
+        headerText = sb.toString();      
 
         User userById = event != null ? event.getJDA().getUserById(player.getUserID()) : (buttonEvent != null ? buttonEvent.getJDA().getUserById(player.getUserID()) : null);
         if (userById != null) {
-            String cardInfo = headerText + "\n" + acText;
+            String cardInfo = headerText;
 
             try {
                 MessageChannel channel = event != null ? event.getChannel() : buttonEvent.getChannel();
@@ -174,7 +145,7 @@ public class CardsInfo extends CardsSubcommandData {
                 String playerPing = threadName + " " + Helper.getPlayerPing(player);
                 for (ThreadChannel threadChannel : threadChannels) {
                     if (threadChannel.getName().equals(threadName)) {
-                        sendCardInfoToChannel(threadChannel, playerPing, headerText, acText, acButtons, activeMap, player, longPNDisplay);
+                        sendCardInfoToChannel(threadChannel, playerPing, headerText, activeMap, player, longPNDisplay);
                         threadFound = true;
                         break;
                     }
@@ -188,7 +159,7 @@ public class CardsInfo extends CardsSubcommandData {
                     }
                     ThreadChannel new_thread = thread.complete();
                     
-                    sendCardInfoToChannel(new_thread, playerPing, headerText, acText, acButtons, activeMap, player, longPNDisplay);
+                    sendCardInfoToChannel(new_thread, playerPing, headerText, activeMap, player, longPNDisplay);
                 }
             } catch (Exception e) {
                 BotLogger.log("Could not create Private Thread");
@@ -198,17 +169,12 @@ public class CardsInfo extends CardsSubcommandData {
         }
     }
 
-    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String header, String ac, List<Button> acButtons, Map activeMap, Player player, boolean longPNDisplay) {
-        String acPlayMsg = "_ _\nClick a button below to play an Action Card";
+    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String header, Map activeMap, Player player, boolean longPNDisplay) {
         String text = ping == null ? null : ping + "\n";
         MessageHelper.sendMessageToChannel(privateChannel, header);
         MessageHelper.sendMessageToChannel(privateChannel, text);
         SOInfo.sendSecretObjectiveInfo(activeMap, player);
-        MessageHelper.sendMessageToChannel(privateChannel, ac);
-        List<MessageCreateData> messageList = MessageHelper.getMessageObject(acPlayMsg, acButtons);
-        for (MessageCreateData message : messageList) {
-            privateChannel.sendMessage(message).queue();
-        }
+        ACInfo.sendActionCardInfo(activeMap, player);
         PNInfo.sendPromissoryNoteInfo(activeMap, player, longPNDisplay);
     }
 

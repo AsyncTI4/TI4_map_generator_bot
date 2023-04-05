@@ -53,7 +53,7 @@ public class ACInfo extends CardsSubcommandData {
 
     private static String getActionCardInfo(Map activeMap, Player player) {
         StringBuilder sb = new StringBuilder();
-        sb.append("\n");
+        sb.append("_ _\n");
 
 
         //ACTION CARDS

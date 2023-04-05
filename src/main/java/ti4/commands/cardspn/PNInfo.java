@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -30,6 +31,7 @@ public class PNInfo extends PNCardsSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
+        checkAndAddPNs(activeMap, player);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, Helper.getPlayerRepresentation(event, player));
         sendPromissoryNoteInfo(activeMap, player, true);
         sendMessage("PN Info Sent");
@@ -55,6 +57,7 @@ public class PNInfo extends PNCardsSubcommandData {
 
     public static String getPromissoryNoteCardInfo(Map activeMap, Player player, boolean longFormat) {
         StringBuilder sb = new StringBuilder();
+        sb.append("_ _\n");
 
         //PROMISSORY NOTES
         sb.append("**Promissory Notes:**").append("\n");
@@ -109,5 +112,25 @@ public class PNInfo extends PNCardsSubcommandData {
         if (longFormat) sb.append("   ").append(pnText);
         sb.append("\n");
         return sb.toString();
+    }
+
+    private static void checkAndAddPNs(Map activeMap, Player player) {
+        String playerColor = AliasHandler.resolveColor(player.getColor());
+        String playerFaction = player.getFaction();
+        if (Mapper.isColorValid(playerColor) && Mapper.isFaction(playerFaction)) {
+            List<String> promissoryNotes = new ArrayList<>(Mapper.getPromissoryNotes(playerColor, playerFaction));
+            for (Player player_ : activeMap.getPlayers().values()) {
+                promissoryNotes.removeAll(player_.getPromissoryNotes().keySet());
+                promissoryNotes.removeAll(player_.getPromissoryNotesInPlayArea());
+            }
+            promissoryNotes.removeAll(player.getPromissoryNotes().keySet());
+            promissoryNotes.removeAll(player.getPromissoryNotesInPlayArea());
+            promissoryNotes.removeAll(activeMap.getPurgedPN());
+            if (!promissoryNotes.isEmpty()) {
+                for (String promissoryNote : promissoryNotes) {
+                    player.setPromissoryNote(promissoryNote);
+                }
+            }
+        }
     }
 }
