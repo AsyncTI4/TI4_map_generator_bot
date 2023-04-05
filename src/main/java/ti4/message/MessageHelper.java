@@ -267,6 +267,11 @@ public class MessageHelper {
         });
     }
 
+    /**
+     * @param player Player to send the messageText
+     * @param activeMap Map/Game the player is in
+     * @param messageText messageText - handles large text ()>1500 chars)
+     */
     public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, @NotNull Map activeMap, String messageText) {
         //GET CARDS INFO THREAD
         ThreadChannel threadChannel = Helper.getPlayerCardsInfoThread(activeMap, player);
@@ -327,6 +332,7 @@ public class MessageHelper {
     }
 
     public static List<MessageCreateData> getMessageObject(String message, List<Button> buttons) {
+        if (buttons == null) return new ArrayList<MessageCreateData>();
         buttons.removeIf(Objects::isNull);
         List<List<Button>> partitions = ListUtils.partition(buttons, 5);
         List<ActionRow> actionRows = new ArrayList<>();

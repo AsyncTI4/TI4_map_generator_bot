@@ -5,7 +5,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -20,7 +19,7 @@ import ti4.message.MessageHelper;
 
 public class SOInfo extends SOCardsSubcommandData {
     public SOInfo() {
-        super(Constants.INFO, "Resent all my cards in Private Message");
+        super(Constants.INFO, "Sent scored and unscored Secret Objectives to your Cards Info thread");
     }
 
     @Override
@@ -45,9 +44,9 @@ public class SOInfo extends SOCardsSubcommandData {
         String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
         List<Button> soButtons = getUnscoredSecretObjectiveButtons(activeMap, player);
         List<MessageCreateData> messageList = MessageHelper.getMessageObject(secretScoreMsg, soButtons);
-        ThreadChannel privateChannel = Helper.getPlayerCardsInfoThread(activeMap, player);
+        ThreadChannel cardsInfoThreadChannel = Helper.getPlayerCardsInfoThread(activeMap, player);
         for (MessageCreateData message : messageList) {
-            privateChannel.sendMessage(message).queue();
+            cardsInfoThreadChannel.sendMessage(message).queue();
         }
     }   
 
@@ -71,7 +70,7 @@ public class SOInfo extends SOCardsSubcommandData {
         String soName = soSplit[0];
         String soPhase = soSplit[1];
         String soDescription = soSplit[2];
-        sb.append(Emojis.SecretObjective).append("__" + soName + "__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
+        sb.append(Emojis.SecretObjective).append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
         return sb.toString();
     }
 
@@ -83,32 +82,36 @@ public class SOInfo extends SOCardsSubcommandData {
         }
         StringBuilder sb = new StringBuilder();
         int index = 1;
-        sb.append("\n");
+        sb.append("_ _\n");
 
         //SCORED SECRET OBJECTIVES
         sb.append("**Scored Secret Objectives:**").append("\n");
         if (scoredSecretObjective != null) {
-            for (java.util.Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
-                sb.append("`").append(index).append(".").append(Helper.leftpad("(" + so.getValue(), 4)).append(")`");
-                sb.append(getSecretObjectiveRepresentationShort(so.getKey()));
-                index++;
+            if (scoredSecretObjective.isEmpty()) {
+                sb.append("> None");
+            } else {
+                for (java.util.Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
+                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + so.getValue(), 4)).append(")`");
+                    sb.append(getSecretObjectiveRepresentationShort(so.getKey()));
+                    index++;
+                }
             }
         }
         sb.append("\n");
 
         //UNSCORED SECRET OBJECTIVES
         sb.append("**Unscored Secret Objectives:**").append("\n");
-        List<Button> soButtons = new ArrayList<>();
         if (secretObjective != null) {
-            for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
-                String[] soSplit = Mapper.getSecretObjective(so.getKey()).split(";");
-                String soName = soSplit[0];
-                Integer idValue = so.getValue();
-                sb.append("`").append(index).append(".").append(Helper.leftpad("(" + idValue, 4)).append(")`");
-                sb.append(getSecretObjectiveRepresentation(so.getKey()));
-                index++;
-                if (soName != null) {
-                    soButtons.add(Button.primary(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+            if (secretObjective.isEmpty()) {
+                sb.append("> None");
+            } else {
+                for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
+                    String[] soSplit = Mapper.getSecretObjective(so.getKey()).split(";");
+                    String soName = soSplit[0];
+                    Integer idValue = so.getValue();
+                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + idValue, 4)).append(")`");
+                    sb.append(getSecretObjectiveRepresentation(so.getKey()));
+                    index++;
                 }
             }
         }
@@ -118,7 +121,7 @@ public class SOInfo extends SOCardsSubcommandData {
     private static List<Button> getUnscoredSecretObjectiveButtons(Map activeMap, Player player) {
         LinkedHashMap<String, Integer> secretObjective = activeMap.getSecretObjective(player.getUserID());
         List<Button> soButtons = new ArrayList<>();
-        if (secretObjective != null) {
+        if (secretObjective != null && !secretObjective.isEmpty()) {
             for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
                 String[] soSplit = Mapper.getSecretObjective(so.getKey()).split(";");
                 String soName = soSplit[0];

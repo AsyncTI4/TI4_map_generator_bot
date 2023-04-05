@@ -23,6 +23,7 @@ import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.Nullable;
 
 import ti4.MapGenerator;
+import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -43,7 +44,7 @@ public class CardsInfo extends CardsSubcommandData {
     private static HashMap<Map, TextChannel> threadTextChannels = new HashMap<>();
 
     public CardsInfo() {
-        super(Constants.INFO, "Resent all my cards in Private Message");
+        super(Constants.INFO, "Send all your cards to your Cards Info thread");
         addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false));
     }
@@ -72,81 +73,18 @@ public class CardsInfo extends CardsSubcommandData {
         if (longPNOption != null) {
             longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
         }
-        String soText;
-        String acText;
-        String pnText;
-
+        String headerText;
+        
         StringBuilder sb = new StringBuilder();
         sb.append("--------------------\n");
         sb.append("**Game: **`").append(activeMap.getName()).append("`\n");
         sb.append(Helper.getPlayerRepresentation(event, player, true));
-
-        soText = sb.toString();
-        sb = new StringBuilder();
-
-        sb.append("_ _\n");
-
-        //ACTION CARDS
-        sb.append("**Action Cards:**").append("\n");
-        int index = 1;
-
-        List<Button> acButtons = new ArrayList<>();
-        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
-        if (actionCards != null) {
-            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
-                String[] acSplit = Mapper.getActionCard(ac.getKey()).split(";");
-                String acName = acSplit[0];
-                String acPhase = acSplit[1];
-                String acWindow = acSplit[2];
-                String acDescription = acSplit[3];
-                Integer value = ac.getValue();
-                String key = ac.getKey();
-                sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
-                sb.append(Emojis.ActionCard).append("__**" + acName + "**__").append(" *(").append(acPhase).append(" Phase)*: _").append(acWindow).append(":_ ").append(acDescription).append("\n");
-                index++;
-                String ac_name = Mapper.getActionCardName(key);
-                if (ac_name != null) {
-                    acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
-                }
-            }
-        }
-        acText = sb.toString();
-        sb = new StringBuilder();
-        sb.append("_ _\n");
-       
-        //PROMISSORY NOTES
-        sb.append("**Promissory Notes:**").append("\n");
-        index = 1;
-        LinkedHashMap<String, Integer> promissoryNotes = player.getPromissoryNotes();
-        List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
-        if (promissoryNotes != null) {
-            for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
-                if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`");
-                    sb.append(Emojis.PN).append(Mapper.getPromissoryNote(pn.getKey(), longPNDisplay));
-                    sb.append("\n");
-                    index++;
-                }
-            }
-            sb.append("\n");
-
-            //PLAY AREA PROMISSORY NOTES
-            sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
-            for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
-                if (promissoryNotesInPlayArea.contains(pn.getKey())) {
-                    String pnData = Mapper.getPromissoryNote(pn.getKey(), longPNDisplay);
-                    sb.append("`").append(index).append(".").append("(" + pn.getValue()).append(")`");
-                    sb.append(Emojis.PN).append(pnData);
-                    sb.append("\n");
-                    index++;
-                }
-            }
-        }
-        pnText = sb.toString();
+        
+        headerText = sb.toString();      
 
         User userById = event != null ? event.getJDA().getUserById(player.getUserID()) : (buttonEvent != null ? buttonEvent.getJDA().getUserById(player.getUserID()) : null);
         if (userById != null) {
-            String cardInfo = soText + "\n" + acText + "\n" + pnText;
+            String cardInfo = headerText;
 
             try {
                 MessageChannel channel = event != null ? event.getChannel() : buttonEvent.getChannel();
@@ -207,7 +145,7 @@ public class CardsInfo extends CardsSubcommandData {
                 String playerPing = threadName + " " + Helper.getPlayerPing(player);
                 for (ThreadChannel threadChannel : threadChannels) {
                     if (threadChannel.getName().equals(threadName)) {
-                        sendCardInfoToChannel(threadChannel, playerPing, soText, acText, acButtons, pnText, activeMap, player);
+                        sendCardInfoToChannel(threadChannel, playerPing, headerText, activeMap, player, longPNDisplay);
                         threadFound = true;
                         break;
                     }
@@ -221,7 +159,7 @@ public class CardsInfo extends CardsSubcommandData {
                     }
                     ThreadChannel new_thread = thread.complete();
                     
-                    sendCardInfoToChannel(new_thread, playerPing, soText, acText, acButtons, pnText, activeMap, player);
+                    sendCardInfoToChannel(new_thread, playerPing, headerText, activeMap, player, longPNDisplay);
                 }
             } catch (Exception e) {
                 BotLogger.log("Could not create Private Thread");
@@ -231,17 +169,13 @@ public class CardsInfo extends CardsSubcommandData {
         }
     }
 
-    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String so, String ac, List<Button> acButtons, String pn, Map activeMap, Player player) {
-        String acPlayMsg = "_ _\nClick a button below to play an Action Card";
+    private static void sendCardInfoToChannel(MessageChannel privateChannel, String ping, String header, Map activeMap, Player player, boolean longPNDisplay) {
         String text = ping == null ? null : ping + "\n";
+        MessageHelper.sendMessageToChannel(privateChannel, header);
         MessageHelper.sendMessageToChannel(privateChannel, text);
         SOInfo.sendSecretObjectiveInfo(activeMap, player);
-        MessageHelper.sendMessageToChannel(privateChannel, ac);
-        List<MessageCreateData> messageList = MessageHelper.getMessageObject(acPlayMsg, acButtons);
-        for (MessageCreateData message : messageList) {
-            privateChannel.sendMessage(message).queue();
-        }
-        MessageHelper.sendMessageToChannel(privateChannel, pn);
+        ACInfo.sendActionCardInfo(activeMap, player);
+        PNInfo.sendPromissoryNoteInfo(activeMap, player, longPNDisplay);
     }
 
     private static void checkAndAddPNs(Map activeMap, Player player) {
