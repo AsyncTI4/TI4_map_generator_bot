@@ -118,6 +118,7 @@ public class FOWCommand implements Command {
         subcommands.add(new RemoveCustomAdjacentTile());
         subcommands.add(new RemoveAllCustomAdjacentTiles());
         subcommands.add(new SetFogFilter());
+        subcommands.add(new Whisper());
         return subcommands;
     }
 
