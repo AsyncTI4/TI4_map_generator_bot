@@ -488,6 +488,20 @@ public class GenerateMap {
 
             String pnName = "pa_pn_name_" + pn + ".png";
             drawPAImage(x + deltaX, y, pnName);
+            String promissoryNote = Mapper.getPromissoryNote(pn, true);
+            String[] pnSplit = promissoryNote.split(";");
+            if (pnSplit.length > 4 && !pnSplit[4].isEmpty()) {
+                String tokenID = pnSplit[4];
+                found:
+                for (Tile tile : map.getTileMap().values()) {
+                    for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                        if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(tokenID))){
+                            drawPlanetImage(x + deltaX + 17, y, "pc_planetname_" + unitHolder.getName() + "_rdy.png");
+                            break found;
+                        }
+                    }
+                }
+            }
             deltaX += 48;
         }
         return x + deltaX + 20;
