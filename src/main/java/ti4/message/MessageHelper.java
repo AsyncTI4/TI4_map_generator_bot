@@ -1,6 +1,7 @@
 package ti4.message;
 
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.MapGenerator;
 import ti4.commands.cards.CardsInfo;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
@@ -20,6 +22,10 @@ import ti4.map.Player;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import org.apache.commons.collections4.ListUtils;
+import org.jetbrains.annotations.NotNull;
 
 public class MessageHelper {
 
@@ -54,19 +60,7 @@ public class MessageHelper {
     }
 
     public static void replyToMessage(SlashCommandInteractionEvent event, String messageText) {
-        if (messageText.length() > 1500) {
-            splitAndSent(messageText, event.getChannel());
-            event.getHook().sendMessage("Message to long for replay, sent all information in base messages").queue();
-        } else {
-            if (!messageText.isEmpty()) {
-                splitAndSent(messageText, event.getChannel());
-            }
-            event.getHook().sendMessage("-").queue();
-            //Deletes slash command
-//            event.getHook().sendMessage("-").queue(msg -> {
-//                msg.delete().queueAfter(1, TimeUnit.SECONDS);
-//            });
-        }
+        replyToSlashCommand(event, messageText);
     }
 
     public static void replyToMessage(SlashCommandInteractionEvent event, File file) {
@@ -118,7 +112,7 @@ public class MessageHelper {
     }
 
     private static void splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, Boolean pinMessages, String... reaction) {
-        if (messageText == null || channel == null) {
+        if (messageText == null || channel == null || messageText.isEmpty()) {
             // BotLogger.log("`splitAndSent` - `messageText` or `channel` was null");
             return;
         }
@@ -173,7 +167,7 @@ public class MessageHelper {
     }
 
     private static void  splitAndSent(String messageText, MessageChannel channel, SlashCommandInteractionEvent event, Guild guild, Button... buttons) {
-        if (messageText == null || channel == null) {
+        if (messageText == null || channel == null || messageText.isEmpty()) {
             // BotLogger.log("`splitAndSent` - `messageText` or `channel` was null");
             return;
         }
@@ -266,11 +260,95 @@ public class MessageHelper {
     public static void sendMessageToUser(String messageText, GenericInteractionCreateEvent event) {
         sendMessageToUser(messageText, event.getUser());
     }
-
+    
     public static void sendMessageToUser(String messageText, User user) {
         user.openPrivateChannel().queue(channel -> {
             splitAndSent(messageText, channel);
         });
     }
+
+    /**
+     * @param player Player to send the messageText
+     * @param activeMap Map/Game the player is in
+     * @param messageText messageText - handles large text ()>1500 chars)
+     */
+    public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, @NotNull Map activeMap, String messageText) {
+        //GET CARDS INFO THREAD
+        ThreadChannel threadChannel = Helper.getPlayerCardsInfoThread(activeMap, player);
+        if (threadChannel == null) {
+            BotLogger.log("`MessageHelper.sendMessageToPlayerCardsInfoThread` - could not find or create Cards Info thread for player " + player.getUserName() + " in game " + activeMap.getName());
+            return;
+        }
+
+        //SEND MESSAGES
+        for (String text : splitLargeText(messageText, 2000)) {
+            threadChannel.sendMessage(text).queue();
+        }
+    }
+
+    /**
+     * Sends a basic message to the event channel, handles large text
+     * @param event
+     * @param messageText
+     */
+    public static void replyToSlashCommand(@NotNull SlashCommandInteractionEvent event, String messageText) {
+        if (messageText == null || messageText.isEmpty()) {
+            // BotLogger.log(event, "`MessageHelper.replyToSlashCommand` : `messageText` was null or empty");
+            return;
+        }
+        sendMessageSplitLarge(event, messageText);
+    }
+
+    private static void sendMessageSplitLarge(SlashCommandInteractionEvent event, String messageText) {
+        for (String text : splitLargeText(messageText, 2000)) {
+            event.getChannel().sendMessage(text).queue();
+        }
+    }
+
+    /**
+     * Given a text string and a maximum length, will return a List<String> split by either the max length or the last newline "\n"
+     * @param messageText any non-null, non-empty string
+     * @param maxLength maximum length, any positive integer
+     * @return
+     */
+    private static List<String> splitLargeText(@NotNull String messageText, @NotNull int maxLength) {
+        List<String> texts = new ArrayList<>();
+        Integer messageLength = messageText.length();
+        int index = 0;
+        while (index < messageLength) {
+            String nextChars = messageText.substring(index, Math.min(index + maxLength, messageLength));
+            Integer lastNewLineIndex = nextChars.lastIndexOf("\n") + 1; // number of chars until right after the last \n
+            String textToAdd = "";
+            if (lastNewLineIndex > 0) {
+                textToAdd = nextChars.substring(0, lastNewLineIndex);
+                index += lastNewLineIndex;
+            } else {
+                textToAdd = nextChars;
+                index += nextChars.length();
+            }
+            texts.add(textToAdd);
+        }
+        return texts;
+    }
+
+    public static List<MessageCreateData> getMessageObject(String message, List<Button> buttons) {
+        if (buttons == null) return new ArrayList<MessageCreateData>();
+        buttons.removeIf(Objects::isNull);
+        List<List<Button>> partitions = ListUtils.partition(buttons, 5);
+        List<ActionRow> actionRows = new ArrayList<>();
+        for (List<Button> partition : partitions) {
+            actionRows.add(ActionRow.of(partition));
+        }
+        List<List<ActionRow>> partitionActionRows = ListUtils.partition(actionRows, 5);
+        List<MessageCreateData> buttonMessages = new ArrayList<>();
+
+        for (List<ActionRow> partitionActionRow : partitionActionRows) {
+            buttonMessages.add(new MessageCreateBuilder()
+                    .addContent(message)
+                    .addComponents(partitionActionRow).build());
+        }
+        return buttonMessages;
+    }
+
 
 }

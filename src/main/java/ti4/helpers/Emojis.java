@@ -49,7 +49,7 @@ public class Emojis {
     public static final String gledge = "<:gledge:1082705658052366346>";
     public static final String khrask = "<:khrask:1082705665715359786>";
     public static final String kjalengard = "<:kjalengard:1082705673596448778>";
-    public static final String kollecc = "<:kollecc:1082705681108447313> ";
+    public static final String kollecc = "<:kollecc:1082705681108447313>";
     public static final String kolume = "<:kolume:1082724367575814245>";
     public static final String kortali = "<:kortali:1082724379114340392>";
     public static final String lanefir = "<:lanefir:1082724385598742599>";
@@ -67,6 +67,9 @@ public class Emojis {
     public static final String veldyr = "<:veldyr:1082724490049491026>";
     public static final String zealots = "<:zealots:1082724497083334827>";
     public static final String zelian = "<:zelian:1082724503190249547>";
+
+    //FACTIONS - OTHER
+    public static final String AdminsFaction = "<:Admins:1084476380584083527>";
 
     //EXPLORATION
     public static final String HFrag = "<:HFrag:1053857012766752788>";
@@ -98,8 +101,10 @@ public class Emojis {
     public static final String SC8Back = "<:SC8Back:1065285658207330354>";
     public static final String ActionCard = "<:Actioncard:1054660449515352114>";
     public static final String ActionCardAlt = "<:ActionCardAlt:1064838264520986655>";
-    public static final String Agenda = "<:Agenda:1054660476874792990> ";
+    public static final String Agenda = "<:Agenda:1054660476874792990>";
     public static final String AgendaAlt = "<:AgendaAlt:1064838239690698812>";
+    public static final String AgendaWhite = "<:Agendawhite:1060073913423495258>";
+    public static final String AgendaBlack = "<:Agendablack:1060073912442036336>";
     public static final String PN = "<:PN:1054660504175521882>";
     public static final String PNALt = "<:PNALt:1064838292467613766>";
     
@@ -133,7 +138,7 @@ public class Emojis {
     //LEADERS - AGENTS
     public static final String ArborecAgent = "<:ArborecAgent:1059670895989374986>";
     public static final String ArgentAgent = "<:ArgentAgent:1059671022384713789>";
-    public static final String CabalAgent = "<:CabalAgent:1059671042215391282> ";
+    public static final String CabalAgent = "<:CabalAgent:1059671042215391282>";
     public static final String GhostAgent = "<:GhostAgent:1059671068551417866>";
     public static final String EmpyreanAgent = "<:EmpyreanAgent:1059671103578058882>";
     public static final String HacanAgent = "<:HacanAgent:1059671127137456209>";
@@ -187,7 +192,7 @@ public class Emojis {
     public static final String YssarilCommander = "<:YssarilCommander:1060184910880583792>";
     
     //LEADERS - HEROES
-    public static final String ArborecHero = "<:ArborecHero:1062743673076469851> ";
+    public static final String ArborecHero = "<:ArborecHero:1062743673076469851>";
     public static final String ArgentHero = "<:ArgentHero:1062743679984467988>";
     public static final String CabalHero = "<:CabalHero:1062743685952978994>";
     public static final String GhostHero = "<:GhostHero:1062743691120357426>";
@@ -253,6 +258,9 @@ public class Emojis {
     public static final String SemLord = "<:SemLord:1072076401462738965>";
     public static final String SemiLor = "<:SemiLor:1072076567053869106>";
 
+    //LIST OF SEM-LORES
+    public static List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor);
+
 
     //ANOMOLIES
     public static final String Supernova = "<:Supernova:1068081584978284635>";
@@ -265,6 +273,7 @@ public class Emojis {
     public static final String PropulsionTech = "<:Propulsiontech:947250608145068074>";
     public static final String BioticTech = "<:Biotictech:947250608107315210>";
     public static final String WarfareTech = "<:Warfaretech:947250607855644743>";
+    public static final String UnitUpgradeTech = "<:UnitUpgradeTech:1085495745018331146>";
     
     //GOOD DOGS
     public static final String GoodDog = "<:GoodDog:1068567308819255316>";
@@ -301,6 +310,7 @@ public class Emojis {
     public static final String BortWindow = "<:bortwindow:1032312829585399880>";
     public static final String Absol = "<:Absol:1079473959248068701>";
     public static final String DiscordantStars = "<:DS:1081308924084506706>";
+    public static final String AsyncTI4Logo = "<:asyncti4:959703535258333264>";
 
     //LIST OF SYMBOLS FOR FOG STUFF
     public static List<String> symbols = Arrays.asList(warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag, CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2, tg, comm, Sleeper, influence, resources, SemLord, Supernova, Asteroid, GravRift, Nebula, CyberneticTech, PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken, BortWindow);

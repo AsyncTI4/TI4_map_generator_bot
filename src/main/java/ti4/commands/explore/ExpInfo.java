@@ -49,7 +49,7 @@ public class ExpInfo extends ExploreSubcommandData {
             info.append(listNames(deck)).append("\n");
             info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (").append(String.valueOf(discardCount)).append(")\n");
             info.append(listNames(discard)).append("\n_ _\n");
-            MessageHelper.replyToMessage(event, info.toString());
+            sendMessage(info.toString());
         }
     }
 

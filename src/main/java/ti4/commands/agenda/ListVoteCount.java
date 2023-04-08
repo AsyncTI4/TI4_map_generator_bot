@@ -24,11 +24,9 @@ public class ListVoteCount extends AgendaSubcommandData {
     }
 
     public static void turnOrder(SlashCommandInteractionEvent event, Map map) {
-        Boolean privateGame = FoWHelper.isPrivateGame(event);
-        if (privateGame){
-            MessageHelper.sendMessageToChannel(event.getChannel(), "FoW game, secret information, cant be revealed");
-            return;
-        }
+        Boolean isPrivateFogGame = FoWHelper.isPrivateGame(event);
+        boolean privateGame = isPrivateFogGame != null && isPrivateFogGame;
+
         StringBuilder msg = new StringBuilder();
         int i = 1;
         List<Player> orderList = new ArrayList<>();
@@ -104,30 +102,33 @@ public class ListVoteCount extends AgendaSubcommandData {
             int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                     .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
             influenceCount += influenceCountFromPlanets;
-            if (player.getFaction().equals("nekro") && !hasXxchaAlliance) {
-                text += " NOT VOTING.: ** 0";
+            
+            if (privateGame) {
+                text += " vote count: **???";
+            } else if (player.getFaction().equals("nekro") && !hasXxchaAlliance) {
+                text += " NOT VOTING.: **0";
             } else {
-                text += " vote Count: **" + influenceCount;
+                text += " vote count: **" + influenceCount;
                 if ("argent".equals(player.getFaction())) {
                     int numPlayers = 0;
                     for (Player player_ : map.getPlayers().values()) {
                         if (player_.isActivePlayer()) numPlayers++;
                     }
-                    text += "(+" + numPlayers + " votes for Zeal)";
+                    text += " (+" + numPlayers + " votes for Zeal)";
                 }
                 if (bloodPactPn) {
-                    text += "(+4 votes for Blood Pact )";
+                    text += " (+4 votes for Blood Pact)";
                 }
                 //Predictive Intelligence
                 if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
-                    text += "(+3 votes for Predictive Intelligence)";
+                    text += " (+3 votes for Predictive Intelligence)";
                 }
             }
 
-            if (player.getUserID().equals(speakerName)) {
-                text += " " + Emojis.SpeakerToken + " ";
-            }
             text += "**";
+            if (!privateGame && player.getUserID().equals(speakerName)) {
+                text += " " + Emojis.SpeakerToken;
+            }
             msg.append(i).append(". ").append(text).append("\n");
             i++;
         }

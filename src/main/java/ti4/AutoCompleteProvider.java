@@ -1,11 +1,14 @@
 package ti4;
 
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.FoWHelper;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
@@ -28,6 +31,9 @@ public class AutoCompleteProvider {
         Map activeMap = MapManager.getInstance().getUserActiveMap(id);
 
         switch (optionName) {
+            case Constants.SETTING_TYPE -> {
+                event.replyChoiceStrings("string","number","bool").queue();
+            }
             case Constants.COLOR -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Mapper.getColors().stream()
@@ -212,7 +218,7 @@ public class AutoCompleteProvider {
                     event.replyChoices(options).queue();
                 } else {
                     List<Command.Choice> options = techs.entrySet().stream()
-                        .filter(Predicate.not(value -> value.getKey().toLowerCase().startsWith("ds")))
+                        .filter(Predicate.not(value -> value.getKey().toLowerCase().startsWith("ds") && !value.getKey().equals("ds")))
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getValue(), value.getKey()))
@@ -224,19 +230,24 @@ public class AutoCompleteProvider {
                 MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName());
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Set<String> planetIDs;
+                HashMap<String, String> planets = Mapper.getPlanetRepresentations();
                 if (activeMap != null && !activeMap.isFoWMode()) {
                     planetIDs = activeMap.getPlanets();
-                } else {
-                    planetIDs = Collections.emptySet();
+                    List<Command.Choice> options = planets.entrySet().stream()
+                            .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                            .filter(value ->  planetIDs.isEmpty() || planetIDs.contains(value.getKey()))
+                            .limit(25)
+                            .map(value -> new Command.Choice(value.getValue() + " (" + Helper.getPlanetResources(value.getKey(), activeMap) + "/" + Helper.getPlanetInfluence(value.getKey(), activeMap) + ")", value.getKey()))
+                            .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                } else if (activeMap != null && activeMap.isFoWMode()) {
+                    List<Command.Choice> options = planets.entrySet().stream()
+                            .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                            .limit(25)
+                            .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                            .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
                 }
-                HashMap<String, String> planets = Mapper.getPlanetRepresentations();
-                List<Command.Choice> options = planets.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                        .filter(value -> planetIDs.isEmpty() || planetIDs.contains(value.getKey()))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
             }
             case Constants.TRAIT -> {
                 String enteredValue = event.getFocusedOption().getValue();
@@ -275,7 +286,7 @@ public class AutoCompleteProvider {
             case Constants.SPEND_AS -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Stream.of("Resources", "Influence", "Votes", "TechSkip", "Other")
-                        .filter(value -> value.contains(enteredValue))
+                        .filter(value -> value.toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))
                         .collect(Collectors.toList());
@@ -284,6 +295,46 @@ public class AutoCompleteProvider {
             case Constants.FOG_FILTER -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Stream.of("Dark Grey (default)", "Sepia", "White", "Pink", "Purple")
+                        .filter(value -> value.toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.PRIMARY_TILE_DIRECTION -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of("North", "Northeast", "Southeast", "South", "Southwest", "Northwest")
+                        .filter(value -> value.toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.SERVER -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of("Primary", "Secondary")
+                        .filter(value -> value.toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.CATEGORY -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Category> categories = new ArrayList<>();
+                for (Guild guild : MapGenerator.jda.getGuilds()) {
+                    categories.addAll(guild.getCategories());
+                }
+                List<Command.Choice> options = categories.stream()
+                        .filter(c -> c.getName().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(c -> new Command.Choice(c.getGuild().getName() + ": #" + c.getName(), c.getName()))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.ANON -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of("y", "n")
                         .filter(value -> value.contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))

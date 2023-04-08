@@ -64,7 +64,7 @@ public class Tile {
     }
 
     @Nullable
-    public String getUnitPath(String unitID) {
+    public static String getUnitPath(String unitID) {
         String unitPath = ResourceHelper.getInstance().getUnitFile(unitID);
         if (unitPath == null) {
             BotLogger.log("Could not find unit: " + unitID);

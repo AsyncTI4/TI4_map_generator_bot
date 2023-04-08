@@ -49,7 +49,7 @@ public class AddCC extends AddRemoveToken {
         }
 
         if (activeMap.isFoWMode()) {
-            String colorMention = Helper.getColourAsMention(color);
+            String colorMention = Helper.getColourAsMention(event.getGuild(), color);
             FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has placed a token in the system");
         }
 

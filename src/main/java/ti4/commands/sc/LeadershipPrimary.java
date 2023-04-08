@@ -43,6 +43,7 @@ public class LeadershipPrimary extends SCSubcommandData {
         OptionMapping optionT = event.getOption(Constants.TACTICAL);
         OptionMapping optionF = event.getOption(Constants.FLEET);
         OptionMapping optionS = event.getOption(Constants.STRATEGY);
+        Stats stats = new Stats();
         if (optionCC != null && (optionT != null || optionF != null && optionS != null)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Use format 3/3/3 for command counters or individual values, not both");
         } else {
@@ -55,31 +56,31 @@ public class LeadershipPrimary extends SCSubcommandData {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Wrong format for tokens count. Must be 3/3/3");
                 } else {
                     try {
-                        Stats.setValue(event, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken());
-                        Stats.setValue(event, player, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken());
-                        Stats.setValue(event, player, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken());
+                        stats.setValue(event, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken());
+                        stats.setValue(event, player, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken());
+                        stats.setValue(event, player, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken());
                     } catch (Exception e) {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "Not number entered, check CC count again");
                     }
                 }
             }
             if (optionT != null) {
-                Stats.setValue(event, player, optionT, player::setTacticalCC, player::getTacticalCC);
+                stats.setValue(event, player, optionT, player::setTacticalCC, player::getTacticalCC);
             }
             if (optionF != null) {
-                Stats.setValue(event, player, optionF, player::setFleetCC, player::getFleetCC);
+                stats.setValue(event, player, optionF, player::setFleetCC, player::getFleetCC);
             }
             if (optionS != null) {
-                Stats.setValue(event, player, optionS, player::setStrategicCC, player::getStrategicCC);
+                stats.setValue(event, player, optionS, player::setStrategicCC, player::getStrategicCC);
             }
         }
         OptionMapping optionTG = event.getOption(Constants.TG);
         if (optionTG != null) {
-            Stats.setValue(event, player, optionTG, player::setTg, player::getTg);
+            stats.setValue(event, player, optionTG, player::setTg, player::getTg);
         }
         OptionMapping optionC = event.getOption(Constants.COMMODITIES);
         if (optionC != null) {
-            Stats.setValue(event, player, optionC, player::setCommodities, player::getCommodities);
+            stats.setValue(event, player, optionC, player::setCommodities, player::getCommodities);
         }
 
     }

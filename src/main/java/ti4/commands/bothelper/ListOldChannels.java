@@ -65,4 +65,21 @@ public class ListOldChannels extends BothelperSubcommandData {
         }
         return sb.toString();
     }
+
+    public static String getHowOldOldestThreadIs(Guild guild) {
+        List<ThreadChannel> threadChannels = guild.getThreadChannels();
+        threadChannels = threadChannels.stream()
+                            .filter(c -> c.getLatestMessageIdLong() != 0)
+                            .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
+                            .limit(1)
+                            .toList();
+        
+        String durationText = "";
+        for (ThreadChannel threadChannel : threadChannels) {
+            OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
+            Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
+            durationText =  duration.toHours() + " hours old";
+        }
+        return durationText;
+    }
 }

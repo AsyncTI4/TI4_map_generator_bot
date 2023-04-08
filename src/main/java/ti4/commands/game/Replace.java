@@ -39,8 +39,10 @@ public class Replace extends GameSubcommandData {
         boolean isAdmin = false;
         if (member != null) {
             java.util.List<Role> roles = member.getRoles();
-            if (roles.contains(MapGenerator.adminRole)) {
-                isAdmin = true;
+            for (Role role : MapGenerator.adminRoles) {
+                if (roles.contains(role)) {
+                    isAdmin = true;
+                }
             }
         }
         if (players.stream().noneMatch(player -> player.getUserID().equals(callerUser.getId())) && !isAdmin) {
@@ -71,7 +73,13 @@ public class Replace extends GameSubcommandData {
                 }
                 player.setUserName(addedUser.getName());
                 player.setUserID(addedUser.getId());
-                map.setSpeaker(addedUser.getId());
+                if (removedPlayer.getUserID().equals(map.getSpeaker())) {
+                    map.setSpeaker(addedUser.getId());
+                }
+                if (removedPlayer.getUserID().equals(map.getActivePlayer())) {
+                    // do not update stats for this action
+                    map.setActivePlayer(addedUser.getId());
+                }
             } else {
                 MessageHelper.replyToMessage(event, "Specify player that is in game to be removed and player that is not in game to be replacement");
                 return;

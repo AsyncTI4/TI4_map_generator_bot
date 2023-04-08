@@ -37,9 +37,9 @@ public class ShowAC extends CardsSubcommandData {
 
         int acIndex = option.getAsInt();
         String acID = null;
-        for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
-            if (so.getValue().equals(acIndex)) {
-                acID = so.getKey();
+        for (java.util.Map.Entry<String, Integer> ac : player.getActionCards().entrySet()) {
+            if (ac.getValue().equals(acIndex)) {
+                acID = ac.getKey();
             }
         }
 

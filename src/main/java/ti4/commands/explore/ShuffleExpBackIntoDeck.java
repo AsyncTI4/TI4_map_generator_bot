@@ -30,6 +30,6 @@ public class ShuffleExpBackIntoDeck extends ExploreSubcommandData {
                 sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());
             }
         }
-        MessageHelper.replyToMessage(event, sb.toString());
+        sendMessage(sb.toString());
     }
 }

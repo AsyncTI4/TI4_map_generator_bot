@@ -50,19 +50,19 @@ public class SetStatus extends GameSubcommandData{
         MapManager mapManager = MapManager.getInstance();
         Map mapToChangeStatusFor = mapManager.getMap(mapName);
 
-        Map map = mapManager.getMap(mapName);
-        Member member = event.getMember();
-        boolean isAdmin = false;
-        if (member != null) {
-            java.util.List<Role> roles = member.getRoles();
-            if (roles.contains(MapGenerator.adminRole)) {
-                isAdmin = true;
-            }
-        }
-        if (!map.getOwnerID().equals(event.getUser().getId()) && !isAdmin){
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game/Map owner can add/remove players.");
-//            return;
-        }
+        // Map map = mapManager.getMap(mapName);
+        // Member member = event.getMember();
+        // boolean isAdmin = false;
+        // if (member != null) {
+        //     java.util.List<Role> roles = member.getRoles();
+        //     if (roles.contains(MapGenerator.adminRole)) {
+        //         isAdmin = true;
+        //     }
+        // }
+//         if (!map.getOwnerID().equals(event.getUser().getId()) && !isAdmin){
+//             MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game/Map owner can add/remove players.");
+// //            return;
+//         }
 
         try {
             MapStatus mapStatus = MapStatus.valueOf(status);

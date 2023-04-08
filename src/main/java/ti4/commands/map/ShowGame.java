@@ -69,16 +69,15 @@ public class ShowGame implements Command {
             } else if (temp.equals(DisplayType.stats.getValue())) {
                 displayType = DisplayType.stats;
             } else if (temp.equals(DisplayType.split.getValue())) {
-                displayType = DisplayType.stats;
+                displayType = DisplayType.map;
                 File stats_file = GenerateMap.getInstance().saveImage(map, displayType, event);
                 MessageHelper.sendFileToChannel(event.getChannel(), stats_file);
                 
-                displayType = DisplayType.map;
+                displayType = DisplayType.stats;
             }
         }
         File file = GenerateMap.getInstance().saveImage(map, displayType, event);
-        FileUpload fileUpload = FileUpload.fromData(file);
-        event.getHook().editOriginalAttachments(fileUpload).queue();
+        MessageHelper.sendFileToChannel(event.getChannel(), file);
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

@@ -42,13 +42,19 @@ public class Turn extends PlayerSubcommandData {
         mainPlayer = Helper.getPlayer(map, mainPlayer, event);
         
         if (mainPlayer == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player/Faction/Color could not be found in map:" + map.getName());
+            sendMessage("Player/Faction/Color could not be found in map:" + map.getName());
             return;
         }
-        pingNextPlayer(event, map, mainPlayer);
+        if(map.isFoWMode()) {
+            sendMessage("_ _");
+        } else {
+            sendMessage(Helper.getPlayerRepresentation(event, mainPlayer) + " ended turn");
+        }
+        String nextMessage = pingNextPlayer(event, map, mainPlayer);
+        if (!nextMessage.isEmpty()) sendMessage(nextMessage);
     }
 
-    public static void pingNextPlayer(SlashCommandInteractionEvent event, Map map, Player mainPlayer) {
+    public String pingNextPlayer(SlashCommandInteractionEvent event, Map map, Player mainPlayer) {
         int scNext = -1;
         boolean naaluPresent = false;
         int naaluSC = 0;
@@ -104,77 +110,9 @@ public class Turn extends PlayerSubcommandData {
 
         MessageChannel gameChannel = map.getMainGameChannel() == null ? event.getChannel() : map.getMainGameChannel();
         if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value) || map.getPlayers().values().stream().allMatch(Player::isPassed)) {
-            String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, map);
-            
-            LinkedHashMap<String, Integer> revealedPublicObjectives = map.getRevealedPublicObjectives();
-
-            HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
-            HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
-            LinkedHashMap<String, Integer> customPublicVP = map.getCustomPublicVP();
-            List<Button> poButtons = new ArrayList<>();
-            List<Button> poButtons1 = new ArrayList<>();
-            List<Button> poButtons2 = new ArrayList<>();
-            List<Button> poButtonsCustom = new ArrayList<>();
-            int poStatus = 0;
-            for (java.util.Map.Entry<String, Integer> objective : revealedPublicObjectives.entrySet()) {
-                String key = objective.getKey();
-                String po_name = publicObjectivesState1.get(key);
-                poStatus = 0;
-                if (po_name == null) {
-                    po_name = publicObjectivesState2.get(key);
-                    poStatus = 1;
-                }
-                if (po_name == null) {
-                    Integer integer = customPublicVP.get(key);
-                    if (integer != null) {
-                        if (key.toLowerCase().contains("custodian") || key.toLowerCase().contains("imperial") ||  key.contains("Shard of the Throne")) {
-                            //Don't add it for now
-                        } else {
-                            po_name = key;
-                            poStatus = 2;
-                        }
-                    }
-                }
-                if (po_name != null) {
-                    Integer value = objective.getValue();
-                    Button objectiveButton;
-                    if (poStatus == 0) { //Stage 1 Objectives
-                        objectiveButton = Button.success(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public1alt));
-                        poButtons1.add(objectiveButton);
-                    } else if (poStatus == 1) { //Stage 2 Objectives
-                        objectiveButton = Button.primary(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public2alt));
-                        poButtons2.add(objectiveButton);
-                    } else if (poStatus == 2) { //Other Objectives
-                        objectiveButton = Button.secondary(Constants.PO_SCORING + value, "(" + value + ") " + po_name);
-                        poButtonsCustom.add(objectiveButton);
-                    } else {
-
-                    }
-                }
-            }
-
-            Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "No PO Scored");
-            Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");
-            poButtons.addAll(poButtons1);
-            poButtons.addAll(poButtons2);
-            poButtons.addAll(poButtonsCustom);
-            poButtons.add(noPOScoring);
-            poButtons.add(noSOScoring);
-            poButtons.removeIf(Objects::isNull);
-            List<List<Button>> partitions = ListUtils.partition(poButtons, 5);
-            List<ActionRow> actionRows = new ArrayList<>();
-            for (List<Button> partition : partitions) {
-                actionRows.add(ActionRow.of(partition));
-            }
-            MessageCreateData messageObject = new MessageCreateBuilder()
-                    .addContent(message)
-                    .addComponents(actionRows).build();
-            
-            gameChannel.sendMessage(messageObject).queue();
-
-
-            MessageHelper.replyToMessageTI4Logo(event);
-            return;
+            map.updateActivePlayer(null);
+            showPublicObjectivesWhenAllPassed(event, map, gameChannel);
+            return "";
         }
 
         int tempProtection = 0;
@@ -190,26 +128,92 @@ public class Turn extends PlayerSubcommandData {
             tempProtection++;
         }
 
-        
         for (Player player : map.getPlayers().values()) {
             int sc = player.getSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
                 String text = Helper.getPlayerRepresentation(event, player, true) + " UP NEXT";
+                map.updateActivePlayer(player);
                 if (isFowPrivateGame) {
                     String fail = "User for next faction not found. Report to ADMIN";
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, map, event, text, fail, success);
+                    return "";
                 } else {
                     MessageHelper.sendMessageToChannel(gameChannel, text);
+                    return "";
                 }
-                return;
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), "Next Player not found");
+        return "Next Player not found";
     }
 
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        MessageHelper.replyToMessageTI4Logo(event);
+    private void showPublicObjectivesWhenAllPassed(SlashCommandInteractionEvent event, Map map, MessageChannel gameChannel) {
+        String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, map);
+        
+        LinkedHashMap<String, Integer> revealedPublicObjectives = map.getRevealedPublicObjectives();
+
+        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
+        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
+        LinkedHashMap<String, Integer> customPublicVP = map.getCustomPublicVP();
+        List<Button> poButtons = new ArrayList<>();
+        List<Button> poButtons1 = new ArrayList<>();
+        List<Button> poButtons2 = new ArrayList<>();
+        List<Button> poButtonsCustom = new ArrayList<>();
+        int poStatus = 0;
+        for (java.util.Map.Entry<String, Integer> objective : revealedPublicObjectives.entrySet()) {
+            String key = objective.getKey();
+            String po_name = publicObjectivesState1.get(key);
+            poStatus = 0;
+            if (po_name == null) {
+                po_name = publicObjectivesState2.get(key);
+                poStatus = 1;
+            }
+            if (po_name == null) {
+                Integer integer = customPublicVP.get(key);
+                if (integer != null) {
+                    if (key.toLowerCase().contains("custodian") || key.toLowerCase().contains("imperial") ||  key.contains("Shard of the Throne")) {
+                        //Don't add it for now
+                    } else {
+                        po_name = key;
+                        poStatus = 2;
+                    }
+                }
+            }
+            if (po_name != null) {
+                Integer value = objective.getValue();
+                Button objectiveButton;
+                if (poStatus == 0) { //Stage 1 Objectives
+                    objectiveButton = Button.success(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public1alt));
+                    poButtons1.add(objectiveButton);
+                } else if (poStatus == 1) { //Stage 2 Objectives
+                    objectiveButton = Button.primary(Constants.PO_SCORING + value, "(" + value + ") " + po_name).withEmoji(Emoji.fromFormatted(Emojis.Public2alt));
+                    poButtons2.add(objectiveButton);
+                } else if (poStatus == 2) { //Other Objectives
+                    objectiveButton = Button.secondary(Constants.PO_SCORING + value, "(" + value + ") " + po_name);
+                    poButtonsCustom.add(objectiveButton);
+                } else {
+
+                }
+            }
+        }
+
+        Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "No PO Scored");
+        Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");
+        poButtons.addAll(poButtons1);
+        poButtons.addAll(poButtons2);
+        poButtons.addAll(poButtonsCustom);
+        poButtons.add(noPOScoring);
+        poButtons.add(noSOScoring);
+        poButtons.removeIf(Objects::isNull);
+        List<List<Button>> partitions = ListUtils.partition(poButtons, 5);
+        List<ActionRow> actionRows = new ArrayList<>();
+        for (List<Button> partition : partitions) {
+            actionRows.add(ActionRow.of(partition));
+        }
+        MessageCreateData messageObject = new MessageCreateBuilder()
+                .addContent(message)
+                .addComponents(actionRows).build();
+        
+        gameChannel.sendMessage(messageObject).queue();
     }
 }

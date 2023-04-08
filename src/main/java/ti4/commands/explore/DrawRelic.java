@@ -24,7 +24,7 @@ public class DrawRelic extends GenericRelicAction {
     public static void drawRelicAndNotify(Player player, SlashCommandInteractionEvent event, Map activeMap) {
         String relicID = activeMap.drawRelic();
         if (relicID.isEmpty()) {
-            MessageHelper.replyToMessage(event, "Relic deck is empty");
+            MessageHelper.replyToSlashCommand(event, "Relic deck is empty");
             return;
         }
         player.addRelic(relicID);
@@ -47,6 +47,6 @@ public class DrawRelic extends GenericRelicAction {
             }
         }
 
-        MessageHelper.replyToMessage(event, message.toString());
+        MessageHelper.replyToSlashCommand(event, message.toString());
     }
 }
