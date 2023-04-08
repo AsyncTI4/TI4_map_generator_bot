@@ -87,13 +87,15 @@ public class PlayPN extends PNCardsSubcommandData {
                 if (playerColor != null && playerColor.equals(pnOwner) || playerFaction != null && playerFaction.equals(pnOwner)) {
                     player_.setPromissoryNote(id);
                     CardsInfo.sentUserCardInfo(event, activeMap, player_);
+                    pnOwner = player_.getFaction();
                     break;
                 }
             }
         }
 
+        String emojiToUse = activeMap.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
         StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(event, player) + " played promissory note:\n");
-        sb.append(Helper.getFactionIconFromDiscord(pnOwner) + Emojis.PN);
+        sb.append(emojiToUse + Emojis.PN);
         String pnText = "";
 
         //Handle AbsolMode Political Secret

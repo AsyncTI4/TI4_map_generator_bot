@@ -34,27 +34,21 @@ public class FoWHelper {
 
     public static Boolean isPrivateGame(Map map, @Nullable GenericCommandInteractionEvent event, @Nullable Channel channel_) {
         Boolean isFoWPrivate = null;
-        if (event == null && channel_ == null) {
+        Channel eventChannel = event == null ? null : event.getChannel();
+        Channel channel = channel_ != null ? channel_ : eventChannel;
+        if (channel == null) {
             return null;
         }
         if (map == null) {
-            Channel channel = channel_ != null ? channel_ : event.getChannel();
-            if (channel == null) {
-                return isFoWPrivate;
-            }
             String gameName = channel.getName();
             gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
             gameName = gameName.substring(0, gameName.indexOf("-"));
             map = MapManager.getInstance().getMap(gameName);
-        }
-        if (map == null) {
-            return isFoWPrivate;
-        }
-        if (map.isFoWMode() && channel_ != null || event != null) {
-            Channel channel = channel_ != null ? channel_ : event.getChannel();
-            if (channel == null) {
+            if (map == null) {
                 return isFoWPrivate;
             }
+        }
+        if (map.isFoWMode() && channel_ != null || event != null) {
             isFoWPrivate = channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
         }
         return isFoWPrivate;
@@ -114,7 +108,7 @@ public class FoWHelper {
             return tiles;
         }
         
-        List<String> directlyAdjacentTiles = Mapper.getAdjacentTilePositions(position);
+        List<String> directlyAdjacentTiles = Mapper.getAdjacentTilePositions(map, position);
         if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
             //adjacency file for this tile is not filled in
             return tiles; 
@@ -123,6 +117,10 @@ public class FoWHelper {
         // for each adjacent tile...
         for (int i = 0; i < 6; i++) {
             String position_ = directlyAdjacentTiles.get(i);
+			String override = map.getAdjacentTileOverride(position, i);
+			if (override != null) {
+				position_ = override;
+			}
 
             if (position_.equals("x") || (hyperlaneData != null && !hyperlaneData.get(i))) {
                 // the hyperlane doesn't exist & doesn't go that direction, skip.
@@ -150,6 +148,14 @@ public class FoWHelper {
         Set<Tile> allTiles = new HashSet<Tile>(map.getTileMap().values());
         Tile tile = map.getTileByPosition(position);
 
+        String ghostFlagship = null;
+        for (Player p : map.getPlayers().values()) {
+            if ("ghost".equals(p.getFaction())) {
+                ghostFlagship = Mapper.getUnitID("fs", p.getColor());
+                break;
+            }
+        }
+
         Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             HashSet<String> tokenList = unitHolder.getTokenList();
@@ -176,6 +182,9 @@ public class FoWHelper {
                     wormholeIDs.add(Constants.DELTA);
                 }
             }
+            if (ghostFlagship != null && unitHolder.getUnits().getOrDefault(ghostFlagship,0) > 0) {
+                wormholeIDs.add(Constants.DELTA);
+            }
         }
 
         if (wormholeIDs.isEmpty()) {
@@ -189,7 +198,7 @@ public class FoWHelper {
 
         for (Tile tile_ : allTiles) {
             String position_ = tile_.getPosition();
-            
+
             if (wormholeTiles.contains(tile_.getTileID())) {
                 adjacentPositions.add(position_);
                 continue;
@@ -203,9 +212,16 @@ public class FoWHelper {
                         }
                     }
                 }
+                if (wormholeIDs.contains(Constants.DELTA) && unitHolder.getUnits().getOrDefault(ghostFlagship, 0) > 0) {
+                    adjacentPositions.add(position_);
+                }
             }
         }
         return adjacentPositions;
+    }
+
+    boolean tileHasWormholeToken(Tile tile, Set<String> wormholeIDs, String ghostFlagship) {
+        return true;
     }
 
     /** Return the list of players that are adjacent to a particular position

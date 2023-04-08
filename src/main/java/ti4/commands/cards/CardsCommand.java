@@ -47,8 +47,10 @@ public class CardsCommand implements Command {
             Member member = event.getMember();
             if (member != null) {
                 java.util.List<Role> roles = member.getRoles();
-                if (roles.contains(MapGenerator.adminRole)) {
-                    return true;
+                for (Role role : MapGenerator.adminRoles) {
+                    if (roles.contains(role)) {
+                        return true;
+                    }
                 }
             }
             Map userActiveMap = mapManager.getUserActiveMap(userID);
@@ -121,6 +123,7 @@ public class CardsCommand implements Command {
     private Collection<CardsSubcommandData> getSubcommands() {
         Collection<CardsSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new CardsInfo());
+        subcommands.add(new ACInfo());
         subcommands.add(new DrawAC());
         subcommands.add(new DiscardAC());
         subcommands.add(new DiscardACRandom());

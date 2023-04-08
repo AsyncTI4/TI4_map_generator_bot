@@ -43,7 +43,7 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         
@@ -57,7 +57,7 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
 
         LinkedHashSet<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(p -> AliasHandler.resolvePlanet(p.getAsString())).toList());
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), getActionHeaderMessage(event, player) + resolveSpendAs(event, planetIDs) + ":");
+        sendMessage(getActionHeaderMessage(event, player) + resolveSpendAs(event, planetIDs) + ":");
 
         for (String planetID : planetIDs) {
             parseParameter(event, player, planetID, activeMap);
@@ -68,21 +68,21 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
         try {
             if (Mapper.isValidPlanet(planetID)) {
                 doAction(player, planetID, map);
-                MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planetID));
+                sendMessage("> " + resolvePlanetMessage(planetID));
             } else {
                 Set<String> planets = map.getPlanets();
                 List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
                 if (possiblePlanets.isEmpty()){
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "> No matching Planet '" + planetID + "'' found - please try again.");
+                    sendMessage("> No matching Planet '" + planetID + "'' found - please try again.");
                     return;
                 } else if (possiblePlanets.size() > 1) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
+                    sendMessage("> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
                     return;
                 }
                 String planet = possiblePlanets.get(0);
                 BotLogger.log(event, "`PlanetAddRemove.parseParameter - " + getActionID() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet);
                 doAction(player, planet, map);
-                MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planet));
+                sendMessage("> " + resolvePlanetMessage(planet));
             }
         } catch (Exception e) {
             BotLogger.log(event, "Error parsing planet: " + planetID);
@@ -148,22 +148,22 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
             String spendAs = option.getAsString();
             int sum = 0;
             switch (spendAs.toLowerCase()) {
-                case "resources" -> {
+                case "r", "resources" -> {
                     for (String planetID : planetIDs) {
                         sum += Helper.getPlanetResources(planetID, getActiveMap());
                     }
                     message.append(Helper.getResourceEmoji(sum) + " resources").toString();
                 }
-                case "influence" -> {
+                case "i", "influence" -> {
                     for (String planetID : planetIDs) {
                         sum += Helper.getPlanetInfluence(planetID, getActiveMap());
                     }
                     message.append(Helper.getInfluenceEmoji(sum) + " influence").toString();
                 }
-                case "votes" -> {
+                case "v", "votes" -> {
                     message.append(" votes").toString();
                 }
-                case "techskip" -> message.append(" a tech skip").toString();
+                case "t", "techskip" -> message.append(" a tech skip").toString();
                 case "toes" -> { //For HolyT
                     for (String planetID : planetIDs) {
                         sum += Helper.getPlanetInfluence(planetID, getActiveMap());

@@ -36,11 +36,12 @@ public class SCPick extends PlayerSubcommandData {
         MessageChannel eventChannel = event.getChannel();
 
         if (player == null) {
-            MessageHelper.sendMessageToChannel(eventChannel, "You're not a player of this game");
+            sendMessage("You're not a player of this game");
             return;
         }
         
-        Stats.pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
+        Stats stats = new Stats();
+        stats.pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
         int sc = player.getSC();
         String msg = "";
         String msgExtra = "";
@@ -74,7 +75,7 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
             if (allPicked) {
-                msgExtra += Helper.getGamePing(event, activeMap) + "All players picked SC";
+                msgExtra += Helper.getGamePing(event, activeMap) + "\nAll players picked SC";
 
                 LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
                 Set<Integer> scPickedList = activePlayers.stream().map(Player::getSC).collect(Collectors.toSet());
@@ -103,12 +104,13 @@ public class SCPick extends PlayerSubcommandData {
                 if (nextPlayer != null) {
                     msgExtra += " " + Helper.getPlayerRepresentation(event, nextPlayer) + " is up for an action";
                     privatePlayer = nextPlayer;
+                    activeMap.updateActivePlayer(nextPlayer);
                 }
             }
         } else {
             msg = "No SC picked.";
         }
-        MessageHelper.replyToMessage(event, msg);
+        sendMessage(msg);
         
         if (isFowPrivateGame) {
             if (allPicked) {
@@ -122,15 +124,8 @@ public class SCPick extends PlayerSubcommandData {
                 ListTurnOrder.turnOrder(event, activeMap);
             }
             if (!msgExtra.isEmpty()) {
-                MessageHelper.sendMessageToChannel(eventChannel, msgExtra);
+                sendMessage(msgExtra);
             }
         }
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
     }
 }

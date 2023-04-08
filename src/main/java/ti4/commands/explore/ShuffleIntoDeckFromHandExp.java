@@ -21,7 +21,7 @@ public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
         Player activePlayer = activeMap.getPlayer(getUser().getId());
         activePlayer = Helper.getGamePlayer(activeMap, activePlayer, event, null);
         if (activePlayer == null) {
-            MessageHelper.replyToMessage(event, "Player not found in game.");
+            sendMessage("Player not found in game.");
             return;
         }
         String ids = event.getOption(Constants.EXPLORE_CARD_ID).getAsString().replaceAll(" ", "");
@@ -37,6 +37,6 @@ public class ShuffleIntoDeckFromHandExp extends ExploreSubcommandData {
                 sb.append("Card ID ").append(id).append(" not found, please retry").append(System.lineSeparator());
             }
         }
-        MessageHelper.replyToMessage(event, sb.toString());
+        sendMessage(sb.toString());
     }
 }

@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
+import ti4.helpers.LoggerHandler;
 
 public class ArchiveOldThreads extends BothelperSubcommandData {
     public ArchiveOldThreads(){
@@ -24,19 +24,26 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
         }
         sendMessage("Archiving " + threadCount + " threads");
         sendMessage(ListOldChannels.getOldThreadsMessage(event.getGuild(), threadCount));
+
         archiveOldThreads(event.getGuild(), threadCount);
     }
 
     public static void archiveOldThreads(Guild guild, Integer threadCount) {
         List<ThreadChannel> threadChannels = guild.getThreadChannels();
+
         threadChannels = threadChannels.stream()
             .filter(c -> c.getLatestMessageIdLong() != 0)
             .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
             .limit(threadCount)
             .toList();
-    
+
         for (ThreadChannel threadChannel : threadChannels) {
-            threadChannel.getManager().setArchived(true).queue();
+            threadChannel.getManager().setArchived(true)
+                .onErrorMap((e) -> {
+                        LoggerHandler.logError("Error map error:");
+                        return null;
+                        })
+                .queue();
         }
     }
 }

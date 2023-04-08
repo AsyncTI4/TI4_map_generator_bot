@@ -90,10 +90,13 @@ public class ButtonListener extends ListenerAdapter {
 
             if (channel != null) {
                 try {
-                    PlayAC.playAC(null, activeMap, player, acID, channel, event.getGuild(), event);
+                    String error = PlayAC.playAC(null, activeMap, player, acID, channel, event.getGuild(), event);
+                    if (error != null) {
+                        event.getChannel().sendMessage(error).queue();
+                    }
                 } catch (Exception e) {
                     BotLogger.log(event, "Could not parse AC ID: " + acID);
-                    event.getChannel().sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
+                    event.getChannel().asThreadChannel().sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
                     return;
                 }
             } else {
@@ -113,8 +116,7 @@ public class ButtonListener extends ListenerAdapter {
             if (channel != null) {
                 try {
                     int soIndex = Integer.parseInt(soID);
-                    ScoreSO object = new ScoreSO();
-                    object.scoreSO(null, activeMap, player, soIndex, channel, event);
+                    ScoreSO.scoreSO(activeMap, player, soIndex, channel, event);
                 } catch (Exception e) {
                     BotLogger.log(event, "Could not parse SO ID: " + soID);
                     event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.").queue();
@@ -337,22 +339,15 @@ public class ButtonListener extends ListenerAdapter {
             }
         }
         
-        Emoji emojiToUse = emojiMap.get(playerFaction.toLowerCase());
-        if (emojiToUse == null) emojiToUse = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(playerFaction));
         Message mainMessage = event.getInteraction().getMessage();
+        Emoji emojiToUse = Helper.getPlayerEmoji(activeMap, player, mainMessage);
         String messageId = mainMessage.getId();
 
         if (activeMap.isFoWMode()) {
-            int index = 0;
-            for (Player player_ : activeMap.getPlayers().values()) {
-                if (player_ == player) break;
-                index++;
-            }
-            emojiToUse = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, messageId));
             event.getChannel().addReactionById(messageId, emojiToUse).queue();
         }
         
-        if (!skipReaction) {
+        if (!skipReaction || activeMap.isFoWMode()) {
             event.getChannel().addReactionById(messageId, emojiToUse).queue();
             checkForAllReactions(event, activeMap);
             if (message == null || message.isEmpty()) return;

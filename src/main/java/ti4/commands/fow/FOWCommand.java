@@ -108,13 +108,18 @@ public class FOWCommand implements Command {
     private Collection<FOWSubcommandData> getSubcommands() {
         Collection<FOWSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new AddCustomAdjacentTile());
+        subcommands.add(new AddAdjacencyOverride());
         subcommands.add(new AddFogTile());
+        subcommands.add(new PingActivePlayer());
         subcommands.add(new PingSystem());
+        subcommands.add(new RemoveAdjacencyOverride());
+        subcommands.add(new RemoveAllAdjacencyOverrides());
         subcommands.add(new RemoveFogTile());
         subcommands.add(new RemoveCustomAdjacentTile());
         subcommands.add(new RemoveAllCustomAdjacentTiles());
         subcommands.add(new SetFogFilter());
-
+        subcommands.add(new Whisper());
+        subcommands.add(new Announce());
         return subcommands;
     }
 

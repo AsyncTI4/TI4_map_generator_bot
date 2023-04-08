@@ -1,8 +1,7 @@
 package ti4.commands.map;
 
-import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -47,34 +46,28 @@ public class CreateGame implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map map = new Map();
-        User user = event.getUser();
-        String ownerID = user.getId();
-        map.setOwnerID(ownerID);
-        map.setOwnerName(user.getName());
         String mapName = event.getOptions().get(0).getAsString().toLowerCase();
+        Member member = event.getMember();
+        createNewGame(event, mapName, member);
+        MessageHelper.replyToMessage(event, "Game created with name: " + mapName);
+    }
+
+    public Map createNewGame(SlashCommandInteractionEvent event, String mapName, Member gameOwner) {
+        Map map = new Map();
+        String ownerID = gameOwner.getId();
+        map.setOwnerID(ownerID);
+        map.setOwnerName(gameOwner.getEffectiveName());
         map.setName(mapName);
 
         MapManager mapManager = MapManager.getInstance();
         mapManager.addMap(map);
         boolean setMapSuccessful = mapManager.setMapForUser(ownerID, mapName);
-        map.addPlayer(user.getId(), user.getName());
+        map.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
         if (!setMapSuccessful) {
             MessageHelper.replyToMessage(event, "Could not assign active Game " + mapName);
         }
-        OptionMapping vpOption = event.getOption(Constants.VP_COUNT);
-        if (vpOption != null) {
-            int count = vpOption.getAsInt();
-            if (count < 1){
-                count = 1;
-            } else if (count > 20){
-                count = 20;
-            }
-            map.setVp(count);
-        }
-
-        MessageHelper.replyToMessage(event, "Game created with name: " + mapName);
         MapSaveLoadManager.saveMap(map);
+        return map;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -84,7 +77,6 @@ public class CreateGame implements Command {
         commands.addCommands(
                 Commands.slash(getActionID(), "Shows selected Game")
                         .addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Game name").setRequired(true))
-                        .addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Specify game VP count").setRequired(false))
         );
     }
 }

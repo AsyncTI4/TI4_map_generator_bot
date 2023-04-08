@@ -29,12 +29,19 @@ public class Constants {
     public static final String REMOVE_PLAYER = "remove_player";
     public static final String PLAYER_NAME = "player_name";
     public static final String PLAYER_COUNT_FOR_MAP = "player_count_for_map";
+    public static final String RING_COUNT_FOR_MAP = "ring_count_for_map";
     public static final String VP_COUNT = "vp_count";
     public static final String JOIN = "join";
     public static final String ADD = "add";
     public static final String REPLACE = "replace";
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
+
+
+    public static final String SET_SETTING = "setting";
+    public static final String SETTING_NAME = "setting_name";
+    public static final String SETTING_VALUE = "setting_value";
+    public static final String SETTING_TYPE = "setting_type";
 
     public static String ALPHA = "alpha";
     public static String BETA = "beta";
@@ -74,6 +81,9 @@ public class Constants {
     public static final String SEARCH_WARRANT = "search_warrant";
     public static final String ADD_CUSTOM_ADJACENT_TILES = "add_custom_adjacent_tiles";
     public static final String ADD_FOG_TILE = "add_fog_tile";
+    public static final String ADD_ADJACENCY_OVERRIDE = "add_adjacency_override";
+    public static final String REMOVE_ADJACENCY_OVERRIDE = "remove_adjacency_override";
+    public static final String REMOVE_ALL_ADJACENCY_OVERRIDES = "remove_all_adjacency_overrides";
     public static final String REMOVE_FOG_TILE = "remove_fog_tile";
     public static final String REMOVE_CUSTOM_ADJACENT_TILES = "remove_custom_adjacent_tiles";
     public static final String REMOVE_ALL_CUSTOM_ADJACENT_TILES = "remove_all_custom_adjacent_tiles";
@@ -108,6 +118,11 @@ public class Constants {
     public static final String BULK_FF = "_tkn_ff.png";
     public static final String COLOR_GF = "_gf.png";
     public static final String COLOR_FF = "_ff.png";
+
+    public static final String UNIT_DD = "_dd.png";
+    public static final String UNIT_DD_EYE = "_dd_eyes.png";
+    public static final int EYE_CHANCE = 1000;
+
     public static final String SETUP6 = "setup6";
     public static final String SETUP8 = "setup8";
     public static final String MALLICE = "mallicelocked";
@@ -228,8 +243,13 @@ public class Constants {
     public static final String PASS = "pass";
     public static final String TURN = "turn_end";
     public static final String SPEAKER = "speaker";
+    public static final String ACTIVE_PLAYER = "active_player";
+    public static final String LAST_ACTIVE_PLAYER_PING = "last_active_player_ping";
+    public static final String LAST_ACTIVE_PLAYER_CHANGE = "last_active_player_change";
     
+    public static final String TABLE_TALK_CHANNEL = "table_talk_channel";
     public static final String MAIN_GAME_CHANNEL = "main_game_channel";
+    public static final String BOT_MAP_CHANNEL = "bot_map_channel";
     public static final String CHANNEL1 = "channel1";
     public static final String CHANNEL2 = "channel2";
     public static final String CHANNEL3 = "channel3";
@@ -300,6 +320,9 @@ public class Constants {
     public static final String VRF = "void_relic_fragment";
     public static final String STRATEGY_CARD = "strategy_card";
     public static final String DUMMY = "dummy";
+    
+    public static final String NUMBER_OF_TURNS = "number_of_turns";
+    public static final String TOTAL_TURN_TIME = "total_turn_time";
 
     public static final String TXT = ".txt";
     public static final String JPG = ".jpg";
@@ -324,6 +347,7 @@ public class Constants {
     public static final String RELIC_PURGE = "relic_purge";
     public static final String SHUFFLE_BACK = "relic_shuffle_back";
     public static final String ADD_BACK_INTO_DECK = "relic_add_back_into_deck";
+    public static final String RELIC_INFO = "relic_info";
     public static final String PUT_TOP = "put_top";
     public static final String PUT_BOTTOM = "put_bottom";
     public static final String SHUFFLE_AGENDAS = "shuffle_deck";
@@ -333,6 +357,7 @@ public class Constants {
     public static final String LOOK_AT_TOP = "look_at_top";
     public static final String LOOK_AT_BOTTOM = "look_at_bottom";
     public static final String REVEAL = "reveal";
+    public static final String REVEAL_FROM_BOTTOM = "reveal_from_bottom";
     public static final String ADD_LAW = "add_law";
     public static final String REMOVE_LAW = "remove_law";
     public static final String SHOW_DISCARDED = "show_discarded";
@@ -359,13 +384,17 @@ public class Constants {
     public static final String CUSTOM_PO_VP = "customPublicVP";
     public static final String SCORED_PO = "scoredPublicObjectives";
     public static final String CUSTOM_ADJACENT_TILES = "customAdjacentTiles";
+    public static final String ADJACENCY_OVERRIDES = "adjacencyOverrides";
     public static final String PRIMARY_TILE = "primary_tile";
+    public static final String SECONDARY_TILE = "secondary_tile";
     public static final String ADJACENT_TILES = "adjacent_tiles";
     public static final String TWO_WAY = "two_way";
     public static final String PO1 = "publicObjectives1";
     public static final String PO2 = "publicObjectives2";
+    public static final String PRIMARY_TILE_DIRECTION = "primary_tile_direction";
 
     public static final String TURN_ORDER = "turn_order";
+    public static final String TURN_STATS = "turn_stats";
     public static final String VOTE_COUNT = "vote_count";
     public static final String SC_TRADE_GOODS = "sc_trade_goods";
     public static final String SC_COUNT = "sc_count";
@@ -423,6 +452,7 @@ public class Constants {
     public static final String TECH_REMOVE = "tech_remove";
     public static final String TECH_EXHAUST = "tech_exhaust";
     public static final String TECH_REFRESH = "tech_ready";
+    public static final String TECH_INFO = "tech_info";
 
     public static final String PLANET_ADD = "planet_add";
     public static final String PLANET_REMOVE = "planet_remove";
@@ -533,6 +563,16 @@ public class Constants {
     public static final String CARDS_INFO_THREAD_PREFIX = "Cards Info-";
     public static final String BOT_CHANNEL_SUFFIX = "-bot-map-updates";
     public static final String PING = "ping";
+    public static final String PING_ACTIVE_PLAYER = "ping_active_player";
+    public static final String WHISPER = "whisper";
+    public static final String MSG = "msg";
+    public static final String ANON = "anon";
+    public static final String ANNOUNCE = "announce";
     public static final String ENDED_GAMES = "ended_games";
-
+    public static final String LARGE_TEXT = "large_text";
+    public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
+    public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
+    public static final String BEGIN_VIDEO_GEN = "begin_video_gen";
+    public static final String SERVER = "server";
+    public static final String LIST_COMMANDS = "list_commands";
 }

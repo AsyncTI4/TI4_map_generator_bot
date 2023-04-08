@@ -22,16 +22,16 @@ public class AddRelicBackIntoDeck extends GenericRelicAction {
     public void doAction(Player player, SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.RELIC);
         if (option == null) {
-            MessageHelper.replyToMessage(event, "Specify relic");
+            sendMessage("Specify relic");
             return;
         }
         String relicId = option.getAsString();
         List<String> allRelics = getActiveMap().getAllRelics();
         if (!allRelics.contains(relicId)){
             getActiveMap().shuffleRelicBack(relicId);
-            MessageHelper.replyToMessage(event, "Relic " + relicId + " added back into deck");
+            sendMessage("Relic " + relicId + " added back into deck");
         } else {
-            MessageHelper.replyToMessage(event, "Invalid relic or specified relic exists in deck");
+            sendMessage("Invalid relic or specified relic exists in deck");
         }
     }
 }

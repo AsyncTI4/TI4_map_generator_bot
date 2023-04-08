@@ -98,8 +98,7 @@ public class PlayerCommand implements Command {
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
 
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
-        MessageHelper.replyToMessage(event, file);
+        GenerateMap.getInstance().saveImage(activeMap, event);
     }
 
 
@@ -118,6 +117,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new TechRemove());
         subcommands.add(new TechExhaust());
         subcommands.add(new TechRefresh());
+        subcommands.add(new TechInfo());
         subcommands.add(new Turn());
         subcommands.add(new SCPick());
         subcommands.add(new PlanetAdd());
@@ -131,7 +131,6 @@ public class PlayerCommand implements Command {
         subcommands.add(new Speaker());
         subcommands.add(new SendTG());
         subcommands.add(new SendCommodities());
-        subcommands.add(new SCFollow());
         return subcommands;
     }
 

@@ -34,13 +34,13 @@ public abstract class TechAddRemove extends PlayerSubcommandData{
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
 
         player = Helper.getPlayer(activeMap, player, event);
         if (player == null){
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player/Faction/Color could not be found in map:" + activeMap.getName());
+            sendMessage("Player/Faction/Color could not be found in map:" + activeMap.getName());
             return;
         }
 
@@ -60,10 +60,10 @@ public abstract class TechAddRemove extends PlayerSubcommandData{
                 List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().toLowerCase().contains(techID))
                         .map(java.util.Map.Entry::getKey).toList();
                 if (possibleTechs.isEmpty()){
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "No matching Tech found");
+                    sendMessage("No matching Tech found");
                     return;
                 } else if (possibleTechs.size() > 1){
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "More that one matching Tech found");
+                    sendMessage("More that one matching Tech found");
                     return;
                 }
                 doAction(player, possibleTechs.get(0));

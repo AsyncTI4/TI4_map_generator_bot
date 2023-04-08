@@ -3,8 +3,10 @@ package ti4.map;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +24,7 @@ import java.nio.file.CopyOption;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.function.Predicate;
 
 public class MapSaveLoadManager {
 
@@ -206,6 +209,15 @@ public class MapSaveLoadManager {
         writer.write(Constants.SPEAKER + " " + map.getSpeaker());
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.ACTIVE_PLAYER + " " + map.getActivePlayer());
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.LAST_ACTIVE_PLAYER_PING + " " + map.getLastActivePlayerPing().getTime());
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " " + map.getLastActivePlayerChange().getTime());
+        writer.write(System.lineSeparator());
+
         HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
         StringBuilder sb = new StringBuilder();
         for (java.util.Map.Entry<Integer, Boolean> entry : scPlayed.entrySet()) {
@@ -255,6 +267,9 @@ public class MapSaveLoadManager {
         writer.write(Constants.PLAYER_COUNT_FOR_MAP + " " + map.getPlayerCountForMap());
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.RING_COUNT_FOR_MAP + " " + map.getRingCount());
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.VP_COUNT + " " + map.getVp());
         writer.write(System.lineSeparator());
 
@@ -274,6 +289,15 @@ public class MapSaveLoadManager {
         writer.write(Constants.CUSTOM_ADJACENT_TILES + " " + adjacentTiles);
         writer.write(System.lineSeparator());
 
+        StringBuilder adjacencyOverrides = new StringBuilder();
+        for (java.util.Map.Entry<Pair<String, Integer>, String> entry : map.getAdjacentTileOverrides().entrySet()) {
+            adjacencyOverrides.append(entry.getKey().getLeft() + "-");
+            adjacencyOverrides.append(entry.getKey().getRight() + "-");
+            adjacencyOverrides.append(entry.getValue() + ";");
+        }
+        writer.write(Constants.ADJACENCY_OVERRIDES + " " + adjacencyOverrides);
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.CREATION_DATE + " " + map.getCreationDate());
         writer.write(System.lineSeparator());
         long time = keepModifiedDate ? map.getLastModifiedDate() : new Date().getTime();
@@ -284,8 +308,15 @@ public class MapSaveLoadManager {
         writer.write(Constants.GAME_CUSTOM_NAME + " " + map.getCustomName());
         writer.write(System.lineSeparator());
 
+        MessageChannel tableTalkChannel = map.getTableTalkChannel();
+        writer.write(Constants.TABLE_TALK_CHANNEL + " " + (tableTalkChannel == null ? "" : tableTalkChannel.getId()));
+        writer.write(System.lineSeparator());
         MessageChannel mainGameChannel = map.getMainGameChannel();
         writer.write(Constants.MAIN_GAME_CHANNEL + " " + (mainGameChannel == null ? "" : mainGameChannel.getId()));
+        writer.write(System.lineSeparator());
+        ThreadChannel botMapChannel = map.getBotMapChannel();
+        writer.write(Constants.BOT_MAP_CHANNEL + " " + (botMapChannel == null ? "" : botMapChannel.getId()));
+
         writer.write(System.lineSeparator());
         writer.write(Constants.COMMUNITY_MODE + " " + map.isCommunityMode());
         writer.write(System.lineSeparator());
@@ -400,7 +431,12 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.STRATEGY_CARD + " " + player.getSC());
             writer.write(System.lineSeparator());
-
+            
+            writer.write(Constants.NUMBER_OF_TURNS + " " + player.getNumberTurns());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.TOTAL_TURN_TIME + " " + player.getTotalTurnTime());
+            writer.write(System.lineSeparator());
+            
             StringBuilder leaderInfo = new StringBuilder();
             for (Leader leader : player.getLeaders()) {
                 leaderInfo.append(leader.getId());
@@ -744,6 +780,13 @@ public class MapSaveLoadManager {
                 case Constants.CUSTOM_PO_VP -> map.setCustomPublicVP(getParsedCards(info));
                 case Constants.SCORED_PO -> map.setScoredPublicObjectives(getParsedCardsForScoredPO(info));
                 case Constants.CUSTOM_ADJACENT_TILES -> map.setCustomAdjacentTiles(getParsedCardsForScoredPO(info));
+                case Constants.ADJACENCY_OVERRIDES -> {
+                    try {
+                        map.setAdjacentTileOverride(getParsedAdjacencyOverrides(info));
+                    } catch (Exception e) {
+                        BotLogger.log("Failed to load adjacency overrides");
+                    }
+                }
                 case Constants.AGENDAS -> map.setAgendas(getCardList(info));
                 case Constants.AC_DISCARDED -> map.setDiscardActionCards(getParsedCards(info));
                 case Constants.DISCARDED_AGENDAS -> map.setDiscardAgendas(getParsedCards(info));
@@ -773,6 +816,25 @@ public class MapSaveLoadManager {
                     }
                 }
                 case Constants.SPEAKER -> map.setSpeaker(info);
+                case Constants.ACTIVE_PLAYER -> map.setActivePlayer(info);
+                case Constants.LAST_ACTIVE_PLAYER_PING -> {
+                    try {
+                        Long millis = Long.parseLong(info);
+                        Date lastPing = new Date(millis);
+                        map.setLastActivePlayerPing(lastPing);
+                    } catch (Exception e) {
+                        // do nothing
+                    }
+                }
+                case Constants.LAST_ACTIVE_PLAYER_CHANGE -> {
+                    try {
+                        Long millis = Long.parseLong(info);
+                        Date lastChange = new Date(millis);
+                        map.setLastActivePlayerChange(lastChange);
+                    } catch (Exception e) {
+                        // do nothing
+                    }
+                }
                 case Constants.PLAYER_COUNT_FOR_MAP -> {
                     String count = info;
                     try {
@@ -784,6 +846,17 @@ public class MapSaveLoadManager {
                         }
                     } catch (Exception e) {
                         map.setPlayerCountForMap(6);
+                    }
+                }
+                case Constants.RING_COUNT_FOR_MAP -> {
+                    String count = info;
+                    try {
+                        int ringCount = Integer.parseInt(count);
+                        if (ringCount == 8) {
+                            map.setRingCount(ringCount);
+                        }
+                    } catch (Exception e) {
+                        map.setRingCount(0);
                     }
                 }
                 case Constants.VP_COUNT -> {
@@ -816,13 +889,56 @@ public class MapSaveLoadManager {
                 }
                 case Constants.GAME_CUSTOM_NAME -> map.setCustomName(info);
                 case Constants.MAIN_GAME_CHANNEL -> {
+                    String id = info.isEmpty() ? "1234" : info; //getTextChannelById can't handle ""
                     try {
-                        TextChannel channelById = MapGenerator.jda.getTextChannelById(info);
-                        map.setMainGameChannel(channelById);
+                        TextChannel mainGameChannel = MapGenerator.jda.getTextChannelById(id);
+                        if (mainGameChannel == null) {
+                            List<TextChannel> gameChannels = MapGenerator.jda.getTextChannelsByName(map.getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
+                            if (!gameChannels.isEmpty() && gameChannels.size() == 1) mainGameChannel = gameChannels.get(0);
+                        }
+                        map.setMainGameChannel(mainGameChannel);
                     } catch (Exception e) {
                         //Do nothing
                     }
                 }
+                case Constants.TABLE_TALK_CHANNEL -> {
+                    String id = info.isEmpty() ? "1234" : info; //getTextChannelById can't handle ""
+                    try {
+                        TextChannel tableTalkChannel = MapGenerator.jda.getTextChannelById(id);
+                        if (tableTalkChannel == null) {
+                            List<TextChannel> gameChannels = MapGenerator.jda.getTextChannels().stream()
+                                        .filter(c -> c.getName().startsWith(map.getName()))
+                                        .filter(Predicate.not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
+                                        .toList();
+                            if (!gameChannels.isEmpty() && gameChannels.size() == 1) tableTalkChannel = gameChannels.get(0);
+                        }
+                        map.setTableTalkChannel(tableTalkChannel);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                //DISABLED - POTENTIALLY OPENING THREADS
+                // case Constants.BOT_MAP_CHANNEL -> {
+                //     String id = info.isEmpty() ? "1234" : info; //getThreadChannelById can't handle ""
+                //     try {
+                //         ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(id); //exists and is not locked
+                //         if (threadChannel == null) { 
+                //             List<ThreadChannel> botChannels = MapGenerator.jda.getThreadChannelsByName(map.getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+                //             if (!botChannels.isEmpty() && botChannels.size() == 1) { //found a matching thread
+                //                 threadChannel = botChannels.get(0);
+                //             } else { //can't find it, might be archived
+                //                 for (ThreadChannel tc : MapGenerator.jda.getTextChannelById(map.getMainGameChannel().getId()).retrieveArchivedPublicThreadChannels()) {
+                //                     if (tc.getName().equals(map.getName() + Constants.BOT_CHANNEL_SUFFIX)) {
+                //                         threadChannel = tc;
+                //                     }
+                //                 }
+                //             }
+                //         }
+                //         map.setBotMapChannel(threadChannel);
+                //     } catch (Exception e) {
+                //         //Do nothing
+                //     }
+                // }
                 case Constants.COMMUNITY_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -932,6 +1048,21 @@ public class MapSaveLoadManager {
         return scoredPOs;
     }
 
+    private static LinkedHashMap<Pair<String, Integer>, String> getParsedAdjacencyOverrides(String tokenizer) {
+        StringTokenizer override = new StringTokenizer(tokenizer, ";");
+        LinkedHashMap<Pair<String, Integer>, String> overrides = new LinkedHashMap<>();
+        while (override.hasMoreTokens()) {
+            String[] overrideInfo = override.nextToken().split("-");
+            String primaryTile = overrideInfo[0];
+            String direction = overrideInfo[1];
+            String secondaryTile = overrideInfo[2];
+
+            Pair<String, Integer> primary = new ImmutablePair<String, Integer>(primaryTile, Integer.parseInt(direction));
+            overrides.put(primary, secondaryTile);
+        }
+        return overrides;
+    }
+
     private static void readPlayerInfo(Player player, String data) {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.countTokens() == 2) {
@@ -1039,6 +1170,8 @@ public class MapSaveLoadManager {
                 }
 
                 case Constants.STRATEGY_CARD -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.NUMBER_OF_TURNS -> player.setNumberTurns(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.TOTAL_TURN_TIME -> player.setTotalTurnTime(Long.parseLong(tokenizer.nextToken()));
                 case Constants.FOG_FILTER -> {
                     String filter = tokenizer.nextToken();
                     player.setFogFilter(filter);
