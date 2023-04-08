@@ -569,6 +569,7 @@ public class Constants {
     public static final String ANON = "anon";
     public static final String ANNOUNCE = "announce";
     public static final String ENDED_GAMES = "ended_games";
+    public static final String LARGE_TEXT = "large_text";
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
     public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
     public static final String BEGIN_VIDEO_GEN = "begin_video_gen";
