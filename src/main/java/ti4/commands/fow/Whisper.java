@@ -18,7 +18,7 @@ public class Whisper extends FOWSubcommandData {
     
     public Whisper() {
         super(Constants.WHISPER, "Send a private message to a player");
-        addOptions(new OptionData(OptionType.STRING, Constants.WHISPERMSG, "Message to send").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.MSG, "Message to send").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send the message").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ANON, "Send anonymously").setAutoComplete(true));
     }
@@ -38,7 +38,7 @@ public class Whisper extends FOWSubcommandData {
             return;
         }
 
-        OptionMapping whisperms = event.getOption(Constants.WHISPERMSG);
+        OptionMapping whisperms = event.getOption(Constants.MSG);
         OptionMapping anon = event.getOption(Constants.ANON);
         if (whisperms != null) {
             String msg = whisperms.getAsString();
@@ -49,7 +49,7 @@ public class Whisper extends FOWSubcommandData {
                 
                 if (anonY.compareToIgnoreCase("y") == 0)
                 {
-                     message =  "Someone says: " + msg;
+                     message =  "[REDACTED] says: " + msg;
                 }
                 else
                 {
