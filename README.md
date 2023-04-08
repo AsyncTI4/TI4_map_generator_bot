@@ -8,7 +8,7 @@ If you have a different way, please share!
 
 ## 1.0 - Locally
 
-### 1.1 - Windows 10, VS Code
+### 1.1 - JAVA, IntelliJ or other Java IDE
 
 Ensure your launch.json file includes a configuration like this:
 
