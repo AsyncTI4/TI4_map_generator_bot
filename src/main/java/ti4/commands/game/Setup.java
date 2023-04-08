@@ -24,6 +24,7 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.FOW_MODE, "Set to YES if want to allow FoW Mode for map, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's - do NOT change this mid-game"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.LARGE_TEXT, "True to make the tile text larger."));
     }
 
     @Override
@@ -105,6 +106,11 @@ public class Setup extends GameSubcommandData {
             } else if ("FALSE".equals(fowMode)){
                 activeMap.setFoWMode(false);
             }
+        }
+
+        OptionMapping largeText = event.getOption(Constants.LARGE_TEXT);
+        if (largeText != null) {
+            getActiveMap().setLargeText(largeText.getAsBoolean());
         }
 
         OptionMapping customOption = event.getOption(Constants.GAME_CUSTOM_NAME);
