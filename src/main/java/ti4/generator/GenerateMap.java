@@ -1908,7 +1908,20 @@ public class GenerateMap {
                         graphics.drawImage(fogOfWar, tileX, tileY, null);
                         graphics.drawString(tile.getFogLabel(), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
                     }
-                    graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x, tileY + tilePositionPoint.y);
+                    int textOffset = 0;
+                    if(map.isLargeText())
+                    {
+                        graphics.setFont(Storage.getFont50());
+                        textOffset = 140;
+                    }
+                    else
+                    {
+                        graphics.setFont(Storage.getFont20());
+                        textOffset = 0;
+                    }
+                    
+                    graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x-textOffset, tileY + tilePositionPoint.y);
+                    graphics.setFont(Storage.getFont20());
                 }
                 case Extras -> {
                     if (tileIsFoggy) return;
