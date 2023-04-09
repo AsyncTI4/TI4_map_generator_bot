@@ -728,7 +728,7 @@ public class Player {
         this.isDummy = isDummy;
     }
 
-    public boolean isActivePlayer() {
+    public boolean isRealPlayer() {
         return !(isDummy || faction == null || color == null || color.equals("null"));
     }
 

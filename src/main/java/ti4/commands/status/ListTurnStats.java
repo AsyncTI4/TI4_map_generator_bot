@@ -29,7 +29,7 @@ public class ListTurnStats extends StatusSubcommandData {
         message.append("__**");
 
         for (Player player : map.getPlayers().values()) {
-            if (!player.isActivePlayer()) continue;
+            if (!player.isRealPlayer()) continue;
             String turnString = playerAverageTurnLength(player);
             message.append("\n" + turnString);
         }

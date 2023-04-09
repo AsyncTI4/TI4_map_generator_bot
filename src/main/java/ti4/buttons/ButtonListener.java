@@ -317,7 +317,7 @@ public class ButtonListener extends ListenerAdapter {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), userID);
-        if (player == null || !player.isActivePlayer()) {
+        if (player == null || !player.isRealPlayer()) {
             event.getChannel().sendMessage("You're not an active player of the game").queue();
             return;
         }
@@ -382,7 +382,7 @@ public class ButtonListener extends ListenerAdapter {
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         int matchingFactionReactions = 0;
         for (Player player : activeMap.getPlayers().values()) {
-            if (!player.isActivePlayer()) {
+            if (!player.isRealPlayer()) {
                 matchingFactionReactions++;
                 continue;
             }

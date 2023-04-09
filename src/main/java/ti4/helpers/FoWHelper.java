@@ -286,22 +286,21 @@ public class FoWHelper {
 			}
 		}
 
+		boolean wh_recon = map.getLaws().keySet().contains("wormhole_recon");
+		boolean absol_recon = map.getLaws().keySet().contains("absol_recon");
+
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			HashSet<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
 				if (token.contains(Constants.ALPHA)) {
 					wormholeIDs.add(Constants.ALPHA);
-					if ((player != null && "ghost".equals(player.getFaction()))
-							|| map.getLaws().keySet().contains("wormhole_recon")
-							|| map.getLaws().keySet().contains("absol_recon")) {
+					if ((player != null && "ghost".equals(player.getFaction())) || wh_recon || absol_recon) {
 						wormholeIDs.add(Constants.BETA);
 					}
 				} else if (token.contains(Constants.BETA)) {
 					wormholeIDs.add(Constants.BETA);
-					if ((player != null && "ghost".equals(player.getFaction()))
-							|| map.getLaws().keySet().contains("wormhole_recon")
-							|| map.getLaws().keySet().contains("absol_recon")) {
+					if ((player != null && "ghost".equals(player.getFaction())) || wh_recon || absol_recon) {
 						wormholeIDs.add(Constants.ALPHA);
 					}
 				} else if (token.contains(Constants.GAMMA)) {
@@ -402,7 +401,7 @@ public class FoWHelper {
 
 	/** Check if the player has units in the system */
 	public static boolean playerHasUnitsInSystem(Player player, Tile tile) {
-		if (!player.isActivePlayer())
+		if (!player.isRealPlayer())
 			return false;
 
 		String colorID = Mapper.getColorID(player.getColor());
