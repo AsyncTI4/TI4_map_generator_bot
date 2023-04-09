@@ -138,16 +138,17 @@ public class GenerateMap {
             if (event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
                 isFoWPrivate = true;
                 Player player = getFowPlayer(map, event);
+                
+                // IMPORTANT NOTE : This method used to be local and was refactored to extract
+                // any references to tilesToDisplay
                 fowPlayer = Helper.getGamePlayer(map, player, event, null);
 
-                Set<String> tilesToShow = fowFilter(map);
-                updatePlayerFogTiles(map, fowPlayer, tilesToShow);
-
+                Set<String> tilesToShow = FoWHelper.fowFilter(map, fowPlayer);
                 Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
                 keys.removeAll(tilesToShow);
                 for (String key : keys) {
                     tilesToDisplay.remove(key);
-                    tilesToDisplay.put(key, fowPlayer.buildFogTile(key));
+                    tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
                 }
             }
         }
@@ -220,36 +221,6 @@ public class GenerateMap {
         return map.getPlayer(user);
     }
 
-    private Set<String> fowFilter(Map map) {
-        Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
-        if (fowPlayer != null) {
-            // Get all tiles with the player in it
-            for (java.util.Map.Entry<String, Tile> tileEntry : tilesToDisplay.entrySet()) {
-                if (FoWHelper.playerIsInSystem(map, tileEntry.getValue(), fowPlayer)) {
-                    tilesWithPlayerUnitsPlanets.add(tileEntry.getKey());
-                }
-            }
-
-            Set<String> tileIDsToShow = new HashSet<>(tilesWithPlayerUnitsPlanets);
-            for (String tileID : tilesWithPlayerUnitsPlanets) {
-                Set<String> adjacentTiles = FoWHelper.getAdjacentTiles(map, tileID, fowPlayer);
-                tileIDsToShow.addAll(adjacentTiles);
-            }
-            return tileIDsToShow;
-        }
-        return Collections.emptySet();
-    }
-
-    private void updatePlayerFogTiles(Map map, Player player, Set<String> tileKeys) {
-        for (String key_ : tileKeys) {
-            Tile tileToUpdate = map.getTileByPosition(key_);
-
-            if (tileToUpdate != null) {
-                player.updateFogTile(tileToUpdate, "Round " + map.getRound());
-            }
-        }
-    }
-
     @NotNull
     public static String getTimeStamp() {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss");
@@ -303,7 +274,7 @@ public class GenerateMap {
                 int baseY = y;
                 x = realX;
 
-                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !canSeeStatsOfPlayer(player, fowPlayer);
+                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(map, player, fowPlayer);
                 if (convertToGeneric) {
                     continue;
                 }
@@ -1061,9 +1032,9 @@ public class GenerateMap {
             Collections.shuffle(players);
         }
         for (Player player : players) {
-            if (!player.isActivePlayer()) continue;
+            if (!player.isRealPlayer()) continue;
             try {
-                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !canSeeStatsOfPlayer(player, fowPlayer);
+                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(map, player, fowPlayer);
                 String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
                 String faction = null;
                 if (player.getColor() != null && player.getFaction() != null) {
@@ -1114,7 +1085,7 @@ public class GenerateMap {
     public static String getSCNumberIfNaaluInPlay(Player player, Map map, String scText) {
         if (Constants.NAALU.equals(player.getFaction())) {
             boolean giftPlayed = false;
-            Collection<Player> activePlayers = map.getPlayers().values().stream().filter(player_ -> player_.isActivePlayer()).toList();
+            Collection<Player> activePlayers = map.getPlayers().values().stream().filter(player_ -> player_.isRealPlayer()).toList();
             for (Player player_ : activePlayers) {
                 if (player != player_ && player_.getPromissoryNotesInPlayArea().contains(Constants.NAALU_PN)) {
                     giftPlayed = true;
@@ -1185,7 +1156,7 @@ public class GenerateMap {
             }
             String userName = player.getUserName();
 
-            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !canSeeStatsOfPlayer(player, fowPlayer);
+            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(map, player, fowPlayer);
             if (convertToGeneric) {
                 continue;
             }
@@ -1258,76 +1229,6 @@ public class GenerateMap {
 
     }
 
-    private boolean canSeeStatsOfFaction(Map map, String faction, Player viewingPlayer) {
-        for (Player player : map.getPlayers().values()) {
-            if (faction.equals(player.getFaction())) {
-                return canSeeStatsOfPlayer(player, viewingPlayer);
-            }
-        }
-        return false;
-    }
-
-    private boolean canSeeStatsOfPlayer(Player player, Player viewingPlayer) {
-        if (player == viewingPlayer) {
-            return true;
-        }
-
-        return viewingPlayer != null && player != null &&
-                (hasHomeSystemInView(player)
-                        || hasPlayersPromInPlayArea(player, viewingPlayer)
-                        || hasMahactCCInFleet(player, viewingPlayer));
-    }
-
-    private boolean hasHomeSystemInView(@NotNull Player player) {
-        String faction = player.getFaction();
-        if (faction == null) {
-            return false;
-        }
-
-        List<String> hsIDs = new ArrayList<>();
-        if ("keleres".equals(faction)) {
-            hsIDs.add("92");
-            hsIDs.add("93");
-            hsIDs.add("94");
-        } else if ("ghost".equals(faction)) {
-            hsIDs.add("51");
-        } else {
-            String playerSetup = Mapper.getPlayerSetup(faction);
-            if (playerSetup != null) {
-                String[] setupInfo = playerSetup.split(";");
-                hsIDs.add(setupInfo[1]);
-            }
-        }
-
-        for (Tile tile : tilesToDisplay.values()) {
-            if (hsIDs.contains(tile.getTileID()) && !tile.hasFog()) {
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    private boolean hasPlayersPromInPlayArea(@NotNull Player player, @NotNull Player viewingPlayer) {
-        boolean hasPromInPA = false;
-        String playerColor = player.getColor();
-        String playerFaction = player.getFaction();
-        List<String> promissoriesInPlayArea = viewingPlayer.getPromissoryNotesInPlayArea();
-        for (String prom_ : promissoriesInPlayArea) {
-            String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(prom_);
-            if (playerColor != null && playerColor.equals(promissoryNoteOwner) || playerFaction != null && playerFaction.equals(promissoryNoteOwner)) {
-                hasPromInPA = true;
-                break;
-            }
-        }
-        return hasPromInPA;
-    }
-
-    private boolean hasMahactCCInFleet(@NotNull Player player, @NotNull Player viewingPlayer) {
-        List<String> mahactCCs = viewingPlayer.getMahactCC();
-        return mahactCCs.contains(player.getColor());
-    }
-
     private void drawCCOfPlayer(String ccID, int x, int y, int ccCount, boolean isLetnev, Player player, Map map) {
         String ccPath = Mapper.getCCPath(ccID);
         try {
@@ -1372,7 +1273,7 @@ public class GenerateMap {
                         faction = getFactionByControlMarker(map.getPlayers().values(), fleetCCID);
                         factionImage = null;
                         if (faction != null) {
-                            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !canSeeStatsOfPlayer(player, fowPlayer);
+                            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(map,player, fowPlayer);
                             if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
                                 String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
                                 if (factionImagePath != null) {
@@ -1419,17 +1320,17 @@ public class GenerateMap {
         Integer[] column = new Integer[1];
         column[0] = 0;
         x = 5;
-        int y1 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState1, po1, 1, column, null, justCalculate, false, graphics, userVPs);
+        int y1 = displayObjectives(y, x, map, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState1, po1, 1, column, null, justCalculate, false, graphics, userVPs);
 
         column[0] = 1;
         x = 801;
         graphics.setColor(new Color(93, 173, 226));
-        int y2 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState2, po2, 2, column, null, justCalculate, false, graphics, userVPs);
+        int y2 = displayObjectives(y, x, map, scoredPublicObjectives, revealedPublicObjectives, players, publicObjectivesState2, po2, 2, column, null, justCalculate, false, graphics, userVPs);
 
         column[0] = 2;
         x = 1598;
         graphics.setColor(Color.WHITE);
-        int y3 = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, customPublics, customVP, null, column, customPublicVP, justCalculate, false, graphics, userVPs);
+        int y3 = displayObjectives(y, x, map, scoredPublicObjectives, revealedPublicObjectives, players, customPublics, customVP, null, column, customPublicVP, justCalculate, false, graphics, userVPs);
 
         revealedPublicObjectives = new LinkedHashMap<>();
         scoredPublicObjectives = new LinkedHashMap<>();
@@ -1446,13 +1347,13 @@ public class GenerateMap {
         }
 
         graphics.setColor(Color.RED);
-        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret, 1, column, customPublicVP, true, false, graphics, userVPs);
+        y = displayObjectives(y, x, map, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret, 1, column, customPublicVP, true, false, graphics, userVPs);
         if (column[0] != 0) {
             y += 40;
         }
 
         graphics.setColor(Color.green);
-        displaySftT(y, x, players, column, graphics);
+        displaySftT(y, x, map, players, column, graphics);
 
         return Math.max(y3, Math.max(y1, y2)) + 15;
     }
@@ -1512,7 +1413,7 @@ public class GenerateMap {
                     boolean convertToGeneric = false;
                     for (Player player : map.getPlayers().values()) {
                         if (optionalText.equals(player.getFaction()) || optionalText.equals(player.getColor())) {
-                            if (isFoWPrivate != null && isFoWPrivate && !canSeeStatsOfPlayer(player, fowPlayer)) {
+                            if (isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(map, player, fowPlayer)) {
                                 convertToGeneric = true;
                             }
                             faction = player.getFaction();
@@ -1581,7 +1482,7 @@ public class GenerateMap {
             LinkedHashMap<String, Integer> revealedSecrets = new LinkedHashMap<>();
             graphics.setColor(Color.LIGHT_GRAY);
             revealedSecrets.putAll(secrets);
-            y = displayObjectives(y, x, new LinkedHashMap<>(), revealedSecrets, players, secretObjectives, secret, 0, column, customPublicVP, false, true, graphics, userVPs);
+            y = displayObjectives(y, x, map, new LinkedHashMap<>(), revealedSecrets, players, secretObjectives, secret, 0, column, customPublicVP, false, true, graphics, userVPs);
         }
         LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>(player.getSecretsScored());
         for (String id : map.getSoToPoList()) {
@@ -1592,7 +1493,7 @@ public class GenerateMap {
             scoredPublicObjectives.put(id, List.of(player.getUserID()));
         }
         graphics.setColor(Color.RED);
-        y = displayObjectives(y, x, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret, 1, column, customPublicVP, false, true, graphics, userVPs);
+        y = displayObjectives(y, x, map, scoredPublicObjectives, revealedPublicObjectives, players, secretObjectives, secret, 1, column, customPublicVP, false, true, graphics, userVPs);
         if (player.isSearchWarrant()) {
             return secretsScored.keySet().size() + player.getSecrets().keySet().size();
         } else {
@@ -1600,7 +1501,7 @@ public class GenerateMap {
         }
     }
 
-    private int displaySftT(int y, int x, LinkedHashMap<String, Player> players, Integer[] column, Graphics graphics) {
+    private int displaySftT(int y, int x, Map map, LinkedHashMap<String, Player> players, Integer[] column, Graphics graphics) {
         for (Player player : players.values()) {
             List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
             for (String id : promissoryNotesInPlayArea) {
@@ -1624,7 +1525,7 @@ public class GenerateMap {
                         }
                     }
                     boolean multiScoring = false;
-                    drawScoreControlMarkers(x + 515, y, players, Collections.singletonList(player.getUserID()), multiScoring, 1, true, graphics, userVPs);
+                    drawScoreControlMarkers(x + 515, y, map, players, Collections.singletonList(player.getUserID()), multiScoring, 1, true, graphics, userVPs);
                     column[0]++;
                     if (column[0] > 2) {
                         column[0] = 0;
@@ -1637,20 +1538,21 @@ public class GenerateMap {
     }
 
     private int displayObjectives(
-            int y,
-            int x,
-            LinkedHashMap<String, List<String>> scoredPublicObjectives,
-            LinkedHashMap<String, Integer> revealedPublicObjectives,
-            LinkedHashMap<String, Player> players,
-            HashMap<String, String> publicObjectivesState,
-            Set<String> po,
-            Integer objectiveWorth,
-            Integer[] column,
-            LinkedHashMap<String, Integer> customPublicVP,
-            boolean justCalculate,
-            boolean fixedColumn,
-            Graphics graphics,
-            HashMap<Player, Integer> userVPs
+        int y,
+        int x,
+        Map map,
+        LinkedHashMap<String, List<String>> scoredPublicObjectives,
+        LinkedHashMap<String, Integer> revealedPublicObjectives,
+        LinkedHashMap<String, Player> players,
+        HashMap<String, String> publicObjectivesState,
+        Set<String> po,
+        Integer objectiveWorth,
+        Integer[] column,
+        LinkedHashMap<String, Integer> customPublicVP,
+        boolean justCalculate,
+        boolean fixedColumn,
+        Graphics graphics,
+        HashMap<Player, Integer> userVPs
     ) {
         Set<String> keysToRemove = new HashSet<>();
         for (java.util.Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
@@ -1685,9 +1587,9 @@ public class GenerateMap {
             boolean multiScoring = Constants.CUSTODIAN.equals(key) || (isFoWPrivate != null && isFoWPrivate);
             if (scoredPlayerID != null) {
                 if (fixedColumn) {
-                    drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, false, objectiveWorth, justCalculate, true, graphics, userVPs);
+                    drawScoreControlMarkers(x + 515, y, map, players, scoredPlayerID, false, objectiveWorth, justCalculate, true, graphics, userVPs);
                 } else {
-                    drawScoreControlMarkers(x + 515, y, players, scoredPlayerID, multiScoring, objectiveWorth, justCalculate, graphics, userVPs);
+                    drawScoreControlMarkers(x + 515, y, map, players, scoredPlayerID, multiScoring, objectiveWorth, justCalculate, graphics, userVPs);
                 }
             }
             if (!justCalculate) {
@@ -1706,30 +1608,32 @@ public class GenerateMap {
     }
 
     private void drawScoreControlMarkers(
-            int x,
-            int y,
-            LinkedHashMap<String, Player> players,
-            List<String> scoredPlayerID,
-            boolean multiScoring,
-            Integer objectiveWorth,
-            boolean justCalculate,
-            Graphics graphics,
-            HashMap<Player, Integer> userVPs
+        int x,
+        int y,
+        Map map,
+        LinkedHashMap<String, Player> players,
+        List<String> scoredPlayerID,
+        boolean multiScoring,
+        Integer objectiveWorth,
+        boolean justCalculate,
+        Graphics graphics,
+        HashMap<Player, Integer> userVPs
     ) {
-        drawScoreControlMarkers(x, y, players, scoredPlayerID, multiScoring, objectiveWorth, justCalculate, false, graphics, userVPs);
+        drawScoreControlMarkers(x, y, map, players, scoredPlayerID, multiScoring, objectiveWorth, justCalculate, false, graphics, userVPs);
     }
 
     private void drawScoreControlMarkers(
-            int x,
-            int y,
-            LinkedHashMap<String, Player> players,
-            List<String> scoredPlayerID,
-            boolean multiScoring,
-            Integer objectiveWorth,
-            boolean justCalculate,
-            boolean fixedColumn,
-            Graphics graphics,
-            HashMap<Player, Integer> userVPs
+        int x,
+        int y,
+        Map map,
+        LinkedHashMap<String, Player> players,
+        List<String> scoredPlayerID,
+        boolean multiScoring,
+        Integer objectiveWorth,
+        boolean justCalculate,
+        boolean fixedColumn,
+        Graphics graphics,
+        HashMap<Player, Integer> userVPs
     ) {
         try {
             int tempX = 0;
@@ -1738,7 +1642,7 @@ public class GenerateMap {
                 Player player = playerEntry.getValue();
                 String userID = player.getUserID();
 
-                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !canSeeStatsOfPlayer(player, fowPlayer);
+                boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(map, player, fowPlayer);
                 if (scoredPlayerID.contains(userID)) {
                     String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(player.getColor());
                     if (controlID.contains("null")) {
@@ -1887,7 +1791,7 @@ public class GenerateMap {
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
             BufferedImage fogOfWar = ImageIO.read(new File(tile.getFowTilePath(fowPlayer)));
-            boolean tileIsFoggy = isFoWPrivate != null && isFoWPrivate && tile.hasFog();
+            boolean tileIsFoggy = isFoWPrivate != null && isFoWPrivate && tile.hasFog(fowPlayer);
 
             Point positionPoint = PositionMapper.getTilePosition(tile.getPosition(), map);
             if (positionPoint == null) {
@@ -1901,12 +1805,11 @@ public class GenerateMap {
                 } //do nothing
                 case Tile -> {
                     graphics.drawImage(image, tileX, tileY, null);
-
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.WHITE);
                     if (tileIsFoggy) {
                         graphics.drawImage(fogOfWar, tileX, tileY, null);
-                        graphics.drawString(tile.getFogLabel(), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
+                        graphics.drawString(tile.getFogLabel(fowPlayer), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
                     }
                     int textOffset = 0;
                     if(map.isLargeText())
@@ -2059,7 +1962,7 @@ public class GenerateMap {
                 Player player = getPlayerByControlMarker(map.getPlayers().values(), ccID);
                 BufferedImage factionImage = null;
                 if (faction != null) {
-                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !canSeeStatsOfPlayer(player, fowPlayer);
+                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(map, player, fowPlayer);
                     if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
                         String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
                         if (factionImagePath != null) {
@@ -2104,7 +2007,7 @@ public class GenerateMap {
                 try {
                     factionImage = null;
                     if (faction != null) {
-                        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !canSeeStatsOfPlayer(player, fowPlayer);
+                        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(map, player, fowPlayer);
                         if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
                             String factionImagePath = tile.getCCPath("control_faction_" + faction + ".png");
                             if (factionImagePath != null) {
@@ -2335,11 +2238,12 @@ public class GenerateMap {
 
         boolean isJail = isCabalJail || isNekroJail || isYssarilJail;
         boolean showJail = false;
-        if (fowPlayer == null
-                || (isCabalJail && canSeeStatsOfFaction(map, "cabal", fowPlayer))
-                || (isNekroJail && canSeeStatsOfFaction(map, "nekro", fowPlayer))
-                || (isYssarilJail && canSeeStatsOfFaction(map, "yssaril", fowPlayer))
-        ) {
+        if (fowPlayer == null 
+            || (isCabalJail && FoWHelper.canSeeStatsOfFaction(map, "cabal", fowPlayer))
+            || (isNekroJail && FoWHelper.canSeeStatsOfFaction(map, "nekro", fowPlayer))
+            || (isYssarilJail && FoWHelper.canSeeStatsOfFaction(map, "yssaril", fowPlayer))
+            )
+        {
             showJail = true;
         }
 

@@ -726,17 +726,17 @@ public class Helper {
      * Resolves community mode & handles fog of war
      */
     @Nullable
-    public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player) {
+    public static String getPlayerRepresentation(GenericInteractionCreateEvent event, Player player) {
         return getPlayerRepresentation(event, player, false);
     }
-
+ 
     /**
      * Get the player's in-game representation.
      * <p>
      * Resolves community mode & handles fog of war
      */
     @Nullable
-    public static String getPlayerRepresentation(GenericCommandInteractionEvent event, Player player, boolean overrideFow) {
+    public static String getPlayerRepresentation(GenericInteractionCreateEvent event, Player player, boolean overrideFow) {
         Boolean privateGame = FoWHelper.isPrivateGame(event);
         if (privateGame != null && privateGame && !overrideFow){
             return getColourAsMention(event.getGuild(), player.getColor());
@@ -755,75 +755,6 @@ public class Helper {
         return getPlayerRepresentation(event.getGuild(), player);
     }
 
-    /**
-     * Get the player's in-game representation.
-     * <p>
-     * Resolves community mode & handles fog of war
-     */
-    @Nullable
-    public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player) { 
-        return getPlayerRepresentation(event, player, false);
-    }
-    
-    /**
-     * Get the player's in-game representation.
-     * <p>
-     * Resolves community mode & handles fog of war
-     */
-    @Nullable
-    public static String getPlayerRepresentation(SlashCommandInteractionEvent event, Player player, boolean overrideFow) {
-        Boolean privateGame = FoWHelper.isPrivateGame(event);
-        if (privateGame != null && privateGame && !overrideFow){
-            return getColourAsMention(event.getGuild(), player.getColor());
-        }
-        if (event == null) {
-            return getPlayerRepresentation(player);
-        }
-        if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
-            Role roleForCommunity = player.getRoleForCommunity();
-            if (roleForCommunity == null) {
-                return "[No Community Role Found]";
-            } else {
-                return getRoleMentionByName(event.getGuild(), roleForCommunity.getName());
-            }
-        }
-        return getPlayerRepresentation(event.getGuild(), player);
-    }
-
-    /**
-     * Get the player's in-game representation.
-     * <p>
-     * Resolves community mode & handles fog of war
-     */
-    @Nullable
-    public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player) { 
-        return getPlayerRepresentation(event, player, false);
-    }
-    
-    /**
-     * Get the player's in-game representation.
-     * <p>
-     * Resolves community mode & handles fog of war
-     */
-    @Nullable
-    public static String getPlayerRepresentation(ButtonInteractionEvent event, Player player, boolean overrideFow) {
-        Boolean privateGame = FoWHelper.isPrivateGame(event);
-        if (privateGame != null && privateGame && !overrideFow){
-            return getColourAsMention(event.getGuild(), player.getColor());
-        }
-        if (event == null) {
-            return getPlayerRepresentation(player);
-        }
-        if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
-            Role roleForCommunity = player.getRoleForCommunity();
-            if (roleForCommunity == null) {
-                return "[No Community Role Found]";
-            } else {
-                return getRoleMentionByName(event.getGuild(), roleForCommunity.getName());
-            }
-        }
-        return getPlayerRepresentation(event.getGuild(), player);
-    }
     
     public static String getFactionLeaderEmoji(String faction, Leader leader) {
         return getEmojiFromDiscord(faction + leader.getId() + leader.getName());
@@ -1441,29 +1372,7 @@ public class Helper {
         return message.toString();
     }
 
-    public static void checkIfHeroUnlocked(SlashCommandInteractionEvent event, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeader(Constants.HERO);
-        if (playerLeader != null && playerLeader.isLocked()) {
-            int scoredSOCount = player.getSecretsScored().size();
-            int scoredPOCount = 0;
-            HashMap<String, List<String>> playerScoredPublics = activeMap.getScoredPublicObjectives();
-            for (Entry<String, List<String>> scoredPublic : playerScoredPublics.entrySet()) {
-                if (Mapper.getPublicObjectivesState1().keySet().contains(scoredPublic.getKey()) || Mapper.getPublicObjectivesState2().keySet().contains(scoredPublic.getKey())) {
-                    if (scoredPublic.getValue().contains(player.getUserID())) {
-                        scoredPOCount++;
-                    }
-                }
-            
-            }
-            int scoredObjectiveCount = scoredPOCount + scoredSOCount;
-            if (scoredObjectiveCount >= 3) {
-                UnlockLeader ul = new UnlockLeader();
-                ul.unlockLeader(event, "hero", activeMap, player);
-            }
-        }
-    }
-
-    public static void checkIfHeroUnlocked(ButtonInteractionEvent event, Map activeMap, Player player) {
+    public static void checkIfHeroUnlocked(GenericInteractionCreateEvent event, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(Constants.HERO);
         if (playerLeader != null && playerLeader.isLocked()) {
             int scoredSOCount = player.getSecretsScored().size();

@@ -28,7 +28,7 @@ public class ListTurnOrder extends StatusSubcommandData {
             HashMap<Integer, String> order = new HashMap<>();
             int naaluSC = 0;
             for (Player player : map.getPlayers().values()) {
-                if (!player.isActivePlayer()){
+                if (!player.isRealPlayer()){
                     continue;
                 }
                 int sc = player.getSC();

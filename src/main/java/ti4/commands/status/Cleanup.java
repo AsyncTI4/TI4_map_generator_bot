@@ -48,7 +48,7 @@ public class Cleanup extends StatusSubcommandData {
             activeMap.setScTradeGood(sc, 0);
             player.setSC(0);
             player.cleanExhaustedTechs();
-            player.cleanExhaustedPlanets();
+            player.cleanExhaustedPlanets(true);
             player.cleanExhaustedRelics();
 
             for (Leader leader : player.getLeaders()) {

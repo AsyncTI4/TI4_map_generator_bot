@@ -56,11 +56,10 @@ public class ButtonListener extends ListenerAdapter {
         }
 
         MessageChannel privateChannel = event.getChannel();
-        boolean inform = true;
         if (activeMap.isFoWMode()) {
             if (player.getPrivateChannel() == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Private channels are not set up for this game. Messages will be suppressed.");
-                inform = false;
+                privateChannel = null;
             } else {
                 privateChannel = player.getPrivateChannel();
             }
@@ -90,7 +89,7 @@ public class ButtonListener extends ListenerAdapter {
 
             if (channel != null) {
                 try {
-                    String error = PlayAC.playAC(null, activeMap, player, acID, channel, event.getGuild(), event);
+                    String error = PlayAC.playAC(event, activeMap, player, acID, channel, event.getGuild());
                     if (error != null) {
                         event.getChannel().sendMessage(error).queue();
                     }
@@ -116,7 +115,7 @@ public class ButtonListener extends ListenerAdapter {
             if (channel != null) {
                 try {
                     int soIndex = Integer.parseInt(soID);
-                    ScoreSO.scoreSO(activeMap, player, soIndex, channel, event);
+                    ScoreSO.scoreSO(event, activeMap, player, soIndex, channel);
                 } catch (Exception e) {
                     BotLogger.log(event, "Could not parse SO ID: " + soID);
                     event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.").queue();
@@ -129,7 +128,7 @@ public class ButtonListener extends ListenerAdapter {
             String poID = buttonID.replace(Constants.PO_SCORING, "");
             try {
                 int poIndex = Integer.parseInt(poID);
-                ScorePublic.scorePO(event, privateChannel, activeMap, player, poIndex, inform);
+                ScorePublic.scorePO(event, privateChannel, activeMap, player, poIndex);
                 addReaction(event, false, false, null, "");
             } catch (Exception e) {
                 BotLogger.log("Could not parse PO ID: " + poID);
@@ -178,7 +177,7 @@ public class ButtonListener extends ListenerAdapter {
                     for (int i = 0; i < count; i++) {
                         activeMap.drawActionCard(player.getUserID());
                     }
-                    CardsInfo.sentUserCardInfo(null, activeMap, player, event);
+                    CardsInfo.sentUserCardInfo(event, activeMap, player, false);
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_draw_so" -> {
@@ -188,7 +187,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String message = "Drew Secret Objective";
                     activeMap.drawSecretObjective(player.getUserID());
-                    CardsInfo.sentUserCardInfo(null, activeMap, player, event);
+                    CardsInfo.sentUserCardInfo(event, activeMap, player, false);
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_follow_trade" -> {
@@ -317,7 +316,7 @@ public class ButtonListener extends ListenerAdapter {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), userID);
-        if (player == null || !player.isActivePlayer()) {
+        if (player == null || !player.isRealPlayer()) {
             event.getChannel().sendMessage("You're not an active player of the game").queue();
             return;
         }
@@ -382,7 +381,7 @@ public class ButtonListener extends ListenerAdapter {
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         int matchingFactionReactions = 0;
         for (Player player : activeMap.getPlayers().values()) {
-            if (!player.isActivePlayer()) {
+            if (!player.isRealPlayer()) {
                 matchingFactionReactions++;
                 continue;
             }
