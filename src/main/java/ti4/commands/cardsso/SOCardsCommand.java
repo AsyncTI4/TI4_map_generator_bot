@@ -124,7 +124,7 @@ public class SOCardsCommand implements Command {
         Collection<SOCardsSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new DrawSO());
         subcommands.add(new DiscardSO());
-        subcommands.add(new CardsInfo());
+        subcommands.add(new SOInfo());
         subcommands.add(new ShowSO());
         subcommands.add(new ShowSOToAll());
         subcommands.add(new ScoreSO());

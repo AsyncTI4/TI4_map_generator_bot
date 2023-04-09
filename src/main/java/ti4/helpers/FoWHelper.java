@@ -240,7 +240,7 @@ public class FoWHelper {
 			return tiles;
 		}
 
-		List<String> directlyAdjacentTiles = Mapper.getAdjacentTilePositions(position);
+		List<String> directlyAdjacentTiles = Mapper.getAdjacentTilePositions(map, position);
 		if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
 			// adjacency file for this tile is not filled in
 			return tiles;

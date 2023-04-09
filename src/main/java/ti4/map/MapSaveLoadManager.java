@@ -267,6 +267,9 @@ public class MapSaveLoadManager {
         writer.write(Constants.PLAYER_COUNT_FOR_MAP + " " + map.getPlayerCountForMap());
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.RING_COUNT_FOR_MAP + " " + map.getRingCount());
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.VP_COUNT + " " + map.getVp());
         writer.write(System.lineSeparator());
 
@@ -843,6 +846,17 @@ public class MapSaveLoadManager {
                         }
                     } catch (Exception e) {
                         map.setPlayerCountForMap(6);
+                    }
+                }
+                case Constants.RING_COUNT_FOR_MAP -> {
+                    String count = info;
+                    try {
+                        int ringCount = Integer.parseInt(count);
+                        if (ringCount == 8) {
+                            map.setRingCount(ringCount);
+                        }
+                    } catch (Exception e) {
+                        map.setRingCount(0);
                     }
                 }
                 case Constants.VP_COUNT -> {

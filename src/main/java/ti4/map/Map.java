@@ -38,6 +38,9 @@ public class Map {
     private DisplayType displayTypeForced = null;
     @ExportableField
     private int playerCountForMap = 6;
+
+    @ExportableField
+    private int ringCount = 0;
     @ExportableField
     private int vp = 10;
     @ExportableField
@@ -46,6 +49,8 @@ public class Map {
     private boolean allianceMode = false;
     @ExportableField
     private boolean fowMode = false;
+    @ExportableField
+    private boolean largeText = false;
     @ExportableField
     private boolean absolMode = false;
     @ExportableField
@@ -233,6 +238,13 @@ public class Map {
         this.fowMode = fowMode;
     }
 
+    public void setLargeText(boolean largeText) {
+        this.largeText = largeText;
+    }
+    public boolean isLargeText() {
+        return largeText;
+    }
+
     public boolean isAbsolMode() {
         return absolMode;
     }
@@ -254,6 +266,7 @@ public class Map {
             put("Community", isCommunityMode());
             put("Alliance", isAllianceMode());
             put("FoW", isFoWMode());
+            put("LargeText", isLargeText());
             put("Absol", isAbsolMode());
             put("DiscordantStars", isDiscordantStarsMode());
         }};
@@ -325,6 +338,14 @@ public class Map {
 
     public void setPlayerCountForMap(int playerCountForMap) {
         this.playerCountForMap = playerCountForMap;
+    }
+
+    public int getRingCount() {
+        return ringCount;
+    }
+
+    public void setRingCount(int ringCount) {
+        this.ringCount = ringCount;
     }
 
     public void setSCPlayed(Integer scNumber, Boolean playedStatus) {
