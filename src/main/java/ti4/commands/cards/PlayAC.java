@@ -3,6 +3,7 @@ package ti4.commands.cards;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -13,6 +14,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -40,13 +42,13 @@ public class PlayAC extends CardsSubcommandData {
             return;
         }
         
-        String reply = playAC(event, activeMap, player, option.getAsString().toLowerCase(), event.getChannel(), event.getGuild(), null);
+        String reply = playAC(event, activeMap, player, option.getAsString().toLowerCase(), event.getChannel(), event.getGuild());
         if (reply != null) {
             sendMessage(reply);
         }
     }
 
-    public static String playAC(SlashCommandInteractionEvent event, Map activeMap, Player player, String value, MessageChannel channel, Guild guild, ButtonInteractionEvent buttonInteractionEvent) {
+    public static String playAC(GenericInteractionCreateEvent event, Map activeMap, Player player, String value, MessageChannel channel, Guild guild) {
         MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? channel : activeMap.getMainGameChannel();
         
         String acID = null;
@@ -115,7 +117,14 @@ public class PlayAC extends CardsSubcommandData {
         } else {
             MessageHelper.sendMessageToChannelWithButtons(mainGameChannel, sb.toString(), guild, sabotageButton, noSabotageButton);
         }
-        CardsInfo.sentUserCardInfo(event, activeMap, player, buttonInteractionEvent);
+        
+        //Fog of war ping
+		if (activeMap.isFoWMode()) {
+            String fowMessage = Helper.getPlayerRepresentation(event, player) + " played an Action Card: " + actionCardTitle;
+			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, fowMessage);
+		}
+
+        CardsInfo.sentUserCardInfo(event, activeMap, player, false);
         return null;
     }
 }

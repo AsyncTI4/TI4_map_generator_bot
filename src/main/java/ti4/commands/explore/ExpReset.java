@@ -21,7 +21,7 @@ public class ExpReset extends ExploreSubcommandData {
             activeMap.resetExplore();
             sendMessage("Exploration decks reset.");
         } else {
-            sendMessage("Confirmation not recieved to reset exploration decks.");
+            sendMessage("Confirmation not received to reset exploration decks.");
             MessageHelper.sendMessageToChannel(event, event.getOption(Constants.CONFIRM).getAsString());
         }
     }

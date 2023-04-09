@@ -8,6 +8,7 @@ import ti4.commands.cards.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -110,6 +111,12 @@ public class PlayPN extends PNCardsSubcommandData {
         if (id.equalsIgnoreCase("terraform")) {
             sb.append("`/add_token token:titanspn`\n");
         }
+
+        //Fog of war ping
+		if (activeMap.isFoWMode()) {
+            // Add extra message for visibility
+			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, sb.toString());
+		}
 
         sendMessage(sb.toString());
         CardsInfo.sentUserCardInfo(event, activeMap, player);

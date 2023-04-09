@@ -52,6 +52,7 @@ public class Player {
     private HashMap<String,String> fow_seenTiles = new HashMap<>();
     private HashMap<String,String> fow_customLabels = new HashMap<>();
     private String fowFogFilter = null;
+    private boolean fogInitialized = false;
 
     @Nullable
     private Role roleForCommunity = null;
@@ -579,9 +580,11 @@ public class Player {
         exhaustedTechs.clear();
     }
 
-    public void cleanExhaustedPlanets() {
+    public void cleanExhaustedPlanets(boolean cleanAbilities) {
         exhaustedPlanets.clear();
-        exhaustedPlanetsAbilities.clear();
+        if (cleanAbilities) {
+            exhaustedPlanetsAbilities.clear();
+        }
     }
 
     public void cleanExhaustedRelics() {
@@ -691,14 +694,14 @@ public class Player {
         fow_customLabels.remove(position);
     }
 
-    public Tile buildFogTile(String position) {
+    public Tile buildFogTile(String position, Player player) {
         String tileID = fow_seenTiles.get(position);
         if (tileID == null) tileID = "0b";
 
         String label = fow_customLabels.get(position);
         if (label == null) label = "";
 
-        return new Tile(tileID, position, true, label);
+        return new Tile(tileID, position, player, true, label);
     }
 
     public HashMap<String,String> getFogTiles() {
@@ -709,6 +712,14 @@ public class Player {
         return fow_customLabels;
     }
 
+    public boolean hasFogInitialized() {
+        return fogInitialized;
+    }
+
+    public void setFogInitialized(boolean init) {
+        fogInitialized = init;
+    }
+
     public boolean isDummy() {
         return isDummy;
     }
@@ -717,7 +728,7 @@ public class Player {
         this.isDummy = isDummy;
     }
 
-    public boolean isActivePlayer() {
+    public boolean isRealPlayer() {
         return !(isDummy || faction == null || color == null || color.equals("null"));
     }
 
