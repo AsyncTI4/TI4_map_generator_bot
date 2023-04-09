@@ -295,14 +295,8 @@ public class FoWHelper {
 			for (String token : tokenList) {
 				if (token.contains(Constants.ALPHA)) {
 					wormholeIDs.add(Constants.ALPHA);
-					if ((player != null && "ghost".equals(player.getFaction())) || wh_recon || absol_recon) {
-						wormholeIDs.add(Constants.BETA);
-					}
 				} else if (token.contains(Constants.BETA)) {
-					wormholeIDs.add(Constants.BETA);
-					if ((player != null && "ghost".equals(player.getFaction())) || wh_recon || absol_recon) {
-						wormholeIDs.add(Constants.ALPHA);
-					}
+					wormholeIDs.add(Constants.BETA);	
 				} else if (token.contains(Constants.GAMMA)) {
 					wormholeIDs.add(Constants.GAMMA);
 				} else if (token.contains(Constants.DELTA)) {
@@ -314,10 +308,17 @@ public class FoWHelper {
 				} else if (token.equals(Constants.ETA)) { //exact match only
 					wormholeIDs.add(Constants.ETA);
 				}
-				
 			}
 			if (ghostFlagship != null && unitHolder.getUnits().getOrDefault(ghostFlagship, 0) > 0) {
 				wormholeIDs.add(Constants.DELTA);
+			}
+		}
+
+		if ((player != null && "ghost".equals(player.getFaction())) || wh_recon || absol_recon) {
+			if (wormholeIDs.contains(Constants.ALPHA)) {
+				wormholeIDs.add(Constants.BETA);
+			} else if (wormholeIDs.contains(Constants.BETA)) {
+				wormholeIDs.add(Constants.ALPHA);
 			}
 		}
 
