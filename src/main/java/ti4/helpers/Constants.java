@@ -47,6 +47,9 @@ public class Constants {
     public static String BETA = "beta";
     public static String GAMMA = "gamma";
     public static String DELTA = "delta";
+    public static String EPSILON = "whepsilon";
+    public static String ZETA = "whzeta";
+    public static String ETA = "wheta";
 
     public static final String DRAW_SPECIFIC_SO_FOR_PLAYER = "draw_specific_so_for_player";
 

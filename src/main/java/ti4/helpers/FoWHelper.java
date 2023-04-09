@@ -308,7 +308,14 @@ public class FoWHelper {
 					wormholeIDs.add(Constants.GAMMA);
 				} else if (token.contains(Constants.DELTA)) {
 					wormholeIDs.add(Constants.DELTA);
+				} else if (token.equals(Constants.EPSILON)) { //exact match only
+					wormholeIDs.add(Constants.EPSILON);
+				} else if (token.equals(Constants.ZETA)) { //exact match only
+					wormholeIDs.add(Constants.ZETA);
+				} else if (token.equals(Constants.ETA)) { //exact match only
+					wormholeIDs.add(Constants.ETA);
 				}
+				
 			}
 			if (ghostFlagship != null && unitHolder.getUnits().getOrDefault(ghostFlagship, 0) > 0) {
 				wormholeIDs.add(Constants.DELTA);
@@ -495,8 +502,8 @@ public class FoWHelper {
 
 			// let's figure out what they can see!
 			initializeFog(activeMap, player_, false);
-			boolean senderVisible = FoWHelper.canSeeStatsOfPlayer(activeMap, player_, sendingPlayer);
-			boolean receiverVisible = FoWHelper.canSeeStatsOfPlayer(activeMap, player_, receivingPlayer);
+			boolean senderVisible = FoWHelper.canSeeStatsOfPlayer(activeMap, sendingPlayer, player_);
+			boolean receiverVisible = FoWHelper.canSeeStatsOfPlayer(activeMap, receivingPlayer, player_);
 
 			StringBuilder sb = new StringBuilder();
 			// first off let's give full info for someone that can see both sides
