@@ -2190,6 +2190,7 @@ public class GenerateMap {
         return tokenID.contains(Constants.SLEEPER) ||
                 tokenID.contains(Constants.DMZ_LARGE) ||
                 tokenID.contains(Constants.WORLD_DESTROYED) ||
+                tokenID.contains(Constants.GLEDGE_CORE) ||
                 tokenID.contains(Constants.CUSTODIAN_TOKEN) ||
                 tokenID.contains(Constants.CONSULATE_TOKEN);
     }
@@ -2229,7 +2230,10 @@ public class GenerateMap {
                 } catch (Exception e) {
                     BotLogger.log("Could not parse control token file for: " + tokenID);
                 }
-                if (tokenPath.contains(Constants.DMZ_LARGE) || tokenPath.contains(Constants.WORLD_DESTROYED) || tokenPath.contains(Constants.CONSULATE_TOKEN)) {
+                if (tokenPath.contains(Constants.DMZ_LARGE) ||
+                        tokenPath.contains(Constants.WORLD_DESTROYED) ||
+                        tokenPath.contains(Constants.CONSULATE_TOKEN) ||
+                        tokenPath.contains(Constants.GLEDGE_CORE)) {
                     graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - (image.getHeight() / 2), null);
                 } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
                     graphics.drawImage(image, tileX + 70, tileY + 45, null);
