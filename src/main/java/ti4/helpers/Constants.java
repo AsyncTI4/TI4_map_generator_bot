@@ -137,6 +137,7 @@ public class Constants {
     public static final String DMZ = "dmz";
     public static final String DMZ_LARGE = "dmz_large";
     public static final String WORLD_DESTROYED = "worlddestroyed";
+    public static final String GLEDGE_CORE = "gledge_core";
 
     public static final String FRONTIER = "frontier";
 
