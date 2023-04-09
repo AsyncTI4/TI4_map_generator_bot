@@ -46,6 +46,9 @@ public class GenerateMap {
     private final int width8 = 2500;
     private final int heght8 = 3350;
 
+    private final int width8ring = 4700;
+    private final int height8ring = 5750;
+
     private Boolean isFoWPrivate = null;
     private Player fowPlayer = null;
     private HashMap<String, Tile> tilesToDisplay = new HashMap<>();
@@ -72,6 +75,10 @@ public class GenerateMap {
         if (map != null && map.getPlayerCountForMap() == 8) {
             mapWidth = width8;
             mapHeight = heght8;
+        }
+        if (map != null && map.getRingCount() == 8) {
+            mapWidth = width8ring;
+            mapHeight = height8ring;
         }
         width = mapWidth + (extraWidth * 2);
         heightForGameInfo = mapHeight;
@@ -149,11 +156,17 @@ public class GenerateMap {
             if (displayType == DisplayType.all || displayType == DisplayType.map) {
                 HashMap<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
                 String setup = tileMap.keySet().stream()
-                        .filter(key -> key.startsWith("setup"))
+                        .filter(key -> key.equals("0"))
                         .findFirst()
                         .orElse(null);
                 if (setup != null) {
-                    addTile(tileMap.get(setup), map, TileStep.Setup);
+                    if (tileMap.get(setup).getTileID().equals("setup8ring")) {
+                        for (String position : PositionMapper.get8RingTiles()) {
+                            addTile(new Tile("0gray", position), map, TileStep.Tile);
+                        }
+                    } else {
+                        addTile(tileMap.get(setup), map, TileStep.Setup);
+                    }
                     tileMap.remove(setup);
                 }
 
@@ -172,8 +185,10 @@ public class GenerateMap {
             String testing = System.getenv("TESTING");
             if (testing == null && displayType == DisplayType.all && (isFoWPrivate == null || !isFoWPrivate)) {
                 new Thread(() -> {
-                    WebHelper.putMap(map.getName(), mainImage);
-                    WebHelper.putData(map.getName(), map);
+                    BufferedImage img = mainImage;
+                    Map mp = map;
+                    WebHelper.putMap(map.getName(), img);
+                    WebHelper.putData(map.getName(), mp);
                 }).start();
             }
         } catch (IOException e) {
@@ -444,6 +459,22 @@ public class GenerateMap {
 
             String pnName = "pa_pn_name_" + pn + ".png";
             drawPAImage(x + deltaX, y, pnName);
+            String promissoryNote = Mapper.getPromissoryNote(pn, true);
+            if (promissoryNote != null) {
+                String[] pnSplit = promissoryNote.split(";");
+                if (pnSplit.length > 4 && !pnSplit[4].isEmpty()) {
+                    String tokenID = pnSplit[4];
+                    found:
+                    for (Tile tile : map.getTileMap().values()) {
+                        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                            if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(tokenID))) {
+                                drawPlanetImage(x + deltaX + 17, y, "pc_planetname_" + unitHolder.getName() + "_rdy.png");
+                                break found;
+                            }
+                        }
+                    }
+                }
+            }
             deltaX += 48;
         }
         return x + deltaX + 20;
@@ -685,27 +716,29 @@ public class GenerateMap {
         List<String> exhaustedPlanetsAbilities = player.getExhaustedPlanetsAbilities();
 
         int deltaX = 0;
-        //RESOURCE/INFLUENCE TOTALS
-        int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, map);
-        int totalPlayerResources = Helper.getPlayerResourcesTotal(player, map);
-        int availablePlayerResourcesOptimal = Helper.getPlayerOptimalResourcesAvailable(player, map);
-        int totalPlayerResourcesOptimal = Helper.getPlayerOptimalResourcesTotal(player, map);
-        int availablePlayerInfluence = Helper.getPlayerInfluenceAvailable(player, map);
-        int totalPlayerInfluence = Helper.getPlayerInfluenceTotal(player, map);
-        int availablePlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceAvailable(player, map);
-        int totalPlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceTotal(player, map);
-        drawPAImage(x + deltaX, y - 2, "pa_resinf_info.png");
-        graphics.setColor(Color.WHITE);
-        graphics.setFont(Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(availablePlayerResources), new Rectangle(x + deltaX + 34, y + 7, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(totalPlayerResources), new Rectangle(x + deltaX + 34, y + 41, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(availablePlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 75, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(totalPlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 109, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(availablePlayerInfluence), new Rectangle(x + deltaX + 185, y + 7, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(totalPlayerInfluence), new Rectangle(x + deltaX + 185, y + 41, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(availablePlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 75, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(totalPlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 109, 32, 32), Storage.getFont32());
-        deltaX += 254;
+
+        //DISABLED
+        // //RESOURCE/INFLUENCE TOTALS
+        // int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, map);
+        // int totalPlayerResources = Helper.getPlayerResourcesTotal(player, map);
+        // int availablePlayerResourcesOptimal = Helper.getPlayerOptimalResourcesAvailable(player, map);
+        // int totalPlayerResourcesOptimal = Helper.getPlayerOptimalResourcesTotal(player, map);
+        // int availablePlayerInfluence = Helper.getPlayerInfluenceAvailable(player, map);
+        // int totalPlayerInfluence = Helper.getPlayerInfluenceTotal(player, map);
+        // int availablePlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceAvailable(player, map);
+        // int totalPlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceTotal(player, map);
+        // drawPAImage(x + deltaX, y - 2, "pa_resinf_info.png");
+        // graphics.setColor(Color.WHITE);
+        // graphics.setFont(Storage.getFont32());
+        // drawCenteredString(graphics, String.valueOf(availablePlayerResources), new Rectangle(x + deltaX + 34, y + 7, 32, 32), Storage.getFont32());
+        // drawCenteredString(graphics, String.valueOf(totalPlayerResources), new Rectangle(x + deltaX + 34, y + 41, 32, 32), Storage.getFont32());
+        // drawCenteredString(graphics, String.valueOf(availablePlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 75, 32, 32), Storage.getFont32());
+        // drawCenteredString(graphics, String.valueOf(totalPlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 109, 32, 32), Storage.getFont32());
+        // drawCenteredString(graphics, String.valueOf(availablePlayerInfluence), new Rectangle(x + deltaX + 185, y + 7, 32, 32), Storage.getFont32());
+        // drawCenteredString(graphics, String.valueOf(totalPlayerInfluence), new Rectangle(x + deltaX + 185, y + 41, 32, 32), Storage.getFont32());
+        // drawCenteredString(graphics, String.valueOf(availablePlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 75, 32, 32), Storage.getFont32());
+        // drawCenteredString(graphics, String.valueOf(totalPlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 109, 32, 32), Storage.getFont32());
+        // deltaX += 254;
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
@@ -1778,7 +1811,20 @@ public class GenerateMap {
                         graphics.drawImage(fogOfWar, tileX, tileY, null);
                         graphics.drawString(tile.getFogLabel(fowPlayer), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
                     }
-                    graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x, tileY + tilePositionPoint.y);
+                    int textOffset = 0;
+                    if(map.isLargeText())
+                    {
+                        graphics.setFont(Storage.getFont50());
+                        textOffset = 140;
+                    }
+                    else
+                    {
+                        graphics.setFont(Storage.getFont20());
+                        textOffset = 0;
+                    }
+                    
+                    graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x-textOffset, tileY + tilePositionPoint.y);
+                    graphics.setFont(Storage.getFont20());
                 }
                 case Extras -> {
                     if (tileIsFoggy) return;

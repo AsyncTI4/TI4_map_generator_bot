@@ -123,6 +123,7 @@ public class CardsCommand implements Command {
     private Collection<CardsSubcommandData> getSubcommands() {
         Collection<CardsSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new CardsInfo());
+        subcommands.add(new ACInfo());
         subcommands.add(new DrawAC());
         subcommands.add(new DiscardAC());
         subcommands.add(new DiscardACRandom());

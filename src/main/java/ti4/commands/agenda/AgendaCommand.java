@@ -76,12 +76,11 @@ public class AgendaCommand implements Command {
             MapSaveLoadManager.saveMap(map);
         }
         if (executedCommand != null) {
-            MessageHelper.replyToMessage(event, "Executed action: " +executedCommand.getActionID());
+            // MessageHelper.replyToMessage(event, "Executed action: " + executedCommand.getActionID());
         } else {
             MessageHelper.replyToMessage(event, "No Action executed");
         }
     }
-
 
     protected String getActionDescription() {
         return "Agenda handling";

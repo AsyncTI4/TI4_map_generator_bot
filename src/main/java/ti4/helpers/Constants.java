@@ -29,6 +29,7 @@ public class Constants {
     public static final String REMOVE_PLAYER = "remove_player";
     public static final String PLAYER_NAME = "player_name";
     public static final String PLAYER_COUNT_FOR_MAP = "player_count_for_map";
+    public static final String RING_COUNT_FOR_MAP = "ring_count_for_map";
     public static final String VP_COUNT = "vp_count";
     public static final String JOIN = "join";
     public static final String ADD = "add";
@@ -117,6 +118,11 @@ public class Constants {
     public static final String BULK_FF = "_tkn_ff.png";
     public static final String COLOR_GF = "_gf.png";
     public static final String COLOR_FF = "_ff.png";
+
+    public static final String UNIT_DD = "_dd.png";
+    public static final String UNIT_DD_EYE = "_dd_eyes.png";
+    public static final int EYE_CHANCE = 1000;
+
     public static final String SETUP6 = "setup6";
     public static final String SETUP8 = "setup8";
     public static final String MALLICE = "mallicelocked";
@@ -341,6 +347,7 @@ public class Constants {
     public static final String RELIC_PURGE = "relic_purge";
     public static final String SHUFFLE_BACK = "relic_shuffle_back";
     public static final String ADD_BACK_INTO_DECK = "relic_add_back_into_deck";
+    public static final String RELIC_INFO = "relic_info";
     public static final String PUT_TOP = "put_top";
     public static final String PUT_BOTTOM = "put_bottom";
     public static final String SHUFFLE_AGENDAS = "shuffle_deck";
@@ -445,6 +452,7 @@ public class Constants {
     public static final String TECH_REMOVE = "tech_remove";
     public static final String TECH_EXHAUST = "tech_exhaust";
     public static final String TECH_REFRESH = "tech_ready";
+    public static final String TECH_INFO = "tech_info";
 
     public static final String PLANET_ADD = "planet_add";
     public static final String PLANET_REMOVE = "planet_remove";
@@ -556,9 +564,15 @@ public class Constants {
     public static final String BOT_CHANNEL_SUFFIX = "-bot-map-updates";
     public static final String PING = "ping";
     public static final String PING_ACTIVE_PLAYER = "ping_active_player";
+    public static final String WHISPER = "whisper";
+    public static final String MSG = "msg";
+    public static final String ANON = "anon";
+    public static final String ANNOUNCE = "announce";
     public static final String ENDED_GAMES = "ended_games";
+    public static final String LARGE_TEXT = "large_text";
     public static final String FIX_CHANNEL_PERMISSIONS = "fix_channel_permissions";
     public static final String CATEGORY_CHANNEL_COUNT = "category_channel_count";
     public static final String BEGIN_VIDEO_GEN = "begin_video_gen";
     public static final String SERVER = "server";
+    public static final String LIST_COMMANDS = "list_commands";
 }
