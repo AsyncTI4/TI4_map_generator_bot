@@ -1,8 +1,8 @@
 package ti4.commands.cardsso;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -42,10 +42,10 @@ public class ScoreSO extends SOCardsSubcommandData {
         }
 
         int soID = option.getAsInt();
-        scoreSO(event, activeMap, player, soID, event.getChannel(), null);
+        scoreSO(event, activeMap, player, soID, event.getChannel());
     }
 
-    public void scoreSO(SlashCommandInteractionEvent event, Map activeMap, Player player, int soID, MessageChannel channel, ButtonInteractionEvent buttonInteractionEvent) {
+    public static void scoreSO(GenericInteractionCreateEvent event, Map activeMap, Player player, int soID, MessageChannel channel) {
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
         boolean scored = activeMap.scoreSecretObjective(player.getUserID(), soID, activeMap);
         if (!scored) {
@@ -65,42 +65,18 @@ public class ScoreSO extends SOCardsSubcommandData {
             message.append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
         }
         if (event != null && channel.getName().equalsIgnoreCase(event.getChannel().getName())) {
-            sendMessage(message.toString());
+            MessageHelper.sendMessageToChannel(event, message.toString());
         } else {
             MessageHelper.sendMessageToChannel(channel, message.toString());
         }
         
         // FoW logic, specific for players with visilibty, generic for the rest
-        if(activeMap.isFoWMode())
-        {
-        	FoWHelper.pingPlayersDifferentMessages(activeMap, event, player, message.toString(), "Scores changed");
+        if(activeMap.isFoWMode()) {
+            FoWHelper.pingPlayersDifferentMessages(activeMap, event, player, message.toString(), "Scores changed");
+            MessageHelper.sendMessageToChannel(channel, "All players notified");
         }
         
-        CardsInfo.sentUserCardInfo(event, activeMap, player, buttonInteractionEvent);
+        CardsInfo.sentUserCardInfo(event, activeMap, player, false);
         Helper.checkIfHeroUnlocked(event, activeMap, player);
-    }
-
-    public static void scoreSO(Map activeMap, Player player, int soID, MessageChannel channel, ButtonInteractionEvent buttonInteractionEvent) {
-        Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
-        boolean scored = activeMap.scoreSecretObjective(player.getUserID(), soID, activeMap);
-        if (!scored) {
-            MessageHelper.sendMessageToChannel(channel, "No such Secret Objective ID found, please retry");
-            return;
-        }
-
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(buttonInteractionEvent, player) + " scored " + Emojis.SecretObjectiveAlt + " ");
-        for (java.util.Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
-            if (alreadyScoredSO.contains(entry.getKey())) {
-                continue;
-            }
-            String[] soText = Mapper.getSecretObjective(entry.getKey()).split(";");
-            String soName = soText[0];
-            String soPhase = soText[1];
-            String soDescription = soText[2];
-            message.append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
-        }
-        MessageHelper.sendMessageToChannel(channel, message.toString());
-        CardsInfo.sentUserCardInfo(null, activeMap, player, buttonInteractionEvent);
-        Helper.checkIfHeroUnlocked(buttonInteractionEvent, activeMap, player);
     }
 }

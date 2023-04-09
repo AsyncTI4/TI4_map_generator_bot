@@ -319,8 +319,6 @@ public class MessageHelper {
 	 */
 	public static void replyToSlashCommand(@NotNull GenericInteractionCreateEvent event, String messageText) {
 		if (messageText == null || messageText.isEmpty()) {
-			// BotLogger.log(event, "`MessageHelper.replyToSlashCommand` : `messageText` was
-			// null or empty");
 			return;
 		}
 		sendMessageSplitLarge(event, messageText);
