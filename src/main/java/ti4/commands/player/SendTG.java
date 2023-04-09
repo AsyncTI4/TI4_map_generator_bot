@@ -9,8 +9,6 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -50,32 +48,19 @@ public class SendTG extends PlayerSubcommandData {
 			targetTG += sendTG;
 			player_.setTg(targetTG);
 
-			String message = Helper.getPlayerRepresentation(event, player) + " sent " + sendTG + Emojis.tg
-					+ " trade goods to " + Helper.getPlayerRepresentation(event, player_);
+			String p1 = Helper.getPlayerRepresentation(event, player);
+			String p2 = Helper.getPlayerRepresentation(event, player_);
+			String tgString = sendTG + Emojis.tg + " trade goods";
+			String message =  p1 + " sent " + tgString + " to " + p2;
 			sendMessage(message);
+
 			if (activeMap.isFoWMode()) {
-				String fail = "Could not notify recieving player.";
+				String fail = "Could not notify receiving player.";
 				String success = "The other player has been notified";
-				MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail,
-						success);
+				MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
 
 				// Add extra message for transaction visibility
-				for (Player viewPlayer : activeMap.getPlayers().values()) {
-					boolean senderVisible = FoWHelper.canSeeStatsOfPlayer(activeMap, player, viewPlayer);
-					boolean recieverVisible = FoWHelper.canSeeStatsOfPlayer(activeMap, player_, viewPlayer);
-					if (senderVisible && recieverVisible) {
-						MessageHelper.sendPrivateMessageToPlayer(viewPlayer, activeMap, message);
-					} else if (senderVisible) {
-						String tempMessage = Helper.getPlayerRepresentation(event, player) + " sent " + sendTG + Emojis.tg
-								+ " trade goods to " + "???";
-						MessageHelper.sendPrivateMessageToPlayer(viewPlayer, activeMap, tempMessage);
-					} else if (recieverVisible) {
-						String tempMessage = "???" + " sent " + sendTG + Emojis.tg
-								+ " trade goods to " + Helper.getPlayerRepresentation(event, player_);
-						MessageHelper.sendPrivateMessageToPlayer(viewPlayer, activeMap, tempMessage);
-					}
-
-				}
+				FoWHelper.pingPlayersTransaction(activeMap, event, player, player_, tgString, null);
 			}
 		}
 	}

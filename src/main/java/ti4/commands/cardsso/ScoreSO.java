@@ -20,8 +20,6 @@ import ti4.message.MessageHelper;
 import java.util.HashSet;
 import java.util.Set;
 
-import kotlin.OverloadResolutionByLambdaReturnType;
-
 public class ScoreSO extends SOCardsSubcommandData {
     public ScoreSO() {
         super(Constants.SCORE_SO, "Score Secret Objective");

@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cards.CardsInfo;
-import ti4.commands.player.SendTG;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -125,52 +124,13 @@ public class SentPN extends PNCardsSubcommandData {
 
 		// FoW specific pinging
 		if (activeMap.isFoWMode()) {
-			int successCount = 0;
-			// iterate through the player list. this may result in some extra pings, we'll
-			// sort that out later
-			for (Player player_ : activeMap.getPlayers().values()) {
-				// let's figure out what they can see!
-				boolean senderVisible = FoWHelper.canSeeStatsOfPlayer(activeMap, player_, player);
-				boolean recieverVisible = FoWHelper.canSeeStatsOfPlayer(activeMap, player_, targetPlayer);
-
-				// first off let's give full info for someone that can see both sides
-				if (senderVisible && recieverVisible) {
-					boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, message);
-					successCount += success ? 1 : 0;
-				} else if (senderVisible) {
-					String tempMessage = Helper.getPlayerRepresentation(event, player) + " sent " + Emojis.PN + text
-							+ "PN to " + "???";
-					boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, tempMessage);
-					successCount += success ? 1 : 0;
-				} else if (recieverVisible) {
-					String tempMessage = "???" + " sent " + Emojis.PN + text + "PN to "
-							+ Helper.getPlayerRepresentation(event, targetPlayer);
-					boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, tempMessage);
-					successCount += success ? 1 : 0;
-				} else if (sendSftT) {
-					// notify score change! This is needed because someone without visiblity to
-					// either player should find out that the score bar changed
-					String tempMessage = "Scores changed";
-					boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, tempMessage);
-					successCount += success ? 1 : 0;
-				}
-			}
-			if (successCount < activeMap.getPlayers().size()) {
-				if (successCount < activeMap.getPlayers().values().size()) {
-					MessageHelper.replyToMessage(event,
-							"One more more pings failed to send.  Please follow up with game's GM.");
-
-				} else {
-					MessageHelper.replyToMessage(event, "Succesfully sent all pings.");
-				}
-			}
-
+			FoWHelper.pingPlayersTransaction(activeMap, event, player, targetPlayer, Emojis.PN + text + "PN", "Scores changed.");
 		}
 
 		// Turned off, as we might change back
-		if (areaPN && false) {
-			File file = GenerateMap.getInstance().saveImage(activeMap, event);
-			MessageHelper.sendFileToChannel(event.getChannel(), file);
-		}
+		// if (areaPN) {
+		// 	File file = GenerateMap.getInstance().saveImage(activeMap, event);
+		// 	MessageHelper.sendFileToChannel(event.getChannel(), file);
+		// }
 	}
 }
