@@ -1,36 +1,20 @@
 package ti4.commands.cards;
 
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.*;
-import net.dv8tion.jda.api.entities.channel.attribute.IThreadContainer;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
-import org.apache.commons.collections4.ListUtils;
-import org.jetbrains.annotations.Nullable;
-
-import ti4.MapGenerator;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
-import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.BotLogger;
@@ -41,7 +25,6 @@ import java.util.*;
 public class CardsInfo extends CardsSubcommandData {
 
     public static final String CARDS_INFO = Constants.CARDS_INFO_THREAD_PREFIX;
-    private static HashMap<Map, TextChannel> threadTextChannels = new HashMap<>();
 
     public CardsInfo() {
         super(Constants.INFO, "Send all your cards to your Cards Info thread");
@@ -64,47 +47,36 @@ public class CardsInfo extends CardsSubcommandData {
     }
 
     public static void sentUserCardInfo(SlashCommandInteractionEvent event, Map activeMap, Player player) {
-        sentUserCardInfo(event, activeMap, player, null);
-    }
-
-    public static void sentUserCardInfo(@Nullable SlashCommandInteractionEvent event, Map activeMap, Player player, @Nullable ButtonInteractionEvent buttonEvent) {
-        checkAndAddPNs(activeMap, player);
         OptionMapping longPNOption = event != null ? event.getOption(Constants.LONG_PN_DISPLAY) : null;
         boolean longPNDisplay = false;
         if (longPNOption != null) {
             longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
         }
+
+        sentUserCardInfo(event, activeMap, player, longPNDisplay);
+    }
+
+    public static void sentUserCardInfo(GenericInteractionCreateEvent event, Map activeMap, Player player, boolean longPNDisplay) {
+        checkAndAddPNs(activeMap, player);
+
         String headerText;
-        
         StringBuilder sb = new StringBuilder();
         sb.append("--------------------\n");
         sb.append("**Game: **`").append(activeMap.getName()).append("`\n");
         if (event != null) {
             sb.append(Helper.getPlayerRepresentation(event, player, true));
-        } else {
-            sb.append(Helper.getPlayerRepresentation(buttonEvent, player, true));
         }
         
         headerText = sb.toString();      
 
-        User userById = event != null ? event.getJDA().getUserById(player.getUserID()) : (buttonEvent != null ? buttonEvent.getJDA().getUserById(player.getUserID()) : null);
+        User userById = event != null ? event.getJDA().getUserById(player.getUserID()) : null;
         if (userById != null) {
-            String cardInfo = headerText;
-
             try {
-                MessageChannel channel = event != null ? event.getChannel() : buttonEvent.getChannel();
+                MessageChannel channel = event.getMessageChannel();
                 if (activeMap.isFoWMode()) {
                     if (player.getPrivateChannel() == null) {
                         MessageHelper.sendMessageToChannel(channel, "Private channels are not set up for this game. Messages will be suppressed.");
                         return;
-                    }
-                }
-
-                
-                if (event != null) {
-                    OptionMapping option = event.getOption(Constants.DM_CARD_INFO);
-                    if (option != null && option.getAsBoolean()) {
-                        MessageHelper.sendMessageToUser(cardInfo, userById);
                     }
                 }
 
@@ -122,7 +94,7 @@ public class CardsInfo extends CardsSubcommandData {
                 BotLogger.log("Could not create Private Thread");
             }
         } else {
-            MessageHelper.sendMessageToUser("Player: " + player.getUserName() + " not found", event != null ? event : buttonEvent);
+            MessageHelper.sendMessageToUser("Player: " + player.getUserName() + " not found", event);
         }
     }
 
