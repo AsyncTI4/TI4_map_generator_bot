@@ -259,8 +259,7 @@ public class Stats extends PlayerSubcommandData {
 		}
 	}
 
-	private static String getSetValueMessage(SlashCommandInteractionEvent event, Player player, String optionName,
-			Integer setToNumber, Integer existingNumber) {
+	private static String getSetValueMessage(SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber) {
 		return ">  set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was "
 				+ String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber - existingNumber)
 				+ ")_";

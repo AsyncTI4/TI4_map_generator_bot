@@ -1,17 +1,12 @@
 package ti4.commands.status;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.Collections;
-import java.util.HashMap;
 
 public class ListTurnStats extends StatusSubcommandData {
     public ListTurnStats() {
@@ -21,7 +16,7 @@ public class ListTurnStats extends StatusSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map map = getActiveMap();
-        if (FoWHelper.isPrivateGame(event)) {
+        if (FoWHelper.isPrivateGame(event) != null && FoWHelper.isPrivateGame(event)) {
             MessageHelper.replyToMessage(event, "This command is not available in fog of war private channels.");
             return;
         }

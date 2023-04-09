@@ -1,14 +1,12 @@
 package ti4.message;
 
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.GenericComponentInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -24,6 +22,7 @@ import ti4.map.Player;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
@@ -347,6 +346,7 @@ public class MessageHelper {
 	private static List<String> splitLargeText(@NotNull String messageText, @NotNull int maxLength) {
 		List<String> texts = new ArrayList<>();
 		Integer messageLength = messageText.length();
+        if (messageLength <= maxLength) return Collections.singletonList(messageText);
 		int index = 0;
 		while (index < messageLength) {
 			String nextChars = messageText.substring(index, Math.min(index + maxLength, messageLength));

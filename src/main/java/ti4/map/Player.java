@@ -580,9 +580,11 @@ public class Player {
         exhaustedTechs.clear();
     }
 
-    public void cleanExhaustedPlanets() {
+    public void cleanExhaustedPlanets(boolean cleanAbilities) {
         exhaustedPlanets.clear();
-        exhaustedPlanetsAbilities.clear();
+        if (cleanAbilities) {
+            exhaustedPlanetsAbilities.clear();
+        }
     }
 
     public void cleanExhaustedRelics() {
