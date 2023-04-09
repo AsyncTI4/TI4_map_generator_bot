@@ -255,7 +255,8 @@ public class Tile {
 
     public boolean hasFog(Player player) {
         Boolean hasFog = fog.get(player);
-        return hasFog != null && hasFog;
+        //default all tiles to being foggy to prevent unintended info leaks
+        return hasFog == null || hasFog;
     }
 
     public void setTileFog(@NotNull Player player, Boolean fog_) {

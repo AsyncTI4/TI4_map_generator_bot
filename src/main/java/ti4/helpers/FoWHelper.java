@@ -48,15 +48,18 @@ public class FoWHelper {
 		if (player == viewingPlayer) {
 			return true;
 		}
-
-		return viewingPlayer != null && player != null && (hasHomeSystemInView(map, player, viewingPlayer)
-				|| hasPlayersPromInPlayArea(player, viewingPlayer) || hasMahactCCInFleet(player, viewingPlayer));
+		
+		return viewingPlayer != null && player != null && 
+			( hasHomeSystemInView(map, player, viewingPlayer)
+				|| hasPlayersPromInPlayArea(player, viewingPlayer) 
+				|| hasMahactCCInFleet(player, viewingPlayer)
+			);
 	}
 
 	/** Check if the fog filter needs to be updated, then return the list of tiles that the player can see */
 	public static Set<String> fowFilter(Map map, Player player) {
 		if (player != null) {
-			initializeFog(map, player);
+			updateFog(map, player);
 
 			Set<String> systems = new HashSet<>();
 			for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(map.getTileMap()).entrySet()) {
@@ -69,10 +72,10 @@ public class FoWHelper {
 		return Collections.emptySet();
 	}
 
-	private static void initializeFog(Map map, @NotNull Player player) {
-		// if (player.hasFogInitialized()) {
-		// 	return;
-		// }
+	private static void initializeFog(Map map, @NotNull Player player, boolean forceRecalculate) {
+		if (player.hasFogInitialized() && !forceRecalculate) {
+			return;
+		}
 
 		// Get all tiles with the player in it
 		Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
@@ -98,8 +101,7 @@ public class FoWHelper {
 	}
 
 	public static void updateFog(Map map, Player player) {
-		player.setFogInitialized(false);
-		initializeFog(map, player);
+		initializeFog(map, player, true);
 	}
 
     private static void updatePlayerFogTiles(Map map, Player player, Set<String> tileKeys) {
@@ -117,7 +119,7 @@ public class FoWHelper {
 		if (faction == null) {
 			return false;
 		}
-
+		
 		List<String> hsIDs = new ArrayList<>();
 		if ("keleres".equals(faction)) {
 			hsIDs.add("92");
@@ -163,8 +165,7 @@ public class FoWHelper {
 		return mahactCCs.contains(player.getColor());
 	}
 
-	public static Boolean isPrivateGame(Map map, @Nullable GenericCommandInteractionEvent event,
-			@Nullable Channel channel_) {
+	public static Boolean isPrivateGame(Map map, @Nullable GenericCommandInteractionEvent event, @Nullable Channel channel_) {
 		Boolean isFoWPrivate = null;
 		Channel eventChannel = event == null ? null : event.getChannel();
 		Channel channel = channel_ != null ? channel_ : eventChannel;
@@ -381,11 +382,11 @@ public class FoWHelper {
 			return true;
 		} else if ("18".equals(tile.getTileID()) && player.getTechs().contains("iihq")) {
 			return true;
-		} else if ("s11".equals(tile.getTileID()) && "cabal".equals(player.getFaction())) {
+		} else if ("s11".equals(tile.getTileID()) && canSeeStatsOfFaction(map, "cabal", player)) {
 			return true;
-		} else if ("s12".equals(tile.getTileID()) && "nekro".equals(player.getFaction())) {
+		} else if ("s12".equals(tile.getTileID()) && canSeeStatsOfFaction(map, "nekro", player)) {
 			return true;
-		} else if ("s13".equals(tile.getTileID()) && "yssaril".equals(player.getFaction())) {
+		} else if ("s13".equals(tile.getTileID()) && canSeeStatsOfFaction(map, "yssaril", player)) {
 			return true;
 		}
 
@@ -445,15 +446,14 @@ public class FoWHelper {
 		}
 	}
 
-	public static void pingAllPlayersWithFullStats(Map activeMap, GenericInteractionCreateEvent event,
-			Player playerWithChange, String message) {
+	public static void pingAllPlayersWithFullStats(Map activeMap, GenericInteractionCreateEvent event, Player playerWithChange, String message) {
 		var playersToPing = activeMap.getPlayers().values().stream()
-				.filter(viewer -> FoWHelper.canSeeStatsOfPlayer(activeMap, playerWithChange, viewer))
+				.filter(viewer -> initializeAndCheckStatVisibility(activeMap, playerWithChange, viewer))
 				.collect(Collectors.toSet());
 		int succesfulCount = 0;
 
+		String playerMessage = Helper.getPlayerRepresentation(event, playerWithChange, false) + " stats changed:\n> " + message;
 		for (Player player_ : playersToPing) {
-			String playerMessage = Helper.getPlayerRepresentation(event, player_, true) + " stats change\n> " + message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			succesfulCount += success ? 1 : 0;
 		}
@@ -473,12 +473,13 @@ public class FoWHelper {
 		String messageForAll
 	) {
 		Set<Player> playersWithVisiblity = activeMap.getPlayers().values().stream()
-				.filter(viewer -> FoWHelper.canSeeStatsOfPlayer(activeMap, playerWithChange, viewer))
+				.filter(viewer -> initializeAndCheckStatVisibility(activeMap, playerWithChange, viewer))
 				.collect(Collectors.toSet());
 		Set<Player> playersWithoutVisiblity = activeMap.getPlayers().values().stream()
-				.filter(player -> !playersWithVisiblity.contains(player)).collect(Collectors.toSet());
-
+				.filter(player -> !playersWithVisiblity.contains(player) && player != playerWithChange)
+				.collect(Collectors.toSet());
 		int succesfulCount = 0;
+		int totalPings = playersWithVisiblity.size() + playersWithoutVisiblity.size();
 
 		for (Player player_ : playersWithVisiblity) {
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, messageForFullInfo);
@@ -489,7 +490,7 @@ public class FoWHelper {
 			succesfulCount += success ? 1 : 0;
 		}
 
-		if (succesfulCount < activeMap.getPlayers().values().size()) {
+		if (succesfulCount < totalPings) {
 			MessageHelper.replyToMessage(event, "One more more pings failed to send.  Please follow up with game's GM.");
 		} else {
 			MessageHelper.replyToMessage(event, "Succesfully sent all pings.");
@@ -497,4 +498,9 @@ public class FoWHelper {
 
 	}
 
+	private static boolean initializeAndCheckStatVisibility(Map map, Player player, Player viewer) {
+		if (viewer == player) return false;
+		initializeFog(map, viewer, false);
+		return FoWHelper.canSeeStatsOfPlayer(map, player, viewer);
+	}
 }
