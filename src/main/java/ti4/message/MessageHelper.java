@@ -264,8 +264,8 @@ public class MessageHelper {
 	 * @param successText     Feedback if the message successfully sent
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Map map, MessageChannel feedbackChannel,
-			String messageText, String failText, String successText) {
+	public static boolean sendPrivateMessageToPlayer(Player player, Map map, MessageChannel feedbackChannel, String messageText, String failText, String successText) {
+        if (messageText == null || messageText.length() == 0) return true; // blank message counts as a success
 		User user = MapGenerator.jda.getUserById(player.getUserID());
 		if (user == null) {
 			sendMessageToChannel(feedbackChannel, failText);

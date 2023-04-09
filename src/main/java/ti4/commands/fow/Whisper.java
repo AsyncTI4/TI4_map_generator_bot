@@ -63,7 +63,7 @@ public class Whisper extends FOWSubcommandData {
         
 
             if (activeMap.isFoWMode()) {
-                String fail = "Could not notify recieving player.";
+                String fail = "Could not notify receiving player.";
                 String success = "";
                 if(message.startsWith("Someone"))
                 {

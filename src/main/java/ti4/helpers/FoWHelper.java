@@ -421,12 +421,7 @@ public class FoWHelper {
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			successfulCount += success ? 1 : 0;
 		}
-
-		if (successfulCount < players.size()) {
-			MessageHelper.replyToMessage(event, "One or more pings failed to send. Please follow up with game's GM.");
-		} else {
-			MessageHelper.replyToMessage(event, "Successfully sent all pings.");
-		}
+		feedbackMessage(event, successfulCount, players.size());
 	}
 
 	/** This will ping all players */
@@ -438,12 +433,7 @@ public class FoWHelper {
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			succesfulCount += success ? 1 : 0;
 		}
-
-		if (succesfulCount < activeMap.getPlayers().size()) {
-			MessageHelper.replyToMessage(event, "One more more pings failed to send.  Please follow up with game's GM.");
-		} else {
-			MessageHelper.replyToMessage(event, "Succesfully sent all pings.");
-		}
+		feedbackMessage(event, succesfulCount, activeMap.getPlayers().size());
 	}
 
 	public static void pingAllPlayersWithFullStats(Map activeMap, GenericInteractionCreateEvent event, Player playerWithChange, String message) {
@@ -452,17 +442,12 @@ public class FoWHelper {
 				.collect(Collectors.toSet());
 		int succesfulCount = 0;
 
-		String playerMessage = Helper.getPlayerRepresentation(event, playerWithChange, false) + " stats changed:\n> " + message;
+		String playerMessage = Helper.getPlayerRepresentation(event, playerWithChange, false) + " stats changed:\n" + message;
 		for (Player player_ : playersToPing) {
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			succesfulCount += success ? 1 : 0;
 		}
-
-		if (succesfulCount < playersToPing.size()) {
-			MessageHelper.replyToMessage(event, "One more more pings failed to send.  Please follow up with game's GM.");
-		} else {
-			MessageHelper.replyToMessage(event, "Succesfully sent all pings.");
-		}
+		feedbackMessage(event, succesfulCount, playersToPing.size());
 	}
 
 	public static void pingPlayersDifferentMessages(
@@ -489,13 +474,60 @@ public class FoWHelper {
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, messageForAll);
 			succesfulCount += success ? 1 : 0;
 		}
+		feedbackMessage(event, succesfulCount, totalPings);
+	}
 
-		if (succesfulCount < totalPings) {
+	public static void pingPlayersTransaction(
+		Map activeMap,
+		GenericInteractionCreateEvent event,
+		Player sendingPlayer,
+		Player receivingPlayer,
+		String transactedObject,
+		String noVisibilityMessage // for stuff like SFTT
+	) {
+		int successCount = 0;
+		int attemptCount = 0;
+		// iterate through the player list. this may result in some extra pings, we'll
+		// sort that out later
+		for (Player player_ : activeMap.getPlayers().values()) {
+			if (player_ == sendingPlayer || player_ == receivingPlayer) continue;
+			attemptCount++;
+
+			// let's figure out what they can see!
+			initializeFog(activeMap, player_, false);
+			boolean senderVisible = FoWHelper.canSeeStatsOfPlayer(activeMap, player_, sendingPlayer);
+			boolean receiverVisible = FoWHelper.canSeeStatsOfPlayer(activeMap, player_, receivingPlayer);
+
+			StringBuilder sb = new StringBuilder();
+			// first off let's give full info for someone that can see both sides
+			if (senderVisible) {
+				sb.append(Helper.getPlayerRepresentation(event, sendingPlayer));
+			} else {
+				sb.append("???");
+			}
+			sb.append(" sent " + transactedObject + " to ");
+			if (receiverVisible) {
+				sb.append(Helper.getPlayerRepresentation(event, receivingPlayer));
+			} else {
+				sb.append("???");
+			}
+			
+			String message = sb.toString();
+			if (!senderVisible && !receiverVisible) {
+				message = noVisibilityMessage;
+			}
+			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, message);
+			successCount += success ? 1 : 0;
+		}
+		feedbackMessage(event, successCount, attemptCount);
+	}
+
+	private static void feedbackMessage(GenericInteractionCreateEvent event, int success, int total) {
+		if (success < total) {
 			MessageHelper.replyToMessage(event, "One more more pings failed to send.  Please follow up with game's GM.");
 		} else {
 			MessageHelper.replyToMessage(event, "Succesfully sent all pings.");
 		}
-
 	}
 
 	private static boolean initializeAndCheckStatVisibility(Map map, Player player, Player viewer) {

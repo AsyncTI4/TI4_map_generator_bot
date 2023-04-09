@@ -7,6 +7,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.MapGenerator;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -57,6 +59,11 @@ public class SentAC extends CardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
             return;
         }
+
+		// FoW specific pinging
+		if (activeMap.isFoWMode()) {
+			FoWHelper.pingPlayersTransaction(activeMap, event, player, player_, Emojis.ActionCard + " Action Card", null);
+		}
 
         player.removeActionCard(acIndex);
         player_.setActionCard(acID);

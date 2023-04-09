@@ -51,7 +51,7 @@ public class Stats extends PlayerSubcommandData {
 			return;
 		}
 
-		sendMessage(Helper.getPlayerRepresentation(event, player) + " player stats changed:");
+		sendMessage(Helper.getPlayerRepresentation(event, player, true) + " player stats changed:");
 
 		OptionMapping optionCC = event.getOption(Constants.CC);
 		OptionMapping optionT = event.getOption(Constants.TACTICAL);
@@ -247,8 +247,7 @@ public class Stats extends PlayerSubcommandData {
 				int newNumber = existingNumber + number;
 				newNumber = Math.max(newNumber, 0);
 				consumer.accept(newNumber);
-				String messageToSend = getChangeValueMessage(event, player, optionName, number, existingNumber,
-						newNumber);
+				String messageToSend = getChangeValueMessage(event, player, optionName, number, existingNumber, newNumber);
 				sendMessage(messageToSend);
 				if (map.isFoWMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(map, event, player, messageToSend);
@@ -260,7 +259,7 @@ public class Stats extends PlayerSubcommandData {
 	}
 
 	private static String getSetValueMessage(SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber) {
-		return ">  set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was "
+		return "> set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was "
 				+ String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber - existingNumber)
 				+ ")_";
 	}
@@ -273,7 +272,7 @@ public class Stats extends PlayerSubcommandData {
 		} else if (changeNumber < 0) {
 			changeDescription = "decreased";
 		}
-		return ">  " + changeDescription + " **" + optionName + "** by " + String.valueOf(changeNumber) + "   _(was "
+		return "> " + changeDescription + " **" + optionName + "** by " + String.valueOf(changeNumber) + "   _(was "
 				+ String.valueOf(existingNumber) + ", now **" + String.valueOf(newNumber) + "**)_";
 	}
 

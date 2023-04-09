@@ -13,6 +13,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -115,6 +116,13 @@ public class PlayAC extends CardsSubcommandData {
         } else {
             MessageHelper.sendMessageToChannelWithButtons(mainGameChannel, sb.toString(), guild, sabotageButton, noSabotageButton);
         }
+        
+        //Fog of war ping
+		if (activeMap.isFoWMode()) {
+            String fowMessage = Helper.getPlayerRepresentation(event, player) + " played an Action Card: " + actionCardTitle;
+			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, fowMessage);
+		}
+
         CardsInfo.sentUserCardInfo(event, activeMap, player, buttonInteractionEvent);
         return null;
     }
