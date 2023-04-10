@@ -47,6 +47,9 @@ public class Constants {
     public static String BETA = "beta";
     public static String GAMMA = "gamma";
     public static String DELTA = "delta";
+    public static String EPSILON = "whepsilon";
+    public static String ZETA = "whzeta";
+    public static String ETA = "wheta";
 
     public static final String DRAW_SPECIFIC_SO_FOR_PLAYER = "draw_specific_so_for_player";
 
@@ -137,6 +140,7 @@ public class Constants {
     public static final String DMZ = "dmz";
     public static final String DMZ_LARGE = "dmz_large";
     public static final String WORLD_DESTROYED = "worlddestroyed";
+    public static final String GLEDGE_CORE = "gledgecore";
 
     public static final String FRONTIER = "frontier";
 
@@ -174,6 +178,7 @@ public class Constants {
     public static final String FOW_SYSTEMS = "fow_systems";
     public static final String FOG_FILTER = "fog_filter";
     public static final String SET_FOG_FILTER = "set_fog_filter";
+    public static final String CHECK_CHANNELS = "check_channels";
     public static final String PING_SYSTEM = "ping_system";
     public static final String LABEL = "label";
     public static final String MESSAGE = "message";
@@ -309,6 +314,7 @@ public class Constants {
     public static final String TG = "trade_goods";
     public static final String COMMODITIES = "commodities";
     public static final String COMMODITIES_TOTAL = "commodities_total";
+    public static final String STASIS_INFANTRY = "stasis_infantry";
     public static final String FACTION = "faction";
     public static final String AC = "action_cards";
     public static final String AC_DISCARDED = "action_cards_discarded";

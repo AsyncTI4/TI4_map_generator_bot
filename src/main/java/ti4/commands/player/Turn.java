@@ -64,7 +64,7 @@ public class Turn extends PlayerSubcommandData {
         boolean isFowPrivateGame = privateGame != null && privateGame;
 
         for (Player player : map.getPlayers().values()) {
-            if (!player.isActivePlayer()){
+            if (!player.isRealPlayer()){
                 player.setPassed(true);
             }
         }
