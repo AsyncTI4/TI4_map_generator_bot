@@ -930,7 +930,7 @@ public class GenerateMap {
 
     private int techStasisCapsule(int x, int y, int deltaX, Player player, List<String> techs, HashMap<String, String[]> techInfo) {
         int stasisInfantry = player.getStasisInfantry();
-        if ((techs == null || hasInfantryII(techs, techInfo) ) && stasisInfantry == 0) {
+        if ((techs == null && stasisInfantry == 0) || !hasInfantryII(techs, techInfo) && stasisInfantry == 0) {
             return deltaX;
         }
         String techSpec = "pa_tech_techname_stasiscapsule.png";
@@ -952,6 +952,9 @@ public class GenerateMap {
     }
 
     private boolean hasInfantryII(List<String> techs, HashMap<String, String[]> techInfo) {
+        if (techs == null) {
+            return false;
+        }
         for (String tech : techs) {
             String[] techInformation = techInfo.get(tech);
             if (techInformation.length >= 5) {
