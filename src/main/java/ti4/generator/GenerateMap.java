@@ -165,7 +165,7 @@ public class GenerateMap {
                             addTile(new Tile("0gray", position), map, TileStep.Tile);
                         }
                     } else {
-                        addTile(tileMap.get(setup), map, TileStep.Setup);
+                        addTile(tileMap.get(setup), map, TileStep.Tile);
                     }
                     tileMap.remove(setup);
                 }
