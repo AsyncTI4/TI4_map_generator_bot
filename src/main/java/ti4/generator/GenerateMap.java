@@ -1901,27 +1901,29 @@ public class GenerateMap {
                 } //do nothing
                 case Tile -> {
                     graphics.drawImage(image, tileX, tileY, null);
-
-                    graphics.setFont(Storage.getFont20());
-                    graphics.setColor(Color.WHITE);
-                    if (tileIsFoggy) {
-                        graphics.drawImage(fogOfWar, tileX, tileY, null);
-                        graphics.drawString(tile.getFogLabel(), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
-                    }
                     int textOffset = 0;
-                    if(map.isLargeText())
+                    if(map.getLargeText().equals("large"))
                     {
                         graphics.setFont(Storage.getFont50());
                         textOffset = 140;
+                    }
+                    else if(map.getLargeText().equals("medium"))
+                    {
+                        graphics.setFont(Storage.getFont35());
+                        textOffset = 20;
                     }
                     else
                     {
                         graphics.setFont(Storage.getFont20());
                         textOffset = 0;
                     }
-                    
+                    graphics.setColor(Color.WHITE);
+                    if (tileIsFoggy) {
+                        graphics.drawImage(fogOfWar, tileX, tileY, null);
+                        graphics.drawString(tile.getFogLabel(), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
+                    }
                     graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x-textOffset, tileY + tilePositionPoint.y);
-                    graphics.setFont(Storage.getFont20());
+
                 }
                 case Extras -> {
                     if (tileIsFoggy) return;
