@@ -258,13 +258,13 @@ public class Stats extends PlayerSubcommandData {
 		}
 	}
 
-	private static String getSetValueMessage(SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber) {
+	public static String getSetValueMessage(SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber) {
 		return "> set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was "
 				+ String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber - existingNumber)
 				+ ")_";
 	}
 
-	private static String getChangeValueMessage(SlashCommandInteractionEvent event, Player player, String optionName,
+	public static String getChangeValueMessage(SlashCommandInteractionEvent event, Player player, String optionName,
 			Integer changeNumber, Integer existingNumber, Integer newNumber) {
 		String changeDescription = "changed";
 		if (changeNumber > 0) {

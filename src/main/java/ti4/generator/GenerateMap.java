@@ -877,6 +877,7 @@ public class GenerateMap {
         deltaX = techField(x, y, techsFiltered.get(Constants.WARFARE), exhaustedTechs, techInfo, deltaX);
         deltaX = techField(x, y, techsFiltered.get(Constants.CYBERNETIC), exhaustedTechs, techInfo, deltaX);
         deltaX = techField(x, y, techsFiltered.get(Constants.BIOTIC), exhaustedTechs, techInfo, deltaX);
+        deltaX = techStasisCapsule(x, y, deltaX, player, techsFiltered.get(Constants.UNIT_UPGRADE), techInfo);
         deltaX = techFieldUnit(x, y, techsFiltered.get(Constants.UNIT_UPGRADE), exhaustedTechs, techInfo, deltaX, player, map);
         return x + deltaX + 20;
     }
@@ -925,6 +926,41 @@ public class GenerateMap {
             deltaX += 48;
         }
         return deltaX;
+    }
+
+    private int techStasisCapsule(int x, int y, int deltaX, Player player, List<String> techs, HashMap<String, String[]> techInfo) {
+        int stasisInfantry = player.getStasisInfantry();
+        if ((techs == null || hasInfantryII(techs, techInfo) ) && stasisInfantry == 0) {
+            return deltaX;
+        }
+        String techSpec = "pa_tech_techname_stasiscapsule.png";
+        drawPAImage(x + deltaX, y, techSpec);
+        if (stasisInfantry < 20) {
+            graphics.setFont(Storage.getFont35());
+        }
+        else {
+            graphics.setFont(Storage.getFont30());
+        }
+        int centerX = 0;
+        if (stasisInfantry < 10) {
+            centerX += 5;
+        }
+        graphics.drawString(String.valueOf(stasisInfantry), x + deltaX + 3 + centerX, y + 148);
+        graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+        deltaX += 48;
+        return deltaX;
+    }
+
+    private boolean hasInfantryII(List<String> techs, HashMap<String, String[]> techInfo) {
+        for (String tech : techs) {
+            String[] techInformation = techInfo.get(tech);
+            if (techInformation.length >= 5) {
+                if (techInformation[4].equals("inf2")){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, String[]> techInfo, int deltaX, Player player, Map map) {

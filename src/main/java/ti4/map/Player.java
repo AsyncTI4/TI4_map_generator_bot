@@ -34,6 +34,7 @@ public class Player {
     private int tg = 0;
     private int commodities = 0;
     private int commoditiesTotal = 0;
+    private int stasisInfantry = 0;
 
     private LinkedHashMap<String, Integer> actionCards = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
@@ -652,6 +653,13 @@ public class Player {
         refreshPlanetAbility(planet);
     }
 
+    public int getStasisInfantry() {
+        return stasisInfantry;
+    }
+
+    public void setStasisInfantry(int stasisInfantry) {
+        this.stasisInfantry = stasisInfantry;
+    }
 
     public int getCommoditiesTotal() {
         return commoditiesTotal;
