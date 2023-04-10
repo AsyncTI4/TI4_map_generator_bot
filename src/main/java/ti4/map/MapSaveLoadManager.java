@@ -424,6 +424,8 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal());
             writer.write(System.lineSeparator());
+            writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
+            writer.write(System.lineSeparator());
 
             writer.write(Constants.SO + " " + getSecretList(player.getSecrets()));
             writer.write(System.lineSeparator());
@@ -1078,6 +1080,7 @@ public class MapSaveLoadManager {
                 case Constants.TG -> player.setTg(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.COMMODITIES -> player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.STASIS_INFANTRY -> player.setStasisInfantry(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.AC -> {
                     StringTokenizer actionCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (actionCardToken.hasMoreTokens()) {

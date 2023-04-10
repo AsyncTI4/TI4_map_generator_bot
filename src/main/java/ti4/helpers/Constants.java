@@ -314,6 +314,7 @@ public class Constants {
     public static final String TG = "trade_goods";
     public static final String COMMODITIES = "commodities";
     public static final String COMMODITIES_TOTAL = "commodities_total";
+    public static final String STASIS_INFANTRY = "stasis_infantry";
     public static final String FACTION = "faction";
     public static final String AC = "action_cards";
     public static final String AC_DISCARDED = "action_cards_discarded";
