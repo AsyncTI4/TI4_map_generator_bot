@@ -110,6 +110,7 @@ public class FOWCommand implements Command {
         subcommands.add(new AddCustomAdjacentTile());
         subcommands.add(new AddAdjacencyOverride());
         subcommands.add(new AddFogTile());
+        subcommands.add(new CheckChannels());
         subcommands.add(new PingActivePlayer());
         subcommands.add(new PingSystem());
         subcommands.add(new RemoveAdjacencyOverride());
@@ -118,6 +119,8 @@ public class FOWCommand implements Command {
         subcommands.add(new RemoveCustomAdjacentTile());
         subcommands.add(new RemoveAllCustomAdjacentTiles());
         subcommands.add(new SetFogFilter());
+        subcommands.add(new Whisper());
+        subcommands.add(new Announce());
         return subcommands;
     }
 

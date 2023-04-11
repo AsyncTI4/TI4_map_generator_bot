@@ -12,6 +12,7 @@ import ti4.commands.player.SendTG;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -37,8 +38,8 @@ public class SendFragments extends ExploreSubcommandData {
         Player sender = activeMap.getPlayers().get(activeUser.getId());
         sender = Helper.getGamePlayer(activeMap, sender, event, null);
 
-		Player reciever = Helper.getPlayer(activeMap, null, event);
-        if (reciever == null) {
+		Player receiver = Helper.getPlayer(activeMap, null, event);
+        if (receiver == null) {
         	sendMessage("Target player could not be found in game:" + activeMap.getName());
             return;
         }
@@ -61,7 +62,7 @@ public class SendFragments extends ExploreSubcommandData {
         	for (int i=0; i<count; i++) {
         		String fragID = fragments.get(i);
         		sender.removeFragment(fragID);
-        		reciever.addFragment(fragID);
+        		receiver.addFragment(fragID);
         	}
         } else {
         	sendMessage("Not enough fragments of the specified trait");
@@ -76,12 +77,19 @@ public class SendFragments extends ExploreSubcommandData {
 			default -> "";	
 		};
 
-		String message = Helper.getPlayerRepresentation(event, sender) + " sent " + trait + " " + Helper.getEmojiFromDiscord(emojiName) + " relic fragments to: " + Helper.getPlayerRepresentation(event, reciever);
+		String p1 = Helper.getPlayerRepresentation(event, sender);
+		String p2 = Helper.getPlayerRepresentation(event, receiver);
+		String fragString = count + " " + trait + " " + Helper.getEmojiFromDiscord(emojiName) + " relic fragments";
+		String message =  p1 + " sent " + fragString + " to " + p2;
 		sendMessage(message);
+
 		if (activeMap.isFoWMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
 			String success = "The other player has been notified";
-			MessageHelper.sendPrivateMessageToPlayer(reciever, activeMap, event, message, fail, success);
+			MessageHelper.sendPrivateMessageToPlayer(receiver, activeMap, event, message, fail, success);
+                
+			// Add extra message for transaction visibility
+			FoWHelper.pingPlayersTransaction(activeMap, event, sender, receiver, fragString, null);
 		}
 	}
 }

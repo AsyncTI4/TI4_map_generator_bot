@@ -4,10 +4,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cards.CardsInfo;
+import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -86,7 +87,7 @@ public class PlayPN extends PNCardsSubcommandData {
                 String playerFaction = player_.getFaction();
                 if (playerColor != null && playerColor.equals(pnOwner) || playerFaction != null && playerFaction.equals(pnOwner)) {
                     player_.setPromissoryNote(id);
-                    CardsInfo.sentUserCardInfo(event, activeMap, player_);
+                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player_);
                     pnOwner = player_.getFaction();
                     break;
                 }
@@ -111,7 +112,13 @@ public class PlayPN extends PNCardsSubcommandData {
             sb.append("`/add_token token:titanspn`\n");
         }
 
+        //Fog of war ping
+		if (activeMap.isFoWMode()) {
+            // Add extra message for visibility
+			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, sb.toString());
+		}
+
         sendMessage(sb.toString());
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

@@ -12,8 +12,9 @@ import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.bothelper.BothelperCommand;
+import ti4.commands.cards.CardsInfo;
+import ti4.commands.cardsac.ACCardsCommand;
 import ti4.commands.agenda.AgendaCommand;
-import ti4.commands.cards.CardsCommand;
 import ti4.commands.cardspn.PNCardsCommand;
 import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.custom.CustomCommand;
@@ -46,19 +47,22 @@ public class MapGenerator {
 
     public static JDA jda;
     public static String userID;
-    public static Guild guild;
+    public static Guild guildPrimary = null;
+    public static Guild guildSecondary = null;
+    public static Guild guildFogOfWar = null;
+    public static Guild guildCommunityPlays = null;
     public static String adminID;
     public static List<Role> adminRoles = new ArrayList<>();
     public static List<Role> developerRoles = new ArrayList<>();
     public static List<Role> bothelperRoles = new ArrayList<>();
-    // public static Role adminRole;
-    // public static Role developerRole;
-    // public static Role bothelperRole;
 
     public static void main(String[] args)
             throws LoginException {
 
-        //GlobalSettings.loadSettings();
+
+        // Load settings
+        GlobalSettings.loadSettings();
+
         jda = JDABuilder.createDefault(args[0])
                 .enableIntents(GatewayIntent.GUILD_MEMBERS)
                 .enableIntents(GatewayIntent.MESSAGE_CONTENT)
@@ -81,23 +85,27 @@ public class MapGenerator {
 
         //ROLES - FOR COMMAND PERMISSIONS
         //ADMIN ROLES
-        adminRoles.add(jda.getRoleById("943596173896323072")); // Async TI4 Server
+        adminRoles.add(jda.getRoleById("943596173896323072")); // Async TI4 Server (Hub)
+        adminRoles.add(jda.getRoleById("1090914497352446042")); // Async Secondary
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
+        adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
         adminRoles.removeIf(r -> r == null);
-        
+
         //DEVELOPER ROLES
         developerRoles.addAll(adminRoles); //admins can also execute developer commands
-        developerRoles.add(jda.getRoleById("947648366056185897")); // Async TI4 Server
+        developerRoles.add(jda.getRoleById("947648366056185897")); // Async TI4 Server (Hub)
+        developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
         developerRoles.removeIf(r -> r == null);
 
         //BOTHELPER ROLES
         bothelperRoles.addAll(developerRoles); //admins and developers can also execute bothelper commands
-        bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server
+        bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server (Hub)
+        bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.removeIf(r -> r == null);
-        
+
 
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddTile());
@@ -106,6 +114,7 @@ public class MapGenerator {
         commandManager.addCommand(new RemoveUnits());
         commandManager.addCommand(new RemoveAllUnits());
         commandManager.addCommand(new CreateGame());
+        commandManager.addCommand(new CardsInfo());
         commandManager.addCommand(new SetGame());
         commandManager.addCommand(new ShowGame());
         commandManager.addCommand(new AddTileList());
@@ -129,7 +138,7 @@ public class MapGenerator {
         commandManager.addCommand(new BothelperCommand());
         commandManager.addCommand(new PlayerCommand());
         commandManager.addCommand(new GameCommand());
-        commandManager.addCommand(new CardsCommand());
+        commandManager.addCommand(new ACCardsCommand());
         commandManager.addCommand(new PNCardsCommand());
         commandManager.addCommand(new SOCardsCommand());
         commandManager.addCommand(new StatusCommand());
@@ -140,30 +149,40 @@ public class MapGenerator {
         commandManager.addCommand(new FOWCommand());
         commandManager.addCommand(new MiltyCommand());
 
-        guild = jda.getGuildById(args[2]);
+        guildPrimary = jda.getGuildById(args[2]);
 
-        CommandListUpdateAction commands = guild.updateCommands();
+        CommandListUpdateAction commands = guildPrimary.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
         commands.queue();
 
         //TI Community game
         if (args.length >= 4) {
-            Guild guild2 = jda.getGuildById(args[3]);
-            BotLogger.log("BOT STARTED UP: " + guild2.getName());
-            CommandListUpdateAction commandsC = guild2.updateCommands();
+            guildCommunityPlays = jda.getGuildById(args[3]);
+            BotLogger.log("BOT STARTED UP: " + guildCommunityPlays.getName());
+            CommandListUpdateAction commandsC = guildCommunityPlays.updateCommands();
             commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
             commandsC.queue();
         }
 
         //FOW game
         if (args.length >= 5) {
-            Guild guild3 = jda.getGuildById(args[4]);
-            BotLogger.log("BOT STARTED UP: " + guild3.getName());
-            CommandListUpdateAction commandsD = guild3.updateCommands();
+            guildFogOfWar = jda.getGuildById(args[4]);
+            BotLogger.log("BOT STARTED UP: " + guildFogOfWar.getName());
+            CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
             commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
             commandsD.queue();
         }
-        BotLogger.log("BOT STARTED UP: " + guild.getName());
+
+        //Async Secondary
+        if (args.length >= 6) {
+            guildSecondary = jda.getGuildById(args[5]);
+            BotLogger.log("BOT STARTED UP: " + guildSecondary.getName());
+            CommandListUpdateAction commandsD = guildSecondary.updateCommands();
+            commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
+            commandsD.queue();
+        }
+
+        BotLogger.log("BOT STARTED UP: " + guildPrimary.getName());
         MapSaveLoadManager.loadMaps();
     }
 }

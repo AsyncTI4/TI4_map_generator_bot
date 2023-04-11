@@ -1,25 +1,23 @@
 package ti4.generator;
 
+import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.map.Map;
 import ti4.message.BotLogger;
 
-import org.jetbrains.annotations.Nullable;
-
 import java.awt.*;
+import java.awt.List;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Properties;
-import java.util.StringTokenizer;
+import java.util.*;
 
 //Handles positions of map
 public class PositionMapper {
 
     private static final Properties positionTileMap6Player = new Properties();
     private static final Properties positionTileMap8Player = new Properties();
+    private static final Properties positionTileMap8Ring = new Properties();
     private static final Properties planetPositions = new Properties();
     private static final Properties spaceTokenPositions = new Properties();
     private static final Properties planetTokenPositions = new Properties();
@@ -30,11 +28,13 @@ public class PositionMapper {
 
     private static final Properties playerInfo = new Properties();
     private static final Properties playerInfo8 = new Properties();
+    private static final Properties playerInfo8ring = new Properties();
     private static final Properties reinforcements = new Properties();
 
     public static void init() {
         readData("6player.properties", positionTileMap6Player, "Could not read position file");
         readData("8player.properties", positionTileMap8Player, "Could not read position file");
+        readData("8ring.properties", positionTileMap8Ring, "Could not read position file");
         readData("planet.properties", planetPositions, "Could not read planet position file");
         readData("ship_position_tilesbytype.properties", tileType, "Could not read tile type file");
         readData("ship_position.properties", shipPosition, "Could not read ship position file");
@@ -42,6 +42,7 @@ public class PositionMapper {
         readData("planet_token.properties", planetTokenPositions, "Could not read planet token position file");
         readData("6player_info.properties", playerInfo, "Could not read player info position file");
         readData("8player_info.properties", playerInfo8, "Could not read player info position file");
+        readData("8ring_info.properties", playerInfo8ring, "Could not read player info position file");
         readData("reinforcements.properties", reinforcements, "Could not read reinforcements position file");
     }
 
@@ -85,14 +86,30 @@ public class PositionMapper {
 
     public static boolean isTilePositionValid(String position, Map userActiveMap) {
         if (userActiveMap != null && userActiveMap.getPlayerCountForMap() == 8) {
+            if (userActiveMap.getRingCount() == 8) {
+                return positionTileMap8Ring.getProperty(position) != null;
+            }
             return positionTileMap8Player.getProperty(position) != null;
         }
         return positionTileMap6Player.getProperty(position) != null;
     }
 
+    public static HashSet<String> get8RingTiles(){
+        HashSet<String> positions = new HashSet<>();
+        for (Object key : positionTileMap8Ring.keySet()) {
+            if (key instanceof String position){
+                positions.add(position);
+            }
+        }
+        return positions;
+    }
+
     @Nullable
     public static Point getTilePosition(String position, Map map) {
         if (map != null && map.getPlayerCountForMap() == 8) {
+            if (map.getRingCount() == 8) {
+                return getPosition(position, positionTileMap8Ring);
+            }
             return getPosition(position, positionTileMap8Player);
         }
         return getPosition(position, positionTileMap6Player);
@@ -121,7 +138,11 @@ public class PositionMapper {
         ArrayList<Point> positions = new ArrayList<>();
         String info;
         if (map != null && map.getPlayerCountForMap() == 8) {
-            info = (String) playerInfo8.get(Integer.toString(playerPosition));
+            if (map.getRingCount() == 8) {
+                info = (String) playerInfo8ring.get(Integer.toString(playerPosition));
+            } else {
+                info = (String) playerInfo8.get(Integer.toString(playerPosition));
+            }
         } else {
             info = (String) playerInfo.get(Integer.toString(playerPosition));
         }

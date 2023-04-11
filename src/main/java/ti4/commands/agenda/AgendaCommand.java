@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands.cards.CardsCommand;
+import ti4.commands.cardsac.ACCardsCommand;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.map.Map;
@@ -31,7 +31,7 @@ public class AgendaCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return CardsCommand.acceptEvent(event, getActionID());
+        return ACCardsCommand.acceptEvent(event, getActionID());
     }
 
     @Override
@@ -76,12 +76,11 @@ public class AgendaCommand implements Command {
             MapSaveLoadManager.saveMap(map);
         }
         if (executedCommand != null) {
-            MessageHelper.replyToMessage(event, "Executed action: " +executedCommand.getActionID());
+            // MessageHelper.replyToMessage(event, "Executed action: " + executedCommand.getActionID());
         } else {
             MessageHelper.replyToMessage(event, "No Action executed");
         }
     }
-
 
     protected String getActionDescription() {
         return "Agenda handling";

@@ -13,3 +13,7 @@ tibot.jar
 TI4_map_generator_bot.code-workspace
 docker_run.ps1
 TI4_map_generator_discord_bot.iml
+.project
+.settings
+/runbot.sh
+.DS_Store

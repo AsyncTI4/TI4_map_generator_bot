@@ -16,6 +16,7 @@ public class Setup extends GameSubcommandData {
     public Setup() {
         super(Constants.SETUP, "Game Setup");
         addOptions(new OptionData(OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Specify player map size: 6 or 8. Default 6").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.RING_COUNT_FOR_MAP, "Specify ring count for map: Default: 0 use standard map, 8 - for max map size").setRequired(false));
         addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Specify game VP count").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Add Custom description to game").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.COMMUNITY_MODE, "Set to YES if want to allow Community Mode for map, FALSE to disable it").setRequired(false));
@@ -23,6 +24,7 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.FOW_MODE, "Set to YES if want to allow FoW Mode for map, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's - do NOT change this mid-game"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
+        addOptions(new OptionData(OptionType.STRING, Constants.LARGE_TEXT, "Small/medium/large, default small").setAutoComplete(true));
     }
 
     @Override
@@ -36,6 +38,16 @@ public class Setup extends GameSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify 6 or 8 player.");
             } else {
                 activeMap.setPlayerCountForMap(count);
+            }
+        }
+
+        OptionMapping ringCount = event.getOption(Constants.RING_COUNT_FOR_MAP);
+        if (ringCount != null) {
+            int count = ringCount.getAsInt();
+            if (count != 0 && count != 8) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify 0 or 8 rings.");
+            } else {
+                activeMap.setRingCount(count);
             }
         }
 
@@ -94,6 +106,12 @@ public class Setup extends GameSubcommandData {
             } else if ("FALSE".equals(fowMode)){
                 activeMap.setFoWMode(false);
             }
+        }
+
+        OptionMapping largeText = event.getOption(Constants.LARGE_TEXT);
+        if (largeText != null) {
+            String large = largeText.getAsString();
+            getActiveMap().setLargeText(large);
         }
 
         OptionMapping customOption = event.getOption(Constants.GAME_CUSTOM_NAME);

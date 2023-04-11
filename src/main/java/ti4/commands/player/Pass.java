@@ -4,9 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class Pass extends PlayerSubcommandData {
     public Pass() {
@@ -20,6 +18,11 @@ public class Pass extends PlayerSubcommandData {
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
             sendMessage("You're not a player of this game");
+            return;
+        }
+
+        if(activeMap.getScPlayed().getOrDefault(player.getSC(), false) == false) {
+            sendMessage("You have not played your strategy card, you cannot pass.");
             return;
         }
         player.setPassed(true);

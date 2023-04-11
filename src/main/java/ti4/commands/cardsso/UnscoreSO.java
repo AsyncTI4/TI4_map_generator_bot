@@ -4,8 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cards.CardsInfo;
-import ti4.generator.Mapper;
+import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -24,22 +23,22 @@ public class UnscoreSO extends SOCardsSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            sendMessage("Player could not be found");
+            MessageHelper.sendMessageToChannel(event, "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            sendMessage("Please select what Secret Objective to unscore");
+            MessageHelper.sendMessageToChannel(event, "Please select what Secret Objective to unscore");
             return;
         }
 
         boolean scored = activeMap.unscoreSecretObjective(getUser().getId(), option.getAsInt());
         if (!scored) {
-            sendMessage("No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToChannel(event, "No such Secret Objective ID found, please retry");
             return;
         }
 
-        sendMessage("Unscored SO " + option.getAsInt());
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        MessageHelper.sendMessageToChannel(event, "Unscored SO " + option.getAsInt());
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
     }
 }

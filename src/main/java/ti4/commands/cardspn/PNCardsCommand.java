@@ -26,7 +26,7 @@ public class PNCardsCommand implements Command {
 
     @Override
     public String getActionID() {
-        return Constants.PN;
+        return Constants.CARDS_PN;
     }
 
     @Override
@@ -123,6 +123,7 @@ public class PNCardsCommand implements Command {
         subcommands.add(new PlayPN());
         subcommands.add(new SentPN());
         subcommands.add(new PurgePN());
+        subcommands.add(new PNInfo());
         return subcommands;
     }
 

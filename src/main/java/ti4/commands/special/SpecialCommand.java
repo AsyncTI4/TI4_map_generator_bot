@@ -125,6 +125,7 @@ public class SpecialCommand implements Command {
         subcommands.add(new SwapSC());
         subcommands.add(new KeleresHeroMentak());
         subcommands.add(new NovaSeed());
+        subcommands.add(new StasisInfantry());
 
         return subcommands;
     }
