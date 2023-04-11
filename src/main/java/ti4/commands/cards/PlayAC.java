@@ -124,7 +124,7 @@ public class PlayAC extends CardsSubcommandData {
 			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, fowMessage);
 		}
 
-        CardsInfo.sentUserCardInfo(event, activeMap, player, false);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
         return null;
     }
 }

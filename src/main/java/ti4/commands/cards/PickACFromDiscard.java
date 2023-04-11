@@ -57,6 +57,6 @@ public class PickACFromDiscard extends CardsSubcommandData {
         sb.append(Mapper.getActionCard(acID)).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
 
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

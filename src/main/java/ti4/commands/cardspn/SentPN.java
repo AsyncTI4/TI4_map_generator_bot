@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cards.CardsInfo;
+import ti4.commands.cards.ACInfo_Legacy;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -108,8 +108,8 @@ public class SentPN extends PNCardsSubcommandData {
 			}
 			areaPN = true;
 		}
-		CardsInfo.sentUserCardInfo(event, activeMap, targetPlayer);
-		CardsInfo.sentUserCardInfo(event, activeMap, player);
+		ACInfo_Legacy.sentUserCardInfo(event, activeMap, targetPlayer);
+		ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
 		String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
 		String message = Helper.getPlayerRepresentation(event, player) + " sent " + Emojis.PN + text + "PN to "
 				+ Helper.getPlayerRepresentation(event, targetPlayer);

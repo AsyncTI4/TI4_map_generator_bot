@@ -3,7 +3,7 @@ package ti4.commands.cardsso;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cards.CardsInfo;
+import ti4.commands.cards.ACInfo_Legacy;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -50,6 +50,6 @@ public class ShowAllSO extends SOCardsSubcommandData {
         }
         sendMessage("All SOs shown to player");
         MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, sb.toString());
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

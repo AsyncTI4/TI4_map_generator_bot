@@ -13,7 +13,7 @@ import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.MapGenerator;
-import ti4.commands.cards.CardsInfo;
+import ti4.commands.cards.ACInfo_Legacy;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -90,7 +90,7 @@ public class MessageHelper {
 				return;
 			}
 			String gameName = event.getChannel().getName();
-			gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
+			gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
 			Map activeMap = MapManager.getInstance().getMap(gameName);
 			if (!activeMap.isFoWMode()

@@ -54,6 +54,6 @@ public class DiscardAC extends CardsSubcommandData {
         sb.append("Discarded Action Card:").append("\n");
         sb.append(Mapper.getActionCard(acID)).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

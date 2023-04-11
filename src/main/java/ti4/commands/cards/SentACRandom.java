@@ -59,7 +59,7 @@ public class SentACRandom extends CardsSubcommandData {
 
         player.removeActionCard(actionCardsMap.get(acID));
         player_.setActionCard(acID);
-        CardsInfo.sentUserCardInfo(event, activeMap, player_);
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player_);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

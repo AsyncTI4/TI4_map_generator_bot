@@ -22,11 +22,11 @@ import ti4.message.MessageHelper;
 
 import java.util.*;
 
-public class CardsInfo extends CardsSubcommandData {
+public class ACInfo_Legacy extends CardsSubcommandData {
 
     public static final String CARDS_INFO = Constants.CARDS_INFO_THREAD_PREFIX;
 
-    public CardsInfo() {
+    public ACInfo_Legacy() {
         super(Constants.INFO, "Send all your cards to your Cards Info thread");
         addOptions(new OptionData(OptionType.STRING, Constants.LONG_PN_DISPLAY, "Long promissory display, y or yes to show full promissory text").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false));

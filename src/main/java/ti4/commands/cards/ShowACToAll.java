@@ -59,6 +59,6 @@ public class ShowACToAll extends CardsSubcommandData {
             player.setActionCard(acID);
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

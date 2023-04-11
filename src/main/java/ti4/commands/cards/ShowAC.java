@@ -70,6 +70,6 @@ public class ShowAC extends CardsSubcommandData {
             return;
         }
         MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, sb.toString());
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }
