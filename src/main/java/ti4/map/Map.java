@@ -50,7 +50,7 @@ public class Map {
     @ExportableField
     private boolean fowMode = false;
     @ExportableField
-    private boolean largeText = false;
+    private String largeText = "small";
     @ExportableField
     private boolean absolMode = false;
     @ExportableField
@@ -237,10 +237,10 @@ public class Map {
         this.fowMode = fowMode;
     }
 
-    public void setLargeText(boolean largeText) {
+    public void setLargeText(String largeText) {
         this.largeText = largeText;
     }
-    public boolean isLargeText() {
+    public String getLargeText() {
         return largeText;
     }
 
@@ -265,7 +265,6 @@ public class Map {
             put("Community", isCommunityMode());
             put("Alliance", isAllianceMode());
             put("FoW", isFoWMode());
-            put("LargeText", isLargeText());
             put("Absol", isAbsolMode());
             put("DiscordantStars", isDiscordantStarsMode());
         }};
