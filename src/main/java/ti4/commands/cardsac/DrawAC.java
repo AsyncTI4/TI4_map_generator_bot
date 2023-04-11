@@ -10,7 +10,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DrawAC extends CardsSubcommandData {
+public class DrawAC extends ACCardsSubcommandData {
     public DrawAC() {
         super(Constants.DRAW_AC, "Draw Action Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));

@@ -12,7 +12,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PickACFromDiscard extends CardsSubcommandData {
+public class PickACFromDiscard extends ACCardsSubcommandData {
     public PickACFromDiscard() {
         super(Constants.PICK_AC_FROM_DISCARD, "Pick Action Card from discards");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));

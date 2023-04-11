@@ -8,7 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
 
-public class ShuffleACDeck extends CardsSubcommandData {
+public class ShuffleACDeck extends ACCardsSubcommandData {
     public ShuffleACDeck() {
         super(Constants.SHUFFLE_AC_DECK, "Shuffle Action Card deck");
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));

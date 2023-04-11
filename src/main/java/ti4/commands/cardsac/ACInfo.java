@@ -17,7 +17,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ACInfo extends CardsSubcommandData {
+public class ACInfo extends ACCardsSubcommandData {
     public ACInfo() {
         super(Constants.INFO + 2, "Send Action Cards to your Cards Info thread");
     }

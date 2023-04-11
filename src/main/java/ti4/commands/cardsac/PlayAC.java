@@ -20,7 +20,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PlayAC extends CardsSubcommandData {
+public class PlayAC extends ACCardsSubcommandData {
     public PlayAC() {
         super(Constants.PLAY_AC, "Play Action Card");
         addOptions(new OptionData(OptionType.STRING, Constants.ACTION_CARD_ID, "Action Card ID that is sent between () or Name/Part of Name").setRequired(true));

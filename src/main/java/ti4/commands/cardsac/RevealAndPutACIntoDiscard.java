@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 
 import java.util.LinkedHashMap;
 
-public class RevealAndPutACIntoDiscard extends CardsSubcommandData {
+public class RevealAndPutACIntoDiscard extends ACCardsSubcommandData {
     public RevealAndPutACIntoDiscard() {
         super(Constants.REVEAL_AND_PUT_AC_INTO_DISCARD, "Reveal Action Card from deck and put into discard pile");
     }

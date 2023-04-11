@@ -22,9 +22,9 @@ import java.util.HashSet;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class CardsCommand implements Command {
+public class ACCardsCommand implements Command {
 
-    private final Collection<CardsSubcommandData> subcommandData = getSubcommands();
+    private final Collection<ACCardsSubcommandData> subcommandData = getSubcommands();
 
     @Override
     public String getActionID() {
@@ -99,9 +99,9 @@ public class CardsCommand implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        CardsSubcommandData subCommandExecuted = null;
+        ACCardsSubcommandData subCommandExecuted = null;
         String subcommandName = event.getInteraction().getSubcommandName();
-        for (CardsSubcommandData subcommand : subcommandData) {
+        for (ACCardsSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
@@ -120,8 +120,8 @@ public class CardsCommand implements Command {
         return "Action Cards";
     }
 
-    private Collection<CardsSubcommandData> getSubcommands() {
-        Collection<CardsSubcommandData> subcommands = new HashSet<>();
+    private Collection<ACCardsSubcommandData> getSubcommands() {
+        Collection<ACCardsSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new ACInfo_Legacy());
         subcommands.add(new ACInfo());
         subcommands.add(new DrawAC());

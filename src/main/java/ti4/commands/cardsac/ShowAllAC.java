@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 
 import java.util.*;
 
-public class ShowAllAC extends CardsSubcommandData {
+public class ShowAllAC extends ACCardsSubcommandData {
     public ShowAllAC() {
         super(Constants.SHOW_ALL_AC, "Show Action Cards to player");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));

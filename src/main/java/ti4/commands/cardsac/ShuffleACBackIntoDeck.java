@@ -9,7 +9,7 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
 
-public class ShuffleACBackIntoDeck extends CardsSubcommandData {
+public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
     public ShuffleACBackIntoDeck() {
         super(Constants.SHUFFLE_AC_BACK_INTO_DECK, "Shuffle Action Card back into deck");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));

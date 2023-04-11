@@ -15,7 +15,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 
-public class DiscardACRandom extends CardsSubcommandData {
+public class DiscardACRandom extends ACCardsSubcommandData {
     public DiscardACRandom() {
         super(Constants.DISCARD_AC_RANDOM, "Discard Random Action Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to discard, default 1"));

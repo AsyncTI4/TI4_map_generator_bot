@@ -6,7 +6,7 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
 
-public class ShowDiscardActionCards extends CardsSubcommandData {
+public class ShowDiscardActionCards extends ACCardsSubcommandData {
     public ShowDiscardActionCards() {
         super(Constants.SHOW_AC_DISCARD_LIST, "Show Action Card discard list");
     }

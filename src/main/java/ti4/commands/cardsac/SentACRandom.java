@@ -18,7 +18,7 @@ import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-public class SentACRandom extends CardsSubcommandData {
+public class SentACRandom extends ACCardsSubcommandData {
     public SentACRandom() {
         super(Constants.SEND_AC_RANDOM, "Send Action Card to player");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));

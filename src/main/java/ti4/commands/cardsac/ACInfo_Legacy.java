@@ -22,7 +22,7 @@ import ti4.message.MessageHelper;
 
 import java.util.*;
 
-public class ACInfo_Legacy extends CardsSubcommandData {
+public class ACInfo_Legacy extends ACCardsSubcommandData {
 
     public static final String CARDS_INFO = Constants.CARDS_INFO_THREAD_PREFIX;
 

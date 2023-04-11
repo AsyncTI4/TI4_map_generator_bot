@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 
 import java.util.LinkedHashMap;
 
-public class ShowACToAll extends CardsSubcommandData {
+public class ShowACToAll extends ACCardsSubcommandData {
     public ShowACToAll() {
         super(Constants.SHOW_AC_TO_ALL, "Show Action Card to table");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));

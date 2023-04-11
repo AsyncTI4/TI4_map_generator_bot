@@ -11,7 +11,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DiscardAC extends CardsSubcommandData {
+public class DiscardAC extends ACCardsSubcommandData {
     public DiscardAC() {
         super(Constants.DISCARD_AC, "Discard Action Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));

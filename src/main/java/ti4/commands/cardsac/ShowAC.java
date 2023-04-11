@@ -13,7 +13,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowAC extends CardsSubcommandData {
+public class ShowAC extends ACCardsSubcommandData {
     public ShowAC() {
         super(Constants.SHOW_AC, "Show Action Card to player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));

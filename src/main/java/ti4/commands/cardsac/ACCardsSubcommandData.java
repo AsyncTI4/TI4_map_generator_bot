@@ -11,7 +11,7 @@ import ti4.map.MapManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public abstract class CardsSubcommandData extends SubcommandData {
+public abstract class ACCardsSubcommandData extends SubcommandData {
     
     private SlashCommandInteractionEvent event;
     private Map activeMap;
@@ -21,7 +21,7 @@ public abstract class CardsSubcommandData extends SubcommandData {
         return getName();
     }
 
-    public CardsSubcommandData(@NotNull String name, @NotNull String description) {
+    public ACCardsSubcommandData(@NotNull String name, @NotNull String description) {
         super(name, description);
     }
 
