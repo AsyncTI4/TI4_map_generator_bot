@@ -60,6 +60,10 @@ public class GameEnd extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "No roles match the game name (" + gameName + ") - no role will be deleted.");
             deleteRole = false;
         }
+
+        MessageHelper.sendMessageToChannel(event.getChannel(), getGameEndText(userActiveMap, event));
+        if (true) return;
+
         //ADD USER PERMISSIONS DIRECTLY TO CHANNEL
         Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), getActiveMap());
 
@@ -114,20 +118,20 @@ public class GameEnd extends GameSubcommandData {
 
     public static String getGameEndText(Map map, SlashCommandInteractionEvent event) {
         StringBuilder sb = new StringBuilder();
-        sb.append("__**").append(map.getName()).append(" - ").append(map.getCustomName()).append("\n");
-        sb.append(map.getCreationDate()).append(" - ").append(map.getLastModifiedDate());
+        sb.append("__**").append(map.getName()).append("**__ - ").append(map.getCustomName()).append("\n");
+        sb.append(map.getCreationDate()).append(" - ").append(Helper.getDateRepresentation(map.getLastModifiedDate()));
         sb.append("\n");
-        sb.append("Players: ").append("\n");
+        sb.append("**Players:**").append("\n");
         HashMap<String, Player> players = map.getPlayers();
         int index = 1;
         for (Player player : players.values()) {
             if (player.getFaction() != null && !player.isDummy()) {
-                sb.append("`").append(index).append(".` ").append(event.getJDA().getUserById(player.getUserID()).getAsMention()).append(Helper.getFactionIconFromDiscord(player.getFaction())).append("\n");
+                sb.append("> `").append(index).append(".` ").append(event.getJDA().getUserById(player.getUserID()).getAsMention()).append(Helper.getFactionIconFromDiscord(player.getFaction())).append("\n");
                 index++;
             }
         }
         
-
+        sb.append("OLD STUFF vvvvvvvv\n");
         sb.append("Game Info:").append("\n");
         sb.append("Game name: " + map.getName()).append("\n");
         sb.append("Game owner: " + map.getOwnerName()).append("\n");
@@ -142,16 +146,16 @@ public class GameEnd extends GameSubcommandData {
 
         sb.append("Game player count: " + map.getPlayerCountForMap()).append("\n");
 
-            sb.append("Players: ").append("\n");
-            HashMap<String, Player> players = map.getPlayers();
-            int index = 1;
-            ArrayList<Player> playerNames = new ArrayList<>(players.values());
-            for (Player value : playerNames) {
-                if (value.getFaction() != null) {
-                    sb.append(index).append(". ").append(value.getUserName()).append(Helper.getFactionIconFromDiscord(value.getFaction())).append("\n");
-                    index++;
-                }
-            }
+            // sb.append("Players: ").append("\n");
+            // HashMap<String, Player> players = map.getPlayers();
+            // int index = 1;
+            // ArrayList<Player> playerNames = new ArrayList<>(players.values());
+            // for (Player value : playerNames) {
+            //     if (value.getFaction() != null) {
+            //         sb.append(index).append(". ").append(value.getUserName()).append(Helper.getFactionIconFromDiscord(value.getFaction())).append("\n");
+            //         index++;
+            //     }
+            // }
 
         return sb.toString();
     }

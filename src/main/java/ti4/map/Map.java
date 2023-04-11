@@ -111,6 +111,8 @@ public class Map {
     private ArrayList<String> discardExplore = new ArrayList<>();
     private ArrayList<String> relics = new ArrayList<>();
 
+    private static HashMap<Player, Integer> playerVPs = new HashMap<>();
+
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
         lastModifiedDate = new Date().getTime();
@@ -1477,5 +1479,38 @@ public class Map {
             planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
         }
         return planets.keySet();
+    }
+
+    private void calculatePlayerVPs() {
+        playerVPs = new HashMap<>();
+
+        for (java.util.Map.Entry<String, Player> playerEntry : getPlayers().entrySet()) {
+            Player player = playerEntry.getValue();
+            String userID = player.getUserID();
+
+            if (scoredPlayerID.contains(userID)) {
+   
+
+                Integer vpCount = playerVPs.get(player);
+                if (vpCount == null) {
+                    vpCount = 0;
+                }
+                if (multiScoring) {
+                    int frequency = Collections.frequency(scoredPlayerID, userID);
+                    vpCount += frequency * objectiveWorth;
+
+                } else {
+                    vpCount += objectiveWorth;
+                }
+                playerVPs.put(player, vpCount);
+            }
+        }
+    }
+
+    public int getPlayerVPs(Player player) {
+        calculatePlayerVPs();
+        Integer playerVPCount = playerVPs.get(player);
+        if (playerVPCount == null) playerVPCount = 0;
+        return playerVPCount;
     }
 }
