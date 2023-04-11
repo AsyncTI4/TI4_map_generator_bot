@@ -18,6 +18,7 @@ jobs:
         username: root
         password: ${{ secrets.SSH_PASSWORD }}
         port: 22
+        script_stop: true
         envs: AWS_KEY, AWS_SECRET
         script: |
           cd /root/ti4bot
