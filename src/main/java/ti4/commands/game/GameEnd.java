@@ -103,7 +103,8 @@ public class GameEnd extends GameSubcommandData {
         });
                 
         //INFORM BOTHELPER
-        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getEventGuildRole(event, "bothelper").getAsMention() + " - this game has concluded");
+        String bothelperMention = Helper.getEventGuildRole(event, "bothelper").getAsMention();
+        MessageHelper.sendMessageToChannel(event.getChannel(), bothelperMention + " - this game has concluded");
         TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
         if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");      
     
@@ -112,13 +113,17 @@ public class GameEnd extends GameSubcommandData {
         TextChannel tableTalkChannel = (TextChannel) userActiveMap.getTableTalkChannel();
         TextChannel actionsChannel = (TextChannel) userActiveMap.getMainGameChannel();
         if (inLimboCategory != null) {
-            if (tableTalkChannel != null) { //MOVE TABLETALK CHANNEL
-                tableTalkChannel.getManager().setParent(inLimboCategory).queue();
-                MessageHelper.sendMessageToChannel(tableTalkChannel, "Channel has been moved to Category: " + inLimboCategory.getName());
-            }
-            if (actionsChannel != null) { //MOVE ACTIONS CHANNEL
-                actionsChannel.getManager().setParent(inLimboCategory).queue();
-                MessageHelper.sendMessageToChannel(actionsChannel, "Channel has been moved to Category: " + inLimboCategory.getName());
+            if (inLimboCategory.getChannels().size() > 48) { //HANDLE FULL IN-LIMBO
+                MessageHelper.sendMessageToChannel(event.getChannel(), inLimboCategory.getName() + " Category is full. " + bothelperMention + " - please make room and manually move these channels.");
+            } else {
+                if (tableTalkChannel != null) { //MOVE TABLETALK CHANNEL
+                    tableTalkChannel.getManager().setParent(inLimboCategory).queue();
+                    MessageHelper.sendMessageToChannel(tableTalkChannel, "Channel has been moved to Category: " + inLimboCategory.getName());
+                }
+                if (actionsChannel != null) { //MOVE ACTIONS CHANNEL
+                    actionsChannel.getManager().setParent(inLimboCategory).queue();
+                    MessageHelper.sendMessageToChannel(actionsChannel, "Channel has been moved to Category: " + inLimboCategory.getName());
+                }
             }
         }
 
