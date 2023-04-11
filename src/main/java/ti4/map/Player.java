@@ -525,11 +525,6 @@ public class Player {
     }
 
     public int getSecretVictoryPoints() {
-        // HashMap<String,Integer> scoredSOs = getSecretsScored();
-        // int vpCount = 0;
-        // for (String scoredSOID : scoredSOs.keySet()) {
-        //     vpCount++;
-        // }
         return getSecretsScored().size();
     }
 
