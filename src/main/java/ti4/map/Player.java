@@ -511,8 +511,9 @@ public class Player {
                         int poValue = Integer.valueOf(poText.split(";")[3]);
                         vpCount += poValue;
                     } else { //IS A CUSTOM PO
+                        int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
                         int poValue = map.getCustomPublicVP().getOrDefault(poID, 0);
-                        vpCount += poValue;
+                        vpCount += poValue * frequency;
                     }
                 } catch (Exception e) {
                     BotLogger.log("`Player.getPublicVictoryPoints   map=" + map.getName() + "  player=" + getUserName() + "` - error finding value of `PO_ID=" + poID);
