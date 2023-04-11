@@ -1,8 +1,7 @@
-package ti4.commands.cards;
+package ti4.commands.cardsac;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.MapGenerator;
@@ -14,10 +13,14 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SentAC extends CardsSubcommandData {
-    public SentAC() {
-        super(Constants.SEND_AC, "Send Action Card to player");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.List;
+
+public class SentACRandom extends CardsSubcommandData {
+    public SentACRandom() {
+        super(Constants.SEND_AC_RANDOM, "Send Action Card to player");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
@@ -30,30 +33,19 @@ public class SentAC extends CardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
-        if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to send");
-            return;
+        LinkedHashMap<String, Integer> actionCardsMap = player.getActionCards();
+        List<String> actionCards = new ArrayList<>(actionCardsMap.keySet());
+        if (actionCards.isEmpty()) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No Action Cards in hand");
         }
-
-        int acIndex = option.getAsInt();
-        String acID = null;
-        for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
-            if (so.getValue().equals(acIndex)) {
-                acID = so.getKey();
-            }
-        }
-
-        if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
-            return;
-        }
-
+        Collections.shuffle(actionCards);
+        String acID = actionCards.get(0);
         Player player_ = Helper.getPlayer(activeMap, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
         }
+
         User user = MapGenerator.jda.getUserById(player_.getUserID());
         if (user == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
@@ -65,7 +57,7 @@ public class SentAC extends CardsSubcommandData {
 			FoWHelper.pingPlayersTransaction(activeMap, event, player, player_, Emojis.ActionCard + " Action Card", null);
 		}
 
-        player.removeActionCard(acIndex);
+        player.removeActionCard(actionCardsMap.get(acID));
         player_.setActionCard(acID);
         ACInfo_Legacy.sentUserCardInfo(event, activeMap, player_);
         ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);

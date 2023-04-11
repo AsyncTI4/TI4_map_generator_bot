@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import ti4.commands.cards.ACInfo_Legacy;
+import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.generator.Mapper;
 import ti4.map.Map;
 import ti4.map.MapManager;

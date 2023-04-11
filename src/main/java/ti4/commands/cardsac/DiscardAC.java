@@ -1,6 +1,5 @@
-package ti4.commands.cards;
+package ti4.commands.cardsac;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -12,9 +11,9 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PickACFromDiscard extends CardsSubcommandData {
-    public PickACFromDiscard() {
-        super(Constants.PICK_AC_FROM_DISCARD, "Pick Action Card from discards");
+public class DiscardAC extends CardsSubcommandData {
+    public DiscardAC() {
+        super(Constants.DISCARD_AC, "Discard Action Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
     }
 
@@ -29,13 +28,12 @@ public class PickACFromDiscard extends CardsSubcommandData {
         }
         OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to draw from discard pile");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to discard");
             return;
         }
-
         int acIndex = option.getAsInt();
         String acID = null;
-        for (java.util.Map.Entry<String, Integer> so : activeMap.getDiscardActionCards().entrySet()) {
+        for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
             if (so.getValue().equals(acIndex)) {
                 acID = so.getKey();
             }
@@ -45,18 +43,17 @@ public class PickACFromDiscard extends CardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        boolean picked = activeMap.pickActionCard(player.getUserID(), acIndex);
-        if (!picked) {
+
+        boolean removed = activeMap.discardActionCard(player.getUserID(), option.getAsInt());
+        if (!removed) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
         StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeMap.getName()).append(" ");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Picked card from Discards: ");
+        sb.append("Player: ").append(player.getUserName()).append(" - ");
+        sb.append("Discarded Action Card:").append("\n");
         sb.append(Mapper.getActionCard(acID)).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
-
         ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

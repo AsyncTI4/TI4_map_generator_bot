@@ -1,4 +1,4 @@
-package ti4.commands.cards;
+package ti4.commands.cardsac;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
