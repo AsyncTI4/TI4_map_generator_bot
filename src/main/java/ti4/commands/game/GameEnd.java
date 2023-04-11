@@ -1,19 +1,19 @@
 package ti4.commands.game;
 
 import java.io.File;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map.Entry;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.MapGenerator;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -23,6 +23,7 @@ import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class GameEnd extends GameSubcommandData {
@@ -61,9 +62,6 @@ public class GameEnd extends GameSubcommandData {
             deleteRole = false;
         }
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), getGameEndText(userActiveMap, event));
-        if (true) return;
-
         //ADD USER PERMISSIONS DIRECTLY TO CHANNEL
         Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), getActiveMap());
 
@@ -77,43 +75,70 @@ public class GameEnd extends GameSubcommandData {
         //POST GAME INFO
         userActiveMap.setHasEnded(true);
         MapSaveLoadManager.saveMap(userActiveMap);
-        MessageHelper.sendMessageToChannel(event.getChannel(), Info.getGameInfo(null, null, userActiveMap, null).toString());
+        String gameEndText = getGameEndText(userActiveMap, event);
+        MessageHelper.sendMessageToChannel(event.getChannel(), gameEndText);
 
         //SEND THE MAP IMAGE
         File file = GenerateMap.getInstance().saveImage(userActiveMap, DisplayType.map, event);
+        FileUpload fileUpload = FileUpload.fromData(file);
         MessageHelper.replyToMessage(event, file);
         
-        //ASK USERS FOR SUMMARY
-        TextChannel pbdChroniclesChannel = event.getJDA().getTextChannelsByName("the-pbd-chronicles", true).get(0);
+        //CREATE POST IN #THE-PBD-CHRONICLES
+        TextChannel pbdChroniclesChannel = MapGenerator.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).get(0);
         String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles" : pbdChroniclesChannel.getAsMention();
+        if (pbdChroniclesChannel == null) {
+            BotLogger.log(event, "`#the-pbd-chronicles` channel not found - `/game end` cannot post summary");
+            return;
+        }
         StringBuilder message = new StringBuilder();
-        for (String playerID : userActiveMap.getPlayerIDs()) {
+        for (String playerID : userActiveMap.getPlayerIDs()) { //GET ALL PLAYER PINGS
             Member member = event.getGuild().getMemberById(playerID);
             if (member != null) message.append(member.getAsMention());
         }
+        message.append("\nPlease provide a summary of the game below:");
 
-        message.append("\nPlease provide a summary of the game for the @Bothelper to post into " + channelMention);
-        MessageHelper.sendMessageToChannel(event.getChannel(), message.toString());
-        
+        pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
+            m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
+            m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
+        });
+                
         //INFORM BOTHELPER
         MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getEventGuildRole(event, "bothelper").getAsMention() + " - this game has concluded");
         TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
-        if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, event.getChannel().getAsMention() + " - Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.\nReact here when a post has been made in " + channelMention);      
+        if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");      
     
         //MOVE CHANNELS TO IN-LIMBO
         Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
         TextChannel tableTalkChannel = (TextChannel) userActiveMap.getTableTalkChannel();
+        TextChannel actionsChannel = (TextChannel) userActiveMap.getMainGameChannel();
         if (inLimboCategory != null) {
-            if (tableTalkChannel != null) {
+            if (tableTalkChannel != null) { //MOVE TABLETALK CHANNEL
                 tableTalkChannel.getManager().setParent(inLimboCategory).queue();
                 MessageHelper.sendMessageToChannel(tableTalkChannel, "Channel has been moved to Category: " + inLimboCategory.getName());
             }
-            TextChannel actionsChannel = (TextChannel) userActiveMap.getMainGameChannel();
-            if (actionsChannel != null) {
+            if (actionsChannel != null) { //MOVE ACTIONS CHANNEL
                 actionsChannel.getManager().setParent(inLimboCategory).queue();
                 MessageHelper.sendMessageToChannel(actionsChannel, "Channel has been moved to Category: " + inLimboCategory.getName());
             }
         }
+
+        //CLOSE THREADS IN CHANNELS
+        if (tableTalkChannel != null) {
+            for (ThreadChannel threadChannel : tableTalkChannel.getThreadChannels()) {
+                threadChannel.getManager().setArchived(true).queue();
+            }
+        }
+        if (actionsChannel != null) {
+            for (ThreadChannel threadChannel : actionsChannel.getThreadChannels()) {
+                threadChannel.getManager().setArchived(true).queue();
+            }
+        }
+
+        //DOWNLOAD CHANNEL BACKUP VIA CLI
+        
+        //POST FILE TO BACKUP CHANNEL
+
+        //DELETE CHANNELS
     }
 
     public static String getGameEndText(Map map, SlashCommandInteractionEvent event) {
@@ -121,41 +146,30 @@ public class GameEnd extends GameSubcommandData {
         sb.append("__**").append(map.getName()).append("**__ - ").append(map.getCustomName()).append("\n");
         sb.append(map.getCreationDate()).append(" - ").append(Helper.getDateRepresentation(map.getLastModifiedDate()));
         sb.append("\n");
+        sb.append("\n");
         sb.append("**Players:**").append("\n");
         HashMap<String, Player> players = map.getPlayers();
         int index = 1;
         for (Player player : players.values()) {
             if (player.getFaction() != null && !player.isDummy()) {
-                sb.append("> `").append(index).append(".` ").append(event.getJDA().getUserById(player.getUserID()).getAsMention()).append(Helper.getFactionIconFromDiscord(player.getFaction())).append("\n");
+                int playerVP = player.getTotalVictoryPoints(map);
+                sb.append("> `").append(index).append(".` ");
+                sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
+                sb.append(Helper.getColourAsMention(event.getGuild(), player.getColor()));
+                sb.append(event.getJDA().getUserById(player.getUserID()).getAsMention());
+                sb.append(" - *").append(playerVP).append("VP* ");
+                if (playerVP >= map.getVp()) sb.append(" - **WINNER**");
+                sb.append("\n");
                 index++;
             }
         }
         
-        sb.append("OLD STUFF vvvvvvvv\n");
-        sb.append("Game Info:").append("\n");
-        sb.append("Game name: " + map.getName()).append("\n");
-        sb.append("Game owner: " + map.getOwnerName()).append("\n");
-        sb.append("Game status: " + map.getMapStatus());
-        if (map.isHasEnded()) sb.append(" - GAME HAS ENDED");
         sb.append("\n");
-        sb.append("Game Modes: " + map.getGameModesText()).append("\n");
-        sb.append("Created: " + map.getCreationDate()).append("\n");
-        sb.append("Last Modified: " + Helper.getDateRepresentation(map.getLastModifiedDate())).append("\n");
+        String gameModesText = map.getGameModesText();
+        if (gameModesText.isEmpty()) gameModesText = "None";
+        sb.append("Game Modes: " + gameModesText).append("\n");
 
         sb.append("Map String: `" + Helper.getMapString(map)).append("`").append("\n");
-
-        sb.append("Game player count: " + map.getPlayerCountForMap()).append("\n");
-
-            // sb.append("Players: ").append("\n");
-            // HashMap<String, Player> players = map.getPlayers();
-            // int index = 1;
-            // ArrayList<Player> playerNames = new ArrayList<>(players.values());
-            // for (Player value : playerNames) {
-            //     if (value.getFaction() != null) {
-            //         sb.append(index).append(". ").append(value.getUserName()).append(Helper.getFactionIconFromDiscord(value.getFaction())).append("\n");
-            //         index++;
-            //     }
-            // }
 
         return sb.toString();
     }
