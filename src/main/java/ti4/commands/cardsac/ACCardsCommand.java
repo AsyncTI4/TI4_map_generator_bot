@@ -28,7 +28,7 @@ public class ACCardsCommand implements Command {
 
     @Override
     public String getActionID() {
-        return Constants.CARDS;
+        return Constants.CARDS_AC;
     }
 
     @Override
