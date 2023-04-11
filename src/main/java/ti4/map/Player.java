@@ -8,11 +8,13 @@ import ti4.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.message.BotLogger;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.*;
 
 public class Player {
@@ -495,6 +497,50 @@ public class Player {
 
     public int getTg() {
         return tg;
+    }
+
+    public int getPublicVictoryPoints(ti4.map.Map map) {
+        LinkedHashMap<String, List<String>> scoredPOs = map.getScoredPublicObjectives();
+        int vpCount = 0;
+        for (Entry<String, List<String>> scoredPOEntry : scoredPOs.entrySet()) {
+            if (scoredPOEntry.getValue().contains(getUserID())) {
+                String poID = scoredPOEntry.getKey();
+                try {
+                    String poText = Mapper.getPublicObjective(poID);
+                    if (poText != null) {//IS A PO 
+                        int poValue = Integer.valueOf(poText.split(";")[3]);
+                        vpCount += poValue;
+                    } else { //IS A CUSTOM PO
+                        int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
+                        int poValue = map.getCustomPublicVP().getOrDefault(poID, 0);
+                        vpCount += poValue * frequency;
+                    }
+                } catch (Exception e) {
+                    BotLogger.log("`Player.getPublicVictoryPoints   map=" + map.getName() + "  player=" + getUserName() + "` - error finding value of `PO_ID=" + poID);
+                }
+            }
+        }
+
+        return vpCount;
+    }
+
+    public int getSecretVictoryPoints() {
+        return getSecretsScored().size();
+    }
+
+    public int getSupportForTheThroneVictoryPoints() {
+        List<String> promissoryNotesInPlayArea = getPromissoryNotesInPlayArea();
+        int vpCount = 0;
+        for (String id : promissoryNotesInPlayArea) {
+            if (id.endsWith("_sftt")) {
+                vpCount++;
+            }
+        }
+        return vpCount;
+    }
+
+    public int getTotalVictoryPoints(ti4.map.Map activeMap) {
+        return getPublicVictoryPoints(activeMap) + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
     }
 
     public void setTg(int tg) {
