@@ -1869,7 +1869,7 @@ public class GenerateMap {
                     graphics.setColor(Color.WHITE);
                     if (tileIsFoggy) {
                         graphics.drawImage(fogOfWar, tileX, tileY, null);
-                        graphics.drawString(tile.getFogLabel(), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
+                        graphics.drawString(tile.getFogLabel(fowPlayer), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
                     }
                     graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x-textOffset, tileY + tilePositionPoint.y);
 
