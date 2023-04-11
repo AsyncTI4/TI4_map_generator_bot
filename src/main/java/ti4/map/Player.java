@@ -507,8 +507,13 @@ public class Player {
                 String poID = scoredPOEntry.getKey();
                 try {
                     String poText = Mapper.getPublicObjective(poID);
-                    int poValue = Integer.valueOf(poText.split(";")[3]);
-                    vpCount += poValue;
+                    if (poText != null) {//IS A PO 
+                        int poValue = Integer.valueOf(poText.split(";")[3]);
+                        vpCount += poValue;
+                    } else { //IS A CUSTOM PO
+                        int poValue = map.getCustomPublicVP().getOrDefault(poID, 0);
+                        vpCount += poValue;
+                    }
                 } catch (Exception e) {
                     BotLogger.log("`Player.getPublicVictoryPoints   map=" + map.getName() + "  player=" + getUserName() + "` - error finding value of `PO_ID=" + poID);
                 }
@@ -519,12 +524,12 @@ public class Player {
     }
 
     public int getSecretVictoryPoints() {
-        HashMap<String,Integer> scoredSOs = getSecretsScored();
-        int vpCount = 0;
-        for (String scoredSOID : scoredSOs.keySet()) {
-            vpCount++;
-        }
-        return vpCount;
+        // HashMap<String,Integer> scoredSOs = getSecretsScored();
+        // int vpCount = 0;
+        // for (String scoredSOID : scoredSOs.keySet()) {
+        //     vpCount++;
+        // }
+        return getSecretsScored().size();
     }
 
     public int getSupportForTheThroneVictoryPoints() {
