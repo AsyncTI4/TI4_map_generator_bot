@@ -1,21 +1,22 @@
-package ti4.commands.cards;
+package ti4.commands.cardsac;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DrawAC extends CardsSubcommandData {
-    public DrawAC() {
-        super(Constants.DRAW_AC, "Draw Action Card");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
-    }
+import java.util.LinkedHashMap;
 
+public class RevealAndPutACIntoDiscard extends ACCardsSubcommandData {
+    public RevealAndPutACIntoDiscard() {
+        super(Constants.REVEAL_AND_PUT_AC_INTO_DISCARD, "Reveal Action Card from deck and put into discard pile");
+    }
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
@@ -25,15 +26,12 @@ public class DrawAC extends CardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        OptionMapping option = event.getOption(Constants.COUNT);
-        int count = 1;
-        if (option != null) {
-            int providedCount = option.getAsInt();
-            count = providedCount > 0 ? providedCount : 1;
-        }
-        for (int i = 0; i < count; i++) {
-            activeMap.drawActionCard(player.getUserID());
-        }
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        String acID = activeMap.drawActionCardAndDiscard();
+        StringBuilder sb = new StringBuilder();
+        sb.append("Game: ").append(activeMap.getName()).append(" ");
+        sb.append("Player: ").append(player.getUserName()).append("\n");
+        sb.append("Revealed and discarded Action card: ");
+        sb.append(Mapper.getActionCard(acID)).append("\n");
+        MessageHelper.sendMessageToChannel(event, sb.toString());
     }
 }

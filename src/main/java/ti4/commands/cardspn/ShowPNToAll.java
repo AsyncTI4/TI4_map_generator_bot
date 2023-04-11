@@ -4,8 +4,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cards.CardsInfo;
-import ti4.commands.cards.CardsSubcommandData;
+import ti4.commands.cardsac.ACInfo_Legacy;
+import ti4.commands.cardsac.ACCardsSubcommandData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -59,6 +59,6 @@ public class ShowPNToAll extends PNCardsSubcommandData {
             player.setPromissoryNote(acID);
         }
         sendMessage(sb.toString());
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

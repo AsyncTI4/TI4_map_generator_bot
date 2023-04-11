@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import ti4.commands.cards.CardsInfo;
+import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.generator.Mapper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -174,7 +174,7 @@ public class FoWHelper {
 		}
 		if (map == null) {
 			String gameName = channel.getName();
-			gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
+			gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
 			map = MapManager.getInstance().getMap(gameName);
 			if (map == null) {

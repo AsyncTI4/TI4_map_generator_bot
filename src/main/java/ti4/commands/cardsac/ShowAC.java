@@ -1,4 +1,4 @@
-package ti4.commands.cards;
+package ti4.commands.cardsac;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -13,7 +13,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class ShowAC extends CardsSubcommandData {
+public class ShowAC extends ACCardsSubcommandData {
     public ShowAC() {
         super(Constants.SHOW_AC, "Show Action Card to player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
@@ -70,6 +70,6 @@ public class ShowAC extends CardsSubcommandData {
             return;
         }
         MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, sb.toString());
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

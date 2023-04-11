@@ -414,9 +414,9 @@ public class Constants {
     public static final String SHOW_ALL_SO = "show_all";
     public static final String SHOW_ALL_SO_TO_ALL = "show_all_to_all";
     public static final String SHOW_SO_TO_ALL = "show_to_all";
-    public static final String CARDS = "ac";
+    public static final String CARDS_AC = "ac";
     public static final String CARDS_SO = "so";
-    public static final String PN = "pn";
+    public static final String CARDS_PN = "pn";
     public static final String DISCARD_SO = "discard";
     public static final String SCORE_SO = "score";
     public static final String UNSCORE_SO = "unscore";
@@ -583,4 +583,5 @@ public class Constants {
     public static final String LIST_COMMANDS = "list_commands";
     public static final String INCLUDE_SUBCOMMANDS = "include_subcommands";
     public static final String INCLUDE_OPTIONS = "include_options";
+    public static final String CARDS_INFO = "cards_info";
 }

@@ -1,4 +1,4 @@
-package ti4.commands.cards;
+package ti4.commands.cardsac;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -12,7 +12,7 @@ import ti4.message.MessageHelper;
 
 import java.util.*;
 
-public class ShowAllAC extends CardsSubcommandData {
+public class ShowAllAC extends ACCardsSubcommandData {
     public ShowAllAC() {
         super(Constants.SHOW_ALL_AC, "Show Action Cards to player");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
@@ -47,6 +47,6 @@ public class ShowAllAC extends CardsSubcommandData {
         }
 
         MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, sb.toString());
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

@@ -1,4 +1,4 @@
-package ti4.commands.cards;
+package ti4.commands.cardsac;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -11,9 +11,11 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class DiscardAC extends CardsSubcommandData {
-    public DiscardAC() {
-        super(Constants.DISCARD_AC, "Discard Action Card");
+import java.util.LinkedHashMap;
+
+public class ShowACToAll extends ACCardsSubcommandData {
+    public ShowACToAll() {
+        super(Constants.SHOW_AC_TO_ALL, "Show Action Card to table");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
     }
 
@@ -28,32 +30,35 @@ public class DiscardAC extends CardsSubcommandData {
         }
         OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to discard");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to show to All");
             return;
         }
-        int acIndex = option.getAsInt();
+
+        int soIndex = option.getAsInt();
         String acID = null;
+        boolean scored = false;
         for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
-            if (so.getValue().equals(acIndex)) {
+            if (so.getValue().equals(soIndex)) {
                 acID = so.getKey();
+                break;
             }
         }
 
         if (acID == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action CardID found, please retry");
             return;
         }
 
-        boolean removed = activeMap.discardActionCard(player.getUserID(), option.getAsInt());
-        if (!removed) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
-            return;
-        }
         StringBuilder sb = new StringBuilder();
-        sb.append("Player: ").append(player.getUserName()).append(" - ");
-        sb.append("Discarded Action Card:").append("\n");
+        sb.append("Game: ").append(activeMap.getName()).append("\n");
+        sb.append("Player: ").append(player.getUserName()).append("\n");
+        sb.append("Showed Action Card:").append("\n");
+
         sb.append(Mapper.getActionCard(acID)).append("\n");
+        if (!scored) {
+            player.setActionCard(acID);
+        }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }
