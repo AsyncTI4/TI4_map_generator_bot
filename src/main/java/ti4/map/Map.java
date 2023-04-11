@@ -111,6 +111,8 @@ public class Map {
     private ArrayList<String> discardExplore = new ArrayList<>();
     private ArrayList<String> relics = new ArrayList<>();
 
+    private static HashMap<Player, Integer> playerVPs = new HashMap<>();
+
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
         lastModifiedDate = new Date().getTime();
@@ -1477,5 +1479,19 @@ public class Map {
             planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
         }
         return planets.keySet();
+    }
+
+    private void calculatePlayerVPs() {
+        playerVPs = new HashMap<>();
+        for (Player player : getPlayers().values()) {
+            playerVPs.put(player, player.getTotalVictoryPoints(this));
+        }
+    }
+
+    public int getPlayerVPs(Player player) {
+        calculatePlayerVPs();
+        Integer playerVPCount = playerVPs.get(player);
+        if (playerVPCount == null) playerVPCount = 0;
+        return playerVPCount;
     }
 }
