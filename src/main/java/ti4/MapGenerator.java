@@ -12,6 +12,7 @@ import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.bothelper.BothelperCommand;
+import ti4.commands.cards.CardsInfo;
 import ti4.commands.cardsac.ACCardsCommand;
 import ti4.commands.agenda.AgendaCommand;
 import ti4.commands.cardspn.PNCardsCommand;
@@ -113,6 +114,7 @@ public class MapGenerator {
         commandManager.addCommand(new RemoveUnits());
         commandManager.addCommand(new RemoveAllUnits());
         commandManager.addCommand(new CreateGame());
+        commandManager.addCommand(new CardsInfo());
         commandManager.addCommand(new SetGame());
         commandManager.addCommand(new ShowGame());
         commandManager.addCommand(new AddTileList());
