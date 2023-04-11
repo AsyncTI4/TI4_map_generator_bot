@@ -1,24 +1,20 @@
-package ti4.commands.cards;
+package ti4.commands.cardsac;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.MapGenerator;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class SentAC extends CardsSubcommandData {
-    public SentAC() {
-        super(Constants.SEND_AC, "Send Action Card to player");
+public class DiscardAC extends ACCardsSubcommandData {
+    public DiscardAC() {
+        super(Constants.DISCARD_AC, "Discard Action Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -32,10 +28,9 @@ public class SentAC extends CardsSubcommandData {
         }
         OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to send");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to discard");
             return;
         }
-
         int acIndex = option.getAsInt();
         String acID = null;
         for (java.util.Map.Entry<String, Integer> so : player.getActionCards().entrySet()) {
@@ -49,25 +44,16 @@ public class SentAC extends CardsSubcommandData {
             return;
         }
 
-        Player player_ = Helper.getPlayer(activeMap, null, event);
-        if (player_ == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
+        boolean removed = activeMap.discardActionCard(player.getUserID(), option.getAsInt());
+        if (!removed) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Card ID found, please retry");
             return;
         }
-        User user = MapGenerator.jda.getUserById(player_.getUserID());
-        if (user == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
-            return;
-        }
-
-		// FoW specific pinging
-		if (activeMap.isFoWMode()) {
-			FoWHelper.pingPlayersTransaction(activeMap, event, player, player_, Emojis.ActionCard + " Action Card", null);
-		}
-
-        player.removeActionCard(acIndex);
-        player_.setActionCard(acID);
-        CardsInfo.sentUserCardInfo(event, activeMap, player_);
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        StringBuilder sb = new StringBuilder();
+        sb.append("Player: ").append(player.getUserName()).append(" - ");
+        sb.append("Discarded Action Card:").append("\n");
+        sb.append(Mapper.getActionCard(acID)).append("\n");
+        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

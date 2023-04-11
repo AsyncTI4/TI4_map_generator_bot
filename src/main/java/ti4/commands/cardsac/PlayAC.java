@@ -1,4 +1,4 @@
-package ti4.commands.cards;
+package ti4.commands.cardsac;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -20,7 +20,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class PlayAC extends CardsSubcommandData {
+public class PlayAC extends ACCardsSubcommandData {
     public PlayAC() {
         super(Constants.PLAY_AC, "Play Action Card");
         addOptions(new OptionData(OptionType.STRING, Constants.ACTION_CARD_ID, "Action Card ID that is sent between () or Name/Part of Name").setRequired(true));
@@ -124,7 +124,7 @@ public class PlayAC extends CardsSubcommandData {
 			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, fowMessage);
 		}
 
-        CardsInfo.sentUserCardInfo(event, activeMap, player, false);
+        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
         return null;
     }
 }

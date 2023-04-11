@@ -11,8 +11,8 @@ import net.dv8tion.jda.api.requests.RestAction;
 import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
 import ti4.MessageListener;
-import ti4.commands.cards.CardsInfo;
-import ti4.commands.cards.PlayAC;
+import ti4.commands.cardsac.ACInfo_Legacy;
+import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.status.ScorePublic;
 import ti4.helpers.Constants;
@@ -45,7 +45,7 @@ public class ButtonListener extends ListenerAdapter {
         String messageID = event.getMessage().getId();
 
         String gameName = event.getChannel().getName();
-        gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
+        gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
         gameName = gameName.substring(0, gameName.indexOf("-"));
         Map activeMap = MapManager.getInstance().getMap(gameName);
         Player player = activeMap.getPlayer(id);
@@ -177,7 +177,7 @@ public class ButtonListener extends ListenerAdapter {
                     for (int i = 0; i < count; i++) {
                         activeMap.drawActionCard(player.getUserID());
                     }
-                    CardsInfo.sentUserCardInfo(event, activeMap, player, false);
+                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_draw_so" -> {
@@ -187,7 +187,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String message = "Drew Secret Objective";
                     activeMap.drawSecretObjective(player.getUserID());
-                    CardsInfo.sentUserCardInfo(event, activeMap, player, false);
+                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_follow_trade" -> {
