@@ -1483,27 +1483,8 @@ public class Map {
 
     private void calculatePlayerVPs() {
         playerVPs = new HashMap<>();
-
-        for (java.util.Map.Entry<String, Player> playerEntry : getPlayers().entrySet()) {
-            Player player = playerEntry.getValue();
-            String userID = player.getUserID();
-
-            if (scoredPlayerID.contains(userID)) {
-   
-
-                Integer vpCount = playerVPs.get(player);
-                if (vpCount == null) {
-                    vpCount = 0;
-                }
-                if (multiScoring) {
-                    int frequency = Collections.frequency(scoredPlayerID, userID);
-                    vpCount += frequency * objectiveWorth;
-
-                } else {
-                    vpCount += objectiveWorth;
-                }
-                playerVPs.put(player, vpCount);
-            }
+        for (Player player : getPlayers().values()) {
+            playerVPs.put(player, player.getTotalVictoryPoints(this));
         }
     }
 
