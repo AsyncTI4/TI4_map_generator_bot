@@ -9,6 +9,8 @@ import ti4.MapGenerator;
 
 import java.util.List;
 
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 public class BotLogger {
     private static TextChannel channel;
 
@@ -37,6 +39,18 @@ public class BotLogger {
         }
     }
 
+    public static void log(SlashCommandInteractionEvent event, String msg, Exception e) {
+        if (channel != null) {
+            if (event != null) {
+                String channelName = event.getChannel().getName();
+                String commandString = event.getCommandString();
+                channel.sendMessage(channelName + " [" + commandString + " ] " + msg).queue();
+            } else {
+                channel.sendMessage(msg).queue(m -> m.createThreadChannel("Stack Trace").queue(t -> MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e))));
+            }
+        }
+    }
+
     public static void log(ButtonInteractionEvent event, String msg) {
         if (channel != null) {
             if (event != null) {
@@ -44,6 +58,17 @@ public class BotLogger {
                 channel.sendMessage(channelName + " [button: `" + event.getButton().getId() + "` pressed] " + msg).queue();
             } else {
                 channel.sendMessage(msg).queue();
+            }
+        }
+    }
+
+    public static void log(ButtonInteractionEvent event, String msg, Exception e) {
+        if (channel != null) {
+            if (event != null) {
+                String channelName = event.getChannel().getName();
+                channel.sendMessage(channelName + " [button: `" + event.getButton().getId() + "` pressed] " + msg).queue(m -> m.createThreadChannel("Stack Trace").queue(t -> MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e))));
+            } else {
+                channel.sendMessage(msg).queue(m -> m.createThreadChannel("Stack Trace").queue(t -> MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e))));
             }
         }
     }

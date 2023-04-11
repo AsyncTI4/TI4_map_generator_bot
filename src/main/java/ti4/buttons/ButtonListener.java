@@ -94,7 +94,7 @@ public class ButtonListener extends ListenerAdapter {
                         event.getChannel().sendMessage(error).queue();
                     }
                 } catch (Exception e) {
-                    BotLogger.log(event, "Could not parse AC ID: " + acID);
+                    BotLogger.log(event, "Could not parse AC ID: " + acID, e);
                     event.getChannel().asThreadChannel().sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
                     return;
                 }
@@ -117,7 +117,7 @@ public class ButtonListener extends ListenerAdapter {
                     int soIndex = Integer.parseInt(soID);
                     ScoreSO.scoreSO(event, activeMap, player, soIndex, channel);
                 } catch (Exception e) {
-                    BotLogger.log(event, "Could not parse SO ID: " + soID);
+                    BotLogger.log(event, "Could not parse SO ID: " + soID, e);
                     event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.").queue();
                     return;
                 }
@@ -131,7 +131,7 @@ public class ButtonListener extends ListenerAdapter {
                 ScorePublic.scorePO(event, privateChannel, activeMap, player, poIndex);
                 addReaction(event, false, false, null, "");
             } catch (Exception e) {
-                BotLogger.log("Could not parse PO ID: " + poID);
+                BotLogger.log(event, "Could not parse PO ID: " + poID, e);
                 event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.").queue();
                 return;
             }
