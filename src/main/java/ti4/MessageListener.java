@@ -67,8 +67,7 @@ public class MessageListener extends ListenerAdapter {
                     String messageText = "Error trying to execute command: " + command.getActionID();
                     String errorMessage = ExceptionUtils.getMessage(e);
                     event.getHook().editOriginal(errorMessage).queue();
-                    BotLogger.log(messageText);
-                    BotLogger.log(errorMessage.substring(0, Math.min(1500, errorMessage.length())));
+                    BotLogger.log(event, messageText, e);
                 }
             }
         }
