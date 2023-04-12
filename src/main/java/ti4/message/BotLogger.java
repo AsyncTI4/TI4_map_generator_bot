@@ -71,14 +71,15 @@ public class BotLogger {
      * @return
      */
     private static TextChannel getBotLogChannel(GenericInteractionCreateEvent event) {
-        if (event == null) return null;
         TextChannel botLogChannel = null;
-        for (TextChannel textChannel : event.getGuild().getTextChannels()) {
-            if ("bot-log".equals(textChannel.getName())) {
-                botLogChannel = textChannel;
+        if (event != null) {
+            for (TextChannel textChannel : event.getGuild().getTextChannels()) {
+                if ("bot-log".equals(textChannel.getName())) {
+                    botLogChannel = textChannel;
+                }
             }
         }
-        if (botLogChannel == null) { //USE PRIMARY SERVER'S BOTLOG CHANNEL
+        if (botLogChannel == null || event == null) { //USE PRIMARY SERVER'S BOTLOG CHANNEL
             for (TextChannel textChannel : MapGenerator.guildPrimary.getTextChannels()) {
                 if ("bot-log".equals(textChannel.getName())) {
                     botLogChannel = textChannel;
