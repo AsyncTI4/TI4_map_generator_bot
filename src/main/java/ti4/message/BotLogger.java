@@ -17,6 +17,15 @@ public class BotLogger {
         log((GenericInteractionCreateEvent) null, msg, null);
     }
 
+    /** Sends a message to the Primary Async Server's #bot-log channel, including stack trace.
+     *  <p> Will create a thread and post the full Stack Trace when supplied with an Exception
+     * @param msg - message to send to the #bot-log channel
+     * @e - Exception
+     */
+    public static void log(String msg, Exception e) {
+        log((GenericInteractionCreateEvent) null, msg, e);
+    }
+
     /** Sends a message to the offending server's #bot-log channel, or if it does not exist, the Primary server's #bot-log channel
      * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
      * @param msg
