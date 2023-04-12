@@ -744,7 +744,8 @@ public class Helper {
         if (event == null) {
             return getPlayerRepresentation(player);
         }
-        if (MapManager.getInstance().getUserActiveMap(event.getUser().getId()).isCommunityMode()) {
+        Map userActiveMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
+        if (userActiveMap != null && userActiveMap.isCommunityMode()) {
             Role roleForCommunity = player.getRoleForCommunity();
             if (roleForCommunity == null) {
                 return "[No Community Role Found]";
