@@ -203,7 +203,7 @@ public class AutoCompleteProvider {
                 try {
                     event.replyChoices(options).queue();
                 } catch (Exception e) {
-                    BotLogger.log("Could not suggest leaders");
+                    BotLogger.log(event, "Could not suggest leaders", e);
                 }
             }
             case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {

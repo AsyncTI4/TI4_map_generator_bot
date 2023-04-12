@@ -209,7 +209,7 @@ public class Tile {
             int unitCount = Integer.parseInt(count);
             addUnit(spaceHolder, unitID, unitCount);
         } catch (Exception e) {
-            BotLogger.log("Could not parse unit count");
+            BotLogger.log("Could not parse unit count", e);
         }
     }
 
@@ -218,7 +218,7 @@ public class Tile {
             int unitCount = Integer.parseInt(count);
             addUnitDamage(spaceHolder, unitID, unitCount);
         } catch (Exception e) {
-            BotLogger.log("Could not parse unit count");
+            BotLogger.log("Could not parse unit count", e);
         }
     }
 

@@ -90,7 +90,7 @@ public class MapSaveLoadManager {
                     saveTile(writer, tile);
                 }
             } catch (IOException e) {
-                BotLogger.log("Could not save map: " + map.getName());
+                BotLogger.log("Could not save map: " + map.getName(), e);
             }
         } else {
             BotLogger.log("Could not save map, error creating save file");
@@ -128,7 +128,7 @@ public class MapSaveLoadManager {
                     MapManager.getInstance().deleteMap(map.getName());
                     MapManager.getInstance().addMap(loadedMap);
                 } catch (Exception e) {
-                    BotLogger.log("Error trying to make undo copy for map: " + mapName);
+                    BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
                 }
             }
         }
@@ -174,7 +174,7 @@ public class MapSaveLoadManager {
                 CopyOption[] options = {StandardCopyOption.REPLACE_EXISTING};
                 Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), options);
             } catch (Exception e) {
-                BotLogger.log("Error trying to make undo copy for map: " + mapName);
+                BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
             }
         }
     }
@@ -575,7 +575,7 @@ public class MapSaveLoadManager {
                     folder = Storage.getMapImageDirectory();
                 }
             } catch (IOException e) {
-                BotLogger.log("Could not create folder for maps");
+                BotLogger.log("Could not create folder for maps", e);
             }
 
         }
@@ -608,7 +608,7 @@ public class MapSaveLoadManager {
                             mapList.put(map.getName(), map);
                         }
                     } catch (Exception e) {
-                        BotLogger.log("Could not load game:" + file);
+                        BotLogger.log("Could not load game:" + file, e);
                     }
                 }
             }
@@ -645,7 +645,7 @@ public class MapSaveLoadManager {
                         try {
                             readGameInfo(map, data);
                         } catch (Exception e) {
-                            BotLogger.log("Data is bad: " + map.getName());
+                            BotLogger.log("Data is bad: " + map.getName(), e);
                         }
                     }
 
@@ -751,13 +751,13 @@ public class MapSaveLoadManager {
                         }
                     }
                 } catch (Exception e) {
-                    BotLogger.log("Data read error: " + mapFile.getName());
+                    BotLogger.log("Data read error: " + mapFile.getName(), e);
                 }
                 map.setTileMap(tileMap);
             } catch (FileNotFoundException e) {
-                BotLogger.log("File not found to read map data: " + mapFile.getName());
+                BotLogger.log("File not found to read map data: " + mapFile.getName(), e);
             } catch (Exception e) {
-                BotLogger.log("Data read error: " + mapFile.getName());
+                BotLogger.log("Data read error: " + mapFile.getName(), e);
             }
             return map;
         } else {
@@ -786,7 +786,7 @@ public class MapSaveLoadManager {
                     try {
                         map.setAdjacentTileOverride(getParsedAdjacencyOverrides(info));
                     } catch (Exception e) {
-                        BotLogger.log("Failed to load adjacency overrides");
+                        BotLogger.log("Failed to load adjacency overrides", e);
                     }
                 }
                 case Constants.AGENDAS -> map.setAgendas(getCardList(info));
@@ -995,7 +995,7 @@ public class MapSaveLoadManager {
                     try {
                         map.setRound(Integer.parseInt(roundNumber));
                     } catch (Exception exception) {
-                        BotLogger.log("Could not parse round number");
+                        BotLogger.log("Could not parse round number", exception);
                     }
                 }
                 case Constants.LAST_MODIFIED_DATE -> {
@@ -1003,7 +1003,7 @@ public class MapSaveLoadManager {
                     try {
                         map.setLastModifiedDate(Long.parseLong(lastModificationDate));
                     } catch (Exception exception) {
-                        BotLogger.log("Could not parse last modified date");
+                        BotLogger.log("Could not parse last modified date", exception);
                     }
                 }
             }
@@ -1128,7 +1128,7 @@ public class MapSaveLoadManager {
                         }
                         player.setLeaders(leaderList);
                     } catch (Exception e) {
-                        BotLogger.log("Could not parse leaders loading map");
+                        BotLogger.log("Could not parse leaders loading map", e);
                     }
                 }
                 case Constants.FOW_SYSTEMS -> {
@@ -1143,7 +1143,7 @@ public class MapSaveLoadManager {
                             player.addFogTile(tileID, position, label);
                         }
                     } catch (Exception e) {
-                        BotLogger.log("Could not parse fog of war systems for player when loading the map: " + player.getColor());
+                        BotLogger.log("Could not parse fog of war systems for player when loading the map: " + player.getColor(), e);
                     }
                 }
                 case Constants.SO_SCORED -> {

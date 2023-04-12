@@ -145,8 +145,7 @@ public class ConvertTTPGtoAsync {
             MapSaveLoadManager.saveMap(map);
             MapSaveLoadManager.loadMaps();
         } catch (Exception e) {
-            BotLogger.log("TTPG Import Failed: " + gamename + "    filename: " + filename);
-            BotLogger.log(ExceptionUtils.getStackTrace(e));
+            BotLogger.log("TTPG Import Failed: " + gamename + "    filename: " + filename, e);
             return false;
         }
         return true;

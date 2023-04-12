@@ -159,7 +159,7 @@ public class Map {
                 } catch (IllegalAccessException e) {
                     // This shouldn't really happen since we
                     // can even see private fields.
-                    BotLogger.log("Unknown error exporting fields from map.");
+                    BotLogger.log("Unknown error exporting fields from map.", e);
                 }
             }
         }

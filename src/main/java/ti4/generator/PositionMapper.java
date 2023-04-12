@@ -67,7 +67,7 @@ public class PositionMapper {
                     points.add(new Point(x, y));
                 }
             } catch (Exception e) {
-                BotLogger.log("Could not parse position");
+                BotLogger.log("Could not parse position", e);
             }
         }
         return points;
@@ -128,7 +128,7 @@ public class PositionMapper {
                 int y = Integer.parseInt(tokenizer.nextToken());
                 return new Point(x, y);
             } catch (Exception e) {
-                BotLogger.log("Could not parse position coordinates");
+                BotLogger.log("Could not parse position coordinates", e);
             }
         }
         return null;
@@ -159,7 +159,7 @@ public class PositionMapper {
                 positions.add(new Point(Integer.parseInt(x), Integer.parseInt(y)));
             }
         } catch (Exception e) {
-            BotLogger.log("Could not parse player positions");
+            BotLogger.log("Could not parse player positions", e);
         }
 
         return positions;
