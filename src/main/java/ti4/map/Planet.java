@@ -1,7 +1,6 @@
 package ti4.map;
 
 import ti4.generator.Mapper;
-import ti4.helpers.LoggerHandler;
 import ti4.message.BotLogger;
 
 import java.awt.*;
@@ -122,7 +121,7 @@ public class Planet extends UnitHolder {
     }
 
     public int getOptimalResources() {
-        if (resources >= influence) {
+        if (resources > influence) {
             return resources;
         } else {
             return 0;
@@ -130,7 +129,15 @@ public class Planet extends UnitHolder {
     }
 
     public int getOptimalInfluence() {
-        if (influence >= resources) {
+        if (influence > resources) {
+            return influence;
+        } else {
+            return 0;
+        }
+    }
+
+    public int getFlexResourcesOrInfluence() {
+        if (influence == resources) {
             return influence;
         } else {
             return 0;
