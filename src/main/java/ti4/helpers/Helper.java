@@ -1236,6 +1236,7 @@ public class Helper {
                 textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
             }
             textChannelManager.queue();
+            // textChannel.sendMessage("This channel's permissions have been updated.").queue();
         }
     }
 

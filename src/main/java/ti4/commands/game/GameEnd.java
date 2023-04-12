@@ -64,15 +64,17 @@ public class GameEnd extends GameSubcommandData {
 
         //ADD USER PERMISSIONS DIRECTLY TO CHANNEL
         Helper.addMapPlayerPermissionsToGameChannels(event.getGuild(), getActiveMap());
+        MessageHelper.sendMessageToChannel(event.getChannel(), "This game's channels' permissions have been updated.");
 
         //DELETE THE ROLE
         if (deleteRole) {
             Role gameRole = gameRoles.get(0);
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Role deleted: " + gameRole.getName());
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Role deleted: " + gameRole.getName() + " - use `/game ping` to ping all players");
             gameRole.delete().queue();
         }
 
         //POST GAME INFO
+        MessageHelper.sendMessageToChannel(event.getChannel(), "**Game: `" + gameName + "` has ended!**");
         userActiveMap.setHasEnded(true);
         MapSaveLoadManager.saveMap(userActiveMap);
         String gameEndText = getGameEndText(userActiveMap, event);
@@ -96,15 +98,19 @@ public class GameEnd extends GameSubcommandData {
             if (member != null) message.append(member.getAsMention());
         }
         message.append("\nPlease provide a summary of the game below:");
-
+        
         pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
             m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
             m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
         });
+
+        //INFORM PLAYERS
+        String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
+        MessageHelper.sendMessageToChannel(event.getChannel(), msg);
                 
-        //INFORM BOTHELPER
+        //INFORM BOTHELPER IF IN-LIMBO IS FULL
         String bothelperMention = Helper.getEventGuildRole(event, "bothelper").getAsMention();
-        MessageHelper.sendMessageToChannel(event.getChannel(), bothelperMention + " - this game has concluded");
+        // MessageHelper.sendMessageToChannel(event.getChannel(), bothelperMention + " - this game has concluded");
         TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
         if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");      
     
@@ -116,13 +122,14 @@ public class GameEnd extends GameSubcommandData {
             if (inLimboCategory.getChannels().size() > 48) { //HANDLE FULL IN-LIMBO
                 MessageHelper.sendMessageToChannel(event.getChannel(), inLimboCategory.getName() + " Category is full. " + bothelperMention + " - please make room and manually move these channels.");
             } else {
+                String moveMessage = "Channel has been moved to Category **" + inLimboCategory.getName() + "** and will be automatically cleaned up shortly.";
                 if (tableTalkChannel != null) { //MOVE TABLETALK CHANNEL
                     tableTalkChannel.getManager().setParent(inLimboCategory).queue();
-                    MessageHelper.sendMessageToChannel(tableTalkChannel, "Channel has been moved to Category: " + inLimboCategory.getName());
+                    MessageHelper.sendMessageToChannel(tableTalkChannel, moveMessage);
                 }
                 if (actionsChannel != null) { //MOVE ACTIONS CHANNEL
                     actionsChannel.getManager().setParent(inLimboCategory).queue();
-                    MessageHelper.sendMessageToChannel(actionsChannel, "Channel has been moved to Category: " + inLimboCategory.getName());
+                    MessageHelper.sendMessageToChannel(actionsChannel, moveMessage);
                 }
             }
         }
