@@ -34,7 +34,7 @@ public class Planet extends UnitHolder {
                 resources = Integer.parseInt(split[2]);
                 influence = Integer.parseInt(split[3]);
             } catch (Exception e) {
-                BotLogger.log("Could not parse res/inf of unitHolder " + name);
+                BotLogger.log("Could not parse res/inf of unitHolder " + name, e);
             }
         }
     }
@@ -85,7 +85,7 @@ public class Planet extends UnitHolder {
                         influence += Integer.parseInt(split[1]);
                     }
                 } catch (Exception e) {
-                    BotLogger.log("Could not parse res/inf in token of unitHolder " + getName());
+                    BotLogger.log("Could not parse res/inf in token of unitHolder " + getName(), e);
                 }
 
                 if (split.length > 2) {

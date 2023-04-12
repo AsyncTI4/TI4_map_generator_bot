@@ -74,7 +74,7 @@ public class MapGenerator {
         try {
             jda.awaitReady();
         } catch (InterruptedException e) {
-            BotLogger.log("Error waiting for bot to get ready");
+            BotLogger.log("Error waiting for bot to get ready", e);
         }
 
         userID = args[1];

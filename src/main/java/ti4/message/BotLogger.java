@@ -17,6 +17,15 @@ public class BotLogger {
         log((GenericInteractionCreateEvent) null, msg, null);
     }
 
+    /** Sends a message to the Primary Async Server's #bot-log channel, including stack trace.
+     *  <p> Will create a thread and post the full Stack Trace when supplied with an Exception
+     * @param msg - message to send to the #bot-log channel
+     * @e - Exception
+     */
+    public static void log(String msg, Exception e) {
+        log((GenericInteractionCreateEvent) null, msg, e);
+    }
+
     /** Sends a message to the offending server's #bot-log channel, or if it does not exist, the Primary server's #bot-log channel
      * @param event GenericInteractionCreateEvent, handling for null, SlashCommandInteractionEvent, and ButtonInteractionEvent
      * @param msg
@@ -44,23 +53,27 @@ public class BotLogger {
         TextChannel botLogChannel = getBotLogChannel(event);
         if (msg == null) msg = "";
         if (botLogChannel != null) {
-            if (event == null) {
-                botLogChannel.sendMessage(msg).queue();
-            } else if (event instanceof SlashCommandInteractionEvent) {
+            if (event == null) { //NON-EVENT LOGS
+                if (e == null) {
+                    botLogChannel.sendMessage(msg).queue();
+                } else {
+                    botLogChannel.sendMessage(msg).queue(m -> m.createThreadChannel("Stack Trace").queue(t -> MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e))));
+                }
+            } else if (event instanceof SlashCommandInteractionEvent) { //SLASH COMMAND EVENT LOGS
                 String channelName = event.getChannel().getName();
                 String commandString = ((SlashCommandInteractionEvent) event).getCommandString();
                 if (e == null) {
-                    botLogChannel.sendMessage(channelName + " [command: `" + commandString + "`] " + msg).queue();
+                    botLogChannel.sendMessage(channelName + " [command: `" + commandString + "`]\n" + msg).queue();
                 } else {
-                    botLogChannel.sendMessage(channelName + " [command: `" + commandString + "`] " + msg).queue(m -> m.createThreadChannel("Stack Trace").queue(t -> MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e))));
+                    botLogChannel.sendMessage(channelName + " [command: `" + commandString + "`]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").queue(t -> MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e))));
                 }
-            } else if (event instanceof ButtonInteractionEvent) {
+            } else if (event instanceof ButtonInteractionEvent) { //BUTTON EVENT LOGS
                 String channelName = event.getChannel().getName();
                 Button button = ((ButtonInteractionEvent) event).getButton();
                 if (e == null) {
-                    botLogChannel.sendMessage(channelName + " [button: `" + button.getId() + "` pressed] " + msg).queue();
+                    botLogChannel.sendMessage(channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue();
                 } else {
-                    botLogChannel.sendMessage(channelName + " [button: `" + button.getId() + "` pressed] " + msg).queue(m -> m.createThreadChannel("Stack Trace").queue(t -> MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e))));
+                    botLogChannel.sendMessage(channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue(m -> m.createThreadChannel("Stack Trace").queue(t -> MessageHelper.sendMessageToChannel(t, ExceptionUtils.getStackTrace(e))));
                 }
             }
         }

@@ -91,7 +91,7 @@ public class ACInfo_Legacy extends ACCardsSubcommandData {
                     sendCardInfoToChannel(threadChannel, threadName + " " + playerPing, headerText, activeMap, player, longPNDisplay);
                 }
             } catch (Exception e) {
-                BotLogger.log("Could not create Private Thread");
+                BotLogger.log("Could not create Private Thread", e);
             }
         } else {
             MessageHelper.sendMessageToUser("Player: " + player.getUserName() + " not found", event);
