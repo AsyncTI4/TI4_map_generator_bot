@@ -731,21 +731,39 @@ public class GenerateMap {
         int totalPlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceTotal(player, map);
         int availablePlayerFlex = Helper.getPlayerFlexResourcesInfluenceAvailable(player, map);
         int totalPlayerFlex = Helper.getPlayerFlexResourcesInfluenceTotal(player, map);
-        drawPAImage(x + deltaX, y - 2, "pa_resinf_info.png");
+        drawPAImage(x + deltaX- 2, y - 2, "pa_resinf_info.png");
         graphics.setColor(Color.WHITE);
         graphics.drawRect(x + deltaX - 2, y - 2, 152, 152);
-        graphics.setFont(Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(availablePlayerResources), new Rectangle(x + deltaX + 34, y + 7, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(totalPlayerResources), new Rectangle(x + deltaX + 34, y + 41, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(availablePlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 75, 32, 32), Storage.getFont32());
+
+        //  RESOURCES
+        graphics.setColor(Color.WHITE);
+        drawCenteredString(graphics, String.valueOf(availablePlayerResources), new Rectangle(x + deltaX + 30, y + 30, 32, 32), Storage.getFont32());
+        graphics.setColor(Color.GRAY);
+        drawCenteredString(graphics, String.valueOf(totalPlayerResources), new Rectangle(x + deltaX + 30, y + 55, 32, 32), Storage.getFont20());
+        graphics.setColor(Color.decode("#d5bd4f")); //greyish-yellow
+        drawCenteredString(graphics, String.valueOf(availablePlayerResourcesOptimal), new Rectangle(x + deltaX + 30, y + 90, 32, 32), Storage.getFont16());
+        // drawCenteredString(graphics, "OPT", new Rectangle(x + deltaX + 30, y + 100, 32, 32), Storage.getFont8());
+        // graphics.setColor(Color.GRAY);
         // drawCenteredString(graphics, String.valueOf(totalPlayerResourcesOptimal), new Rectangle(x + deltaX + 34, y + 109, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(availablePlayerInfluence), new Rectangle(x + deltaX + 185, y + 7, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(totalPlayerInfluence), new Rectangle(x + deltaX + 185, y + 41, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(availablePlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 75, 32, 32), Storage.getFont32());
+
+        //  INFLUENCE
+        graphics.setColor(Color.WHITE);
+        drawCenteredString(graphics, String.valueOf(availablePlayerInfluence), new Rectangle(x + deltaX + 90, y + 30, 32, 32), Storage.getFont32());
+        graphics.setColor(Color.GRAY);
+        drawCenteredString(graphics, String.valueOf(totalPlayerInfluence), new Rectangle(x + deltaX + 90, y + 55, 32, 32), Storage.getFont20());
+        graphics.setColor(Color.decode("#57b9d9")); //greyish-blue
+        drawCenteredString(graphics, String.valueOf(availablePlayerInfluenceOptimal), new Rectangle(x + deltaX + 90, y + 90, 32, 32), Storage.getFont16());
+        // drawCenteredString(graphics, "OPT", new Rectangle(x + deltaX + 90, y + 100, 32, 32), Storage.getFont8());
+        // graphics.setColor(Color.GRAY);
         // drawCenteredString(graphics, String.valueOf(totalPlayerInfluenceOptimal), new Rectangle(x + deltaX + 185, y + 109, 32, 32), Storage.getFont32());
-        drawCenteredString(graphics, String.valueOf(availablePlayerFlex), new Rectangle(x + deltaX + 185, y + 109, 32, 32), Storage.getFont32());
+
+        //  FLEX
+        graphics.setColor(Color.GRAY);
+        // drawCenteredString(graphics, "FLEX", new Rectangle(x + deltaX, y + 130, 150, 8), Storage.getFont8());
+        if (player.getUserID().equals("203608548440014848") || player.getUserID().equals("481860200169472030")) graphics.setColor(Color.decode("#f616ce"));
+        drawCenteredString(graphics, String.valueOf(availablePlayerFlex), new Rectangle(x + deltaX, y + 115, 150, 20), Storage.getFont16());
         // drawCenteredString(graphics, String.valueOf(totalPlayerFlex), new Rectangle(x + deltaX + 185, y + 109, 32, 32), Storage.getFont32());
-        deltaX += 154;
+        deltaX += 156;
 
         boolean randomizeList = player != fowPlayer && isFoWPrivate != null && isFoWPrivate;
         if (randomizeList) {
