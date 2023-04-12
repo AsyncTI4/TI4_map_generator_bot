@@ -1112,6 +1112,47 @@ public class Helper {
         return influenceCount;
     }
 
+    public static Integer getPlayerFlexResourcesInfluenceAvailable(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
+            }
+        } 
+
+        int influenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getFlexResourcesOrInfluence).sum();
+
+        return influenceCount;
+    }
+
+    public static Integer getPlayerFlexResourcesInfluenceTotal(Player player, Map map) {
+        if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
+            return null;
+        }
+        List<String> planets = new ArrayList<>(player.getPlanets());
+
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        if ("xxcha".equals(player.getFaction())) {
+            Leader leader = player.getLeader(Constants.HERO);
+            if (leader != null && !leader.isLocked()) {
+                return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
+            }
+        } 
+
+        int influenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getFlexResourcesOrInfluence).sum();
+
+        return influenceCount;
+    }
+
     public static String getPlayerResourceInfluenceRepresentation(Player player, Map map) {
         StringBuilder sb = new StringBuilder(getPlayerRepresentation(player)).append(":\n");
         sb.append("Resources: ").append(getPlayerResourcesAvailable(player, map)).append("/").append(getPlayerResourcesTotal(player, map)).append("  Optimal: " + getPlayerOptimalResourcesAvailable(player, map)).append("/").append(getPlayerOptimalResourcesTotal(player, map)).append("\n");
