@@ -202,7 +202,7 @@ public class StartMilty extends MiltySubcommandData {
 
             imageWriter.write(null, new IIOImage(mainImage, null, null), defaultWriteParam);
         } catch (IOException e) {
-            BotLogger.log("Could not save generated slice image");
+            BotLogger.log("Could not save generated slice image", e);
         }
         Map map = getActiveMap();
         String absolutePath = file.getParent() + "/" + map.getName() + "_slices.jpg";
@@ -221,7 +221,7 @@ public class StartMilty extends MiltySubcommandData {
                 throw new IllegalStateException("Failed to write image.");
             }
         } catch (IOException e) {
-            BotLogger.log("Could not save jpg file");
+            BotLogger.log("Could not save jpg file", e);
         }
         //noinspection ResultOfMethodCallIgnored
         file.delete();

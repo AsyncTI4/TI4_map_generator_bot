@@ -82,7 +82,7 @@ public class AliasHandler {
                     }
                 }
             } catch (IOException e) {
-                BotLogger.log("Could not read alias file");
+                BotLogger.log("Could not read alias file", e);
             }
         }
     }

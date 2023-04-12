@@ -36,7 +36,7 @@ public class MessageListener extends ListenerAdapter {
         try {
             AutoCompleteProvider.autoCompleteListener(event);
         } catch (Exception e) {
-            BotLogger.log("Auto complete issue in event: " + event.getName());
+            BotLogger.log("Auto complete issue in event: " + event.getName(), e);
         }
     }
 

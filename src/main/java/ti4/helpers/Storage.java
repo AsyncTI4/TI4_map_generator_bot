@@ -113,7 +113,7 @@ public class Storage {
             tiFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
             tiFont = tiFont.deriveFont(size);
         } catch (Exception e) {
-            BotLogger.log("Could not load font");
+            BotLogger.log("Could not load font", e);
         }
         return tiFont;
     }
