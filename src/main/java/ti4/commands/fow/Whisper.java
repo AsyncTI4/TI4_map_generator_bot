@@ -53,12 +53,12 @@ public class Whisper extends FOWSubcommandData {
                 }
                 else
                 {
-                     message = "Attention " + Helper.getPlayerRepresentation(event, player_, true) + "! " + Helper.getPlayerRepresentation(event, player) + " says: " + msg;
+                     message = Helper.getPlayerRepresentation(event, player) + " says: " + msg;
                 }
             }
             else
             {
-                message =  "Attention" + Helper.getPlayerRepresentation(event, player_, true) + "! " + Helper.getPlayerRepresentation(event, player) + " says: " + msg;
+                message = Helper.getPlayerRepresentation(event, player) + " says: " + msg;
             }
         
 
