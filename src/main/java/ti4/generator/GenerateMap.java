@@ -1870,17 +1870,13 @@ public class GenerateMap {
                     graphics.drawImage(image, tileX, tileY, null);
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.WHITE);
-                    if (tileIsFoggy) {
-                        graphics.drawImage(fogOfWar, tileX, tileY, null);
-                        graphics.drawString(tile.getFogLabel(fowPlayer), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
-                    }
                     int textOffset = 0;
-                    if(map.getLargeText().equals("large"))
+                    if(map.isLargeText())
                     {
                         graphics.setFont(Storage.getFont50());
                         textOffset = 140;
                     }
-                    else if(map.getLargeText().equals("medium"))
+                    else if(map.isMedText())
                     {
                         graphics.setFont(Storage.getFont35());
                         textOffset = 20;
