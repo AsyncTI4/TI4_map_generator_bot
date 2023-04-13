@@ -44,7 +44,7 @@ public class AbilityRemove extends FrankenSubcommandData {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(event, player)).append(" removed an ability:\n").append(AbilityInfo.getAbilityRepresentation(abilityID));
+        sb.append(Helper.getPlayerRepresentation(event, player)).append(" removed an ability: ").append(abilityID);
         sendMessage(sb.toString());
         player.removeFactionAbility(abilityID);
     }
