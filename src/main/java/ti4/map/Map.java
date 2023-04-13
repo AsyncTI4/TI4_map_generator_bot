@@ -968,7 +968,6 @@ public class Map {
     public String drawExplore(String reqType) {
         List<String> deck = getExplores(reqType, explore);
         if (!deck.isEmpty()) {
-            Collections.shuffle(deck);
             String id = deck.get(0);
             discardExplore(id);
             return id;
@@ -1016,7 +1015,6 @@ public class Map {
         if (relics_.isEmpty()) {
             return "";
         }
-        Collections.shuffle(relics_);
         String remove = relics_.remove(0);
         relics.remove(remove);
         return remove;
