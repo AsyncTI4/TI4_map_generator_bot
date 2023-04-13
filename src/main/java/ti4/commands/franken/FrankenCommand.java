@@ -1,12 +1,12 @@
-package ti4.commands.player;
+package ti4.commands.franken;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
@@ -14,25 +14,25 @@ import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public class PlayerCommand implements Command {
+public class FrankenCommand implements Command {
 
-    private final Collection<PlayerSubcommandData> subcommandData = getSubcommands();
+    private final Collection<FrankenSubcommandData> subcommandData = getSubcommands();
 
     @Override
     public String getActionID() {
-        return Constants.PLAYER;
+        return Constants.FRANKEN;
     }
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
         if (event.getName().equals(getActionID())) {
-            String userID = event.getUser().getId();
+            User user = event.getUser();
+            String userID = user.getId();
             MapManager mapManager = MapManager.getInstance();
             if (!mapManager.isUserWithActiveMap(userID)) {
                 MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
@@ -77,8 +77,8 @@ public class PlayerCommand implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String subcommandName = event.getInteraction().getSubcommandName();
-        PlayerSubcommandData executedCommand = null;
-        for (PlayerSubcommandData subcommand : subcommandData) {
+        FrankenSubcommandData executedCommand = null;
+        for (FrankenSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
@@ -97,48 +97,25 @@ public class PlayerCommand implements Command {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap);
-
-        GenerateMap.getInstance().saveImage(activeMap, event);
+        MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }
 
 
     protected String getActionDescription() {
-        return "Player";
+        return "Franken";
     }
 
-    private Collection<PlayerSubcommandData> getSubcommands() {
-        Collection<PlayerSubcommandData> subcommands = new HashSet<>();
-        subcommands.add(new Stats());
-        subcommands.add(new Planets());
-        subcommands.add(new Setup());
-        subcommands.add(new SCPlay());
-        subcommands.add(new Pass());
-        subcommands.add(new TechAdd());
-        subcommands.add(new TechRemove());
-        subcommands.add(new TechExhaust());
-        subcommands.add(new TechRefresh());
-        subcommands.add(new TechInfo());
-        subcommands.add(new AbilityInfo());
-        subcommands.add(new Turn());
-        subcommands.add(new SCPick());
-        subcommands.add(new PlanetAdd());
-        subcommands.add(new PlanetRemove());
-        subcommands.add(new PlanetExhaust());
-        subcommands.add(new PlanetRefresh());
-        subcommands.add(new PlanetExhaustAbility());
-        subcommands.add(new PlanetRefreshAbility());
-        subcommands.add(new PlanetRefreshAll());
-        subcommands.add(new PlanetExhaustAll());
-        subcommands.add(new Speaker());
-        subcommands.add(new SendTG());
-        subcommands.add(new SendCommodities());
+    private Collection<FrankenSubcommandData> getSubcommands() {
+        Collection<FrankenSubcommandData> subcommands = new HashSet<>();
+        subcommands.add(new AbilityAdd());
+        subcommands.add(new AbilityRemove());
+
         return subcommands;
     }
 
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(
-                Commands.slash(getActionID(), getActionDescription())
-                        .addSubcommands(getSubcommands()));
+        SlashCommandData list = Commands.slash(getActionID(), getActionDescription()).addSubcommands(getSubcommands());
+        commands.addCommands(list);
     }
 }

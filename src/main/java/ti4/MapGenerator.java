@@ -20,6 +20,7 @@ import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.custom.CustomCommand;
 import ti4.commands.explore.ExploreCommand;
 import ti4.commands.fow.FOWCommand;
+import ti4.commands.franken.FrankenCommand;
 import ti4.commands.game.GameCommand;
 import ti4.commands.help.*;
 import ti4.commands.leaders.LeaderCommand;
@@ -148,6 +149,7 @@ public class MapGenerator {
         commandManager.addCommand(new CustomCommand());
         commandManager.addCommand(new FOWCommand());
         commandManager.addCommand(new MiltyCommand());
+        commandManager.addCommand(new FrankenCommand());
 
         guildPrimary = jda.getGuildById(args[2]);
 

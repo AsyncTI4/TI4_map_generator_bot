@@ -350,6 +350,28 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.ABILITY -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, String> abilities = Mapper.getFactionAbilities();
+                abilities.replaceAll((k, v) -> v.substring(0, v.indexOf("|")));
+
+                if (activeMap.isDiscordantStarsMode()) {
+                    List<Command.Choice> options = abilities.entrySet().stream()
+                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                } else {
+                    List<Command.Choice> options = abilities.entrySet().stream()
+                        .filter(Predicate.not(value -> value.getKey().toLowerCase().startsWith("ds")))
+                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
+            }
         }
     }
 }
