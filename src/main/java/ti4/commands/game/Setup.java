@@ -111,15 +111,7 @@ public class Setup extends GameSubcommandData {
         OptionMapping largeText = event.getOption(Constants.LARGE_TEXT);
         if (largeText != null) {
             String large = largeText.getAsString();
-            if("large".equals(large))
-            {
-                getActiveMap().setLargeText(true);
-            }
-            else if(large.equals("medium"))
-            {
-                getActiveMap().setMedText(true);
-            }
-            
+            getActiveMap().setLargeText(large);
         }
 
         OptionMapping customOption = event.getOption(Constants.GAME_CUSTOM_NAME);
