@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 public class ExhaustLeader extends LeaderAction {
 	public ExhaustLeader() {
 		super(Constants.EXHAUST_LEADER, "Exhaust leader");
-		addOptions(new OptionData(OptionType.STRING, Constants.TG, "TG count to add to leader").setRequired(false));
+		addOptions(new OptionData(OptionType.INTEGER, Constants.TG, "TG count to add to leader").setRequired(false));
 	}
 
 	@Override
@@ -33,9 +33,7 @@ public class ExhaustLeader extends LeaderAction {
 					.append(" exhausted ").append(Helper.getLeaderFullRepresentation(player, playerLeader));
 			OptionMapping optionTG = event.getOption(Constants.TG);
 			if (optionTG != null) {
-				Stats stats = new Stats();
-				stats.preExecute(event);
-				stats.setValue(event, activeMap, player, optionTG, playerLeader::setTgCount, playerLeader::getTgCount);
+				playerLeader.setTgCount(optionTG.getAsInt());
 				messageText.append("\n").append(optionTG.getAsString()).append(Emojis.tg)
 						.append(" was placed on top of the leader");
 				if (playerLeader.getTgCount() != optionTG.getAsInt()) {
