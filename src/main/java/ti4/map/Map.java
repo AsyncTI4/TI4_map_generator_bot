@@ -968,7 +968,6 @@ public class Map {
     public String drawExplore(String reqType) {
         List<String> deck = getExplores(reqType, explore);
         if (!deck.isEmpty()) {
-            Collections.shuffle(deck);
             String id = deck.get(0);
             discardExplore(id);
             return id;

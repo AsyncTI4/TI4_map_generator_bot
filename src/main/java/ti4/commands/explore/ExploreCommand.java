@@ -71,6 +71,8 @@ public class ExploreCommand implements Command {
         subcommands.add(new AddRelicBackIntoDeck());
         subcommands.add(new RelicInfo());
         subcommands.add(new RelicLookAtTop());
+        subcommands.add(new ExploreLookAtTop());
+
         return subcommands;
     }
 
