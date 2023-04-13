@@ -1016,7 +1016,6 @@ public class Map {
         if (relics_.isEmpty()) {
             return "";
         }
-        Collections.shuffle(relics_);
         String remove = relics_.remove(0);
         relics.remove(remove);
         return remove;

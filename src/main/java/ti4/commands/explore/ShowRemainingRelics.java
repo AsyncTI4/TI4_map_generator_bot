@@ -4,12 +4,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class ShowRemainingRelics extends GenericRelicAction {
@@ -33,6 +32,7 @@ public class ShowRemainingRelics extends GenericRelicAction {
             text = new StringBuilder("**RELIC DECK IS EMPTY**");
         } else {
             text = new StringBuilder(Emojis.Relic).append(" **RELICS REMAINING IN DECK** (").append(String.valueOf(deckCount)).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
+            Collections.sort(allRelics);
             for (String relicId : allRelics) {
                 String[] relicData = Mapper.getRelic(relicId).split(";");
                 text.append("- ").append(relicData[0]).append("\n");
