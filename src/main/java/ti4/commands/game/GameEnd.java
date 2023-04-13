@@ -181,8 +181,6 @@ public class GameEnd extends GameSubcommandData {
         if (gameModesText.isEmpty()) gameModesText = "None";
         sb.append("Game Modes: " + gameModesText).append("\n");
 
-        sb.append("Map String: `" + Helper.getMapString(map)).append("`").append("\n");
-
         return sb.toString();
     }
 }
