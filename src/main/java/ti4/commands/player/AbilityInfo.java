@@ -49,13 +49,13 @@ public class AbilityInfo extends PlayerSubcommandData {
         return sb.toString();
     }
 
-    public String getAbilityRepresentation(String abilityID) {
+    public static String getAbilityRepresentation(String abilityID) {
         HashMap<String, String> abilityInfo = Mapper.getFactionAbilities();
         String abilityRawText = abilityInfo.get(abilityID);
         StringTokenizer tokenizer = new StringTokenizer(abilityRawText, "|");
         int expectedTokenCount = 4;
         if (tokenizer.countTokens() != expectedTokenCount) {
-            BotLogger.log(getEvent(), "Ability info raw text is incorrectly formatted (needs " + (expectedTokenCount - 1) + " | to split properly):\n> " + abilityRawText);
+            BotLogger.log("Ability info raw text is incorrectly formatted (needs " + (expectedTokenCount - 1) + " | to split properly):\n> " + abilityRawText);
             return abilityRawText;
         }
         String abilityName = tokenizer.nextToken();

@@ -142,6 +142,14 @@ public class Player {
         this.factionAbilities = factionAbilities;
     }
 
+    public void addFactionAbility(String abilityID) {
+        factionAbilities.add(abilityID);
+    }
+    
+    public void removeFactionAbility(String abilityID) {
+        factionAbilities.remove(abilityID);
+    }
+
     public LinkedHashMap<String, Integer> getActionCards() {
         return actionCards;
     }
