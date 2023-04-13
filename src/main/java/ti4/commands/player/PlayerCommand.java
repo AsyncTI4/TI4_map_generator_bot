@@ -118,6 +118,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new TechExhaust());
         subcommands.add(new TechRefresh());
         subcommands.add(new TechInfo());
+        subcommands.add(new AbilityInfo());
         subcommands.add(new Turn());
         subcommands.add(new SCPick());
         subcommands.add(new PlanetAdd());

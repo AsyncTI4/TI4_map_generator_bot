@@ -23,6 +23,7 @@ public class Mapper {
     private static final Properties attachment_tokens = new Properties();
     private static final Properties tokens = new Properties();
     private static final Properties special_case = new Properties();
+    private static final Properties faction_abilities = new Properties();
     private static final Properties factions = new Properties();
     private static final Properties general = new Properties();
     private static final Properties secretObjectives = new Properties();
@@ -62,6 +63,7 @@ public class Mapper {
         readData("tokens.properties", tokens, "Could not read token name file");
         readData("special_case.properties", special_case, "Could not read token name file");
         readData("general.properties", general, "Could not read general token name file");
+        readData("faction_abilities.properties", faction_abilities, "Could not read faction abilities file");
         readData("factions.properties", factions, "Could not read factions name file");
         readData("secret_objectives.properties", secretObjectives, "Could not read secret objectives file");
         readData("action_cards.properties", actionCards, "Could not read action cards file");
@@ -667,6 +669,14 @@ public class Mapper {
         return agendaList;
     }
 
+    public static HashMap<String, String> getFactionAbilities() {
+        HashMap<String, String> factionAbilities = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : faction_abilities.entrySet()) {
+            factionAbilities.put((String) entry.getKey(), (String) entry.getValue());
+        }
+        return factionAbilities;
+    }
+    
     public static List<String> getFactions() {
         return factions.keySet().stream()
                 .filter(token -> token instanceof String)

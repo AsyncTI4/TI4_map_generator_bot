@@ -16,6 +16,7 @@ import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.StringTokenizer;
 
@@ -88,6 +89,8 @@ public class Setup extends PlayerSubcommandData {
             return;
         }
         String[] setupInfo = playerSetup.split(";");
+
+        //HOME SYSTEM
         String hsTile = setupInfo[1];
 
         ArrayList<String> setup;
@@ -115,6 +118,7 @@ public class Setup extends PlayerSubcommandData {
         Tile tile = new Tile(hsTile, position);
         activeMap.setTile(tile);
 
+        //HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("ghost".equals(faction)){
             if (useSpecified){
                 position = "tr";
@@ -162,7 +166,7 @@ public class Setup extends PlayerSubcommandData {
             activeMap.setTile(tile);
         }
 
-
+        //STARTING COMMODITIES
         player.setCommoditiesTotal(Integer.parseInt(setupInfo[3]));
         for (String tech : setupInfo[5].split(",")) {
             if (tech.trim().isEmpty()){
@@ -171,6 +175,7 @@ public class Setup extends PlayerSubcommandData {
             player.addTech(tech);
         }
 
+        //STARTING PLANETS
         for (String planet : setupInfo[6].split(",")) {
             if (planet.isEmpty()){
                 continue;
@@ -179,7 +184,21 @@ public class Setup extends PlayerSubcommandData {
             new PlanetAdd().doAction(player, planetResolved, activeMap);
             player.refreshPlanet(planetResolved);
         }
+
+        //STARTING ABILITIES
+        HashSet<String> abilities = new HashSet<>();
+        for (String ability : setupInfo[7].split(",")) {
+            if (ability.isEmpty()){
+                continue;
+            } else {
+                abilities.add(ability);
+            }
+        }
+        player.setFactionAbilities(abilities);
+
         player.getExhaustedPlanets().clear();
+
+        //STARTING UNITS
         addUnits(setupInfo, tile, color, event);
         if(!activeMap.isFoWMode()) {
             sendMessage("Player: " + Helper.getPlayerRepresentation(event, player) + " has been set up");

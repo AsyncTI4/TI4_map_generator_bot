@@ -584,4 +584,6 @@ public class Constants {
     public static final String INCLUDE_SUBCOMMANDS = "include_subcommands";
     public static final String INCLUDE_OPTIONS = "include_options";
     public static final String CARDS_INFO = "cards_info";
+    public static final String ABILITIES = "abilities";
+    public static final String ABILITY_INFO = "ability_info";
 }

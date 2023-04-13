@@ -42,6 +42,7 @@ public class Player {
     private LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> promissoryNotes = new LinkedHashMap<>();
+    private HashSet<String> factionAbilities = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
     private List<String> exhaustedTechs = new ArrayList<>();
@@ -131,6 +132,14 @@ public class Player {
 
     public void setPassed(boolean passed) {
         this.passed = passed;
+    }
+
+    public HashSet<String> getFactionAbilities() {
+        return factionAbilities;
+    }
+
+    public void setFactionAbilities(HashSet<String> factionAbilities) {
+        this.factionAbilities = factionAbilities;
     }
 
     public LinkedHashMap<String, Integer> getActionCards() {
