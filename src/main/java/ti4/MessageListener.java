@@ -118,6 +118,9 @@ public class MessageListener extends ListenerAdapter {
         if (msg.getContentRaw().startsWith("[DELETE]")) {
             msg.delete().queue();
         }
+        if (msg.getContentRaw().contains("used /fow whisper")) {
+            msg.delete().queue();
+        }
         if (msg.getContentRaw().startsWith("map_log")) {
             if (event.isFromType(ChannelType.PRIVATE)) {
                 System.out.printf("[PM] %s: %s\n", event.getAuthor().getName(), event.getMessage().getContentDisplay());
