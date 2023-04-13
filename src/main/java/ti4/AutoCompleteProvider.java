@@ -127,7 +127,7 @@ public class AutoCompleteProvider {
                 if (activeMap.isAbsolMode()){
                     List<Command.Choice> options = relics.entrySet().stream()
                             .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                            .filter(value -> value.getKey().startsWith("absol_"))
+                            .filter(value -> value.getKey().startsWith("absol_") || value.getKey().equals("enigmaticdevice"))
                             .limit(25)
                             .map(value -> new Command.Choice(value.getValue(), value.getKey()))
                             .collect(Collectors.toList());
