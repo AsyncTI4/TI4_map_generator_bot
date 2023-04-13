@@ -696,7 +696,9 @@ public class GenerateMap {
         UnitTokenPosition textPosition = PositionMapper.getReinforcementsPosition(id);
         String text = "pa_reinforcements_numbers_" + reinforcementsCount;
         String colorID = Mapper.getColorID(color);
-        if (colorID.startsWith("ylw") || colorID.startsWith("gry") || colorID.startsWith("org") || colorID.startsWith("pnk")) {
+        if (colorID.startsWith("ylw") || colorID.startsWith("gry") || colorID.startsWith("org") || colorID.startsWith("pnk")
+                || colorID.startsWith("tan") || colorID.startsWith("crm") || colorID.startsWith("sns") || colorID.startsWith("tqs")
+                || colorID.startsWith("gld") || colorID.startsWith("lgy")) {
             text += "_blk.png";
         } else {
             text += "_wht.png";
@@ -2362,7 +2364,9 @@ public class GenerateMap {
 
             Color groupUnitColor = Color.WHITE;
             Integer bulkUnitCount = null;
-            if (unitID.startsWith("ylw") || unitID.startsWith("gry") || unitID.startsWith("org") || unitID.startsWith("pnk")) {
+            if (unitID.startsWith("ylw") || unitID.startsWith("gry") || unitID.startsWith("org") || unitID.startsWith("pnk")
+                    || unitID.startsWith("tan") || unitID.startsWith("crm") || unitID.startsWith("sns") || unitID.startsWith("tqs")
+                    || unitID.startsWith("gld") || unitID.startsWith("lgy")) {
                 groupUnitColor = Color.BLACK;
             }
             if (unitID.endsWith(Constants.COLOR_FF)) {
