@@ -18,8 +18,8 @@ public class Whisper extends FOWSubcommandData {
     
     public Whisper() {
         super(Constants.WHISPER, "Send a private message to a player");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send the message").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.MSG, "Message to send").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send the message").setAutoComplete(true).setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.ANON, "Send anonymously").setAutoComplete(true));
     }
 
@@ -53,12 +53,12 @@ public class Whisper extends FOWSubcommandData {
                 }
                 else
                 {
-                     message = "Attention " + Helper.getPlayerRepresentation(event, player_, true) + "! " + Helper.getPlayerRepresentation(event, player) + " says: " + msg;
+                     message = Helper.getPlayerRepresentation(event, player) + " says: " + msg;
                 }
             }
             else
             {
-                message =  "Attention" + Helper.getPlayerRepresentation(event, player_, true) + "! " + Helper.getPlayerRepresentation(event, player) + " says: " + msg;
+                message = Helper.getPlayerRepresentation(event, player) + " says: " + msg;
             }
         
 
@@ -71,7 +71,7 @@ public class Whisper extends FOWSubcommandData {
                 }
                 else
                 {
-                    success = Helper.getPlayerRepresentation(event, player)+"(You) said: \"" + msg + "\" to " + Helper.getPlayerRepresentation(event, player_);
+                    success = "You sent: \"" + msg + "\" to " + Helper.getPlayerRepresentation(event, player_);
                 }
                 MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
             }
