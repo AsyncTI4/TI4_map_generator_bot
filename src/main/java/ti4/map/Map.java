@@ -50,7 +50,9 @@ public class Map {
     @ExportableField
     private boolean fowMode = false;
     @ExportableField
-    private String largeText = "small";
+    private boolean largeText = false;
+    @ExportableField
+    private boolean medText = false;
     @ExportableField
     private boolean absolMode = false;
     @ExportableField
@@ -239,11 +241,18 @@ public class Map {
         this.fowMode = fowMode;
     }
 
-    public void setLargeText(String largeText) {
+    public void setLargeText(boolean largeText) {
         this.largeText = largeText;
     }
-    public String getLargeText() {
+    public boolean isLargeText() {
         return largeText;
+    }
+
+    public void setMedText(boolean medText) {
+        this.medText = medText;
+    }
+    public boolean isMedText() {
+        return medText;
     }
 
     public boolean isAbsolMode() {
