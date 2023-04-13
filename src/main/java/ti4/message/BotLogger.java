@@ -92,7 +92,7 @@ public class BotLogger {
                 }
             }
         }
-        if (botLogChannel == null || event == null) { //USE PRIMARY SERVER'S BOTLOG CHANNEL
+        if ((botLogChannel == null || event == null) && MapGenerator.guildPrimary != null) { //USE PRIMARY SERVER'S BOTLOG CHANNEL
             for (TextChannel textChannel : MapGenerator.guildPrimary.getTextChannels()) {
                 if ("bot-log".equals(textChannel.getName())) {
                     botLogChannel = textChannel;
