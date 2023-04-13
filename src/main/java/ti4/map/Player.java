@@ -142,10 +142,14 @@ public class Player {
         this.factionAbilities = factionAbilities;
     }
 
+    /**
+     * @param abilityID The ID of the ability - does not check if valid
+     * @see faction_abilities.properties
+     */
     public void addFactionAbility(String abilityID) {
         factionAbilities.add(abilityID);
     }
-    
+
     public void removeFactionAbility(String abilityID) {
         factionAbilities.remove(abilityID);
     }
