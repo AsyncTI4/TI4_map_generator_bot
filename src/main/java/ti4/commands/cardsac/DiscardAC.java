@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 
 public class DiscardAC extends ACCardsSubcommandData {
     public DiscardAC() {
-        super(Constants.DISCARD_AC, "Discard Action Card");
+        super(Constants.DISCARD_AC, "Discard an Action Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
     }
 
@@ -54,6 +54,6 @@ public class DiscardAC extends ACCardsSubcommandData {
         sb.append("Discarded Action Card:").append("\n");
         sb.append(Mapper.getActionCard(acID)).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
+        ACInfo.sendActionCardInfo(activeMap, player);
     }
 }
