@@ -189,21 +189,11 @@ public class Helper {
     }
 
     public static String getColourAsMention(String colour) {
-        return switch (colour) {
-            case "gray" -> "<@&1061551360870453259>";
-            case "red" -> "<@&1061551006019764274>";
-            case "purple" -> "<@&1061551337344614462>";
-            case "pink" -> "<@&1061551925218267166>";
-            case "yellow" -> "<@&1061551266213408788>";
-            case "orange" -> "<@&1061551323616657468>";
-            case "green" -> "<@&1061551347561926716>";
-            case "blue" -> "<@&1061551166397366292>";
-            case "black" -> "<@&1061551792128806962>";
-            default -> "(" + colour + ")";
-        };
+        return getColourAsMention(null, colour);
     }
 
     public static String getColourAsMention(Guild guild, String colour) {
+        if (guild == null) return "@" + colour;
         return getRoleMentionByName(guild, colour);
     }
 
