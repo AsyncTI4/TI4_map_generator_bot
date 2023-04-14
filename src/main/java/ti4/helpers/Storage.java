@@ -18,6 +18,7 @@ public class Storage {
     private static Font TI_FONT_8 = null;
     private static Font TI_FONT_12 = null;
     private static Font TI_FONT_16 = null;
+    private static Font TI_FONT_18 = null;
     private static Font TI_FONT_20 = null;
     private static Font TI_FONT_24 = null;
     private static Font TI_FONT_26 = null;
@@ -51,6 +52,14 @@ public class Storage {
         }
         TI_FONT_16 = getFont(16f);
         return TI_FONT_16;
+    }
+
+    public static Font getFont18() {
+        if (TI_FONT_18 != null) {
+            return TI_FONT_18;
+        }
+        TI_FONT_18 = getFont(18f);
+        return TI_FONT_18;
     }
 
     public static Font getFont20() {
