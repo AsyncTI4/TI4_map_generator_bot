@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 
 public class ShowAC extends ACCardsSubcommandData {
     public ShowAC() {
-        super(Constants.SHOW_AC, "Show Action Card to player");
+        super(Constants.SHOW_AC, "Show an Action Card to one player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
@@ -70,6 +70,5 @@ public class ShowAC extends ACCardsSubcommandData {
             return;
         }
         MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, sb.toString());
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

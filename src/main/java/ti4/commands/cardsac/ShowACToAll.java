@@ -15,7 +15,7 @@ import java.util.LinkedHashMap;
 
 public class ShowACToAll extends ACCardsSubcommandData {
     public ShowACToAll() {
-        super(Constants.SHOW_AC_TO_ALL, "Show Action Card to table");
+        super(Constants.SHOW_AC_TO_ALL, "Show an Action Card to all players");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
     }
 
@@ -59,6 +59,5 @@ public class ShowACToAll extends ACCardsSubcommandData {
             player.setActionCard(acID);
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

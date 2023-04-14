@@ -20,7 +20,7 @@ import java.util.List;
 
 public class SentACRandom extends ACCardsSubcommandData {
     public SentACRandom() {
-        super(Constants.SEND_AC_RANDOM, "Send Action Card to player");
+        super(Constants.SEND_AC_RANDOM, "Send a random Action Card to a player");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
@@ -59,7 +59,7 @@ public class SentACRandom extends ACCardsSubcommandData {
 
         player.removeActionCard(actionCardsMap.get(acID));
         player_.setActionCard(acID);
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player_);
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
+        ACInfo.sendActionCardInfo(activeMap, player_);
+        ACInfo.sendActionCardInfo(activeMap, player);
     }
 }

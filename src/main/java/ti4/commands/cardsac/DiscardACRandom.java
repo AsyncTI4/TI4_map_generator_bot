@@ -17,7 +17,7 @@ import java.util.LinkedHashMap;
 
 public class DiscardACRandom extends ACCardsSubcommandData {
     public DiscardACRandom() {
-        super(Constants.DISCARD_AC_RANDOM, "Discard Random Action Card");
+        super(Constants.DISCARD_AC_RANDOM, "Discard a random Action Card");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to discard, default 1"));
     }
 
@@ -61,6 +61,6 @@ public class DiscardACRandom extends ACCardsSubcommandData {
         }
 
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
+        ACInfo.sendActionCardInfo(activeMap, player);
     }
 }

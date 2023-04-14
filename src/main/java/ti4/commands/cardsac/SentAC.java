@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 
 public class SentAC extends ACCardsSubcommandData {
     public SentAC() {
-        super(Constants.SEND_AC, "Send Action Card to player");
+        super(Constants.SEND_AC, "Send an Action Card to a player");
         addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
@@ -67,7 +67,7 @@ public class SentAC extends ACCardsSubcommandData {
 
         player.removeActionCard(acIndex);
         player_.setActionCard(acID);
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player_);
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
+        ACInfo.sendActionCardInfo(activeMap, player_);
+        ACInfo.sendActionCardInfo(activeMap, player);
     }
 }
