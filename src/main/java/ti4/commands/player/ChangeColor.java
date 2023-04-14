@@ -23,10 +23,6 @@ public class ChangeColor extends PlayerSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-        if (!activeMap.isMapOpen()) {
-            sendMessage("Can do faction setup only when map is open and not locked");
-            return;
-        }
 
         @SuppressWarnings("ConstantConditions")
         String color = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
