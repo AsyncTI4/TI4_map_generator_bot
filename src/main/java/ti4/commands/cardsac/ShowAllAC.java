@@ -14,7 +14,7 @@ import java.util.*;
 
 public class ShowAllAC extends ACCardsSubcommandData {
     public ShowAllAC() {
-        super(Constants.SHOW_ALL_AC, "Show Action Cards to player");
+        super(Constants.SHOW_ALL_AC, "Show all Action Cards one player");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
     }
 
@@ -47,6 +47,5 @@ public class ShowAllAC extends ACCardsSubcommandData {
         }
 
         MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, sb.toString());
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

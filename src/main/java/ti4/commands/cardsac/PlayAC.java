@@ -22,7 +22,7 @@ import ti4.message.MessageHelper;
 
 public class PlayAC extends ACCardsSubcommandData {
     public PlayAC() {
-        super(Constants.PLAY_AC, "Play Action Card");
+        super(Constants.PLAY_AC, "Play an Action Card");
         addOptions(new OptionData(OptionType.STRING, Constants.ACTION_CARD_ID, "Action Card ID that is sent between () or Name/Part of Name").setRequired(true));
     }
 
@@ -124,7 +124,7 @@ public class PlayAC extends ACCardsSubcommandData {
 			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, fowMessage);
 		}
 
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+        ACInfo.sendActionCardInfo(activeMap, player);
         return null;
     }
 }

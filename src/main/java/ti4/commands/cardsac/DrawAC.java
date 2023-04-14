@@ -34,6 +34,6 @@ public class DrawAC extends ACCardsSubcommandData {
         for (int i = 0; i < count; i++) {
             activeMap.drawActionCard(player.getUserID());
         }
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
+        ACInfo.sendActionCardInfo(activeMap, player);
     }
 }
