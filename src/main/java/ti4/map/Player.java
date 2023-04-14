@@ -398,6 +398,42 @@ public class Player {
         this.faction = faction;
         initPNs();
         initLeaders();
+        initAbilities();
+    }
+
+    private void initAbilities() {
+        HashSet<String> abilities = new HashSet<>();
+        for (String ability : getFactionStartingAbilities()) {
+            if (ability.isEmpty() || ability.isBlank()){
+                continue;
+            } else {
+                abilities.add(ability);
+            }
+        }
+        setFactionAbilities(abilities);
+    }
+
+    
+    public String[] getFactionSetupInfo() {
+        String factionSetupInfo = Mapper.getPlayerSetup(faction);
+        if (factionSetupInfo == null) {
+            BotLogger.log("Could not get faction starting abilities for: " + faction);
+            return null;
+        }
+        long count = factionSetupInfo.chars().filter(ch -> ch == ';').count();
+        int expectedTokenCount = 7;
+        if (count != expectedTokenCount) {
+            BotLogger.log("Faction setup raw text is incorrectly formatted (needs " + (expectedTokenCount - 1) + " ; to split properly):\n> " + factionSetupInfo);
+            return null;
+        }
+        String[] setupInfo = factionSetupInfo.split(";");
+        return setupInfo;
+    }
+    
+    private List<String> getFactionStartingAbilities() {
+        String[] factionSetupInfo = getFactionSetupInfo();
+        if(factionSetupInfo == null) return new ArrayList<String>();
+        return Arrays.asList(getFactionSetupInfo()[7].split(","));
     }
 
     public void initLeaders() {
