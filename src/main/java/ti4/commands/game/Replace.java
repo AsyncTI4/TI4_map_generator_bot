@@ -92,5 +92,6 @@ public class Replace extends GameSubcommandData {
         MapSaveLoadManager.reload(map);
         MessageHelper.replyToMessage(event, message);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        Helper.fixGameChannelPermissions(event.getGuild(), map);
     }
 }
