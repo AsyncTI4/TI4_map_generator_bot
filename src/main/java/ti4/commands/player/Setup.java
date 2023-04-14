@@ -13,10 +13,8 @@ import ti4.map.Map;
 import ti4.map.MapStringMapper;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.StringTokenizer;
 
@@ -83,7 +81,6 @@ public class Setup extends PlayerSubcommandData {
             }
         }
         String playerSetup = Mapper.getPlayerSetup(faction);
-
         if (playerSetup == null) {
             sendMessage("Could not setup faction. Report to ADMIN");
             return;
@@ -184,17 +181,6 @@ public class Setup extends PlayerSubcommandData {
             new PlanetAdd().doAction(player, planetResolved, activeMap);
             player.refreshPlanet(planetResolved);
         }
-
-        //STARTING ABILITIES
-        HashSet<String> abilities = new HashSet<>();
-        for (String ability : setupInfo[7].split(",")) {
-            if (ability.isEmpty()){
-                continue;
-            } else {
-                abilities.add(ability);
-            }
-        }
-        player.setFactionAbilities(abilities);
 
         player.getExhaustedPlanets().clear();
 
