@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.FoWHelper;
@@ -19,6 +20,8 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class AutoCompleteProvider {
 
@@ -353,24 +356,21 @@ public class AutoCompleteProvider {
             case Constants.ABILITY -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 HashMap<String, String> abilities = Mapper.getFactionAbilities();
-                abilities.replaceAll((k, v) -> v.substring(0, v.indexOf("|")));
-
-                if (activeMap.isDiscordantStarsMode()) {
-                    List<Command.Choice> options = abilities.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                } else {
-                    List<Command.Choice> options = abilities.entrySet().stream()
-                        .filter(Predicate.not(value -> value.getKey().toLowerCase().startsWith("ds")))
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
-                        .collect(Collectors.toList());
-                    event.replyChoices(options).queue();
-                }
+                abilities.replaceAll((k, v) -> {
+                    int index = v.indexOf("|");
+                    String abilityName = v.substring(0, index);
+                    String factionName = v.substring(index + 1, StringUtils.ordinalIndexOf(v, "|", 2));
+                    factionName = Mapper.getFactionRepresentations().get(factionName);
+                    return factionName + " - " + abilityName;
+                });
+                
+                List<Command.Choice> options = abilities.entrySet().stream()
+                    .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                    .limit(25)
+                    .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+                
             }
         }
     }
