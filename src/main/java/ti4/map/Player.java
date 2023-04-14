@@ -414,7 +414,7 @@ public class Player {
     }
 
     
-    private String[] getFactionSetupInfo() {
+    public String[] getFactionSetupInfo() {
         String factionSetupInfo = Mapper.getPlayerSetup(faction);
         if (factionSetupInfo == null) {
             BotLogger.log("Could not get faction starting abilities for: " + faction);

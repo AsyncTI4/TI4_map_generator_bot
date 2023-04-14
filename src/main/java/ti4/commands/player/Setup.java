@@ -80,13 +80,9 @@ public class Setup extends PlayerSubcommandData {
                 break;
             }
         }
-        String playerSetup = Mapper.getPlayerSetup(faction);
-        if (playerSetup == null) {
-            sendMessage("Could not setup faction. Report to ADMIN");
-            return;
-        }
-        String[] setupInfo = playerSetup.split(";");
 
+        String[] setupInfo = player.getFactionSetupInfo();
+       
         //HOME SYSTEM
         String hsTile = setupInfo[1];
 
