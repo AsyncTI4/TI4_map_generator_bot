@@ -174,6 +174,10 @@ public class Map {
         this.purgedPN.add(purgedPN);
     }
 
+    public void removePurgedPN(String purgedPN){
+        this.purgedPN.remove(purgedPN);
+    }
+
     public void setPurgedPNs(ArrayList<String> purgedPN) {
         this.purgedPN = purgedPN;
     }

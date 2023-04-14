@@ -124,6 +124,7 @@ public class PNCardsCommand implements Command {
         subcommands.add(new SentPN());
         subcommands.add(new PurgePN());
         subcommands.add(new PNInfo());
+        subcommands.add(new PNReset());
         return subcommands;
     }
 
