@@ -696,7 +696,7 @@ public class GenerateMap {
         UnitTokenPosition textPosition = PositionMapper.getReinforcementsPosition(id);
         String text = "pa_reinforcements_numbers_" + reinforcementsCount;
         String colorID = Mapper.getColorID(color);
-        if (colorID.startsWith("ylw") || colorID.startsWith("gry") || colorID.startsWith("org") || colorID.startsWith("pnk")
+        if (colorID.startsWith("ylw") || colorID.startsWith("org") || colorID.startsWith("pnk")
                 || colorID.startsWith("tan") || colorID.startsWith("crm") || colorID.startsWith("sns") || colorID.startsWith("tqs")
                 || colorID.startsWith("gld") || colorID.startsWith("lgy")) {
             text += "_blk.png";
@@ -1828,9 +1828,9 @@ public class GenerateMap {
             case "green":
                 return Color.GREEN;
             case "gray":
-                return Color.GRAY;
+                return new Color(113, 126, 152);
             case "grey":
-                return Color.GRAY;
+                return new Color(113, 126, 152);
             case "orange":
                 return Color.ORANGE;
             case "pink":
@@ -1841,6 +1841,24 @@ public class GenerateMap {
                 return Color.RED;
             case "yellow":
                 return Color.YELLOW;
+            case "petrol":
+                return new Color(62, 128, 133);
+            case "brown":
+                return new Color(112, 78, 42);
+            case "tan":
+                return new Color(180, 168, 121);
+            case "forest":
+                return new Color(93, 151, 102);
+            case "chrome":
+                return new Color(186, 193, 195);
+            case "sunset":
+                return new Color(173, 106, 248);
+            case "torquoise":
+                return new Color(37, 255, 232);
+            case "gold":
+                return new Color(215, 1, 247);
+            case "lightgray":
+                return new Color(213, 213, 213);
             default:
                 return Color.WHITE;
         }
@@ -2364,7 +2382,7 @@ public class GenerateMap {
 
             Color groupUnitColor = Color.WHITE;
             Integer bulkUnitCount = null;
-            if (unitID.startsWith("ylw") || unitID.startsWith("gry") || unitID.startsWith("org") || unitID.startsWith("pnk")
+            if (unitID.startsWith("ylw") || unitID.startsWith("org") || unitID.startsWith("pnk")
                     || unitID.startsWith("tan") || unitID.startsWith("crm") || unitID.startsWith("sns") || unitID.startsWith("tqs")
                     || unitID.startsWith("gld") || unitID.startsWith("lgy")) {
                 groupUnitColor = Color.BLACK;
