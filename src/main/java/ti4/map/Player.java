@@ -418,10 +418,10 @@ public class Player {
     }
 
     public String[] getFactionSetupInfo() {
-        if (faction == null || faction.equals("null")) return null;
+        if (faction == null || faction.equals("null") || faction.equals("keleres")) return null;
         String factionSetupInfo = Mapper.getPlayerSetup(faction);
         if (factionSetupInfo == null) {
-            BotLogger.log("Could not get faction starting abilities for: " + faction);
+            BotLogger.log("Could not get faction setup info for: " + faction);
             return null;
         }
         long count = factionSetupInfo.chars().filter(ch -> ch == ';').count();
