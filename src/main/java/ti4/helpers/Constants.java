@@ -238,6 +238,7 @@ public class Constants {
 
     public static final String GAME = "game";
     public static final String INFO = "info";
+    public static final String PN_RESET = "reset";
     public static final String UNDO = "undo";
     public static final String SET_ORDER = "set_order";
     public static final String PASSED = "passed";

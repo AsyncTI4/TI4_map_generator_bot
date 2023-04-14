@@ -198,6 +198,10 @@ public class Player {
         this.promissoryNotesInPlayArea = promissoryNotesInPlayArea;
     }
 
+    public void setPromissoryNotes(LinkedHashMap<String, Integer> promissoryNotes) {
+        this.promissoryNotes = promissoryNotes;
+    }
+
     public void removePromissoryNotesInPlayArea(String id) {
         promissoryNotesInPlayArea.remove(id);
     }
@@ -513,6 +517,12 @@ public class Player {
             this.color = AliasHandler.resolveColor(color);
         }
         initPNs();
+    }
+
+    public void changeColor(String color) {
+        if (!color.equals("null")) {
+            this.color = AliasHandler.resolveColor(color);
+        }
     }
 
     public void initPNs() {
