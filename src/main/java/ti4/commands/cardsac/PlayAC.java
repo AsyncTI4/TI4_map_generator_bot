@@ -114,10 +114,8 @@ public class PlayAC extends ACCardsSubcommandData {
         Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(Emoji.fromFormatted(Emojis.NoSabotage));
 
         if (acID.contains("sabo")) {
-            // no buttons needed
             MessageHelper.sendMessageToChannel(mainGameChannel, sb.toString());
         } else {
-            // something special
             Button buttons [] = { sabotageButton, noSabotageButton };
             MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, sb.toString(), activeMap, player, buttons);
         }
@@ -126,6 +124,7 @@ public class PlayAC extends ACCardsSubcommandData {
 		if (activeMap.isFoWMode()) {
             String fowMessage = Helper.getPlayerRepresentation(event, player) + " played an Action Card: " + actionCardTitle;
 			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, fowMessage);
+            MessageHelper.sendPrivateMessageToPlayer(player, activeMap, "Played action card: " + actionCardTitle);
 		}
 
         ACInfo.sendActionCardInfo(activeMap, player);
