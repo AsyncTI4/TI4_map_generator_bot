@@ -124,7 +124,9 @@ public class SentPN extends PNCardsSubcommandData {
 
 		// FoW specific pinging
 		if (activeMap.isFoWMode()) {
-			FoWHelper.pingPlayersTransaction(activeMap, event, player, targetPlayer, Emojis.PN + text + "PN", "Scores changed.");
+			String extra = null;
+			if (sendSftT) extra = "Scores changed.";
+			FoWHelper.pingPlayersTransaction(activeMap, event, player, targetPlayer, Emojis.PN + text + "PN", extra);
 		}
 
 		// Turned off, as we might change back

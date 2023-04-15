@@ -57,7 +57,7 @@ public class Announce extends FOWSubcommandData {
             }
 
             MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? event.getChannel() : activeMap.getMainGameChannel();
-            MessageHelper.sendMessageToChannelWithButtons(mainGameChannel, message, null);
+            MessageHelper.sendMessageToChannel(mainGameChannel, message);
         }
     }
     @Override

@@ -424,6 +424,8 @@ public class FoWHelper {
 		List<Player> players = getAdjacentPlayers(activeMap, position);
 		int successfulCount = 0;
 		for (Player player_ : players) {
+			if (!player_.isRealPlayer()) continue;
+			
 			String playerMessage = Helper.getPlayerRepresentation(event, player_, true) + " - System " + position + " has been pinged:\n>>> " + message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			successfulCount += success ? 1 : 0;
@@ -497,6 +499,7 @@ public class FoWHelper {
 		// iterate through the player list. this may result in some extra pings, we'll
 		// sort that out later
 		for (Player player_ : activeMap.getPlayers().values()) {
+			if (!player_.isRealPlayer()) continue;
 			if (player_ == sendingPlayer || player_ == receivingPlayer) continue;
 			attemptCount++;
 
@@ -539,6 +542,7 @@ public class FoWHelper {
 
 	private static boolean initializeAndCheckStatVisibility(Map map, Player player, Player viewer) {
 		if (viewer == player) return false;
+		if (!viewer.isRealPlayer()) return false;
 		initializeFog(map, viewer, false);
 		return FoWHelper.canSeeStatsOfPlayer(map, player, viewer);
 	}
