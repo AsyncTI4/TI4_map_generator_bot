@@ -68,7 +68,7 @@ public class SCPlay extends PlayerSubcommandData {
         message += "Please indicate your choice by pressing a button below and post additional details in the thread.";
 
         String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
-        TextChannel textChannel = event.getChannel().asTextChannel();
+        TextChannel textChannel = (TextChannel) mainGameChannel;
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
 
         Button followButton;
