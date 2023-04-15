@@ -112,10 +112,14 @@ public class PlayAC extends ACCardsSubcommandData {
 
         Button sabotageButton = Button.danger("sabotage", "Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
         Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(Emoji.fromFormatted(Emojis.NoSabotage));
+
         if (acID.contains("sabo")) {
-            MessageHelper.sendMessageToChannelWithButtons(mainGameChannel, sb.toString(), null);
+            // no buttons needed
+            MessageHelper.sendMessageToChannel(mainGameChannel, sb.toString());
         } else {
-            MessageHelper.sendMessageToChannelWithButtons(mainGameChannel, sb.toString(), guild, sabotageButton, noSabotageButton);
+            // something special
+            Button buttons [] = { sabotageButton, noSabotageButton };
+            MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, sb.toString(), activeMap, player, buttons);
         }
         
         //Fog of war ping

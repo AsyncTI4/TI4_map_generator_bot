@@ -9,9 +9,11 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+
 import ti4.MapGenerator;
 import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.helpers.Constants;
@@ -30,25 +32,38 @@ import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class MessageHelper {
+	interface MessageFunction{
+		void run(Message msg);
+	}
 
-	public static void sendMessageToChannel(GenericInteractionCreateEvent event, String messageText,
-			String... reaction) {
+	public static void sendMessageToChannel(GenericInteractionCreateEvent event, String messageText) {
 		if (event.getChannel() instanceof MessageChannel) {
-			splitAndSent(messageText, (MessageChannel) event.getChannel(), event, false, reaction);
+			splitAndSent(messageText, (MessageChannel) event.getChannel(), event, null);
 		}
 	}
 
-	public static void sendMessageToChannelWithButtons(GenericInteractionCreateEvent event, String messageText,
-			Button... buttons) {
+	public static void sendMessageToChannelWithButtons(GenericInteractionCreateEvent event, String messageText, Button[] buttons) {
 		if(event.getChannel() instanceof MessageChannel)
 		{
-			splitAndSent(messageText, (MessageChannel)event.getChannel(), event, null, buttons);
+			splitAndSent(messageText, (MessageChannel)event.getChannel(), event, buttons);
 		}
 	}
 
-	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, Guild guild,
-			Button... buttons) {
-		splitAndSent(messageText, channel, null, guild, buttons);
+	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, Button[] buttons) {
+		splitAndSent(messageText, channel, null, buttons);
+	}
+
+	
+	private static void addFactionReactToMessage(Map activeMap, Player player, Message message) {
+		Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player, message); 
+		if (reactionEmoji != null) {
+			message.addReaction(reactionEmoji).queue();
+		}
+	}
+
+	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Map activeMap, Player player, Button[] buttons) {
+		MessageFunction addFactionReact = (msg) -> addFactionReactToMessage(activeMap, player, msg);
+		splitAndSentWithAction(messageText, channel, null, addFactionReact, buttons);
 	}
 
 	public static void sendMessageToChannel(MessageChannel channel, String messageText) {
@@ -56,7 +71,8 @@ public class MessageHelper {
 	}
 
 	public static void sendMessageToChannelAndPin(MessageChannel channel, String messageText) {
-		splitAndSent(messageText, channel, null, true);
+		MessageFunction pin = (msg) -> msg.pin().queue();
+		splitAndSentWithAction(messageText, channel, null, pin);
 	}
 
 	public static void sendFileToChannel(MessageChannel channel, File file) {
@@ -80,9 +96,7 @@ public class MessageHelper {
 		replyToMessage(event, file, forceShowMap, null, false);
 	}
 
-	public static void replyToMessage(GenericInteractionCreateEvent event, File file, boolean forceShowMap,
-			String messageText, boolean pinMessage) {
-
+	public static void replyToMessage(GenericInteractionCreateEvent event, File file, boolean forceShowMap, String messageText, boolean pinMessage) {
 		try {
 			if (forceShowMap && event.getChannel() instanceof MessageChannel) {
 				sendMessageWithFile((MessageChannel) event.getChannel(), file, messageText, pinMessage);
@@ -115,80 +129,24 @@ public class MessageHelper {
 		}
 		MessageCreateData messageObject = message.addFiles(fileUpload).build();
 		channel.sendMessage(messageObject).queue(x -> {
-			if (pinMessage)
-				x.pin().queue();
+			if (pinMessage) x.pin().queue();
 		});
 	}
 
 	private static void splitAndSent(String messageText, MessageChannel channel) {
-		splitAndSent(messageText, channel, null, false, null, "");
+		splitAndSent(messageText, channel, null, null);
 	}
 
-	private static void splitAndSent(String messageText, MessageChannel channel, GenericInteractionCreateEvent event,
-			Boolean pinMessages, String... reaction) {
-		if (messageText == null || channel == null || messageText.isEmpty()) {
-			// BotLogger.log("`splitAndSent` - `messageText` or `channel` was null");
-			return;
-		}
-
-		Integer messageLength = messageText.length();
-		if (messageLength > 1500) {
-			List<String> texts = new ArrayList<>();
-			int index = 0;
-			while (index < messageLength) {
-				String next1500Chars = messageText.substring(index, Math.min(index + 1500, messageLength));
-				Integer lastNewLineIndex = next1500Chars.lastIndexOf("\n") + 1; // number of chars until right after the
-																				// last \n
-				String textToAdd = "";
-				if (lastNewLineIndex > 0) {
-					textToAdd = next1500Chars.substring(0, lastNewLineIndex);
-					index += lastNewLineIndex;
-				} else {
-					textToAdd = next1500Chars;
-					index += next1500Chars.length();
-				}
-				texts.add(textToAdd);
-			}
-			for (String text : texts) {
-				channel.sendMessage(text).queue(x -> {
-					if (pinMessages)
-						x.pin().queue();
-				});
-			}
-		} else {
-			if (event == null || reaction == null || reaction.length == 0) {
-				channel.sendMessage(messageText).queue(x -> {
-					if (pinMessages)
-						x.pin().queue();
-				});
-			} else {
-				Guild guild = event.getGuild();
-				if (guild != null) {
-					channel.sendMessage(messageText).queue(complete -> {
-						if (pinMessages)
-							complete.pin().queue();
-						for (String reactionID : reaction) {
-							Emoji emoteById = guild.getEmojiById(reactionID);
-							if (emoteById == null) {
-								continue;
-							}
-							complete.addReaction(emoteById).queue();
-						}
-					});
-					return;
-				}
-				channel.sendMessage(messageText).queue(x -> {
-					if (pinMessages)
-						x.pin().queue();
-				});
-			}
-		}
+	private static void splitAndSent(String messageText, MessageChannel channel, GenericInteractionCreateEvent event, Button[] buttons) {
+		splitAndSentWithAction(messageText, channel, event, null, buttons);
 	}
 
-	private static void splitAndSent(String messageText, MessageChannel channel, GenericInteractionCreateEvent event,
-			Guild guild, Button... buttons) {
+	private static void splitAndSentWithAction(String messageText, MessageChannel channel, GenericInteractionCreateEvent event, MessageFunction restAction) {
+		splitAndSentWithAction(messageText, channel, event, restAction, null);
+	}
+
+	private static void splitAndSentWithAction(String messageText, MessageChannel channel, GenericInteractionCreateEvent event, MessageFunction restAction, Button[] buttons) {
 		if (messageText == null || channel == null || messageText.isEmpty()) {
-			// BotLogger.log("`splitAndSent` - `messageText` or `channel` was null");
 			return;
 		}
 
@@ -205,20 +163,20 @@ public class MessageHelper {
 				index += lastNewLineIndex;
 			}
 			for (String text : texts) {
-				channel.sendMessage(text).queue();
+				channel.sendMessage(text).queue(complete -> {
+					if (restAction != null) restAction.run(complete);
+				});
 			}
 		} else {
-			if (event == null && guild == null || buttons == null || buttons.length == 0) {
-				channel.sendMessage(messageText).queue();
+			if (event == null || buttons == null || buttons.length == 0) {
+				channel.sendMessage(messageText).queue(complete -> {
+					if (restAction != null) restAction.run(complete);
+				});
 			} else {
-				Guild guild_ = guild == null ? event.getGuild() : guild;
-				if (guild_ != null) {
-					MessageCreateData message = new MessageCreateBuilder().addContent(messageText)
-							.addComponents(ActionRow.of(buttons)).build();
-					channel.sendMessage(message).queue();
-					return;
-				}
-				channel.sendMessage(messageText).queue();
+				MessageCreateData message = new MessageCreateBuilder().addContent(messageText).addComponents(ActionRow.of(buttons)).build();
+				channel.sendMessage(message).queue(complete -> {
+					if (restAction != null) restAction.run(complete);
+				});
 			}
 		}
 	}
