@@ -168,7 +168,7 @@ public class MessageHelper {
 				});
 			}
 		} else {
-			if (event == null || buttons == null || buttons.length == 0) {
+			if (buttons == null || buttons.length == 0) {
 				channel.sendMessage(messageText).queue(complete -> {
 					if (restAction != null) restAction.run(complete);
 				});
