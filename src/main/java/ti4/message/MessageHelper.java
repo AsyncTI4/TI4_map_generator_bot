@@ -151,18 +151,8 @@ public class MessageHelper {
 		}
 
 		Integer messageLength = messageText.length();
-		if (messageLength > 1500) {
-			List<String> texts = new ArrayList<>();
-			int index = 0;
-			while (index < messageLength) {
-				String next1500Chars = messageText.substring(index, Math.min(index + 1500, messageLength));
-				Integer lastNewLineIndex = next1500Chars.lastIndexOf("\n") + 1; // number of chars until right after the
-																				// last \n
-				String textToAdd = next1500Chars.substring(0, lastNewLineIndex);
-				texts.add(textToAdd);
-				index += lastNewLineIndex;
-			}
-			for (String text : texts) {
+		if (messageLength > 2000) {
+			for (String text : splitLargeText(messageText, 2000)) {
 				channel.sendMessage(text).queue(complete -> {
 					if (restAction != null) restAction.run(complete);
 				});
@@ -279,13 +269,8 @@ public class MessageHelper {
 		if (messageText == null || messageText.isEmpty()) {
 			return;
 		}
-		sendMessageSplitLarge(event, messageText);
-	}
-
-	private static void sendMessageSplitLarge(GenericInteractionCreateEvent event, String messageText) {
 		for (String text : splitLargeText(messageText, 2000)) {
 			if (event.getChannel() instanceof MessageChannelUnion) {
-
 				((MessageChannelUnion) event.getChannel()).sendMessage(text).queue();
 			}
 		}
@@ -324,19 +309,21 @@ public class MessageHelper {
         if (buttons == null) return new ArrayList<MessageCreateData>();
         buttons.removeIf(Objects::isNull);
         List<List<Button>> partitions = ListUtils.partition(buttons, 5);
-        List<ActionRow> actionRows = new ArrayList<>();
+        List<ActionRow> buttonRows = new ArrayList<>();
         for (List<Button> partition : partitions) {
-            actionRows.add(ActionRow.of(partition));
+            buttonRows.add(ActionRow.of(partition));
         }
-        List<List<ActionRow>> partitionActionRows = ListUtils.partition(actionRows, 5);
-        List<MessageCreateData> buttonMessages = new ArrayList<>();
-
-        for (List<ActionRow> partitionActionRow : partitionActionRows) {
-            buttonMessages.add(new MessageCreateBuilder()
-                    .addContent(message)
+        List<List<ActionRow>> partitionedButtonRows = ListUtils.partition(buttonRows, 5);
+        List<MessageCreateData> messagesWithButtons = new ArrayList<>();
+		for (String text : splitLargeText(message, 2000)) {
+			messagesWithButtons.add(new MessageCreateBuilder()
+					.addContent(text).build());
+		}
+        for (List<ActionRow> partitionActionRow : partitionedButtonRows) {
+            messagesWithButtons.add(new MessageCreateBuilder()
                     .addComponents(partitionActionRow).build());
         }
-        return buttonMessages;
+        return messagesWithButtons;
     }
 
 
