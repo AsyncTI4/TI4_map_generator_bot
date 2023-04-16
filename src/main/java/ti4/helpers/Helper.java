@@ -1440,7 +1440,7 @@ public class Helper {
         TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
         if (activeMap.isFoWMode()) actionsChannel = (TextChannel) player.getPrivateChannel();
         if (actionsChannel == null) {
-            BotLogger.log("`Helper.getPlayerCardsInfoThread`: actionsChannel is null");
+            BotLogger.log("`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game: " + activeMap.getName());
             return null;
         }
 
@@ -1458,11 +1458,22 @@ public class Helper {
 
         // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
         List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+        List<ThreadChannel> hiddenCardsInfoThreadChannels = new ArrayList<>();
         for (ThreadChannel threadChannel : hiddenThreadChannels) {
             if (threadChannel.getName().equals(threadName)) {
-                threadChannel.getManager().setArchived(false).complete();
-                return threadChannel;
+                hiddenCardsInfoThreadChannels.add(threadChannel);
+                // threadChannel.getManager().setArchived(false).complete();
+                // return threadChannel;
             }
+        }
+
+        if (hiddenCardsInfoThreadChannels.size() == 1) {
+            return hiddenCardsInfoThreadChannels.get(0);
+        } else if (hiddenCardsInfoThreadChannels.size() > 1) {
+            while (hiddenCardsInfoThreadChannels.size() > 1) {
+                hiddenCardsInfoThreadChannels.remove(0).delete().queue();
+            }
+            return hiddenCardsInfoThreadChannels.get(0);
         }
 
         // CREATE NEW THREAD
