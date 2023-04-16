@@ -99,7 +99,10 @@ public class Setup extends PlayerSubcommandData {
         } else {
             setup = Constants.setup8p;
             is6playerMap = false;
-            if (MapStringMapper.mapFor8Player.contains(positionHS)){
+            if (activeMap.getRingCount() == 8)
+            {
+                useSpecified = true;
+            } else if (MapStringMapper.mapFor8Player.contains(positionHS)){
                 useSpecified = true;
             }
         }
