@@ -46,6 +46,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
@@ -1438,7 +1439,10 @@ public class Helper {
     public static ThreadChannel getPlayerCardsInfoThread(Map activeMap, Player player) {
         TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
         if (activeMap.isFoWMode()) actionsChannel = (TextChannel) player.getPrivateChannel();
-        if (actionsChannel == null) return null;
+        if (actionsChannel == null) {
+            BotLogger.log("`Helper.getPlayerCardsInfoThread`: actionsChannel is null");
+            return null;
+        }
 
         List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
         if (threadChannels == null) return null;
@@ -1447,12 +1451,19 @@ public class Helper {
 
         // SEARCH FOR EXISTING OPEN THREAD
         for (ThreadChannel threadChannel : threadChannels) {
-            if (threadChannel.getName().equals(threadName)) {
+            if (threadChannel.getName().equals(threadName) && !threadChannel.isArchived()) {
                 return threadChannel;
             }
         }
 
-        // TODO: SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+        // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+        List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+        for (ThreadChannel threadChannel : hiddenThreadChannels) {
+            if (threadChannel.getName().equals(threadName)) {
+                threadChannel.getManager().setArchived(false).complete();
+                return threadChannel;
+            }
+        }
 
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
