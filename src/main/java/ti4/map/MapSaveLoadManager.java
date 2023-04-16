@@ -326,6 +326,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + map.isAbsolMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.LARGE_TEXT + " " + map.getLargeText());
+        writer.write(System.lineSeparator());
         writer.write(Constants.DISCORDANT_STARS_MODE + " " + map.isDiscordantStarsMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
@@ -964,6 +966,14 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         map.setFoWMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.LARGE_TEXT -> {
+                    try {
+                        String value = info;
+                        map.setLargeText(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
