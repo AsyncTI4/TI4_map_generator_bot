@@ -373,7 +373,8 @@ public class GenerateMap {
                 xDelta2 += 25;
                 xDelta2 = drawFrags(y + 73, x, yDelta, crf, crfImage, xDelta2);
 
-                xDelta = x + 550 + Math.max(xDelta, xDelta2);
+                xDelta = x + 600;
+                // xDelta = x + 550 + Math.max(xDelta, xDelta2); DISABLE AUTO-SCALE BASED ON AMOUNT OF FRAGS - ALIGNS PLAYERS' LEADERS/PLANETS
                 int yPlayArea = y - 30;
                 y += 85;
                 y += 200;
