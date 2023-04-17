@@ -593,4 +593,5 @@ public class Constants {
     public static final String ABILITY_ADD = "ability_add";
     public static final String ABILITY_REMOVE = "ability_remove";
     public static final String RELIC_LOOK_AT_TOP = "relic_look_at_top";
+    public static final String CARDS_INFO_THREAD_CHANNEL_ID = "cards_info_thread_channel_id";
 }

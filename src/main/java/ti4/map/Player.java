@@ -1,6 +1,9 @@
 package ti4.map;
 
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -62,7 +65,8 @@ public class Player {
     private Role roleForCommunity = null;
     @Nullable
     private MessageChannel privateChannel = null;
-
+    @Nullable
+    private String cardsInfoThreadID = null;
 
     private int crf = 0;
     private int hrf = 0;
@@ -116,6 +120,62 @@ public class Player {
 
     public void setPrivateChannel(MessageChannel privateChannel) {
         this.privateChannel = privateChannel;
+    }
+
+    public String getCardsInfoThreadID() {
+        return cardsInfoThreadID;
+    }
+
+    public void setCardsInfoThreadID(String cardsInfoThreadID) {
+        this.cardsInfoThreadID = cardsInfoThreadID;
+    }
+
+    public ThreadChannel getCardsInfoThread(ti4.map.Map activeMap) {
+        TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
+        if (activeMap.isFoWMode()) actionsChannel = (TextChannel) getPrivateChannel();
+        if (actionsChannel == null) {
+            BotLogger.log("`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game: " + activeMap.getName());
+            return null;
+        }
+
+        String cardsInfoThreadID = getCardsInfoThreadID();
+        if (cardsInfoThreadID != null) {    
+            List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+            if (threadChannels == null) return null;
+
+            ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(cardsInfoThreadID);
+            if (threadChannel != null) return threadChannel;
+            
+            // SEARCH FOR EXISTING OPEN THREAD
+            for (ThreadChannel threadChannel_ : threadChannels) {
+                if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                    setCardsInfoThreadID(threadChannel_.getId());
+                    return threadChannel_;
+                }
+            }
+            
+            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+            List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+            for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                    setCardsInfoThreadID(threadChannel_.getId());
+                    return threadChannel_;
+                }
+            }
+        }
+        
+        // CREATE NEW THREAD
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + getUserName().replaceAll("/", "");
+        //Make card info thread a public thread in community mode
+        boolean isPrivateChannel = !activeMap.isCommunityMode();
+        ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
+        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
+        if (isPrivateChannel) {
+            threadAction.setInvitable(false);
+        }
+        ThreadChannel threadChannel = threadAction.complete();
+        setCardsInfoThreadID(threadChannel.getId());
+        return threadChannel;
     }
 
     public void setUserID(String userID) {

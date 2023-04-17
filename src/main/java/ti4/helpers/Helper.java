@@ -46,6 +46,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.Random;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
@@ -1433,35 +1434,5 @@ public class Helper {
         } catch (Exception e) {
             return null;
         }
-    }
-
-    public static ThreadChannel getPlayerCardsInfoThread(Map activeMap, Player player) {
-        TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
-        if (activeMap.isFoWMode()) actionsChannel = (TextChannel) player.getPrivateChannel();
-        if (actionsChannel == null) return null;
-
-        List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-        if (threadChannels == null) return null;
-
-        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
-
-        // SEARCH FOR EXISTING OPEN THREAD
-        for (ThreadChannel threadChannel : threadChannels) {
-            if (threadChannel.getName().equals(threadName)) {
-                return threadChannel;
-            }
-        }
-
-        // TODO: SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-
-        // CREATE NEW THREAD
-        //Make card info thread a public thread in community mode
-        boolean isPrivateChannel = !activeMap.isCommunityMode();
-        ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
-        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
-        if (isPrivateChannel) {
-            threadAction.setInvitable(false);
-        }
-        return threadAction.complete();
     }
 }

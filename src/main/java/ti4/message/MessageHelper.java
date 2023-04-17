@@ -257,7 +257,7 @@ public class MessageHelper {
      */
     public static void sendMessageToPlayerCardsInfoThread(@NotNull Player player, @NotNull Map activeMap, String messageText) {
         //GET CARDS INFO THREAD
-        ThreadChannel threadChannel = Helper.getPlayerCardsInfoThread(activeMap, player);
+        ThreadChannel threadChannel = player.getCardsInfoThread(activeMap);
         if (threadChannel == null) {
             BotLogger.log("`MessageHelper.sendMessageToPlayerCardsInfoThread` - could not find or create Cards Info thread for player " + player.getUserName() + " in game " + activeMap.getName());
             return;
