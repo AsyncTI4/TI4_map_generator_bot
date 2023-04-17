@@ -141,7 +141,7 @@ public class Player {
         //ATTEMPT TO FIND BY ID
         String cardsInfoThreadID = getCardsInfoThreadID();
         try {
-            if (cardsInfoThreadID != null || !cardsInfoThreadID.isBlank() || !cardsInfoThreadID.isEmpty()) {
+            if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty()) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
                 if (threadChannels == null) return null;
     
@@ -173,7 +173,7 @@ public class Player {
         //ATTEMPT TO FIND BY NAME
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + getUserName().replaceAll("/", "");
         try {
-            if (cardsInfoThreadID != null || !cardsInfoThreadID.isBlank() || !cardsInfoThreadID.isEmpty()) {
+            if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty()) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
                 if (threadChannels == null) return null;
     
