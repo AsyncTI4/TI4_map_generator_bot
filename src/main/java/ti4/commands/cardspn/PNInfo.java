@@ -47,7 +47,7 @@ public class PNInfo extends PNCardsSubcommandData {
         String pnPlayMessage = "_ _\nClick a button below to play a Promissory Note";
         List<Button> pnButtons = getPlayablePNButtons(activeMap, player);
         List<MessageCreateData> messageList = MessageHelper.getMessageObject(pnPlayMessage, pnButtons);
-        ThreadChannel cardsInfoThreadChannel = Helper.getPlayerCardsInfoThread(activeMap, player);
+        ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
         for (MessageCreateData message : messageList) {
             cardsInfoThreadChannel.sendMessage(message).queue();
         }

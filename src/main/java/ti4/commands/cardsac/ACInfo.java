@@ -45,7 +45,7 @@ public class ACInfo extends ACCardsSubcommandData {
         String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
         List<Button> acButtons = getPlayActionCardButtons(activeMap, player);
         List<MessageCreateData> messageList = MessageHelper.getMessageObject(secretScoreMsg, acButtons);
-        ThreadChannel cardsInfoThreadChannel = Helper.getPlayerCardsInfoThread(activeMap, player);
+        ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
         for (MessageCreateData message : messageList) {
             cardsInfoThreadChannel.sendMessage(message).queue();
         }

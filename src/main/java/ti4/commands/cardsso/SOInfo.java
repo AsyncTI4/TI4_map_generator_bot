@@ -45,7 +45,7 @@ public class SOInfo extends SOCardsSubcommandData {
         String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
         List<Button> soButtons = getUnscoredSecretObjectiveButtons(activeMap, player);
         List<MessageCreateData> messageList = MessageHelper.getMessageObject(secretScoreMsg, soButtons);
-        ThreadChannel cardsInfoThreadChannel = Helper.getPlayerCardsInfoThread(activeMap, player);
+        ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
         for (MessageCreateData message : messageList) {
             cardsInfoThreadChannel.sendMessage(message).queue();
         }

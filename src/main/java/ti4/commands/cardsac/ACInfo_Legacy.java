@@ -83,7 +83,7 @@ public class ACInfo_Legacy extends ACCardsSubcommandData {
                 String threadName = CARDS_INFO + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
                 String playerPing = Helper.getPlayerPing(player);
                 
-                ThreadChannel threadChannel = Helper.getPlayerCardsInfoThread(activeMap, player);
+                ThreadChannel threadChannel = player.getCardsInfoThread(activeMap);
                 if (threadChannel == null) {
                     MessageHelper.sendMessageToChannel(channel, "Could not generate card info for " + playerPing);
                     return;
