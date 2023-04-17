@@ -138,34 +138,71 @@ public class Player {
             return null;
         }
 
+        //ATTEMPT TO FIND BY ID
         String cardsInfoThreadID = getCardsInfoThreadID();
-        if (cardsInfoThreadID != null) {    
-            List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-            if (threadChannels == null) return null;
+        try {
+            if (cardsInfoThreadID != null || !cardsInfoThreadID.isBlank() || !cardsInfoThreadID.isEmpty()) {
+                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+                if (threadChannels == null) return null;
+    
+                ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(cardsInfoThreadID);
+                if (threadChannel != null) return threadChannel;
+                
+                // SEARCH FOR EXISTING OPEN THREAD
+                for (ThreadChannel threadChannel_ : threadChannels) {
+                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+                
+                // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using ID: " + cardsInfoThreadID, e);
+        }
 
-            ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(cardsInfoThreadID);
-            if (threadChannel != null) return threadChannel;
-            
-            // SEARCH FOR EXISTING OPEN THREAD
-            for (ThreadChannel threadChannel_ : threadChannels) {
-                if (threadChannel_.getId().equals(cardsInfoThreadID)) {
-                    setCardsInfoThreadID(threadChannel_.getId());
-                    return threadChannel_;
+        //ATTEMPT TO FIND BY NAME
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + getUserName().replaceAll("/", "");
+        try {
+            if (cardsInfoThreadID != null || !cardsInfoThreadID.isBlank() || !cardsInfoThreadID.isEmpty()) {
+                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+                if (threadChannels == null) return null;
+    
+                ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(cardsInfoThreadID);
+                if (threadChannel != null) return threadChannel;
+                
+                // SEARCH FOR EXISTING OPEN THREAD
+                for (ThreadChannel threadChannel_ : threadChannels) {
+                    if (threadChannel_.getName().equals(threadName)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+                
+                // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                    if (threadChannel_.getName().equals(threadName)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
                 }
             }
-            
-            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-            List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
-            for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
-                if (threadChannel_.getId().equals(cardsInfoThreadID)) {
-                    setCardsInfoThreadID(threadChannel_.getId());
-                    return threadChannel_;
-                }
-            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using name: " + threadName, e);
         }
         
         // CREATE NEW THREAD
-        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + getUserName().replaceAll("/", "");
         //Make card info thread a public thread in community mode
         boolean isPrivateChannel = !activeMap.isCommunityMode();
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
