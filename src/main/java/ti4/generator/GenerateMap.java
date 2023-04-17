@@ -2318,7 +2318,7 @@ public class GenerateMap {
                 continue;
             }
             try {
-                float scale = tokenPath.contains(Constants.MIRAGE) ? 1.0f : 0.80f;
+                float scale = 1.0f;// tokenPath.contains(Constants.MIRAGE) ? 1.0f : 0.80f;
                 image = resizeImage(ImageIO.read(new File(tokenPath)), scale);
             } catch (Exception e) {
                 BotLogger.log("Could not parse control token file for: " + tokenID, e);
