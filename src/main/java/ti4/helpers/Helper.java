@@ -1448,33 +1448,36 @@ public class Helper {
         if (threadChannels == null) return null;
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
+        String cardsInfoThreadID = player.getCardsInfoThreadID();
 
         // SEARCH FOR EXISTING OPEN THREAD
         for (ThreadChannel threadChannel : threadChannels) {
-            if (threadChannel.getName().equals(threadName) && !threadChannel.isArchived()) {
+            if (threadChannel.getId().equals(cardsInfoThreadID)) {
+                player.setCardsInfoThreadID(threadChannel.getId());
                 return threadChannel;
             }
         }
 
         // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
         List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
-        List<ThreadChannel> hiddenCardsInfoThreadChannels = new ArrayList<>();
+        // List<ThreadChannel> hiddenCardsInfoThreadChannels = new ArrayList<>();
         for (ThreadChannel threadChannel : hiddenThreadChannels) {
-            if (threadChannel.getName().equals(threadName)) {
-                hiddenCardsInfoThreadChannels.add(threadChannel);
+            if (threadChannel.getId().equals(cardsInfoThreadID)) {
+                // hiddenCardsInfoThreadChannels.add(threadChannel);
                 // threadChannel.getManager().setArchived(false).complete();
-                // return threadChannel;
+                player.setCardsInfoThreadID(threadChannel.getId());
+                return threadChannel;
             }
         }
 
-        if (hiddenCardsInfoThreadChannels.size() == 1) {
-            return hiddenCardsInfoThreadChannels.get(0);
-        } else if (hiddenCardsInfoThreadChannels.size() > 1) {
-            while (hiddenCardsInfoThreadChannels.size() > 1) {
-                hiddenCardsInfoThreadChannels.remove(0).delete().queue();
-            }
-            return hiddenCardsInfoThreadChannels.get(0);
-        }
+        // if (hiddenCardsInfoThreadChannels.size() == 1) {
+        //     return hiddenCardsInfoThreadChannels.get(0);
+        // } else if (hiddenCardsInfoThreadChannels.size() > 1) {
+        //     while (hiddenCardsInfoThreadChannels.size() > 1) {
+        //         hiddenCardsInfoThreadChannels.remove(0).delete().queue();
+        //     }
+        //     return hiddenCardsInfoThreadChannels.get(0);
+        // }
 
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
@@ -1484,6 +1487,8 @@ public class Helper {
         if (isPrivateChannel) {
             threadAction.setInvitable(false);
         }
-        return threadAction.complete();
+        ThreadChannel threadChannel = threadAction.complete();
+        player.setCardsInfoThreadID(threadChannel.getId());
+        return threadChannel;
     }
 }

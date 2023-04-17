@@ -478,6 +478,9 @@ public class MapSaveLoadManager {
             writer.write(Constants.FOW_SYSTEMS + " " + fogOfWarSystems);
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.CARDS_INFO_THREAD_CHANNEL_ID + " " + player.getCardsInfoThreadID());
+            writer.write(System.lineSeparator());
+
             writer.write(ENDPLAYER);
             writer.write(System.lineSeparator());
         }
@@ -1186,6 +1189,7 @@ public class MapSaveLoadManager {
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
             }
         }
     }

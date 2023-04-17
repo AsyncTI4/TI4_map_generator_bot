@@ -62,7 +62,8 @@ public class Player {
     private Role roleForCommunity = null;
     @Nullable
     private MessageChannel privateChannel = null;
-
+    @Nullable
+    private String cardsInfoThreadID = null;
 
     private int crf = 0;
     private int hrf = 0;
@@ -116,6 +117,14 @@ public class Player {
 
     public void setPrivateChannel(MessageChannel privateChannel) {
         this.privateChannel = privateChannel;
+    }
+
+    public String getCardsInfoThreadID() {
+        return cardsInfoThreadID;
+    }
+
+    public void setCardsInfoThreadID(String cardsInfoThreadID) {
+        this.cardsInfoThreadID = cardsInfoThreadID;
     }
 
     public void setUserID(String userID) {
