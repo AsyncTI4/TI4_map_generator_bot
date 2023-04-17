@@ -1,8 +1,14 @@
 package ti4.generator;
 
+import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.utils.ImageProxy;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import ti4.MapGenerator;
 import ti4.ResourceHelper;
 import ti4.helpers.*;
 import ti4.map.Map;
@@ -15,10 +21,12 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -138,7 +146,7 @@ public class GenerateMap {
             if (event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
                 isFoWPrivate = true;
                 Player player = getFowPlayer(map, event);
-                
+
                 // IMPORTANT NOTE : This method used to be local and was refactored to extract
                 // any references to tilesToDisplay
                 fowPlayer = Helper.getGamePlayer(map, player, event, null);
@@ -212,7 +220,7 @@ public class GenerateMap {
         File jpgFile = new File(absolutePath);
         MapFileDeleter.addFileToDelete(jpgFile);
         long time = System.currentTimeMillis() - startup;
-        //BotLogger.log("Image for game: " + map.getName() + " Generation took: " + time + " ms");
+        // BotLogger.log("Image for game: " + map.getName() + " Generation took: " + time + " ms");
         return jpgFile;
     }
 
@@ -239,6 +247,23 @@ public class GenerateMap {
             BotLogger.log("Could not find faction: " + factionID);
         }
         return factionFile;
+    }
+
+    private Image getPlayerDiscordAvatar(Player player) {
+        String userID = player.getUserID();
+        Member member = MapGenerator.guildPrimary.getMemberById(userID);
+        if (member == null) return null;
+        BufferedImage resourceBufferedImage = null;
+        Image image = null;
+        try {
+            ImageProxy avatarProxy = member.getEffectiveAvatar();
+            InputStream inputStream = avatarProxy.download().get();
+            resourceBufferedImage = ImageIO.read(inputStream);
+            image = resourceBufferedImage.getScaledInstance(32, 32, Image.SCALE_FAST);
+        } catch (Exception e) {
+            BotLogger.log("Could not get Avatar", e);
+        }
+        return image;
     }
 
     private void gameInfo(Map map, DisplayType displayType) throws IOException {
@@ -279,12 +304,13 @@ public class GenerateMap {
                     continue;
                 }
 
+                graphics.drawImage(getPlayerDiscordAvatar(player), x, y + 5, null);
                 y += 34;
                 graphics.setFont(Storage.getFont32());
                 Color color = getColor(player.getColor());
                 graphics.setColor(Color.WHITE);
                 String userName = player.getUserName() + ("null".equals(player.getColor()) ? "" : " (" + player.getColor() + ")");
-                graphics.drawString(userName, x, y);
+                graphics.drawString(userName, x + 34, y);
                 if (player.getFaction() == null || "null".equals(player.getColor()) || player.getColor() == null) {
                     continue;
                 }
@@ -2329,7 +2355,7 @@ public class GenerateMap {
 
         boolean isJail = isCabalJail || isNekroJail || isYssarilJail;
         boolean showJail = false;
-        if (fowPlayer == null 
+        if (fowPlayer == null
             || (isCabalJail && FoWHelper.canSeeStatsOfFaction(map, "cabal", fowPlayer))
             || (isNekroJail && FoWHelper.canSeeStatsOfFaction(map, "nekro", fowPlayer))
             || (isYssarilJail && FoWHelper.canSeeStatsOfFaction(map, "yssaril", fowPlayer))
