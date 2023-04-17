@@ -686,18 +686,18 @@ public class Mapper {
     }
 
     public static String getTilesList() {
-        return "__**Tiles:**__\n" + tiles.values().stream()
+        return "__**Tiles:**__\n> " + tiles.values().stream()
                 .sorted()
                 .filter(value -> value instanceof String)
                 .map(value -> (String) value)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining("\n> "));
     }
 
     public static String getPlanetList() {
-        return "__**Planets:**__\n" + AliasHandler.getPlanetList().stream()
+        return "__**Planets:**__\n> " + AliasHandler.getPlanetList().stream()
                 .sorted()
                 .filter(Objects::nonNull)
-                .collect(Collectors.joining(", "));
+                .collect(Collectors.joining("\n> "));
     }
 
     public static String getUnitList() {
