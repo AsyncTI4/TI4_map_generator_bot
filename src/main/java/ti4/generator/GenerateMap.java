@@ -1903,7 +1903,7 @@ public class GenerateMap {
 
             Point positionPoint = PositionMapper.getTilePosition(tile.getPosition(), map);
             if (positionPoint == null) {
-                throw new Exception("Could not map tile to a position on the map");
+                throw new Exception("Could not map tile to a position on the map: " + map.getName());
             }
             int tileX = positionPoint.x + extraWidth;
             int tileY = positionPoint.y;
