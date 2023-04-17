@@ -1435,48 +1435,4 @@ public class Helper {
             return null;
         }
     }
-
-    public static ThreadChannel getPlayerCardsInfoThread(Map activeMap, Player player) {
-        TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
-        if (activeMap.isFoWMode()) actionsChannel = (TextChannel) player.getPrivateChannel();
-        if (actionsChannel == null) {
-            BotLogger.log("`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game: " + activeMap.getName());
-            return null;
-        }
-
-        List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-        if (threadChannels == null) return null;
-
-        String cardsInfoThreadID = player.getCardsInfoThreadID();
-        
-        // SEARCH FOR EXISTING OPEN THREAD
-        for (ThreadChannel threadChannel : threadChannels) {
-            if (threadChannel.getId().equals(cardsInfoThreadID)) {
-                player.setCardsInfoThreadID(threadChannel.getId());
-                return threadChannel;
-            }
-        }
-        
-        // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-        List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
-        for (ThreadChannel threadChannel : hiddenThreadChannels) {
-            if (threadChannel.getId().equals(cardsInfoThreadID)) {
-                player.setCardsInfoThreadID(threadChannel.getId());
-                return threadChannel;
-            }
-        }
-        
-        // CREATE NEW THREAD
-        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
-        //Make card info thread a public thread in community mode
-        boolean isPrivateChannel = !activeMap.isCommunityMode();
-        ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
-        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
-        if (isPrivateChannel) {
-            threadAction.setInvitable(false);
-        }
-        ThreadChannel threadChannel = threadAction.complete();
-        player.setCardsInfoThreadID(threadChannel.getId());
-        return threadChannel;
-    }
 }

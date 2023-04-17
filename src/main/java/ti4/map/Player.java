@@ -1,6 +1,9 @@
 package ti4.map;
 
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -125,6 +128,50 @@ public class Player {
 
     public void setCardsInfoThreadID(String cardsInfoThreadID) {
         this.cardsInfoThreadID = cardsInfoThreadID;
+    }
+
+    public ThreadChannel getCardsInfoThread(ti4.map.Map activeMap) {
+        TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
+        if (activeMap.isFoWMode()) actionsChannel = (TextChannel) getPrivateChannel();
+        if (actionsChannel == null) {
+            BotLogger.log("`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game: " + activeMap.getName());
+            return null;
+        }
+
+        List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+        if (threadChannels == null) return null;
+
+        String cardsInfoThreadID = getCardsInfoThreadID();
+        
+        // SEARCH FOR EXISTING OPEN THREAD
+        for (ThreadChannel threadChannel : threadChannels) {
+            if (threadChannel.getId().equals(cardsInfoThreadID)) {
+                setCardsInfoThreadID(threadChannel.getId());
+                return threadChannel;
+            }
+        }
+        
+        // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+        List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+        for (ThreadChannel threadChannel : hiddenThreadChannels) {
+            if (threadChannel.getId().equals(cardsInfoThreadID)) {
+                setCardsInfoThreadID(threadChannel.getId());
+                return threadChannel;
+            }
+        }
+        
+        // CREATE NEW THREAD
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + getUserName().replaceAll("/", "");
+        //Make card info thread a public thread in community mode
+        boolean isPrivateChannel = !activeMap.isCommunityMode();
+        ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
+        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_3_DAYS);
+        if (isPrivateChannel) {
+            threadAction.setInvitable(false);
+        }
+        ThreadChannel threadChannel = threadAction.complete();
+        setCardsInfoThreadID(threadChannel.getId());
+        return threadChannel;
     }
 
     public void setUserID(String userID) {
