@@ -108,6 +108,7 @@ public class MapGenerator {
         bothelperRoles.removeIf(r -> r == null);
 
 
+
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddTile());
         commandManager.addCommand(new RemoveTile());
