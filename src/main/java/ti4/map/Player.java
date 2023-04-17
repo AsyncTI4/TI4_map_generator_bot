@@ -138,25 +138,29 @@ public class Player {
             return null;
         }
 
-        List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
-        if (threadChannels == null) return null;
-
         String cardsInfoThreadID = getCardsInfoThreadID();
-        
-        // SEARCH FOR EXISTING OPEN THREAD
-        for (ThreadChannel threadChannel : threadChannels) {
-            if (threadChannel.getId().equals(cardsInfoThreadID)) {
-                setCardsInfoThreadID(threadChannel.getId());
-                return threadChannel;
+        if (cardsInfoThreadID != null) {    
+            List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+            if (threadChannels == null) return null;
+
+            ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(cardsInfoThreadID);
+            if (threadChannel != null) return threadChannel;
+            
+            // SEARCH FOR EXISTING OPEN THREAD
+            for (ThreadChannel threadChannel_ : threadChannels) {
+                if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                    setCardsInfoThreadID(threadChannel_.getId());
+                    return threadChannel_;
+                }
             }
-        }
-        
-        // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
-        List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
-        for (ThreadChannel threadChannel : hiddenThreadChannels) {
-            if (threadChannel.getId().equals(cardsInfoThreadID)) {
-                setCardsInfoThreadID(threadChannel.getId());
-                return threadChannel;
+            
+            // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+            List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+            for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                    setCardsInfoThreadID(threadChannel_.getId());
+                    return threadChannel_;
+                }
             }
         }
         
