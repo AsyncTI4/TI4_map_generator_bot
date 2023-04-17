@@ -220,7 +220,7 @@ public class GenerateMap {
         File jpgFile = new File(absolutePath);
         MapFileDeleter.addFileToDelete(jpgFile);
         long time = System.currentTimeMillis() - startup;
-        //BotLogger.log("Image for game: " + map.getName() + " Generation took: " + time + " ms");
+        // BotLogger.log("Image for game: " + map.getName() + " Generation took: " + time + " ms");
         return jpgFile;
     }
 
@@ -252,6 +252,7 @@ public class GenerateMap {
     private Image getPlayerDiscordAvatar(Player player) {
         String userID = player.getUserID();
         Member member = MapGenerator.guildPrimary.getMemberById(userID);
+        if (member == null) return null;
         BufferedImage resourceBufferedImage = null;
         Image image = null;
         try {
@@ -259,15 +260,8 @@ public class GenerateMap {
             InputStream inputStream = avatarProxy.download().get();
             resourceBufferedImage = ImageIO.read(inputStream);
             image = resourceBufferedImage.getScaledInstance(32, 32, Image.SCALE_FAST);
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        } catch (ExecutionException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
+        } catch (Exception e) {
+            BotLogger.log("Could not get Avatar", e);
         }
         return image;
     }
