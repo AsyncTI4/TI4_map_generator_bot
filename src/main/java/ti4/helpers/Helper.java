@@ -1447,9 +1447,8 @@ public class Helper {
         List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
         if (threadChannels == null) return null;
 
-        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
         String cardsInfoThreadID = player.getCardsInfoThreadID();
-
+        
         // SEARCH FOR EXISTING OPEN THREAD
         for (ThreadChannel threadChannel : threadChannels) {
             if (threadChannel.getId().equals(cardsInfoThreadID)) {
@@ -1457,29 +1456,18 @@ public class Helper {
                 return threadChannel;
             }
         }
-
+        
         // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
         List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
-        // List<ThreadChannel> hiddenCardsInfoThreadChannels = new ArrayList<>();
         for (ThreadChannel threadChannel : hiddenThreadChannels) {
             if (threadChannel.getId().equals(cardsInfoThreadID)) {
-                // hiddenCardsInfoThreadChannels.add(threadChannel);
-                // threadChannel.getManager().setArchived(false).complete();
                 player.setCardsInfoThreadID(threadChannel.getId());
                 return threadChannel;
             }
         }
-
-        // if (hiddenCardsInfoThreadChannels.size() == 1) {
-        //     return hiddenCardsInfoThreadChannels.get(0);
-        // } else if (hiddenCardsInfoThreadChannels.size() > 1) {
-        //     while (hiddenCardsInfoThreadChannels.size() > 1) {
-        //         hiddenCardsInfoThreadChannels.remove(0).delete().queue();
-        //     }
-        //     return hiddenCardsInfoThreadChannels.get(0);
-        // }
-
+        
         // CREATE NEW THREAD
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
         //Make card info thread a public thread in community mode
         boolean isPrivateChannel = !activeMap.isCommunityMode();
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
