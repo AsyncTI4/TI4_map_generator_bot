@@ -19,7 +19,8 @@ import java.util.HashMap;
 
 public class Undo extends GameSubcommandData{
     public Undo() {
-        super(Constants.UNDO, "Undo last action");
+        super(Constants.UNDO, "Undo the last action");
+        addOptions(new OptionData(OptionType.STRING, Constants.LATEST_COMMAND, "For Reference Only - Autocomplete should show the last command.").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 
@@ -42,9 +43,9 @@ public class Undo extends GameSubcommandData{
             return;
         }
 
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Undoing the last saved command:\n> " + userActiveMap.getLatestCommand());
+
         MapSaveLoadManager.undo(userActiveMap);
         userActiveMap = MapManager.getInstance().getMap(userActiveMap.getName());
-        File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
-        MessageHelper.replyToMessage(event, file);
     }
 }

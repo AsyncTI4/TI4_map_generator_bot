@@ -372,6 +372,9 @@ public class AutoCompleteProvider {
                 event.replyChoices(options).queue();
                 
             }
+            case Constants.LATEST_COMMAND -> {
+                event.replyChoice(activeMap.getLatestCommand(), Constants.LATEST_COMMAND).queue();
+            }
         }
     }
 }
