@@ -1890,6 +1890,8 @@ public class GenerateMap {
                 return new Color(215, 1, 247);
             case "lightgray":
                 return new Color(213, 213, 213);
+            case "bloodred":
+                return Color.decode("#610808");
             default:
                 return Color.WHITE;
         }
