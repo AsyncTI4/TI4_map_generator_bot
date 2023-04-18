@@ -81,6 +81,10 @@ public class ACInfo_Legacy extends ACCardsSubcommandData {
                 }
 
                 String threadName = CARDS_INFO + activeMap.getName() + "-" + player.getUserName().replaceAll("/", "");
+                if(activeMap.isFoWMode())
+                {
+                    threadName = activeMap.getName() + "-" + "cards-info-"+ player.getUserName().replaceAll("/", "") + "-private";
+                }
                 String playerPing = Helper.getPlayerPing(player);
                 
                 ThreadChannel threadChannel = player.getCardsInfoThread(activeMap);
