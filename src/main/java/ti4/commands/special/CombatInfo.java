@@ -26,6 +26,10 @@ public class CombatInfo extends SpecialSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
+        if (activeMap.isFoWMode()) {
+            sendMessage("This is disabled for FoW for now.");
+            return;
+        }
         for (OptionMapping tileOption : event.getOptions()) {
             if (tileOption == null){
                 continue;
