@@ -270,9 +270,12 @@ public class GenerateMap {
         int widthOfLine = width - 50;
         int y = heightForGameInfo + 60;
         int x = 10;
-        HashMap<String, Player> players = map.getPlayers();
+        List<Player> players = new ArrayList<>(map.getPlayers().values());
         int deltaY = 35;
         int yDelta = 0;
+
+        //TODO: REMOVE THIS - TEMP FIX FOR PBD100 PLAYER AREAS NOT BEING VISIBLE
+        if (map.getName().equals("pbd100")) Collections.shuffle(players);
 
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
@@ -295,7 +298,7 @@ public class GenerateMap {
             g2.setStroke(new BasicStroke(5));
             int realX = x;
             HashMap<String, Integer> unitCount = new HashMap<>();
-            for (Player player : players.values()) {
+            for (Player player : players) {
                 int baseY = y;
                 x = realX;
 
