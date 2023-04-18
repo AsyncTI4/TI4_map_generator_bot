@@ -92,7 +92,7 @@ public class ScorePublic extends StatusSubcommandData {
 	public void reply(SlashCommandInteractionEvent event) {
 		String userID = event.getUser().getId();
 		Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-		MapSaveLoadManager.saveMap(activeMap);
+		MapSaveLoadManager.saveMap(activeMap, event);
 		MessageHelper.replyToMessageTI4Logo(event);
 	}
 }
