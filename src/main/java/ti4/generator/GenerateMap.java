@@ -2415,8 +2415,8 @@ public class GenerateMap {
             Integer bulkUnitCount = null;
             if (unitID.startsWith("ylw") || unitID.startsWith("org") || unitID.startsWith("pnk")
                     || unitID.startsWith("tan") || unitID.startsWith("crm") || unitID.startsWith("sns") || unitID.startsWith("tqs")
-                    || unitID.startsWith("gld") || colorID.startsWith("lme") || colorID.startsWith("lvn") || colorID.startsWith("rse")
-                    || colorID.startsWith("spr") || colorID.startsWith("tea") || unitID.startsWith("lgy")) {
+                    || unitID.startsWith("gld") || unitID.startsWith("lme") || unitID.startsWith("lvn") || unitID.startsWith("rse")
+                    || unitID.startsWith("spr") || unitID.startsWith("tea") || unitID.startsWith("lgy")) {
                 groupUnitColor = Color.BLACK;
             }
             if (unitID.endsWith(Constants.COLOR_FF)) {
