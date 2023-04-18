@@ -54,7 +54,7 @@ public class CombatInfo extends SpecialSubcommandData {
             tileName = " - " + tileName + "[" + tile.getTileID() + "]";
             StringBuilder sb = new StringBuilder();
             StringBuilder sb_roll = new StringBuilder();
-            sb_roll.append("> `/roll roll_command:");
+            sb_roll.append("/roll roll_command:");
             sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
             java.util.Map<String, String> unitRepresentation = Mapper.getUnits();
             HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
@@ -103,15 +103,15 @@ public class CombatInfo extends SpecialSubcommandData {
                             }
                             if (combatNum != "10") {
                                 sb_roll.append(diceRolls).append(baseRoll).append(combatNum).append("?");
-                                sb_roll.append(unitEntry.getValue() + " " + playerColor + " " + unitType + "(s);\n> ");
+                                sb_roll.append(unitEntry.getValue() + " " + playerColor + " " + unitType + "(s);\n");
                             }
                         }
                     }
                 }
             }
-            sb.append(sb_roll);
-            String message = sb.toString();
-            message = StringUtils.removeEnd(message, ";\n> ") + "`";
+            MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+            String message = sb_roll.toString();
+            message = StringUtils.removeEnd(message, ";\n");
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }
     }
