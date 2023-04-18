@@ -45,7 +45,7 @@ public class DrawSpecificSOForPlayer extends AdminSubcommandData {
             sendMessage("SO not retrieved");
             return;
         }
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
         sendMessage("SO sent to user's hand - please check `/ac info`");
     }
 }

@@ -96,7 +96,7 @@ public class FrankenCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }
 
