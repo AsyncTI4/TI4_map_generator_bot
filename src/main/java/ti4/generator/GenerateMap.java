@@ -1239,6 +1239,8 @@ public class GenerateMap {
             Collections.shuffle(players);
         }
 
+        if (map.getName().equals("pbd100")) Collections.shuffle(players);
+
         for (Player player : players) {
             ArrayList<Point> points = PositionMapper.getPlayerPosition(playerPosition, map);
             if (points.isEmpty()) {
