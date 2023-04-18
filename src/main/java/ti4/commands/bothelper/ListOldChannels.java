@@ -52,7 +52,7 @@ public class ListOldChannels extends BothelperSubcommandData {
         StringBuilder sb;
         List<ThreadChannel> threadChannels = guild.getThreadChannels();
         threadChannels = threadChannels.stream()
-                            .filter(c -> c.getLatestMessageIdLong() != 0)
+                            .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
                             .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
                             .limit(channelCount)
                             .toList();
