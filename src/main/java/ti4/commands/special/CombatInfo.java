@@ -1,6 +1,5 @@
 package ti4.commands.special;
 
-import net.dv8tion.jda.api.events.Event;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -15,7 +14,8 @@ import ti4.map.*;
 import ti4.message.MessageHelper;
 
 import java.util.HashMap;
-import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class CombatInfo extends SpecialSubcommandData {
     public CombatInfo() {
@@ -50,16 +50,16 @@ public class CombatInfo extends SpecialSubcommandData {
             tileName = " - " + tileName + "[" + tile.getTileID() + "]";
             StringBuilder sb = new StringBuilder();
             StringBuilder sb_roll = new StringBuilder();
-            sb_roll.append("`");
+            sb_roll.append("> `/roll roll_command:");
             sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
             java.util.Map<String, String> unitRepresentation = Mapper.getUnits();
             HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
             Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
-            String baseRoll = "d10ceo";
+            String baseRoll = "d10hv";
             String playerColor = player.getColor();
             String playerColorKey = getFactionColorId(activeMap, colorToId, playerColor, event);
             sb.append("Possible roll command for combat - modifiers, upgrades, or faction specific units may change these\n");
-            sb.append("BETA - WIP\n");
+            sb.append("Please verify the below command before copy/paste/running it - this is **BETA/WIP**\n");
             for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
                 String name = entry.getKey();
                 UnitHolder unitHolder = entry.getValue();
@@ -99,16 +99,16 @@ public class CombatInfo extends SpecialSubcommandData {
                             }
                             if (combatNum != "10") {
                                 sb_roll.append(diceRolls).append(baseRoll).append(combatNum).append("?");
-                                sb_roll.append(unitEntry.getValue() + " " + playerColor + " " + unitType + "(s);\n");
+                                sb_roll.append(unitEntry.getValue() + " " + playerColor + " " + unitType + "(s);\n> ");
                             }
                         }
                     }
                 }
             }
-            int last = sb_roll.length() - 2;
-            sb_roll.replace(last, last + 2, "`");
-            MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
-            MessageHelper.sendMessageToChannel(event.getChannel(), sb_roll.toString());
+            sb.append(sb_roll);
+            String message = sb.toString();
+            message = StringUtils.removeEnd(message, ";\n> ") + "`";
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }
     }
 
