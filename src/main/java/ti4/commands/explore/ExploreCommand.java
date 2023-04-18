@@ -43,7 +43,7 @@ public class ExploreCommand implements Command {
         }
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
     }
 
     private Collection<ExploreSubcommandData> getSubcommands() {

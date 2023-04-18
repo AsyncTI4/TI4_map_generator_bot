@@ -96,7 +96,7 @@ public class PlayerCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
 
         GenerateMap.getInstance().saveImage(activeMap, event);
     }

@@ -111,7 +111,7 @@ public class ACCardsCommand implements Command {
         }
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
         MessageHelper.replyToMessage(event, "Card action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
     }
 

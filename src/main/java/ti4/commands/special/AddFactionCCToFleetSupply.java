@@ -18,6 +18,6 @@ public class AddFactionCCToFleetSupply extends AddRemoveFactionCCToFromFleet{
         for (String color : colors) {
             player.addMahactCC(color);
         }
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
     }
 }

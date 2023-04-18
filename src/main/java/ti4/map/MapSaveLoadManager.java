@@ -5,6 +5,9 @@ import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
@@ -55,15 +58,33 @@ public class MapSaveLoadManager {
     public static void saveMaps() {
         HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
         for (java.util.Map.Entry<String, Map> mapEntry : mapList.entrySet()) {
-            saveMap(mapEntry.getValue(), true);
+            saveMap(mapEntry.getValue(), true, null);
         }
     }
 
     public static void saveMap(Map map) {
-        saveMap(map, false);
+        saveMap(map, false, null);
     }
 
-    public static void saveMap(Map map, boolean keepModifiedDate) {
+    public static void saveMap(Map map, GenericInteractionCreateEvent event) {
+        saveMap(map, false, event);
+    }
+
+    public static void saveMap(Map map, boolean keepModifiedDate, @Nullable GenericInteractionCreateEvent event) {
+        //ADD COMMAND/BUTTON FOR UNDO INFORMATION
+        if (event != null) {
+            String username = event.getUser().getName();
+            if (event instanceof SlashCommandInteractionEvent) {
+                map.setLatestCommand(username + " used: " + ((SlashCommandInteractionEvent) event).getCommandString());
+            } else if (event instanceof ButtonInteractionEvent) {
+                map.setLatestCommand(username + " pressed button: " + ((ButtonInteractionEvent) event).getButton().getId());   
+            } else {
+                map.setLatestCommand("Last Command Unknown - Not a Slash Command or Button Press");
+            }
+        } else {
+            map.setLatestCommand("Last Command Unknown - No Event Provided");
+        }
+        
         ObjectMapper mapper = new ObjectMapper();
         try {
             mapper.writeValue(Storage.getMapsJSONStorage(map.getName() + JSON), map);
@@ -185,10 +206,14 @@ public class MapSaveLoadManager {
 
         writer.write(map.getMapStatus());
         writer.write(System.lineSeparator());
+        
 
         writer.write(GAMEINFO);
         writer.write(System.lineSeparator());
         //game information
+        writer.write(Constants.LATEST_COMMAND + " " + map.getLatestCommand());
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.SO + " " + String.join(",", map.getSecretObjectives()));
         writer.write(System.lineSeparator());
 
@@ -780,6 +805,7 @@ public class MapSaveLoadManager {
             String identification = tokenizer[0];
             String info = tokenizer[1];
             switch (identification) {
+                case Constants.LATEST_COMMAND -> map.setLatestCommand(info);
                 case Constants.SO -> map.setSecretObjectives(getCardList(info));
                 case Constants.AC -> map.setActionCards(getCardList(info));
                 case Constants.PO1 -> map.setPublicObjectives1(getCardList(info));

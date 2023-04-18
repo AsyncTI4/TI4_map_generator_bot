@@ -264,7 +264,7 @@ public class ButtonListener extends ListenerAdapter {
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
         }
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
     }
 
     private boolean addUsedSCPlayer(String messageID, Map map, Player player, @NotNull ButtonInteractionEvent event, String text) {

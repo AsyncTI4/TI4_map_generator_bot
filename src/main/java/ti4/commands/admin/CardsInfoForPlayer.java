@@ -33,7 +33,7 @@ public class CardsInfoForPlayer extends AdminSubcommandData {
             Player player = activeMap.getPlayer(user.getId());
             ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
         }
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
         sendMessage("Info sent");
     }
 }

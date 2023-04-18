@@ -43,6 +43,6 @@ public class RemoveFogTile extends FOWSubcommandData {
 
         //remove the custom tile from the player
         player.removeFogTile(position);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
     }
 }

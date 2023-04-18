@@ -30,6 +30,8 @@ public class Map {
     private String ownerName = "";
     private String name;
 
+    private String latestCommand = "";
+
     private MiltyDraftManager miltyDraftManager;
 
     private HashMap<String, UnitHolder> planets = new HashMap<>();
@@ -164,6 +166,14 @@ public class Map {
             }
         }
         return returnValue;
+    }
+
+    public String getLatestCommand() {
+        return latestCommand;
+    }
+
+    public void setLatestCommand(String latestCommand) {
+        this.latestCommand = latestCommand;
     }
 
     public MiltyDraftManager getMiltyDraftManager() {

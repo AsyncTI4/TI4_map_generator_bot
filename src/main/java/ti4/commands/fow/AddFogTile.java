@@ -65,6 +65,6 @@ public class AddFogTile extends FOWSubcommandData {
 
         //add the custom tile to the player
         player.addFogTile(planetTileName, position, label);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
     }
 }
