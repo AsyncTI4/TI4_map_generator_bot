@@ -725,7 +725,8 @@ public class GenerateMap {
         String colorID = Mapper.getColorID(color);
         if (colorID.startsWith("ylw") || colorID.startsWith("org") || colorID.startsWith("pnk")
                 || colorID.startsWith("tan") || colorID.startsWith("crm") || colorID.startsWith("sns") || colorID.startsWith("tqs")
-                || colorID.startsWith("gld") || colorID.startsWith("lgy")) {
+                || colorID.startsWith("gld") || colorID.startsWith("lme") || colorID.startsWith("lvn") || colorID.startsWith("rse")
+                || colorID.startsWith("spr") || colorID.startsWith("tea") || colorID.startsWith("lgy")) {
             text += "_blk.png";
         } else {
             text += "_wht.png";
