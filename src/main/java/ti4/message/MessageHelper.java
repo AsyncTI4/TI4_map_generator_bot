@@ -35,6 +35,10 @@ public class MessageHelper {
 		void run(Message msg);
 	}
 
+	public static void sendMessageToChannel(MessageChannel channel, String messageText) {
+		splitAndSent(messageText, channel);
+	}
+	
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
 		splitAndSent(messageText, channel, buttons);
 	}
@@ -51,9 +55,6 @@ public class MessageHelper {
 		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
 	}
 
-	public static void sendMessageToChannel(MessageChannel channel, String messageText) {
-		splitAndSent(messageText, channel);
-	}
 
 	public static void sendMessageToChannelAndPin(MessageChannel channel, String messageText) {
 		MessageFunction pin = (msg) -> msg.pin().queue();
