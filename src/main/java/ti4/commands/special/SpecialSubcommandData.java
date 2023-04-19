@@ -47,6 +47,6 @@ public abstract class SpecialSubcommandData extends SubcommandData {
     }
 
     public void reply(SlashCommandInteractionEvent event) {
-        MessageHelper.replyToMessageTI4Logo(event);
+
     }
 }

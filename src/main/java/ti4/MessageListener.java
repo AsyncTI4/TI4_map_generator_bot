@@ -52,7 +52,6 @@ public class MessageListener extends ListenerAdapter {
             boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName());
             if (!isChannelOK) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Command canceled. Execute command in correct channel, as game name.");
-                MessageHelper.replyToMessageTI4Logo(event);
                 return;
             }
         }

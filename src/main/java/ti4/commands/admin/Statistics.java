@@ -93,7 +93,6 @@ public class Statistics extends AdminSubcommandData {
             }
         }
 
-        MessageHelper.replyToMessageTI4Logo(event);
 
         sendStatistics(event, factionCount, "Faction played:");
         sendStatisticsColor(event, colorCount, "Color played:");

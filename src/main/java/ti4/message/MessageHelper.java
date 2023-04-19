@@ -65,10 +65,6 @@ public class MessageHelper {
 		channel.sendFiles(fileUpload).queue();
 	}
 
-	public static void replyToMessageTI4Logo(GenericInteractionCreateEvent event) {
-		replyToMessage(event, "");
-	}
-
 	public static void replyToMessage(GenericInteractionCreateEvent event, String messageText) {
 		splitAndSent(messageText, event.getMessageChannel());
 	}
@@ -85,7 +81,6 @@ public class MessageHelper {
 		try {
 			if (forceShowMap && event.getChannel() instanceof MessageChannel) {
 				sendMessageWithFile((MessageChannel) event.getChannel(), file, messageText, pinMessage);
-				replyToMessageTI4Logo(event);
 				return;
 			}
 			String gameName = event.getChannel().getName();
@@ -96,7 +91,6 @@ public class MessageHelper {
 					|| activeMap.isFoWMode() && event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
 				if (event.getChannel() instanceof MessageChannel) {
 					sendMessageWithFile((MessageChannel)event.getChannel(), file, messageText, pinMessage);
-					replyToMessageTI4Logo(event);
 				}
 			} else {
 				replyToMessage(event, "Map updated successfully. Use /special system_info to check the systems.");

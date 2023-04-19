@@ -157,6 +157,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
-        MessageHelper.replyToMessageTI4Logo(event);
+
     }
 }
