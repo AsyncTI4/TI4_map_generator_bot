@@ -1184,7 +1184,7 @@ public class Helper {
     }
 
     public static void checkThreadLimitAndArchive(Guild guild) {
-        int threadCount = guild.getThreadChannels().size();
+        long threadCount = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).count();
         int closeCount = GlobalSettings.getSetting("thread_close_count", Integer.class, 25);
 
         if (threadCount >= 975) {
