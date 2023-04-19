@@ -36,7 +36,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(id);
         
-        MessageHelper.sendMessageToChannel(event, Helper.getAgendaRepresentation(id, uniqueID));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getAgendaRepresentation(id, uniqueID));
         String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you will **Play a When** or **Play an After** or not by pressing the buttons below:";
 
         Button playWhen = Button.danger("play_when", "Play When");
@@ -47,10 +47,10 @@ public class RevealAgenda extends AgendaSubcommandData {
         Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromFormatted(Emojis.noafters));
         List<Button> afterButtons = new ArrayList<>(List.of(playAfter, noAfter));
 
-        MessageHelper.sendMessageToChannel(event, text);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
         
-        MessageHelper.sendMessageToChannelWithButtons(event, Emojis.nowhens, whenButtons);
-        MessageHelper.sendMessageToChannelWithButtons(event, Emojis.noafters, afterButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), Emojis.nowhens, whenButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), Emojis.noafters, afterButtons);
         ListVoteCount.turnOrder(event, activeMap);
     }
 }

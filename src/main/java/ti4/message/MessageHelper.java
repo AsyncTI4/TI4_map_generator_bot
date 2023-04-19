@@ -35,23 +35,9 @@ public class MessageHelper {
 		void run(Message msg);
 	}
 
-	public static void sendMessageToChannel(GenericInteractionCreateEvent event, String messageText) {
-		if (event.getChannel() instanceof MessageChannel) {
-			splitAndSent(messageText, (MessageChannel) event.getChannel(), event, null);
-		}
-	}
-
-	public static void sendMessageToChannelWithButtons(GenericInteractionCreateEvent event, String messageText, List<Button> buttons) {
-		if(event.getChannel() instanceof MessageChannel)
-		{
-			splitAndSent(messageText, (MessageChannel)event.getChannel(), event, buttons);
-		}
-	}
-
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
-		splitAndSent(messageText, channel, null, buttons);
+		splitAndSent(messageText, channel, buttons);
 	}
-
 	
 	private static void addFactionReactToMessage(Map activeMap, Player player, Message message) {
 		Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player, message); 
@@ -62,7 +48,7 @@ public class MessageHelper {
 
 	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Map activeMap, Player player, List<Button> buttons) {
 		MessageFunction addFactionReact = (msg) -> addFactionReactToMessage(activeMap, player, msg);
-		splitAndSentWithAction(messageText, channel, null, addFactionReact, buttons);
+		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
 	}
 
 	public static void sendMessageToChannel(MessageChannel channel, String messageText) {
@@ -71,7 +57,7 @@ public class MessageHelper {
 
 	public static void sendMessageToChannelAndPin(MessageChannel channel, String messageText) {
 		MessageFunction pin = (msg) -> msg.pin().queue();
-		splitAndSentWithAction(messageText, channel, null, pin);
+		splitAndSentWithAction(messageText, channel, pin);
 	}
 
 	public static void sendFileToChannel(MessageChannel channel, File file) {
@@ -84,7 +70,7 @@ public class MessageHelper {
 	}
 
 	public static void replyToMessage(GenericInteractionCreateEvent event, String messageText) {
-		replyToSlashCommand(event, messageText);
+		splitAndSent(messageText, event.getMessageChannel());
 	}
 
 	public static void replyToMessage(GenericInteractionCreateEvent event, File file) {
@@ -103,7 +89,7 @@ public class MessageHelper {
 				return;
 			}
 			String gameName = event.getChannel().getName();
-			gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
 			Map activeMap = MapManager.getInstance().getMap(gameName);
 			if (!activeMap.isFoWMode()
@@ -133,24 +119,23 @@ public class MessageHelper {
 	}
 
 	private static void splitAndSent(String messageText, MessageChannel channel) {
-		splitAndSent(messageText, channel, null, null);
+		splitAndSent(messageText, channel, null);
 	}
 
-	private static void splitAndSent(String messageText, MessageChannel channel, GenericInteractionCreateEvent event, List<Button> buttons) {
-		splitAndSentWithAction(messageText, channel, event, null, buttons);
+	private static void splitAndSent(String messageText, MessageChannel channel, List<Button> buttons) {
+		splitAndSentWithAction(messageText, channel, null, buttons);
 	}
 
-	private static void splitAndSentWithAction(String messageText, MessageChannel channel, GenericInteractionCreateEvent event, MessageFunction restAction) {
-		splitAndSentWithAction(messageText, channel, event, restAction, null);
+	private static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction) {
+		splitAndSentWithAction(messageText, channel, restAction, null);
 	}
 
-	private static void splitAndSentWithAction(String messageText, MessageChannel channel, GenericInteractionCreateEvent event, MessageFunction restAction, List<Button> buttons) {
+	private static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction, List<Button> buttons) {
 		if (messageText == null || channel == null || messageText.isEmpty()) {
 			return;
 		}
 
-		Integer messageLength = messageText.length();
-		if (messageLength > 2000) {
+		if (messageText.length() > 2000) {
 			for (String text : splitLargeText(messageText, 2000)) {
 				channel.sendMessage(text).queue(complete -> {
 					if (restAction != null) restAction.run(complete);
@@ -256,23 +241,6 @@ public class MessageHelper {
             threadChannel.sendMessage(text).queue();
         }
     }
-
-	/**
-	 * Sends a basic message to the event channel, handles large text
-	 * 
-	 * @param event
-	 * @param messageText
-	 */
-	public static void replyToSlashCommand(@NotNull GenericInteractionCreateEvent event, String messageText) {
-		if (messageText == null || messageText.isEmpty()) {
-			return;
-		}
-		for (String text : splitLargeText(messageText, 2000)) {
-			if (event.getChannel() instanceof MessageChannelUnion) {
-				((MessageChannelUnion) event.getChannel()).sendMessage(text).queue();
-			}
-		}
-	}
 
 	/**
 	 * Given a text string and a maximum length, will return a List<String> split by

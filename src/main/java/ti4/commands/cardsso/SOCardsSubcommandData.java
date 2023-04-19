@@ -38,7 +38,7 @@ public abstract class SOCardsSubcommandData extends SubcommandData {
      * @param messageText new message
      */
     public void sendMessage(String messageText) {
-        MessageHelper.replyToSlashCommand(event, messageText);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);
     }
     
     abstract public void execute(SlashCommandInteractionEvent event);

@@ -108,7 +108,7 @@ public class Statistics extends AdminSubcommandData {
         factionCount.entrySet().stream()
                 .sorted(java.util.Map.Entry.comparingByValue())
                 .forEach(entry -> sb.append(Helper.getFactionIconFromDiscord(entry.getKey())).append(" - ").append(entry.getValue()).append("\n"));
-        MessageHelper.sendMessageToChannel(event, sb.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
     private static void sendStatisticsColor(SlashCommandInteractionEvent event, HashMap<String, Integer> factionCount, String text) {
@@ -117,7 +117,7 @@ public class Statistics extends AdminSubcommandData {
         factionCount.entrySet().stream()
                 .sorted(java.util.Map.Entry.comparingByValue())
                 .forEach(entry -> sb.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n"));
-        MessageHelper.sendMessageToChannel(event, sb.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
     private class Stats {

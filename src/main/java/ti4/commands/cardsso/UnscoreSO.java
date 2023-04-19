@@ -23,22 +23,22 @@ public class UnscoreSO extends SOCardsSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event, "Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player could not be found");
             return;
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            MessageHelper.sendMessageToChannel(event, "Please select what Secret Objective to unscore");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please select what Secret Objective to unscore");
             return;
         }
 
         boolean scored = activeMap.unscoreSecretObjective(getUser().getId(), option.getAsInt());
         if (!scored) {
-            MessageHelper.sendMessageToChannel(event, "No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Secret Objective ID found, please retry");
             return;
         }
 
-        MessageHelper.sendMessageToChannel(event, "Unscored SO " + option.getAsInt());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Unscored SO " + option.getAsInt());
         ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
     }
 }
