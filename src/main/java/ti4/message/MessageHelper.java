@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -42,14 +41,14 @@ public class MessageHelper {
 		}
 	}
 
-	public static void sendMessageToChannelWithButtons(GenericInteractionCreateEvent event, String messageText, Button[] buttons) {
+	public static void sendMessageToChannelWithButtons(GenericInteractionCreateEvent event, String messageText, List<Button> buttons) {
 		if(event.getChannel() instanceof MessageChannel)
 		{
 			splitAndSent(messageText, (MessageChannel)event.getChannel(), event, buttons);
 		}
 	}
 
-	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, Button[] buttons) {
+	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
 		splitAndSent(messageText, channel, null, buttons);
 	}
 
@@ -61,7 +60,7 @@ public class MessageHelper {
 		}
 	}
 
-	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Map activeMap, Player player, Button[] buttons) {
+	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Map activeMap, Player player, List<Button> buttons) {
 		MessageFunction addFactionReact = (msg) -> addFactionReactToMessage(activeMap, player, msg);
 		splitAndSentWithAction(messageText, channel, null, addFactionReact, buttons);
 	}
@@ -137,7 +136,7 @@ public class MessageHelper {
 		splitAndSent(messageText, channel, null, null);
 	}
 
-	private static void splitAndSent(String messageText, MessageChannel channel, GenericInteractionCreateEvent event, Button[] buttons) {
+	private static void splitAndSent(String messageText, MessageChannel channel, GenericInteractionCreateEvent event, List<Button> buttons) {
 		splitAndSentWithAction(messageText, channel, event, null, buttons);
 	}
 
@@ -145,7 +144,7 @@ public class MessageHelper {
 		splitAndSentWithAction(messageText, channel, event, restAction, null);
 	}
 
-	private static void splitAndSentWithAction(String messageText, MessageChannel channel, GenericInteractionCreateEvent event, MessageFunction restAction, Button[] buttons) {
+	private static void splitAndSentWithAction(String messageText, MessageChannel channel, GenericInteractionCreateEvent event, MessageFunction restAction, List<Button> buttons) {
 		if (messageText == null || channel == null || messageText.isEmpty()) {
 			return;
 		}
@@ -158,7 +157,7 @@ public class MessageHelper {
 				});
 			}
 		} else {
-			if (buttons == null || buttons.length == 0) {
+			if (buttons == null || buttons.size() == 0) {
 				channel.sendMessage(messageText).queue(complete -> {
 					if (restAction != null) restAction.run(complete);
 				});
@@ -182,8 +181,7 @@ public class MessageHelper {
 	 * @param successText Feedback if the message successfully sent
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Map map, SlashCommandInteractionEvent event,
-			String messageText, String failText, String successText) {
+	public static boolean sendPrivateMessageToPlayer(Player player, Map map, SlashCommandInteractionEvent event, String messageText, String failText, String successText) {
 		return sendPrivateMessageToPlayer(player, map, event.getChannel(), messageText, failText, successText);
 	}
 

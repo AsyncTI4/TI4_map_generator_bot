@@ -12,7 +12,9 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public class RevealAgenda extends AgendaSubcommandData {
     public RevealAgenda() {
@@ -39,11 +41,11 @@ public class RevealAgenda extends AgendaSubcommandData {
 
         Button playWhen = Button.danger("play_when", "Play When");
         Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-        Button[] whenButtons = { playWhen, noWhen };
+        List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen));
         
         Button playAfter = Button.danger("play_after", "Play After");
         Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromFormatted(Emojis.noafters));
-        Button[] afterButtons = { playAfter, noAfter };
+        List<Button> afterButtons = new ArrayList<>(List.of(playAfter, noAfter));
 
         MessageHelper.sendMessageToChannel(event, text);
         
