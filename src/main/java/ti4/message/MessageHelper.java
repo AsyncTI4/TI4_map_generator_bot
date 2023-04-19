@@ -303,24 +303,40 @@ public class MessageHelper {
 		return texts;
 	}
 
-    public static List<MessageCreateData> getMessageObject(String message, List<Button> buttons) {
-        if (buttons == null) return new ArrayList<MessageCreateData>();
-        buttons.removeIf(Objects::isNull);
-        List<List<Button>> partitions = ListUtils.partition(buttons, 5);
-        List<ActionRow> buttonRows = new ArrayList<>();
-        for (List<Button> partition : partitions) {
-            buttonRows.add(ActionRow.of(partition));
-        }
-        List<List<ActionRow>> partitionedButtonRows = ListUtils.partition(buttonRows, 5);
-        List<MessageCreateData> messagesWithButtons = new ArrayList<>();
-		for (String text : splitLargeText(message, 2000)) {
-			messagesWithButtons.add(new MessageCreateBuilder()
-					.addContent(text).build());
+    /**
+	 * Example of use:
+	 * <pre>
+	* {@code
+		for (MessageCreateData messageData : getMessageObject(message, buttons)) {
+			channel.sendMessage(messageData).queue();
 		}
-        for (List<ActionRow> partitionActionRow : partitionedButtonRows) {
-            messagesWithButtons.add(new MessageCreateBuilder()
-                    .addComponents(partitionActionRow).build());
-        }
+	* </pre>
+     */
+    public static List<MessageCreateData> getMessageObject(String message, List<Button> buttons) {
+		List<MessageCreateData> messagesWithButtons = new ArrayList<>();
+
+		//ADD MESSAGES
+		if (message != null && !message.isEmpty()) {
+			for (String text : splitLargeText(message, 2000)) {
+				messagesWithButtons.add(new MessageCreateBuilder()
+						.addContent(text).build());
+			}
+		}
+
+		//ADD BUTTONS
+        if (buttons != null && !buttons.isEmpty()) {
+			buttons.removeIf(Objects::isNull);
+			List<List<Button>> partitions = ListUtils.partition(buttons, 5);
+			List<ActionRow> buttonRows = new ArrayList<>();
+			for (List<Button> partition : partitions) {
+				buttonRows.add(ActionRow.of(partition));
+			}
+			List<List<ActionRow>> partitionedButtonRows = ListUtils.partition(buttonRows, 5);
+			for (List<ActionRow> partitionActionRow : partitionedButtonRows) {
+				messagesWithButtons.add(new MessageCreateBuilder()
+						.addComponents(partitionActionRow).build());
+			}
+		}
         return messagesWithButtons;
     }
 
