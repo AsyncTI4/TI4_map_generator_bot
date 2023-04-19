@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils.Null;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -22,6 +23,10 @@ import ti4.message.MessageHelper;
 public class FoWHelper {
 
 	public static Boolean isPrivateGame(GenericInteractionCreateEvent event) {
+		if (event == null)
+		{
+			return null;
+		}
 		return isPrivateGame(null, null, event.getChannel());
 	}
 
