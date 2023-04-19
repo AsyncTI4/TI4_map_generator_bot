@@ -34,11 +34,12 @@ public class ServerLimitStats extends BothelperSubcommandData {
         long categoryChannelCount = channels.stream().filter(c -> c.getType() == ChannelType.CATEGORY).count();
         
         //THREADS
-        List<ThreadChannel> threadChannels = guild.getThreadChannels();
+        List<ThreadChannel> threadChannels = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).toList();
         int threadCount = threadChannels.size(); //1000
+        List<ThreadChannel> threadChannelsArchived = guild.getThreadChannels().stream().filter(c -> c.isArchived()).toList();
+        int threadArchivedCount = threadChannelsArchived.size();
         long cardsInfoThreadCount = threadChannels.stream().filter(t -> t.getName().startsWith("Cards Info")).count();
-        long botThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-bot-")).count();
-        long mapThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-map-")).count();
+        long botThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-bot-map-")).count();
         long scThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-round-")).count();
         long privateThreadCount = threadChannels.stream().filter(t -> !t.isPublic()).count();
         long publicThreadCount = threadChannels.stream().filter(t -> t.isPublic()).count();
@@ -68,10 +69,11 @@ public class ServerLimitStats extends BothelperSubcommandData {
         sb.append("     - ").append(pbdChannelCount).append("   " + getPercentage(pbdChannelCount, channelCount) + "  'pbd' channels").append("\n");
         sb.append("     - ").append(categoryChannelCount).append("   " + getPercentage(categoryChannelCount, channelCount) + "  categories").append("\n");
         sb.append("**").append(threadCount).append(" / 1000" + getPercentage(threadCount, 1000) + " - threads**").append("\n");
+        sb.append("     - ").append(threadArchivedCount).append("   " + threadArchivedCount + " - loaded archived threads").append("\n");
         sb.append("     - ").append(privateThreadCount).append("   " + getPercentage(privateThreadCount, threadCount) + "  private threads").append("\n");
         sb.append("     - ").append(cardsInfoThreadCount).append("   " + getPercentage(cardsInfoThreadCount, threadCount) + "  'Cards Info' threads (/ac info)").append("\n");
         sb.append("     - ").append(publicThreadCount).append("   " + getPercentage(publicThreadCount, threadCount) + "  public threads").append("\n");
-        sb.append("     - ").append(botThreadCount + mapThreadCount).append("   " + getPercentage(botThreadCount + mapThreadCount, threadCount) + "  '-bot-' and '-map-' threads").append("\n");
+        sb.append("     - ").append(botThreadCount).append("   " + getPercentage(botThreadCount, threadCount) + "  '-bot-map-' threads").append("\n");
         sb.append("     - ").append(scThreadCount).append("   " + getPercentage(scThreadCount, threadCount) + "  '-round-' threads (/sc play)").append("\n");
         if (inLimboArchive != null) {
             sb.append("**In Limbo:** ").append(inLimboArchive.getAsMention()).append("\n");
