@@ -728,7 +728,8 @@ public class GenerateMap {
         String colorID = Mapper.getColorID(color);
         if (colorID.startsWith("ylw") || colorID.startsWith("org") || colorID.startsWith("pnk")
                 || colorID.startsWith("tan") || colorID.startsWith("crm") || colorID.startsWith("sns") || colorID.startsWith("tqs")
-                || colorID.startsWith("gld") || colorID.startsWith("lgy")) {
+                || colorID.startsWith("gld") || colorID.startsWith("lme") || colorID.startsWith("lvn") || colorID.startsWith("rse")
+                || colorID.startsWith("spr") || colorID.startsWith("tea") || colorID.startsWith("lgy")) {
             text += "_blk.png";
         } else {
             text += "_wht.png";
@@ -1889,6 +1890,8 @@ public class GenerateMap {
                 return new Color(215, 1, 247);
             case "lightgray":
                 return new Color(213, 213, 213);
+            case "bloodred":
+                return Color.decode("#610808");
             default:
                 return Color.WHITE;
         }
@@ -2414,7 +2417,8 @@ public class GenerateMap {
             Integer bulkUnitCount = null;
             if (unitID.startsWith("ylw") || unitID.startsWith("org") || unitID.startsWith("pnk")
                     || unitID.startsWith("tan") || unitID.startsWith("crm") || unitID.startsWith("sns") || unitID.startsWith("tqs")
-                    || unitID.startsWith("gld") || unitID.startsWith("lgy")) {
+                    || unitID.startsWith("gld") || unitID.startsWith("lme") || unitID.startsWith("lvn") || unitID.startsWith("rse")
+                    || unitID.startsWith("spr") || unitID.startsWith("tea") || unitID.startsWith("lgy")) {
                 groupUnitColor = Color.BLACK;
             }
             if (unitID.endsWith(Constants.COLOR_FF)) {
