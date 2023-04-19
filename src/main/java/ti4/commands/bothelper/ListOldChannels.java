@@ -17,13 +17,13 @@ import ti4.message.MessageHelper;
 public class ListOldChannels extends BothelperSubcommandData {
     public ListOldChannels(){
         super(Constants.LIST_OLD_CHANNELS, "List the oldest 'active' channels. Use to help find dead games to free up channels.");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of channels to list (1 to 100)").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of channels to list (1 to 500)").setRequired(true));
     }
     
     public void execute(SlashCommandInteractionEvent event) {
         Integer channelCount = event.getOption(Constants.COUNT).getAsInt();
-        if (channelCount < 1 || channelCount > 100) {
-            sendMessage("Please choose a number between 1 and 100");
+        if (channelCount < 1 || channelCount > 500) {
+            sendMessage("Please choose a number between 1 and 500");
             return;
         }
         Guild guild = event.getGuild();
