@@ -3,7 +3,6 @@ package ti4.message;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -14,7 +13,6 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import ti4.MapGenerator;
-import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -24,6 +22,7 @@ import ti4.map.Player;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -38,7 +37,7 @@ public class MessageHelper {
 	public static void sendMessageToChannel(MessageChannel channel, String messageText) {
 		splitAndSent(messageText, channel);
 	}
-	
+
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
 		splitAndSent(messageText, channel, buttons);
 	}
@@ -126,24 +125,17 @@ public class MessageHelper {
 	}
 
 	private static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction, List<Button> buttons) {
-		if (messageText == null || channel == null || messageText.isEmpty()) {
+		if (channel == null) {
 			return;
 		}
 
-		if (messageText.length() > 2000) {
-			for (String text : splitLargeText(messageText, 2000)) {
-				channel.sendMessage(text).queue(complete -> {
-					if (restAction != null) restAction.run(complete);
-				});
-			}
-		} else {
-			if (buttons == null || buttons.size() == 0) {
-				channel.sendMessage(messageText).queue(complete -> {
-					if (restAction != null) restAction.run(complete);
-				});
-			} else {
-				MessageCreateData message = new MessageCreateBuilder().addContent(messageText).addComponents(ActionRow.of(buttons)).build();
-				channel.sendMessage(message).queue(complete -> {
+		Iterator<MessageCreateData> iterator = getMessageObject(messageText, buttons).iterator();
+		while (iterator.hasNext()) {
+			MessageCreateData messageCreateData = iterator.next();
+			if (iterator.hasNext()) { //not  message
+				channel.sendMessage(messageCreateData).queue();
+			} else { //last message, do action
+				channel.sendMessage(messageCreateData).queue(complete -> {
 					if (restAction != null) restAction.run(complete);
 				});
 			}
