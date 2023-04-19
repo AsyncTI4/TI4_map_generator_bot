@@ -28,7 +28,6 @@ public class ListOldChannels extends BothelperSubcommandData {
         }
         Guild guild = event.getGuild();
         sendMessage(getOldChannelsMessage(guild, channelCount));
-        sendMessage(getOldThreadsMessage(guild, channelCount));
     }
 
     public static String getOldChannelsMessage(Guild guild, Integer channelCount) {
@@ -46,40 +45,5 @@ public class ListOldChannels extends BothelperSubcommandData {
             sb.append("> `" + latestActivityTime.toString() + " (" + duration.toDays() + " days ago)`  " + channel.getAsMention()).append("\n");
         }
         return sb.toString();
-    }
-
-    public static String getOldThreadsMessage(Guild guild, Integer channelCount) {
-        StringBuilder sb;
-        List<ThreadChannel> threadChannels = guild.getThreadChannels();
-        threadChannels = threadChannels.stream()
-                            .filter(c -> c.getLatestMessageIdLong() != 0 && !c.isArchived())
-                            .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
-                            .limit(channelCount)
-                            .toList();
-        
-        sb = new StringBuilder("Least Active Threads:\n");
-        for (ThreadChannel threadChannel : threadChannels) {
-            OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
-            Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
-            sb.append("> `" + latestActivityTime.toString() + " (" + duration.toHours() + " hours ago)`  " + threadChannel.getAsMention() + " **" + threadChannel.getName() + "** from channel **" + threadChannel.getParentChannel().getName()).append("**\n");
-        }
-        return sb.toString();
-    }
-
-    public static String getHowOldOldestThreadIs(Guild guild) {
-        List<ThreadChannel> threadChannels = guild.getThreadChannels();
-        threadChannels = threadChannels.stream()
-                            .filter(c -> c.getLatestMessageIdLong() != 0)
-                            .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
-                            .limit(1)
-                            .toList();
-        
-        String durationText = "";
-        for (ThreadChannel threadChannel : threadChannels) {
-            OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
-            Duration duration = Duration.between(latestActivityTime.toLocalDateTime(), OffsetDateTime.now().toLocalDateTime());
-            durationText =  duration.toHours() + " hours old";
-        }
-        return durationText;
     }
 }
