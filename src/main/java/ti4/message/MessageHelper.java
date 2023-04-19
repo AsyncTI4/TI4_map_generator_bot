@@ -129,7 +129,7 @@ public class MessageHelper {
 			return;
 		}
 
-		Iterator<MessageCreateData> iterator = getMessageObject(messageText, buttons).iterator();
+		Iterator<MessageCreateData> iterator = getMessageCreateDataObjects(messageText, buttons).iterator();
 		while (iterator.hasNext()) {
 			MessageCreateData messageCreateData = iterator.next();
 			if (iterator.hasNext()) { //not  message
@@ -267,13 +267,13 @@ public class MessageHelper {
 		}
 	* </pre>
      */
-    public static List<MessageCreateData> getMessageObject(String message, List<Button> buttons) {
-		List<MessageCreateData> messagesWithButtons = new ArrayList<>();
+    public static List<MessageCreateData> getMessageCreateDataObjects(String message, List<Button> buttons) {
+		List<MessageCreateData> messageCreateDataList = new ArrayList<>();
 
 		//ADD MESSAGES
 		if (message != null && !message.isEmpty()) {
 			for (String text : splitLargeText(message, 2000)) {
-				messagesWithButtons.add(new MessageCreateBuilder()
+				messageCreateDataList.add(new MessageCreateBuilder()
 						.addContent(text).build());
 			}
 		}
@@ -288,11 +288,11 @@ public class MessageHelper {
 			}
 			List<List<ActionRow>> partitionedButtonRows = ListUtils.partition(buttonRows, 5);
 			for (List<ActionRow> partitionActionRow : partitionedButtonRows) {
-				messagesWithButtons.add(new MessageCreateBuilder()
+				messageCreateDataList.add(new MessageCreateBuilder()
 						.addComponents(partitionActionRow).build());
 			}
 		}
-        return messagesWithButtons;
+        return messageCreateDataList;
     }
 
 
