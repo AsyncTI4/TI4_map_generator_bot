@@ -6,13 +6,11 @@ import java.util.List;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.utils.TimeUtil;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
 
 public class ListOldChannels extends BothelperSubcommandData {
     public ListOldChannels(){
