@@ -377,7 +377,7 @@ public class AutoCompleteProvider {
                 if (activeMap.isFoWMode()) { //!event.getUser().getID().equals(activeMap.getGMID()); //TODO: Validate that the user running the command is the FoW GM, if so, display command.
                     latestCommand = "Game is Fog of War mode - last command is hidden."; 
                 } else {
-                    latestCommand = activeMap.getLatestCommand();
+                    latestCommand = StringUtils.left(activeMap.getLatestCommand(), 100);
                 }
                 event.replyChoice(latestCommand, Constants.LATEST_COMMAND).queue();
             }
