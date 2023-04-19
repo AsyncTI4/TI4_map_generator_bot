@@ -29,6 +29,7 @@ import ti4.ResourceHelper;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldChannels;
+import ti4.commands.bothelper.ListOldThreads;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
 import ti4.map.*;
@@ -1183,15 +1184,15 @@ public class Helper {
     }
 
     public static void checkThreadLimitAndArchive(Guild guild) {
-        int threadCount = guild.getThreadChannels().size();
-        int closeCount = GlobalSettings.getSetting("thread_close_count", Integer.class, 10);
+        long threadCount = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).count();
+        int closeCount = GlobalSettings.getSetting("thread_close_count", Integer.class, 25);
 
-        if (threadCount >= 980) {
+        if (threadCount >= 975) {
             BotLogger.log("`Helper.checkThreadLimitAndArchive:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
             if(false) { // Here to keep in case it's needed.
-                BotLogger.log(ListOldChannels.getOldThreadsMessage(guild, closeCount));
+                BotLogger.log(ListOldThreads.getOldThreadsMessage(guild, closeCount));
             } else {
-                BotLogger.log("> The oldest thread was " + ListOldChannels.getHowOldOldestThreadIs(guild));
+                BotLogger.log("> The oldest thread was " + ListOldThreads.getHowOldOldestThreadIs(guild));
             }
             ArchiveOldThreads.archiveOldThreads(guild, closeCount);
         }

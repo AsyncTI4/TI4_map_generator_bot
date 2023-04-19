@@ -33,8 +33,8 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        if (!player.getFaction().equalsIgnoreCase("keleres")) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player is not playing the faction *'Council of Keleres'*");
+        if (!(player.getFaction().equalsIgnoreCase("keleresm") || player.getFaction().equalsIgnoreCase("keleres"))) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player is not playing the faction *'Council of Keleres - Mentak'*");
             return;
         }
         Integer originalACDeckCount = activeMap.getActionCards().size();
