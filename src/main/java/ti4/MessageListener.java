@@ -127,10 +127,7 @@ public class MessageListener extends ListenerAdapter {
         }
         if (msg.getContentRaw().startsWith("tored") || msg.getContentRaw().startsWith("topurple")
         || msg.getContentRaw().startsWith("toblue") || msg.getContentRaw().startsWith("toyellow") 
-        || msg.getContentRaw().startsWith("toorange") || msg.getContentRaw().startsWith("togreen") ||
-           msg.getContentRaw().startsWith("Tored") || msg.getContentRaw().startsWith("Topurple")
-        || msg.getContentRaw().startsWith("Toblue") || msg.getContentRaw().startsWith("Toyellow") 
-        || msg.getContentRaw().startsWith("Toorange") || msg.getContentRaw().startsWith("Togreen")) {
+        || msg.getContentRaw().startsWith("toorange") || msg.getContentRaw().startsWith("togreen")) {
             
             String gameName = event.getChannel().getName();
 			gameName = gameName.substring(0, gameName.indexOf("-"));
