@@ -59,12 +59,12 @@ public class Info extends GameSubcommandData{
         sb.append("Game player count: " + map.getPlayerCountForMap()).append(NEW_LINE);
         if (privateGame == null || privateGame == false) {
             sb.append("Players: ").append(NEW_LINE);
-            HashMap<String, Player> players = map.getPlayers();
+            HashMap<String, Player> mapPlayers = map.getPlayers();
             int index = 1;
-            ArrayList<Player> playerNames = new ArrayList<>(players.values());
-            for (Player value : playerNames) {
-                if (value.getFaction() != null) {
-                    sb.append(index).append(". ").append(value.getUserName()).append(Helper.getFactionIconFromDiscord(value.getFaction())).append(NEW_LINE);
+            ArrayList<Player> players = new ArrayList<>(mapPlayers.values());
+            for (Player player : players) {
+                if (player.getFaction() != null) {
+                    sb.append("> `").append(index).append(".` ").append(player.getUserName()).append(Helper.getFactionIconFromDiscord(player.getFaction())).append(Helper.getColourAsMention(event.getGuild(), player.getColor())).append(NEW_LINE);
                     index++;
                 }
             }

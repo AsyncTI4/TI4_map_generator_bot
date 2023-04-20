@@ -15,6 +15,10 @@ public class Storage {
     public static final String MAPS_JSON = "/maps_json/";
     public static final String DELETED_MAPS = "/deletedmaps/";
     public static final String TTPG_EXPORTS = "/ttpg_exports/";
+    private static Font TI_FONT_8 = null;
+    private static Font TI_FONT_12 = null;
+    private static Font TI_FONT_16 = null;
+    private static Font TI_FONT_18 = null;
     private static Font TI_FONT_20 = null;
     private static Font TI_FONT_24 = null;
     private static Font TI_FONT_26 = null;
@@ -22,8 +26,41 @@ public class Storage {
     private static Font TI_FONT_30 = null;
     private static Font TI_FONT_32 = null;
     private static Font TI_FONT_35 = null;
+    private static Font TI_FONT_40 = null;
     private static Font TI_FONT_50 = null;
     private static Font TI_FONT_64 = null;
+
+    public static Font getFont8() {
+        if (TI_FONT_8 != null) {
+            return TI_FONT_8;
+        }
+        TI_FONT_8 = getFont(8f);
+        return TI_FONT_8;
+    }
+
+    public static Font getFont12() {
+        if (TI_FONT_12 != null) {
+            return TI_FONT_12;
+        }
+        TI_FONT_12 = getFont(12f);
+        return TI_FONT_12;
+    }
+
+    public static Font getFont16() {
+        if (TI_FONT_16 != null) {
+            return TI_FONT_16;
+        }
+        TI_FONT_16 = getFont(16f);
+        return TI_FONT_16;
+    }
+
+    public static Font getFont18() {
+        if (TI_FONT_18 != null) {
+            return TI_FONT_18;
+        }
+        TI_FONT_18 = getFont(18f);
+        return TI_FONT_18;
+    }
 
     public static Font getFont20() {
         if (TI_FONT_20 != null) {
@@ -87,6 +124,14 @@ public class Storage {
         return TI_FONT_64;
     }
 
+    public static Font getFont40() {
+        if (TI_FONT_40 != null) {
+            return TI_FONT_40;
+        }
+        TI_FONT_40 = getFont(40f);
+        return TI_FONT_40;
+    }
+
     public static Font getFont50() {
         if (TI_FONT_50 != null) {
             return TI_FONT_50;
@@ -104,7 +149,7 @@ public class Storage {
             tiFont = Font.createFont(Font.TRUETYPE_FONT, inputStream);
             tiFont = tiFont.deriveFont(size);
         } catch (Exception e) {
-            BotLogger.log("Could not load font");
+            BotLogger.log("Could not load font", e);
         }
         return tiFont;
     }

@@ -39,13 +39,16 @@ public class RevealAgenda extends AgendaSubcommandData {
 
         Button playWhen = Button.danger("play_when", "Play When");
         Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-
+        Button[] whenButtons = { playWhen, noWhen };
+        
         Button playAfter = Button.danger("play_after", "Play After");
         Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromFormatted(Emojis.noafters));
+        Button[] afterButtons = { playAfter, noAfter };
 
         MessageHelper.sendMessageToChannel(event, text);
-        MessageHelper.sendMessageToChannelWithButtons(event, Emojis.nowhens, playWhen, noWhen);
-        MessageHelper.sendMessageToChannelWithButtons(event, Emojis.noafters, playAfter, noAfter);
+        
+        MessageHelper.sendMessageToChannelWithButtons(event, Emojis.nowhens, whenButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event, Emojis.noafters, afterButtons);
         ListVoteCount.turnOrder(event, activeMap);
     }
 }

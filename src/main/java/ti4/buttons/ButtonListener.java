@@ -11,8 +11,8 @@ import net.dv8tion.jda.api.requests.RestAction;
 import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
 import ti4.MessageListener;
-import ti4.commands.cards.CardsInfo;
-import ti4.commands.cards.PlayAC;
+import ti4.commands.cardsac.ACInfo_Legacy;
+import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.status.ScorePublic;
 import ti4.helpers.Constants;
@@ -45,7 +45,7 @@ public class ButtonListener extends ListenerAdapter {
         String messageID = event.getMessage().getId();
 
         String gameName = event.getChannel().getName();
-        gameName = gameName.replace(CardsInfo.CARDS_INFO, "");
+        gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
         gameName = gameName.substring(0, gameName.indexOf("-"));
         Map activeMap = MapManager.getInstance().getMap(gameName);
         Player player = activeMap.getPlayer(id);
@@ -56,11 +56,10 @@ public class ButtonListener extends ListenerAdapter {
         }
 
         MessageChannel privateChannel = event.getChannel();
-        boolean inform = true;
         if (activeMap.isFoWMode()) {
             if (player.getPrivateChannel() == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Private channels are not set up for this game. Messages will be suppressed.");
-                inform = false;
+                privateChannel = null;
             } else {
                 privateChannel = player.getPrivateChannel();
             }
@@ -90,12 +89,12 @@ public class ButtonListener extends ListenerAdapter {
 
             if (channel != null) {
                 try {
-                    String error = PlayAC.playAC(null, activeMap, player, acID, channel, event.getGuild(), event);
+                    String error = PlayAC.playAC(event, activeMap, player, acID, channel, event.getGuild());
                     if (error != null) {
                         event.getChannel().sendMessage(error).queue();
                     }
                 } catch (Exception e) {
-                    BotLogger.log(event, "Could not parse AC ID: " + acID);
+                    BotLogger.log(event, "Could not parse AC ID: " + acID, e);
                     event.getChannel().asThreadChannel().sendMessage("Could not parse AC ID: " + acID + " Please play manually.").queue();
                     return;
                 }
@@ -116,9 +115,9 @@ public class ButtonListener extends ListenerAdapter {
             if (channel != null) {
                 try {
                     int soIndex = Integer.parseInt(soID);
-                    ScoreSO.scoreSO(activeMap, player, soIndex, channel, event);
+                    ScoreSO.scoreSO(event, activeMap, player, soIndex, channel);
                 } catch (Exception e) {
-                    BotLogger.log(event, "Could not parse SO ID: " + soID);
+                    BotLogger.log(event, "Could not parse SO ID: " + soID, e);
                     event.getChannel().sendMessage("Could not parse SO ID: " + soID + " Please Score manually.").queue();
                     return;
                 }
@@ -129,10 +128,10 @@ public class ButtonListener extends ListenerAdapter {
             String poID = buttonID.replace(Constants.PO_SCORING, "");
             try {
                 int poIndex = Integer.parseInt(poID);
-                ScorePublic.scorePO(event, privateChannel, activeMap, player, poIndex, inform);
+                ScorePublic.scorePO(event, privateChannel, activeMap, player, poIndex);
                 addReaction(event, false, false, null, "");
             } catch (Exception e) {
-                BotLogger.log("Could not parse PO ID: " + poID);
+                BotLogger.log(event, "Could not parse PO ID: " + poID, e);
                 event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.").queue();
                 return;
             }
@@ -178,7 +177,7 @@ public class ButtonListener extends ListenerAdapter {
                     for (int i = 0; i < count; i++) {
                         activeMap.drawActionCard(player.getUserID());
                     }
-                    CardsInfo.sentUserCardInfo(null, activeMap, player, event);
+                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_draw_so" -> {
@@ -188,7 +187,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String message = "Drew Secret Objective";
                     activeMap.drawSecretObjective(player.getUserID());
-                    CardsInfo.sentUserCardInfo(null, activeMap, player, event);
+                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_follow_trade" -> {
@@ -265,7 +264,7 @@ public class ButtonListener extends ListenerAdapter {
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
         }
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
     }
 
     private boolean addUsedSCPlayer(String messageID, Map map, Player player, @NotNull ButtonInteractionEvent event, String text) {
@@ -317,7 +316,7 @@ public class ButtonListener extends ListenerAdapter {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), userID);
-        if (player == null || !player.isActivePlayer()) {
+        if (player == null || !player.isRealPlayer()) {
             event.getChannel().sendMessage("You're not an active player of the game").queue();
             return;
         }
@@ -382,7 +381,7 @@ public class ButtonListener extends ListenerAdapter {
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         int matchingFactionReactions = 0;
         for (Player player : activeMap.getPlayers().values()) {
-            if (!player.isActivePlayer()) {
+            if (!player.isRealPlayer()) {
                 matchingFactionReactions++;
                 continue;
             }

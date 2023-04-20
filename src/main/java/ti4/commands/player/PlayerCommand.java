@@ -96,7 +96,7 @@ public class PlayerCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
 
         GenerateMap.getInstance().saveImage(activeMap, event);
     }
@@ -117,6 +117,8 @@ public class PlayerCommand implements Command {
         subcommands.add(new TechRemove());
         subcommands.add(new TechExhaust());
         subcommands.add(new TechRefresh());
+        subcommands.add(new TechInfo());
+        subcommands.add(new AbilityInfo());
         subcommands.add(new Turn());
         subcommands.add(new SCPick());
         subcommands.add(new PlanetAdd());
@@ -130,6 +132,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new Speaker());
         subcommands.add(new SendTG());
         subcommands.add(new SendCommodities());
+        subcommands.add(new ChangeColor());
         return subcommands;
     }
 

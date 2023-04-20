@@ -1,6 +1,9 @@
 package ti4.map;
 
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -8,11 +11,13 @@ import ti4.MapGenerator;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.message.BotLogger;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.*;
 
 public class Player {
@@ -34,11 +39,13 @@ public class Player {
     private int tg = 0;
     private int commodities = 0;
     private int commoditiesTotal = 0;
+    private int stasisInfantry = 0;
 
     private LinkedHashMap<String, Integer> actionCards = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> promissoryNotes = new LinkedHashMap<>();
+    private HashSet<String> factionAbilities = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
     private List<String> exhaustedTechs = new ArrayList<>();
@@ -52,12 +59,14 @@ public class Player {
     private HashMap<String,String> fow_seenTiles = new HashMap<>();
     private HashMap<String,String> fow_customLabels = new HashMap<>();
     private String fowFogFilter = null;
+    private boolean fogInitialized = false;
 
     @Nullable
     private Role roleForCommunity = null;
     @Nullable
     private MessageChannel privateChannel = null;
-
+    @Nullable
+    private String cardsInfoThreadID = null;
 
     private int crf = 0;
     private int hrf = 0;
@@ -113,6 +122,104 @@ public class Player {
         this.privateChannel = privateChannel;
     }
 
+    public String getCardsInfoThreadID() {
+        return cardsInfoThreadID;
+    }
+
+    public void setCardsInfoThreadID(String cardsInfoThreadID) {
+        this.cardsInfoThreadID = cardsInfoThreadID;
+    }
+
+    public ThreadChannel getCardsInfoThread(ti4.map.Map activeMap) {
+        TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
+        if (activeMap.isFoWMode()) actionsChannel = (TextChannel) getPrivateChannel();
+        if (actionsChannel == null) {
+            BotLogger.log("`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game: " + activeMap.getName());
+            return null;
+        }
+
+        String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + getUserName().replaceAll("/", "");
+        if(activeMap.isFoWMode())
+            {
+                threadName = activeMap.getName() + "-" + "cards-info-"+ getUserName().replaceAll("/", "") + "-private";
+            }
+
+        //ATTEMPT TO FIND BY ID
+        String cardsInfoThreadID = getCardsInfoThreadID();
+        try {
+            if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !cardsInfoThreadID.equals("null")) {
+                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+                if (threadChannels == null) return null;
+    
+                ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(cardsInfoThreadID);
+                if (threadChannel != null) return threadChannel;
+                
+                // SEARCH FOR EXISTING OPEN THREAD
+                for (ThreadChannel threadChannel_ : threadChannels) {
+                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+                
+                // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                    if (threadChannel_.getId().equals(cardsInfoThreadID)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using ID: " + cardsInfoThreadID + " for potential thread name: " + threadName, e);
+        }
+
+        //ATTEMPT TO FIND BY NAME
+        try {
+            if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !cardsInfoThreadID.equals("null")) {
+                List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
+                if (threadChannels == null) return null;
+    
+                ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(cardsInfoThreadID);
+                if (threadChannel != null) return threadChannel;
+                
+                // SEARCH FOR EXISTING OPEN THREAD
+                for (ThreadChannel threadChannel_ : threadChannels) {
+                    if (threadChannel_.getName().equals(threadName)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+                
+                // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
+                List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
+                for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
+                    if (threadChannel_.getName().equals(threadName)) {
+                        setCardsInfoThreadID(threadChannel_.getId());
+                        return threadChannel_;
+                    }
+                }
+            }
+        } catch (Exception e) {
+            // TODO: handle exception
+            BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using name: " + threadName, e);
+        }
+        
+        // CREATE NEW THREAD
+        //Make card info thread a public thread in community mode
+        boolean isPrivateChannel = !activeMap.isCommunityMode();
+        ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
+        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
+        if (isPrivateChannel) {
+            threadAction.setInvitable(false);
+        }
+        ThreadChannel threadChannel = threadAction.complete();
+        setCardsInfoThreadID(threadChannel.getId());
+        return threadChannel;
+    }
+
     public void setUserID(String userID) {
         this.userID = userID;
     }
@@ -127,6 +234,26 @@ public class Player {
 
     public void setPassed(boolean passed) {
         this.passed = passed;
+    }
+
+    public HashSet<String> getFactionAbilities() {
+        return factionAbilities;
+    }
+
+    public void setFactionAbilities(HashSet<String> factionAbilities) {
+        this.factionAbilities = factionAbilities;
+    }
+
+    /**
+     * @param abilityID The ID of the ability - does not check if valid
+     * @see faction_abilities.properties
+     */
+    public void addFactionAbility(String abilityID) {
+        factionAbilities.add(abilityID);
+    }
+
+    public void removeFactionAbility(String abilityID) {
+        factionAbilities.remove(abilityID);
     }
 
     public LinkedHashMap<String, Integer> getActionCards() {
@@ -170,7 +297,17 @@ public class Player {
     }
 
     public void setPromissoryNotesInPlayArea(List<String> promissoryNotesInPlayArea) {
-        this.promissoryNotesInPlayArea = promissoryNotesInPlayArea;
+        List<String> replaced = new ArrayList<>();
+        for (String id : promissoryNotesInPlayArea) {
+            id = id.replace("torquoise", "turquoise");
+            replaced.add(id);
+        }
+
+        this.promissoryNotesInPlayArea = replaced;
+    }
+
+    public void setPromissoryNotes(LinkedHashMap<String, Integer> promissoryNotes) {
+        this.promissoryNotes = promissoryNotes;
     }
 
     public void removePromissoryNotesInPlayArea(String id) {
@@ -182,6 +319,7 @@ public class Player {
     }
 
     public void setPromissoryNote(String id, Integer identifier) {
+        id = id.replace("torquoise", "turquoise");
         promissoryNotes.put(id, identifier);
     }
 
@@ -373,6 +511,42 @@ public class Player {
         this.faction = faction;
         initPNs();
         initLeaders();
+        initAbilities();
+    }
+
+    private void initAbilities() {
+        HashSet<String> abilities = new HashSet<>();
+        for (String ability : getFactionStartingAbilities()) {
+            if (ability.isEmpty() || ability.isBlank()){
+                continue;
+            } else {
+                abilities.add(ability);
+            }
+        }
+        setFactionAbilities(abilities);
+    }
+
+    public String[] getFactionSetupInfo() {
+        if (faction == null || faction.equals("null") || faction.equals("keleres")) return null;
+        String factionSetupInfo = Mapper.getPlayerSetup(faction);
+        if (factionSetupInfo == null) {
+            BotLogger.log("Could not get faction setup info for: " + faction);
+            return null;
+        }
+        long count = factionSetupInfo.chars().filter(ch -> ch == ';').count();
+        int expectedTokenCount = 7;
+        if (count != expectedTokenCount) {
+            BotLogger.log("Faction setup raw text is incorrectly formatted (needs " + (expectedTokenCount - 1) + " ; to split properly):\n> " + factionSetupInfo);
+            return null;
+        }
+        String[] setupInfo = factionSetupInfo.split(";");
+        return setupInfo;
+    }
+    
+    private List<String> getFactionStartingAbilities() {
+        String[] factionSetupInfo = getFactionSetupInfo();
+        if(factionSetupInfo == null) return new ArrayList<String>();
+        return Arrays.asList(getFactionSetupInfo()[7].split(","));
     }
 
     public void initLeaders() {
@@ -454,6 +628,12 @@ public class Player {
         initPNs();
     }
 
+    public void changeColor(String color) {
+        if (!color.equals("null")) {
+            this.color = AliasHandler.resolveColor(color);
+        }
+    }
+
     public void initPNs() {
         if (color != null && faction != null && Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
             promissoryNotes.clear();
@@ -493,6 +673,50 @@ public class Player {
 
     public int getTg() {
         return tg;
+    }
+
+    public int getPublicVictoryPoints(ti4.map.Map map) {
+        LinkedHashMap<String, List<String>> scoredPOs = map.getScoredPublicObjectives();
+        int vpCount = 0;
+        for (Entry<String, List<String>> scoredPOEntry : scoredPOs.entrySet()) {
+            if (scoredPOEntry.getValue().contains(getUserID())) {
+                String poID = scoredPOEntry.getKey();
+                try {
+                    String poText = Mapper.getPublicObjective(poID);
+                    if (poText != null) {//IS A PO 
+                        int poValue = Integer.valueOf(poText.split(";")[3]);
+                        vpCount += poValue;
+                    } else { //IS A CUSTOM PO
+                        int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
+                        int poValue = map.getCustomPublicVP().getOrDefault(poID, 0);
+                        vpCount += poValue * frequency;
+                    }
+                } catch (Exception e) {
+                    BotLogger.log("`Player.getPublicVictoryPoints   map=" + map.getName() + "  player=" + getUserName() + "` - error finding value of `PO_ID=" + poID, e);
+                }
+            }
+        }
+
+        return vpCount;
+    }
+
+    public int getSecretVictoryPoints() {
+        return getSecretsScored().size();
+    }
+
+    public int getSupportForTheThroneVictoryPoints() {
+        List<String> promissoryNotesInPlayArea = getPromissoryNotesInPlayArea();
+        int vpCount = 0;
+        for (String id : promissoryNotesInPlayArea) {
+            if (id.endsWith("_sftt")) {
+                vpCount++;
+            }
+        }
+        return vpCount;
+    }
+
+    public int getTotalVictoryPoints(ti4.map.Map activeMap) {
+        return getPublicVictoryPoints(activeMap) + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
     }
 
     public void setTg(int tg) {
@@ -579,9 +803,11 @@ public class Player {
         exhaustedTechs.clear();
     }
 
-    public void cleanExhaustedPlanets() {
+    public void cleanExhaustedPlanets(boolean cleanAbilities) {
         exhaustedPlanets.clear();
-        exhaustedPlanetsAbilities.clear();
+        if (cleanAbilities) {
+            exhaustedPlanetsAbilities.clear();
+        }
     }
 
     public void cleanExhaustedRelics() {
@@ -649,6 +875,13 @@ public class Player {
         refreshPlanetAbility(planet);
     }
 
+    public int getStasisInfantry() {
+        return stasisInfantry;
+    }
+
+    public void setStasisInfantry(int stasisInfantry) {
+        this.stasisInfantry = stasisInfantry;
+    }
 
     public int getCommoditiesTotal() {
         return commoditiesTotal;
@@ -691,14 +924,14 @@ public class Player {
         fow_customLabels.remove(position);
     }
 
-    public Tile buildFogTile(String position) {
+    public Tile buildFogTile(String position, Player player) {
         String tileID = fow_seenTiles.get(position);
         if (tileID == null) tileID = "0b";
 
         String label = fow_customLabels.get(position);
         if (label == null) label = "";
 
-        return new Tile(tileID, position, true, label);
+        return new Tile(tileID, position, player, true, label);
     }
 
     public HashMap<String,String> getFogTiles() {
@@ -709,6 +942,14 @@ public class Player {
         return fow_customLabels;
     }
 
+    public boolean hasFogInitialized() {
+        return fogInitialized;
+    }
+
+    public void setFogInitialized(boolean init) {
+        fogInitialized = init;
+    }
+
     public boolean isDummy() {
         return isDummy;
     }
@@ -717,7 +958,7 @@ public class Player {
         this.isDummy = isDummy;
     }
 
-    public boolean isActivePlayer() {
+    public boolean isRealPlayer() {
         return !(isDummy || faction == null || color == null || color.equals("null"));
     }
 

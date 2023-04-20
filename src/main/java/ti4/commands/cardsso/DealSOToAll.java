@@ -4,7 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cards.CardsInfo;
+import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -29,7 +29,7 @@ public class DealSOToAll extends SOCardsSubcommandData {
                 for (int i = 0; i < count; i++) {
                     activeMap.drawSecretObjective(player.getUserID());
                 }
-                CardsInfo.sentUserCardInfo(event, activeMap, player);
+                ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
             }
         }
         sendMessage(count + " SO Dealt to All");

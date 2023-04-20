@@ -73,7 +73,7 @@ abstract public class AddRemoveToken implements Command {
                 }
 
                 parsingForTile(event, colors, tile, activeMap);
-                MapSaveLoadManager.saveMap(activeMap);
+                MapSaveLoadManager.saveMap(activeMap, event);
 
                 File file = GenerateMap.getInstance().saveImage(activeMap, event);
                 MessageHelper.replyToMessage(event, file);

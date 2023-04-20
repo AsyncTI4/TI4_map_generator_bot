@@ -30,6 +30,8 @@ public class Map {
     private String ownerName = "";
     private String name;
 
+    private String latestCommand = "";
+
     private MiltyDraftManager miltyDraftManager;
 
     private HashMap<String, UnitHolder> planets = new HashMap<>();
@@ -49,6 +51,8 @@ public class Map {
     private boolean allianceMode = false;
     @ExportableField
     private boolean fowMode = false;
+    @ExportableField
+    private String largeText = "small";
     @ExportableField
     private boolean absolMode = false;
     @ExportableField
@@ -109,6 +113,8 @@ public class Map {
     private ArrayList<String> discardExplore = new ArrayList<>();
     private ArrayList<String> relics = new ArrayList<>();
 
+    private static HashMap<Player, Integer> playerVPs = new HashMap<>();
+
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
         lastModifiedDate = new Date().getTime();
@@ -156,16 +162,23 @@ public class Map {
         for (Field field : fields) {
             if (field.getDeclaredAnnotation(ExportableField.class) != null) {
                 try {
-                    ObjectMapper mapper = new ObjectMapper();
                     returnValue.put(field.getName(), field.get(this));
                 } catch (IllegalAccessException e) {
                     // This shouldn't really happen since we
                     // can even see private fields.
-                    BotLogger.log("Unknown error exporting fields from map.");
+                    BotLogger.log("Unknown error exporting fields from map.", e);
                 }
             }
         }
         return returnValue;
+    }
+
+    public String getLatestCommand() {
+        return latestCommand;
+    }
+
+    public void setLatestCommand(String latestCommand) {
+        this.latestCommand = latestCommand;
     }
 
     public MiltyDraftManager getMiltyDraftManager() {
@@ -174,6 +187,10 @@ public class Map {
 
     public void setPurgedPN(String purgedPN) {
         this.purgedPN.add(purgedPN);
+    }
+
+    public void removePurgedPN(String purgedPN){
+        this.purgedPN.remove(purgedPN);
     }
 
     public void setPurgedPNs(ArrayList<String> purgedPN) {
@@ -239,6 +256,13 @@ public class Map {
 
     public void setFoWMode(boolean fowMode) {
         this.fowMode = fowMode;
+    }
+
+    public void setLargeText(String largeText) {
+        this.largeText = largeText;
+    }
+    public String getLargeText() {
+        return largeText;
     }
 
     public boolean isAbsolMode() {
@@ -963,7 +987,6 @@ public class Map {
     public String drawExplore(String reqType) {
         List<String> deck = getExplores(reqType, explore);
         if (!deck.isEmpty()) {
-            Collections.shuffle(deck);
             String id = deck.get(0);
             discardExplore(id);
             return id;
@@ -1011,7 +1034,6 @@ public class Map {
         if (relics_.isEmpty()) {
             return "";
         }
-        Collections.shuffle(relics_);
         String remove = relics_.remove(0);
         relics.remove(remove);
         return remove;
@@ -1474,5 +1496,19 @@ public class Map {
             planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
         }
         return planets.keySet();
+    }
+
+    private void calculatePlayerVPs() {
+        playerVPs = new HashMap<>();
+        for (Player player : getPlayers().values()) {
+            playerVPs.put(player, player.getTotalVictoryPoints(this));
+        }
+    }
+
+    public int getPlayerVPs(Player player) {
+        calculatePlayerVPs();
+        Integer playerVPCount = playerVPs.get(player);
+        if (playerVPCount == null) playerVPCount = 0;
+        return playerVPCount;
     }
 }

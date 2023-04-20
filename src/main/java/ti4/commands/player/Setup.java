@@ -13,7 +13,6 @@ import ti4.map.Map;
 import ti4.map.MapStringMapper;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -26,7 +25,6 @@ public class Setup extends PlayerSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
         addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position"));
-        addOptions(new OptionData(OptionType.STRING, Constants.KELERES_HS, "Keleres HS").setAutoComplete(true));
     }
 
     @Override
@@ -82,28 +80,10 @@ public class Setup extends PlayerSubcommandData {
                 break;
             }
         }
-        String playerSetup = null;
-        if ("keleres".equals(faction)) {
-            OptionMapping option = event.getOption(Constants.KELERES_HS);
-            if (option != null) {
-                playerSetup = Mapper.getPlayerSetup(option.getAsString());
-            } else {
-                sendMessage("Could not setup Keleres. Please select subfaction with the `keleres_hs` option");
-                return;
-            }
-        } else {
-            playerSetup = Mapper.getPlayerSetup(faction);
-        }
 
-        if (playerSetup == null) {
-            sendMessage("Could not setup faction. Report to ADMIN");
-            return;
-        }
-
-
-
-
-        String[] setupInfo = playerSetup.split(";");
+        String[] setupInfo = player.getFactionSetupInfo();
+       
+        //HOME SYSTEM
         String hsTile = setupInfo[1];
 
         ArrayList<String> setup;
@@ -113,14 +93,16 @@ public class Setup extends PlayerSubcommandData {
         boolean is6playerMap = true;
         if (activeMap.getPlayerCountForMap() == 6){
             setup = Constants.setup6p;
-            is6playerMap = true;
             if (MapStringMapper.mapFor6Player.contains(positionHS)){
                 useSpecified = true;
             }
         } else {
             setup = Constants.setup8p;
             is6playerMap = false;
-            if (MapStringMapper.mapFor8Player.contains(positionHS)){
+            if (activeMap.getRingCount() == 8)
+            {
+                useSpecified = true;
+            } else if (MapStringMapper.mapFor8Player.contains(positionHS)){
                 useSpecified = true;
             }
         }
@@ -132,6 +114,7 @@ public class Setup extends PlayerSubcommandData {
         Tile tile = new Tile(hsTile, position);
         activeMap.setTile(tile);
 
+        //HANDLE GHOSTS' HOME SYSTEM LOCATION
         if ("ghost".equals(faction)){
             if (useSpecified){
                 position = "tr";
@@ -179,7 +162,7 @@ public class Setup extends PlayerSubcommandData {
             activeMap.setTile(tile);
         }
 
-
+        //STARTING COMMODITIES
         player.setCommoditiesTotal(Integer.parseInt(setupInfo[3]));
         for (String tech : setupInfo[5].split(",")) {
             if (tech.trim().isEmpty()){
@@ -188,6 +171,7 @@ public class Setup extends PlayerSubcommandData {
             player.addTech(tech);
         }
 
+        //STARTING PLANETS
         for (String planet : setupInfo[6].split(",")) {
             if (planet.isEmpty()){
                 continue;
@@ -196,7 +180,10 @@ public class Setup extends PlayerSubcommandData {
             new PlanetAdd().doAction(player, planetResolved, activeMap);
             player.refreshPlanet(planetResolved);
         }
+
         player.getExhaustedPlanets().clear();
+
+        //STARTING UNITS
         addUnits(setupInfo, tile, color, event);
         if(!activeMap.isFoWMode()) {
             sendMessage("Player: " + Helper.getPlayerRepresentation(event, player) + " has been set up");

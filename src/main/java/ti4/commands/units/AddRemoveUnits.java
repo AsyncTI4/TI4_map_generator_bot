@@ -48,7 +48,7 @@ abstract public class AddRemoveUnits implements Command {
             for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
                 addPlanetToPlayArea(event, tile, unitHolder_.getName());
             }
-            MapSaveLoadManager.saveMap(activeMap);
+            MapSaveLoadManager.saveMap(activeMap, event);
 
             OptionMapping optionMapGen = event.getOption(Constants.NO_MAPGEN);
             if (optionMapGen == null) {

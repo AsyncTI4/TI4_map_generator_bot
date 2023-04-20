@@ -6,10 +6,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -48,12 +47,20 @@ public class SendCommodities extends PlayerSubcommandData {
             targetTG += sendCommodities;
             player_.setTg(targetTG);
 
-            String message = Helper.getPlayerRepresentation(event, player) + " sent " + sendCommodities + Emojis.comm + " commodities to " + Helper.getPlayerRepresentation(event, player_);
-            sendMessage(message);
+            
+			String p1 = Helper.getPlayerRepresentation(event, player);
+			String p2 = Helper.getPlayerRepresentation(event, player_);
+			String commString = sendCommodities + " " + Emojis.comm + " commodities";
+			String message =  p1 + " sent " + commString + " to " + p2;
+			sendMessage(message);
+
             if (activeMap.isFoWMode()) {
-                String fail = "Could not notify recieving player.";
+                String fail = "Could not notify receiving player.";
                 String success = "The other player has been notified";
                 MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
+                
+				// Add extra message for transaction visibility
+				FoWHelper.pingPlayersTransaction(activeMap, event, player, player_, commString, null);
             }
         }
     }

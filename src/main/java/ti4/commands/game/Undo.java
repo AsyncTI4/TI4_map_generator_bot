@@ -4,22 +4,16 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
-import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
-import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Undo extends GameSubcommandData{
     public Undo() {
-        super(Constants.UNDO, "Undo last action");
+        super(Constants.UNDO, "Undo the last action");
+        addOptions(new OptionData(OptionType.STRING, Constants.LATEST_COMMAND, "For Reference Only - Autocomplete should show the last command.").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 
@@ -42,9 +36,9 @@ public class Undo extends GameSubcommandData{
             return;
         }
 
+        MessageHelper.sendMessageToChannel(event.getChannel(), "Undoing the last saved command:\n> " + userActiveMap.getLatestCommand());
+
         MapSaveLoadManager.undo(userActiveMap);
         userActiveMap = MapManager.getInstance().getMap(userActiveMap.getName());
-        File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
-        MessageHelper.replyToMessage(event, file);
     }
 }

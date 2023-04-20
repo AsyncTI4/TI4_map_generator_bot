@@ -5,6 +5,9 @@ import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 
@@ -55,15 +58,33 @@ public class MapSaveLoadManager {
     public static void saveMaps() {
         HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
         for (java.util.Map.Entry<String, Map> mapEntry : mapList.entrySet()) {
-            saveMap(mapEntry.getValue(), true);
+            saveMap(mapEntry.getValue(), true, null);
         }
     }
 
     public static void saveMap(Map map) {
-        saveMap(map, false);
+        saveMap(map, false, null);
     }
 
-    public static void saveMap(Map map, boolean keepModifiedDate) {
+    public static void saveMap(Map map, GenericInteractionCreateEvent event) {
+        saveMap(map, false, event);
+    }
+
+    public static void saveMap(Map map, boolean keepModifiedDate, @Nullable GenericInteractionCreateEvent event) {
+        //ADD COMMAND/BUTTON FOR UNDO INFORMATION
+        if (event != null) {
+            String username = event.getUser().getName();
+            if (event instanceof SlashCommandInteractionEvent) {
+                map.setLatestCommand(username + " used: " + ((SlashCommandInteractionEvent) event).getCommandString());
+            } else if (event instanceof ButtonInteractionEvent) {
+                map.setLatestCommand(username + " pressed button: " + ((ButtonInteractionEvent) event).getButton().getId());   
+            } else {
+                map.setLatestCommand("Last Command Unknown - Not a Slash Command or Button Press");
+            }
+        } else {
+            map.setLatestCommand("Last Command Unknown - No Event Provided");
+        }
+        
         ObjectMapper mapper = new ObjectMapper();
         try {
             mapper.writeValue(Storage.getMapsJSONStorage(map.getName() + JSON), map);
@@ -90,7 +111,7 @@ public class MapSaveLoadManager {
                     saveTile(writer, tile);
                 }
             } catch (IOException e) {
-                BotLogger.log("Could not save map: " + map.getName());
+                BotLogger.log("Could not save map: " + map.getName(), e);
             }
         } else {
             BotLogger.log("Could not save map, error creating save file");
@@ -128,7 +149,7 @@ public class MapSaveLoadManager {
                     MapManager.getInstance().deleteMap(map.getName());
                     MapManager.getInstance().addMap(loadedMap);
                 } catch (Exception e) {
-                    BotLogger.log("Error trying to make undo copy for map: " + mapName);
+                    BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
                 }
             }
         }
@@ -174,7 +195,7 @@ public class MapSaveLoadManager {
                 CopyOption[] options = {StandardCopyOption.REPLACE_EXISTING};
                 Files.copy(originalMapFile.toPath(), mapUndoStorage.toPath(), options);
             } catch (Exception e) {
-                BotLogger.log("Error trying to make undo copy for map: " + mapName);
+                BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
             }
         }
     }
@@ -185,10 +206,14 @@ public class MapSaveLoadManager {
 
         writer.write(map.getMapStatus());
         writer.write(System.lineSeparator());
+        
 
         writer.write(GAMEINFO);
         writer.write(System.lineSeparator());
         //game information
+        writer.write(Constants.LATEST_COMMAND + " " + map.getLatestCommand());
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.SO + " " + String.join(",", map.getSecretObjectives()));
         writer.write(System.lineSeparator());
 
@@ -326,6 +351,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + map.isAbsolMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.LARGE_TEXT + " " + map.getLargeText());
+        writer.write(System.lineSeparator());
         writer.write(Constants.DISCORDANT_STARS_MODE + " " + map.isDiscordantStarsMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
@@ -418,11 +445,16 @@ public class MapSaveLoadManager {
             writer.write(Constants.STRATEGY + " " + player.getStrategicCC());
             writer.write(System.lineSeparator());
 
+            writer.write(Constants.ABILITIES + " " + String.join(",", player.getFactionAbilities()));
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.TG + " " + player.getTg());
             writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES + " " + player.getCommodities());
             writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.SO + " " + getSecretList(player.getSecrets()));
@@ -471,6 +503,9 @@ public class MapSaveLoadManager {
                 fogOfWarSystems.append(";");
             }
             writer.write(Constants.FOW_SYSTEMS + " " + fogOfWarSystems);
+            writer.write(System.lineSeparator());
+
+            writer.write(Constants.CARDS_INFO_THREAD_CHANNEL_ID + " " + player.getCardsInfoThreadID());
             writer.write(System.lineSeparator());
 
             writer.write(ENDPLAYER);
@@ -573,7 +608,7 @@ public class MapSaveLoadManager {
                     folder = Storage.getMapImageDirectory();
                 }
             } catch (IOException e) {
-                BotLogger.log("Could not create folder for maps");
+                BotLogger.log("Could not create folder for maps", e);
             }
 
         }
@@ -606,7 +641,7 @@ public class MapSaveLoadManager {
                             mapList.put(map.getName(), map);
                         }
                     } catch (Exception e) {
-                        BotLogger.log("Could not load game:" + file);
+                        BotLogger.log("Could not load game:" + file, e);
                     }
                 }
             }
@@ -643,7 +678,7 @@ public class MapSaveLoadManager {
                         try {
                             readGameInfo(map, data);
                         } catch (Exception e) {
-                            BotLogger.log("Data is bad: " + map.getName());
+                            BotLogger.log("Data is bad: " + map.getName(), e);
                         }
                     }
 
@@ -749,13 +784,13 @@ public class MapSaveLoadManager {
                         }
                     }
                 } catch (Exception e) {
-                    BotLogger.log("Data read error: " + mapFile.getName());
+                    BotLogger.log("Data read error: " + mapFile.getName(), e);
                 }
                 map.setTileMap(tileMap);
             } catch (FileNotFoundException e) {
-                BotLogger.log("File not found to read map data: " + mapFile.getName());
+                BotLogger.log("File not found to read map data: " + mapFile.getName(), e);
             } catch (Exception e) {
-                BotLogger.log("Data read error: " + mapFile.getName());
+                BotLogger.log("Data read error: " + mapFile.getName(), e);
             }
             return map;
         } else {
@@ -770,6 +805,7 @@ public class MapSaveLoadManager {
             String identification = tokenizer[0];
             String info = tokenizer[1];
             switch (identification) {
+                case Constants.LATEST_COMMAND -> map.setLatestCommand(info);
                 case Constants.SO -> map.setSecretObjectives(getCardList(info));
                 case Constants.AC -> map.setActionCards(getCardList(info));
                 case Constants.PO1 -> map.setPublicObjectives1(getCardList(info));
@@ -784,7 +820,7 @@ public class MapSaveLoadManager {
                     try {
                         map.setAdjacentTileOverride(getParsedAdjacencyOverrides(info));
                     } catch (Exception e) {
-                        BotLogger.log("Failed to load adjacency overrides");
+                        BotLogger.log("Failed to load adjacency overrides", e);
                     }
                 }
                 case Constants.AGENDAS -> map.setAgendas(getCardList(info));
@@ -963,6 +999,14 @@ public class MapSaveLoadManager {
                         //Do nothing
                     }
                 }
+                case Constants.LARGE_TEXT -> {
+                    try {
+                        String value = info;
+                        map.setLargeText(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
                 case Constants.ABSOL_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -993,7 +1037,7 @@ public class MapSaveLoadManager {
                     try {
                         map.setRound(Integer.parseInt(roundNumber));
                     } catch (Exception exception) {
-                        BotLogger.log("Could not parse round number");
+                        BotLogger.log("Could not parse round number", exception);
                     }
                 }
                 case Constants.LAST_MODIFIED_DATE -> {
@@ -1001,7 +1045,7 @@ public class MapSaveLoadManager {
                     try {
                         map.setLastModifiedDate(Long.parseLong(lastModificationDate));
                     } catch (Exception exception) {
-                        BotLogger.log("Could not parse last modified date");
+                        BotLogger.log("Could not parse last modified date", exception);
                     }
                 }
             }
@@ -1078,6 +1122,7 @@ public class MapSaveLoadManager {
                 case Constants.TG -> player.setTg(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.COMMODITIES -> player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.STASIS_INFANTRY -> player.setStasisInfantry(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.AC -> {
                     StringTokenizer actionCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (actionCardToken.hasMoreTokens()) {
@@ -1104,6 +1149,7 @@ public class MapSaveLoadManager {
                 case Constants.PLANETS_ABILITY_EXHAUSTED ->
                         player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
+                case Constants.ABILITIES -> player.setFactionAbilities(new HashSet<String>(getCardList(tokenizer.nextToken())));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));
                 case Constants.EXHAUSTED_RELICS -> player.setExhaustedRelics(getCardList(tokenizer.nextToken()));
@@ -1125,7 +1171,7 @@ public class MapSaveLoadManager {
                         }
                         player.setLeaders(leaderList);
                     } catch (Exception e) {
-                        BotLogger.log("Could not parse leaders loading map");
+                        BotLogger.log("Could not parse leaders loading map", e);
                     }
                 }
                 case Constants.FOW_SYSTEMS -> {
@@ -1140,7 +1186,7 @@ public class MapSaveLoadManager {
                             player.addFogTile(tileID, position, label);
                         }
                     } catch (Exception e) {
-                        BotLogger.log("Could not parse fog of war systems for player when loading the map: " + player.getColor());
+                        BotLogger.log("Could not parse fog of war systems for player when loading the map: " + player.getColor(), e);
                     }
                 }
                 case Constants.SO_SCORED -> {
@@ -1179,6 +1225,7 @@ public class MapSaveLoadManager {
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
             }
         }
     }
