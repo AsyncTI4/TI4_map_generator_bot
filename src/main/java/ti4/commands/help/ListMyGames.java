@@ -31,7 +31,7 @@ public class ListMyGames extends HelpSubcommandData {
 
         Predicate<Map> mapFilter = includeEndedGames ? m -> m.getPlayerIDs().contains(userID) : m -> !m.isHasEnded() && m.getPlayerIDs().contains(userID);
 
-        Comparator<Map> mapSort =new Comparator<Map>() {
+        Comparator<Map> mapSort = new Comparator<Map>() {
             @Override
             public int compare(Map map1, Map map2) {
                 return map1.getName().compareTo(map2.getName());
@@ -54,7 +54,7 @@ public class ListMyGames extends HelpSubcommandData {
         if (player == null) return "fail";
         StringBuilder sb = new StringBuilder();
         sb.append("**").append(map.getName()).append("**:  ");
-        sb.append(Helper.getFactionIconFromDiscord(player.getFaction())).append(Helper.getColourAsMention(event.getGuild(), player.getColor())).append(map.getActionChannel() == null ? "" : map.getActionChannel().getAsMention());
+        sb.append(Helper.getFactionIconFromDiscord(player.getFaction())).append(Helper.getColourAsMention(event.getGuild(), player.getColor())).append(" ").append(map.getActionChannel() == null ? "" : map.getActionChannel().getAsMention());
         if (map.getActivePlayer().equals(userID)) sb.append(" - **__IT IS YOUR TURN__**");
         if (map.isHasEnded()) sb.append(" - GAME HAS ENDED");
         return sb.toString();
