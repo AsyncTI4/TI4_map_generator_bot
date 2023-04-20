@@ -29,7 +29,7 @@ public class ListMyGames extends HelpSubcommandData {
         User user = event.getUser();
         String userID = user.getId();
 
-        Predicate<Map> mapFilter = includeEndedGames ? m -> !m.isFoWMode() && m.getPlayerIDs().contains(userID) : m -> !m.isHasEnded() && m.isFoWMode() && m.getPlayerIDs().contains(userID);
+        Predicate<Map> mapFilter = includeEndedGames ? m -> !m.isFoWMode() && m.getPlayerIDs().contains(userID) : m -> !m.isHasEnded() && !m.isFoWMode() && m.getPlayerIDs().contains(userID);
 
         Comparator<Map> mapSort = new Comparator<Map>() {
             @Override
