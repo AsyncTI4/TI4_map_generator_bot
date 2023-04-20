@@ -55,7 +55,7 @@ public class ListMyGames extends HelpSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("**").append(map.getName()).append("**:  ");
         sb.append(Helper.getFactionIconFromDiscord(player.getFaction())).append(Helper.getColourAsMention(event.getGuild(), player.getColor())).append(" ").append(map.getActionChannel() == null ? "" : map.getActionChannel().getAsMention());
-        if (map.getActivePlayer().equals(userID)) sb.append(" - **__IT IS YOUR TURN__**");
+        if (map.getActivePlayer() == null ? false : map.getActivePlayer().equals(userID)) sb.append(" - **__IT IS YOUR TURN__**");
         if (map.isHasEnded()) sb.append(" - GAME HAS ENDED");
         return sb.toString();
     }
