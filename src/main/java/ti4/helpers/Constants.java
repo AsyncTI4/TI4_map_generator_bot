@@ -597,5 +597,6 @@ public class Constants {
     public static final String RELIC_LOOK_AT_TOP = "relic_look_at_top";
     public static final String CARDS_INFO_THREAD_CHANNEL_ID = "cards_info_thread_channel_id";
     public static final String LATEST_COMMAND = "latest_command";
+    public static final String LIST_MY_GAMES = "list_my_games";
     public static final String RELIC_SEND = "relic_send";
 }
