@@ -45,7 +45,7 @@ public class ListTurnStats extends StatusSubcommandData {
         }
 
         long total = totalMillis / numTurns;
-        long millis = total % 1000;
+        long millis = total % 1000;;
         
         total = total / 1000; //total seconds (truncates)
         long seconds = total % 60;

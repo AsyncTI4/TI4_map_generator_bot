@@ -481,12 +481,10 @@ public class FoWHelper {
 		int totalPings = playersWithVisiblity.size() + playersWithoutVisiblity.size();
 
 		for (Player player_ : playersWithVisiblity) {
-			if (!player_.isRealPlayer()) continue;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, messageForFullInfo);
 			succesfulCount += success ? 1 : 0;
 		}
 		for (Player player_ : playersWithoutVisiblity) {
-			if (!player_.isRealPlayer()) continue;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, messageForAll);
 			succesfulCount += success ? 1 : 0;
 		}
