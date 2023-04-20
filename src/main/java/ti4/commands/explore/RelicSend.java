@@ -18,22 +18,19 @@ public class RelicSend extends GenericRelicAction {
     public RelicSend() {
         super(Constants.RELIC_SEND, "Send a relic to another Player", true);
         addOptions(new OptionData(OptionType.STRING, Constants.RELIC, "Relic to send from Target to Source").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Target Faction or Color").setAutoComplete(true).setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR_2, "Source Faction or Color (default is you)").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR_2, "Target Faction or Color").setAutoComplete(true).setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Source Faction or Color (default is you)").setAutoComplete(true));
     }
 
-    public void doAction(Player player, SlashCommandInteractionEvent event) {
+    public void doAction(Player player1, SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         String relicID = event.getOption(Constants.RELIC, null, OptionMapping::getAsString);
-        String targetFaction = event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString);
-        String sourceFaction = event.getOption(Constants.FACTION_COLOR_2, player.getFaction(), OptionMapping::getAsString);
+        String targetFaction = event.getOption(Constants.FACTION_COLOR_2, null, OptionMapping::getAsString);
+        String sourceFaction = event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString);
 
 
         //resolve player1
-        Player player1 = null; //OG player
-        if (sourceFaction == null) {
-            player1 = player;
-        } else {
+        if (sourceFaction != null) {
             String factionColor = AliasHandler.resolveColor(sourceFaction.toLowerCase());
             factionColor = AliasHandler.resolveFaction(factionColor);
             for (Player player_ : activeMap.getPlayers().values()) {
@@ -43,11 +40,7 @@ public class RelicSend extends GenericRelicAction {
                 }
             }
         }
-        if (player1 == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
-            return;
-        }
-        
+                
         //resolve player2
         Player player2 = null; //Player to send to
         if (targetFaction != null) {
@@ -66,16 +59,33 @@ public class RelicSend extends GenericRelicAction {
         }       
 
         if (player1.equals(player2)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Players provided are the same player");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "The two players provided are the same player");
             return;
         }
 
         List<String> player1Relics = player1.getRelics();
         if (!player1Relics.contains(relicID)) {
             sendMessage(player1.getUserName() + " does not have relic: " + relicID);
+            return;
         }
+
         player1.removeRelic(relicID);
         player2.addRelic(relicID);
+
+        //HANDLE SHARD OF THE THRONE
+        if (relicID.equals("shard")) {
+            Integer shardPublicObjectiveID = activeMap.getCustomPublicVP().get("Shard of the Throne");
+            if (shardPublicObjectiveID != null) {
+                activeMap.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
+                activeMap.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
+            }
+        }
+
+        if (player1.getRelics().contains(relicID) || !player2.getRelics().contains(relicID)) {
+            sendMessage("Something may have gone wrong - please check your relics and ping Bothelper if there is a problem.");
+            return;
+        }
+
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getPlayerRepresentation(event, player1, false));
         sb.append(" sent a relic to ").append(Helper.getPlayerRepresentation(event, player2, false));
