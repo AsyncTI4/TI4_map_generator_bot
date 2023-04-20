@@ -308,6 +308,14 @@ public class Map {
         return mainChannel;
     }
 
+    public void setActionChannel(MessageChannel channel) {
+        mainChannel = channel;
+    }
+
+    public MessageChannel getActionChannel() {
+        return mainChannel;
+    }
+
     public void setBotMapChannel(ThreadChannel channel) {
         botMapChannel = channel;
     }
