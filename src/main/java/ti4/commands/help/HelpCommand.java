@@ -82,7 +82,7 @@ public class HelpCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
 //        String userID = event.getUser().getId();
 //        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-//        MapSaveLoadManager.saveMap(activeMap);
+//        MapSaveLoadManager.saveMap(activeMap, event);
 //
 //        File file = GenerateMap.getInstance().saveImage(activeMap);
 //        MessageHelper.replyToMessage(event, file);
@@ -102,6 +102,7 @@ public class HelpCommand implements Command {
         subcommands.add(new ListPlanets());
         subcommands.add(new ListTiles());
         subcommands.add(new ListUnits());
+        subcommands.add(new ListCommands());
 
         return subcommands;
     }

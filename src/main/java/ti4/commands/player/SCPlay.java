@@ -68,7 +68,7 @@ public class SCPlay extends PlayerSubcommandData {
         message += "Please indicate your choice by pressing a button below and post additional details in the thread.";
 
         String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
-        TextChannel textChannel = event.getChannel().asTextChannel();
+        TextChannel textChannel = (TextChannel) mainGameChannel;
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
 
         Button followButton;
@@ -107,11 +107,11 @@ public class SCPlay extends PlayerSubcommandData {
                 message_.addReaction(reactionEmoji).queue();
             }
 
-            if (getActiveMap().isFoWMode()) {
+            if (activeMap.isFoWMode()) {
                 //in fow, send a message back to the player that includes their emoji
                 String response = "SC played.";
                 response += reactionEmoji != null ? " " + reactionEmoji.getFormatted() : "\nUnable to generate initial reaction, please click \"Not Following\" to add your reaction.";
-                MessageHelper.sendPrivateMessageToPlayer(player_, getActiveMap(), response);
+                MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, response);
             } else {
                 //only do thread in non-fow games
                 ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());

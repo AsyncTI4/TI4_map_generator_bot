@@ -37,7 +37,7 @@ public class WebHelper {
         try (InputStream input = new FileInputStream(Objects.requireNonNull(ResourceHelper.getInstance().getWebFile("web.properties")))) {
             webProperties.load(input);
         } catch (IOException e) {
-            BotLogger.log("Could not load web properties.");
+            BotLogger.log("Could not load web properties.", e);
         }
 
     }
@@ -59,7 +59,7 @@ public class WebHelper {
                     HttpResponse.BodyHandlers.ofString());
 
         } catch (IOException | InterruptedException e) {
-            BotLogger.log("Could not put data to web server");
+            BotLogger.log("Could not put data to web server", e);
         }
 
 
@@ -93,13 +93,13 @@ public class WebHelper {
             try {
                 imageWriter.write(null, new IIOImage(img, null, null), defaultWriteParam);
             } catch (IOException e) {
-                BotLogger.log("Could not write image to web server");
+                BotLogger.log("Could not write image to web server", e);
                 throw new RuntimeException(e);
             }
 
             s3.putObject(request, RequestBody.fromBytes(out.toByteArray()));
         } catch (Exception e) {
-            BotLogger.log("Could not add image to web server");
+            BotLogger.log("Could not add image to web server", e);
         }
     }
 }

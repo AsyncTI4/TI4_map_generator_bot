@@ -111,7 +111,7 @@ public class SOCardsCommand implements Command {
         }
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
         // MessageHelper.replyToMessage(event, "Card action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
     }
 
@@ -124,7 +124,7 @@ public class SOCardsCommand implements Command {
         Collection<SOCardsSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new DrawSO());
         subcommands.add(new DiscardSO());
-        subcommands.add(new CardsInfo());
+        subcommands.add(new SOInfo());
         subcommands.add(new ShowSO());
         subcommands.add(new ShowSOToAll());
         subcommands.add(new ScoreSO());

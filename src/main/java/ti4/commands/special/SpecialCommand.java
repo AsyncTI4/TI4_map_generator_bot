@@ -96,7 +96,7 @@ public class SpecialCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
 
         File file = GenerateMap.getInstance().saveImage(activeMap, event);
         MessageHelper.replyToMessage(event, file);
@@ -119,12 +119,14 @@ public class SpecialCommand implements Command {
         subcommands.add(new SleeperToken());
         subcommands.add(new IonFlip());
         subcommands.add(new SystemInfo());
+        subcommands.add(new CombatInfo());
         subcommands.add(new StellarConverter());
         subcommands.add(new RiseOfMessiah());
         subcommands.add(new FighterConscription());
         subcommands.add(new SwapSC());
         subcommands.add(new KeleresHeroMentak());
         subcommands.add(new NovaSeed());
+        subcommands.add(new StasisInfantry());
 
         return subcommands;
     }

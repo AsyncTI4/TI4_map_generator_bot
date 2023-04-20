@@ -26,7 +26,7 @@ public class PNCardsCommand implements Command {
 
     @Override
     public String getActionID() {
-        return Constants.PN;
+        return Constants.CARDS_PN;
     }
 
     @Override
@@ -108,7 +108,7 @@ public class PNCardsCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
     }
 
     protected String getActionDescription() {
@@ -123,6 +123,8 @@ public class PNCardsCommand implements Command {
         subcommands.add(new PlayPN());
         subcommands.add(new SentPN());
         subcommands.add(new PurgePN());
+        subcommands.add(new PNInfo());
+        subcommands.add(new PNReset());
         return subcommands;
     }
 

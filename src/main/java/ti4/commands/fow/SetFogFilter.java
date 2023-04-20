@@ -51,6 +51,6 @@ public class SetFogFilter extends FOWSubcommandData {
         }
 
         player.setFogFilter(color_suffix);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
     }
 }

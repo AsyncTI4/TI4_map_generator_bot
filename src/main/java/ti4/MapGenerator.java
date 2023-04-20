@@ -12,13 +12,15 @@ import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.bothelper.BothelperCommand;
+import ti4.commands.cards.CardsInfo;
+import ti4.commands.cardsac.ACCardsCommand;
 import ti4.commands.agenda.AgendaCommand;
-import ti4.commands.cards.CardsCommand;
 import ti4.commands.cardspn.PNCardsCommand;
 import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.custom.CustomCommand;
 import ti4.commands.explore.ExploreCommand;
 import ti4.commands.fow.FOWCommand;
+import ti4.commands.franken.FrankenCommand;
 import ti4.commands.game.GameCommand;
 import ti4.commands.help.*;
 import ti4.commands.leaders.LeaderCommand;
@@ -73,7 +75,7 @@ public class MapGenerator {
         try {
             jda.awaitReady();
         } catch (InterruptedException e) {
-            BotLogger.log("Error waiting for bot to get ready");
+            BotLogger.log("Error waiting for bot to get ready", e);
         }
 
         userID = args[1];
@@ -106,6 +108,7 @@ public class MapGenerator {
         bothelperRoles.removeIf(r -> r == null);
 
 
+
         CommandManager commandManager = CommandManager.getInstance();
         commandManager.addCommand(new AddTile());
         commandManager.addCommand(new RemoveTile());
@@ -113,6 +116,7 @@ public class MapGenerator {
         commandManager.addCommand(new RemoveUnits());
         commandManager.addCommand(new RemoveAllUnits());
         commandManager.addCommand(new CreateGame());
+        commandManager.addCommand(new CardsInfo());
         commandManager.addCommand(new SetGame());
         commandManager.addCommand(new ShowGame());
         commandManager.addCommand(new AddTileList());
@@ -136,7 +140,7 @@ public class MapGenerator {
         commandManager.addCommand(new BothelperCommand());
         commandManager.addCommand(new PlayerCommand());
         commandManager.addCommand(new GameCommand());
-        commandManager.addCommand(new CardsCommand());
+        commandManager.addCommand(new ACCardsCommand());
         commandManager.addCommand(new PNCardsCommand());
         commandManager.addCommand(new SOCardsCommand());
         commandManager.addCommand(new StatusCommand());
@@ -146,6 +150,7 @@ public class MapGenerator {
         commandManager.addCommand(new CustomCommand());
         commandManager.addCommand(new FOWCommand());
         commandManager.addCommand(new MiltyCommand());
+        commandManager.addCommand(new FrankenCommand());
 
         guildPrimary = jda.getGuildById(args[2]);
 

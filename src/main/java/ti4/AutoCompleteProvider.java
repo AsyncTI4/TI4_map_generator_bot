@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.FoWHelper;
@@ -19,6 +20,8 @@ import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class AutoCompleteProvider {
 
@@ -127,7 +130,7 @@ public class AutoCompleteProvider {
                 if (activeMap.isAbsolMode()){
                     List<Command.Choice> options = relics.entrySet().stream()
                             .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                            .filter(value -> value.getKey().startsWith("absol_"))
+                            .filter(value -> value.getKey().startsWith("absol_") || value.getKey().equals("enigmaticdevice"))
                             .limit(25)
                             .map(value -> new Command.Choice(value.getValue(), value.getKey()))
                             .collect(Collectors.toList());
@@ -203,7 +206,7 @@ public class AutoCompleteProvider {
                 try {
                     event.replyChoices(options).queue();
                 } catch (Exception e) {
-                    BotLogger.log("Could not suggest leaders");
+                    BotLogger.log(event, "Could not suggest leaders", e);
                 }
             }
             case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
@@ -331,6 +334,52 @@ public class AutoCompleteProvider {
                         .map(c -> new Command.Choice(c.getGuild().getName() + ": #" + c.getName(), c.getName()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
+            }
+            case Constants.ANON -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of("y", "n")
+                        .filter(value -> value.contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.LARGE_TEXT -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of("small", "medium", "large")
+                        .filter(value -> value.contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.ABILITY -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, String> abilities = Mapper.getFactionAbilities();
+                abilities.replaceAll((k, v) -> {
+                    int index = v.indexOf("|");
+                    String abilityName = v.substring(0, index);
+                    String factionName = v.substring(index + 1, StringUtils.ordinalIndexOf(v, "|", 2));
+                    factionName = Mapper.getFactionRepresentations().get(factionName);
+                    return factionName + " - " + abilityName;
+                });
+                
+                List<Command.Choice> options = abilities.entrySet().stream()
+                    .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                    .limit(25)
+                    .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+                
+            }
+            case Constants.LATEST_COMMAND -> {
+                String latestCommand = "";
+                if (activeMap.isFoWMode()) { //!event.getUser().getID().equals(activeMap.getGMID()); //TODO: Validate that the user running the command is the FoW GM, if so, display command.
+                    latestCommand = "Game is Fog of War mode - last command is hidden."; 
+                } else {
+                    latestCommand = StringUtils.left(activeMap.getLatestCommand(), 100);
+                }
+                event.replyChoice(latestCommand, Constants.LATEST_COMMAND).queue();
             }
         }
     }
