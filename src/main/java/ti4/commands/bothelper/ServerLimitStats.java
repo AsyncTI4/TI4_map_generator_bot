@@ -38,7 +38,7 @@ public class ServerLimitStats extends BothelperSubcommandData {
         int threadCount = threadChannels.size(); //1000
         List<ThreadChannel> threadChannelsArchived = guild.getThreadChannels().stream().filter(c -> c.isArchived()).toList();
         int threadArchivedCount = threadChannelsArchived.size();
-        long cardsInfoThreadCount = threadChannels.stream().filter(t -> t.getName().startsWith("Cards Info")).count();
+        long cardsInfoThreadCount = threadChannels.stream().filter(t -> t.getName().startsWith(Constants.CARDS_INFO_THREAD_PREFIX)).count();
         long botThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-bot-map-")).count();
         long scThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-round-")).count();
         long privateThreadCount = threadChannels.stream().filter(t -> !t.isPublic()).count();
