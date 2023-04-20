@@ -91,7 +91,7 @@ public class AddTileList implements Command {
                 BotLogger.log("Could not add setup and Mallice tiles", e);
             }
 
-            MapSaveLoadManager.saveMap(userActiveMap);
+            MapSaveLoadManager.saveMap(userActiveMap, event);
 
             File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
             MessageHelper.replyToMessage(event, file);

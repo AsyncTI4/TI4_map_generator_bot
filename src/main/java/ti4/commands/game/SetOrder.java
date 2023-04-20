@@ -71,7 +71,7 @@ public class SetOrder extends GameSubcommandData {
         } catch (Exception e){
             map.setPlayers(playersBackup);
         }
-        MapSaveLoadManager.saveMap(map);
+        MapSaveLoadManager.saveMap(map, event);
         MessageHelper.replyToMessage(event, "Player order set for game:\n" + Info.getGameInfo(gameOption, MapManager.getInstance(), map, null));
     }
 

@@ -34,7 +34,7 @@ abstract public class JoinLeave extends GameSubcommandData {
         }
         User user = event.getUser();
         action(map, user);
-        MapSaveLoadManager.saveMap(map);
+        MapSaveLoadManager.saveMap(map, event);
         MessageHelper.replyToMessage(event, getResponseMessage(map, user));
     }
     abstract protected String getResponseMessage(Map map, User user);

@@ -66,7 +66,7 @@ public class CreateGame implements Command {
         if (!setMapSuccessful) {
             MessageHelper.replyToMessage(event, "Could not assign active Game " + mapName);
         }
-        MapSaveLoadManager.saveMap(map);
+        MapSaveLoadManager.saveMap(map, event);
         return map;
     }
 

@@ -76,7 +76,7 @@ public class GameEnd extends GameSubcommandData {
         //POST GAME INFO
         MessageHelper.sendMessageToChannel(event.getChannel(), "**Game: `" + gameName + "` has ended!**");
         userActiveMap.setHasEnded(true);
-        MapSaveLoadManager.saveMap(userActiveMap);
+        MapSaveLoadManager.saveMap(userActiveMap, event);
         String gameEndText = getGameEndText(userActiveMap, event);
         MessageHelper.sendMessageToChannel(event.getChannel(), gameEndText);
 
