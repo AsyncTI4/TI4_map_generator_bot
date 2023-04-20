@@ -125,9 +125,9 @@ public class MessageListener extends ListenerAdapter {
         if (msg.getContentRaw().contains("used /fow whisper")) {
             msg.delete().queue();
         }
-        if (msg.getContentRaw().toLowerCase().startsWith("tored") || msg.getContentRaw().toLowerCase().startsWith("topurple")
-        || msg.getContentRaw().toLowerCase().startsWith("toblue") || msg.getContentRaw().toLowerCase().startsWith("toyellow") 
-        || msg.getContentRaw().toLowerCase().startsWith("toorange") || msg.getContentRaw().toLowerCase().startsWith("togreen")) {
+        if (msg.getContentRaw().startsWith("tored") || msg.getContentRaw().startsWith("topurple")
+        || msg.getContentRaw().startsWith("toblue") || msg.getContentRaw().startsWith("toyellow") 
+        || msg.getContentRaw().startsWith("toorange") || msg.getContentRaw().startsWith("togreen")) {
             
             String gameName = event.getChannel().getName();
 			gameName = gameName.substring(0, gameName.indexOf("-"));
