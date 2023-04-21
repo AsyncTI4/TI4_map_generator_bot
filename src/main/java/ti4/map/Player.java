@@ -211,7 +211,7 @@ public class Player {
         //Make card info thread a public thread in community mode
         boolean isPrivateChannel = !activeMap.isCommunityMode();
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
-        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
+        threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
         if (isPrivateChannel) {
             threadAction.setInvitable(false);
         }
