@@ -816,7 +816,24 @@ public class MapSaveLoadManager {
                 case Constants.REVEALED_PO -> map.setRevealedPublicObjectives(getParsedCards(info));
                 case Constants.CUSTOM_PO_VP -> map.setCustomPublicVP(getParsedCards(info));
                 case Constants.SCORED_PO -> map.setScoredPublicObjectives(getParsedCardsForScoredPO(info));
-                case Constants.CUSTOM_ADJACENT_TILES -> map.setCustomAdjacentTiles(getParsedCardsForScoredPO(info));
+                case Constants.CUSTOM_ADJACENT_TILES -> {
+
+                    LinkedHashMap<String, List<String>> adjacentTiles = getParsedCardsForScoredPO(info);
+                    LinkedHashMap<String, List<String>> adjacentTilesMigrated = new LinkedHashMap<>();
+                    for (java.util.Map.Entry<String, List<String>> entry : adjacentTiles.entrySet()) {
+                        String key = entry.getKey();
+                        key = migratePosition(map, key);
+
+                        List<String> migrated = new ArrayList<>();
+                        for (String value : entry.getValue()) {
+                            value = migratePosition(map, value);
+                            migrated.add(value);
+                        }
+                        adjacentTilesMigrated.put(key, migrated);
+                    }
+
+                    map.setCustomAdjacentTiles(adjacentTilesMigrated);
+                }
                 case Constants.ADJACENCY_OVERRIDES -> {
                     try {
                         map.setAdjacentTileOverride(getParsedAdjacencyOverrides(info, map));
