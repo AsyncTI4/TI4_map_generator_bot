@@ -1281,28 +1281,23 @@ public class GenerateMap {
         int deltaX = mapWidth - extraX - (extraRow ? extraX : 0);
         int deltaY = extraY;
 
-
-//        public static final String STATS_USERNAME="userName";
-//        public static final String STATS_VO="vp";
-//        public static final String STATS_CC="cc";
-//        public static final String STATS_SPEAKER="speaker";
-//        public static final String STATS_SC="sc";
-//        public static final String STATS_PASSED="passed";
-//        public static final String STATS_SO="so";
-//
+        boolean inverted = false;
         for (Player player : players) {
 
-            if ((deltaY + PLAYER_STATS_HEIGHT) > (mapHeight - extraY)) {
+            if ((deltaY + PLAYER_STATS_HEIGHT) > (mapHeight - extraY) || (deltaY + PLAYER_STATS_HEIGHT) < extraY) {
                 playerRow++;
                 if (playerRow == 2) {
-                    deltaY = extraY;
+                    deltaY = deltaY - PLAYER_STATS_HEIGHT;
                     deltaX = 10;
+                    inverted = true;
                 } else if (playerRow == 3) {
                     deltaX = mapWidth - extraX + 10;
                     deltaY = extraY;
+                    inverted = false;
                 } else if (playerRow == 4) {
                     deltaX = mapWidth + 10;
-                    deltaY = extraY;
+                    deltaY = deltaY - PLAYER_STATS_HEIGHT;;
+                    inverted = true;
                 }
             }
 
@@ -1380,8 +1375,11 @@ public class GenerateMap {
                 graphics.drawString("PASSED", point.x + deltaX, point.y + deltaY);
                 graphics.setColor(Color.WHITE);
             }
-
-            deltaY += PLAYER_STATS_HEIGHT;
+            if (inverted) {
+                deltaY -= PLAYER_STATS_HEIGHT;
+            } else {
+                deltaY += PLAYER_STATS_HEIGHT;
+            }
         }
     }
 
