@@ -214,6 +214,7 @@ public class GenerateMap {
                     tileMap.remove(setup);
                 }
 
+                tileMap.remove(null);
                 Set<String> tiles = tileMap.keySet();
                 Set<String> tilesWithExtra = new HashSet<String>(map.getAdjacentTileOverrides().values());
                 tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), map, TileStep.Tile));
