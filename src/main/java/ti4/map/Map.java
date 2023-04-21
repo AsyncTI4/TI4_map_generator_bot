@@ -1542,9 +1542,10 @@ public class Map {
         }
     }
 
-    private void rebuildTilePositionAutoCompleteList() {
+    public void rebuildTilePositionAutoCompleteList() {
         setTileNameAutocompleteOptionsCache(getTileMap().entrySet().stream()
             .map(e -> new AbstractMap.SimpleEntry<String, String>(e.getValue().getRepresentationForAutoComplete(), e.getValue().getPosition()))
+            .filter(e -> !e.getKey().toLowerCase().contains("hyperlane"))
             .toList());
     }
 

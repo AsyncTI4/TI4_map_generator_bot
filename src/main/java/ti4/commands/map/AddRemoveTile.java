@@ -81,6 +81,7 @@ abstract public class AddRemoveTile implements Command {
         }
 
         tileAction(tile, position, userActiveMap);
+        userActiveMap.rebuildTilePositionAutoCompleteList();
         return userActiveMap;
     }
 
@@ -94,7 +95,6 @@ abstract public class AddRemoveTile implements Command {
                 Commands.slash(getActionID(), getActionDescription())
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name").setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map").setRequired(true))
-
         );
     }
 

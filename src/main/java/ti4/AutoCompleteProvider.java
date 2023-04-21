@@ -385,7 +385,10 @@ public class AutoCompleteProvider {
             }
             case Constants.TILE_NAME, Constants.TILE_NAME_TO -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                
+                if (activeMap == null) {
+                    event.replyChoiceStrings("No Active Map for this Channel").queue();
+                    return;
+                }
                 if (activeMap.isFoWMode()) {
                     List<String> positions = new ArrayList<>(activeMap.getTileMap().keySet());
                     List<Command.Choice> options = positions.stream()
