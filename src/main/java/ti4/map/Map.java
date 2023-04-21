@@ -1522,12 +1522,14 @@ public class Map {
     }
 
     public void endGameIfOld() {
+        if (isHasEnded()) return;
+        
         LocalDate currentDate = LocalDate.now();
         LocalDate lastModifiedDate = (new Date(this.lastModifiedDate)).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         Period period = Period.ofMonths(5); //TODO: CANDIDATE FOR GLOBAL VARIABLE
         LocalDate oldestLastModifiedDateBeforeEnding = currentDate.minus(period);
 
-        if (!isHasEnded() && lastModifiedDate.compareTo(oldestLastModifiedDateBeforeEnding) < 0) {
+        if (lastModifiedDate.compareTo(oldestLastModifiedDateBeforeEnding) < 0) {
             BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate.toString() + " - the game flag `hasEnded` has been set to true");
             setHasEnded(true);
             MapSaveLoadManager.saveMap(this);
