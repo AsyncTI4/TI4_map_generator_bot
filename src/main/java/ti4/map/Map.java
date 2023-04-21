@@ -16,11 +16,12 @@ import ti4.message.BotLogger;
 
 import java.awt.*;
 import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.*;
 
@@ -1521,11 +1522,14 @@ public class Map {
     }
 
     public void endGameIfOld() {
-        Date lastModifiedDate = new Date(this.lastModifiedDate);
-        Date oldestLastModifiedDateBeforeEnding = new Date(1667260800000l); //2022-11-01
+        LocalDate currentDate = LocalDate.now();
+        LocalDate lastModifiedDate = (new Date(this.lastModifiedDate)).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        Period period = Period.ofMonths(5);
+        LocalDate oldestLastModifiedDateBeforeEnding = currentDate.minus(period);
+
         if (!isHasEnded() && lastModifiedDate.compareTo(oldestLastModifiedDateBeforeEnding) < 0) {
-            BotLogger.log("Game: " + getName() + " has not been modified since ~" + Helper.getDateRepresentation(lastModifiedDate.getTime()) + " - the game flag `hasEnded` has been set to true");
-            setHasEnded(true);
+            BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate.toString() + " - the game flag `hasEnded` has been set to true");
+            // setHasEnded(true);
         }
     }
 }
