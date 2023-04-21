@@ -309,9 +309,6 @@ public class GenerateMap {
         int deltaY = 35;
         int yDelta = 0;
 
-        //TODO: REMOVE THIS - TEMP FIX FOR PBD100 PLAYER AREAS NOT BEING VISIBLE
-        if (map.getName().equals("pbd100")) Collections.shuffle(players);
-
         graphics.setFont(Storage.getFont50());
         graphics.setColor(Color.WHITE);
         graphics.drawString(map.getCustomName(), 0, y);
