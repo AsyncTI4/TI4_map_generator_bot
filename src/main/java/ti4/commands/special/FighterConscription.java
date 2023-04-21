@@ -106,7 +106,7 @@ public class FighterConscription extends SpecialSubcommandData {
                 msg += ", **" + tile.getPosition() + "**";
             }
         }
-        MessageHelper.sendMessageToChannel(event, msg);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
     @Override

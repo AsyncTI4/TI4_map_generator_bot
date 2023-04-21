@@ -119,6 +119,5 @@ public class SCPlay extends PlayerSubcommandData {
                 threadChannel.queue();
             }
         });
-        event.getHook().deleteOriginal().queue();
     }
 }

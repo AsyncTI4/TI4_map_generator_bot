@@ -22,7 +22,7 @@ public class ExpReset extends ExploreSubcommandData {
             sendMessage("Exploration decks reset.");
         } else {
             sendMessage("Confirmation not received to reset exploration decks.");
-            MessageHelper.sendMessageToChannel(event, event.getOption(Constants.CONFIRM).getAsString());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getOption(Constants.CONFIRM).getAsString());
         }
     }
 }

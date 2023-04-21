@@ -29,7 +29,7 @@ public class Announce extends FOWSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.replyToSlashCommand(event,"Player could not be found");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Player could not be found");
             return;
         }
 

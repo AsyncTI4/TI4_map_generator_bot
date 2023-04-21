@@ -3,19 +3,16 @@ package ti4.message;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import ti4.MapGenerator;
-import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -25,6 +22,7 @@ import ti4.map.Player;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -36,23 +34,13 @@ public class MessageHelper {
 		void run(Message msg);
 	}
 
-	public static void sendMessageToChannel(GenericInteractionCreateEvent event, String messageText) {
-		if (event.getChannel() instanceof MessageChannel) {
-			splitAndSent(messageText, (MessageChannel) event.getChannel(), event, null);
-		}
+	public static void sendMessageToChannel(MessageChannel channel, String messageText) {
+		splitAndSent(messageText, channel);
 	}
 
-	public static void sendMessageToChannelWithButtons(GenericInteractionCreateEvent event, String messageText, Button[] buttons) {
-		if(event.getChannel() instanceof MessageChannel)
-		{
-			splitAndSent(messageText, (MessageChannel)event.getChannel(), event, buttons);
-		}
+	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
+		splitAndSent(messageText, channel, buttons);
 	}
-
-	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, Button[] buttons) {
-		splitAndSent(messageText, channel, null, buttons);
-	}
-
 	
 	private static void addFactionReactToMessage(Map activeMap, Player player, Message message) {
 		Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player, message); 
@@ -61,18 +49,15 @@ public class MessageHelper {
 		}
 	}
 
-	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Map activeMap, Player player, Button[] buttons) {
+	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Map activeMap, Player player, List<Button> buttons) {
 		MessageFunction addFactionReact = (msg) -> addFactionReactToMessage(activeMap, player, msg);
-		splitAndSentWithAction(messageText, channel, null, addFactionReact, buttons);
+		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
 	}
 
-	public static void sendMessageToChannel(MessageChannel channel, String messageText) {
-		splitAndSent(messageText, channel);
-	}
 
 	public static void sendMessageToChannelAndPin(MessageChannel channel, String messageText) {
 		MessageFunction pin = (msg) -> msg.pin().queue();
-		splitAndSentWithAction(messageText, channel, null, pin);
+		splitAndSentWithAction(messageText, channel, pin);
 	}
 
 	public static void sendFileToChannel(MessageChannel channel, File file) {
@@ -80,12 +65,8 @@ public class MessageHelper {
 		channel.sendFiles(fileUpload).queue();
 	}
 
-	public static void replyToMessageTI4Logo(GenericInteractionCreateEvent event) {
-		replyToMessage(event, "");
-	}
-
 	public static void replyToMessage(GenericInteractionCreateEvent event, String messageText) {
-		replyToSlashCommand(event, messageText);
+		splitAndSent(messageText, event.getMessageChannel());
 	}
 
 	public static void replyToMessage(GenericInteractionCreateEvent event, File file) {
@@ -100,18 +81,16 @@ public class MessageHelper {
 		try {
 			if (forceShowMap && event.getChannel() instanceof MessageChannel) {
 				sendMessageWithFile((MessageChannel) event.getChannel(), file, messageText, pinMessage);
-				replyToMessageTI4Logo(event);
 				return;
 			}
 			String gameName = event.getChannel().getName();
-			gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
 			Map activeMap = MapManager.getInstance().getMap(gameName);
 			if (!activeMap.isFoWMode()
 					|| activeMap.isFoWMode() && event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
 				if (event.getChannel() instanceof MessageChannel) {
 					sendMessageWithFile((MessageChannel)event.getChannel(), file, messageText, pinMessage);
-					replyToMessageTI4Logo(event);
 				}
 			} else {
 				replyToMessage(event, "Map updated successfully. Use /special system_info to check the systems.");
@@ -134,37 +113,29 @@ public class MessageHelper {
 	}
 
 	private static void splitAndSent(String messageText, MessageChannel channel) {
-		splitAndSent(messageText, channel, null, null);
+		splitAndSent(messageText, channel, null);
 	}
 
-	private static void splitAndSent(String messageText, MessageChannel channel, GenericInteractionCreateEvent event, Button[] buttons) {
-		splitAndSentWithAction(messageText, channel, event, null, buttons);
+	private static void splitAndSent(String messageText, MessageChannel channel, List<Button> buttons) {
+		splitAndSentWithAction(messageText, channel, null, buttons);
 	}
 
-	private static void splitAndSentWithAction(String messageText, MessageChannel channel, GenericInteractionCreateEvent event, MessageFunction restAction) {
-		splitAndSentWithAction(messageText, channel, event, restAction, null);
+	private static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction) {
+		splitAndSentWithAction(messageText, channel, restAction, null);
 	}
 
-	private static void splitAndSentWithAction(String messageText, MessageChannel channel, GenericInteractionCreateEvent event, MessageFunction restAction, Button[] buttons) {
-		if (messageText == null || channel == null || messageText.isEmpty()) {
+	private static void splitAndSentWithAction(String messageText, MessageChannel channel, MessageFunction restAction, List<Button> buttons) {
+		if (channel == null) {
 			return;
 		}
 
-		Integer messageLength = messageText.length();
-		if (messageLength > 2000) {
-			for (String text : splitLargeText(messageText, 2000)) {
-				channel.sendMessage(text).queue(complete -> {
-					if (restAction != null) restAction.run(complete);
-				});
-			}
-		} else {
-			if (buttons == null || buttons.length == 0) {
-				channel.sendMessage(messageText).queue(complete -> {
-					if (restAction != null) restAction.run(complete);
-				});
-			} else {
-				MessageCreateData message = new MessageCreateBuilder().addContent(messageText).addComponents(ActionRow.of(buttons)).build();
-				channel.sendMessage(message).queue(complete -> {
+		Iterator<MessageCreateData> iterator = getMessageCreateDataObjects(messageText, buttons).iterator();
+		while (iterator.hasNext()) {
+			MessageCreateData messageCreateData = iterator.next();
+			if (iterator.hasNext()) { //not  message
+				channel.sendMessage(messageCreateData).queue();
+			} else { //last message, do action
+				channel.sendMessage(messageCreateData).queue(complete -> {
 					if (restAction != null) restAction.run(complete);
 				});
 			}
@@ -182,8 +153,7 @@ public class MessageHelper {
 	 * @param successText Feedback if the message successfully sent
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Map map, SlashCommandInteractionEvent event,
-			String messageText, String failText, String successText) {
+	public static boolean sendPrivateMessageToPlayer(Player player, Map map, SlashCommandInteractionEvent event, String messageText, String failText, String successText) {
 		return sendPrivateMessageToPlayer(player, map, event.getChannel(), messageText, failText, successText);
 	}
 
@@ -260,23 +230,6 @@ public class MessageHelper {
     }
 
 	/**
-	 * Sends a basic message to the event channel, handles large text
-	 * 
-	 * @param event
-	 * @param messageText
-	 */
-	public static void replyToSlashCommand(@NotNull GenericInteractionCreateEvent event, String messageText) {
-		if (messageText == null || messageText.isEmpty()) {
-			return;
-		}
-		for (String text : splitLargeText(messageText, 2000)) {
-			if (event.getChannel() instanceof MessageChannelUnion) {
-				((MessageChannelUnion) event.getChannel()).sendMessage(text).queue();
-			}
-		}
-	}
-
-	/**
 	 * Given a text string and a maximum length, will return a List<String> split by
 	 * either the max length or the last newline "\n"
 	 * 
@@ -305,25 +258,41 @@ public class MessageHelper {
 		return texts;
 	}
 
-    public static List<MessageCreateData> getMessageObject(String message, List<Button> buttons) {
-        if (buttons == null) return new ArrayList<MessageCreateData>();
-        buttons.removeIf(Objects::isNull);
-        List<List<Button>> partitions = ListUtils.partition(buttons, 5);
-        List<ActionRow> buttonRows = new ArrayList<>();
-        for (List<Button> partition : partitions) {
-            buttonRows.add(ActionRow.of(partition));
-        }
-        List<List<ActionRow>> partitionedButtonRows = ListUtils.partition(buttonRows, 5);
-        List<MessageCreateData> messagesWithButtons = new ArrayList<>();
-		for (String text : splitLargeText(message, 2000)) {
-			messagesWithButtons.add(new MessageCreateBuilder()
-					.addContent(text).build());
+    /**
+	 * Example of use:
+	 * <pre>
+	* {@code
+		for (MessageCreateData messageData : getMessageObject(message, buttons)) {
+			channel.sendMessage(messageData).queue();
 		}
-        for (List<ActionRow> partitionActionRow : partitionedButtonRows) {
-            messagesWithButtons.add(new MessageCreateBuilder()
-                    .addComponents(partitionActionRow).build());
-        }
-        return messagesWithButtons;
+	* </pre>
+     */
+    public static List<MessageCreateData> getMessageCreateDataObjects(String message, List<Button> buttons) {
+		List<MessageCreateData> messageCreateDataList = new ArrayList<>();
+
+		//ADD MESSAGES
+		if (message != null && !message.isEmpty()) {
+			for (String text : splitLargeText(message, 2000)) {
+				messageCreateDataList.add(new MessageCreateBuilder()
+						.addContent(text).build());
+			}
+		}
+
+		//ADD BUTTONS
+        if (buttons != null && !buttons.isEmpty()) {
+			buttons.removeIf(Objects::isNull);
+			List<List<Button>> partitions = ListUtils.partition(buttons, 5);
+			List<ActionRow> buttonRows = new ArrayList<>();
+			for (List<Button> partition : partitions) {
+				buttonRows.add(ActionRow.of(partition));
+			}
+			List<List<ActionRow>> partitionedButtonRows = ListUtils.partition(buttonRows, 5);
+			for (List<ActionRow> partitionActionRow : partitionedButtonRows) {
+				messageCreateDataList.add(new MessageCreateBuilder()
+						.addComponents(partitionActionRow).build());
+			}
+		}
+        return messageCreateDataList;
     }
 
 

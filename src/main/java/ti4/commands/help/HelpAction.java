@@ -32,6 +32,5 @@ public class HelpAction extends HelpSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find help file");
         }
-        MessageHelper.replyToMessageTI4Logo(event);
     }
 }

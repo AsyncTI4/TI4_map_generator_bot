@@ -32,6 +32,6 @@ public class RevealAndPutACIntoDiscard extends ACCardsSubcommandData {
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Revealed and discarded Action card: ");
         sb.append(Mapper.getActionCard(acID)).append("\n");
-        MessageHelper.sendMessageToChannel(event, sb.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 }
