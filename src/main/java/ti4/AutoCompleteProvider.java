@@ -388,7 +388,6 @@ public class AutoCompleteProvider {
                 
                 if (activeMap.isFoWMode()) {
                     List<String> positions = MapStringMapper.mapFor8Player;
-
                     List<Command.Choice> options = positions.stream()
                         .filter(value -> value.toLowerCase().contains(enteredValue))
                         .limit(25)
