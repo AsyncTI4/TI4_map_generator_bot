@@ -395,9 +395,7 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
                 } else {                    
-                    HashMap<String, Tile> tileMap = activeMap.getTileMap();
-                    List<Command.Choice> options = tileMap.entrySet().stream()
-                        .map(e -> new AbstractMap.SimpleEntry<String, String>(e.getValue().getRepresentationForAutoComplete(), e.getValue().getPosition()))
+                    List<Command.Choice> options = activeMap.getTileNameAutocompleteOptionsCache().stream()
                         .filter(value -> value.getKey().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getKey(), value.getValue()))
