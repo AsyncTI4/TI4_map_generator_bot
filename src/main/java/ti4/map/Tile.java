@@ -295,4 +295,20 @@ public class Tile {
         return unitHolders;
     }
 
+    public String getRepresentation() {
+        try {
+            return Mapper.getTileRepresentations().get(getTileID());     
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return null;
+    }
+
+    public String getRepresentationForAutoComplete() {
+        try {
+            return getPosition() + " (" + getRepresentation() + ")";
+        } catch (Exception e) {
+            return getTileID();
+        }
+    }
 }

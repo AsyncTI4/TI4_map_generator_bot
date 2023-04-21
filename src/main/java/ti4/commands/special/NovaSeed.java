@@ -14,7 +14,7 @@ import ti4.message.MessageHelper;
 public class NovaSeed extends SpecialSubcommandData {
     public NovaSeed() {
         super(Constants.NOVA_SEED, "Nova seed a system");
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player using nova seed").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color using nova seed").setAutoComplete(true));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DESTROY_OTHER_UNITS, "Destroy other players units"));
