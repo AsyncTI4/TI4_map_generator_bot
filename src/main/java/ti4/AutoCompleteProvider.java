@@ -12,7 +12,9 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
+import ti4.map.MapStringMapper;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.message.BotLogger;
 
 import java.io.File;
@@ -380,6 +382,28 @@ public class AutoCompleteProvider {
                     latestCommand = StringUtils.left(activeMap.getLatestCommand(), 100);
                 }
                 event.replyChoice(latestCommand, Constants.LATEST_COMMAND).queue();
+            }
+            case Constants.TILE_NAME, Constants.TILE_NAME_TO -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                
+                if (activeMap.isFoWMode()) {
+                    List<String> positions = MapStringMapper.mapFor8Player;
+                    List<Command.Choice> options = positions.stream()
+                        .filter(value -> value.toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                } else {                    
+                    HashMap<String, Tile> tileMap = activeMap.getTileMap();
+                    List<Command.Choice> options = tileMap.entrySet().stream()
+                        .map(e -> new AbstractMap.SimpleEntry<String, String>(e.getValue().getRepresentationForAutoComplete(), e.getValue().getPosition()))
+                        .filter(value -> value.getKey().toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value.getKey(), value.getValue()))
+                        .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                }
             }
         }
     }

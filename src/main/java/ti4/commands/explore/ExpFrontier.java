@@ -15,7 +15,7 @@ import ti4.message.MessageHelper;
 public class ExpFrontier extends ExploreSubcommandData {
     public ExpFrontier() {
         super(Constants.FRONTIER, "Explore a frontier tile");
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Location of the frontier tile").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Location of the frontier tile").setRequired(true).setAutoComplete(true));
     }
 
     @Override
