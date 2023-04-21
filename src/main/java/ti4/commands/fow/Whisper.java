@@ -3,10 +3,12 @@ package ti4.commands.fow;
 
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -37,46 +39,65 @@ public class Whisper extends FOWSubcommandData {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Player to send message to could not be found");
             return;
         }
-
         OptionMapping whisperms = event.getOption(Constants.MSG);
         OptionMapping anon = event.getOption(Constants.ANON);
-        if (whisperms != null) {
-            String msg = whisperms.getAsString();
-            String message = "";
-            if (anon != null)
+        String msg = "";
+        if(whisperms != null)
+        {
+            msg = whisperms.getAsString();
+        }
+        String anonY = "";
+        if (anon != null)
+        {
+            anonY = anon.getAsString();
+        }
+        Whisper.sendWhisper(activeMap, player, player_, msg, anonY, event.getMessageChannel(), event.getGuild());
+        
+    }
+
+    public static void sendWhisper(Map activeMap, Player player, Player player_, String msg, String anonY, MessageChannel feedbackChannel, Guild guild)
+    {
+        String message = "";
+        String realIdentity = "";
+        String player1 = Helper.getColourAsMention(guild, player.getColor());
+        if(activeMap.isCommunityMode())
+        {
+            if(player_.getRoleForCommunity() == null)
             {
-                String anonY = anon.getAsString();
-                
-                if (anonY.compareToIgnoreCase("y") == 0)
-                {
-                     message =  "[REDACTED] says: " + msg;
-                }
-                else
-                {
-                     message = Helper.getPlayerRepresentation(event, player) + " says: " + msg;
-                }
+                return;
+            }
+            realIdentity = Helper.getRoleMentionByName(guild, player_.getRoleForCommunity().getName());
+        }
+        else
+        {
+            realIdentity =Helper.getPlayerRepresentation(player_);
+        }
+        if (anonY.compareToIgnoreCase("y") == 0)
+        {
+                message =  "[REDACTED] says: " + msg;
+        }
+        else
+        {
+            message = "Attention " + realIdentity + "! " +player1 + " says: " + msg;
+        }
+        if (activeMap.isFoWMode()) {
+            String fail = "Could not notify receiving player.";
+            String success = "";
+            String player2 = Helper.getColourAsMention(guild, player_.getColor());
+            if(message.startsWith("[REDACTED]"))
+            {
+                success = player1+ "(You) anonymously said: \"" + msg + "\" to " + player2;
             }
             else
             {
-                message = "Attention " + Helper.getPlayerRepresentation(event, player_,true) + "! " +Helper.getPlayerRepresentation(event, player) + " says: " + msg;
+                success = player1+ "(You) said: \"" + msg + "\" to " + player2;
             }
-        
-
-            if (activeMap.isFoWMode()) {
-                String fail = "Could not notify receiving player.";
-                String success = "";
-                if(message.startsWith("Someone"))
-                {
-                    success = "You anonymously sent: \"" + msg + "\" to " + Helper.getPlayerRepresentation(event, player_);
-                }
-                else
-                {
-                    success = Helper.getPlayerRepresentation(event, player)+ "(You) said: \"" + msg + "\" to " + Helper.getPlayerRepresentation(event, player_);
-                }
-                MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
-            }
+            MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, feedbackChannel, message, fail, success);
         }
     }
+    
+
+
     @Override
     public void reply(SlashCommandInteractionEvent event) {
         return;

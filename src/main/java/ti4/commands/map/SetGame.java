@@ -28,7 +28,7 @@ public class SetGame implements Command {
         }
         String mapName = event.getOptions().get(0).getAsString();
         if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-            MessageHelper.replyToMessage(event, "Game with such name: "+mapName+ " does not exists, use /list_games");
+            MessageHelper.replyToMessage(event, "Game with such name: " + mapName + " does not exist.");
             return false;
         }
         String userID = event.getUser().getId();

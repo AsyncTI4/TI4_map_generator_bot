@@ -28,7 +28,7 @@ public class SaveMap extends AdminSubcommandData {
                 return;
             }
             Map map = MapManager.getInstance().getMap(mapName);
-            MapSaveLoadManager.saveMap(map);
+            MapSaveLoadManager.saveMap(map, event);
             sendMessage("Save map: " + map.getName());
 
         } else {

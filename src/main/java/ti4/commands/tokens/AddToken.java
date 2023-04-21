@@ -135,10 +135,8 @@ public class AddToken extends AddRemoveToken {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TOKEN, "Token name")
-                                .setRequired(true).setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                                .setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TOKEN, "Token name").setRequired(true).setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))
 
         );

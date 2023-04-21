@@ -115,7 +115,7 @@ public class SCPlay extends PlayerSubcommandData {
             } else {
                 //only do thread in non-fow games
                 ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
-                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
+                threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
                 threadChannel.queue();
             }
         });

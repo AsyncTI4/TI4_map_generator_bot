@@ -18,7 +18,7 @@ public class AddFogTile extends FOWSubcommandData {
     public AddFogTile() {
         super(Constants.ADD_FOG_TILE, "Add a Fog of War tile to the map.");
         addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name"));
         addOptions(new OptionData(OptionType.STRING, Constants.LABEL, "How you want the tile to be labeled").setRequired(false).setMaxLength(10));
     }
 
@@ -50,7 +50,7 @@ public class AddFogTile extends FOWSubcommandData {
         String label = labelMapping == null ? "" : labelMapping.getAsString();
 
         String position = positionMapping.getAsString().toLowerCase();
-        if (!PositionMapper.isTilePositionValid(position, activeMap)) {
+        if (!PositionMapper.isTilePositionValid(position)) {
             MessageHelper.replyToMessage(event, "Tile position is not allowed");
             return;
         }

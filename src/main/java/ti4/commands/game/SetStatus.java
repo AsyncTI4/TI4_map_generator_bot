@@ -75,7 +75,7 @@ public class SetStatus extends GameSubcommandData{
             MessageHelper.replyToMessage(event, "Map: " + mapName + " status was not changed, as invalid status entered.");
             return;
         }
-        MapSaveLoadManager.saveMap(mapToChangeStatusFor);
+        MapSaveLoadManager.saveMap(mapToChangeStatusFor, event);
         MessageHelper.replyToMessage(event, "Map: "+ mapName +" status changed to: " + mapToChangeStatusFor.getMapStatus());
     }
 }

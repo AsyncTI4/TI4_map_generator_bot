@@ -2,7 +2,7 @@
 
 Hello Async TI Developers!
 
-Please test your changes before making a PR.
+Please *test your changes* (`mvn package`) before making a PR.
 See below for methods and examples of how to test.
 If you have a different way, please share!
 

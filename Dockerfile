@@ -1,7 +1,8 @@
 FROM amazoncorretto:18
 WORKDIR /opt
 RUN df -h && \
-    yum install -y maven
+    yum install -y maven && \
+    mvn --version
 COPY ./src ./src
 COPY pom.xml pom.xml
 COPY .classpath .classpath

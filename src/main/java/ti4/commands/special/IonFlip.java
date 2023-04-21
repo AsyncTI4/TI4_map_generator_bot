@@ -14,7 +14,7 @@ public class IonFlip extends SpecialSubcommandData {
 
     public IonFlip() {
         super(Constants.ION_TOKEN_FLIP, "Flip ION Storm Token");
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
     }
 
     @Override

@@ -50,6 +50,8 @@ public class ChangeColor extends PlayerSubcommandData {
 
         String oldColor = player.getColor();
         player.changeColor(color);
+        String oldColorID = Mapper.getColorID(oldColor);
+        String colorID = Mapper.getColorID(color);
 
         for (Player playerInfo : players.values()) {
             LinkedHashMap<String, Integer> promissoryNotes = playerInfo.getPromissoryNotes();
@@ -70,10 +72,15 @@ public class ChangeColor extends PlayerSubcommandData {
                 promissoryNotesInPlayAreaChanged.add(replacedPN);
             }
             playerInfo.setPromissoryNotesInPlayArea(promissoryNotesInPlayAreaChanged);
+            List<String> mahactCC = playerInfo.getMahactCC();
+            for (String cc : mahactCC) {
+                String replacedCC = cc.replace(oldColor, color);
+                replacedCC = replacedCC.replace(oldColorID, colorID);
+                playerInfo.removeMahactCC(cc);
+                playerInfo.addMahactCC(replacedCC);
+            }
         }
 
-        String oldColorID = Mapper.getColorID(oldColor);
-        String colorID = Mapper.getColorID(color);
 
         for (Tile tile : activeMap.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {

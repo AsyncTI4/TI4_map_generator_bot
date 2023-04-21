@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
@@ -99,7 +98,7 @@ public class MoveUnits extends AddRemoveUnits {
 
 
             String planetTileName = AliasHandler.resolveTile("82b");
-            if (!PositionMapper.isTilePositionValid(position, activeMap)) {
+            if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
                 return null;
             }
@@ -220,16 +219,11 @@ public class MoveUnits extends AddRemoveUnits {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "From System/Tile name")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "To System/Tile name")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Unit name/s. Example: Dread, 2 Warsuns")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                                .setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "From System/Tile name").setRequired(true).setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns").setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "To System/Tile name").setRequired(true).setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Unit name/s. Example: Dread, 2 Warsuns").setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type no or n to not add CC, r or retreat to add a CC without taking it from tactics").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units. Type in yes or y"))
                         .addOptions(new OptionData(OptionType.STRING, Constants.NO_MAPGEN, "'True' to not generate a map update with this command").setAutoComplete(true))

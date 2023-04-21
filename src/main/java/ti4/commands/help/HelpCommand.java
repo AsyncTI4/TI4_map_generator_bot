@@ -103,6 +103,7 @@ public class HelpCommand implements Command {
         subcommands.add(new ListTiles());
         subcommands.add(new ListUnits());
         subcommands.add(new ListCommands());
+        subcommands.add(new ListMyGames());
 
         return subcommands;
     }

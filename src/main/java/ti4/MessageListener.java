@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInterac
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.entities.Role;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.helpers.Constants;
@@ -18,7 +19,8 @@ import ti4.map.MapFileDeleter;
 import ti4.map.MapManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-
+import ti4.commands.fow.Whisper;
+import ti4.map.Player;
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -26,8 +28,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
-
+import java.util.Objects;
+import java.util.Collection;
 import org.apache.commons.lang3.exception.ExceptionUtils;
+import ti4.helpers.AliasHandler;
 
 public class MessageListener extends ListenerAdapter {
 
@@ -119,6 +123,46 @@ public class MessageListener extends ListenerAdapter {
         }
         if (msg.getContentRaw().contains("used /fow whisper")) {
             msg.delete().queue();
+        }
+        if (msg.getContentRaw().toLowerCase().startsWith("tored") || msg.getContentRaw().toLowerCase().startsWith("topurple")
+        || msg.getContentRaw().toLowerCase().startsWith("toblue") || msg.getContentRaw().toLowerCase().startsWith("toyellow") 
+        || msg.getContentRaw().toLowerCase().startsWith("toorange") || msg.getContentRaw().toLowerCase().startsWith("togreen")) {
+            
+            String gameName = event.getChannel().getName();
+			gameName = gameName.substring(0, gameName.indexOf("-"));
+			Map map = MapManager.getInstance().getMap(gameName);
+            if(map.isFoWMode())
+            {
+                String msg3 = msg.getContentRaw();
+                String msg2 = msg3.substring(msg3.indexOf(" ")+1,msg3.length());
+                Player player = map.getPlayer(event.getAuthor().getId());
+                if(map.isCommunityMode())
+                {
+                    Collection<Player> players = map.getPlayers().values();
+                    java.util.List<Role> roles = event.getMember().getRoles();
+                    for (Player player2 : players) {
+                        if (roles.contains(player2.getRoleForCommunity())) {
+                            player = player2;
+                        }
+                    }
+                }
+                Player player_ = map.getPlayer(event.getAuthor().getId());
+                String factionColor = msg3.substring(2,msg3.indexOf(" ")).toLowerCase();
+                factionColor = AliasHandler.resolveFaction(factionColor);
+                for (Player player3 : map.getPlayers().values()) {
+                    if (Objects.equals(factionColor, player3.getFaction()) ||
+                            Objects.equals(factionColor, player3.getColor())) {
+                        player_ = player3;
+                        break;
+                    }
+                }
+                
+                if (map != null)
+                {
+                    Whisper.sendWhisper(map, player, player_, msg2, "n", (MessageChannel) event.getChannel(), event.getGuild());
+                }
+                msg.delete().queue();
+            }
         }
         if (msg.getContentRaw().startsWith("map_log")) {
             if (event.isFromType(ChannelType.PRIVATE)) {

@@ -7,11 +7,13 @@ import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionE
 import java.util.*;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.ObjectUtils.Null;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
@@ -22,6 +24,10 @@ import ti4.message.MessageHelper;
 public class FoWHelper {
 
 	public static Boolean isPrivateGame(GenericInteractionCreateEvent event) {
+		if (event == null)
+		{
+			return null;
+		}
 		return isPrivateGame(null, null, event.getChannel());
 	}
 
@@ -241,7 +247,7 @@ public class FoWHelper {
 			return tiles;
 		}
 
-		List<String> directlyAdjacentTiles = Mapper.getAdjacentTilePositions(map, position);
+		List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(map, position);
 		if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
 			// adjacency file for this tile is not filled in
 			return tiles;
@@ -476,10 +482,12 @@ public class FoWHelper {
 		int totalPings = playersWithVisiblity.size() + playersWithoutVisiblity.size();
 
 		for (Player player_ : playersWithVisiblity) {
+			if (!player_.isRealPlayer()) continue;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, messageForFullInfo);
 			succesfulCount += success ? 1 : 0;
 		}
 		for (Player player_ : playersWithoutVisiblity) {
+			if (!player_.isRealPlayer()) continue;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, messageForAll);
 			succesfulCount += success ? 1 : 0;
 		}

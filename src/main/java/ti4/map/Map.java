@@ -16,11 +16,14 @@ import ti4.message.BotLogger;
 
 import java.awt.*;
 import java.lang.reflect.Field;
+import java.time.LocalDate;
+import java.time.Period;
+import java.time.ZoneId;
 import java.util.List;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.util.*;
 
@@ -42,7 +45,7 @@ public class Map {
     private int playerCountForMap = 6;
 
     @ExportableField
-    private int ringCount = 0;
+    private int ringCount = 4;
     @ExportableField
     private int vp = 10;
     @ExportableField
@@ -115,6 +118,10 @@ public class Map {
 
     private static HashMap<Player, Integer> playerVPs = new HashMap<>();
 
+    //AUTOCOMPLETE CACHE
+    List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache = null;
+    List<SimpleEntry<String, String>> planetNameAutocompleteOptionsCache = null;
+
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
         lastModifiedDate = new Date().getTime();
@@ -147,6 +154,11 @@ public class Map {
         for (int i = 0; i < 8; i++) {
             scTradeGoods.put(i + 1, 0);
         }
+    }
+
+    synchronized public Map copy() {
+        Map m = this;
+        return m;
     }
 
     public HashMap<String, Object> getExportableFieldMap() {
@@ -300,6 +312,14 @@ public class Map {
     }
 
     public MessageChannel getMainGameChannel() {
+        return mainChannel;
+    }
+
+    public void setActionChannel(MessageChannel channel) {
+        mainChannel = channel;
+    }
+
+    public MessageChannel getActionChannel() {
         return mainChannel;
     }
 
@@ -1505,5 +1525,39 @@ public class Map {
         Integer playerVPCount = playerVPs.get(player);
         if (playerVPCount == null) playerVPCount = 0;
         return playerVPCount;
+    }
+
+    public void endGameIfOld() {
+        if (isHasEnded()) return;
+        
+        LocalDate currentDate = LocalDate.now();
+        LocalDate lastModifiedDate = (new Date(this.lastModifiedDate)).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        Period period = Period.ofMonths(5); //TODO: CANDIDATE FOR GLOBAL VARIABLE
+        LocalDate oldestLastModifiedDateBeforeEnding = currentDate.minus(period);
+
+        if (lastModifiedDate.compareTo(oldestLastModifiedDateBeforeEnding) < 0) {
+            BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate.toString() + " - the game flag `hasEnded` has been set to true");
+            setHasEnded(true);
+            MapSaveLoadManager.saveMap(this);
+        }
+    }
+
+    public void rebuildTilePositionAutoCompleteList() {
+        setTileNameAutocompleteOptionsCache(getTileMap().entrySet().stream()
+            .map(e -> new AbstractMap.SimpleEntry<String, String>(e.getValue().getRepresentationForAutoComplete(), e.getValue().getPosition()))
+            .filter(e -> !e.getKey().toLowerCase().contains("hyperlane"))
+            .toList());
+    }
+
+    public List<SimpleEntry<String, String>> getTileNameAutocompleteOptionsCache() {
+        if (tileNameAutocompleteOptionsCache != null) {
+            return this.tileNameAutocompleteOptionsCache;
+        }
+        rebuildTilePositionAutoCompleteList();
+        return this.tileNameAutocompleteOptionsCache;
+    }
+
+    public void setTileNameAutocompleteOptionsCache(List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache) {
+        this.tileNameAutocompleteOptionsCache = tileNameAutocompleteOptionsCache;
     }
 }
