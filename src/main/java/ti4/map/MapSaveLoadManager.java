@@ -819,7 +819,7 @@ public class MapSaveLoadManager {
                 case Constants.CUSTOM_ADJACENT_TILES -> map.setCustomAdjacentTiles(getParsedCardsForScoredPO(info));
                 case Constants.ADJACENCY_OVERRIDES -> {
                     try {
-                        map.setAdjacentTileOverride(getParsedAdjacencyOverrides(info));
+                        map.setAdjacentTileOverride(getParsedAdjacencyOverrides(info, map));
                     } catch (Exception e) {
                         BotLogger.log("Failed to load adjacency overrides", e);
                     }
@@ -1091,7 +1091,8 @@ public class MapSaveLoadManager {
         return scoredPOs;
     }
 
-    private static LinkedHashMap<Pair<String, Integer>, String> getParsedAdjacencyOverrides(String tokenizer) {
+    private static LinkedHashMap<Pair<String, Integer>, String> getParsedAdjacencyOverrides(String tokenizer, Map map) {
+
         StringTokenizer override = new StringTokenizer(tokenizer, ";");
         LinkedHashMap<Pair<String, Integer>, String> overrides = new LinkedHashMap<>();
         while (override.hasMoreTokens()) {
@@ -1100,10 +1101,24 @@ public class MapSaveLoadManager {
             String direction = overrideInfo[1];
             String secondaryTile = overrideInfo[2];
 
+            primaryTile = migratePosition(map, primaryTile);
+            secondaryTile = migratePosition(map, secondaryTile);
+
             Pair<String, Integer> primary = new ImmutablePair<String, Integer>(primaryTile, Integer.parseInt(direction));
             overrides.put(primary, secondaryTile);
         }
         return overrides;
+    }
+
+    private static String migratePosition(Map map, String primaryTile) {
+        if (!PositionMapper.isTilePositionValid(primaryTile)) {
+            if (map.getRingCount() == 8) {
+                primaryTile = PositionMapper.getMigrate8RingsPosition(primaryTile);
+            } else {
+                primaryTile = PositionMapper.getMigratePosition(primaryTile);
+            }
+        }
+        return primaryTile;
     }
 
     private static void readPlayerInfo(Player player, String data) {
