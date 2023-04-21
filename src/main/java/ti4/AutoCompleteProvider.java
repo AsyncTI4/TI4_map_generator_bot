@@ -385,7 +385,10 @@ public class AutoCompleteProvider {
             }
             case Constants.TILE_NAME, Constants.TILE_NAME_TO -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                
+                if (activeMap == null) {
+                    event.replyChoiceStrings("No Active Map for this Channel").queue();
+                    return;
+                }
                 if (activeMap.isFoWMode()) {
                     List<String> positions = new ArrayList<>(activeMap.getTileMap().keySet());
                     List<Command.Choice> options = positions.stream()
@@ -395,9 +398,7 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
                 } else {                    
-                    HashMap<String, Tile> tileMap = activeMap.getTileMap();
-                    List<Command.Choice> options = tileMap.entrySet().stream()
-                        .map(e -> new AbstractMap.SimpleEntry<String, String>(e.getValue().getRepresentationForAutoComplete(), e.getValue().getPosition()))
+                    List<Command.Choice> options = activeMap.getTileNameAutocompleteOptionsCache().stream()
                         .filter(value -> value.getKey().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getKey(), value.getValue()))

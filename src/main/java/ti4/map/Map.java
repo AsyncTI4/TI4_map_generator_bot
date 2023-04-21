@@ -20,6 +20,8 @@ import java.time.LocalDate;
 import java.time.Period;
 import java.time.ZoneId;
 import java.util.List;
+import java.util.AbstractMap.SimpleEntry;
+import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -115,6 +117,10 @@ public class Map {
     private ArrayList<String> relics = new ArrayList<>();
 
     private static HashMap<Player, Integer> playerVPs = new HashMap<>();
+
+    //AUTOCOMPLETE CACHE
+    List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache = null;
+    List<SimpleEntry<String, String>> planetNameAutocompleteOptionsCache = null;
 
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
@@ -1534,5 +1540,24 @@ public class Map {
             setHasEnded(true);
             MapSaveLoadManager.saveMap(this);
         }
+    }
+
+    public void rebuildTilePositionAutoCompleteList() {
+        setTileNameAutocompleteOptionsCache(getTileMap().entrySet().stream()
+            .map(e -> new AbstractMap.SimpleEntry<String, String>(e.getValue().getRepresentationForAutoComplete(), e.getValue().getPosition()))
+            .filter(e -> !e.getKey().toLowerCase().contains("hyperlane"))
+            .toList());
+    }
+
+    public List<SimpleEntry<String, String>> getTileNameAutocompleteOptionsCache() {
+        if (tileNameAutocompleteOptionsCache != null) {
+            return this.tileNameAutocompleteOptionsCache;
+        }
+        rebuildTilePositionAutoCompleteList();
+        return this.tileNameAutocompleteOptionsCache;
+    }
+
+    public void setTileNameAutocompleteOptionsCache(List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache) {
+        this.tileNameAutocompleteOptionsCache = tileNameAutocompleteOptionsCache;
     }
 }

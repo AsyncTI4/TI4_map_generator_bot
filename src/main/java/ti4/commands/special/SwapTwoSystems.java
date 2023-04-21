@@ -51,5 +51,6 @@ public class SwapTwoSystems extends SpecialSubcommandData {
         tileTo.setPosition(position);
         activeMap.setTile(tile);
         activeMap.setTile(tileTo);
+        activeMap.rebuildTilePositionAutoCompleteList();
     }
 }
