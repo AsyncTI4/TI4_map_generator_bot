@@ -64,7 +64,7 @@ public class ScoreSO extends SOCardsSubcommandData {
             message.append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
         }
         if (event != null && channel.getName().equalsIgnoreCase(event.getChannel().getName())) {
-            MessageHelper.sendMessageToChannel(event, message.toString());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
         } else {
             MessageHelper.sendMessageToChannel(channel, message.toString());
         }

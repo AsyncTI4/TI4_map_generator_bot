@@ -1,11 +1,13 @@
 package ti4.commands.cardsac;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -116,7 +118,7 @@ public class PlayAC extends ACCardsSubcommandData {
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannel(mainGameChannel, sb.toString());
         } else {
-            Button buttons [] = { sabotageButton, noSabotageButton };
+            List<Button> buttons = new ArrayList<>(List.of(sabotageButton, noSabotageButton));
             MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, sb.toString(), activeMap, player, buttons);
         }
         

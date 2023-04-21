@@ -57,6 +57,5 @@ public class DebtSend extends PlayerSubcommandData {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap, event);
-        MessageHelper.replyToMessageTI4Logo(event);
     }
 }

@@ -45,7 +45,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
      * @param messageText new message
      */
     public void sendMessage(String messageText) {
-        MessageHelper.replyToSlashCommand(event, messageText);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);
     }
 
     abstract public void execute(SlashCommandInteractionEvent event);
@@ -157,6 +157,6 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
-        MessageHelper.replyToMessageTI4Logo(event);
+
     }
 }

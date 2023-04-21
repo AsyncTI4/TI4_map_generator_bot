@@ -22,25 +22,25 @@ public class PingActivePlayer extends FOWSubcommandData {
 
         String playerID = activeMap.getActivePlayer();
         if (playerID == null) {
-            MessageHelper.replyToSlashCommand(event, "There is no active player right now.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
             return;
         }
         Player player = activeMap.getPlayer(playerID);
         if (player == null) {
-            MessageHelper.replyToSlashCommand(event, "There is no active player right now.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "There is no active player right now.");
             return;
         }
 
         long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
         if (milliSinceLastPing < (1000 * 60 * 60 * 8)) { //eight hours
-            MessageHelper.replyToSlashCommand(event, "Active player was pinged recently. Try again later.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player was pinged recently. Try again later.");
         } else {
             String ping = Helper.getPlayerRepresentation(event, player, true) + " IS STILL UP FOR AN ACTION";
             if(activeMap.isFoWMode()) {
-                MessageHelper.replyToSlashCommand(event, "Active player has been pinged.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Active player has been pinged.");
                 MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);
             } else {
-                MessageHelper.replyToSlashCommand(event, ping);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);
             }
             activeMap.setLastActivePlayerPing(new Date());
         }

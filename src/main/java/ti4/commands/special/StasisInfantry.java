@@ -48,13 +48,13 @@ public class StasisInfantry extends SpecialSubcommandData {
             if (setValue) {
                 consumer.accept(number);
                 String messageToSend = Stats.getSetValueMessage(event, player, Constants.COUNT, number, existingNumber);
-                MessageHelper.replyToSlashCommand(event, messageToSend);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageToSend);
             } else {
                 int newNumber = existingNumber + number;
                 newNumber = Math.max(newNumber, 0);
                 consumer.accept(newNumber);
                 String messageToSend = Stats.getChangeValueMessage(event, player, Constants.COUNT, number, existingNumber, newNumber);
-                MessageHelper.replyToSlashCommand(event, messageToSend);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageToSend);
             }
         } catch (Exception e) {
             sendMessage("Could not parse number for: " + Constants.COUNT);
