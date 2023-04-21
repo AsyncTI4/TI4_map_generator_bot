@@ -43,7 +43,7 @@ public class Map {
     private int playerCountForMap = 6;
 
     @ExportableField
-    private int ringCount = 0;
+    private int ringCount = 4;
     @ExportableField
     private int vp = 10;
     @ExportableField

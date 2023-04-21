@@ -74,13 +74,13 @@ public class AddTileList implements Command {
 
             try {
                 Tile tile;
-                if (userActiveMap.getPlayerCountForMap() == 8) {
-                    tile = new Tile(AliasHandler.resolveTile(Constants.SETUP8), "0");
-                } else {
-                    tile = new Tile(AliasHandler.resolveTile(Constants.SETUP6), "0");
-                }
-
-                userActiveMap.setTile(tile);
+//                if (userActiveMap.getPlayerCountForMap() == 8) {
+//                    tile = new Tile(AliasHandler.resolveTile(Constants.SETUP8), "0");
+//                } else {
+//                    tile = new Tile(AliasHandler.resolveTile(Constants.SETUP6), "0");
+//                }
+//
+//                userActiveMap.setTile(tile);
                 tile = new Tile(AliasHandler.resolveTile(Constants.MALLICE), "TL");
                 userActiveMap.setTile(tile);
                 if (!tileList.startsWith("{") && !tileList.contains("}")) {

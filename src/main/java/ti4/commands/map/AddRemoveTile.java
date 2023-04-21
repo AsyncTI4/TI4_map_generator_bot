@@ -50,7 +50,7 @@ abstract public class AddRemoveTile implements Command {
     protected Map tileParsing(SlashCommandInteractionEvent event, String userID, MapManager mapManager) {
         String planetTileName = AliasHandler.resolveTile(event.getOptions().get(0).getAsString().toLowerCase());
         String position = event.getOptions().get(1).getAsString();
-        if (!PositionMapper.isTilePositionValid(position, mapManager.getUserActiveMap(userID))) {
+        if (!PositionMapper.isTilePositionValid(position)) {
             MessageHelper.replyToMessage(event, "Position tile not allowed");
             return null;
         }

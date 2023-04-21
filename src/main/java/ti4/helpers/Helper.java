@@ -885,14 +885,8 @@ public class Helper {
      */
     public static String getMapString(Map map) {
         List<String> tilePositions = new ArrayList<String>();
-        tilePositions.add("0a");
-        if (map.getPlayerCountForMap() == 6) {
-            tilePositions.addAll(MapStringMapper.mapFor6Player);
-        } else if (map.getPlayerCountForMap() == 8) {
-            tilePositions.addAll(MapStringMapper.mapFor8Player);
-        } else {
-            return new String("at the current time, `/game get_map_string` is only supported for 6 and 8 player games");
-        }
+        tilePositions.add("000");
+        tilePositions.addAll(map.getTileMap().keySet());
         List<String> sortedTilePositions = tilePositions.stream().sorted().collect(Collectors.toList());
         
         HashMap<String, Tile> tileMap = new HashMap<>(map.getTileMap());

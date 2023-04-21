@@ -24,7 +24,7 @@ public class RemoveAdjacencyOverride extends FOWSubcommandData {
             return;
         }
         String primaryTile = primaryTileOption.getAsString().toLowerCase();
-        if (primaryTile.isBlank() || !PositionMapper.isTilePositionValid(primaryTile, activeMap)){
+        if (primaryTile.isBlank() || !PositionMapper.isTilePositionValid(primaryTile)){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Bad data, try again");
             return;
         }

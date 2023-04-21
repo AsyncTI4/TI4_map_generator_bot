@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -93,7 +94,7 @@ public class Setup extends PlayerSubcommandData {
         boolean is6playerMap = true;
         if (activeMap.getPlayerCountForMap() == 6){
             setup = Constants.setup6p;
-            if (MapStringMapper.mapFor6Player.contains(positionHS)){
+            if (PositionMapper.isTilePositionValid(positionHS)){
                 useSpecified = true;
             }
         } else {
@@ -102,7 +103,7 @@ public class Setup extends PlayerSubcommandData {
             if (activeMap.getRingCount() == 8)
             {
                 useSpecified = true;
-            } else if (MapStringMapper.mapFor8Player.contains(positionHS)){
+            } else if (PositionMapper.isTilePositionValid(positionHS)){
                 useSpecified = true;
             }
         }

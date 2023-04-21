@@ -1,5 +1,6 @@
 package ti4.map;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -10,12 +11,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-
 import org.jetbrains.annotations.Nullable;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-
 import ti4.MapGenerator;
+import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
@@ -719,8 +717,10 @@ public class MapSaveLoadManager {
                         if (tileData.isEmpty()) {
                             continue;
                         }
-                        Tile tile = readTile(tileData);
-                        tileMap.put(tile.getPosition(), tile);
+                        Tile tile = readTile(tileData, map);
+                        if (tile != null) {
+                            tileMap.put(tile.getPosition(), tile);
+                        }
 
                         while (myReader.hasNextLine()) {
                             String tmpData = myReader.nextLine();
@@ -873,10 +873,9 @@ public class MapSaveLoadManager {
                     }
                 }
                 case Constants.PLAYER_COUNT_FOR_MAP -> {
-                    String count = info;
                     try {
-                        int playerCount = Integer.parseInt(count);
-                        if (playerCount == 6 || playerCount == 8) {
+                        int playerCount = Integer.parseInt(info);
+                        if (playerCount >= 2 && playerCount <= 30) {
                             map.setPlayerCountForMap(playerCount);
                         } else {
                             map.setPlayerCountForMap(6);
@@ -886,32 +885,31 @@ public class MapSaveLoadManager {
                     }
                 }
                 case Constants.RING_COUNT_FOR_MAP -> {
-                    String count = info;
                     try {
-                        int ringCount = Integer.parseInt(count);
-                        if (ringCount == 8) {
+                        int ringCount = Integer.parseInt(info);
+                        if (ringCount >= 3 && ringCount <= 8) {
                             map.setRingCount(ringCount);
+                        } else {
+                            map.setRingCount(3);
                         }
                     } catch (Exception e) {
-                        map.setRingCount(0);
+                        map.setRingCount(3);
                     }
                 }
                 case Constants.VP_COUNT -> {
-                    String count = info;
                     try {
-                        int vpCount = Integer.parseInt(count);
+                        int vpCount = Integer.parseInt(info);
                         map.setVp(vpCount);
                     } catch (Exception e) {
                         map.setVp(10);
                     }
                 }
                 case Constants.DISPLAY_TYPE -> {
-                    String displayType = info;
-                    if (displayType.equals(DisplayType.stats.getValue())) {
+                    if (info.equals(DisplayType.stats.getValue())) {
                         map.setDisplayTypeForced(DisplayType.stats);
-                    } else if (displayType.equals(DisplayType.map.getValue())) {
+                    } else if (info.equals(DisplayType.map.getValue())) {
                         map.setDisplayTypeForced(DisplayType.map);
-                    } else if (displayType.equals(DisplayType.all.getValue())) {
+                    } else if (info.equals(DisplayType.all.getValue())) {
                         map.setDisplayTypeForced(DisplayType.all);
                     }
                 }
@@ -1243,12 +1241,27 @@ public class MapSaveLoadManager {
         player.setRoleForCommunity(roleById);
     }
 
-    private static Tile readTile(String tileData) {
+    private static Tile readTile(String tileData, Map map) {
         StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
         String tileID = tokenizer.nextToken();
         String position = tokenizer.nextToken();
         if (position.equals("mr")) {
             position = "0a";
+        }
+        String tempPosition = position;
+        if (!PositionMapper.isTilePositionValid(position)) {
+            if (map.getRingCount() == 8) {
+                position = PositionMapper.getMigrate8RingsPosition(position);
+            } else {
+                position = PositionMapper.getMigratePosition(position);
+            }
+            if (position == null) {
+                System.out.println(tempPosition + " " + map.getName());
+            }
+        }
+        if (tileID.equalsIgnoreCase("setup6") || tileID.equalsIgnoreCase("setup8"))
+        {
+            tileID = "setup";
         }
         return new Tile(tileID, position);
     }

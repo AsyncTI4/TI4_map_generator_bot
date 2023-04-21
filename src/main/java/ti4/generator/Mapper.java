@@ -48,8 +48,6 @@ public class Mapper {
     private static final Properties playerSetup = new Properties();
     private static final Properties miltyDraft = new Properties();
     private static final Properties agendaRepresentation = new Properties();
-    private static final Properties adjacentTiles = new Properties();
-    private static final Properties adjacent8RingTiles = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties wormholes = new Properties();
     private static final HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = new HashMap<>();
@@ -85,8 +83,6 @@ public class Mapper {
         readData("faction_setup.properties", playerSetup, "Could not read player setup file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("agenda_representation.properties", agendaRepresentation, "Could not read agenda representaion file");
-        readData("adjacent.properties", adjacentTiles, "Could not read adjacent tiles file");
-        readData("adjacent8ring.properties", adjacent8RingTiles, "Could not read adjacent tiles file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
         readData("wormholes.properties", wormholes, "Could not read wormholes file");
     }
@@ -146,20 +142,6 @@ public class Mapper {
 
     public static String getTileID(String tileID) {
         return tiles.getProperty(tileID);
-    }
-
-    public static List<String> getAdjacentTilePositions(ti4.map.Map map, String tileID) {
-
-        String property;
-        if (map.getRingCount() == 8) {
-            property = adjacent8RingTiles.getProperty(tileID);
-        } else {
-            property = adjacentTiles.getProperty(tileID);
-        }
-        if (property == null) {
-            return Collections.emptyList();
-        }
-        return Arrays.stream(property.split(",")).toList();
     }
 
     public static List<List<Boolean>> getHyperlaneData(String tileID) {

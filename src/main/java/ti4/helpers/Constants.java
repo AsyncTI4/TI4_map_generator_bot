@@ -522,24 +522,24 @@ public class Constants {
     public static final String HS_TILE_POSITION = "hs_tile_position";
     public static final ArrayList<String> setup6p = new ArrayList<>();
     static {
-        setup6p.add("3a");
-        setup6p.add("3d");
-        setup6p.add("3g");
-        setup6p.add("3j");
-        setup6p.add("3m");
-        setup6p.add("3p");
+        setup6p.add("301");
+        setup6p.add("304");
+        setup6p.add("307");
+        setup6p.add("310");
+        setup6p.add("313");
+        setup6p.add("316");
     }
 
     public static final ArrayList<String> setup8p = new ArrayList<>();
     static {
-        setup8p.add("4a");
-        setup8p.add("4d");
-        setup8p.add("4g");
-        setup8p.add("4j");
-        setup8p.add("4m");
-        setup8p.add("4p");
-        setup8p.add("4s");
-        setup8p.add("4w");
+        setup8p.add("401");
+        setup8p.add("404");
+        setup8p.add("407");
+        setup8p.add("410");
+        setup8p.add("413");
+        setup8p.add("416");
+        setup8p.add("419");
+        setup8p.add("422");
     }
     public static final HashMap<String, String> KELERES_CHOICES = new HashMap<>();
     static {
@@ -599,4 +599,12 @@ public class Constants {
     public static final String LATEST_COMMAND = "latest_command";
     public static final String LIST_MY_GAMES = "list_my_games";
     public static final String RELIC_SEND = "relic_send";
+
+    public static final String STATS_USERNAME="userName";
+    public static final String STATS_VP ="vp";
+    public static final String STATS_CC="cc";
+    public static final String STATS_SPEAKER="speaker";
+    public static final String STATS_SC="sc";
+    public static final String STATS_PASSED="passed";
+    public static final String STATS_SO="so";
 }

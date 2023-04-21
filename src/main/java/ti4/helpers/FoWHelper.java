@@ -13,6 +13,7 @@ import org.jetbrains.annotations.Nullable;
 
 import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
@@ -246,7 +247,7 @@ public class FoWHelper {
 			return tiles;
 		}
 
-		List<String> directlyAdjacentTiles = Mapper.getAdjacentTilePositions(map, position);
+		List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(map, position);
 		if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
 			// adjacency file for this tile is not filled in
 			return tiles;

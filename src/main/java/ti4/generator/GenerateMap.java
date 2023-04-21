@@ -1,13 +1,10 @@
 package ti4.generator;
 
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
-
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
 import ti4.MapGenerator;
 import ti4.ResourceHelper;
 import ti4.helpers.*;
@@ -26,7 +23,6 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -34,28 +30,34 @@ import java.util.stream.Collectors;
 public class GenerateMap {
     public static final int DELTA_X = 8;
     public static final int DELTA_Y = 24;
+    public static final int RING_MAX_COUNT = 8;
+    public static final int PLAYER_STATS_HEIGHT = 650;
     private Graphics graphics;
     private BufferedImage mainImage;
     private int width;
     private int height;
     private int heightStorage;
     private int heightStats;
+    private int mapHeight;
+    private int mapWidth;
     private int heightForGameInfo;
-    private int heightForGameInfoStorage;
     private static int scoreTokenWidth = 0;
-    private int extraWidth = 200;
+    private int extraX = 300;
+    private int extraY = 200;
     private static Point tilePositionPoint = new Point(230, 295);
     private static Point labelPositionPoint = new Point(90, 295);
     private static Point numberPositionPoint = new Point(40, 27);
     private static HashMap<Player, Integer> userVPs = new HashMap<>();
 
-    private final int width6 = 2000;
-    private final int heght6 = 2100;
     private final int width8 = 2500;
     private final int heght8 = 3350;
+    private final int playerHeight = 340;
 
-    private final int width8ring = 4700;
-    private final int height8ring = 5750;
+    private int minX = -1;
+    private int minY = -1;
+    private int maxX = -1;
+    private int maxY = -1;
+    private boolean extraRow = false;
 
     private Boolean isFoWPrivate = null;
     private Player fowPlayer = null;
@@ -78,21 +80,26 @@ public class GenerateMap {
     }
 
     private void init(Map map) {
-        int mapWidth = width6;
-        int mapHeight = heght6;
-        if (map != null && map.getPlayerCountForMap() == 8) {
-            mapWidth = width8;
-            mapHeight = heght8;
+        mapHeight = width8;
+        mapWidth = heght8;
+        heightStats = heght8 / 2;
+        if (map != null) {
+            int playerCountForMap = map.getPlayerCountForMap();
+            heightStats = playerCountForMap * playerHeight + map.getLaws().keySet().size() * 115 + 600;
+            mapHeight = (map.getRingCount() + 1) * 600 + extraY * 2;
+            mapWidth = (map.getRingCount() + 1) * 520 + extraX * 2;
+            extraRow = false;
+            if ((mapHeight - extraY) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + extraY)) {
+                mapWidth += extraX;
+                extraRow = true;
+            }
+
+            if (mapWidth < 2500) {
+                mapWidth = 2500;
+            }
         }
-        if (map != null && map.getRingCount() == 8) {
-            mapWidth = width8ring;
-            mapHeight = height8ring;
-        }
-        width = mapWidth + (extraWidth * 2);
-        heightForGameInfo = mapHeight;
-        heightForGameInfoStorage = heightForGameInfo;
-        height = heightForGameInfo + mapHeight / 2 + 2200;
-        heightStats = mapHeight / 2 + 2200;
+        width = mapWidth;
+        height = mapHeight + heightStats;
         heightStorage = height;
     }
 
@@ -130,10 +137,10 @@ public class GenerateMap {
             heightForGameInfo = 40;
             height = heightStats;
         } else if (displayType == DisplayType.map) {
-            heightForGameInfo = heightForGameInfoStorage;
-            height = heightForGameInfoStorage + 640;
+            heightForGameInfo = mapHeight - 600;
+            height = mapHeight;
         } else {
-            heightForGameInfo = heightForGameInfoStorage;
+            heightForGameInfo = mapHeight;
             height = heightStorage;
         }
         resetImage();
@@ -164,14 +171,43 @@ public class GenerateMap {
             if (displayType == DisplayType.all || displayType == DisplayType.map) {
                 HashMap<String, Tile> tileMap = new HashMap<>(tilesToDisplay);
                 String setup = tileMap.keySet().stream()
-                        .filter(key -> key.equals("0"))
+                        .filter(key -> key != null && key.equals("0"))
                         .findFirst()
                         .orElse(null);
                 if (setup != null) {
-                    if (tileMap.get(setup).getTileID().equals("setup8ring")) {
+                    if (tileMap.get(setup).getTileID().equals("setup")) {
+                        int ringCount = map.getRingCount();
+                        minX = 10000;
+                        minY = 10000;
+                        maxX = -1;
+                        maxY = -1;
+                        Set<String> filledPositions = new HashSet<>();
                         for (String position : PositionMapper.get8RingTiles()) {
-                            addTile(new Tile("0gray", position), map, TileStep.Tile);
+                            String tileRing = "0";
+                            if (position.length() == 3) {
+                                tileRing = position.substring(0, 1);
+                            } else if (position.length() == 4) {
+                                tileRing = position.substring(0, 2);
+                            }
+                            int tileRingNumber = -1;
+                            try {
+                                tileRingNumber = Integer.parseInt(tileRing);
+                            } catch (Exception e) {
+                                //Do nothing
+                            }
+
+                            if (tileRingNumber > -1 && tileRingNumber <= ringCount && !tileMap.containsKey(position)) {
+                                addTile(new Tile("0gray", position), map, TileStep.Tile);
+                                filledPositions.add(position);
+                            }
                         }
+                        for (String position : PositionMapper.get8RingTiles()) {
+                            if (!tileMap.containsKey(position) || !filledPositions.contains(position)) {
+                                addTile(new Tile("0border", position), map, TileStep.Tile, true);
+                            }
+                        }
+
+
                     } else {
                         addTile(tileMap.get(setup), map, TileStep.Tile);
                     }
@@ -204,8 +240,8 @@ public class GenerateMap {
         String timeStamp = getTimeStamp();
         String absolutePath = Storage.getMapImageDirectory() + "/" + map.getName() + "_" + timeStamp + ".jpg";
         try (
-             FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)
-             ) {
+                FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)
+        ) {
             final BufferedImage convertedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
             convertedImage.createGraphics().drawImage(mainImage, 0, 0, Color.black, null);
             final boolean canWrite = ImageIO.write(convertedImage, "jpg", fileOutputStream);
@@ -762,7 +798,7 @@ public class GenerateMap {
         int totalPlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceTotal(player, map);
         int availablePlayerFlex = Helper.getPlayerFlexResourcesInfluenceAvailable(player, map);
         int totalPlayerFlex = Helper.getPlayerFlexResourcesInfluenceTotal(player, map);
-        drawPAImage(x + deltaX- 2, y - 2, "pa_resinf_info.png");
+        drawPAImage(x + deltaX - 2, y - 2, "pa_resinf_info.png");
         graphics.setColor(Color.WHITE);
         graphics.drawRect(x + deltaX - 2, y - 2, 152, 152);
 
@@ -990,8 +1026,7 @@ public class GenerateMap {
         drawPAImage(x + deltaX, y, techSpec);
         if (stasisInfantry < 20) {
             graphics.setFont(Storage.getFont35());
-        }
-        else {
+        } else {
             graphics.setFont(Storage.getFont30());
         }
         int centerX = 0;
@@ -1011,7 +1046,7 @@ public class GenerateMap {
         for (String tech : techs) {
             String[] techInformation = techInfo.get(tech);
             if (techInformation.length >= 5) {
-                if (techInformation[4].equals("inf2")){
+                if (techInformation[4].equals("inf2")) {
                     return true;
                 }
             }
@@ -1232,7 +1267,7 @@ public class GenerateMap {
     }
 
     private void playerInfo(Map map) {
-        int playerPosition = 1;
+        int playerRow = 1;
         graphics.setFont(Storage.getFont32());
         graphics.setColor(Color.WHITE);
         Player speaker = map.getPlayer(map.getSpeaker());
@@ -1241,21 +1276,47 @@ public class GenerateMap {
             Collections.shuffle(players);
         }
 
+
+        int deltaX = mapWidth - extraX - (extraRow ? extraX : 0);
+        int deltaY = extraY;
+
+
+//        public static final String STATS_USERNAME="userName";
+//        public static final String STATS_VO="vp";
+//        public static final String STATS_CC="cc";
+//        public static final String STATS_SPEAKER="speaker";
+//        public static final String STATS_SC="sc";
+//        public static final String STATS_PASSED="passed";
+//        public static final String STATS_SO="so";
+//
         for (Player player : players) {
-            ArrayList<Point> points = PositionMapper.getPlayerPosition(playerPosition, map);
-            if (points.isEmpty()) {
-                continue;
+
+            if ((deltaY + PLAYER_STATS_HEIGHT) > (mapHeight - extraY)) {
+                playerRow++;
+                if (playerRow == 2) {
+                    deltaY = extraY;
+                    deltaX = 10;
+                } else if (playerRow == 3) {
+                    deltaX = mapWidth - extraX + 10;
+                    deltaY = extraY;
+                } else if (playerRow == 4) {
+                    deltaX = mapWidth + 10;
+                    deltaY = extraY;
+                }
             }
+
             String userName = player.getUserName();
 
             boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(map, player, fowPlayer);
             if (convertToGeneric) {
                 continue;
             }
-            graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), points.get(0).x, points.get(0).y);
+            Point point = PositionMapper.getPlayerStats(Constants.STATS_USERNAME);
+            graphics.drawString(userName.substring(0, Math.min(userName.length(), 11)), point.x + deltaX, point.y + deltaY);
             Integer vpCount = userVPs.get(player);
             vpCount = vpCount == null ? 0 : vpCount;
-            graphics.drawString("VP - " + vpCount, points.get(1).x, points.get(1).y);
+            point = PositionMapper.getPlayerStats(Constants.STATS_VP);
+            graphics.drawString("VP - " + vpCount, point.x + deltaX, point.y + deltaY);
 
             int totalSecrets = player.getSecrets().keySet().size();
             Set<String> soSet = player.getSecretsScored().keySet();
@@ -1263,33 +1324,35 @@ public class GenerateMap {
 
             String soHand = "pa_so-icon_hand.png";
             String soScored = "pa_so-icon_scored.png";
+            point = PositionMapper.getPlayerStats(Constants.STATS_SO);
             for (int i = 0; i < totalSecrets; i++) {
-                drawPAImage((points.get(6).x + soOffset), points.get(6).y, soHand);
+                drawPAImage((point.x + deltaX + soOffset), point.y + deltaY, soHand);
                 soOffset += 25;
             }
             ArrayList<String> soToPoList = map.getSoToPoList();
             for (String soID : soSet) {
                 if (!soToPoList.contains(soID)) {
-                    drawPAImage((points.get(6).x + soOffset), points.get(6).y, soScored);
+                    drawPAImage((point.x + deltaX + soOffset), point.y + deltaY, soScored);
                     soOffset += 25;
                 }
             }
-
 
             int sc = player.getSC();
             String scText = sc == 0 ? " " : Integer.toString(sc);
             scText = getSCNumberIfNaaluInPlay(player, map, scText);
             graphics.setColor(getSCColor(sc, map));
             graphics.setFont(Storage.getFont64());
+            point = PositionMapper.getPlayerStats(Constants.STATS_SC);
             if (sc != 0) {
-                graphics.drawString(scText, points.get(4).x, points.get(4).y);
+                graphics.drawString(scText, point.x + deltaX, point.y + deltaY);
             }
             graphics.setColor(Color.WHITE);
             graphics.setFont(Storage.getFont32());
             String ccID = Mapper.getCCID(player.getColor());
             String fleetCCID = Mapper.getFleeCCID(player.getColor());
-            int x = points.get(2).x;
-            int y = points.get(2).y;
+            point = PositionMapper.getPlayerStats(Constants.STATS_CC);
+            int x = point.x + deltaX;
+            int y = point.y + deltaY;
             drawCCOfPlayer(ccID, x, y, player.getTacticalCC(), false, null, map);
 //            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), "letnev".equals(player.getFaction()));
             drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), false, player, map);
@@ -1305,20 +1368,20 @@ public class GenerateMap {
                     } catch (IOException e) {
                         BotLogger.log("Could not read speaker file", e);
                     }
-                    graphics.drawImage(bufferedImage, points.get(3).x, points.get(3).y, null);
+                    point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
+                    graphics.drawImage(bufferedImage, point.x + deltaX, point.y + deltaY, null);
                     graphics.setColor(Color.WHITE);
                 }
             }
             if (player.isPassed()) {
+                point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
                 graphics.setColor(new Color(238, 58, 80));
-                graphics.drawString("PASSED", points.get(5).x, points.get(5).y);
+                graphics.drawString("PASSED", point.x + deltaX, point.y + deltaY);
                 graphics.setColor(Color.WHITE);
             }
 
-            playerPosition++;
+            deltaY += PLAYER_STATS_HEIGHT;
         }
-
-
     }
 
     private void drawCCOfPlayer(String ccID, int x, int y, int ccCount, boolean isLetnev, Player player, Map map) {
@@ -1365,7 +1428,7 @@ public class GenerateMap {
                         faction = getFactionByControlMarker(map.getPlayers().values(), fleetCCID);
                         factionImage = null;
                         if (faction != null) {
-                            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(map,player, fowPlayer);
+                            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(map, player, fowPlayer);
                             if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
                                 String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
                                 if (factionImagePath != null) {
@@ -1630,21 +1693,21 @@ public class GenerateMap {
     }
 
     private int displayObjectives(
-        int y,
-        int x,
-        Map map,
-        LinkedHashMap<String, List<String>> scoredPublicObjectives,
-        LinkedHashMap<String, Integer> revealedPublicObjectives,
-        LinkedHashMap<String, Player> players,
-        HashMap<String, String> publicObjectivesState,
-        Set<String> po,
-        Integer objectiveWorth,
-        Integer[] column,
-        LinkedHashMap<String, Integer> customPublicVP,
-        boolean justCalculate,
-        boolean fixedColumn,
-        Graphics graphics,
-        HashMap<Player, Integer> userVPs
+            int y,
+            int x,
+            Map map,
+            LinkedHashMap<String, List<String>> scoredPublicObjectives,
+            LinkedHashMap<String, Integer> revealedPublicObjectives,
+            LinkedHashMap<String, Player> players,
+            HashMap<String, String> publicObjectivesState,
+            Set<String> po,
+            Integer objectiveWorth,
+            Integer[] column,
+            LinkedHashMap<String, Integer> customPublicVP,
+            boolean justCalculate,
+            boolean fixedColumn,
+            Graphics graphics,
+            HashMap<Player, Integer> userVPs
     ) {
         Set<String> keysToRemove = new HashSet<>();
         for (java.util.Map.Entry<String, Integer> revealed : revealedPublicObjectives.entrySet()) {
@@ -1700,32 +1763,32 @@ public class GenerateMap {
     }
 
     private void drawScoreControlMarkers(
-        int x,
-        int y,
-        Map map,
-        LinkedHashMap<String, Player> players,
-        List<String> scoredPlayerID,
-        boolean multiScoring,
-        Integer objectiveWorth,
-        boolean justCalculate,
-        Graphics graphics,
-        HashMap<Player, Integer> userVPs
+            int x,
+            int y,
+            Map map,
+            LinkedHashMap<String, Player> players,
+            List<String> scoredPlayerID,
+            boolean multiScoring,
+            Integer objectiveWorth,
+            boolean justCalculate,
+            Graphics graphics,
+            HashMap<Player, Integer> userVPs
     ) {
         drawScoreControlMarkers(x, y, map, players, scoredPlayerID, multiScoring, objectiveWorth, justCalculate, false, graphics, userVPs);
     }
 
     private void drawScoreControlMarkers(
-        int x,
-        int y,
-        Map map,
-        LinkedHashMap<String, Player> players,
-        List<String> scoredPlayerID,
-        boolean multiScoring,
-        Integer objectiveWorth,
-        boolean justCalculate,
-        boolean fixedColumn,
-        Graphics graphics,
-        HashMap<Player, Integer> userVPs
+            int x,
+            int y,
+            Map map,
+            LinkedHashMap<String, Player> players,
+            List<String> scoredPlayerID,
+            boolean multiScoring,
+            Integer objectiveWorth,
+            boolean justCalculate,
+            boolean fixedColumn,
+            Graphics graphics,
+            HashMap<Player, Integer> userVPs
     ) {
         try {
             int tempX = 0;
@@ -1900,17 +1963,63 @@ public class GenerateMap {
     }
 
     private void addTile(Tile tile, Map map, TileStep step) {
+        addTile(tile, map, step, false);
+    }
+
+    private void addTile(Tile tile, Map map, TileStep step, boolean setupCheck) {
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
             BufferedImage fogOfWar = ImageIO.read(new File(tile.getFowTilePath(fowPlayer)));
             boolean tileIsFoggy = isFoWPrivate != null && isFoWPrivate && tile.hasFog(fowPlayer);
 
-            Point positionPoint = PositionMapper.getTilePosition(tile.getPosition(), map);
+            String position = tile.getPosition();
+            Point positionPoint = PositionMapper.getTilePosition(position);
             if (positionPoint == null) {
                 throw new Exception("Could not map tile to a position on the map: " + map.getName());
             }
-            int tileX = positionPoint.x + extraWidth;
-            int tileY = positionPoint.y;
+
+            int x = positionPoint.x;
+            int y = positionPoint.y;
+            if (!setupCheck) {
+                if ((!position.equalsIgnoreCase("tl") &&
+                        !position.equalsIgnoreCase("tr") &&
+                        !position.equalsIgnoreCase("bl") &&
+                        !position.equalsIgnoreCase("br"))) {
+                    minX = Math.min(minX, x);
+                    minY = Math.min(minY, y);
+                    maxX = Math.max(maxX, x);
+                    maxY = Math.max(maxY, y);
+                }
+            } else {
+                if (x < minX || x > maxX || y < minY || y > maxY) {
+                    return;
+                }
+            }
+
+            int ringCount = map.getRingCount();
+            if (ringCount < RING_MAX_COUNT) {
+                int lower = RING_MAX_COUNT - ringCount;
+
+                if (position.equalsIgnoreCase("tl")) {
+                    y -= 150;
+                } else if (position.equalsIgnoreCase("bl")) {
+                    y -= lower * 600 - 150;
+                } else if (position.equalsIgnoreCase("tr")) {
+                    x -= lower * 520;
+                    y -= 150;
+                } else if (position.equalsIgnoreCase("br")) {
+                    x -= lower * 520;
+                    y -= lower * 600 - 150;
+                } else {
+                    x -= lower * 260;
+                    y -= lower * 300;
+                }
+                positionPoint = new Point(x, y);
+            }
+
+
+            int tileX = positionPoint.x + extraX;
+            int tileY = positionPoint.y + extraY;
 
             switch (step) {
                 case Setup -> {
@@ -1924,32 +2033,27 @@ public class GenerateMap {
                         graphics.drawString(tile.getFogLabel(fowPlayer), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
                     }
                     int textOffset = 0;
-                    if(map.getLargeText().equals("large"))
-                    {
+                    if (map.getLargeText().equals("large")) {
                         graphics.setFont(Storage.getFont50());
-                        textOffset = 140;
-                    }
-                    else if(map.getLargeText().equals("medium"))
-                    {
+                        textOffset = 160;
+                    } else if (map.getLargeText().equals("medium")) {
                         graphics.setFont(Storage.getFont35());
-                        textOffset = 20;
-                    }
-                    else
-                    {
+                        textOffset = 40;
+                    } else {
                         graphics.setFont(Storage.getFont20());
-                        textOffset = 0;
+                        textOffset = 20;
                     }
                     graphics.setColor(Color.WHITE);
                     if (tileIsFoggy) {
                         graphics.drawImage(fogOfWar, tileX, tileY, null);
                         graphics.drawString(tile.getFogLabel(fowPlayer), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
                     }
-                    graphics.drawString(tile.getPosition(), tileX + tilePositionPoint.x-textOffset, tileY + tilePositionPoint.y);
+                    graphics.drawString(position, tileX + tilePositionPoint.x - textOffset, tileY + tilePositionPoint.y);
 
                 }
                 case Extras -> {
                     if (tileIsFoggy) return;
-                    String primaryTile = tile.getPosition();
+                    String primaryTile = position;
                     List<String> adj = map.getAdjacentTileOverrides(primaryTile);
                     int direction = 0;
                     for (String secondaryTile : adj) {
@@ -2360,11 +2464,10 @@ public class GenerateMap {
         boolean isJail = isCabalJail || isNekroJail || isYssarilJail;
         boolean showJail = false;
         if (fowPlayer == null
-            || (isCabalJail && FoWHelper.canSeeStatsOfFaction(map, "cabal", fowPlayer))
-            || (isNekroJail && FoWHelper.canSeeStatsOfFaction(map, "nekro", fowPlayer))
-            || (isYssarilJail && FoWHelper.canSeeStatsOfFaction(map, "yssaril", fowPlayer))
-            )
-        {
+                || (isCabalJail && FoWHelper.canSeeStatsOfFaction(map, "cabal", fowPlayer))
+                || (isNekroJail && FoWHelper.canSeeStatsOfFaction(map, "nekro", fowPlayer))
+                || (isYssarilJail && FoWHelper.canSeeStatsOfFaction(map, "yssaril", fowPlayer))
+        ) {
             showJail = true;
         }
 

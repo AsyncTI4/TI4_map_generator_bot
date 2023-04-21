@@ -6,10 +6,10 @@ import ti4.map.Map;
 import ti4.message.BotLogger;
 
 import java.awt.*;
-import java.awt.List;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.List;
 import java.util.*;
 
 //Handles positions of map
@@ -29,7 +29,14 @@ public class PositionMapper {
     private static final Properties playerInfo = new Properties();
     private static final Properties playerInfo8 = new Properties();
     private static final Properties playerInfo8ring = new Properties();
+    private static final Properties stats = new Properties();
     private static final Properties reinforcements = new Properties();
+
+    //    private static final Properties adjacentTiles = new Properties();
+    private static final Properties adjacent8RingTiles = new Properties();
+
+    private static final Properties migrate = new Properties();
+    private static final Properties migrate8rings = new Properties();
 
     public static void init() {
         readData("6player.properties", positionTileMap6Player, "Could not read position file");
@@ -43,7 +50,88 @@ public class PositionMapper {
         readData("6player_info.properties", playerInfo, "Could not read player info position file");
         readData("8player_info.properties", playerInfo8, "Could not read player info position file");
         readData("8ring_info.properties", playerInfo8ring, "Could not read player info position file");
+        readData("stats.properties", stats, "Could not read player info position file");
         readData("reinforcements.properties", reinforcements, "Could not read reinforcements position file");
+//        readData("adjacent.properties", adjacentTiles, "Could not read adjacent tiles file");
+        readData("adjacent8ring.properties", adjacent8RingTiles, "Could not read adjacent tiles file");
+
+        readData("migrate.properties", migrate, "Could not read wormholes file");
+        readData("migrate8rings.properties", migrate8rings, "Could not read wormholes file");
+
+        //temp code migration
+//        java.util.Map<String, String> migratedAdjacency = new LinkedHashMap<>();
+//        for (java.util.Map.Entry<Object, Object> entry : adjacent8RingTiles.entrySet()) {
+//            String key = (String)entry.getKey();
+//            String value = (String)entry.getValue();
+//            String newKey = PositionMapper.getMigrate8RingsPosition(key);
+//            if (newKey != null){
+//                String[] split = value.split(",");
+//                String newAdjacentcy = "";
+//                for (String splitID : split) {
+//                    String newSplitID = PositionMapper.getMigrate8RingsPosition(splitID);
+//                    if (newSplitID != null){
+//                        newAdjacentcy += "," + newSplitID;
+//                    } else {
+//                        newAdjacentcy += "," + splitID;
+//                        if (!splitID.equals("x")) {
+//                            System.out.println("Could not find adjacent coordinates: " + splitID);
+//                        }
+//                    }
+//                }
+//                migratedAdjacency.put(newKey, newAdjacentcy);
+//            }
+//            else {
+//                System.out.println("Could not find tile: " + key);
+//            }
+//        }
+//        BufferedWriter writer = null;
+//        try {
+//            writer = new BufferedWriter(new FileWriter("E:\\DEV_TI4\\aaa.txt"));
+//            ArrayList<String> keys = new ArrayList<>(migratedAdjacency.keySet());
+//            Collections.sort(keys);
+//            for (String key : keys) {
+//                writer.write(key+"="+migratedAdjacency.get(key));
+//                writer.write(System.lineSeparator());
+//            }
+//            writer.close();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+//
+//        java.util.Map<String, String> positionsNew = new LinkedHashMap<>();
+//        for (java.util.Map.Entry<Object, Object> entry : positionTileMap8Ring.entrySet()) {
+//            String key = (String)entry.getKey();
+//            String value = (String)entry.getValue();
+//            String newKey = PositionMapper.getMigrate8RingsPosition(key);
+//            if (newKey != null){
+//                positionsNew.put(newKey, value);
+//            }
+//            else {
+//                System.out.println("Could not find tile: " + key);
+//            }
+//        }
+////        BufferedWriter writer = null;
+//        try {
+//            writer = new BufferedWriter(new FileWriter("E:\\DEV_TI4\\bbb.txt"));
+//            ArrayList<String> keys = new ArrayList<>(positionsNew.keySet());
+//            Collections.sort(keys);
+//            for (String key : keys) {
+//                writer.write(key+"="+positionsNew.get(key));
+//                writer.write(System.lineSeparator());
+//            }
+//            writer.close();
+//        } catch (IOException e) {
+//            throw new RuntimeException(e);
+//        }
+
+    }
+
+    public static String getMigratePosition(String position) {
+        return migrate.getProperty(position);
+    }
+
+    public static String getMigrate8RingsPosition(String position) {
+        return migrate8rings.getProperty(position);
     }
 
     public static String getTilePlanetPositions(String tileID) {
@@ -84,20 +172,14 @@ public class PositionMapper {
         }
     }
 
-    public static boolean isTilePositionValid(String position, Map userActiveMap) {
-        if (userActiveMap != null && userActiveMap.getPlayerCountForMap() == 8) {
-            if (userActiveMap.getRingCount() == 8) {
-                return positionTileMap8Ring.getProperty(position) != null;
-            }
-            return positionTileMap8Player.getProperty(position) != null;
-        }
-        return positionTileMap6Player.getProperty(position) != null;
+    public static boolean isTilePositionValid(String position) {
+        return positionTileMap8Ring.getProperty(position) != null;
     }
 
-    public static HashSet<String> get8RingTiles(){
+    public static HashSet<String> get8RingTiles() {
         HashSet<String> positions = new HashSet<>();
         for (Object key : positionTileMap8Ring.keySet()) {
-            if (key instanceof String position){
+            if (key instanceof String position) {
                 positions.add(position);
             }
         }
@@ -105,18 +187,12 @@ public class PositionMapper {
     }
 
     @Nullable
-    public static Point getTilePosition(String position, Map map) {
-        if (map != null && map.getPlayerCountForMap() == 8) {
-            if (map.getRingCount() == 8) {
-                return getPosition(position, positionTileMap8Ring);
-            }
-            return getPosition(position, positionTileMap8Player);
-        }
-        return getPosition(position, positionTileMap6Player);
+    public static Point getTilePosition(String position) {
+        return getPosition(position, positionTileMap8Ring);
     }
 
-    private static Point getPosition(String position, Properties positionTileMap6Player) {
-        String value = positionTileMap6Player.getProperty(position);
+    private static Point getPosition(String position, Properties positionTileMap) {
+        String value = positionTileMap.getProperty(position);
         return getPoint(value);
     }
 
@@ -134,18 +210,27 @@ public class PositionMapper {
         return null;
     }
 
-    public static ArrayList<Point> getPlayerPosition(int playerPosition, Map map) {
-        ArrayList<Point> positions = new ArrayList<>();
-        String info;
-        if (map != null && map.getPlayerCountForMap() == 8) {
-            if (map.getRingCount() == 8) {
-                info = (String) playerInfo8ring.get(Integer.toString(playerPosition));
-            } else {
-                info = (String) playerInfo8.get(Integer.toString(playerPosition));
-            }
-        } else {
-            info = (String) playerInfo.get(Integer.toString(playerPosition));
+    public static Point getPlayerStats(String id) {
+        Point point = new Point();
+        String info = (String) stats.get(id);
+        if (info == null) {
+            return new Point(0, 0);
         }
+
+        try {
+            StringTokenizer individualPoints = new StringTokenizer(info, ",");
+            String x = individualPoints.nextToken();
+            String y = individualPoints.nextToken();
+            point = new Point(Integer.parseInt(x), Integer.parseInt(y));
+        } catch (Exception e) {
+            BotLogger.log("Could not parse player positions", e);
+        }
+        return point;
+    }
+
+    public static ArrayList<Point> getPlayerPosition(int playerPosition) {
+        ArrayList<Point> positions = new ArrayList<>();
+        String info = (String) playerInfo8ring.get(Integer.toString(playerPosition));
         if (info == null) {
             return positions;
         }
@@ -283,4 +368,11 @@ public class PositionMapper {
         return unitTokenPosition;
     }
 
+    public static List<String> getAdjacentTilePositions(Map map, String tileID) {
+        String property = adjacent8RingTiles.getProperty(tileID);
+        if (property == null) {
+            return Collections.emptyList();
+        }
+        return Arrays.stream(property.split(",")).toList();
+    }
 }
