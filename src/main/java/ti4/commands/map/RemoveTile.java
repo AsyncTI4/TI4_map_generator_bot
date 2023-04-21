@@ -27,7 +27,7 @@ public class RemoveTile extends AddRemoveTile {
     @Override
     protected Map tileParsing(SlashCommandInteractionEvent event, String userID, MapManager mapManager) {
         String position = event.getOptions().get(0).getAsString();
-        if (!PositionMapper.isTilePositionValid(position, mapManager.getUserActiveMap(userID))) {
+        if (!PositionMapper.isTilePositionValid(position)) {
             MessageHelper.replyToMessage(event, "Position tile not allowed");
             return null;
         }

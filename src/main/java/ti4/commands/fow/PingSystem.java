@@ -43,7 +43,7 @@ public class PingSystem extends FOWSubcommandData {
         String message = messageMapping == null ? "" : messageMapping.getAsString();
 
         String position = positionMapping.getAsString().toLowerCase();
-        if (!PositionMapper.isTilePositionValid(position, activeMap)) {
+        if (!PositionMapper.isTilePositionValid(position)) {
             MessageHelper.replyToMessage(event, "Tile position is not allowed");
             return;
         }

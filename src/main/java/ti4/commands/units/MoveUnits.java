@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
@@ -99,7 +98,7 @@ public class MoveUnits extends AddRemoveUnits {
 
 
             String planetTileName = AliasHandler.resolveTile("82b");
-            if (!PositionMapper.isTilePositionValid(position, activeMap)) {
+            if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
                 return null;
             }
