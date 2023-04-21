@@ -1522,10 +1522,10 @@ public class Map {
 
     public void endGameIfOld() {
         Date lastModifiedDate = new Date(this.lastModifiedDate);
-        Date oldestLastModifiedDateBeforeEnding = new Date(1656633600000l); //2022-07-01
-        if (lastModifiedDate.compareTo(oldestLastModifiedDateBeforeEnding) < 0) {
+        Date oldestLastModifiedDateBeforeEnding = new Date(1667260800000l); //2022-11-01
+        if (!isHasEnded() && lastModifiedDate.compareTo(oldestLastModifiedDateBeforeEnding) < 0) {
             BotLogger.log("Game: " + getName() + " has not been modified since ~" + Helper.getDateRepresentation(lastModifiedDate.getTime()) + " - the game flag `hasEnded` has been set to true");
-            // setHasEnded(true);
+            setHasEnded(true);
         }
     }
 }
