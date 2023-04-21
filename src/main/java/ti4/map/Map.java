@@ -1519,4 +1519,14 @@ public class Map {
         if (playerVPCount == null) playerVPCount = 0;
         return playerVPCount;
     }
+
+    public void endGameIfOld() {
+        Date lastModifiedDate = new Date(this.lastModifiedDate);
+        // Date oldestLastModifiedDateBeforeEnding = new Date(1667260800000l); //2022-11-01
+        Date oldestLastModifiedDateBeforeEnding = new Date(1651363200000l); //2022-05-01
+        if (lastModifiedDate.compareTo(oldestLastModifiedDateBeforeEnding) < 0) {
+            BotLogger.log("Game: " + getName() + " has not been modified since ~" + Helper.getDateRepresentation(lastModifiedDate.getTime()) + " - the game flag `hasEnded` has been set to true");
+            // setHasEnded(true);
+        }
+    }
 }

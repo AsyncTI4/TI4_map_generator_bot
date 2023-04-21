@@ -792,6 +792,7 @@ public class MapSaveLoadManager {
             } catch (Exception e) {
                 BotLogger.log("Data read error: " + mapFile.getName(), e);
             }
+            map.endGameIfOld();
             return map;
         } else {
             BotLogger.log("Could not save map, error creating save file");
