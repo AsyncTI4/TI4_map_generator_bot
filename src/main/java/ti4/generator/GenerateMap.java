@@ -85,7 +85,7 @@ public class GenerateMap {
         heightStats = heght8 / 2;
         if (map != null) {
             int playerCountForMap = map.getPlayerCountForMap();
-            heightStats = playerCountForMap * playerHeight + map.getLaws().keySet().size() * 115 + 600;
+            heightStats = playerCountForMap * playerHeight + ((map.getLaws().keySet().size() / 2 + 1) * 115) + 600;
             mapHeight = (map.getRingCount() + 1) * 600 + extraY * 2;
             mapWidth = (map.getRingCount() + 1) * 520 + extraX * 2;
             extraRow = false;
@@ -1296,7 +1296,8 @@ public class GenerateMap {
                     inverted = false;
                 } else if (playerRow == 4) {
                     deltaX = mapWidth + 10;
-                    deltaY = deltaY - PLAYER_STATS_HEIGHT;;
+                    deltaY = deltaY - PLAYER_STATS_HEIGHT;
+                    ;
                     inverted = true;
                 }
             }
