@@ -84,7 +84,7 @@ public class MoveUnits extends AddRemoveUnits {
             removeTacticsCC(event, color, tile, activeMap);
         }
 
-        AddCC.addCC(event, color, tile);
+        AddCC.addCC(event, color, tile, false);
         Helper.isCCCountCorrect(event, activeMap, color);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
             addPlanetToPlayArea(event, tile, unitHolder_.getName());
