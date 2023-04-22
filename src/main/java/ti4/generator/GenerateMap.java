@@ -137,8 +137,8 @@ public class GenerateMap {
             heightForGameInfo = 40;
             height = heightStats;
         } else if (displayType == DisplayType.map) {
-            heightForGameInfo = mapHeight - 600;
-            height = mapHeight;
+            heightForGameInfo = mapHeight - 400;
+            height = mapHeight + 600;
         } else {
             heightForGameInfo = mapHeight;
             height = heightStorage;
