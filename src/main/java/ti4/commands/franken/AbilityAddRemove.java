@@ -2,7 +2,6 @@ package ti4.commands.franken;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -15,17 +14,16 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 
 public abstract class AbilityAddRemove extends FrankenSubcommandData {
     public AbilityAddRemove(String name, String description) {
         super(name, description);
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY, "Ability Name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_1, "Ability Name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_2, "Ability Name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_3, "Ability Name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_4, "Ability Name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_5, "Ability Name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_1, "Ability Name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_2, "Ability Name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_3, "Ability Name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_4, "Ability Name").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_5, "Ability Name").setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
