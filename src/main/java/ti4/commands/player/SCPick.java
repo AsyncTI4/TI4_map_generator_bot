@@ -21,7 +21,13 @@ import java.util.stream.Collectors;
 public class SCPick extends PlayerSubcommandData {
     public SCPick() {
         super(Constants.SC_PICK, "Pick SC");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number count").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card #").setRequired(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC2, "2nd choice"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC3, "3rd"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC4, "4th"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC5, "5th"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.SC6, "6th"));
+
     }
 
     @Override
@@ -43,6 +49,18 @@ public class SCPick extends PlayerSubcommandData {
         Stats stats = new Stats();
         stats.pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
         int sc = player.getSC();
+
+        String[] scs = {Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6};
+        int c = 0;
+        while(sc == 0 && c < 5)
+        {
+            if (event.getOption(scs[c]) != null)
+            {
+                stats.pickSC(event, activeMap, player, event.getOption(scs[c]));
+            }
+            sc = player.getSC();
+            c++;
+        }
         String msg = "";
         String msgExtra = "";
         boolean allPicked = true;
@@ -111,20 +129,22 @@ public class SCPick extends PlayerSubcommandData {
             msg = "No SC picked.";
         }
         sendMessage(msg);
-        
-        if (isFowPrivateGame) {
-            if (allPicked) {
-                msgExtra = Helper.getPlayerRepresentation(event, privatePlayer, true) + " UP NEXT";
-            }
-            String fail = "User for next faction not found. Report to ADMIN";
-            String success = "The next player has been notified";
-            MessageHelper.sendPrivateMessageToPlayer(privatePlayer, activeMap, event, msgExtra, fail, success);
-        } else {
-            if (allPicked) {
-                ListTurnOrder.turnOrder(event, activeMap);
-            }
-            if (!msgExtra.isEmpty()) {
-                sendMessage(msgExtra);
+        if (!msg.equalsIgnoreCase("No SC picked."))
+        {
+            if (isFowPrivateGame ) {
+                if (allPicked) {
+                    msgExtra = Helper.getPlayerRepresentation(event, privatePlayer, true) + " UP NEXT";
+                }
+                String fail = "User for next faction not found. Report to ADMIN";
+                String success = "The next player has been notified";
+                MessageHelper.sendPrivateMessageToPlayer(privatePlayer, activeMap, event, msgExtra, fail, success);
+            } else {
+                if (allPicked) {
+                    ListTurnOrder.turnOrder(event, activeMap);
+                }
+                if (!msgExtra.isEmpty()) {
+                    sendMessage(msgExtra);
+                }
             }
         }
     }
