@@ -207,10 +207,20 @@ public class Stats extends PlayerSubcommandData {
 					}
 					if (!scPickedAlready) {
 						player.setSC(scNumber);
+						String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) + " picked SC #"+scNumber;
+						if (activeMap.isFoWMode()) {
+							FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+						}
 						Integer tgCount = scTradeGoods.get(scNumber);
-						if (tgCount != null) {
+						if (tgCount != null && tgCount != 0) {
 							int tg = player.getTg();
 							tg += tgCount;
+							messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
+							MessageHelper.sendMessageToChannel(event.getChannel(),"You gained "+tgCount +" tgs from picking SC #"+scNumber);
+							if (activeMap.isFoWMode()) {
+								FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+							}
+							
 							player.setTg(tg);
 						}
 					}

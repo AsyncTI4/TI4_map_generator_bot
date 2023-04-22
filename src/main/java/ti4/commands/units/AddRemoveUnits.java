@@ -13,6 +13,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
+import ti4.helpers.FoWHelper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
@@ -126,6 +127,10 @@ abstract public class AddRemoveUnits implements Command {
 
             planetName = getPlanet(event, tile, planetName);
             unitAction(event, tile, count, planetName, unitID, color);
+            if (map.isFoWMode()) {
+                String colorMention = Helper.getColourAsMention(event.getGuild(), color);
+                FoWHelper.pingSystem(map, event, tile.getPosition(), colorMention + " has modified units in the system");
+            }
 
             addPlanetToPlayArea(event, tile, planetName);
         }
