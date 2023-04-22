@@ -127,12 +127,13 @@ abstract public class AddRemoveUnits implements Command {
 
             planetName = getPlanet(event, tile, planetName);
             unitAction(event, tile, count, planetName, unitID, color);
-            if (map.isFoWMode()) {
-                String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-                FoWHelper.pingSystem(map, event, tile.getPosition(), colorMention + " has modified units in the system");
-            }
+            
 
             addPlanetToPlayArea(event, tile, planetName);
+        }
+        if (map.isFoWMode()) {
+            String colorMention = Helper.getColourAsMention(event.getGuild(), color);
+            FoWHelper.pingSystem(map, event, tile.getPosition(), colorMention + " has modified units in the system");
         }
         actionAfterAll(event, tile, color, map);
     }
