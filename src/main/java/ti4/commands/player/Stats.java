@@ -1,6 +1,5 @@
 package ti4.commands.player;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -8,12 +7,12 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.GenerateMap;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.StringTokenizer;
 import java.util.function.Consumer;
@@ -35,8 +34,7 @@ public class Stats extends PlayerSubcommandData {
 				.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
 				.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
 				.addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,
-						"Faction or Color for which you set stats").setAutoComplete(true));
+				.addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,"Faction or Color for which you set stats").setAutoComplete(true));
 	}
 
 	@Override
@@ -48,6 +46,12 @@ public class Stats extends PlayerSubcommandData {
 		player = Helper.getPlayer(activeMap, player, event);
 		if (player == null) {
 			sendMessage("Player could not be found");
+			return;
+		}
+
+		//NO OPTIONS SELECTED, JUST DISPLAY STATS
+		if (event.getOptions().isEmpty() && !activeMap.isFoWMode()) {
+			sendMessage(getPlayersCurrentStatsText(player));
 			return;
 		}
 
@@ -169,6 +173,42 @@ public class Stats extends PlayerSubcommandData {
 			sendMessage(message.toString());
 		}
 
+	}
+
+	private String getPlayersCurrentStatsText(Player player) {
+		StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(getEvent(), player, false) + " player's current stats:\n");
+
+		sb.append("> VP: ").append(player.getTotalVictoryPoints(getActiveMap()));
+		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/").append(player.getStrategicCC());
+		sb.append("      ").append(Emojis.tg).append(player.getTg());
+		sb.append("      ").append(Emojis.comm).append(player.getCommodities()).append("/").append(player.getCommoditiesTotal());
+		sb.append("      ").append(Emojis.CFrag).append(player.getCrf());
+		sb.append("   ").append(Emojis.IFrag).append(player.getIrf());
+		sb.append("   ").append(Emojis.HFrag).append(player.getHrf());
+		sb.append("   ").append(Emojis.UFrag).append(player.getVrf());
+		if (player.getSC() > 0) {
+			if (getActiveMap().getScPlayed().get(player.getSC())) {
+				sb.append("      ").append(Helper.getSCBackEmojiFromInteger(player.getSC())).append(" (Played)");
+			} else {
+				sb.append("      ").append(Helper.getSCEmojiFromInteger(player.getSC())).append(" (Ready)");
+			}
+		} else {
+			sb.append("      No SC Picked");
+		}
+		sb.append("\n");
+		sb.append("> Speaker: ").append(getActiveMap().getSpeaker().equals(player.getUserID())).append("\n");
+		sb.append("> Passed: ").append(player.isPassed()).append("\n");
+		sb.append("> Dummy: ").append(player.isDummy()).append("\n");
+		
+		sb.append("> Abilities: ").append(player.getFactionAbilities()).append("\n");
+		sb.append("> Planets: ").append(player.getPlanets()).append("\n");
+		sb.append("> Techs: ").append(player.getTechs()).append("\n");
+		sb.append("> Relics: ").append(player.getRelics()).append("\n");
+		sb.append("> Leaders: [");
+		player.getLeaders().forEach(l -> sb.append(" [" + l.getId() + l.getName() + "] "));
+		sb.append("]\n");
+
+		return sb.toString();
 	}
 
 	@Override
