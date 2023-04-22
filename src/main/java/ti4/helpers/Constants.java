@@ -581,6 +581,7 @@ public class Constants {
     public static final String PING_ACTIVE_PLAYER = "ping_active_player";
     public static final String WHISPER = "whisper";
     public static final String MSG = "msg";
+    public static final String OVERRIDE_FOW = "override_fow";
     public static final String ANON = "anon";
     public static final String ANNOUNCE = "announce";
     public static final String ENDED_GAMES = "ended_games";
