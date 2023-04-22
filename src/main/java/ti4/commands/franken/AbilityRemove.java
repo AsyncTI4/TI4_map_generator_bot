@@ -1,51 +1,28 @@
 package ti4.commands.franken;
 
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.player.AbilityInfo;
-import ti4.generator.Mapper;
+import java.util.List;
+
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
-import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.BotLogger;
 
-public class AbilityRemove extends FrankenSubcommandData {
+public class AbilityRemove extends AbilityAddRemove {
     public AbilityRemove() {
         super(Constants.ABILITY_REMOVE, "Remove an ability from your faction");
-        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY, "Ability Name").setRequired(true).setAutoComplete(true));
     }
     
-    public void execute(SlashCommandInteractionEvent event) {
-        String abilityID = event.getOption(Constants.ABILITY, null, OptionMapping::getAsString);
-        if (abilityID == null || abilityID.isBlank()) {
-            sendMessage("No ability was entered");
-            return;
+    @Override
+    public void doAction(Player player, List<String> abilityIDs) {
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(getEvent(), player)).append(" removed abilities:\n");
+        for (String abilityID : abilityIDs) {
+            if (!player.getFactionAbilities().contains(abilityID)) {
+                sb.append("> ").append(abilityID).append(" (player did not have this ability)");
+            } else {
+                sb.append("> ").append(abilityID);
+            }
+            sb.append("\n");
+            player.removeFactionAbility(abilityID);
         }
-        if (!Mapper.getFactionAbilities().keySet().contains(abilityID)) {
-            sendMessage("Ability not found: " + abilityID);
-            BotLogger.log(event, "Could not remove faction ability: " + abilityID);
-            return;
-        }
-        
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        if (player == null) {
-            sendMessage("Player could not be found");
-            return;
-        }
-
-        if (!player.getFactionAbilities().contains(abilityID)) {
-            sendMessage("Player does not currently have ability: " + abilityID);
-            return;
-        }
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(event, player)).append(" removed an ability: ").append(abilityID);
         sendMessage(sb.toString());
-        player.removeFactionAbility(abilityID);
     }
 }
