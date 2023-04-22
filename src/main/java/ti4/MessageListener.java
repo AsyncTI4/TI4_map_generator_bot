@@ -118,6 +118,8 @@ public class MessageListener extends ListenerAdapter {
 //        }
 
         Message msg = event.getMessage();
+
+
         if (msg.getContentRaw().startsWith("[DELETE]")) {
             msg.delete().queue();
         }
