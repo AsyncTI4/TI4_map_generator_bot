@@ -200,7 +200,7 @@ public class Stats extends PlayerSubcommandData {
 					boolean scPickedAlready = false;
 					for (Player playerStats : players.values()) {
 						if (playerStats.getSC() == scNumber) {
-							MessageHelper.sendMessageToChannel(event.getChannel(), "SC is already picked.");
+							MessageHelper.sendMessageToChannel(event.getChannel(), "SC #"+scNumber+" is already picked.");
 							scPickedAlready = true;
 							break;
 						}
