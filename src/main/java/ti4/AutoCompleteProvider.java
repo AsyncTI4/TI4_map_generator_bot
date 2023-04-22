@@ -5,16 +5,13 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.Command;
 import ti4.generator.Mapper;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
-import ti4.map.MapStringMapper;
 import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.BotLogger;
 
 import java.io.File;
@@ -31,9 +28,14 @@ public class AutoCompleteProvider {
 
     public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
         String optionName = event.getFocusedOption().getName();
-        MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName());
-        String id = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(id);
+        String userID = event.getUser().getId();
+        MessageListener.setActiveGame(event.getMessageChannel(), userID, event.getName());
+        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        Player player = null;
+        if (activeMap != null) {
+            player = activeMap.getPlayer(userID);
+            player = Helper.getGamePlayer(activeMap, player, event, null);
+        }
 
         switch (optionName) {
             case Constants.SETTING_TYPE -> {
@@ -75,11 +77,11 @@ public class AutoCompleteProvider {
 
                 List<String> factionColorsRetain = new ArrayList<>();
                 Boolean privateGame = FoWHelper.isPrivateGame(activeMap, null, event.getChannel());
-                for (Player player : activeMap.getPlayers().values()) {
+                for (Player player_ : activeMap.getPlayers().values()) {
                     if (privateGame == null || !privateGame) {
-                        factionColorsRetain.add(player.getFaction());
+                        factionColorsRetain.add(player_.getFaction());
                     }
-                    factionColorsRetain.add(player.getColor());
+                    factionColorsRetain.add(player_.getColor());
                 }
                 factionColors.retainAll(factionColorsRetain);
                 List<Command.Choice> options = factionColors.stream()
@@ -355,9 +357,28 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.ABILITY -> {
+            case Constants.ABILITY, Constants.ABILITY_1, Constants.ABILITY_2, Constants.ABILITY_3, Constants.ABILITY_4, Constants.ABILITY_5 -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> abilities = Mapper.getFactionAbilities();
+
+                HashMap<String, String> abilities = new HashMap<>();
+                try {
+                    if (player != null && event.getSubcommandName().equals(Constants.ABILITY_REMOVE)) {
+                        for (String abilityID : player.getFactionAbilities()) {
+                            abilities.put(abilityID, Mapper.getFactionAbilities().get(abilityID));
+                        }
+                    } else if (player != null && event.getSubcommandName().equals(Constants.ABILITY_ADD)) {
+                        abilities = Mapper.getFactionAbilities();
+                        for (String abilityID : player.getFactionAbilities()) {
+                            abilities.remove(abilityID);
+                        }
+                    } else {
+                        abilities = Mapper.getFactionAbilities();
+                    }   
+                } catch (Exception e) {
+                    BotLogger.log(event, "Ability Autocomplete Setup Error", e);
+                    abilities = Mapper.getFactionAbilities();
+                }
+
                 abilities.replaceAll((k, v) -> {
                     int index = v.indexOf("|");
                     String abilityName = v.substring(0, index);
@@ -375,6 +396,10 @@ public class AutoCompleteProvider {
                 
             }
             case Constants.LATEST_COMMAND -> {
+                if (activeMap == null) {
+                    event.replyChoiceStrings("No Active Map for this Channel").queue();
+                    return;
+                }
                 String latestCommand = "";
                 if (activeMap.isFoWMode()) { //!event.getUser().getID().equals(activeMap.getGMID()); //TODO: Validate that the user running the command is the FoW GM, if so, display command.
                     latestCommand = "Game is Fog of War mode - last command is hidden."; 

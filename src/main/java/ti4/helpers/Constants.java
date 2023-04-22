@@ -595,6 +595,11 @@ public class Constants {
     public static final String CARDS_INFO = "cards_info";
     public static final String FRANKEN = "franken";
     public static final String ABILITY = "ability";
+    public static final String ABILITY_1 = "ability_1";
+    public static final String ABILITY_2 = "ability_2";
+    public static final String ABILITY_3 = "ability_3";
+    public static final String ABILITY_4 = "ability_4";
+    public static final String ABILITY_5 = "ability_5";
     public static final String ABILITIES = "abilities";
     public static final String ABILITY_INFO = "ability_info";
     public static final String ABILITY_ADD = "ability_add";

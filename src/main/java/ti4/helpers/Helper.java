@@ -55,7 +55,7 @@ import java.util.stream.Collectors;
 public class Helper {
 
     @Nullable
-    public static Player getGamePlayer(Map map, Player initialPlayer, SlashCommandInteractionEvent event, String userID) {
+    public static Player getGamePlayer(Map map, Player initialPlayer, GenericInteractionCreateEvent event, String userID) {
         return getGamePlayer(map, initialPlayer, event.getMember(), userID);
     }
 
