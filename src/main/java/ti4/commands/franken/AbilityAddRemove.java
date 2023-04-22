@@ -2,6 +2,9 @@ package ti4.commands.franken;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -18,21 +21,23 @@ public abstract class AbilityAddRemove extends FrankenSubcommandData {
     public AbilityAddRemove(String name, String description) {
         super(name, description);
         addOptions(new OptionData(OptionType.STRING, Constants.ABILITY, "Ability Name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_1, "Ability Name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_2, "Ability Name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_3, "Ability Name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_4, "Ability Name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.ABILITY_5, "Ability Name").setRequired(true).setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
         List<String> abilityIDs = new ArrayList<>();
 
-        String abilityID = event.getOption(Constants.ABILITY, null, OptionMapping::getAsString);
-        if (abilityID == null || abilityID.isBlank()) {
-            sendMessage("No ability was entered");
-            return;
+        //GET ALL ABILITY OPTIONS AS STRING
+        for (OptionMapping option : event.getOptions().stream().filter(o -> o != null && o.getName().contains(Constants.ABILITY)).toList()) {
+            abilityIDs.add(option.getAsString());
         }
-        if (!Mapper.getFactionAbilities().keySet().contains(abilityID)) {
-            sendMessage("Ability not found: " + abilityID);
-            BotLogger.log(event, "Could not " + getActionID() + " faction ability: " + abilityID);
-            return;
-        }
+
+        abilityIDs.removeIf(StringUtils::isEmpty);
+        abilityIDs.removeIf(a -> !Mapper.getFactionAbilities().keySet().contains(a));
         
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
@@ -41,8 +46,6 @@ public abstract class AbilityAddRemove extends FrankenSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
-
-        abilityIDs.add(abilityID);
 
         doAction(player, abilityIDs);
     }
