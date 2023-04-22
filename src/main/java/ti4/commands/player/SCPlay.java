@@ -73,21 +73,29 @@ public class SCPlay extends PlayerSubcommandData {
 
         Button followButton;
         if (sc == 1) {
-            followButton = Button.success("sc_follow_leadership", "SC Follow");
+            followButton = Button.success("sc_follow_leadership", "SC Follow #1");
         } else {
             if (sc == 5) {
-                followButton = Button.success("sc_follow_trade", "SC Follow");
+                followButton = Button.success("sc_follow_trade", "SC Follow #5");
             } else {
-                followButton = Button.success("sc_follow", "SC Follow");
+                followButton = Button.success("sc_follow", "SC Follow #"+sc);
             }
         }
-        Button noFollowButton = Button.primary("sc_no_follow", "Not Following");
-        Button trade_primary = Button.success("trade_primary", "Resolve Primary");
-        Button refresh = Button.secondary("sc_refresh", "Replenish Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
-        Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash").withEmoji(Emoji.fromFormatted(Emojis.Wash));
+        Button noFollowButton = Button.primary("sc_no_follow", "Not Following #"+sc);
+        Button trade_primary = Button.success("trade_primary", "Resolve Primary #"+sc);
+        Button refresh = Button.secondary("sc_refresh", "Replenish Commodities for SC #"+sc).withEmoji(Emoji.fromFormatted(Emojis.comm));
+        Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash for SC #"+sc).withEmoji(Emoji.fromFormatted(Emojis.Wash));
         Button draw_2_ac = Button.secondary("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
         Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective));
 
+        for (Player player2 : activeMap.getPlayers().values()) {
+            if (!player2.isRealPlayer()) {
+                continue;
+            }
+            String faction = player2.getFaction();
+            if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
+            player2.setSCFollowedStatus(sc, false);
+        }
         ActionRow of;
         if (sc == 5) {
             of = ActionRow.of(trade_primary, followButton, noFollowButton, refresh, refresh_and_wash);
@@ -105,6 +113,7 @@ public class SCPlay extends PlayerSubcommandData {
             Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player_, message_); 
             if (reactionEmoji != null) {
                 message_.addReaction(reactionEmoji).queue();
+                player_.setSCFollowedStatus(sc, true);
             }
 
             if (activeMap.isFoWMode()) {
