@@ -41,6 +41,9 @@ public class Player {
     private int commoditiesTotal = 0;
     private int stasisInfantry = 0;
 
+    private boolean[] stratfollows = { true, true, true, true, true, true, true, true };
+
+
     private LinkedHashMap<String, Integer> actionCards = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
@@ -721,6 +724,15 @@ public class Player {
 
     public void setTg(int tg) {
         this.tg = tg;
+    }
+
+    public void setSCFollowedStatus (int scnumber, boolean followed)
+    {
+        stratfollows[scnumber -1] = followed;
+    }
+    public boolean getSCFollowedStatus (int scnumber)
+    {
+        return stratfollows[scnumber -1];
     }
 
     public int getAc() {
