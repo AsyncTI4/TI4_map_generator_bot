@@ -90,7 +90,9 @@ public class Map {
     private String activePlayer = null;
     private Date lastActivePlayerPing = new Date(0);
     private Date lastActivePlayerChange = new Date(0);
-
+    private Date lastTimeGamesChecked = new Date(0);
+    private boolean auto_ping_enabled = false;
+    private long autoPingSpacer = 0;
     private List<String> secretObjectives;
     private List<String> actionCards;
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();

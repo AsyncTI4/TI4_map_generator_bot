@@ -21,11 +21,14 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.commands.fow.Whisper;
 import ti4.map.Player;
+import ti4.helpers.Helper;
 import java.io.File;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Set;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 import java.util.Objects;
@@ -151,7 +154,7 @@ public class MessageListener extends ListenerAdapter {
                                 }
                                 else
                                 {
-                                    realIdentity =Helper.getPlayerRepresentation(player);
+                                    realIdentity = Helper.getPlayerRepresentation(player);
                                 }
                                 realIdentity =Helper.getPlayerRepresentation(player);
                                 String ping = realIdentity + " this is a gentle reminder that it is your turn.";
