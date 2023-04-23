@@ -25,7 +25,6 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ABSOL_MODE, "True to switch out the PoK Agendas & Relics for Absol's - do NOT change this mid-game"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to add the Discordant Stars factions to the pool."));
         addOptions(new OptionData(OptionType.STRING, Constants.LARGE_TEXT, "Small/medium/large, default small").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.NUMBER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
     }
 
     @Override
@@ -113,23 +112,6 @@ public class Setup extends GameSubcommandData {
         if (largeText != null) {
             String large = largeText.getAsString();
             getActiveMap().setLargeText(large);
-        }
-
-        OptionMapping pingHours = event.getOption(Constants.AUTO_PING);
-        if (pingHours != null) {
-            long pinghrs = pingHours.getAsLong();
-            if(pinghrs == 0)
-            {
-                activeMap.setAutoPing(false);
-            }
-            else
-            {
-                activeMap.setAutoPing(true);
-                if (pinghrs < 1){
-                    pinghrs = 1;
-                } 
-                activeMap.setAutoPingSpacer(pinghrs);
-            }
         }
 
         OptionMapping customOption = event.getOption(Constants.GAME_CUSTOM_NAME);

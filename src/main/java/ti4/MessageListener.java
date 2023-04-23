@@ -14,7 +14,6 @@ import ti4.commands.CommandManager;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Storage;
-import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapFileDeleter;
 import ti4.map.MapManager;
@@ -31,9 +30,6 @@ import java.util.StringTokenizer;
 import java.util.concurrent.CompletableFuture;
 import java.util.Objects;
 import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import ti4.helpers.AliasHandler;
 
@@ -122,51 +118,7 @@ public class MessageListener extends ListenerAdapter {
 //        }
 
         Message msg = event.getMessage();
-        Map map2 = MapManager.getInstance().getMap("finreference");
-        if((new Date().getTime()) - map2.getLastTimeGamesChecked().getTime() > 1000*10*60) //10 minutes
-        {
-            map2.setLastTimeGamesChecked(new Date());
-            HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
-            for (Map activeMap : mapList.values()) {
-                String playerID = activeMap.getActivePlayer();
-                if (playerID != null) 
-                {
-                    Player player = activeMap.getPlayer(playerID);
-                    if (player != null) 
-                    {
-                        long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
-                        if (milliSinceLastPing > (1000 *60*60* activeMap.getAutoPingSpacer())) 
-                        {
-                            String realIdentity = "";
-                            if(activeMap.isCommunityMode())
-                            {
-                                if(player.getRoleForCommunity() == null)
-                                {
-                                    return;
-                                }
-                                realIdentity = Helper.getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName());
-                            }
-                            else
-                            {
-                                realIdentity =Helper.getPlayerRepresentation(player);
-                            }
-                            String ping = realIdentity + " this is a gentle reminder that it is your turn.";
-                            if(activeMap.isFoWMode()) {
-                                MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);
-                            } else {
-                                MessageChannel gameChannel = activeMap.getMainGameChannel();
-                                if(gameChannel != null)
-                                {
-                                    MessageHelper.sendMessageToChannel(gameChannel, ping);
-                                }
-                            }
-                            activeMap.setLastActivePlayerPing(new Date());
-                        }
-                    }
-                }
-            }
 
-        }
 
         if (msg.getContentRaw().startsWith("[DELETE]")) {
             msg.delete().queue();

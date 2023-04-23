@@ -238,12 +238,6 @@ public class MapSaveLoadManager {
         writer.write(Constants.LAST_ACTIVE_PLAYER_PING + " " + map.getLastActivePlayerPing().getTime());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.LAST_TIME_GAMES_CHECKED + " " + map.getLastTimeGamesChecked().getTime());
-        writer.write(System.lineSeparator());
-
-        writer.write(Constants.AUTO_PING + " " + map.getAutoPingSpacer());
-        writer.write(System.lineSeparator());
-
         writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " " + map.getLastActivePlayerChange().getTime());
         writer.write(System.lineSeparator());
 
@@ -897,31 +891,6 @@ public class MapSaveLoadManager {
                         Long millis = Long.parseLong(info);
                         Date lastPing = new Date(millis);
                         map.setLastActivePlayerPing(lastPing);
-                    } catch (Exception e) {
-                        // do nothing
-                    }
-                }
-                case Constants.LAST_TIME_GAMES_CHECKED -> {
-                    try {
-                        Long millis = Long.parseLong(info);
-                        Date lastGameCheck = new Date(millis);
-                        map.setLastTimeGamesChecked(lastGameCheck);
-                    } catch (Exception e) {
-                        // do nothing
-                    }
-                }
-                case Constants.AUTO_PING-> {
-                    try {
-                        Long pnghrs = Long.parseLong(info);
-                        if (pnghrs != 0)
-                        {
-                            map.setAutoPing(true);  
-                        }
-                        else
-                        {
-                            map.setAutoPing(false);
-                        }
-                        map.setAutoPingSpacer(pnghrs);
                     } catch (Exception e) {
                         // do nothing
                     }
