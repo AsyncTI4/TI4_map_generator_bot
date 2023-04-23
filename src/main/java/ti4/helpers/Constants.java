@@ -183,7 +183,8 @@ public class Constants {
     public static final String PING_SYSTEM = "ping_system";
     public static final String LABEL = "label";
     public static final String MESSAGE = "message";
-
+    public static final String LAST_TIME_GAMES_CHECKED = "last_time_games_checked";
+    public static final String AUTO_PING = "auto_ping";
     public static final String FOW_FILTER_DARK_GREY = "Dark grey (default)";
     public static final String FOW_FILTER_FROG = "Frog";
     public static final String FOW_FILTER_SEPIA = "Sepia";
