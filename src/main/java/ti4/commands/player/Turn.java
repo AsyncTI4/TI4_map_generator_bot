@@ -147,13 +147,22 @@ public class Turn extends PlayerSubcommandData {
                     return "";
                 } else {
                     MessageHelper.sendMessageToChannel(gameChannel, text);
+                    boolean anyMissed = false;
+                    String missedNums = "";
                     for(int x = 1; x <9; x++)
                     {
+                        
                         if(player.getSCFollowedStatus(x)==false)
                         {
-                            MessageHelper.sendMessageToChannel(gameChannel, "This is a reminder that you have not yet followed SC #"+x);
+                            missedNums = missedNums + " "+x;
+                            anyMissed=true;
                         }
+
                     }
+                    if(anyMissed)
+                        {
+                            MessageHelper.sendMessageToChannel(gameChannel, "This is a reminder that you have not yet followed SC(s) #"+missedNums);
+                        }
                     return "";
                 }
             }
