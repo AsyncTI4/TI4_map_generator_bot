@@ -440,7 +440,7 @@ public class Map {
 
     public void setAutoPing(boolean status)
     {
-        auto_ping_enabled = status;
+        this.auto_ping_enabled = status;
     }
     public boolean getAutoPingStatus()
     {

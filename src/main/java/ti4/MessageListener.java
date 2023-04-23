@@ -128,39 +128,44 @@ public class MessageListener extends ListenerAdapter {
             map2.setLastTimeGamesChecked(new Date());
             HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
             for (Map activeMap : mapList.values()) {
-                String playerID = activeMap.getActivePlayer();
-                if (playerID != null) 
+                if(activeMap.getAutoPingStatus() && activeMap.getAutoPingSpacer() != 0)
                 {
-                    Player player = activeMap.getPlayer(playerID);
-                    if (player != null) 
+                    String playerID = activeMap.getActivePlayer();
+                    if (playerID != null) 
                     {
-                        long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
-                        if (milliSinceLastPing > (1000 *60*60* activeMap.getAutoPingSpacer())) 
+                        Player player = activeMap.getPlayer(playerID);
+                        if (player != null) 
                         {
-                            String realIdentity = "";
-                            if(activeMap.isCommunityMode())
+                            long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
+                            if (milliSinceLastPing > (1000 *60*60* activeMap.getAutoPingSpacer())) 
                             {
-                                if(player.getRoleForCommunity() == null)
+                                String realIdentity = "";
+                                if(activeMap.isCommunityMode())
                                 {
-                                    return;
+                                    if(player.getRoleForCommunity() == null)
+                                    {
+                                        return;
+                                    }
+                                    
+                                    realIdentity = Helper.getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName()); //need to get right guild later
                                 }
-                                realIdentity = Helper.getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName());
-                            }
-                            else
-                            {
+                                else
+                                {
+                                    realIdentity =Helper.getPlayerRepresentation(player);
+                                }
                                 realIdentity =Helper.getPlayerRepresentation(player);
-                            }
-                            String ping = realIdentity + " this is a gentle reminder that it is your turn.";
-                            if(activeMap.isFoWMode()) {
-                                MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);
-                            } else {
-                                MessageChannel gameChannel = activeMap.getMainGameChannel();
-                                if(gameChannel != null)
-                                {
-                                    MessageHelper.sendMessageToChannel(gameChannel, ping);
+                                String ping = realIdentity + " this is a gentle reminder that it is your turn.";
+                                if(activeMap.isFoWMode()) {
+                                    MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);
+                                } else {
+                                    MessageChannel gameChannel = activeMap.getMainGameChannel();
+                                    if(gameChannel != null)
+                                    {
+                                        MessageHelper.sendMessageToChannel(gameChannel, ping);
+                                    }
                                 }
+                                activeMap.setLastActivePlayerPing(new Date());
                             }
-                            activeMap.setLastActivePlayerPing(new Date());
                         }
                     }
                 }

@@ -894,7 +894,7 @@ public class MapSaveLoadManager {
                 case Constants.ACTIVE_PLAYER -> map.setActivePlayer(info);
                 case Constants.LAST_ACTIVE_PLAYER_PING -> {
                     try {
-                        Long millis = Long.parseLong(info);
+                        long millis = Long.parseLong(info);
                         Date lastPing = new Date(millis);
                         map.setLastActivePlayerPing(lastPing);
                     } catch (Exception e) {
@@ -903,7 +903,7 @@ public class MapSaveLoadManager {
                 }
                 case Constants.LAST_TIME_GAMES_CHECKED -> {
                     try {
-                        Long millis = Long.parseLong(info);
+                        long millis = Long.parseLong(info);
                         Date lastGameCheck = new Date(millis);
                         map.setLastTimeGamesChecked(lastGameCheck);
                     } catch (Exception e) {
@@ -912,7 +912,7 @@ public class MapSaveLoadManager {
                 }
                 case Constants.AUTO_PING-> {
                     try {
-                        Long pnghrs = Long.parseLong(info);
+                        int pnghrs = Integer.parseInt(info);
                         if (pnghrs != 0)
                         {
                             map.setAutoPing(true);  
