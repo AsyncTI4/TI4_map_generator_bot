@@ -618,7 +618,8 @@ public class Constants {
     public static final String SC_FOLLOW_6 = "sc_follow_6";
     public static final String SC_FOLLOW_7 = "sc_follow_7";
     public static final String SC_FOLLOW_8 = "sc_follow_8";
-
+    public static final String AUTO_PING = "auto_ping";
+    public static final String LAST_TIME_GAMES_CHECKED = "last_time_game_checked";
     public static final String STATS_USERNAME="userName";
     public static final String STATS_VP ="vp";
     public static final String STATS_CC="cc";
