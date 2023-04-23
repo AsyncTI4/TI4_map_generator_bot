@@ -117,7 +117,60 @@ public class MessageListener extends ListenerAdapter {
 //            }
 //        }
 
+
+
+
+
         Message msg = event.getMessage();
+        Map map2 = MapManager.getInstance().getMap("finreference");
+        if((new Date().getTime()) - map2.getLastTimeGamesChecked().getTime() > 1000*10*60) //10 minutes
+        {
+            map2.setLastTimeGamesChecked(new Date());
+            HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
+            for (Map activeMap : mapList.values()) {
+                if(activeMap.getAutoPingStatus() && activeMap.getAutoPingSpacer() != 0)
+                {
+                    String playerID = activeMap.getActivePlayer();
+                    if (playerID != null) 
+                    {
+                        Player player = activeMap.getPlayer(playerID);
+                        if (player != null) 
+                        {
+                            long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
+                            if (milliSinceLastPing > (1000 *60*60* activeMap.getAutoPingSpacer())) 
+                            {
+                                String realIdentity = "";
+                                if(activeMap.isCommunityMode())
+                                {
+                                    if(player.getRoleForCommunity() == null)
+                                    {
+                                        return;
+                                    }
+                                    
+                                    realIdentity = Helper.getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName()); //need to get right guild later
+                                }
+                                else
+                                {
+                                    realIdentity =Helper.getPlayerRepresentation(player);
+                                }
+                                realIdentity =Helper.getPlayerRepresentation(player);
+                                String ping = realIdentity + " this is a gentle reminder that it is your turn.";
+                                if(activeMap.isFoWMode()) {
+                                    MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);
+                                } else {
+                                    MessageChannel gameChannel = activeMap.getMainGameChannel();
+                                    if(gameChannel != null)
+                                    {
+                                        MessageHelper.sendMessageToChannel(gameChannel, ping);
+                                    }
+                                }
+                                activeMap.setLastActivePlayerPing(new Date());
+                            }
+                        }
+                    }
+                }
+            }
+        }
 
 
         if (msg.getContentRaw().startsWith("[DELETE]")) {
