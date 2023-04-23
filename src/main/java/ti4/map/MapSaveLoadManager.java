@@ -926,6 +926,7 @@ public class MapSaveLoadManager {
                         // do nothing
                     }
                 }
+
                 case Constants.LAST_ACTIVE_PLAYER_CHANGE -> {
                     try {
                         Long millis = Long.parseLong(info);
