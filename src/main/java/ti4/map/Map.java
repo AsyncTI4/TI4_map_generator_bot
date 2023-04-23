@@ -429,6 +429,29 @@ public class Map {
         return lastActivePlayerPing;
     }
 
+
+    public Date getLastTimeGamesChecked() {
+        return lastTimeGamesChecked;
+    }
+    public void setLastTimeGamesChecked(Date time) {
+        this.lastTimeGamesChecked = time;
+    }
+
+    public void setAutoPing(boolean status)
+    {
+        this.auto_ping_enabled = status;
+    }
+    public boolean getAutoPingStatus()
+    {
+        return auto_ping_enabled;
+    }
+    public long getAutoPingSpacer() {
+        return autoPingSpacer;
+    }
+    public void setAutoPingSpacer(long spacer) {
+        this.autoPingSpacer = spacer;
+    }
+
     public void setLastActivePlayerPing(Date time) {
         this.lastActivePlayerPing = time;
     }
