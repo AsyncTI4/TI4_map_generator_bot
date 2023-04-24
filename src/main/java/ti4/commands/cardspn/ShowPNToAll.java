@@ -59,6 +59,5 @@ public class ShowPNToAll extends PNCardsSubcommandData {
             player.setPromissoryNote(acID);
         }
         sendMessage(sb.toString());
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }

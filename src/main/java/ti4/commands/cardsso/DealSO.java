@@ -44,6 +44,6 @@ public class DealSO extends SOCardsSubcommandData {
             activeMap.drawSecretObjective(player_.getUserID());
         }
         sendMessage(count + " SO Dealt");
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player_);
+        SOInfo.sendSecretObjectiveInfo(activeMap, player_);
     }
 }

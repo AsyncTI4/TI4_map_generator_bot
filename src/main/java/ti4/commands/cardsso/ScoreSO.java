@@ -75,7 +75,7 @@ public class ScoreSO extends SOCardsSubcommandData {
             MessageHelper.sendMessageToChannel(channel, "All players notified");
         }
         
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+        SOInfo.sendSecretObjectiveInfo(activeMap, player);
         Helper.checkIfHeroUnlocked(event, activeMap, player);
     }
 }

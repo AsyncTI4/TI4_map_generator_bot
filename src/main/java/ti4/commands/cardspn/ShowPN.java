@@ -76,8 +76,5 @@ public class ShowPN extends PNCardsSubcommandData {
         }
         MessageHelper.sendMessageToUser(sb.toString(), user);
         sendMessage("PN shown");
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
-
-
     }
 }

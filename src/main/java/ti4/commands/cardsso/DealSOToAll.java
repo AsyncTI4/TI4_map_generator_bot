@@ -29,7 +29,7 @@ public class DealSOToAll extends SOCardsSubcommandData {
                 for (int i = 0; i < count; i++) {
                     activeMap.drawSecretObjective(player.getUserID());
                 }
-                ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
+                SOInfo.sendSecretObjectiveInfo(activeMap, player);
             }
         }
         sendMessage(count + " SO Dealt to All");

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -121,7 +120,7 @@ public class PNInfo extends PNCardsSubcommandData {
         String pnText = pnSplit[2];
         sb.append(Emojis.PN).append("__**" + pnName + "**__");
         sb.append(" *(").append(pnFactionOrColour).append(")*");
-        if (longFormat) sb.append("   ").append(pnText);
+        if (longFormat || Mapper.isFaction(pnFactionOrColour)) sb.append("   ").append(pnText);
         sb.append("\n");
         return sb.toString();
     }

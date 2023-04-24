@@ -47,6 +47,6 @@ public class PurgePN extends PNCardsSubcommandData {
         activeMap.setPurgedPN(id);
         player.removePromissoryNote(id);
         sendMessage("PN Purged");
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
+        PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
     }
 }

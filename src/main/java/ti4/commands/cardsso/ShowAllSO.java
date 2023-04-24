@@ -50,6 +50,5 @@ public class ShowAllSO extends SOCardsSubcommandData {
         }
         sendMessage("All SOs shown to player");
         MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, sb.toString());
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
     }
 }
