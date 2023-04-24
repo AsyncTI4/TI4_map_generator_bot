@@ -341,7 +341,7 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.MAIN_GAME_CHANNEL + " " + map.getMainGameChannelID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.BOT_MAP_CHANNEL + " " + map.getBotMapChannelID());
+        writer.write(Constants.BOT_MAP_CHANNEL + " " + map.getBotMapUpdatesThreadID());
 
         writer.write(System.lineSeparator());
         writer.write(Constants.COMMUNITY_MODE + " " + map.isCommunityMode());
@@ -988,7 +988,7 @@ public class MapSaveLoadManager {
                 case Constants.GAME_CUSTOM_NAME -> map.setCustomName(info);
                 case Constants.TABLE_TALK_CHANNEL ->  map.setTableTalkChannelID(info);
                 case Constants.MAIN_GAME_CHANNEL -> map.setMainGameChannelID(info);
-                case Constants.BOT_MAP_CHANNEL -> map.setBotMapChannelID(info);
+                case Constants.BOT_MAP_CHANNEL -> map.setBotMapUpdatesThreadID(info);
                 case Constants.COMMUNITY_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);

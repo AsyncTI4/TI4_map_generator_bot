@@ -200,7 +200,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
         .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
         .complete();
-        map.setBotMapChannelID(botThread.getId());
+        map.setBotMapUpdatesThreadID(botThread.getId());
         
         StringBuilder botGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - bot/map channel\n");
         botGetStartedMessage.append("__Use the following commands to get started:__\n");

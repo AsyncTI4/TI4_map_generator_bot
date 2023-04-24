@@ -72,7 +72,7 @@ public class Map {
     @Nullable
     private String mainChannelID = null;
     @Nullable
-    private String botMapChannelID = null;
+    private String botMapUpdatesThreadID = null;
     
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
@@ -334,11 +334,11 @@ public class Map {
     }
 
     public void setTableTalkChannelID(String channelID) {
-        tableTalkChannelID = channelID;
+        this.tableTalkChannelID = channelID;
     }
 
     public String getTableTalkChannelID() {
-        return tableTalkChannelID;
+        return this.tableTalkChannelID;
     }
 
     public TextChannel getMainGameChannel() {
@@ -357,20 +357,20 @@ public class Map {
     }
 
     public void setMainGameChannelID(String channelID) {
-        mainChannelID = channelID;
+        this.mainChannelID = channelID;
     }
 
     public String getMainGameChannelID() {
-        return mainChannelID;
+        return this.mainChannelID;
     }
 
     public TextChannel getActionsChannel() {
         return getMainGameChannel();
     }
 
-    public ThreadChannel getBotMapChannel() {
+    public ThreadChannel getBotMapUpdatesThread() {
         try {
-            return MapGenerator.jda.getThreadChannelById(getBotMapChannelID());
+            return MapGenerator.jda.getThreadChannelById(getBotMapUpdatesThreadID());
         } catch (Exception e) {
             ThreadChannel threadChannel = null; //exists and is not locked
             List<ThreadChannel> botChannels = MapGenerator.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
@@ -380,7 +380,7 @@ public class Map {
                 for (ThreadChannel threadChannel_ : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
                     if (threadChannel_.getName().equals(getName() + Constants.BOT_CHANNEL_SUFFIX)) {
                         threadChannel = threadChannel_;
-                        setBotMapChannelID(threadChannel.getId());
+                        setBotMapUpdatesThreadID(threadChannel.getId());
                         return threadChannel;
                     }
                 }
@@ -389,16 +389,16 @@ public class Map {
         return null;
     }
 
-    public void setBotMapChannelID(String botMapChannelID) {
-        this.botMapChannelID = botMapChannelID;
+    public void setBotMapUpdatesThreadID(String threadID) {
+        this.botMapUpdatesThreadID = threadID;
     }
 
-    public String getBotMapChannelID() {
-        return this.botMapChannelID;
+    public String getBotMapUpdatesThreadID() {
+        return this.botMapUpdatesThreadID;
     }
 
     /**
-     * @return Guild that the Actions or Main Game Channel resides
+     * @return Guild that the ActionsChannel or MainGameChannel resides
      */
     @Nullable
     public Guild getGuild() {
