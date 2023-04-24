@@ -337,14 +337,11 @@ public class MapSaveLoadManager {
         writer.write(Constants.GAME_CUSTOM_NAME + " " + map.getCustomName());
         writer.write(System.lineSeparator());
 
-        MessageChannel tableTalkChannel = map.getTableTalkChannel();
-        writer.write(Constants.TABLE_TALK_CHANNEL + " " + (tableTalkChannel == null ? "" : tableTalkChannel.getId()));
+        writer.write(Constants.TABLE_TALK_CHANNEL + " " + map.getTableTalkChannelID());
         writer.write(System.lineSeparator());
-        MessageChannel mainGameChannel = map.getMainGameChannel();
-        writer.write(Constants.MAIN_GAME_CHANNEL + " " + (mainGameChannel == null ? "" : mainGameChannel.getId()));
+        writer.write(Constants.MAIN_GAME_CHANNEL + " " + map.getMainGameChannelID());
         writer.write(System.lineSeparator());
-        ThreadChannel botMapChannel = map.getBotMapChannel();
-        writer.write(Constants.BOT_MAP_CHANNEL + " " + (botMapChannel == null ? "" : botMapChannel.getId()));
+        writer.write(Constants.BOT_MAP_CHANNEL + " " + map.getBotMapUpdatesThreadID());
 
         writer.write(System.lineSeparator());
         writer.write(Constants.COMMUNITY_MODE + " " + map.isCommunityMode());
@@ -989,57 +986,9 @@ public class MapSaveLoadManager {
                     }                    
                 }
                 case Constants.GAME_CUSTOM_NAME -> map.setCustomName(info);
-                case Constants.MAIN_GAME_CHANNEL -> {
-                    String id = info.isEmpty() ? "1234" : info; //getTextChannelById can't handle ""
-                    try {
-                        TextChannel mainGameChannel = MapGenerator.jda.getTextChannelById(id);
-                        if (mainGameChannel == null) {
-                            List<TextChannel> gameChannels = MapGenerator.jda.getTextChannelsByName(map.getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
-                            if (!gameChannels.isEmpty() && gameChannels.size() == 1) mainGameChannel = gameChannels.get(0);
-                        }
-                        map.setMainGameChannel(mainGameChannel);
-                    } catch (Exception e) {
-                        //Do nothing
-                    }
-                }
-                case Constants.TABLE_TALK_CHANNEL -> {
-                    String id = info.isEmpty() ? "1234" : info; //getTextChannelById can't handle ""
-                    try {
-                        TextChannel tableTalkChannel = MapGenerator.jda.getTextChannelById(id);
-                        if (tableTalkChannel == null) {
-                            List<TextChannel> gameChannels = MapGenerator.jda.getTextChannels().stream()
-                                        .filter(c -> c.getName().startsWith(map.getName()))
-                                        .filter(Predicate.not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
-                                        .toList();
-                            if (!gameChannels.isEmpty() && gameChannels.size() == 1) tableTalkChannel = gameChannels.get(0);
-                        }
-                        map.setTableTalkChannel(tableTalkChannel);
-                    } catch (Exception e) {
-                        //Do nothing
-                    }
-                }
-                //DISABLED - POTENTIALLY OPENING THREADS
-                // case Constants.BOT_MAP_CHANNEL -> {
-                //     String id = info.isEmpty() ? "1234" : info; //getThreadChannelById can't handle ""
-                //     try {
-                //         ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(id); //exists and is not locked
-                //         if (threadChannel == null) { 
-                //             List<ThreadChannel> botChannels = MapGenerator.jda.getThreadChannelsByName(map.getName() + Constants.BOT_CHANNEL_SUFFIX, true);
-                //             if (!botChannels.isEmpty() && botChannels.size() == 1) { //found a matching thread
-                //                 threadChannel = botChannels.get(0);
-                //             } else { //can't find it, might be archived
-                //                 for (ThreadChannel tc : MapGenerator.jda.getTextChannelById(map.getMainGameChannel().getId()).retrieveArchivedPublicThreadChannels()) {
-                //                     if (tc.getName().equals(map.getName() + Constants.BOT_CHANNEL_SUFFIX)) {
-                //                         threadChannel = tc;
-                //                     }
-                //                 }
-                //             }
-                //         }
-                //         map.setBotMapChannel(threadChannel);
-                //     } catch (Exception e) {
-                //         //Do nothing
-                //     }
-                // }
+                case Constants.TABLE_TALK_CHANNEL ->  map.setTableTalkChannelID(info);
+                case Constants.MAIN_GAME_CHANNEL -> map.setMainGameChannelID(info);
+                case Constants.BOT_MAP_CHANNEL -> map.setBotMapUpdatesThreadID(info);
                 case Constants.COMMUNITY_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
