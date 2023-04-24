@@ -55,6 +55,8 @@ public class Map {
     @ExportableField
     private boolean fowMode = false;
     @ExportableField
+    private boolean stratPings = true;
+    @ExportableField
     private String largeText = "small";
     @ExportableField
     private boolean absolMode = false;
@@ -265,6 +267,14 @@ public class Map {
 
     public void setFoWMode(boolean fowMode) {
         this.fowMode = fowMode;
+    }
+
+    public boolean isStratPings() {
+        return stratPings;
+    }
+
+    public void setStratPings(boolean stratPings) {
+        this.stratPings = stratPings;
     }
 
     public void setLargeText(String largeText) {
