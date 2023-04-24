@@ -120,7 +120,7 @@ public class PNInfo extends PNCardsSubcommandData {
         String pnText = pnSplit[2];
         sb.append(Emojis.PN).append("__**" + pnName + "**__");
         sb.append(" *(").append(pnFactionOrColour).append(")*");
-        if (longFormat || Mapper.isFaction(pnFactionOrColour)) sb.append("   ").append(pnText);
+        if (longFormat || Mapper.isFaction(pnFactionOrColour.toLowerCase())) sb.append("   ").append(pnText);
         sb.append("\n");
         return sb.toString();
     }
