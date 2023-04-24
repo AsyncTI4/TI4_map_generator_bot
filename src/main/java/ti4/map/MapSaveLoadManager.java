@@ -87,9 +87,10 @@ public class MapSaveLoadManager {
         try {
             mapper.writeValue(Storage.getMapsJSONStorage(map.getName() + JSON), map);
         } catch (IOException e) {
-            // Do nothing
-            // e.printStackTrace();
-        }       
+
+        } catch (Exception e) {
+            BotLogger.log("JSON MAPPER", e);
+        }
         
         File mapFile = Storage.getMapImageStorage(map.getName() + TXT);
         if (mapFile != null) {
