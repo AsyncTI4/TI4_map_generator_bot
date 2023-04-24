@@ -166,16 +166,18 @@ public class Turn extends PlayerSubcommandData {
                     String missedNums = "";
                     for(int x = 1; x <9; x++)
                     {
-                        
-                        if(!anyMissed)
-                            {
-                                missedNums = missedNums +x;
-                                anyMissed=true;
-                            }
-                        else
-                            {
-                                missedNums = missedNums + ", " +x;
-                            }
+                        if(player.getSCFollowedStatus(x)==false && map.isStratPings())
+                        {
+                            if(!anyMissed)
+                                {
+                                    missedNums = missedNums +x;
+                                    anyMissed=true;
+                                }
+                            else
+                                {
+                                    missedNums = missedNums + ", " +x;
+                                }
+                        }
                     }
                     if(anyMissed && map.isStratPings())
                     {
