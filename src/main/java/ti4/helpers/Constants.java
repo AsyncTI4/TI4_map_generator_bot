@@ -334,6 +334,7 @@ public class Constants {
     public static final String SC4 = "4th_choice";
     public static final String SC5 = "5th_choice";
     public static final String SC6 = "6th_choice";
+    public static final String STRAT_PINGS = "strat_pings";
     public static final String DUMMY = "dummy";
     
     public static final String NUMBER_OF_TURNS = "number_of_turns";

@@ -2,6 +2,7 @@ package ti4;
 
 import net.dv8tion.jda.api.entities.channel.*;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
@@ -149,14 +150,13 @@ public class MessageListener extends ListenerAdapter {
                                     {
                                         return;
                                     }
-                                    
-                                    realIdentity = Helper.getRoleMentionByName(event.getGuild(), player.getRoleForCommunity().getName()); //need to get right guild later
+                                    GuildChannel guildGetter = (GuildChannel) activeMap.getMainGameChannel();
+                                    realIdentity = Helper.getRoleMentionByName(guildGetter.getGuild(), player.getRoleForCommunity().getName()); //need to get right guild later
                                 }
                                 else
                                 {
                                     realIdentity = Helper.getPlayerRepresentation(player);
                                 }
-                                realIdentity =Helper.getPlayerRepresentation(player);
                                 String ping = realIdentity + " this is a gentle reminder that it is your turn.";
                                 if(activeMap.isFoWMode()) {
                                     MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);

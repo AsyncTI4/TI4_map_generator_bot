@@ -353,6 +353,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.FOW_MODE + " " + map.isFoWMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.STRAT_PINGS + " " + map.isStratPings());
+        writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + map.isAbsolMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.LARGE_TEXT + " " + map.getLargeText());
@@ -1058,6 +1060,14 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         map.setFoWMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.STRAT_PINGS -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setStratPings(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

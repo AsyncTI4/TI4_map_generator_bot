@@ -134,15 +134,30 @@ public class Turn extends PlayerSubcommandData {
                 String text = Helper.getPlayerRepresentation(event, player, true) + " UP NEXT";
                 map.updateActivePlayer(player);
                 if (isFowPrivateGame) {
+                    boolean anyMissed = false;
+                    String missedNums = "";
                     String fail = "User for next faction not found. Report to ADMIN";
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, map, event, text, fail, success);
+                    
                     for(int x = 1; x <9; x++)
                     {
-                        if(player.getSCFollowedStatus(x)==false)
+                        if(player.getSCFollowedStatus(x)==false && map.isStratPings())
                         {
-                            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), "This is a reminder that you have not yet followed SC #"+x);
+                            if(!anyMissed)
+                            {
+                                missedNums = missedNums +x;
+                                anyMissed=true;
+                            }
+                            else
+                            {
+                                missedNums = missedNums + ", " +x;
+                            }
                         }
+                    }
+                    if(anyMissed&& map.isStratPings())
+                    {
+                        MessageHelper.sendMessageToChannel(player.getPrivateChannel(), "This is a reminder that you have not yet followed SC(s) #"+missedNums);
                     }
                     return "";
                 } else {
@@ -152,17 +167,20 @@ public class Turn extends PlayerSubcommandData {
                     for(int x = 1; x <9; x++)
                     {
                         
-                        if(player.getSCFollowedStatus(x)==false)
-                        {
-                            missedNums = missedNums + " "+x;
-                            anyMissed=true;
-                        }
-
+                        if(!anyMissed)
+                            {
+                                missedNums = missedNums +x;
+                                anyMissed=true;
+                            }
+                        else
+                            {
+                                missedNums = missedNums + ", " +x;
+                            }
                     }
-                    if(anyMissed)
-                        {
+                    if(anyMissed && map.isStratPings())
+                    {
                             MessageHelper.sendMessageToChannel(gameChannel, "This is a reminder that you have not yet followed SC(s) #"+missedNums);
-                        }
+                    }
                     return "";
                 }
             }
