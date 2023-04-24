@@ -39,6 +39,6 @@ public class UnscoreSO extends SOCardsSubcommandData {
         }
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Unscored SO " + option.getAsInt());
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+        SOInfo.sendSecretObjectiveInfo(activeMap, player);
     }
 }
