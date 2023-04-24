@@ -232,6 +232,10 @@ public class MessageListener extends ListenerAdapter {
             }
         }
 
+        saveJSONInTTPGExportsChannel(event);
+    }
+
+    private void saveJSONInTTPGExportsChannel(MessageReceivedEvent event) {
         // TTPG-EXPORTS - Save attachment to ttpg_exports folder for later processing
         if (event.getChannel().getName().equalsIgnoreCase("ttpg-exports")) {
             List<Message.Attachment> attachments = event.getMessage().getAttachments();
