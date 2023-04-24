@@ -3,6 +3,7 @@ package ti4.map;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonSetter;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -128,7 +129,9 @@ public class Map {
     private static HashMap<Player, Integer> playerVPs = new HashMap<>();
 
     //AUTOCOMPLETE CACHE
+    @JsonIgnore
     List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache = null;
+    @JsonIgnore
     List<SimpleEntry<String, String>> planetNameAutocompleteOptionsCache = null;
 
     public Map() {
@@ -889,6 +892,7 @@ public class Map {
         sentAgendas.clear();
     }
 
+    @JsonSetter
     public void setDiscardAgendas(LinkedHashMap<String, Integer> discardAgendas) {
         this.discardAgendas = discardAgendas;
     }
@@ -1219,6 +1223,7 @@ public class Map {
         discardActionCards.put(id, identifier);
     }
 
+    @JsonIgnore
     public boolean discardActionCard(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
         if (player != null) {
@@ -1432,6 +1437,7 @@ public class Map {
         this.actionCards = actionCards;
     }
 
+    @JsonSetter
     public void setDiscardActionCards(LinkedHashMap<String, Integer> discardActionCards) {
         this.discardActionCards = discardActionCards;
     }
