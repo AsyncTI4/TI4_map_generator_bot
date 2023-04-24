@@ -1,17 +1,37 @@
 package ti4.map;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.Nullable;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
 import ti4.MapGenerator;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
@@ -19,13 +39,6 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
-
-import java.io.*;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.*;
-import java.util.function.Predicate;
 
 public class MapSaveLoadManager {
 
@@ -674,7 +687,8 @@ public class MapSaveLoadManager {
         try {
             return mapper.readValue(mapFile, Map.class);
         } catch (Exception e) {
-            BotLogger.log("JSON LOADER", e);
+            // BotLogger.log("JSON LOADER", e);
+            System.out.println(ExceptionUtils.getStackTrace(e));
         }
 
         // if (mapFile != null) {
