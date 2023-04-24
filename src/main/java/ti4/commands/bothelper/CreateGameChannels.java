@@ -15,7 +15,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.channel.unions.GuildChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -187,7 +186,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         .addRolePermissionOverride(gameRoleID, permission, 0)
         .complete();
         MessageHelper.sendMessageToChannel((MessageChannel) chatChannel, role.getAsMention()+ " - table talk channel");
-        map.setTableTalkChannel(chatChannel);
+        map.setTableTalkChannelID(chatChannel.getId());
         
         // CREATE ACTIONS CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
@@ -195,12 +194,13 @@ public class CreateGameChannels extends BothelperSubcommandData {
         .addRolePermissionOverride(gameRoleID, permission, 0)
         .complete();
         MessageHelper.sendMessageToChannel((MessageChannel) actionsChannel, role.getAsMention() + " - actions channel");
-        map.setMainGameChannel(actionsChannel);
+        map.setMainGameChannelID(actionsChannel.getId());
         
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
         .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
         .complete();
+        map.setBotMapChannelID(botThread.getId());
         
         StringBuilder botGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - bot/map channel\n");
         botGetStartedMessage.append("__Use the following commands to get started:__\n");
