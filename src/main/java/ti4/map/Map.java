@@ -2,6 +2,8 @@ package ti4.map;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -303,6 +305,7 @@ public class Map {
         this.discordantStarsMode = discordantStarsMode;
     }
 
+    @JsonIgnore
     public String getGameModesText() {
         HashMap<String,Boolean> gameModes = new HashMap<>() {{
             put("Community", isCommunityMode());
@@ -314,6 +317,7 @@ public class Map {
         return gameModes.entrySet().stream().filter(gm -> gm.getValue()).map(java.util.Map.Entry::getKey).collect(Collectors.joining(", "));
     }
 
+    @JsonIgnore
     public TextChannel getTableTalkChannel() {
         try {
             return MapGenerator.jda.getTextChannelById(getTableTalkChannelID());
@@ -341,6 +345,7 @@ public class Map {
         return this.tableTalkChannelID;
     }
 
+    @JsonIgnore
     public TextChannel getMainGameChannel() {
         try {
             return MapGenerator.jda.getTextChannelById(getMainGameChannelID());
@@ -364,10 +369,12 @@ public class Map {
         return this.mainChannelID;
     }
 
+    @JsonIgnore
     public TextChannel getActionsChannel() {
         return getMainGameChannel();
     }
 
+    @JsonIgnore
     public ThreadChannel getBotMapUpdatesThread() {
         try {
             return MapGenerator.jda.getThreadChannelById(getBotMapUpdatesThreadID());
@@ -400,7 +407,7 @@ public class Map {
     /**
      * @return Guild that the ActionsChannel or MainGameChannel resides
      */
-    @Nullable
+    @Nullable @JsonIgnore
     public Guild getGuild() {
         return getActionsChannel() == null ? null : ((GuildChannel) getActionsChannel()).getGuild();
     }
@@ -502,7 +509,6 @@ public class Map {
     public Date getLastActivePlayerPing() {
         return lastActivePlayerPing;
     }
-
 
     public Date getLastTimeGamesChecked() {
         return lastTimeGamesChecked;
