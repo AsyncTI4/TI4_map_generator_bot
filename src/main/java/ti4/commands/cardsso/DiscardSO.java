@@ -37,6 +37,6 @@ public class DiscardSO extends SOCardsSubcommandData {
             return;
         }
         sendMessage("SO Discarded");
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
+        SOInfo.sendSecretObjectiveInfo(activeMap, player);
     }
 }

@@ -36,6 +36,6 @@ public class DrawSO extends SOCardsSubcommandData {
             activeMap.drawSecretObjective(player.getUserID());
         }
         sendMessage("Drew " + count + " SO");
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
+        SOInfo.sendSecretObjectiveInfo(activeMap, player);
     }
 }
