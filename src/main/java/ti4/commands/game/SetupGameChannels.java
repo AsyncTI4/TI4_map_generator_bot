@@ -65,7 +65,7 @@ public class SetupGameChannels extends GameSubcommandData {
             return;
         }
 
-        activeMap.setMainGameChannel(channel.getAsChannel().asTextChannel());
+        activeMap.setMainGameChannelID(channel.getAsChannel().asTextChannel().getId());
 
         if (activeMap.isCommunityMode() || activeMap.isFoWMode()) {
             setRoleAndChannel(event, activeMap, Constants.PLAYER1, Constants.ROLE1, Constants.CHANNEL1);

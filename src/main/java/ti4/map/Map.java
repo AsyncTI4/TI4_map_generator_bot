@@ -2,10 +2,13 @@ package ti4.map;
 
 import org.jetbrains.annotations.Nullable;
 
+import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import ti4.MapGenerator;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.player.PlanetRemove;
 import ti4.generator.Mapper;
@@ -65,11 +68,11 @@ public class Map {
     private boolean hasEnded = false;
 
     @Nullable
-    private MessageChannel tableTalkChannel = null;
+    private String tableTalkChannelID = null;
     @Nullable
-    private MessageChannel mainChannel = null;
+    private String mainChannelID = null;
     @Nullable
-    private ThreadChannel botMapChannel = null;
+    private String botMapUpdatesThreadID = null;
     
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
@@ -311,36 +314,95 @@ public class Map {
         return gameModes.entrySet().stream().filter(gm -> gm.getValue()).map(java.util.Map.Entry::getKey).collect(Collectors.joining(", "));
     }
 
-    public void setTableTalkChannel(MessageChannel channel) {
-        tableTalkChannel = channel;
+    public TextChannel getTableTalkChannel() {
+        try {
+            return MapGenerator.jda.getTextChannelById(getTableTalkChannelID());
+        } catch (Exception e) {
+            TextChannel tableTalkChannel = null;
+            List<TextChannel> gameChannels = MapGenerator.jda.getTextChannels().stream()
+                        .filter(c -> c.getName().startsWith(getName()))
+                        .filter(Predicate.not(c -> c.getName().contains(Constants.ACTIONS_CHANNEL_SUFFIX)))
+                        .toList();
+            if (!gameChannels.isEmpty() && gameChannels.size() == 1) {
+                tableTalkChannel = gameChannels.get(0);
+                setTableTalkChannelID(tableTalkChannel.getId());
+                return tableTalkChannel;
+            }
+            BotLogger.log("Could not retrieve TableTalkChannel for " + getName(), e);
+        }
+        return null;
     }
 
-    public MessageChannel getTableTalkChannel() {
-        return tableTalkChannel;
+    public void setTableTalkChannelID(String channelID) {
+        this.tableTalkChannelID = channelID;
     }
 
-    public void setMainGameChannel(MessageChannel channel) {
-        mainChannel = channel;
+    public String getTableTalkChannelID() {
+        return this.tableTalkChannelID;
     }
 
-    public MessageChannel getMainGameChannel() {
-        return mainChannel;
+    public TextChannel getMainGameChannel() {
+        try {
+            return MapGenerator.jda.getTextChannelById(getMainGameChannelID());
+        } catch (Exception e) {
+            List<TextChannel> gameChannels = MapGenerator.jda.getTextChannelsByName(getName() + Constants.ACTIONS_CHANNEL_SUFFIX, true);
+            if (!gameChannels.isEmpty() && gameChannels.size() == 1) {
+                TextChannel mainGameChannel = gameChannels.get(0);
+                setMainGameChannelID(mainGameChannel.getId());
+                return mainGameChannel;
+            }
+            BotLogger.log("Could not retrieve MainGameChannel for " + getName(), e);
+        }
+        return null;
     }
 
-    public void setActionChannel(MessageChannel channel) {
-        mainChannel = channel;
+    public void setMainGameChannelID(String channelID) {
+        this.mainChannelID = channelID;
     }
 
-    public MessageChannel getActionChannel() {
-        return mainChannel;
+    public String getMainGameChannelID() {
+        return this.mainChannelID;
     }
 
-    public void setBotMapChannel(ThreadChannel channel) {
-        botMapChannel = channel;
+    public TextChannel getActionsChannel() {
+        return getMainGameChannel();
     }
 
-    public ThreadChannel getBotMapChannel() {
-        return botMapChannel;
+    public ThreadChannel getBotMapUpdatesThread() {
+        try {
+            return MapGenerator.jda.getThreadChannelById(getBotMapUpdatesThreadID());
+        } catch (Exception e) {
+            ThreadChannel threadChannel = null; //exists and is not locked
+            List<ThreadChannel> botChannels = MapGenerator.jda.getThreadChannelsByName(getName() + Constants.BOT_CHANNEL_SUFFIX, true);
+            if (!botChannels.isEmpty() && botChannels.size() == 1) { //found a matching thread
+                threadChannel = botChannels.get(0);
+            } else { //can't find it, might be archived
+                for (ThreadChannel threadChannel_ : getActionsChannel().retrieveArchivedPublicThreadChannels()) {
+                    if (threadChannel_.getName().equals(getName() + Constants.BOT_CHANNEL_SUFFIX)) {
+                        threadChannel = threadChannel_;
+                        setBotMapUpdatesThreadID(threadChannel.getId());
+                        return threadChannel;
+                    }
+                }
+            }
+        }
+        return null;
+    }
+
+    public void setBotMapUpdatesThreadID(String threadID) {
+        this.botMapUpdatesThreadID = threadID;
+    }
+
+    public String getBotMapUpdatesThreadID() {
+        return this.botMapUpdatesThreadID;
+    }
+
+    /**
+     * @return Guild that the ActionsChannel or MainGameChannel resides
+     */
+    @Nullable
+    public Guild getGuild() {
+        return getActionsChannel() == null ? null : ((GuildChannel) getActionsChannel()).getGuild();
     }
 
     public boolean isHasEnded() {
