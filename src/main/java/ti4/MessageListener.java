@@ -18,6 +18,7 @@ import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.MapFileDeleter;
 import ti4.map.MapManager;
+import ti4.map.MapSaveLoadManager;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.commands.fow.Whisper;
@@ -126,10 +127,11 @@ public class MessageListener extends ListenerAdapter {
 
 
         Message msg = event.getMessage();
-        Map map2 = MapManager.getInstance().getMap("finreference");
-        if (map2 != null && (new Date().getTime()) - map2.getLastTimeGamesChecked().getTime() > 1000*10*60) //10 minutes
+        Map mapreference = MapManager.getInstance().getMap("finreference");
+        if (mapreference != null && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 1000*10*60) //10 minutes
         {
-            map2.setLastTimeGamesChecked(new Date());
+            mapreference.setLastTimeGamesChecked(new Date());
+            MapSaveLoadManager.saveMap(mapreference);
             HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
             for (Map activeMap : mapList.values()) {
                 if(activeMap.getAutoPingStatus() && activeMap.getAutoPingSpacer() != 0)
@@ -168,6 +170,7 @@ public class MessageListener extends ListenerAdapter {
                                     }
                                 }
                                 activeMap.setLastActivePlayerPing(new Date());
+                                MapSaveLoadManager.saveMap(activeMap);
                             }
                         }
                     }
