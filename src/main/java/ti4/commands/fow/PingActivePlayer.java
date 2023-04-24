@@ -9,6 +9,7 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.map.MapSaveLoadManager;
 
 public class PingActivePlayer extends FOWSubcommandData {
     
@@ -50,6 +51,7 @@ public class PingActivePlayer extends FOWSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ping);
             }
             activeMap.setLastActivePlayerPing(new Date());
+            MapSaveLoadManager.saveMap(activeMap);
         }
     }
 
