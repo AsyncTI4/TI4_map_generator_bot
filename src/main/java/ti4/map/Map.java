@@ -2,8 +2,12 @@ package ti4.map;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -116,7 +120,10 @@ public class Map {
     private LinkedHashMap<String, Integer> customPublicVP = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
+
+    @JsonDeserialize(keyUsing = MapPairKeyDeserializer.class)
     private LinkedHashMap<Pair<String, Integer>, String> adjacencyOverrides = new LinkedHashMap<>();
+
     private ArrayList<String> publicObjectives1 = new ArrayList<>();
     private ArrayList<String> publicObjectives2 = new ArrayList<>();
     private ArrayList<String> soToPoList = new ArrayList<>();
@@ -134,6 +141,7 @@ public class Map {
     @JsonIgnore
     List<SimpleEntry<String, String>> planetNameAutocompleteOptionsCache = null;
 
+    @JsonCreator
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
         lastModifiedDate = new Date().getTime();
@@ -812,6 +820,7 @@ public class Map {
         return customAdjacentTiles;
     }
 
+    @JsonSerialize(keyUsing = MapPairKeySerializer.class) 
     public LinkedHashMap<Pair<String, Integer>, String> getAdjacentTileOverrides() {
         return adjacencyOverrides;
     }
@@ -1658,6 +1667,7 @@ public class Map {
             .toList());
     }
 
+    @JsonIgnore
     public List<SimpleEntry<String, String>> getTileNameAutocompleteOptionsCache() {
         if (tileNameAutocompleteOptionsCache != null) {
             return this.tileNameAutocompleteOptionsCache;
