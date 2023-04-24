@@ -127,7 +127,7 @@ public class MessageListener extends ListenerAdapter {
 
         Message msg = event.getMessage();
         Map map2 = MapManager.getInstance().getMap("finreference");
-        if((new Date().getTime()) - map2.getLastTimeGamesChecked().getTime() > 1000*10*60) //10 minutes
+        if (map2 != null && (new Date().getTime()) - map2.getLastTimeGamesChecked().getTime() > 1000*10*60) //10 minutes
         {
             map2.setLastTimeGamesChecked(new Date());
             HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
