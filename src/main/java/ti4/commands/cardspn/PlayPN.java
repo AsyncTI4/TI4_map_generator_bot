@@ -119,6 +119,6 @@ public class PlayPN extends PNCardsSubcommandData {
 		}
 
         sendMessage(sb.toString());
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
+        PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
     }
 }

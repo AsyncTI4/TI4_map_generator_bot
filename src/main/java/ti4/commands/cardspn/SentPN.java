@@ -20,10 +20,8 @@ import java.io.File;
 public class SentPN extends PNCardsSubcommandData {
 	public SentPN() {
 		super(Constants.SEND_PN, "Send Promissory Note to player");
-		addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID,
-				"Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
-		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true)
-				.setAutoComplete(true));
+		addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID,"Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
+		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));
 	}
 
 	@Override
@@ -108,8 +106,8 @@ public class SentPN extends PNCardsSubcommandData {
 			}
 			areaPN = true;
 		}
-		ACInfo_Legacy.sentUserCardInfo(event, activeMap, targetPlayer);
-		ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
+		PNInfo.sendPromissoryNoteInfo(activeMap, targetPlayer, false);
+		PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
 		String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
 		String message = Helper.getPlayerRepresentation(event, player) + " sent " + Emojis.PN + text + "PN to "
 				+ Helper.getPlayerRepresentation(event, targetPlayer);
