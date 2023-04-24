@@ -328,7 +328,7 @@ public class Map {
                 setTableTalkChannelID(tableTalkChannel.getId());
                 return tableTalkChannel;
             }
-            BotLogger.log("Could not retrieve TableTalkChannel for " + getName(), e);
+            // BotLogger.log("Could not retrieve TableTalkChannel for " + getName(), e);
         }
         return null;
     }
@@ -351,7 +351,7 @@ public class Map {
                 setMainGameChannelID(mainGameChannel.getId());
                 return mainGameChannel;
             }
-            BotLogger.log("Could not retrieve MainGameChannel for " + getName(), e);
+            // BotLogger.log("Could not retrieve MainGameChannel for " + getName(), e);
         }
         return null;
     }
@@ -1629,7 +1629,7 @@ public class Map {
         
         LocalDate currentDate = LocalDate.now();
         LocalDate lastModifiedDate = (new Date(this.lastModifiedDate)).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
-        Period period = Period.ofMonths(5); //TODO: CANDIDATE FOR GLOBAL VARIABLE
+        Period period = Period.ofMonths(2); //TODO: CANDIDATE FOR GLOBAL VARIABLE
         LocalDate oldestLastModifiedDateBeforeEnding = currentDate.minus(period);
 
         if (lastModifiedDate.compareTo(oldestLastModifiedDateBeforeEnding) < 0) {
