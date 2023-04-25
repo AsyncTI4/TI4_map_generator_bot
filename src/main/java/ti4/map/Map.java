@@ -131,12 +131,15 @@ public class Map {
     private ArrayList<String> publicObjectives1 = new ArrayList<>();
     private ArrayList<String> publicObjectives2 = new ArrayList<>();
     private ArrayList<String> soToPoList = new ArrayList<>();
+
+    @JsonIgnore
     private ArrayList<String> purgedPN = new ArrayList<>();
 
     private ArrayList<String> explore = new ArrayList<>();
     private ArrayList<String> discardExplore = new ArrayList<>();
     private ArrayList<String> relics = new ArrayList<>();
 
+    @JsonIgnore
     private static HashMap<Player, Integer> playerVPs = new HashMap<>();
 
     //AUTOCOMPLETE CACHE
@@ -148,6 +151,7 @@ public class Map {
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
         lastModifiedDate = new Date().getTime();
+        
         miltyDraftManager = new MiltyDraftManager();
 
         HashMap<String, String> secretObjectives = Mapper.getSecretObjectives();
@@ -211,6 +215,7 @@ public class Map {
         this.latestCommand = latestCommand;
     }
 
+    @JsonIgnore
     public MiltyDraftManager getMiltyDraftManager() {
         return miltyDraftManager;
     }
@@ -535,13 +540,16 @@ public class Map {
     {
         this.auto_ping_enabled = status;
     }
+    
     public boolean getAutoPingStatus()
     {
         return auto_ping_enabled;
     }
+
     public long getAutoPingSpacer() {
         return autoPingSpacer;
     }
+
     public void setAutoPingSpacer(long spacer) {
         this.autoPingSpacer = spacer;
     }

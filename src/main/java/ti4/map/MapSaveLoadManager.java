@@ -683,42 +683,45 @@ public class MapSaveLoadManager {
 
     public static void loadMaps() {
         HashMap<String, Map> mapList = new HashMap<>();
-        // File[] files = readAllMapFiles();
-        File[] jsonfiles = readAllMapJSONFiles();
-        if (jsonfiles != null) {
-            for (File file : jsonfiles) {
-                if (isJSONExtention(file)) {
-                    try {
-                        Map map = loadMap(file);
-                        if (map != null) {
-                            mapList.put(map.getName(), map);
+        boolean runJSONInstead = true;
+        if (runJSONInstead) {
+            File[] jsonfiles = readAllMapJSONFiles();
+            if (jsonfiles != null) {
+                for (File file : jsonfiles) {
+                    if (isJSONExtention(file)) {
+                        try {
+                            Map map = loadMapJSON(file);
+                            if (map != null) {
+                                mapList.put(map.getName(), map);
+                            }
+                        } catch (Exception e) {
+                            BotLogger.log("Could not load JSON game:" + file, e);
                         }
-                    } catch (Exception e) {
-                        BotLogger.log("Could not load game:" + file, e);
+                    }
+                }
+            }
+        } else {
+            File[] txtFiles = readAllMapFiles();
+            if (txtFiles != null) {
+                for (File file : txtFiles) {
+                    if (isTxtExtention(file)) {
+                        try {
+                            Map map = loadMap(file);
+                            if (map != null) {
+                                mapList.put(map.getName(), map);
+                            }
+                        } catch (Exception e) {
+                            BotLogger.log("Could not load game:" + file, e);
+                        }
                     }
                 }
             }
         }
-        // File[] txtFiles = readAllMapFiles();
-        // if (txtFiles != null) {
-        //     for (File file : txtFiles) {
-        //         if (isTxtExtention(file)) {
-        //             try {
-        //                 Map map = loadMap(file);
-        //                 if (map != null) {
-        //                     mapList.put(map.getName(), map);
-        //                 }
-        //             } catch (Exception e) {
-        //                 BotLogger.log("Could not load game:" + file, e);
-        //             }
-        //         }
-        //     }
-        // }
+
         MapManager.getInstance().setMapList(mapList);
     }
 
-    @Nullable
-    private static Map loadMap(File mapFile) {
+    private static Map loadMapJSON(File mapFile) {
         ObjectMapper mapper = new ObjectMapper();
         // mapper.registerModule(new SimpleModule().addKeySerializer(ImmutablePair.class, new MapPairKeySerializer()));
         // mapper.registerModule(new SimpleModule().addKeySerializer(ImmutablePair.class);
@@ -732,8 +735,11 @@ public class MapSaveLoadManager {
             System.out.println(ExceptionUtils.getStackTrace(e));
         }
 
-        if (true) return null;
+        return null;
+    }
 
+    @Nullable
+    private static Map loadMap(File mapFile) {
         if (mapFile != null) {
             Map map = new Map();
             try (Scanner myReader = new Scanner(mapFile)) {

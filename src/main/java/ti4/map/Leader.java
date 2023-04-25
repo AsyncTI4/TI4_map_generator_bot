@@ -1,6 +1,7 @@
 package ti4.map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ti4.helpers.Constants;
 
@@ -13,7 +14,12 @@ public class Leader {
     private boolean active = false;
 
     @JsonCreator
-    public Leader(String id, String name, int tgCount, boolean exhausted, boolean locked, boolean active) {
+    public Leader(@JsonProperty("id") String id,
+                  @JsonProperty("name") String name,
+                  @JsonProperty("tgCount") int tgCount,
+                  @JsonProperty("exhausted") boolean exhausted,
+                  @JsonProperty("locked") boolean locked,
+                  @JsonProperty("active") boolean active) {
         this.id = id;
         this.name = name;
         this.tgCount = tgCount;
