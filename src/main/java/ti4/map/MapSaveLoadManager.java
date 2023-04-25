@@ -683,7 +683,7 @@ public class MapSaveLoadManager {
 
     public static void loadMaps() {
         HashMap<String, Map> mapList = new HashMap<>();
-        boolean runJSONInstead = true;
+        boolean runJSONInstead = false;
         if (runJSONInstead) {
             File[] jsonfiles = readAllMapJSONFiles();
             if (jsonfiles != null) {
@@ -711,7 +711,7 @@ public class MapSaveLoadManager {
                                 mapList.put(map.getName(), map);
                             }
                         } catch (Exception e) {
-                            BotLogger.log("Could not load game:" + file, e);
+                            BotLogger.log("Could not load TXT game:" + file, e);
                         }
                     }
                 }
@@ -721,18 +721,17 @@ public class MapSaveLoadManager {
         MapManager.getInstance().setMapList(mapList);
     }
 
+    @Nullable
     private static Map loadMapJSON(File mapFile) {
         ObjectMapper mapper = new ObjectMapper();
-        // mapper.registerModule(new SimpleModule().addKeySerializer(ImmutablePair.class, new MapPairKeySerializer()));
-        // mapper.registerModule(new SimpleModule().addKeySerializer(ImmutablePair.class);
         mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
         try {
             Map map = mapper.readValue(mapFile, Map.class);
             return map;
         } catch (Exception e) {
-            // BotLogger.log("JSON LOADER", e);
-            System.out.println(mapFile.getAbsolutePath());
-            System.out.println(ExceptionUtils.getStackTrace(e));
+            BotLogger.log(mapFile.getName() + "JSON FAILED TO LOAD", e);
+            // System.out.println(mapFile.getAbsolutePath());
+            // System.out.println(ExceptionUtils.getStackTrace(e));
         }
 
         return null;

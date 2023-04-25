@@ -1,11 +1,14 @@
 package ti4.map;
 
 import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
+import ti4.helpers.AliasHandler;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.StringTokenizer;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -28,7 +31,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 abstract public class UnitHolder {
     private final String name;
 
-    @JsonIgnore
+    // @JsonIgnore
     private final Point holderCenterPosition;
 
     //ID, Count
@@ -174,7 +177,6 @@ abstract public class UnitHolder {
         return controlList;
     }
 
-    @JsonIgnore
     public Point getHolderCenterPosition() {
         return holderCenterPosition;
     }

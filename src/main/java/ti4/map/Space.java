@@ -7,14 +7,12 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
 
+import ti4.helpers.Constants;
+
 @JsonTypeName("space")
 public class Space extends UnitHolder {
-    protected Space(String name, Point holderCenterPosition) {
-        super(name, holderCenterPosition);
-    }
-    
     @JsonCreator
-    public Space(@JsonProperty("name") String name) {
-        super(name, null);
+    protected Space(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
+        super(name, holderCenterPosition);
     }
 }

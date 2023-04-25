@@ -105,6 +105,7 @@ public class Map {
     private Date lastActivePlayerPing = new Date(0);
     private Date lastActivePlayerChange = new Date(0);
     private Date lastTimeGamesChecked = new Date(0);
+    @JsonProperty("autoPingStatus")
     private boolean auto_ping_enabled = false;
     private long autoPingSpacer = 0;
     private List<String> secretObjectives;
@@ -540,7 +541,7 @@ public class Map {
     {
         this.auto_ping_enabled = status;
     }
-    
+
     public boolean getAutoPingStatus()
     {
         return auto_ping_enabled;
@@ -1542,6 +1543,7 @@ public class Map {
         return players.get(userID);
     }
 
+    @JsonIgnore
     public Set<String> getPlayerIDs() {
         return players.keySet();
     }
@@ -1560,6 +1562,7 @@ public class Map {
         mapStatus = status;
     }
 
+    @JsonIgnore
     public boolean isMapOpen() {
         return mapStatus == MapStatus.open;
     }

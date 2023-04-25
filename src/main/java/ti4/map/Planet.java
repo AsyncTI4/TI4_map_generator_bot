@@ -1,12 +1,16 @@
 package ti4.map;
 
 import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
+import ti4.helpers.AliasHandler;
 import ti4.message.BotLogger;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringTokenizer;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
@@ -22,7 +26,8 @@ public class Planet extends UnitHolder {
     private ArrayList<String> techSpeciality = new ArrayList<>();
     private boolean hasAbility = false;
 
-    public Planet(String name, Point holderCenterPosition) {
+    @JsonCreator
+    public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
         super(name, holderCenterPosition);
         String planetInfo = Mapper.getPlanet(name);
         if (planetInfo != null) {
@@ -41,10 +46,6 @@ public class Planet extends UnitHolder {
                 BotLogger.log("Could not parse res/inf of unitHolder " + name, e);
             }
         }
-    }
-
-    public Planet(@JsonProperty("name") String name) {
-        super(name, null);
     }
 
     private void addTechSpec(String techSpec) {
