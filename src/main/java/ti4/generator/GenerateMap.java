@@ -157,15 +157,13 @@ public class GenerateMap {
                 // IMPORTANT NOTE : This method used to be local and was refactored to extract
                 // any references to tilesToDisplay
                 fowPlayer = Helper.getGamePlayer(map, player, event, null);
-                if (fowPlayer != null) {
+
                 Set<String> tilesToShow = FoWHelper.fowFilter(map, fowPlayer);
                 Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
                 keys.removeAll(tilesToShow);
-
-                    for (String key : keys) {
-                        tilesToDisplay.remove(key);
-                        tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
-                    }
+                for (String key : keys) {
+                    tilesToDisplay.remove(key);
+                    tilesToDisplay.put(key, fowPlayer.buildFogTile(key, fowPlayer));
                 }
             }
         }
