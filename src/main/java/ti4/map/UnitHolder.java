@@ -31,7 +31,6 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 abstract public class UnitHolder {
     private final String name;
 
-    // @JsonIgnore
     private final Point holderCenterPosition;
 
     //ID, Count

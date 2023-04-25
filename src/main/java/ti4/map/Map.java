@@ -2,7 +2,6 @@ package ti4.map;
 
 import org.jetbrains.annotations.Nullable;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -32,7 +31,6 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 

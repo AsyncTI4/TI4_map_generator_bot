@@ -1,14 +1,11 @@
 package ti4.map;
 
 import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.helpers.AliasHandler;
 import ti4.message.BotLogger;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.StringTokenizer;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;

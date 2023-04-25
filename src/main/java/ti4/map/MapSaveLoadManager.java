@@ -67,6 +67,8 @@ public class MapSaveLoadManager {
     public static final String PLAYER = "-player-";
     public static final String ENDPLAYER = "-endplayer-";
 
+    public static final boolean loadFromJSON = true; //TEMPORARY FLAG THAT CAN BE REMOVED ONCE JSON SAVES ARE 100% WORKING
+
     public static void saveMaps() {
         HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
         for (java.util.Map.Entry<String, Map> mapEntry : mapList.entrySet()) {
@@ -105,6 +107,8 @@ public class MapSaveLoadManager {
         } catch (Exception e) {
             BotLogger.log("JSON SAVER", e);
         }
+
+        if (loadFromJSON) return; //DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
         
         File mapFile = Storage.getMapImageStorage(map.getName() + TXT);
         if (mapFile != null) {
@@ -683,8 +687,7 @@ public class MapSaveLoadManager {
 
     public static void loadMaps() {
         HashMap<String, Map> mapList = new HashMap<>();
-        boolean runJSONInstead = false;
-        if (runJSONInstead) {
+        if (loadFromJSON) {
             File[] jsonfiles = readAllMapJSONFiles();
             if (jsonfiles != null) {
                 for (File file : jsonfiles) {
