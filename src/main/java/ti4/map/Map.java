@@ -1638,7 +1638,7 @@ public class Map {
         Period period = Period.ofMonths(2); //TODO: CANDIDATE FOR GLOBAL VARIABLE
         LocalDate oldestLastModifiedDateBeforeEnding = currentDate.minus(period);
 
-        if (lastModifiedDate.compareTo(oldestLastModifiedDateBeforeEnding) < 0) {
+        if (lastModifiedDate.isBefore(oldestLastModifiedDateBeforeEnding)) {
             BotLogger.log("Game: " + getName() + " has not been modified since ~" + lastModifiedDate.toString() + " - the game flag `hasEnded` has been set to true");
             setHasEnded(true);
             MapSaveLoadManager.saveMap(this);

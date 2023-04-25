@@ -511,7 +511,8 @@ public class MapSaveLoadManager {
             HashMap<String, String> fow_systems = player.getFogTiles();
             HashMap<String, String> fow_labels = player.getFogLabels();
             for (String key : fow_systems.keySet()) {
-                String system = fow_systems.get(key);
+                key = migratePosition(map, key);
+                String system = migratePosition(map, fow_systems.get(key));
                 String label = fow_labels.get(key);
                 if (label != null) label = label.replaceAll(" ", "—"); //replace spaces with em dash
                 fogOfWarSystems.append(key);
