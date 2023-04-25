@@ -103,7 +103,7 @@ public class MapSaveLoadManager {
         try {
             mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(map.getName() + JSON), map);
         } catch (IOException e) {
-
+            BotLogger.log("IOException with JSON SAVER", e);
         } catch (Exception e) {
             BotLogger.log("JSON SAVER", e);
         }
