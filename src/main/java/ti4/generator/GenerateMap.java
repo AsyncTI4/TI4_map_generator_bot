@@ -156,7 +156,6 @@ public class GenerateMap {
 
                 // IMPORTANT NOTE : This method used to be local and was refactored to extract
                 // any references to tilesToDisplay
-
                 fowPlayer = Helper.getGamePlayer(map, player, event, null);
                 if (fowPlayer != null) {
                 Set<String> tilesToShow = FoWHelper.fowFilter(map, fowPlayer);
