@@ -1,6 +1,30 @@
 package ti4.map;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.Writer;
+import java.nio.file.CopyOption;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+import java.util.StringTokenizer;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.Nullable;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
+
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -9,7 +33,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import org.jetbrains.annotations.Nullable;
 import ti4.MapGenerator;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
@@ -17,12 +40,6 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
-
-import java.io.*;
-import java.nio.file.CopyOption;
-import java.nio.file.Files;
-import java.nio.file.StandardCopyOption;
-import java.util.*;
 
 public class MapSaveLoadManager {
 
@@ -49,6 +66,8 @@ public class MapSaveLoadManager {
     public static final String ENDPLAYERINFO = "-endplayerinfo-";
     public static final String PLAYER = "-player-";
     public static final String ENDPLAYER = "-endplayer-";
+
+    public static final boolean loadFromJSON = false; //TEMPORARY FLAG THAT CAN BE REMOVED ONCE JSON SAVES ARE 100% WORKING
 
     public static void saveMaps() {
         HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
@@ -82,12 +101,14 @@ public class MapSaveLoadManager {
         
         ObjectMapper mapper = new ObjectMapper();
         try {
-            mapper.writeValue(Storage.getMapsJSONStorage(map.getName() + JSON), map);
+            mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(map.getName() + JSON), map);
         } catch (IOException e) {
-
+            BotLogger.log("IOException with JSON SAVER", e);
         } catch (Exception e) {
-            BotLogger.log("JSON MAPPER", e);
+            BotLogger.log("JSON SAVER", e);
         }
+
+        if (loadFromJSON) return; //DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
         
         File mapFile = Storage.getMapImageStorage(map.getName() + TXT);
         if (mapFile != null) {
@@ -631,9 +652,28 @@ public class MapSaveLoadManager {
         return folder.listFiles();
     }
 
+    private static File[] readAllMapJSONFiles() {
+        File folder = Storage.getMapsJSONDirectory();
+        if (folder == null) {
+            try {
+                //noinspection ConstantConditions
+                if (folder.createNewFile()) {
+                    folder = Storage.getMapImageDirectory();
+                }
+            } catch (IOException e) {
+                BotLogger.log("Could not create folder for maps", e);
+            }
+
+        }
+        return folder.listFiles();
+    }
+
     private static boolean isTxtExtention(File file) {
         return file.getAbsolutePath().endsWith(TXT);
+    }
 
+    private static boolean isJSONExtention(File file) {
+        return file.getAbsolutePath().endsWith(JSON);
     }
 
     public static boolean deleteMap(String mapName) {
@@ -647,22 +687,57 @@ public class MapSaveLoadManager {
 
     public static void loadMaps() {
         HashMap<String, Map> mapList = new HashMap<>();
-        File[] files = readAllMapFiles();
-        if (files != null) {
-            for (File file : files) {
-                if (isTxtExtention(file)) {
-                    try {
-                        Map map = loadMap(file);
-                        if (map != null) {
-                            mapList.put(map.getName(), map);
+        if (loadFromJSON) {
+            File[] jsonfiles = readAllMapJSONFiles();
+            if (jsonfiles != null) {
+                for (File file : jsonfiles) {
+                    if (isJSONExtention(file)) {
+                        try {
+                            Map map = loadMapJSON(file);
+                            if (map != null) {
+                                mapList.put(map.getName(), map);
+                            }
+                        } catch (Exception e) {
+                            BotLogger.log("Could not load JSON game:" + file, e);
                         }
-                    } catch (Exception e) {
-                        BotLogger.log("Could not load game:" + file, e);
+                    }
+                }
+            }
+        } else {
+            File[] txtFiles = readAllMapFiles();
+            if (txtFiles != null) {
+                for (File file : txtFiles) {
+                    if (isTxtExtention(file)) {
+                        try {
+                            Map map = loadMap(file);
+                            if (map != null) {
+                                mapList.put(map.getName(), map);
+                            }
+                        } catch (Exception e) {
+                            BotLogger.log("Could not load TXT game:" + file, e);
+                        }
                     }
                 }
             }
         }
+
         MapManager.getInstance().setMapList(mapList);
+    }
+
+    @Nullable
+    private static Map loadMapJSON(File mapFile) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
+        try {
+            Map map = mapper.readValue(mapFile, Map.class);
+            return map;
+        } catch (Exception e) {
+            BotLogger.log(mapFile.getName() + "JSON FAILED TO LOAD", e);
+            // System.out.println(mapFile.getAbsolutePath());
+            // System.out.println(ExceptionUtils.getStackTrace(e));
+        }
+
+        return null;
     }
 
     @Nullable

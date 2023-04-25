@@ -7,6 +7,12 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonTypeName;
+
+@JsonTypeName("planet")
 public class Planet extends UnitHolder {
 
     private int resources = 0;
@@ -17,7 +23,8 @@ public class Planet extends UnitHolder {
     private ArrayList<String> techSpeciality = new ArrayList<>();
     private boolean hasAbility = false;
 
-    public Planet(String name, Point holderCenterPosition) {
+    @JsonCreator
+    public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
         super(name, holderCenterPosition);
         String planetInfo = Mapper.getPlanet(name);
         if (planetInfo != null) {
@@ -46,6 +53,7 @@ public class Planet extends UnitHolder {
         planetType.add(type);
     }
 
+    @JsonIgnore
     public boolean hasAttachment() {
         return tokenList.stream().anyMatch(token -> !token.contains("sleeper") && !token.contains("dmz_large"));
     }
@@ -120,6 +128,7 @@ public class Planet extends UnitHolder {
         return influence;
     }
 
+    @JsonIgnore
     public int getOptimalResources() {
         if (resources > influence) {
             return resources;
@@ -128,6 +137,7 @@ public class Planet extends UnitHolder {
         }
     }
 
+    @JsonIgnore
     public int getOptimalInfluence() {
         if (influence > resources) {
             return influence;
@@ -136,6 +146,7 @@ public class Planet extends UnitHolder {
         }
     }
 
+    @JsonIgnore
     public int getFlexResourcesOrInfluence() {
         if (influence == resources) {
             return influence;
@@ -144,6 +155,7 @@ public class Planet extends UnitHolder {
         }
     }
 
+    @JsonIgnore
     public int getSumResourcesInfluence() {
         return resources + influence;
     }
