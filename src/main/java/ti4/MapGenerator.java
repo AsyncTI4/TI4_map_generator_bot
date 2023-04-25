@@ -161,28 +161,35 @@ public class MapGenerator {
         //TI Community game
         if (args.length >= 4) {
             guildCommunityPlays = jda.getGuildById(args[3]);
-            BotLogger.log("BOT STARTED UP: " + guildCommunityPlays.getName());
-            CommandListUpdateAction commandsC = guildCommunityPlays.updateCommands();
-            commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
-            commandsC.queue();
+            if (guildCommunityPlays != null) {
+                BotLogger.log("BOT STARTED UP: " + guildCommunityPlays.getName());
+                CommandListUpdateAction commandsC = guildCommunityPlays.updateCommands();
+                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsC));
+                commandsC.queue();
+            }
         }
+
 
         //FOW game
         if (args.length >= 5) {
             guildFogOfWar = jda.getGuildById(args[4]);
-            BotLogger.log("BOT STARTED UP: " + guildFogOfWar.getName());
-            CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
-            commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
-            commandsD.queue();
+            if (guildFogOfWar != null) {
+                BotLogger.log("BOT STARTED UP: " + guildFogOfWar.getName());
+                CommandListUpdateAction commandsD = guildFogOfWar.updateCommands();
+                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
+                commandsD.queue();
+            }
         }
 
         //Async Secondary
         if (args.length >= 6) {
             guildSecondary = jda.getGuildById(args[5]);
-            BotLogger.log("BOT STARTED UP: " + guildSecondary.getName());
-            CommandListUpdateAction commandsD = guildSecondary.updateCommands();
-            commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
-            commandsD.queue();
+            if (guildSecondary != null) {
+                BotLogger.log("BOT STARTED UP: " + guildSecondary.getName());
+                CommandListUpdateAction commandsD = guildSecondary.updateCommands();
+                commandManager.getCommandList().forEach(command -> command.registerCommands(commandsD));
+                commandsD.queue();
+            }
         }
 
         BotLogger.log("BOT STARTED UP: " + guildPrimary.getName());

@@ -793,7 +793,7 @@ public class MapSaveLoadManager {
                             if (ENDPLAYER.equals(data)) {
                                 break;
                             }
-                            readPlayerInfo(player, data);
+                            readPlayerInfo(player, data, map);
                         }
                     }
                 }
@@ -885,6 +885,7 @@ public class MapSaveLoadManager {
             } catch (Exception e) {
                 BotLogger.log("Data read error: " + mapFile.getName(), e);
             }
+
             map.endGameIfOld();
             return map;
         } else {
@@ -1217,7 +1218,7 @@ public class MapSaveLoadManager {
         return primaryTile;
     }
 
-    private static void readPlayerInfo(Player player, String data) {
+    private static void readPlayerInfo(Player player, String data, Map map) {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.countTokens() == 2) {
             data = tokenizer.nextToken();
@@ -1297,7 +1298,7 @@ public class MapSaveLoadManager {
                         StringTokenizer fow_systems = new StringTokenizer(tokenizer.nextToken(), ";");
                         while (fow_systems.hasMoreTokens()) {
                             String[] system = fow_systems.nextToken().split(",");
-                            String position = system[0];
+                            String position = migratePosition(map, system[0]);
                             String tileID = system[1];
                             String label = system[2];
                             if (label != null) label = label.replaceAll("—", " "); //replace em dash with spaces
