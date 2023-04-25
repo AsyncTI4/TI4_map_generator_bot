@@ -813,6 +813,7 @@ public class MapSaveLoadManager {
             } catch (Exception e) {
                 BotLogger.log("Data read error: " + mapFile.getName(), e);
             }
+
             map.endGameIfOld();
             return map;
         } else {
