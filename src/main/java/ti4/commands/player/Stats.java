@@ -111,8 +111,7 @@ public class Stats extends PlayerSubcommandData {
 		OptionMapping optionCT = event.getOption(Constants.COMMODITIES_TOTAL);
 		if (optionCT != null) {
 			player.setCommoditiesTotal(optionCT.getAsInt());
-			StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionCT));
-			sendMessage(message.toString());
+			sendMessage(getGeneralMessage(event, player, optionCT));
 		}
 
 		OptionMapping optionSpeaker = event.getOption(Constants.SPEAKER);
@@ -151,12 +150,10 @@ public class Stats extends PlayerSubcommandData {
 				String value = optionSCPlayed.getAsString().toLowerCase();
 				if ("y".equals(value) || "yes".equals(value)) {
 					activeMap.setSCPlayed(sc, true);
-					message.append("> flipped " + Helper.getSCEmojiFromInteger(sc) + " to "
-							+ Helper.getSCBackEmojiFromInteger(sc) + " (played)");
+					message.append("> flipped ").append(Helper.getSCEmojiFromInteger(sc)).append(" to ").append(Helper.getSCBackEmojiFromInteger(sc)).append(" (played)");
 				} else if ("n".equals(value) || "no".equals(value)) {
 					activeMap.setSCPlayed(sc, false);
-					message.append("> flipped " + Helper.getSCBackEmojiFromInteger(sc) + " to "
-							+ Helper.getSCEmojiFromInteger(sc) + " (unplayed)");
+					message.append("> flipped ").append(Helper.getSCBackEmojiFromInteger(sc)).append(" to ").append(Helper.getSCEmojiFromInteger(sc)).append(" (unplayed)");
 				}
 			} else {
 				message.append(
@@ -167,10 +164,9 @@ public class Stats extends PlayerSubcommandData {
 
 		OptionMapping optionDummy = event.getOption(Constants.DUMMY);
 		if (optionDummy != null) {
-			StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionDummy));
 			boolean value = optionDummy.getAsBoolean();
 			player.setDummy(value);
-			sendMessage(message.toString());
+			sendMessage(getGeneralMessage(event, player, optionDummy));
 		}
 
 	}
@@ -205,7 +201,7 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Techs: ").append(player.getTechs()).append("\n");
 		sb.append("> Relics: ").append(player.getRelics()).append("\n");
 		sb.append("> Leaders: [");
-		player.getLeaders().forEach(l -> sb.append(" [" + l.getId() + l.getName() + "] "));
+		player.getLeaders().forEach(l -> sb.append(" [").append(l.getId()).append(l.getName()).append("] "));
 		sb.append("]\n");
 
 		return sb.toString();
@@ -280,7 +276,8 @@ public class Stats extends PlayerSubcommandData {
 
 	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, String optionName,
 			Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
-		if (event.getSubcommandName().equals(Constants.EXHAUST_LEADER))
+		String subcommandName = event.getSubcommandName();
+		if (subcommandName == null || subcommandName.equals(Constants.EXHAUST_LEADER))
 			return; // exit when adding TG to Artuno
 		try {
 			boolean setValue = !value.startsWith("+") && !value.startsWith("-");
