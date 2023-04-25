@@ -104,7 +104,7 @@ public class MapSaveLoadManager {
             Map map2 = map.copy();
             mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(map2.getName() + JSON), map2);
         } catch (IOException e) {
-            BotLogger.log("IOException with JSON SAVER", e);
+            BotLogger.log(map.getName() + ": IOException with JSON SAVER\n" + ExceptionUtils.getMessage(e));
         } catch (Exception e) {
             BotLogger.log("JSON SAVER", e);
         }
