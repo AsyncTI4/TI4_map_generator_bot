@@ -2,7 +2,12 @@ package ti4.map;
 
 import org.jetbrains.annotations.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
@@ -26,7 +31,6 @@ import java.time.Period;
 import java.time.ZoneId;
 import java.util.List;
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Map.Entry;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -42,6 +46,7 @@ public class Map {
 
     private MiltyDraftManager miltyDraftManager;
 
+    @JsonIgnore
     private HashMap<String, UnitHolder> planets = new HashMap<>();
 
     @Nullable
@@ -98,6 +103,7 @@ public class Map {
     private Date lastActivePlayerPing = new Date(0);
     private Date lastActivePlayerChange = new Date(0);
     private Date lastTimeGamesChecked = new Date(0);
+    @JsonProperty("autoPingStatus")
     private boolean auto_ping_enabled = false;
     private long autoPingSpacer = 0;
     private List<String> secretObjectives;
@@ -115,25 +121,36 @@ public class Map {
     private LinkedHashMap<String, Integer> customPublicVP = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
+
+    @JsonProperty("adjacentTileOverrides")
+    @JsonDeserialize(keyUsing = MapPairKeyDeserializer.class)
+    // @JsonDeserialize(keyUsing = MapPairKeyDeserializer.class)
     private LinkedHashMap<Pair<String, Integer>, String> adjacencyOverrides = new LinkedHashMap<>();
+
     private ArrayList<String> publicObjectives1 = new ArrayList<>();
     private ArrayList<String> publicObjectives2 = new ArrayList<>();
     private ArrayList<String> soToPoList = new ArrayList<>();
+
+    @JsonIgnore
     private ArrayList<String> purgedPN = new ArrayList<>();
 
     private ArrayList<String> explore = new ArrayList<>();
     private ArrayList<String> discardExplore = new ArrayList<>();
     private ArrayList<String> relics = new ArrayList<>();
 
+    @JsonIgnore
     private static HashMap<Player, Integer> playerVPs = new HashMap<>();
 
     //AUTOCOMPLETE CACHE
+    @JsonIgnore
     List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache = null;
+    @JsonIgnore
     List<SimpleEntry<String, String>> planetNameAutocompleteOptionsCache = null;
 
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
         lastModifiedDate = new Date().getTime();
+        
         miltyDraftManager = new MiltyDraftManager();
 
         HashMap<String, String> secretObjectives = Mapper.getSecretObjectives();
@@ -197,6 +214,7 @@ public class Map {
         this.latestCommand = latestCommand;
     }
 
+    @JsonIgnore
     public MiltyDraftManager getMiltyDraftManager() {
         return miltyDraftManager;
     }
@@ -521,13 +539,16 @@ public class Map {
     {
         this.auto_ping_enabled = status;
     }
+
     public boolean getAutoPingStatus()
     {
         return auto_ping_enabled;
     }
+
     public long getAutoPingSpacer() {
         return autoPingSpacer;
     }
+
     public void setAutoPingSpacer(long spacer) {
         this.autoPingSpacer = spacer;
     }
@@ -809,6 +830,8 @@ public class Map {
         return customAdjacentTiles;
     }
 
+    @JsonGetter
+    @JsonSerialize(keyUsing = MapPairKeySerializer.class) 
     public LinkedHashMap<Pair<String, Integer>, String> getAdjacentTileOverrides() {
         return adjacencyOverrides;
     }
@@ -889,6 +912,7 @@ public class Map {
         sentAgendas.clear();
     }
 
+    @JsonSetter
     public void setDiscardAgendas(LinkedHashMap<String, Integer> discardAgendas) {
         this.discardAgendas = discardAgendas;
     }
@@ -1219,6 +1243,7 @@ public class Map {
         discardActionCards.put(id, identifier);
     }
 
+    @JsonIgnore
     public boolean discardActionCard(String userID, Integer acIDNumber) {
         Player player = getPlayer(userID);
         if (player != null) {
@@ -1432,6 +1457,7 @@ public class Map {
         this.actionCards = actionCards;
     }
 
+    @JsonSetter
     public void setDiscardActionCards(LinkedHashMap<String, Integer> discardActionCards) {
         this.discardActionCards = discardActionCards;
     }
@@ -1515,6 +1541,7 @@ public class Map {
         return players.get(userID);
     }
 
+    @JsonIgnore
     public Set<String> getPlayerIDs() {
         return players.keySet();
     }
@@ -1533,6 +1560,7 @@ public class Map {
         mapStatus = status;
     }
 
+    @JsonIgnore
     public boolean isMapOpen() {
         return mapStatus == MapStatus.open;
     }
@@ -1602,6 +1630,7 @@ public class Map {
         planets.clear();
     }
 
+    @JsonIgnore
     public Set<String> getPlanets() {
         if (planets.isEmpty()) {
             for (Tile tile : tileMap.values()) {
@@ -1652,6 +1681,7 @@ public class Map {
             .toList());
     }
 
+    @JsonIgnore
     public List<SimpleEntry<String, String>> getTileNameAutocompleteOptionsCache() {
         if (tileNameAutocompleteOptionsCache != null) {
             return this.tileNameAutocompleteOptionsCache;

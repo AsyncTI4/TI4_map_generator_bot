@@ -16,6 +16,10 @@ import ti4.message.BotLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.*;
@@ -43,7 +47,6 @@ public class Player {
 
     private boolean[] stratfollows = { true, true, true, true, true, true, true, true };
 
-
     private LinkedHashMap<String, Integer> actionCards = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
@@ -56,6 +59,8 @@ public class Player {
     private List<String> exhaustedPlanets = new ArrayList<>();
     private List<String> exhaustedPlanetsAbilities = new ArrayList<>();
     private List<String> mahactCC = new ArrayList<>();
+
+    @JsonProperty("leaders")
     private List<Leader> leaders = new ArrayList<>();
 
     private HashMap<String,String> debt_tokens = new HashMap<>();
@@ -84,7 +89,11 @@ public class Player {
     private int numberOfTurns = 0;
     private long totalTimeSpent = 0;
 
-    public Player(String userID, String userName) {
+    public Player() {
+    }
+
+    public Player(@JsonProperty("userID") String userID,
+                  @JsonProperty("userName") String userName) {
         this.userID = userID;
         this.userName = userName;
     }
@@ -133,6 +142,7 @@ public class Player {
         this.cardsInfoThreadID = cardsInfoThreadID;
     }
 
+    @JsonIgnore
     public ThreadChannel getCardsInfoThread(ti4.map.Map activeMap) {
         TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
         if (activeMap.isFoWMode()) actionsChannel = (TextChannel) getPrivateChannel();
@@ -299,6 +309,7 @@ public class Player {
         }
     }
 
+    @JsonSetter
     public void setPromissoryNotesInPlayArea(List<String> promissoryNotesInPlayArea) {
         List<String> replaced = new ArrayList<>();
         for (String id : promissoryNotesInPlayArea) {
@@ -529,6 +540,7 @@ public class Player {
         setFactionAbilities(abilities);
     }
 
+    @JsonIgnore
     public String[] getFactionSetupInfo() {
         if (faction == null || faction.equals("null") || faction.equals("keleres")) return null;
         String factionSetupInfo = Mapper.getPlayerSetup(faction);
@@ -703,10 +715,12 @@ public class Player {
         return vpCount;
     }
 
+    @JsonIgnore
     public int getSecretVictoryPoints() {
         return getSecretsScored().size();
     }
 
+    @JsonIgnore
     public int getSupportForTheThroneVictoryPoints() {
         List<String> promissoryNotesInPlayArea = getPromissoryNotesInPlayArea();
         int vpCount = 0;
@@ -718,6 +732,7 @@ public class Player {
         return vpCount;
     }
 
+    @JsonIgnore
     public int getTotalVictoryPoints(ti4.map.Map activeMap) {
         return getPublicVictoryPoints(activeMap) + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
     }
@@ -735,18 +750,22 @@ public class Player {
         return stratfollows[scnumber -1];
     }
 
+    @JsonIgnore
     public int getAc() {
         return actionCards.size();
     }
 
+    @JsonIgnore
     public int getPnCount() {
         return (promissoryNotes.size() - promissoryNotesInPlayArea.size());
     }
 
+    @JsonIgnore
     public int getSo() {
         return secrets.size();
     }
 
+    @JsonIgnore
     public int getSoScored() {
         return secretsScored.size();
     }
@@ -936,6 +955,7 @@ public class Player {
         fow_customLabels.remove(position);
     }
 
+    @JsonIgnore
     public Tile buildFogTile(String position, Player player) {
         String tileID = fow_seenTiles.get(position);
         if (tileID == null) tileID = "0b";
@@ -970,6 +990,7 @@ public class Player {
         this.isDummy = isDummy;
     }
 
+    @JsonIgnore
     public boolean isRealPlayer() {
         return !(isDummy || faction == null || color == null || color.equals("null"));
     }

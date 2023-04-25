@@ -3,6 +3,9 @@ package ti4.map;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -23,7 +26,7 @@ public class Tile {
     private HashMap<Player,Boolean> fog = new HashMap<>();
     private HashMap<Player,String> fogLabel = new HashMap<>();
 
-    public Tile(String tileID, String position) {
+    public Tile(@JsonProperty("tileID") String tileID, @JsonProperty("position") String position) {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
         initPlanetsAndSpace(tileID);
@@ -222,6 +225,7 @@ public class Tile {
         }
     }
 
+    @JsonIgnore
     public List<Boolean> getHyperlaneData(Integer sourceDirection) {
         List<List<Boolean>> fullHyperlaneData = Mapper.getHyperlaneData(this.tileID);
         if (fullHyperlaneData == null || fullHyperlaneData.size() == 0) {
@@ -244,6 +248,7 @@ public class Tile {
         this.position = position;
     }
 
+    @JsonIgnore
     public String getTilePath() {
         String tileName = Mapper.getTileID(tileID);
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
@@ -271,6 +276,7 @@ public class Tile {
         fogLabel.put(player, fogLabel_);
     }
 
+    @JsonIgnore
     public String getFowTilePath(Player player) {
         String fogTileColor = player == null ? "default" : player.getFogFilter();
         String fogTileColorSuffix = "_" + fogTileColor;
@@ -295,6 +301,7 @@ public class Tile {
         return unitHolders;
     }
 
+    @JsonIgnore
     public String getRepresentation() {
         try {
             return Mapper.getTileRepresentations().get(getTileID());     
@@ -304,6 +311,7 @@ public class Tile {
         return null;
     }
 
+    @JsonIgnore
     public String getRepresentationForAutoComplete() {
         try {
             return getPosition() + " (" + getRepresentation() + ")";
