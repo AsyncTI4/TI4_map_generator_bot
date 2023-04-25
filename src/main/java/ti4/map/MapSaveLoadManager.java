@@ -23,6 +23,7 @@ import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.Channel;
@@ -719,6 +720,9 @@ public class MapSaveLoadManager {
     @Nullable
     private static Map loadMap(File mapFile) {
         ObjectMapper mapper = new ObjectMapper();
+        // mapper.registerModule(new SimpleModule().addKeySerializer(ImmutablePair.class, new MapPairKeySerializer()));
+        // mapper.registerModule(new SimpleModule().addKeySerializer(ImmutablePair.class);
+        mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
         try {
             Map map = mapper.readValue(mapFile, Map.class);
             return map;

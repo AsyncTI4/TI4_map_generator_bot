@@ -3,6 +3,7 @@ package ti4.map;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSetter;
@@ -47,6 +48,7 @@ public class Map {
 
     private MiltyDraftManager miltyDraftManager;
 
+    @JsonIgnore
     private HashMap<String, UnitHolder> planets = new HashMap<>();
 
     @Nullable
@@ -121,7 +123,9 @@ public class Map {
     private LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>();
     private LinkedHashMap<String, List<String>> customAdjacentTiles = new LinkedHashMap<>();
 
+    @JsonProperty("adjacentTileOverrides")
     @JsonDeserialize(keyUsing = MapPairKeyDeserializer.class)
+    // @JsonDeserialize(keyUsing = MapPairKeyDeserializer.class)
     private LinkedHashMap<Pair<String, Integer>, String> adjacencyOverrides = new LinkedHashMap<>();
 
     private ArrayList<String> publicObjectives1 = new ArrayList<>();
@@ -141,7 +145,6 @@ public class Map {
     @JsonIgnore
     List<SimpleEntry<String, String>> planetNameAutocompleteOptionsCache = null;
 
-    @JsonCreator
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
         lastModifiedDate = new Date().getTime();
@@ -820,6 +823,7 @@ public class Map {
         return customAdjacentTiles;
     }
 
+    @JsonGetter
     @JsonSerialize(keyUsing = MapPairKeySerializer.class) 
     public LinkedHashMap<Pair<String, Integer>, String> getAdjacentTileOverrides() {
         return adjacencyOverrides;
@@ -1617,6 +1621,7 @@ public class Map {
         planets.clear();
     }
 
+    @JsonIgnore
     public Set<String> getPlanets() {
         if (planets.isEmpty()) {
             for (Tile tile : tileMap.values()) {

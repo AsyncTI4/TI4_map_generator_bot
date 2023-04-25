@@ -16,6 +16,8 @@ import ti4.message.BotLogger;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.fasterxml.jackson.annotation.JsonSetter;
+
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.*;
@@ -83,6 +85,9 @@ public class Player {
     // Statistics
     private int numberOfTurns = 0;
     private long totalTimeSpent = 0;
+
+    public Player() {
+    }
 
     public Player(String userID, String userName) {
         this.userID = userID;
@@ -299,6 +304,7 @@ public class Player {
         }
     }
 
+    @JsonSetter
     public void setPromissoryNotesInPlayArea(List<String> promissoryNotesInPlayArea) {
         List<String> replaced = new ArrayList<>();
         for (String id : promissoryNotesInPlayArea) {
