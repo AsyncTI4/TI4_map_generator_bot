@@ -111,7 +111,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         //POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
         if (!activeMap.isFoWMode() && sc == 3) { 
-            String assignSpeakerMessage = "Click a faction below to assign Speaker " + Emojis.SpeakerToken;
+            String assignSpeakerMessage = Helper.getPlayerRepresentation(event, player) + ", please click a faction below to assign Speaker " + Emojis.SpeakerToken;
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons();
             if (assignSpeakerActionRow.isEmpty()) return;
 
