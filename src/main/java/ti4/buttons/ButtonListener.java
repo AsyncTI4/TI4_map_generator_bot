@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
 import ti4.MessageListener;
@@ -136,6 +137,20 @@ public class ButtonListener extends ListenerAdapter {
                 BotLogger.log(event, "Could not parse PO ID: " + poID, e);
                 event.getChannel().sendMessage("Could not parse PO ID: " + poID + " Please Score manually.").queue();
                 return;
+            }
+        } else if (buttonID.startsWith(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX)) {
+            String faction = buttonID.replace(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX, "");
+            if (player.getSC() != 3) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Only the player who played Politics can assign Speaker");
+            }
+            if (activeMap != null && !activeMap.isFoWMode()) {
+                for (Player player_ : activeMap.getPlayers().values()) {
+                    if (player_.getFaction().equals(faction)) {
+                        activeMap.setSpeaker(player_.getUserID());
+                        String message = Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(event, player_);
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                    }
+                }
             }
         } else {
             switch (buttonID) {
