@@ -84,7 +84,7 @@ public class SCPlay extends PlayerSubcommandData {
         
         ActionRow actionRow = getSCButtons(sc);
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
-        baseMessageObject.addComponents(actionRow);
+        if (!actionRow.isEmpty()) baseMessageObject.addComponents(actionRow);
         
         final Player player_ = player;
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
