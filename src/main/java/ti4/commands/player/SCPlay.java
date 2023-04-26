@@ -14,6 +14,7 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -107,6 +108,17 @@ public class SCPlay extends PlayerSubcommandData {
                 threadChannel.queue();
             }
         });
+
+        //POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
+        if (!activeMap.isFoWMode() && sc == 3) { 
+            String assignSpeakerMessage = "Click a faction below to assign Speaker " + Emojis.SpeakerToken;
+            List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons();
+            if (assignSpeakerActionRow.isEmpty()) return;
+
+            for (MessageCreateData messageCreateData : MessageHelper.getMessageCreateDataObjects(assignSpeakerMessage, assignSpeakerActionRow)) {
+                mainGameChannel.sendMessage(messageCreateData).queue();
+            }
+        }
     }
 
     private List<Button> getSCButtons(int sc) {       
@@ -145,10 +157,12 @@ public class SCPlay extends PlayerSubcommandData {
     private List<Button> getPoliticsAssignSpeakerButtons() {
         List<Button> assignSpeakerButtons = new ArrayList<>();
         for (Player player : getActiveMap().getPlayers().values()) {
-            if (player.isRealPlayer() && player.getUserID().equals(getActiveMap().getSpeaker())) {
+            if (player.isRealPlayer() && !player.getUserID().equals(getActiveMap().getSpeaker())) {
                 String faction = player.getFaction();
-                if (Mapper.isFaction(faction)) {
-                    Button button = Button.danger("sc_3_assign_speaker_to_" + faction, "").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction)));
+                if (faction != null && Mapper.isFaction(faction)) {
+                    Button button = Button.secondary(Constants.SC_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ");
+                    String factionEmojiString = Helper.getFactionIconFromDiscord(faction);
+                    button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                     assignSpeakerButtons.add(button);
                 }
             }
