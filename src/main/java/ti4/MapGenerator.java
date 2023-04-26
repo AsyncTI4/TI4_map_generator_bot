@@ -169,7 +169,6 @@ public class MapGenerator {
             }
         }
 
-
         //FOW game
         if (args.length >= 5) {
             guildFogOfWar = jda.getGuildById(args[4]);
