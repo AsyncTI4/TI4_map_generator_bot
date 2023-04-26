@@ -155,6 +155,7 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else {
             switch (buttonID) {
+                //AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
                 case Constants.PO_NO_SCORING -> {
                     String message = Helper.getPlayerRepresentation(event, player) + " - no Public Objective scored.";
                     if (!activeMap.isFoWMode()) {
@@ -171,11 +172,13 @@ public class ButtonListener extends ListenerAdapter {
                     String reply = activeMap.isFoWMode() ? "No secret objective scored" : null;
                     addReaction(event, false, false, reply, "");
                 }
+                //AFTER AN ACTION CARD HAS BEEN PLAYED
                 case "sabotage" -> addReaction(event, true, true, "Sabotaging Action Card Play", " Sabotage played");
                 case "no_sabotage" -> {
                     String message = activeMap.isFoWMode() ? "No sabotage" : null;
                     addReaction(event, false, false, message, "");
                 }
+                //AFTER AN SC HAS BEEN PLAYED
                 case "sc_follow" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
                     if (used) {
@@ -258,23 +261,6 @@ public class ButtonListener extends ListenerAdapter {
                     players.remove(player);
                     playerUsedSC.put(messageID, players);
                 }
-                case "play_when" -> {
-                    clearAllReactions(event);
-                    addReaction(event, true, true, "Playing When", "When Played");
-                }
-                case "no_when" -> {
-                    String message = activeMap.isFoWMode() ? "No whens" : null;
-                    addReaction(event, false, false, message, "");
-                }
-                case "play_after" -> {
-                    clearAllReactions(event);
-                    
-                    addReaction(event, true, true, "Playing After", "After Played");
-                }
-                case "no_after" -> {
-                    String message = activeMap.isFoWMode() ? "No afters" : null;
-                    addReaction(event, false, false, message, "");
-                }
                 case "sc_refresh" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "Replenish");
                     if (used) {
@@ -308,6 +294,24 @@ public class ButtonListener extends ListenerAdapter {
                     player.setTg(tg + 3);
                     player.setCommodities(player.getCommoditiesTotal());
                     addReaction(event, false, false, "gained 3" + Emojis.tg + " and replenished commodities (" + String.valueOf(player.getCommodities()) + Emojis.comm + ")", "");
+                }
+                //AFTER AN AGENDA HAS BEEN REVEALED
+                case "play_when" -> {
+                    clearAllReactions(event);
+                    addReaction(event, true, true, "Playing When", "When Played");
+                }
+                case "no_when" -> {
+                    String message = activeMap.isFoWMode() ? "No whens" : null;
+                    addReaction(event, false, false, message, "");
+                }
+                case "play_after" -> {
+                    clearAllReactions(event);
+                    
+                    addReaction(event, true, true, "Playing After", "After Played");
+                }
+                case "no_after" -> {
+                    String message = activeMap.isFoWMode() ? "No afters" : null;
+                    addReaction(event, false, false, message, "");
                 }
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
