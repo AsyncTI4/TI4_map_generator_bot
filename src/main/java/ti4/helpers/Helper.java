@@ -221,6 +221,14 @@ public class Helper {
         return getRoleMentionByName(guild, scname);
     }
 
+    public static String getSCFrontRepresentation(GenericInteractionCreateEvent event, int sc) {
+        return getSCEmojiFromInteger(sc) + getSCAsMention(event.getGuild(), sc);
+    }
+
+    public static String getSCBackRepresentation(GenericInteractionCreateEvent event, int sc) {
+        return getSCBackEmojiFromInteger(sc) + getSCAsMention(event.getGuild(), sc);
+    }
+
     public static String getSCName(int sc) {
         return switch (sc) {
             case 1 -> "leadership";
