@@ -142,6 +142,7 @@ public class ButtonListener extends ListenerAdapter {
             String faction = buttonID.replace(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX, "");
             if (player.getSC() != 3) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Only the player who played Politics can assign Speaker");
+                return;
             }
             if (activeMap != null && !activeMap.isFoWMode()) {
                 for (Player player_ : activeMap.getPlayers().values()) {
