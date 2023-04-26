@@ -628,5 +628,5 @@ public class Constants {
     public static final String STATS_SC="sc";
     public static final String STATS_PASSED="passed";
     public static final String STATS_SO="so";
-    public static final String SC_ASSIGN_SPEAKER_BUTTON_ID_PREFIX = "sc_3_assign_speaker_to_";
+    public static final String SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX = "sc_3_assign_speaker_to_";
 }

@@ -160,7 +160,7 @@ public class SCPlay extends PlayerSubcommandData {
             if (player.isRealPlayer() && !player.getUserID().equals(getActiveMap().getSpeaker())) {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isFaction(faction)) {
-                    Button button = Button.secondary(Constants.SC_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ");
+                    Button button = Button.secondary(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ");
                     String factionEmojiString = Helper.getFactionIconFromDiscord(faction);
                     button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                     assignSpeakerButtons.add(button);
