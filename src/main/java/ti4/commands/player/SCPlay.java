@@ -82,7 +82,8 @@ public class SCPlay extends PlayerSubcommandData {
             player2.setSCFollowedStatus(sc, false);
         }
         
-        ActionRow actionRow = getSCButtons(sc);
+        //GET BUTTONS
+        ActionRow actionRow = ActionRow.of(getSCButtons(sc));
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
         if (!actionRow.isEmpty()) baseMessageObject.addComponents(actionRow);
         
@@ -108,7 +109,7 @@ public class SCPlay extends PlayerSubcommandData {
         });
     }
 
-    private ActionRow getSCButtons(int sc) {       
+    private List<Button> getSCButtons(int sc) {       
         return switch (sc) {
             case 1 -> getLeadershipButtons();
             case 2 -> getDiplomacyButtons();
@@ -118,74 +119,74 @@ public class SCPlay extends PlayerSubcommandData {
             case 6 -> getWarfareButtons();
             case 7 -> getTechnologyButtons();
             case 8 -> getImperialButtons();
-            default -> ActionRow.of();
+            default -> new ArrayList<>();
         };
     }
 
-    private ActionRow getLeadershipButtons() {
+    private List<Button> getLeadershipButtons() {
         Button followButton = Button.success("sc_follow_leadership", "SC Follow #1");
         Button noFollowButton = Button.primary("sc_no_follow", "Not Following #1");
-        return ActionRow.of(followButton, noFollowButton);
+        return List.of(followButton, noFollowButton);
     }
     
-    private ActionRow getDiplomacyButtons() {
+    private List<Button> getDiplomacyButtons() {
         Button followButton = Button.success("sc_follow", "SC Follow #2");
         Button noFollowButton = Button.primary("sc_no_follow", "Not Following #2");
-        return ActionRow.of(followButton, noFollowButton);
+        return List.of(followButton, noFollowButton);
     }
     
-    private ActionRow getPoliticsButtons() {
+    private List<Button> getPoliticsButtons() {
         Button followButton = Button.success("sc_follow", "SC Follow #3");
         Button noFollowButton = Button.primary("sc_no_follow", "Not Following #3");
         Button draw_2_ac = Button.secondary("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
-        return ActionRow.of(followButton, noFollowButton, draw_2_ac);
+        return List.of(followButton, noFollowButton, draw_2_ac);
     }
     
-    private ActionRow getPoliticsAssignSpeakerButtons() {
-        List<Button> politicsButtons = new ArrayList<>();
+    private List<Button> getPoliticsAssignSpeakerButtons() {
+        List<Button> assignSpeakerButtons = new ArrayList<>();
         for (Player player : getActiveMap().getPlayers().values()) {
             if (player.isRealPlayer() && player.getUserID().equals(getActiveMap().getSpeaker())) {
                 String faction = player.getFaction();
                 if (Mapper.isFaction(faction)) {
                     Button button = Button.danger("sc_3_assign_speaker_to_" + faction, "").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction)));
-                    politicsButtons.add(button);
+                    assignSpeakerButtons.add(button);
                 }
             }
         }
-        return ActionRow.of(politicsButtons);
+        return assignSpeakerButtons;
     }
 
-    private ActionRow getConstructionButtons() {
+    private List<Button> getConstructionButtons() {
         Button followButton = Button.success("sc_follow", "SC Follow #4");
         Button noFollowButton = Button.primary("sc_no_follow", "Not Following #4");
-        return ActionRow.of(followButton, noFollowButton);
+        return List.of(followButton, noFollowButton);
     }
     
-    private ActionRow getTradeButtons() {
+    private List<Button> getTradeButtons() {
         Button trade_primary = Button.success("trade_primary", "Resolve Primary #5");
         Button followButton = Button.success("sc_follow_trade", "SC Follow #5");
         Button noFollowButton = Button.primary("sc_no_follow", "Not Following #5");
         Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash for SC #5").withEmoji(Emoji.fromFormatted(Emojis.Wash));
         Button refresh = Button.secondary("sc_refresh", "Replenish Commodities for SC #5").withEmoji(Emoji.fromFormatted(Emojis.comm));
-        return ActionRow.of(trade_primary, followButton, noFollowButton, refresh, refresh_and_wash);
+        return List.of(trade_primary, followButton, noFollowButton, refresh, refresh_and_wash);
     }
     
-    private ActionRow getWarfareButtons() {
+    private List<Button> getWarfareButtons() {
         Button followButton = Button.success("sc_follow", "SC Follow #6");
         Button noFollowButton = Button.primary("sc_no_follow", "Not Following #6");
-        return ActionRow.of(followButton, noFollowButton);
+        return List.of(followButton, noFollowButton);
     }
     
-    private ActionRow getTechnologyButtons() {
+    private List<Button> getTechnologyButtons() {
         Button followButton = Button.success("sc_follow", "SC Follow #7");
         Button noFollowButton = Button.primary("sc_no_follow", "Not Following #7");
-        return ActionRow.of(followButton, noFollowButton);
+        return List.of(followButton, noFollowButton);
     }
     
-    private ActionRow getImperialButtons() {
+    private List<Button> getImperialButtons() {
         Button followButton = Button.success("sc_follow", "SC Follow #8");
         Button noFollowButton = Button.primary("sc_no_follow", "Not Following #8");
         Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective));
-        return ActionRow.of(followButton, noFollowButton, draw_so);
+        return List.of(followButton, noFollowButton, draw_so);
     }
 }
