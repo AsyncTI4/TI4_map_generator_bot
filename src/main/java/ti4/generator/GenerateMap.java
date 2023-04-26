@@ -1949,7 +1949,23 @@ public class GenerateMap {
             case "lightgray":
                 return new Color(213, 213, 213);
             case "bloodred":
-                return Color.decode("#610808");
+                return Color.decode("#70001a");
+            case "chocolate":
+                return Color.decode("#3a1d19");
+            case "teal":
+                return Color.decode("#00deff");
+            case "emerald":
+                return Color.decode("#004018");
+            case "navy":
+                return Color.decode("#03004b");
+            case "lime":
+                return Color.decode("#ace3a0");
+            case "lavender":
+                return Color.decode("#9796df");
+            case "rose":
+                return Color.decode("#d59de2");
+            case "spring":
+                return Color.decode("#cedd8e");
             default:
                 return Color.WHITE;
         }
