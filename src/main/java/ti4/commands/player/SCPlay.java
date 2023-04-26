@@ -72,8 +72,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
         TextChannel textChannel = (TextChannel) mainGameChannel;
-        MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
-
+        
         for (Player player2 : activeMap.getPlayers().values()) {
             if (!player2.isRealPlayer()) {
                 continue;
@@ -82,10 +81,10 @@ public class SCPlay extends PlayerSubcommandData {
             if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
             player2.setSCFollowedStatus(sc, false);
         }
-
-        ActionRow of = getSCButtons(sc);
-
-        baseMessageObject.addComponents(of);
+        
+        ActionRow actionRow = getSCButtons(sc);
+        MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
+        baseMessageObject.addComponents(actionRow);
         
         final Player player_ = player;
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
