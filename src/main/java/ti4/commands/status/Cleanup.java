@@ -50,6 +50,7 @@ public class Cleanup extends StatusSubcommandData {
             player.cleanExhaustedTechs();
             player.cleanExhaustedPlanets(true);
             player.cleanExhaustedRelics();
+            player.clearFollowedSCs();
 
             for (Leader leader : player.getLeaders()) {
                 if (!leader.isLocked()){

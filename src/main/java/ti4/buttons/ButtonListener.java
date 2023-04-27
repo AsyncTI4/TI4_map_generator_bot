@@ -40,7 +40,7 @@ public class ButtonListener extends ListenerAdapter {
         MessageListener.setActiveGame(event.getMessageChannel(), id, "button");
         String buttonID = event.getButton().getId();
         String buttonLabel = event.getButton().getLabel();
-        String lastchar = StringUtils.right(buttonLabel, 1);
+        String lastchar = StringUtils.right(buttonLabel, 2).replace("#", "");
         if (buttonID == null) {
             event.getChannel().sendMessage("Button command not found").queue();
             return;
