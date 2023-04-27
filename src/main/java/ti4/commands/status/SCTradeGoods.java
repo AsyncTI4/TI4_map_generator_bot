@@ -44,7 +44,7 @@ public class SCTradeGoods extends StatusSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card must be from possible ones in Game");
                 return;
             }
-            Set<Integer> scPicked = activeMap.getPlayers().values().stream().map(Player::getSC).collect(Collectors.toSet());
+            Set<Integer> scPicked = activeMap.getPlayers().values().stream().map(Player::getSCs).map();
             if (scPicked.contains(sc)){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card is already picked, can't add Trade Goods");
                 return;
@@ -54,7 +54,7 @@ public class SCTradeGoods extends StatusSubcommandData {
         }
 
         LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
-        Set<Integer> scPicked = activeMap.getPlayers().values().stream().map(Player::getSC).collect(Collectors.toSet());
+        Set<Integer> scPicked = activeMap.getPlayers().values().stream().map(Player::getSCs).collect(Collectors.toSet());
         for (Integer scNumber :  scTradeGoods.keySet()) {
             if (!scPicked.contains(scNumber)){
                 Integer tgCount = scTradeGoods.get(scNumber);

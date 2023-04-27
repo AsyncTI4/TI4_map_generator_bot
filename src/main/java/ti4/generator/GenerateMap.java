@@ -360,7 +360,7 @@ public class GenerateMap {
                     }
                 }
                 y += 4;
-                int sc = player.getSC();
+                int sc = player.getSCs();
                 String scText = sc == 0 ? " " : Integer.toString(sc);
                 if (sc != 0) {
                     scText = getSCNumberIfNaaluInPlay(player, map, scText);
@@ -1244,7 +1244,7 @@ public class GenerateMap {
         y += 80;
         LinkedHashMap<Integer, Integer> scTradeGoods = map.getScTradeGoods();
         Collection<Player> players = map.getPlayers().values();
-        Set<Integer> scPicked = players.stream().map(Player::getSC).collect(Collectors.toSet());
+        Set<Integer> scPicked = players.stream().map(Player::getSCs).collect(Collectors.toSet());
         HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
         int x = 20;
         for (java.util.Map.Entry<Integer, Integer> scTGs : scTradeGoods.entrySet()) {
@@ -1344,7 +1344,7 @@ public class GenerateMap {
                 }
             }
 
-            int sc = player.getSC();
+            int sc = player.getSCs();
             String scText = sc == 0 ? " " : Integer.toString(sc);
             scText = getSCNumberIfNaaluInPlay(player, map, scText);
             graphics.setColor(getSCColor(sc, map));

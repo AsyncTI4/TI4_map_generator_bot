@@ -64,12 +64,12 @@ public class ExpInfo extends ExploreSubcommandData {
             info.append(listNames(discard)).append("\n_ _\n");
             
             
-            if(player == null || player.getSC() == 0 || over || !activeMap.isFoWMode())
+            if(player == null || player.getSCs().isEmpty() || over || !activeMap.isFoWMode())
             {
                 sendMessage(info.toString());
             }
         }
-        if(player != null && player.getSC() != 0 && !over && activeMap.isFoWMode())
+        if(player != null && !player.getSCs().isEmpty() && !over && activeMap.isFoWMode())
             {
                 sendMessage("It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
             }

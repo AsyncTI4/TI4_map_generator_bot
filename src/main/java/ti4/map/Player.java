@@ -83,7 +83,7 @@ public class Player {
     private ArrayList<String> fragments = new ArrayList<>();
     private List<String> relics = new ArrayList<>();
     private List<String> exhaustedRelics = new ArrayList<>();
-    private int SC = 0;
+    private HashSet<Integer> SCs = new HashSet<>();
 
     // Statistics
     private int numberOfTurns = 0;
@@ -758,7 +758,7 @@ public class Player {
     }
 
     public void clearFollowedSCs() {
-        this.followedSCs = new HashSet<Integer>();
+        this.followedSCs.clear();
     }
 
     public Set<Integer> getFollowedSCs() {
@@ -785,14 +785,25 @@ public class Player {
         return secretsScored.size();
     }
 
-    public int getSC() {
-        return SC;
+    public Set<Integer> getSCs() {
+        return SCs;
     }
 
-    public void setSC(int SC) {
-        this.SC = SC;
+    public void setSCs(HashSet<Integer> SCs) {
+        this.SCs = SCs;
     }
 
+    public void addSC(int sc) {
+        SCs.add(sc);
+    }
+
+    public void removeSC(int sc) {
+        SCs.remove(sc);
+    }
+
+    public void clearSCs() {
+        SCs.clear();
+    }
     public int getCommodities() {
         return commodities;
     }

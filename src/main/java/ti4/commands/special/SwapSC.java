@@ -71,18 +71,18 @@ public class SwapSC extends SpecialSubcommandData {
             return;
         }
 
-        Integer player1SC = player1.getSC();
-        Integer player2SC = player2.getSC();
+        Integer player1SC = player1.getSCs();
+        Integer player2SC = player2.getSCs();
 
         if (player1SC == 0 || player2SC == 0) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot swap SCs because One or more players have no selected an SC yet");
             return;
         }
 
-        player1.setSC(0);
-        player2.setSC(0);
-        player1.setSC(player2SC);
-        player2.setSC(player1SC);
+        player1.setSCs(0);
+        player2.setSCs(0);
+        player1.setSCs(player2SC);
+        player2.setSCs(player1SC);
 
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getPlayerRepresentation(event, player1)).append(" swapped SC with ").append(Helper.getPlayerRepresentation(event, player2)).append("\n");
