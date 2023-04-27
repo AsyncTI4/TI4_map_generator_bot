@@ -361,6 +361,7 @@ public class GenerateMap {
                 }
                 y += 4;
 
+                //PAINT SCs
                 Set<Integer> playerSCs = player.getSCs();
                 if (playerSCs.size() == 1) {
                     int sc = playerSCs.stream().findFirst().get();
@@ -379,11 +380,25 @@ public class GenerateMap {
                     } else {
                         graphics.drawString(scText, x + 90, y + 70 + yDelta);
                     }
-                } else if (playerSCs.size() <= 4) {
+                } else { //if (playerSCs.size() <= 4) {
                     int count = 1;
                     int row = 0;
                     int col = 0;
                     for (int sc : playerSCs) {
+                        if (count == 5) break;
+                        switch (count) {
+                            case 2 -> {
+                                col = 1;
+                            }
+                            case 3 -> {
+                                row = 1;
+                                col = 0;
+                            }
+                            case 4 -> {
+                                row = 1;
+                                col = 1;
+                            }
+                        }
                         String scText = sc == 0 ? " " : Integer.toString(sc);
                         if (sc != 0) {
                             scText = getSCNumberIfNaaluInPlay(player, map, scText);
@@ -397,21 +412,7 @@ public class GenerateMap {
                             graphics.setColor(Color.WHITE);
                             graphics.drawString(Integer.toString(sc), x + 120, y + 80 + yDelta);
                         } else {
-                            graphics.drawString(scText, x + 90, y + 70 + yDelta);
-                            drawCenteredString(graphics, scText, new Rectangle(x + 90 + 32 * col, y + 70 + yDelta + 32 * row, 32, 32), Storage.getFont32());
-                        }
-                        switch (count) {
-                            case 1 -> {
-                                col = 1;
-                            }
-                            case 2 -> {
-                                row = 1;
-                                col = 0;
-                            }
-                            case 3 -> {
-                                row = 1;
-                                col = 1;
-                            }
+                            drawCenteredString(graphics, scText, new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32), Storage.getFont32());
                         }
                         count++;
                     }
