@@ -13,7 +13,6 @@ import net.dv8tion.jda.api.entities.Role;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.MapFileDeleter;
@@ -112,21 +111,46 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onMessageReceived(MessageReceivedEvent event) {
-//        CommandManager commandManager = CommandManager.getInstance();
-//        for (Command command : commandManager.getCommandList()) {
-//            if (command.accept(event))
-//            {
-//                command.execute(event);
-//                String message = event.getMessage().getContentRaw();
-//                LoggerHandler.logInfo(message);
-//            }
-//        }
-
-
-
-
-
         Message msg = event.getMessage();
+
+        autoPingGames();
+
+        if (msg.getContentRaw().startsWith("[DELETE]")) {
+            msg.delete().queue();
+        }
+
+        handleFoWWhispers(event, msg);
+
+        mapLog(event, msg);
+
+        saveJSONInTTPGExportsChannel(event);
+    }
+
+    private void saveJSONInTTPGExportsChannel(MessageReceivedEvent event) {
+        // TTPG-EXPORTS - Save attachment to ttpg_exports folder for later processing
+        if (event.getChannel().getName().equalsIgnoreCase("ttpg-exports")) {
+            List<Message.Attachment> attachments = event.getMessage().getAttachments();
+            if (attachments.isEmpty()) {
+                return; // no attachments on the message!
+            } else if (!attachments.get(0).getFileExtension().equalsIgnoreCase("json")) {
+                // MessageHelper.sendMessageToChannel(event.getChannel(), "File is not a JSON file. Will not be saved.");
+                return;
+            } else { //write to file
+                String currentDateTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuu-MM-dd-HHmmss"));
+                String fileName = "ttpgexport_" + currentDateTime + ".json";
+                String filePath =  Storage.getTTPGExportDirectory() + "/" + fileName;
+                File file = new File(filePath);
+                CompletableFuture<File> future = attachments.get(0).getProxy().downloadToFile(file);
+                future.exceptionally(error -> { // handle possible errors
+                    error.printStackTrace();
+                    return null;
+                });
+                MessageHelper.sendMessageToChannel(event.getChannel(), "File imported as: `" + fileName + "`");
+            }
+        }
+    }
+
+    private void autoPingGames() {
         Map mapreference = MapManager.getInstance().getMap("finreference");
         if (mapreference != null && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 1000*10*60) //10 minutes
         {
@@ -177,11 +201,9 @@ public class MessageListener extends ListenerAdapter {
                 }
             }
         }
+    }
 
-
-        if (msg.getContentRaw().startsWith("[DELETE]")) {
-            msg.delete().queue();
-        }
+    private void handleFoWWhispers(MessageReceivedEvent event, Message msg) {
         if (msg.getContentRaw().contains("used /fow whisper")) {
             msg.delete().queue();
         }
@@ -225,6 +247,9 @@ public class MessageListener extends ListenerAdapter {
                 msg.delete().queue();
             }
         }
+    }
+
+    private void mapLog(MessageReceivedEvent event, Message msg) {
         if (msg.getContentRaw().startsWith("map_log")) {
             if (event.isFromType(ChannelType.PRIVATE)) {
                 System.out.printf("[PM] %s: %s\n", event.getAuthor().getName(), event.getMessage().getContentDisplay());
@@ -232,32 +257,6 @@ public class MessageListener extends ListenerAdapter {
             } else {
                 System.out.printf("[%s][%s] %s: %s\n", event.getGuild().getName(), event.getChannel().asTextChannel().getName(), event.getMember().getEffectiveName(), event.getMessage().getContentDisplay());
                 System.out.printf("[%s][%s] %s: %s\n", event.getGuild().getId(), event.getChannel().asTextChannel().getId(), event.getAuthor().getId(), event.getMessage().getContentDisplay());
-            }
-        }
-
-        saveJSONInTTPGExportsChannel(event);
-    }
-
-    private void saveJSONInTTPGExportsChannel(MessageReceivedEvent event) {
-        // TTPG-EXPORTS - Save attachment to ttpg_exports folder for later processing
-        if (event.getChannel().getName().equalsIgnoreCase("ttpg-exports")) {
-            List<Message.Attachment> attachments = event.getMessage().getAttachments();
-            if (attachments.isEmpty()) {
-                return; // no attachments on the message!
-            } else if (!attachments.get(0).getFileExtension().equalsIgnoreCase("json")) {
-                // MessageHelper.sendMessageToChannel(event.getChannel(), "File is not a JSON file. Will not be saved.");
-                return;
-            } else { //write to file
-                String currentDateTime = ZonedDateTime.now().format(DateTimeFormatter.ofPattern("uuuu-MM-dd-HHmmss"));
-                String fileName = "ttpgexport_" + currentDateTime + ".json";
-                String filePath =  Storage.getTTPGExportDirectory() + "/" + fileName;
-                File file = new File(filePath);
-                CompletableFuture<File> future = attachments.get(0).getProxy().downloadToFile(file);
-                future.exceptionally(error -> { // handle possible errors
-                    error.printStackTrace();
-                    return null;
-                });
-                MessageHelper.sendMessageToChannel(event.getChannel(), "File imported as: `" + fileName + "`");
             }
         }
     }
