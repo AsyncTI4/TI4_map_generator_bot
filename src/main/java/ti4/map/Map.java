@@ -648,6 +648,24 @@ public class Map {
         scTradeGoods.put(sc, tradeGoodCount);
     }
 
+    @JsonIgnore
+    public List<Integer> getSCList() {
+        return (new ArrayList<Integer>(getScTradeGoods().keySet()));
+    }
+
+    /** Add an additonal Strategy Card to use
+     * @param sc the integer value of the new strategy card
+     */
+    public void addSC(int sc) {
+        if(!getSCList().contains(sc)) {
+            setScTradeGood(sc, null);
+        }
+    }
+
+    public void purgeSC(int sc) {
+        scTradeGoods.remove(sc);
+    }
+
     public void setScPlayed(HashMap<Integer, Boolean> scPlayed) {
         this.scPlayed = scPlayed;
     }

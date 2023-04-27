@@ -745,8 +745,8 @@ public class Player {
     {
         stratfollows[scnumber -1] = followed;
     }
-    public boolean getSCFollowedStatus (int scnumber)
-    {
+    public boolean getSCFollowedStatus (int scnumber) {
+        if (scnumber > 8) return true; //HANDLE EXTRA SCs TODO: Replace stratFollows with a HashMap<Integer, String>()
         return stratfollows[scnumber -1];
     }
 
