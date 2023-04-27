@@ -83,7 +83,7 @@ public class Player {
     private ArrayList<String> fragments = new ArrayList<>();
     private List<String> relics = new ArrayList<>();
     private List<String> exhaustedRelics = new ArrayList<>();
-    private HashSet<Integer> SCs = new HashSet<>();
+    private LinkedHashSet<Integer> SCs = new LinkedHashSet<>();
 
     // Statistics
     private int numberOfTurns = 0;
@@ -785,11 +785,11 @@ public class Player {
         return secretsScored.size();
     }
 
-    public Set<Integer> getSCs() {
+    public LinkedHashSet<Integer> getSCs() {
         return SCs;
     }
 
-    public void setSCs(HashSet<Integer> SCs) {
+    public void setSCs(LinkedHashSet<Integer> SCs) {
         this.SCs = SCs;
     }
 
@@ -804,6 +804,15 @@ public class Player {
     public void clearSCs() {
         SCs.clear();
     }
+
+    public int getLowestSC() {
+        try {
+            return Collections.min(getSCs());
+        } catch (NoSuchElementException e) {
+            return 100;
+        }
+    }
+
     public int getCommodities() {
         return commodities;
     }

@@ -63,25 +63,32 @@ public class Turn extends PlayerSubcommandData {
         Boolean privateGame = FoWHelper.isPrivateGame(map, event);
         boolean isFowPrivateGame = privateGame != null && privateGame;
 
+        //MAKE ALL NON-REAL PLAYERS PASSED
         for (Player player : map.getPlayers().values()) {
             if (!player.isRealPlayer()){
                 player.setPassed(true);
             }
         }
+
+        //DETERMINE IF NAALU IS PRESENT AND GET THEIR SC
         for (Player player : map.getPlayers().values()) {
-            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(player.getSCs()));
-            if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                naaluSC = player.getSCs();
-                naaluPresent = true;
-                break;
+            for (int sc : player.getSCs()) {
+                String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
+                if (scNumberIfNaaluInPlay.startsWith("0/")) {
+                    naaluSC = sc;
+                    naaluPresent = true;
+                    break;
+                }
             }
         }
-        if (max == naaluSC) {
+        if (max == naaluSC) { //quick fix if Naalu picks for e.g. the 8, max is now 7
             max--;
         }
+
+        //FIND CURRENT PLAYER AND ???
         for (Player player : map.getPlayers().values()) {
             if (mainPlayer.getUserID().equals(player.getUserID())) {
-                int sc = player.getSCs();
+                int sc = player.getLowestSC();
                 scNext = sc;
                 String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
                 if (scNumberIfNaaluInPlay.startsWith("0/")) {
@@ -91,12 +98,14 @@ public class Turn extends PlayerSubcommandData {
                 break;
             }
         }
+
+        //CREATE LIST OF UNPASSED PLAYERS
         HashMap<Integer, Boolean> scPassed = new HashMap<>();
         for (Player player : map.getPlayers().values()) {
             if (player.isPassed()) {
                 continue;
             }
-            int sc = player.getSCs();
+            int sc = player.getLowestSC();
             String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 scPassed.put(0, player.isPassed());
@@ -117,7 +126,7 @@ public class Turn extends PlayerSubcommandData {
 
         int tempProtection = 0;
         int nextSCFound = -1;
-        while (tempProtection < 20) {
+        while (tempProtection < (map.getSCList().size() + 5)) {
             Boolean isPassed = scPassed.get(scNext);
             if (isPassed != null && !isPassed) {
                 nextSCFound = scNext;
@@ -129,7 +138,7 @@ public class Turn extends PlayerSubcommandData {
         }
 
         for (Player player : map.getPlayers().values()) {
-            int sc = player.getSCs();
+            int sc = player.getLowestSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
                 String text = Helper.getPlayerRepresentation(event, player, true) + " UP NEXT";
                 map.updateActivePlayer(player);
