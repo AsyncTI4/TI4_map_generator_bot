@@ -80,20 +80,22 @@ public class SCPlay extends PlayerSubcommandData {
             }
             String faction = player2.getFaction();
             if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
-            player2.setSCFollowedStatus(sc, false);
+            player2.removeFollowedSC(sc);
         }
         
-        //GET BUTTONS
-        ActionRow actionRow = ActionRow.of(getSCButtons(sc));
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
-        if (!actionRow.isEmpty()) baseMessageObject.addComponents(actionRow);
+        //GET BUTTONS
+        ActionRow actionRow = null;
+        List<Button> scButtons = getSCButtons(sc);
+        if (scButtons != null && !scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
+        if (actionRow != null) baseMessageObject.addComponents(actionRow);
         
         final Player player_ = player;
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
             Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player_, message_); 
             if (reactionEmoji != null) {
                 message_.addReaction(reactionEmoji).queue();
-                player_.setSCFollowedStatus(sc, true);
+                player_.addFollowedSC(sc);
             }
 
             if (activeMap.isFoWMode()) {
@@ -131,7 +133,7 @@ public class SCPlay extends PlayerSubcommandData {
             case 6 -> getWarfareButtons();
             case 7 -> getTechnologyButtons();
             case 8 -> getImperialButtons();
-            default -> new ArrayList<>();
+            default -> getGenericButtons(sc);
         };
     }
 
@@ -202,5 +204,11 @@ public class SCPlay extends PlayerSubcommandData {
         Button noFollowButton = Button.primary("sc_no_follow", "Not Following #8");
         Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective));
         return List.of(followButton, noFollowButton, draw_so);
+    }
+
+    private List<Button> getGenericButtons(int sc) {
+        Button followButton = Button.success("sc_follow", "SC Follow #" + sc);
+        Button noFollowButton = Button.primary("sc_no_follow", "Not Following #" + sc);
+        return List.of(followButton, noFollowButton);
     }
 }

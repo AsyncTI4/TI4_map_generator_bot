@@ -194,7 +194,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if(setstatus)
                     {
-                        player.setSCFollowedStatus(scnum, true);
+                        player.addFollowedSC(scnum);
                     }
                     addReaction(event, false, false, message, "");
                     
@@ -229,14 +229,14 @@ public class ButtonListener extends ListenerAdapter {
                         break;
                     }
                     String message = deductCC(player, event);
-                    player.setSCFollowedStatus(5, true);
+                    player.addFollowedSC(5);
                     player.setCommodities(player.getCommoditiesTotal());
                     addReaction(event, false, false, message, "");
                     addReaction(event, false, false, "Replenishing Commodities", "");
                 }
                 case "sc_follow_leadership" -> {
                     String message = Helper.getPlayerPing(player) + " following.";
-                    player.setSCFollowedStatus(1, true);
+                    player.addFollowedSC(1);
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_no_follow" -> {
@@ -251,7 +251,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if(setstatus)
                     {
-                        player.setSCFollowedStatus(scnum2, true);
+                        player.addFollowedSC(scnum2);
                     }
                     addReaction(event, false, false, "Not Following", "");
                     Set<Player> players = playerUsedSC.get(messageID);
@@ -267,7 +267,7 @@ public class ButtonListener extends ListenerAdapter {
                         break;
                     }
                     player.setCommodities(player.getCommoditiesTotal());
-                    player.setSCFollowedStatus(5, true);
+                    player.addFollowedSC(5);
                     addReaction(event, false, false, "Replenishing Commodities", "");
                 }
                 case "sc_refresh_and_wash" -> {
@@ -279,7 +279,7 @@ public class ButtonListener extends ListenerAdapter {
                     int tg = player.getTg();
                     player.setTg(tg + commoditiesTotal);
                     player.setCommodities(0);
-                    player.setSCFollowedStatus(5, true);
+                    player.addFollowedSC(5);
                     addReaction(event, false, false, "Replenishing and washing", "");
                 }
                 case "trade_primary" -> {

@@ -610,6 +610,7 @@ public class Constants {
     public static final String LATEST_COMMAND = "latest_command";
     public static final String LIST_MY_GAMES = "list_my_games";
     public static final String RELIC_SEND = "relic_send";
+    public static final String FOLLOWED_SC = "followed_sc";
     public static final String SC_FOLLOW_1 = "sc_follow_1";
     public static final String SC_FOLLOW_2 = "sc_follow_2";
     public static final String SC_FOLLOW_3 = "sc_follow_3";
