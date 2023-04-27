@@ -378,6 +378,10 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.DISCORDANT_STARS_MODE + " " + map.isDiscordantStarsMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.VERBOSITY + " " + map.getOutputVerbosity());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.BETA_TEST_MODE + " " + map.isTestBetaFeaturesMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
         writer.write(System.lineSeparator());
         writer.write(ENDGAMEINFO);
@@ -1116,6 +1120,22 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         map.setDiscordantStarsMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.VERBOSITY -> {
+                    try {
+                        String value = info;
+                        map.setOutputVerbosity(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.BETA_TEST_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setTestBetaFeaturesMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

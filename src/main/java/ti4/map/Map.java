@@ -72,6 +72,8 @@ public class Map {
     private boolean absolMode = false;
     @ExportableField
     private boolean discordantStarsMode = false;
+    private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
+    private boolean testBetaFeaturesMode = false;
     private boolean hasEnded = false;
 
     @Nullable
@@ -344,6 +346,24 @@ public class Map {
 
     public void setDiscordantStarsMode(boolean discordantStarsMode) {
         this.discordantStarsMode = discordantStarsMode;
+    }
+
+    public String getOutputVerbosity() {
+        return outputVerbosity;
+    }
+
+    public void setOutputVerbosity(String outputVerbosity) {
+        if (Constants.VERBOSITY_OPTIONS.contains(outputVerbosity)) {
+            this.outputVerbosity = outputVerbosity;
+        }
+    }
+
+    public boolean isTestBetaFeaturesMode() {
+        return testBetaFeaturesMode;
+    }
+
+    public void setTestBetaFeaturesMode(boolean testBetaFeaturesMode) {
+        this.testBetaFeaturesMode = testBetaFeaturesMode;
     }
 
     @JsonIgnore

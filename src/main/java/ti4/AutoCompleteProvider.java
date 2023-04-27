@@ -431,6 +431,9 @@ public class AutoCompleteProvider {
                     event.replyChoices(options).queue();
                 }
             }
+            case Constants.VERBOSITY -> {
+                event.replyChoiceStrings(Constants.VERBOSITY_OPTIONS).queue();
+            }
         }
     }
 }
