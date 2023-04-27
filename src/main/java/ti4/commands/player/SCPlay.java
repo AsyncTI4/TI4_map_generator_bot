@@ -47,7 +47,7 @@ public class SCPlay extends PlayerSubcommandData {
             return;
         }
 
-        int sc = player.getSC();
+        int sc = player.getSCs();
         String emojiName = "SC" + String.valueOf(sc);
         if (sc == 0) {
             sendMessage("No SC selected by player");

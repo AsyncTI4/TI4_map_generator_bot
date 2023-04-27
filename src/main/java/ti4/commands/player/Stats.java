@@ -146,7 +146,7 @@ public class Stats extends PlayerSubcommandData {
 		OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
 		if (optionSCPlayed != null) {
 			StringBuilder message = new StringBuilder();
-			int sc = player.getSC();
+			int sc = player.getSCs();
 			if (sc > 0) {
 				String value = optionSCPlayed.getAsString().toLowerCase();
 				if ("y".equals(value) || "yes".equals(value)) {
@@ -186,11 +186,11 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("   ").append(Emojis.IFrag).append(player.getIrf());
 		sb.append("   ").append(Emojis.HFrag).append(player.getHrf());
 		sb.append("   ").append(Emojis.UFrag).append(player.getVrf());
-		if (player.getSC() > 0) {
-			if (getActiveMap().getScPlayed().get(player.getSC())) {
-				sb.append("      ").append(Helper.getSCBackEmojiFromInteger(player.getSC())).append(" (Played)");
+		if (player.getSCs() > 0) {
+			if (getActiveMap().getScPlayed().get(player.getSCs())) {
+				sb.append("      ").append(Helper.getSCBackEmojiFromInteger(player.getSCs())).append(" (Played)");
 			} else {
-				sb.append("      ").append(Helper.getSCEmojiFromInteger(player.getSC())).append(" (Ready)");
+				sb.append("      ").append(Helper.getSCEmojiFromInteger(player.getSCs())).append(" (Ready)");
 			}
 		} else {
 			sb.append("      No SC Picked");
@@ -239,14 +239,14 @@ public class Stats extends PlayerSubcommandData {
 					LinkedHashMap<String, Player> players = activeMap.getPlayers();
 					boolean scPickedAlready = false;
 					for (Player playerStats : players.values()) {
-						if (playerStats.getSC() == scNumber) {
+						if (playerStats.getSCs() == scNumber) {
 							MessageHelper.sendMessageToChannel(event.getChannel(), "SC #"+scNumber+" is already picked.");
 							scPickedAlready = true;
 							break;
 						}
 					}
 					if (!scPickedAlready) {
-						player.setSC(scNumber);
+						player.setSCs(scNumber);
 						String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) + " picked SC #"+scNumber;
 						if (activeMap.isFoWMode()) {
 							FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
@@ -265,8 +265,8 @@ public class Stats extends PlayerSubcommandData {
 						}
 					}
 				} else if (scNumber == 0) {
-					int sc = player.getSC();
-					player.setSC(scNumber);
+					int sc = player.getSCs();
+					player.setSCs(scNumber);
 					activeMap.setSCPlayed(sc, false);
 				}
 			}

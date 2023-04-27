@@ -69,9 +69,9 @@ public class Turn extends PlayerSubcommandData {
             }
         }
         for (Player player : map.getPlayers().values()) {
-            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(player.getSC()));
+            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(player.getSCs()));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                naaluSC = player.getSC();
+                naaluSC = player.getSCs();
                 naaluPresent = true;
                 break;
             }
@@ -81,7 +81,7 @@ public class Turn extends PlayerSubcommandData {
         }
         for (Player player : map.getPlayers().values()) {
             if (mainPlayer.getUserID().equals(player.getUserID())) {
-                int sc = player.getSC();
+                int sc = player.getSCs();
                 scNext = sc;
                 String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
                 if (scNumberIfNaaluInPlay.startsWith("0/")) {
@@ -96,7 +96,7 @@ public class Turn extends PlayerSubcommandData {
             if (player.isPassed()) {
                 continue;
             }
-            int sc = player.getSC();
+            int sc = player.getSCs();
             String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 scPassed.put(0, player.isPassed());
@@ -129,7 +129,7 @@ public class Turn extends PlayerSubcommandData {
         }
 
         for (Player player : map.getPlayers().values()) {
-            int sc = player.getSC();
+            int sc = player.getSCs();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
                 String text = Helper.getPlayerRepresentation(event, player, true) + " UP NEXT";
                 map.updateActivePlayer(player);

@@ -140,7 +140,7 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX)) {
             String faction = buttonID.replace(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX, "");
-            if (player.getSC() != 3) {
+            if (player.getSCs().contains(3) && activeMap.getPlayedSCs().contains(3)) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Only the player who played Politics can assign Speaker");
                 return;
             }
@@ -283,7 +283,7 @@ public class ButtonListener extends ListenerAdapter {
                     addReaction(event, false, false, "Replenishing and washing", "");
                 }
                 case "trade_primary" -> {
-                    if (5 != player.getSC()){
+                    if (!player.getSCs().contains(5)) {
                         break;
                     }
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "Trade Primary");

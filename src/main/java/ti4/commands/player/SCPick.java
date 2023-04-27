@@ -48,7 +48,7 @@ public class SCPick extends PlayerSubcommandData {
         
         Stats stats = new Stats();
         stats.pickSC(event, activeMap, player, event.getOption(Constants.STRATEGY_CARD));
-        int sc = player.getSC();
+        int sc = player.getSCs();
 
         String[] scs = {Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6};
         int c = 0;
@@ -58,7 +58,7 @@ public class SCPick extends PlayerSubcommandData {
             {
                 stats.pickSC(event, activeMap, player, event.getOption(scs[c]));
             }
-            sc = player.getSC();
+            sc = player.getSCs();
             c++;
         }
         String msg = "";
@@ -79,7 +79,7 @@ public class SCPick extends PlayerSubcommandData {
                 if (player_ == null || !player_.isRealPlayer()) {
                     continue;
                 }
-                if (nextCorrectPing && player_.getSC() == 0 && player_.getFaction() != null) {
+                if (nextCorrectPing && player_.getSCs() == 0 && player_.getFaction() != null) {
                     msgExtra += Helper.getPlayerRepresentation(event, player_, true) + " To Pick SC";
                     privatePlayer = player_;
                     allPicked = false;
@@ -88,7 +88,7 @@ public class SCPick extends PlayerSubcommandData {
                 if (player_ == player) {
                     nextCorrectPing = true;
                 }
-                if (player_.getSC() == 0 && player_.getFaction() != null) {
+                if (player_.getSCs() == 0 && player_.getFaction() != null) {
                     players.add(player_);
                 }
             }
@@ -96,7 +96,7 @@ public class SCPick extends PlayerSubcommandData {
                 msgExtra += Helper.getGamePing(event, activeMap) + "\nAll players picked SC";
 
                 LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
-                Set<Integer> scPickedList = activePlayers.stream().map(Player::getSC).collect(Collectors.toSet());
+                Set<Integer> scPickedList = activePlayers.stream().map(Player::getSCs).collect(Collectors.toSet());
                 for (Integer scNumber : scTradeGoods.keySet()) {
                     if (!scPickedList.contains(scNumber) && scNumber != 0) {
                         Integer tgCount = scTradeGoods.get(scNumber);
@@ -108,7 +108,7 @@ public class SCPick extends PlayerSubcommandData {
                 Player nextPlayer = null;
                 int lowestSC = 100;
                 for (Player player_ : activePlayers) {
-                    int scPicked = player_.getSC();
+                    int scPicked = player_.getSCs();
                     String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player_, activeMap, Integer.toString(sc));
                     if (scNumberIfNaaluInPlay.startsWith("0/")) {
                         nextPlayer = player_;

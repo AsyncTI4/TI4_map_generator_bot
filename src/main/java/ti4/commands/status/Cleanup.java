@@ -11,6 +11,7 @@ import ti4.message.MessageHelper;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.Set;
 
 public class Cleanup extends StatusSubcommandData {
     public Cleanup() {
@@ -44,13 +45,15 @@ public class Cleanup extends StatusSubcommandData {
 
         for (Player player : players.values()) {
             player.setPassed(false);
-            int sc = player.getSC();
-            activeMap.setScTradeGood(sc, 0);
-            player.setSC(0);
+            Set<Integer> SCs = player.getSCs();
+            for (int sc : SCs) {
+                activeMap.setScTradeGood(sc, 0);
+            }
+            player.clearSCs();
+            player.clearFollowedSCs();
             player.cleanExhaustedTechs();
             player.cleanExhaustedPlanets(true);
             player.cleanExhaustedRelics();
-            player.clearFollowedSCs();
 
             for (Leader leader : player.getLeaders()) {
                 if (!leader.isLocked()){
