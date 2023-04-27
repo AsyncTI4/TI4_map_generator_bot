@@ -1,41 +1,43 @@
 package ti4;
 
-import net.dv8tion.jda.api.entities.channel.*;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import java.io.File;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.concurrent.CompletableFuture;
+
+import org.apache.commons.lang3.exception.ExceptionUtils;
+
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
-import net.dv8tion.jda.api.entities.Role;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
+import ti4.commands.fow.Whisper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.map.Map;
 import ti4.map.MapFileDeleter;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
+import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.commands.fow.Whisper;
-import ti4.map.Player;
-import ti4.helpers.Helper;
-import java.io.File;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
-import java.util.List;
-import java.util.Set;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.StringTokenizer;
-import java.util.concurrent.CompletableFuture;
-import java.util.Objects;
-import java.util.Collection;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import ti4.helpers.AliasHandler;
 
 public class MessageListener extends ListenerAdapter {
 
