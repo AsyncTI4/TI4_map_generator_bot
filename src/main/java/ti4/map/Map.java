@@ -500,6 +500,11 @@ public class Map {
         return scPlayed;
     }
 
+    @JsonIgnore
+    public List<Integer> getPlayedSCs() {
+        return getScPlayed().entrySet().stream().filter(e -> e.getValue()).map(e -> e.getKey()).toList();
+    }
+
     public DisplayType getDisplayTypeForced() {
         return displayTypeForced;
     }

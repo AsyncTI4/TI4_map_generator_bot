@@ -156,15 +156,17 @@ public class Turn extends PlayerSubcommandData {
 
     private String getMissedSCFollowsText(Map map, Player player) {
         if (!map.isStratPings()) return null;
+        boolean sendReminder = false;
         
         StringBuilder sb = new StringBuilder("This is a reminder that you have not yet followed SC(s): ");
 
-        for (int sc : map.getSCList()) {
-            if (!player.getSCFollowedStatus(sc)) {   
+        for (int sc : map.getPlayedSCs()) {
+            if (!player.hasFollowedSC(sc)) {   
                 sb.append(Helper.getSCBackEmojiFromInteger(sc));
+                sendReminder = true;
             }
         }
-        return  sb.toString();
+        return sendReminder ? sb.toString() : null;
     }
 
     private void showPublicObjectivesWhenAllPassed(SlashCommandInteractionEvent event, Map map, MessageChannel gameChannel) {

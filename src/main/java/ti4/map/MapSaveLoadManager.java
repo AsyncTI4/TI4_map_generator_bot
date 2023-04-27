@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.StringTokenizer;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.Nullable;
@@ -495,21 +496,7 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.TOTAL_TURN_TIME + " " + player.getTotalTurnTime());
             writer.write(System.lineSeparator());
-            writer.write(Constants.SC_FOLLOW_1 + " " + player.getSCFollowedStatus(1));
-            writer.write(System.lineSeparator());
-            writer.write(Constants.SC_FOLLOW_2 + " " + player.getSCFollowedStatus(2));
-            writer.write(System.lineSeparator());
-            writer.write(Constants.SC_FOLLOW_3 + " " + player.getSCFollowedStatus(3));
-            writer.write(System.lineSeparator());
-            writer.write(Constants.SC_FOLLOW_4 + " " + player.getSCFollowedStatus(4));
-            writer.write(System.lineSeparator());
-            writer.write(Constants.SC_FOLLOW_5 + " " + player.getSCFollowedStatus(5));
-            writer.write(System.lineSeparator());
-            writer.write(Constants.SC_FOLLOW_6 + " " + player.getSCFollowedStatus(6));
-            writer.write(System.lineSeparator());
-            writer.write(Constants.SC_FOLLOW_7 + " " + player.getSCFollowedStatus(7));
-            writer.write(System.lineSeparator());
-            writer.write(Constants.SC_FOLLOW_8 + " " + player.getSCFollowedStatus(8));
+            writer.write(Constants.FOLLOWED_SC + " " + String.join(",", player.getFollowedSCs().stream().map(String::valueOf).toList()));
             writer.write(System.lineSeparator());
             StringBuilder leaderInfo = new StringBuilder();
             for (Leader leader : player.getLeaders()) {
@@ -1252,14 +1239,7 @@ public class MapSaveLoadManager {
                 case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TG -> player.setTg(Integer.parseInt(tokenizer.nextToken()));
-                case Constants.SC_FOLLOW_1 -> player.setSCFollowedStatus(1,Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.SC_FOLLOW_2 -> player.setSCFollowedStatus(2,Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.SC_FOLLOW_3 -> player.setSCFollowedStatus(3,Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.SC_FOLLOW_4 -> player.setSCFollowedStatus(4,Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.SC_FOLLOW_5 -> player.setSCFollowedStatus(5,Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.SC_FOLLOW_6 -> player.setSCFollowedStatus(6,Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.SC_FOLLOW_7 -> player.setSCFollowedStatus(7,Boolean.parseBoolean(tokenizer.nextToken()));
-                case Constants.SC_FOLLOW_8 -> player.setSCFollowedStatus(8,Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.FOLLOWED_SC -> player.setFollowedSCs(new HashSet<Integer>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
                 case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.COMMODITIES -> player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STASIS_INFANTRY -> player.setStasisInfantry(Integer.parseInt(tokenizer.nextToken()));
@@ -1354,7 +1334,7 @@ public class MapSaveLoadManager {
                         player.addFragment(fragments.nextToken());
                     }
                 }
-
+                
                 case Constants.STRATEGY_CARD -> player.setSC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.NUMBER_OF_TURNS -> player.setNumberTurns(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TOTAL_TURN_TIME -> player.setTotalTurnTime(Long.parseLong(tokenizer.nextToken()));
@@ -1381,7 +1361,7 @@ public class MapSaveLoadManager {
         Role roleById = MapGenerator.jda.getRoleById(id);
         player.setRoleForCommunity(roleById);
     }
-
+    
     private static Tile readTile(String tileData, Map map) {
         StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
         String tileID = tokenizer.nextToken();
