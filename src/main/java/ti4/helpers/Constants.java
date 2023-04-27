@@ -510,15 +510,13 @@ public class Constants {
     public static final String BIOTIC = "biotic";
     public static final String UNIT_UPGRADE = "unitupgrade";
 
+    public static final String PRIVATE_CHANNEL = "-private";
 
     public static final String LEADER = "leader";
     public static final String AGENT = "agent";
     public static final String COMMANDER = "commander";
     public static final String HERO = "hero";
-
     public static final ArrayList<String> leaderList = new ArrayList<>();
-    public static final String PRIVATE_CHANNEL = "-private";
-
     static {
         leaderList.add(AGENT);
         leaderList.add(COMMANDER);
@@ -629,4 +627,17 @@ public class Constants {
     public static final String STATS_PASSED="passed";
     public static final String STATS_SO="so";
     public static final String SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX = "sc_3_assign_speaker_to_";
+
+    public static final String VERBOSITY = "verbosity";
+    public static final String VERBOSITY_VERBOSE = "verbose";
+    public static final String VERBOSITY_AVERAGE = "average";
+    public static final String VERBOSITY_MINIMAL = "minimal";
+    public static final ArrayList<String> VERBOSITY_OPTIONS = new ArrayList<>();
+    static {
+        VERBOSITY_OPTIONS.add(VERBOSITY_VERBOSE);
+        VERBOSITY_OPTIONS.add(VERBOSITY_AVERAGE);
+        VERBOSITY_OPTIONS.add(VERBOSITY_MINIMAL);
+    }
+    public static final String BETA_TEST_MODE = "beta_test_mode";
+
 }

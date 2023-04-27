@@ -27,6 +27,8 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.LARGE_TEXT, "Small/medium/large, default small").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.STRAT_PINGS, "Set to YES if want to allow strategy card follow reminders, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
+        addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").setAutoComplete(true));
     }
 
     @Override
@@ -166,5 +168,11 @@ public class Setup extends GameSubcommandData {
         if (displayType != null) {
             activeMap.setDisplayTypeForced(displayType);
         }
+
+        Boolean betaTestMode = event.getOption(Constants.BETA_TEST_MODE, null, OptionMapping::getAsBoolean);
+        if (betaTestMode != null) activeMap.setTestBetaFeaturesMode(betaTestMode);
+
+        String verbosity = event.getOption(Constants.VERBOSITY, null, OptionMapping::getAsString);
+        if (verbosity != null && Constants.VERBOSITY_OPTIONS.contains(verbosity)) activeMap.setOutputVerbosity(verbosity);
     }
 }
