@@ -99,6 +99,11 @@ public class Map {
     private int round = 1;
 
     @ExportableField
+    private int pingSystemCounter = 0;
+    @ExportableField
+    private String[] listOfTilePinged =new String[10]; 
+
+    @ExportableField
     private String activePlayer = null;
     private Date lastActivePlayerPing = new Date(0);
     private Date lastActivePlayerChange = new Date(0);
@@ -266,6 +271,24 @@ public class Map {
     public void setCustomName(String customName) {
         this.customName = customName;
     }
+
+    public int getPingSystemCounter()
+    {
+        return pingSystemCounter;
+    }
+    public void setPingSystemCounter(int count)
+    {
+        pingSystemCounter = count;
+    }
+    public String[] getListOfTilesPinged()
+    {
+        return listOfTilePinged;
+    }
+    public void setTileAsPinged(int count, String tileName)
+    {
+        listOfTilePinged[count] = tileName;
+    }
+
 
     //GAME MODES
     public boolean isCommunityMode() {

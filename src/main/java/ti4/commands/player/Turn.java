@@ -139,6 +139,11 @@ public class Turn extends PlayerSubcommandData {
                     String fail = "User for next faction not found. Report to ADMIN";
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, map, event, text, fail, success);
+                    map.setPingSystemCounter(0);
+                    for(int x = 0; x < 10; x++)
+                    {
+                        map.setTileAsPinged(x, null);
+                    }
                     
                     for(int x = 1; x <9; x++)
                     {
