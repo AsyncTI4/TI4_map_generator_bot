@@ -5,10 +5,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import ti4.commands.cardsac.ACInfo_Legacy;
 import org.jetbrains.annotations.NotNull;
+import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.commands.player.PlanetAdd;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -149,14 +152,69 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 if (Constants.MIRAGE.equalsIgnoreCase(token)) {
                     Helper.addMirageToTile(tile);
                     activeMap.clearPlanetsCache();
-                    message = "Mirage added to map!";
+                    message = "Mirage added to map and explored! Please add the planet to yourself.";
+
                 }
                 activeMap.purgeExplore(cardID);
             } else {
                 message = "Invalid token or tile";
             }
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+        
+        switch (cardID) {
+            case "lc1":
+            case "lc2":
+                boolean isYssaril = player.getFaction().equals("yssaril");
+                message = isYssaril ? "Drew 3 Actions cards" : "Drew 2 Actions cards";
+                int count = isYssaril ? 3 : 2;
+                for (int i = 0; i < count; i++) {
+                    activeMap.drawActionCard(player.getUserID());
+                }
+                ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+                break;
+            case "dv1":
+            case "dv2":
+                 message = "Drew Secret Objective";
+                activeMap.drawSecretObjective(player.getUserID());
+                ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+                break;
+            case "dw":
+                message = "Drew relic";
+                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+                DrawRelic.drawRelicAndNotify(player,  event,  activeMap);
+                break;
+            case "ms1":
+            case "ms2":
+                player.setCommodities(player.getCommoditiesTotal());
+                message = "Replenished Commodifites";
+                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+                break;
+            case "mirage":
+                String planetName2 = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet("mirage"));
+                String planet2 = Mapper.getPlanet(planetName2);
+                if (planet2 == null) {
+                    sendMessage("Invalid planet");
+                    return;
+                }
+                String[] planetInfo2 = planet2.split(",");
+                String drawColor2 = planetInfo2[1];
+                String cardID2 = activeMap.drawExplore(drawColor2);
+                if (cardID2 == null) {
+                    sendMessage("Planet cannot be explored");
+                    return;
+                }
+                StringBuilder messageText2 = new StringBuilder(Helper.getEmojiFromDiscord(drawColor2));
+                messageText2.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(planetName2) +" *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(event, player)).append(":\n");
+                messageText2.append(displayExplore(cardID2));
+                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+                resolveExplore(event, cardID2, tile, planetName2, messageText2.toString(), false);
+                break;
+            default:
+                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+        }
+        
 
     }
 }
