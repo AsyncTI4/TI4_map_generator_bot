@@ -134,65 +134,37 @@ public class Turn extends PlayerSubcommandData {
                 String text = Helper.getPlayerRepresentation(event, player, true) + " UP NEXT";
                 map.updateActivePlayer(player);
                 if (isFowPrivateGame) {
-                    boolean anyMissed = false;
-                    String missedNums = "";
                     String fail = "User for next faction not found. Report to ADMIN";
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, map, event, text, fail, success);
+                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(map, player));
                     map.setPingSystemCounter(0);
                     for(int x = 0; x < 10; x++)
                     {
                         map.setTileAsPinged(x, null);
                     }
-                    
-                    for(int x = 1; x <9; x++)
-                    {
-                        if(player.getSCFollowedStatus(x)==false && map.isStratPings())
-                        {
-                            if(!anyMissed)
-                            {
-                                missedNums = missedNums +x;
-                                anyMissed=true;
-                            }
-                            else
-                            {
-                                missedNums = missedNums + ", " +x;
-                            }
-                        }
-                    }
-                    if(anyMissed&& map.isStratPings())
-                    {
-                        MessageHelper.sendMessageToChannel(player.getPrivateChannel(), "This is a reminder that you have not yet followed SC(s) #"+missedNums);
-                    }
                     return "";
                 } else {
                     MessageHelper.sendMessageToChannel(gameChannel, text);
-                    boolean anyMissed = false;
-                    String missedNums = "";
-                    for(int x = 1; x <9; x++)
-                    {
-                        if(player.getSCFollowedStatus(x)==false && map.isStratPings())
-                        {
-                            if(!anyMissed)
-                                {
-                                    missedNums = missedNums +x;
-                                    anyMissed=true;
-                                }
-                            else
-                                {
-                                    missedNums = missedNums + ", " +x;
-                                }
-                        }
-                    }
-                    if(anyMissed && map.isStratPings())
-                    {
-                            MessageHelper.sendMessageToChannel(gameChannel, "This is a reminder that you have not yet followed SC(s) #"+missedNums);
-                    }
+                    MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(map, player));
                     return "";
                 }
             }
         }
         return "Next Player not found";
+    }
+
+    private String getMissedSCFollowsText(Map map, Player player) {
+        if (!map.isStratPings()) return null;
+        
+        StringBuilder sb = new StringBuilder("This is a reminder that you have not yet followed SC(s): ");
+
+        for (int sc : map.getSCList()) {
+            if (!player.getSCFollowedStatus(sc)) {   
+                sb.append(Helper.getSCBackEmojiFromInteger(sc));
+            }
+        }
+        return  sb.toString();
     }
 
     private void showPublicObjectivesWhenAllPassed(SlashCommandInteractionEvent event, Map map, MessageChannel gameChannel) {
