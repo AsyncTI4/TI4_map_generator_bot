@@ -198,7 +198,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "ms2":
                 player.setCommodities(player.getCommoditiesTotal());
                 message = "Replenished Commodifites";
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + "\n" + message);
                 break;
             case "mirage":
                 String planetName2 = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet("mirage"));
@@ -313,6 +313,46 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 });
                  
                 break;
+            case "exp2":
+            case "exp1":
+            case "exp3":
+                message = "Resolve explore using the buttons.";   
+                MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
+                Button ReadyPlanet= Button.success("planet_ready", "Remove Inf Or Have Mech To Ready "+planetName);
+                Button Decline = Button.danger("decline_explore", "Decline Explore");
+                ActionRow actionRow5 = ActionRow.of(List.of(ReadyPlanet,Decline));
+                MessageCreateBuilder baseMessageObject5 = new MessageCreateBuilder().addContent(message);
+                if (!actionRow5.isEmpty()) baseMessageObject5.addComponents(actionRow5);
+                event.getChannel().sendMessage(baseMessageObject5.build()).queue(message5_ -> {
+                });
+                break;
+            case "cm2":
+            case "cm1":
+            case "cm3":
+                message = "Resolve explore using the buttons.";   
+                MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
+                Button gainTG= Button.success("gain_1_tg", "Gain 1tg By Removing 1 Inf Or Having Mech On "+planetName);
+                Button Decline2 = Button.danger("decline_explore", "Decline Explore");
+                ActionRow actionRow6 = ActionRow.of(List.of(gainTG,Decline2));
+                MessageCreateBuilder baseMessageObject6 = new MessageCreateBuilder().addContent(message);
+                if (!actionRow6.isEmpty()) baseMessageObject6.addComponents(actionRow6);
+                event.getChannel().sendMessage(baseMessageObject6.build()).queue(message6_ -> {
+                });
+                break;
+            case "vfs2":
+            case "vfs1":
+            case "vfs3":
+                message = "Resolve explore using the buttons.";   
+                MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
+                Button gainCC= Button.success("gain_CC", "Gain 1CC By Removing 1 Inf Or Having Mech On "+planetName);
+                Button Decline3 = Button.danger("decline_explore", "Decline Explore");
+                ActionRow actionRow7 = ActionRow.of(List.of(gainCC,Decline3));
+                MessageCreateBuilder baseMessageObject7 = new MessageCreateBuilder().addContent(message);
+                if (!actionRow7.isEmpty()) baseMessageObject7.addComponents(actionRow7);
+                event.getChannel().sendMessage(baseMessageObject7.build()).queue(message7_ -> {
+                });
+                break;
+                
             
             default:
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
