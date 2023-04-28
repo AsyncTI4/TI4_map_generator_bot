@@ -109,7 +109,7 @@ public class PlayerCommand implements Command {
     private Collection<PlayerSubcommandData> getSubcommands() {
         Collection<PlayerSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new Stats());
-        subcommands.add(new Planets());
+        // subcommands.add(new Planets());
         subcommands.add(new Setup());
         subcommands.add(new SCPlay());
         subcommands.add(new Pass());
@@ -121,6 +121,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new AbilityInfo());
         subcommands.add(new Turn());
         subcommands.add(new SCPick());
+        subcommands.add(new SCUnpick());
         subcommands.add(new PlanetAdd());
         subcommands.add(new PlanetRemove());
         subcommands.add(new PlanetExhaust());
