@@ -21,8 +21,8 @@ public class Pass extends PlayerSubcommandData {
             return;
         }
 
-        if(activeMap.getScPlayed().getOrDefault(player.getSCs(), false) == false) {
-            sendMessage("You have not played your strategy card, you cannot pass.");
+        if(!activeMap.getPlayedSCs().containsAll(player.getSCs())) {
+            sendMessage("You have not played your strategy cards, you cannot pass.");
             return;
         }
         player.setPassed(true);
