@@ -189,7 +189,7 @@ public class Stats extends PlayerSubcommandData {
 		if (!player.getSCs().isEmpty()) {
 			sb.append("      ");
 			for (int sc: player.getSCs()) {
-				if (getActiveMap().getScPlayed().get(player.getSCs())) {
+				if (getActiveMap().getScPlayed().get(sc)) {
 					sb.append(Helper.getSCBackEmojiFromInteger(sc));
 				} else {
 					sb.append(Helper.getSCEmojiFromInteger(sc));
@@ -223,8 +223,10 @@ public class Stats extends PlayerSubcommandData {
 		GenerateMap.getInstance().saveImage(activeMap, event);
 	}
 
-	public void pickSC(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping optionSC) {
-		if (optionSC != null) {
+	public boolean pickSC(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping optionSC) {
+			if (optionSC == null) {
+				return false;
+			}
 			if (activeMap.isMapOpen() && !activeMap.isCommunityMode()) {
 				activeMap.setMapStatus(MapStatus.locked);
 			}
@@ -232,18 +234,18 @@ public class Stats extends PlayerSubcommandData {
 			LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
 			if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
 				MessageHelper.sendMessageToChannel(event.getChannel(), "Can pick SC only if faction and color picked");
-				return;
+				return false;
 			}
 			if (!scTradeGoods.containsKey(scNumber)) {
 				MessageHelper.sendMessageToChannel(event.getChannel(),"Strategy Card must be from possible ones in Game");
-				return;
+				return false;
 			}
 
 			LinkedHashMap<String, Player> players = activeMap.getPlayers();
 			for (Player playerStats : players.values()) {
 				if (playerStats.getSCs().contains(scNumber)) {
 					MessageHelper.sendMessageToChannel(event.getChannel(), "SC #"+scNumber+" is already picked by this player.");
-					return;
+					return false;
 				}
 			}
 	
@@ -263,8 +265,8 @@ public class Stats extends PlayerSubcommandData {
 				}
 				
 				player.setTg(tg);
-			}	
-		}
+			}
+			return true;
 	}
 
 	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, OptionMapping option,
