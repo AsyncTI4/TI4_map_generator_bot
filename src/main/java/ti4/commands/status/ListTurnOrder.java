@@ -32,40 +32,39 @@ public class ListTurnOrder extends StatusSubcommandData {
                 if (!player.isRealPlayer()){
                     continue;
                 }
-                Set<Integer> SCs = player.getSCs();
-                for(int sc : SCs) {
 
-                    String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
-                    if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                        naaluSC = sc;
-                    }
-                    boolean passed = player.isPassed();
-                    HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
-                    Boolean found = scPlayed.get(sc);
-                    boolean isPlayed = found != null ? found : false;
-                    String scEmoji = isPlayed ? Helper.getSCBackEmojiFromInteger(sc) : Helper.getSCEmojiFromInteger(sc);
-                    String text = "";
-                    if (isPlayed) {
-                        text += "~~";
-                    }
-                    text += scEmoji + Helper.getSCAsMention(event.getGuild(), sc);
-                    if (isPlayed) {
-                        text += "~~";
-                    }
-                    if (passed) {
-                        text += "~~";
-                    }
-                    text += Helper.getPlayerRepresentation(event, player);
-                    if (passed) {
-                        text += "~~ - PASSED";
-                    }
-                    
-                    if(player.getUserID().equals(map.getSpeaker())) {
-                        text += " " + Emojis.SpeakerToken;
-                    }
-                    
-                    order.put(sc, text);
+                int sc = player.getLowestSC();
+                String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
+                if (scNumberIfNaaluInPlay.startsWith("0/")) {
+                    naaluSC = sc;
                 }
+                boolean passed = player.isPassed();
+                HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
+                Boolean found = scPlayed.get(sc);
+                boolean isPlayed = found != null ? found : false;
+                String scEmoji = isPlayed ? Helper.getSCBackEmojiFromInteger(sc) : Helper.getSCEmojiFromInteger(sc);
+                String text = "";
+                if (isPlayed) {
+                    text += "~~";
+                }
+                text += scEmoji + Helper.getSCAsMention(event.getGuild(), sc);
+                if (isPlayed) {
+                    text += "~~";
+                }
+                if (passed) {
+                    text += "~~";
+                }
+                text += Helper.getPlayerRepresentation(event, player);
+                if (passed) {
+                    text += "~~ - PASSED";
+                }
+                
+                if(player.getUserID().equals(map.getSpeaker())) {
+                    text += " " + Emojis.SpeakerToken;
+                }
+                
+                order.put(sc, text);
+                
             }
             StringBuilder msg = new StringBuilder("__**Turn Order:**__\n");
 
