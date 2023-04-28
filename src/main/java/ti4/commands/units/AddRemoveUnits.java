@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands.player.PlanetAdd;
@@ -16,6 +17,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.FoWHelper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 
 import java.io.File;
 import java.util.HashSet;
@@ -159,6 +161,83 @@ abstract public class AddRemoveUnits implements Command {
         actionAfterAll(event, tile, color, map);
     }
 
+    public void unitParsing(ButtonInteraction event, String color, Tile tile, String unitList, Map map) {
+        unitList = unitList.replace(", ", ",");
+        StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
+        while (unitListTokenizer.hasMoreTokens()) {
+            String unitListToken = unitListTokenizer.nextToken();
+            StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
+            
+            int tokenCount = unitInfoTokenizer.countTokens();
+            if (tokenCount > 3) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
+            }
+
+            int count = 1;
+            boolean numberIsSet = false;
+            String planetName = Constants.SPACE;
+            String unit = "";
+            if (unitInfoTokenizer.hasMoreTokens()) {
+                String ifNumber = unitInfoTokenizer.nextToken();
+                try {
+                    count = Integer.parseInt(ifNumber);
+                    numberIsSet = true;
+                } catch (Exception e) {
+                    unit = AliasHandler.resolveUnit(ifNumber);
+                }
+            }
+            if (unitInfoTokenizer.hasMoreTokens() && numberIsSet) {
+                unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
+            }
+            String unitID = Mapper.getUnitID(unit, color);
+            String unitPath = tile.getUnitPath(unitID);
+            if (unitPath == null) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
+                continue;
+            }
+            if (unitInfoTokenizer.hasMoreTokens()) {
+                String planetToken = unitInfoTokenizer.nextToken();
+                planetName = AliasHandler.resolvePlanet(planetToken);
+                // if (!Mapper.isValidPlanet(planetName)) {
+                //     MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: `" + planetToken + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
+                //     continue;
+                // }
+            }
+
+            planetName = getPlanet(event, tile, planetName);
+            unitAction((GenericInteractionCreateEvent) event, tile, count, planetName, unitID, color);
+            addPlanetToPlayArea(event, tile, planetName);
+        }
+        if (map.isFoWMode()) {
+            boolean pingedAlready = false;
+            int count = 0;
+            String[] tileList = map.getListOfTilesPinged();
+            while(count < 10 && !pingedAlready)
+            {
+                String tilePingedAlready = tileList[count];
+                if(tilePingedAlready != null)
+                {
+                    pingedAlready = tilePingedAlready.equalsIgnoreCase(tile.getPosition());
+                    count++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if(!pingedAlready)
+            {
+                String colorMention = Helper.getColourAsMention(event.getGuild(), color);
+                FoWHelper.pingSystem(map, (GenericInteractionCreateEvent) event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
+                map.setPingSystemCounter(count);
+                map.setTileAsPinged(count, tile.getPosition());
+            }
+        }
+    }
+
+
+
+
     public void addPlanetToPlayArea(SlashCommandInteractionEvent event, Tile tile, String planetName) {
         String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
@@ -190,6 +269,37 @@ abstract public class AddRemoveUnits implements Command {
         }
     }
 
+    public void addPlanetToPlayArea(ButtonInteraction event, Tile tile, String planetName) {
+        String userID = event.getUser().getId();
+        MapManager mapManager = MapManager.getInstance();
+        Map activeMap = mapManager.getUserActiveMap(userID);
+        if (!activeMap.isAllianceMode() && !Constants.SPACE.equals(planetName)){
+            UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+            if (unitHolder != null){
+                Set<String> allUnitsOnPlanet = unitHolder.getUnits().keySet();
+                Set<String> unitColors = new HashSet<>();
+                for (String unit_ : allUnitsOnPlanet) {
+                    String unitColor = unit_.substring(0, unit_.indexOf("_"));
+                    unitColors.add(unitColor);
+                }
+               if (unitColors.size() == 1){
+                   String unitColor = unitColors.iterator().next();
+                   for (Player player : activeMap.getPlayers().values()) {
+                       if (player.getFaction() != null && player.getColor() != null) {
+                           String colorID = Mapper.getColorID(player.getColor());
+                           if (unitColor.equals(colorID)){
+                               if (!player.getPlanets().contains(planetName)) {
+                                   new PlanetAdd().doAction(player, planetName, activeMap);
+                               }
+                               break;
+                           }
+                       }
+                   }
+               }
+            }
+        }
+    }
+
     public static String getPlanet(SlashCommandInteractionEvent event, Tile tile, String planetName) {
         if (!tile.isSpaceHolderValid(planetName)) {
             Set<String> unitHolderIDs = new HashSet<>(tile.getUnitHolders().keySet());
@@ -206,7 +316,24 @@ abstract public class AddRemoveUnits implements Command {
         return planetName;
     }
 
+    public static String getPlanet(ButtonInteraction event, Tile tile, String planetName) {
+        if (!tile.isSpaceHolderValid(planetName)) {
+            Set<String> unitHolderIDs = new HashSet<>(tile.getUnitHolders().keySet());
+            unitHolderIDs.remove(Constants.SPACE);
+            String finalPlanetName = planetName;
+            List<String> validUnitHolderIDs = unitHolderIDs.stream().filter(unitHolderID -> unitHolderID.startsWith(finalPlanetName))
+                    .collect(Collectors.toList());
+            if (validUnitHolderIDs.size() == 1) {
+                planetName = validUnitHolderIDs.get(0);
+            } else {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planetName + " is not valid and not supported.");
+            }
+        }
+        return planetName;
+    }
+
     abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color);
+    abstract protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color);
 
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map){
         //do nothing, overriden by child classes

@@ -10,10 +10,16 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import java.util.Objects;
 
 public class RemoveUnits extends AddRemoveUnits {
+
+    @Override
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color) {
+        
+    }
+
 
     @Override
     protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color) {
