@@ -39,17 +39,21 @@ public class ListTurnOrder extends StatusSubcommandData {
                     naaluSC = sc;
                 }
                 boolean passed = player.isPassed();
+
+                Set<Integer> SCs = player.getSCs();
                 HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
-                Boolean found = scPlayed.get(sc);
-                boolean isPlayed = found != null ? found : false;
-                String scEmoji = isPlayed ? Helper.getSCBackEmojiFromInteger(sc) : Helper.getSCEmojiFromInteger(sc);
                 String text = "";
-                if (isPlayed) {
-                    text += "~~";
-                }
-                text += scEmoji + Helper.getSCAsMention(event.getGuild(), sc);
-                if (isPlayed) {
-                    text += "~~";
+                for (int sc_ : SCs) {
+                    Boolean found = scPlayed.get(sc_);
+                    boolean isPlayed = found != null ? found : false;
+                    String scEmoji = isPlayed ? Helper.getSCBackEmojiFromInteger(sc_) : Helper.getSCEmojiFromInteger(sc_);
+                    if (isPlayed) {
+                        text += "~~";
+                    }
+                    text += scEmoji + Helper.getSCAsMention(event.getGuild(), sc_);
+                    if (isPlayed) {
+                        text += "~~";
+                    }
                 }
                 if (passed) {
                     text += "~~";
