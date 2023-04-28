@@ -7,16 +7,22 @@ import net.dv8tion.jda.api.entities.emoji.*;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
 import ti4.MessageListener;
 import ti4.commands.cardsac.ACInfo_Legacy;
+import ti4.map.UnitHolder;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.units.AddUnits;
+import ti4.commands.player.PlanetAdd;
+import ti4.commands.player.PlanetRefresh;
 import ti4.helpers.Constants;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Emojis;
@@ -27,7 +33,7 @@ import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-
+import ti4.map.Tile;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -367,7 +373,7 @@ public class ButtonListener extends ListenerAdapter {
                             activeMap.drawActionCard(player.getUserID());
                         }
                         ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
-                        addReaction(event, false, false,"Spent 1 commodity for an AC", "");
+                        addReaction(event, false, false,"Spent 1 commodity for "+count2+ " AC", "");
                     }
                     else if(player.getTg() > 0)
                     {
@@ -403,26 +409,128 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
                 case "incease_strategy_cc" -> {
+                    addReaction(event, false, false, "Increased Strategy Pool CCs By 1 ("+player.getStrategicCC()+"->"+(player.getStrategicCC()+1)+").", "");
                     player.setStrategicCC(player.getStrategicCC()+1);
-                    addReaction(event, false, false, "Increased Strategy Pool CCs By 1", "");
                 }
                 case "incease_tactic_cc" -> {
+                    addReaction(event, false, false, "Increased Tactic Pool CCs By 1 ("+player.getTacticalCC()+ "->" +(player.getTacticalCC()+1)+").", "");
                     player.setTacticalCC(player.getTacticalCC()+1);
-                    addReaction(event, false, false, "Increased Tactic Pool CCs By 1", "");
                 }
                 case "incease_fleet_cc" -> {
+                    addReaction(event, false, false, "Increased Fleet Pool CCs By 1 ("+player.getFleetCC()+"->"+(player.getFleetCC()+1)+").", "");
+
                     player.setFleetCC(player.getFleetCC()+1);
-                    addReaction(event, false, false, "Increased Fleet Pool CCs By 1", "");
                 }
-                case "incease_tg_by_1" -> {
-                    player.setTg(player.getTg()+1);
-                    addReaction(event, false, false, "Increased Tgs By 1", "");
+                case "gain_1_tg" -> {
+
+                    String message = "";
+                    String labelP = event.getButton().getLabel();
+                    String planetName = labelP.substring(labelP.lastIndexOf(" ")+1, labelP.length());
+                    boolean failed = false;
+                    if(labelP.contains("Inf") && labelP.contains("Mech"))
+                    {
+                        message = message + mechOrInfCheck(planetName, activeMap);
+                        failed = message.contains("Please try again.");
+                    }
+                    if(!failed)
+                    {
+                        message = message + "Gained 1 tg ("+player.getTg()+"->"+(player.getTg()+1)+").";
+                        player.setTg(player.getTg()+1);
+                    }
+                    addReaction(event, false, false, message, "");
+                }
+                case "decline_explore" -> {
+                    addReaction(event, false, false, "Declined Explore", "");
+                }
+                case "planet_ready" -> {
+                    String message = "";
+                    String labelP = event.getButton().getLabel();
+                    String planetName = labelP.substring(labelP.lastIndexOf(" ")+1, labelP.length());
+                    boolean failed = false;
+                    if(labelP.contains("Inf") && labelP.contains("Mech"))
+                    {
+                        message = message + mechOrInfCheck(planetName, activeMap);
+                        failed = message.contains("Please try again.");
+                    }
+
+                    if(!failed)
+                    {
+                        new PlanetRefresh().doAction(player, planetName, activeMap);
+                        message = message + "Readied "+ planetName;
+                    }
+                    addReaction(event, false, false, message, "");
+                }
+                case "gain_CC"-> {
+                    String message = "";
+                    String labelP = event.getButton().getLabel();
+                    String planetName = labelP.substring(labelP.lastIndexOf(" ")+1, labelP.length());
+                    boolean failed = false;
+                    if(labelP.contains("Inf") && labelP.contains("Mech"))
+                    {
+                        message = message + mechOrInfCheck(planetName, activeMap);
+                        failed = message.contains("Please try again.");
+                    }
+
+                    if(!failed)
+                    {
+                        String message2 = "Resolve cc gain using the buttons.";   
+                        Button getTactic= Button.success("incease_tactic_cc", "Gain 1 Tactic CC");
+                        Button getFleet = Button.success("incease_fleet_cc", "Gain 1 Fleet CC");
+                        Button getStrat= Button.success("incease_strategy_cc", "Gain 1 Strategy CC");
+                        ActionRow actionRow4 = ActionRow.of(List.of(getTactic, getFleet, getStrat));
+                        MessageCreateBuilder baseMessageObject4 = new MessageCreateBuilder().addContent(message2);
+                        if (!actionRow4.isEmpty()) baseMessageObject4.addComponents(actionRow4);
+                             event.getChannel().sendMessage(baseMessageObject4.build()).queue(message4_ -> {
+                        });
+
+                    }
+                    addReaction(event, false, false, message, "");
+
                 }
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
         }
         MapSaveLoadManager.saveMap(activeMap, event);
     }
+
+    private String mechOrInfCheck(String planetName, Map activeMap)
+    {
+        String message = "";
+        Tile tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
+        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        int numMechs = 0;
+        int numInf = 0;
+        
+        if (unitHolder.getUnits() != null)
+        {
+            if(unitHolder.getUnits().get("grn_mf.png") != null)
+            {
+                numMechs = unitHolder.getUnits().get("grn_mf.png");
+            }
+            if(unitHolder.getUnits().get("grn_gf.png")!=null)
+            {
+                numInf = unitHolder.getUnits().get("grn_gf.png");
+            }
+        }
+        if (numMechs > 0 || numInf > 0)
+        {
+            if (numMechs > 0)
+            {
+                message = "Planet had a mech. ";
+            }
+            else
+            {
+                message = "Planet did not have a mech. Removed 1 infantry ("+numInf+"->"+(numInf-1)+"). ";
+                tile.removeUnit(planetName, "grn_gf.png", 1);
+            }
+        }
+        else
+        {
+            message = "Planet did not have a mech or infantry. Please try again.";
+        }
+        return message;
+    }
+
 
     private boolean addUsedSCPlayer(String messageID, Map map, Player player, @NotNull ButtonInteractionEvent event, String text) {
         Set<Player> players = playerUsedSC.get(messageID);
