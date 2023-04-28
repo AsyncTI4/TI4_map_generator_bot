@@ -84,7 +84,7 @@ public class AddTileList implements Command {
                 tile = new Tile(AliasHandler.resolveTile(Constants.MALLICE), "TL");
                 userActiveMap.setTile(tile);
                 if (!tileList.startsWith("{") && !tileList.contains("}")) {
-                    tile = new Tile(AliasHandler.resolveTile(Constants.MR), "0a");
+                    tile = new Tile(AliasHandler.resolveTile(Constants.MR), "000");
                     userActiveMap.setTile(tile);
                 }
             } catch (Exception e) {
