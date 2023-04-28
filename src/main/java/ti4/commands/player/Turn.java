@@ -167,7 +167,7 @@ public class Turn extends PlayerSubcommandData {
         if (!map.isStratPings()) return null;
         boolean sendReminder = false;
         
-        StringBuilder sb = new StringBuilder("This is a reminder that you have not yet followed SC(s): ");
+        StringBuilder sb = new StringBuilder("> Please react to ");
 
         for (int sc : map.getPlayedSCs()) {
             if (!player.hasFollowedSC(sc)) {   
@@ -175,6 +175,7 @@ public class Turn extends PlayerSubcommandData {
                 sendReminder = true;
             }
         }
+        sb.append(" above before taking your turn.");
         return sendReminder ? sb.toString() : null;
     }
 
