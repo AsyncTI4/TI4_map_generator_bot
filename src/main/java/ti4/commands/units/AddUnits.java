@@ -1,5 +1,6 @@
 package ti4.commands.units;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -16,10 +17,12 @@ public class AddUnits extends AddRemoveUnits {
     @Override
     protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color) {
         tile.addUnit(planetName, unitID, count);
-        
+    }
+    @Override
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color) {
+        tile.addUnit(planetName, unitID, count);
     }
 
-    @Override
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map) {
         OptionMapping option = event.getOption(Constants.CC_USE);
         if (option != null){

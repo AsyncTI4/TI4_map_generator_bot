@@ -3,6 +3,7 @@ package ti4.helpers;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -547,6 +548,8 @@ public class FoWHelper {
 			MessageHelper.replyToMessage(event, "Succesfully sent all pings.");
 		}
 	}
+
+	
 
 	private static boolean initializeAndCheckStatVisibility(Map map, Player player, Player viewer) {
 		if (viewer == player) return false;
