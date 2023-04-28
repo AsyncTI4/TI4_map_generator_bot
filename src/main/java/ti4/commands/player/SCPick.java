@@ -36,12 +36,23 @@ public class SCPick extends PlayerSubcommandData {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
-
+        
         Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
         boolean isFowPrivateGame = (privateGame != null && privateGame);
-
+        
         if (player == null) {
             sendMessage("You're not a player of this game");
+            return;
+        }
+
+        Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
+                .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("null"))
+                .collect(Collectors.toList());
+        int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
+
+        int playerSCCount = player.getSCs().size();
+        if (playerSCCount >= maxSCsPerPlayer) {
+            sendMessage("Player can not pick another SC. Max SC per player for this game is " + maxSCsPerPlayer);
             return;
         }
         
@@ -49,7 +60,10 @@ public class SCPick extends PlayerSubcommandData {
         int scPicked = option.getAsInt();
         
         Stats stats = new Stats();
-        stats.pickSC(event, activeMap, player, option);
+        boolean pickSuccessful = stats.pickSC(event, activeMap, player, option);
+        if (!pickSuccessful) {
+            return;
+        }
         LinkedHashSet<Integer> playerSCs = player.getSCs();
 
         //ONLY DEAL WITH EXTRA PICKS IF IN FoW
@@ -82,18 +96,14 @@ public class SCPick extends PlayerSubcommandData {
         sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(event, scPicked));
 
         boolean nextCorrectPing = false;
-        Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
-                .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("null"))
-                .collect(Collectors.toList());
-        int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
         Queue<Player> players = new ArrayDeque<>(activePlayers);
         while (players.iterator().hasNext()) {
             Player player_ = players.poll();
             if (player_ == null || !player_.isRealPlayer()) {
                 continue;
             }
-            int playerSCCount = player_.getSCs().size();
-            if (nextCorrectPing && playerSCCount < maxSCsPerPlayer && player_.getFaction() != null) {
+            int player_SCCount = player_.getSCs().size();
+            if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
                 msgExtra += Helper.getPlayerRepresentation(event, player_, true) + " To Pick SC";
                 privatePlayer = player_;
                 allPicked = false;
@@ -102,7 +112,7 @@ public class SCPick extends PlayerSubcommandData {
             if (player_ == player) {
                 nextCorrectPing = true;
             }
-            if (playerSCCount < maxSCsPerPlayer && player_.getFaction() != null) {
+            if (player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
                 players.add(player_);
             }
         }
