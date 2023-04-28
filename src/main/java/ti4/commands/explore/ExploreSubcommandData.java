@@ -293,7 +293,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     player.setTg(player.getTg()+2);
                     message = "Gained 2 tgs. ";
                 }
-                else if(cardID.equalsIgnoreCase("ent"))
+                else if(cardID.equalsIgnoreCase("majent"))
                 {
                     player.setTg(player.getTg()+3);
                     message = "Gained 3 tgs. ";
