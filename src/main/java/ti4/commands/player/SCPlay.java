@@ -30,7 +30,7 @@ import ti4.message.MessageHelper;
 public class SCPlay extends PlayerSubcommandData {
     public SCPlay() {
         super(Constants.SC_PLAY, "Play SC");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Which SC to play. Defaults to your lowest SC"));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Which SC to play. If you have more than 1 SC, this is mandatory"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
