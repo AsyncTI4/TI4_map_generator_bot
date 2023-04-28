@@ -155,6 +155,10 @@ public class Stats extends PlayerSubcommandData {
 							+ Helper.getSCBackEmojiFromInteger(sc) + " (played)");
 				} else if ("n".equals(value) || "no".equals(value)) {
 					activeMap.setSCPlayed(sc, false);
+
+					for (Player player_ : activeMap.getPlayers().values()) {
+						player_.setSCFollowedStatus(sc, true);
+					}
 					message.append("> flipped " + Helper.getSCBackEmojiFromInteger(sc) + " to "
 							+ Helper.getSCEmojiFromInteger(sc) + " (unplayed)");
 				}
