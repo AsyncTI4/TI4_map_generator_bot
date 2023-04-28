@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.entities.emoji.*;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
-
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
@@ -15,8 +14,11 @@ import ti4.MessageListener;
 import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsso.ScoreSO;
+import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.status.ScorePublic;
+import ti4.commands.units.AddUnits;
 import ti4.helpers.Constants;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -28,6 +30,8 @@ import ti4.message.MessageHelper;
 
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import javax.lang.model.util.ElementScanner14;
 
 public class ButtonListener extends ListenerAdapter {
     public static HashMap<Guild, HashMap<String, Emoji>> emoteMap = new HashMap<>();
@@ -220,6 +224,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String message = "Drew Secret Objective";
                     activeMap.drawSecretObjective(player.getUserID());
+                    player.setSCFollowedStatus(8, true);
                     ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
                     addReaction(event, false, false, message, "");
                 }
@@ -312,6 +317,106 @@ public class ButtonListener extends ListenerAdapter {
                 case "no_after" -> {
                     String message = activeMap.isFoWMode() ? "No afters" : null;
                     addReaction(event, false, false, message, "");
+                }
+                case "gain_2_comms" -> {
+                    if(player.getCommodities()+2 > player.getCommoditiesTotal())
+                    {
+                        player.setCommodities(player.getCommoditiesTotal());
+                        addReaction(event, false, false, "Gained Commodities to Max", "");
+                    }
+                    else
+                    {
+                        player.setCommodities(player.getCommodities()+2);
+                        addReaction(event, false, false, "Gained 2 Commodities", "");
+                    }
+                }
+                case "covert_2_comms" -> {
+                    if(player.getCommodities() > 1)
+                    {
+                        player.setCommodities(player.getCommodities()-2);
+                        player.setTg(player.getTg()+2);
+                        addReaction(event, false, false, "Coverted 2 Commodities to 2 tg", "");
+                    }
+                    else
+                    {
+                        player.setTg(player.getTg()+player.getCommodities());
+                        player.setCommodities(0);
+                        addReaction(event, false, false, "Converted all remaining commodies (less than 2) into tg", "");
+                    }
+                }
+                case "gain_1_comms" -> {
+                    if(player.getCommodities()+1 > player.getCommoditiesTotal())
+                    {
+                        player.setCommodities(player.getCommoditiesTotal());
+                        addReaction(event, false, false,"Gained No Commodities (at max already)", "");
+
+                    }
+                    else
+                    {
+                        player.setCommodities(player.getCommodities()+1);
+                        addReaction(event, false, false,"Gained 1 Commodity", "");
+                    }
+                }
+                case "spend_comm_for_AC" -> {
+                    boolean isYssaril = player.getFaction().equals("yssaril");
+                    int count2 = isYssaril ? 2 : 1;
+                    if(player.getCommodities() > 0)
+                    {
+                        player.setCommodities(player.getCommodities()-1);
+                        for (int i = 0; i < count2; i++) {
+                            activeMap.drawActionCard(player.getUserID());
+                        }
+                        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                        addReaction(event, false, false,"Spent 1 commodity for an AC", "");
+                    }
+                    else if(player.getTg() > 0)
+                    {
+                        player.setTg(player.getTg()-1);
+                        for (int i = 0; i < count2; i++) {
+                            activeMap.drawActionCard(player.getUserID());
+                        }
+                        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                        addReaction(event, false, false,"Spent 1 tg for an AC", "");
+
+                    }
+                    else{
+                        addReaction(event, false, false,"Didn't have any comms/tg to spend, no AC drawn", "");
+                    }
+                }
+                case "spend_comm_for_mech" -> {
+                    String labelP = event.getButton().getLabel();
+                    String planetName = labelP.substring(labelP.lastIndexOf(" ")+1, labelP.length());
+                    if(player.getCommodities() > 0)
+                    {
+                        player.setCommodities(player.getCommodities()-1);
+                         new AddUnits().unitParsing(event, player.getColor(), activeMap.getTile(AliasHandler.resolveTile(planetName)), "mech "+planetName, activeMap);
+                        addReaction(event, false, false, "Spent 1 commodity for a mech on "+planetName, "");
+                    }
+                    else if(player.getTg() > 0)
+                    {
+                        player.setTg(player.getTg()-1);
+                        new AddUnits().unitParsing(event, player.getColor(), activeMap.getTile(AliasHandler.resolveTile(planetName)), "mech "+planetName, activeMap);
+                        addReaction(event, false, false, "Spent 1 tg for a mech on "+ planetName, "");
+                    }
+                    else{
+                        addReaction(event, false, false, "Didn't have any comms/tg to spend, no mech placed", "");
+                    }
+                }
+                case "incease_strategy_cc" -> {
+                    player.setStrategicCC(player.getStrategicCC()+1);
+                    addReaction(event, false, false, "Increased Strategy Pool CCs By 1", "");
+                }
+                case "incease_tactic_cc" -> {
+                    player.setTacticalCC(player.getTacticalCC()+1);
+                    addReaction(event, false, false, "Increased Tactic Pool CCs By 1", "");
+                }
+                case "incease_fleet_cc" -> {
+                    player.setFleetCC(player.getFleetCC()+1);
+                    addReaction(event, false, false, "Increased Fleet Pool CCs By 1", "");
+                }
+                case "incease_tg_by_1" -> {
+                    player.setTg(player.getTg()+1);
+                    addReaction(event, false, false, "Increased Tgs By 1", "");
                 }
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
