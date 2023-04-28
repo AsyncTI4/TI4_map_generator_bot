@@ -1391,7 +1391,8 @@ public class GenerateMap {
             }
 
             //PAINT SC#
-            Set<Integer> playerSCs = player.getSCs();
+            List<Integer> playerSCs = new ArrayList<>(player.getSCs());
+            Collections.sort(playerSCs);
             int count = 0;
             for (int sc : playerSCs) {
                 String scText = sc == 0 ? " " : Integer.toString(sc);
