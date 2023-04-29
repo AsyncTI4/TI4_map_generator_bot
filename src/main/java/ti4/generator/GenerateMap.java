@@ -360,22 +360,65 @@ public class GenerateMap {
                     }
                 }
                 y += 4;
-                int sc = player.getSC();
-                String scText = sc == 0 ? " " : Integer.toString(sc);
-                if (sc != 0) {
-                    scText = getSCNumberIfNaaluInPlay(player, map, scText);
-                }
-                graphics.setColor(getSCColor(sc, map));
-                graphics.setFont(Storage.getFont64());
 
-                if (scText.contains("0/")) {
-                    graphics.drawString("0", x + 90, y + 70 + yDelta);
-                    graphics.setFont(Storage.getFont32());
-                    graphics.setColor(Color.WHITE);
-                    graphics.drawString(Integer.toString(sc), x + 120, y + 80 + yDelta);
-                } else {
-                    graphics.drawString(scText, x + 90, y + 70 + yDelta);
+                //PAINT SCs
+                Set<Integer> playerSCs = player.getSCs();
+                if (playerSCs.size() == 1) {
+                    int sc = playerSCs.stream().findFirst().get();
+                    String scText = sc == 0 ? " " : Integer.toString(sc);
+                    if (sc != 0) {
+                        scText = getSCNumberIfNaaluInPlay(player, map, scText);
+                    }
+                    graphics.setColor(getSCColor(sc, map));
+                    graphics.setFont(Storage.getFont64());
+
+                    if (scText.contains("0/")) {
+                        graphics.drawString("0", x + 90, y + 70 + yDelta);
+                        graphics.setFont(Storage.getFont32());
+                        graphics.setColor(Color.WHITE);
+                        graphics.drawString(Integer.toString(sc), x + 120, y + 80 + yDelta);
+                    } else {
+                        graphics.drawString(scText, x + 90, y + 70 + yDelta);
+                    }
+                } else { //if (playerSCs.size() <= 4) {
+                    int count = 1;
+                    int row = 0;
+                    int col = 0;
+                    for (int sc : playerSCs) {
+                        if (count == 5) break;
+                        switch (count) {
+                            case 2 -> {
+                                col = 1;
+                            }
+                            case 3 -> {
+                                row = 1;
+                                col = 0;
+                            }
+                            case 4 -> {
+                                row = 1;
+                                col = 1;
+                            }
+                        }
+                        String scText = sc == 0 ? " " : Integer.toString(sc);
+                        if (sc != 0) {
+                            scText = getSCNumberIfNaaluInPlay(player, map, scText);
+                        }
+                        graphics.setColor(getSCColor(sc, map));
+                        
+                        if (scText.contains("0/")) {
+                            graphics.setFont(Storage.getFont64());
+                            graphics.drawString("0", x + 90, y + 70 + yDelta);
+                            graphics.setFont(Storage.getFont32());
+                            graphics.setColor(Color.WHITE);
+                            graphics.drawString(Integer.toString(sc), x + 120, y + 80 + yDelta);
+                        } else {
+                            drawCenteredString(graphics, scText, new Rectangle(x + 90 + 32 * col, y + 70 - 64 + 32 * row, 32, 32), Storage.getFont32());
+                        }
+                        count++;
+                    }
                 }
+
+
                 if (player.isPassed()) {
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(new Color(238, 58, 80));
@@ -1244,7 +1287,10 @@ public class GenerateMap {
         y += 80;
         LinkedHashMap<Integer, Integer> scTradeGoods = map.getScTradeGoods();
         Collection<Player> players = map.getPlayers().values();
-        Set<Integer> scPicked = players.stream().map(Player::getSC).collect(Collectors.toSet());
+        Set<Integer> scPicked = new HashSet<>();
+        for (Player player : players) {
+            scPicked.addAll(player.getSCs());
+        }
         HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
         int x = 20;
         for (java.util.Map.Entry<Integer, Integer> scTGs : scTradeGoods.entrySet()) {
@@ -1344,15 +1390,23 @@ public class GenerateMap {
                 }
             }
 
-            int sc = player.getSC();
-            String scText = sc == 0 ? " " : Integer.toString(sc);
-            scText = getSCNumberIfNaaluInPlay(player, map, scText);
-            graphics.setColor(getSCColor(sc, map));
-            graphics.setFont(Storage.getFont64());
-            point = PositionMapper.getPlayerStats(Constants.STATS_SC);
-            if (sc != 0) {
-                graphics.drawString(scText, point.x + deltaX, point.y + deltaY);
+            //PAINT SC#
+            List<Integer> playerSCs = new ArrayList<>(player.getSCs());
+            Collections.sort(playerSCs);
+            int count = 0;
+            for (int sc : playerSCs) {
+                String scText = sc == 0 ? " " : Integer.toString(sc);
+                scText = getSCNumberIfNaaluInPlay(player, map, scText);
+                graphics.setColor(getSCColor(sc, map));
+                graphics.setFont(Storage.getFont64());
+                point = PositionMapper.getPlayerStats(Constants.STATS_SC);
+                if (sc != 0) {
+                    graphics.drawString(scText, point.x + deltaX + 64 * count, point.y + deltaY);
+                }
+                count++;
             }
+
+
             graphics.setColor(Color.WHITE);
             graphics.setFont(Storage.getFont32());
             String ccID = Mapper.getCCID(player.getColor());

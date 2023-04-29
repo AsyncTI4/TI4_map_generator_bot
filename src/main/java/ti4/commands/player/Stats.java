@@ -29,7 +29,7 @@ public class Stats extends PlayerSubcommandData {
 				.addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count"))
 				.addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
 				.addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number count"))
-				.addOptions(new OptionData(OptionType.STRING, Constants.SC_PLAYED, "Strategy Card played y/n"))
+				.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card from played to unplayed or unplayer to played"))
 				.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player passed y/n"))
 				.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
 				.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
@@ -146,14 +146,14 @@ public class Stats extends PlayerSubcommandData {
 		OptionMapping optionSCPlayed = event.getOption(Constants.SC_PLAYED);
 		if (optionSCPlayed != null) {
 			StringBuilder message = new StringBuilder();
-			int sc = player.getSC();
+			int sc = optionSCPlayed.getAsInt();
 			if (sc > 0) {
-				String value = optionSCPlayed.getAsString().toLowerCase();
-				if ("y".equals(value) || "yes".equals(value)) {
+				boolean scIsPlayed = activeMap.getScPlayed().get(sc);
+				if (!scIsPlayed) {
 					activeMap.setSCPlayed(sc, true);
 					message.append("> flipped " + Helper.getSCEmojiFromInteger(sc) + " to "
 							+ Helper.getSCBackEmojiFromInteger(sc) + " (played)");
-				} else if ("n".equals(value) || "no".equals(value)) {
+				} else {
 					activeMap.setSCPlayed(sc, false);
 
 					for (Player player_ : activeMap.getPlayers().values()) {
@@ -162,7 +162,7 @@ public class Stats extends PlayerSubcommandData {
 						}
 						String faction = player_.getFaction();
 						if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
-						player_.setSCFollowedStatus(sc, true);
+						player_.addFollowedSC(sc);
 					}
 					message.append("> flipped " + Helper.getSCBackEmojiFromInteger(sc) + " to "
 							+ Helper.getSCEmojiFromInteger(sc) + " (unplayed)");
@@ -195,11 +195,14 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("   ").append(Emojis.IFrag).append(player.getIrf());
 		sb.append("   ").append(Emojis.HFrag).append(player.getHrf());
 		sb.append("   ").append(Emojis.UFrag).append(player.getVrf());
-		if (player.getSC() > 0) {
-			if (getActiveMap().getScPlayed().get(player.getSC())) {
-				sb.append("      ").append(Helper.getSCBackEmojiFromInteger(player.getSC())).append(" (Played)");
-			} else {
-				sb.append("      ").append(Helper.getSCEmojiFromInteger(player.getSC())).append(" (Ready)");
+		if (!player.getSCs().isEmpty()) {
+			sb.append("      ");
+			for (int sc: player.getSCs()) {
+				if (getActiveMap().getScPlayed().get(sc)) {
+					sb.append(Helper.getSCBackEmojiFromInteger(sc));
+				} else {
+					sb.append(Helper.getSCEmojiFromInteger(sc));
+				}
 			}
 		} else {
 			sb.append("      No SC Picked");
@@ -229,8 +232,10 @@ public class Stats extends PlayerSubcommandData {
 		GenerateMap.getInstance().saveImage(activeMap, event);
 	}
 
-	public void pickSC(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping optionSC) {
-		if (optionSC != null) {
+	public boolean pickSC(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping optionSC) {
+			if (optionSC == null) {
+				return false;
+			}
 			if (activeMap.isMapOpen() && !activeMap.isCommunityMode()) {
 				activeMap.setMapStatus(MapStatus.locked);
 			}
@@ -238,48 +243,39 @@ public class Stats extends PlayerSubcommandData {
 			LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
 			if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
 				MessageHelper.sendMessageToChannel(event.getChannel(), "Can pick SC only if faction and color picked");
-				return;
+				return false;
 			}
-			if (!scTradeGoods.containsKey(scNumber) && scNumber != 0) {
-				MessageHelper.sendMessageToChannel(event.getChannel(),
-						"Strategy Card must be from possible ones in Game");
-			} else {
-				if (scNumber > 0) {
-					LinkedHashMap<String, Player> players = activeMap.getPlayers();
-					boolean scPickedAlready = false;
-					for (Player playerStats : players.values()) {
-						if (playerStats.getSC() == scNumber) {
-							MessageHelper.sendMessageToChannel(event.getChannel(), "SC #"+scNumber+" is already picked.");
-							scPickedAlready = true;
-							break;
-						}
-					}
-					if (!scPickedAlready) {
-						player.setSC(scNumber);
-						String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) + " picked SC #"+scNumber;
-						if (activeMap.isFoWMode()) {
-							FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
-						}
-						Integer tgCount = scTradeGoods.get(scNumber);
-						if (tgCount != null && tgCount != 0) {
-							int tg = player.getTg();
-							tg += tgCount;
-							messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
-							MessageHelper.sendMessageToChannel(event.getChannel(),"You gained "+tgCount +" tgs from picking SC #"+scNumber);
-							if (activeMap.isFoWMode()) {
-								FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
-							}
-							
-							player.setTg(tg);
-						}
-					}
-				} else if (scNumber == 0) {
-					int sc = player.getSC();
-					player.setSC(scNumber);
-					activeMap.setSCPlayed(sc, false);
+			if (!scTradeGoods.containsKey(scNumber)) {
+				MessageHelper.sendMessageToChannel(event.getChannel(),"Strategy Card must be from possible ones in Game");
+				return false;
+			}
+
+			LinkedHashMap<String, Player> players = activeMap.getPlayers();
+			for (Player playerStats : players.values()) {
+				if (playerStats.getSCs().contains(scNumber)) {
+					MessageHelper.sendMessageToChannel(event.getChannel(), "SC #"+scNumber+" is already picked by this player.");
+					return false;
 				}
 			}
-		}
+	
+			player.addSC(scNumber);
+			String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) + " picked SC #"+scNumber;
+			if (activeMap.isFoWMode()) {
+				FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+			}
+			Integer tgCount = scTradeGoods.get(scNumber);
+			if (tgCount != null && tgCount != 0) {
+				int tg = player.getTg();
+				tg += tgCount;
+				messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
+				MessageHelper.sendMessageToChannel(event.getChannel(),"You gained "+tgCount +" tgs from picking SC #"+scNumber);
+				if (activeMap.isFoWMode()) {
+					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
+				}
+				
+				player.setTg(tg);
+			}
+			return true;
 	}
 
 	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, OptionMapping option,

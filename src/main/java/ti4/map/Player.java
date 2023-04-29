@@ -45,7 +45,7 @@ public class Player {
     private int commoditiesTotal = 0;
     private int stasisInfantry = 0;
 
-    private boolean[] stratfollows = { true, true, true, true, true, true, true, true };
+    private Set<Integer> followedSCs = new HashSet<>();
 
     private LinkedHashMap<String, Integer> actionCards = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
@@ -83,7 +83,7 @@ public class Player {
     private ArrayList<String> fragments = new ArrayList<>();
     private List<String> relics = new ArrayList<>();
     private List<String> exhaustedRelics = new ArrayList<>();
-    private int SC = 0;
+    private LinkedHashSet<Integer> SCs = new LinkedHashSet<>();
 
     // Statistics
     private int numberOfTurns = 0;
@@ -741,13 +741,28 @@ public class Player {
         this.tg = tg;
     }
 
-    public void setSCFollowedStatus (int scnumber, boolean followed)
-    {
-        stratfollows[scnumber -1] = followed;
+    public void setFollowedSCs(Set<Integer> followedSCs) {
+        this.followedSCs = followedSCs;
     }
-    public boolean getSCFollowedStatus (int scnumber)
-    {
-        return stratfollows[scnumber -1];
+
+    public void addFollowedSC(Integer sc) {
+        this.followedSCs.add(sc);
+    }
+
+    public void removeFollowedSC(Integer sc) {
+        this.followedSCs.remove(sc);
+    }
+
+    public boolean hasFollowedSC(int sc) {
+        return getFollowedSCs().contains(sc);
+    }
+
+    public void clearFollowedSCs() {
+        this.followedSCs.clear();
+    }
+
+    public Set<Integer> getFollowedSCs() {
+        return this.followedSCs;
     }
 
     @JsonIgnore
@@ -770,12 +785,32 @@ public class Player {
         return secretsScored.size();
     }
 
-    public int getSC() {
-        return SC;
+    public LinkedHashSet<Integer> getSCs() {
+        return SCs;
     }
 
-    public void setSC(int SC) {
-        this.SC = SC;
+    public void setSCs(LinkedHashSet<Integer> SCs) {
+        this.SCs = SCs;
+    }
+
+    public void addSC(int sc) {
+        SCs.add(sc);
+    }
+
+    public void removeSC(int sc) {
+        SCs.remove(sc);
+    }
+
+    public void clearSCs() {
+        SCs.clear();
+    }
+
+    public int getLowestSC() {
+        try {
+            return Collections.min(getSCs());
+        } catch (NoSuchElementException e) {
+            return 100;
+        }
     }
 
     public int getCommodities() {
