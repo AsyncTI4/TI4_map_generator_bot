@@ -83,7 +83,7 @@ public class SOInfo extends SOCardsSubcommandData {
         }
         StringBuilder sb = new StringBuilder();
         int index = 1;
-        sb.append("_ _\n");
+        sb.append(Helper.getPlayerPing(player)).append("\n");
 
         //SCORED SECRET OBJECTIVES
         sb.append("**Scored Secret Objectives:**").append("\n");
