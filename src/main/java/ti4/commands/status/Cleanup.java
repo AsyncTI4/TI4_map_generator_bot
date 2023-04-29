@@ -20,14 +20,19 @@ public class Cleanup extends StatusSubcommandData {
     }
 
     @Override
+
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())){
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-
         Map activeMap = getActiveMap();
+        runStatusCleanup(activeMap);
+    }
+
+    public void runStatusCleanup(Map activeMap) {
+
         HashMap<String, Tile> tileMap = activeMap.getTileMap();
         for (Tile tile : tileMap.values()) {
             tile.removeAllCC();

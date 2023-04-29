@@ -663,6 +663,10 @@ public class Helper {
         return getGamePing(event.getGuild(), activeMap);
     }
 
+    public static String getGamePing(GenericInteractionCreateEvent event, Map activeMap) {
+        return getGamePing(event.getGuild(), activeMap);
+    }
+
     public static String getGamePing(@NotNull Guild guild, @NotNull Map activeMap) {
         if (guild != null) {
             for (Role role : guild.getRoles()) {

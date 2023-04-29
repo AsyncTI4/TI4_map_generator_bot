@@ -1,6 +1,8 @@
 package ti4.commands.agenda;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -25,12 +27,16 @@ public class RevealAgenda extends AgendaSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-
         OptionMapping revealFromBottomOption = event.getOption(Constants.REVEAL_FROM_BOTTOM);
         boolean revealFromBottom = false;
         if (revealFromBottomOption != null) {
             revealFromBottom = revealFromBottomOption.getAsBoolean();
         }
+        revealAgenda(event, revealFromBottom, activeMap, event.getChannel());
+    }
+
+
+    public void revealAgenda(GenericInteractionCreateEvent event, boolean revealFromBottom, Map activeMap, MessageChannel channel) {
 
         String id = activeMap.revealAgenda(revealFromBottom);
         LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
@@ -49,8 +55,8 @@ public class RevealAgenda extends AgendaSubcommandData {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
         
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), Emojis.nowhens, whenButtons);
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), Emojis.noafters, afterButtons);
-        ListVoteCount.turnOrder(event, activeMap);
+        MessageHelper.sendMessageToChannelWithButtons(channel, Emojis.nowhens, whenButtons);
+        MessageHelper.sendMessageToChannelWithButtons(channel, Emojis.noafters, afterButtons);
+        ListVoteCount.turnOrder(event, activeMap, channel);
     }
 }
