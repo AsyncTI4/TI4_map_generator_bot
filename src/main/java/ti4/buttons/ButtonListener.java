@@ -502,11 +502,12 @@ public class ButtonListener extends ListenerAdapter {
         int numMechs = 0;
         int numInf = 0;
         System.out.println(unitHolder.getUnits());
+        String colorID = Mapper.getColorID(player.getColor());
+        String mechKey = colorID + "_mf.png";
+        String infKey = colorID + "_gf.png";
         if (unitHolder.getUnits() != null)
         {
-            String colorID = Mapper.getColorID(player.getColor());
-            String mechKey = colorID + "_mf.png";
-            String infKey = colorID + "_gf.png";
+            
             if(unitHolder.getUnits().get(mechKey) != null)
             {
                 numMechs = unitHolder.getUnits().get(mechKey);
@@ -525,7 +526,7 @@ public class ButtonListener extends ListenerAdapter {
             else
             {
                 message = "Planet did not have a mech. Removed 1 infantry ("+numInf+"->"+(numInf-1)+"). ";
-                tile.removeUnit(planetName, "grn_gf.png", 1);
+                tile.removeUnit(planetName, infKey, 1);
             }
         }
         else
