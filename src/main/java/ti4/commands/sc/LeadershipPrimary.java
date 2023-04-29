@@ -17,9 +17,7 @@ import java.util.StringTokenizer;
 public class LeadershipPrimary extends SCSubcommandData {
 	public LeadershipPrimary() {
 		super(Constants.LEADERSHIP_PRIMARY, "Leadership primary");
-		addOptions(
-				new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()")
-						.setRequired(true));
+		addOptions(new OptionData(OptionType.INTEGER, Constants.ACTION_CARD_ID, "Action Card ID that is sent between ()").setRequired(true));
 		addOptions(new OptionData(OptionType.STRING, Constants.TACTICAL, "Tactical command counter count"));
 		addOptions(new OptionData(OptionType.STRING, Constants.FLEET, "Fleet command counter count"));
 		addOptions(new OptionData(OptionType.STRING, Constants.STRATEGY, "Strategy command counter count"));
