@@ -155,6 +155,15 @@ public class Stats extends PlayerSubcommandData {
 							+ Helper.getSCBackEmojiFromInteger(sc) + " (played)");
 				} else {
 					activeMap.setSCPlayed(sc, false);
+
+					for (Player player_ : activeMap.getPlayers().values()) {
+						if (!player_.isRealPlayer()) {
+							continue;
+						}
+						String faction = player_.getFaction();
+						if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
+						player_.setSCFollowedStatus(sc, true);
+					}
 					message.append("> flipped " + Helper.getSCBackEmojiFromInteger(sc) + " to "
 							+ Helper.getSCEmojiFromInteger(sc) + " (unplayed)");
 				}
