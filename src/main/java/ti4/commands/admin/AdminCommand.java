@@ -100,6 +100,7 @@ public class AdminCommand implements Command {
         subcommands.add(new DrawSpecificSOForPlayer());
         subcommands.add(new Statistics());
         subcommands.add(new SetGlobalSetting());
+        subcommands.add(new UpdateThreadArchiveTime());
         return subcommands;
     }
 
