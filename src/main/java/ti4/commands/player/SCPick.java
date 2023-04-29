@@ -51,7 +51,7 @@ public class SCPick extends PlayerSubcommandData {
         int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
 
         int playerSCCount = player.getSCs().size();
-        if (playerSCCount >= maxSCsPerPlayer) {
+        if (playerSCCount > maxSCsPerPlayer) { //TEMP FIX - PUT BACK LATER    if (playerSCCount >= maxSCsPerPlayer) {
             sendMessage("Player can not pick another SC. Max SC per player for this game is " + maxSCsPerPlayer);
             return;
         }
