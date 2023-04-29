@@ -44,8 +44,8 @@ public class AutoCompleteProvider {
             case Constants.COLOR -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Mapper.getColors().stream()
-                        .limit(25)
                         .filter(color -> color.startsWith(enteredValue))
+                        .limit(25)
                         .map(color -> new Command.Choice(color, color))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
