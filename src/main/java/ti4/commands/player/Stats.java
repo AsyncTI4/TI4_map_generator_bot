@@ -162,7 +162,7 @@ public class Stats extends PlayerSubcommandData {
 						}
 						String faction = player_.getFaction();
 						if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
-						player_.setSCFollowedStatus(sc, true);
+						player_.addFollowedSC(sc);
 					}
 					message.append("> flipped " + Helper.getSCBackEmojiFromInteger(sc) + " to "
 							+ Helper.getSCEmojiFromInteger(sc) + " (unplayed)");

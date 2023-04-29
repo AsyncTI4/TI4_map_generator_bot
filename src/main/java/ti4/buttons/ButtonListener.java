@@ -230,7 +230,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String message = "Drew Secret Objective";
                     activeMap.drawSecretObjective(player.getUserID());
-                    player.setSCFollowedStatus(8, true);
+                    player.addFollowedSC(8);
                     ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
                     addReaction(event, false, false, message, "");
                 }
