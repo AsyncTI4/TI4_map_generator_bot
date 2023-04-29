@@ -48,7 +48,7 @@ public class MoveUnits extends AddRemoveUnits {
         Map activeMap = mapManager.getUserActiveMap(userID);
         tile = getTile(event, tileID, activeMap);
         if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile: " + tileID + " not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile: " + tileID + " not found. Please try a different name or just use position coordinate");
             return;
         }
 
