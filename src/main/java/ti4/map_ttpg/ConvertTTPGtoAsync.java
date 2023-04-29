@@ -218,7 +218,7 @@ public class ConvertTTPGtoAsync {
             //PLAYER STRATEGY CARDS
             if (!ttpgPlayer.getStrategyCards().isEmpty()) {
                 String ttpgSC = (String) ttpgPlayer.getStrategyCards().get(0);
-                if (Objects.nonNull(ttpgSC)) asyncPlayer.setSC(Helper.getSCNumber(ttpgSC));
+                if (Objects.nonNull(ttpgSC)) asyncPlayer.addSC(Helper.getSCNumber(ttpgSC));
             }
             if (!ttpgPlayer.getStrategyCardsFaceDown().isEmpty()) {
                 String ttpgSCplayed = (String) ttpgPlayer.getStrategyCardsFaceDown().get(0);

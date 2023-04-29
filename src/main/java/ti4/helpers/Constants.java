@@ -248,6 +248,7 @@ public class Constants {
     public static final String SC_FOLLOW = "sc_follow";
     public static final String SC_PLAY = "sc_play";
     public static final String SC_PICK = "sc_pick";
+    public static final String SC_UNPICK = "sc_unpick";
     public static final String PASS = "pass";
     public static final String TURN = "turn_end";
     public static final String SPEAKER = "speaker";
@@ -610,6 +611,7 @@ public class Constants {
     public static final String LATEST_COMMAND = "latest_command";
     public static final String LIST_MY_GAMES = "list_my_games";
     public static final String RELIC_SEND = "relic_send";
+    public static final String FOLLOWED_SC = "followed_sc";
     public static final String SC_FOLLOW_1 = "sc_follow_1";
     public static final String SC_FOLLOW_2 = "sc_follow_2";
     public static final String SC_FOLLOW_3 = "sc_follow_3";

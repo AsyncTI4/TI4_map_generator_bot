@@ -500,6 +500,11 @@ public class Map {
         return scPlayed;
     }
 
+    @JsonIgnore
+    public List<Integer> getPlayedSCs() {
+        return getScPlayed().entrySet().stream().filter(e -> e.getValue()).map(e -> e.getKey()).toList();
+    }
+
     public DisplayType getDisplayTypeForced() {
         return displayTypeForced;
     }
@@ -646,6 +651,24 @@ public class Map {
     public void setScTradeGood(Integer sc, Integer tradeGoodCount) {
         if (Objects.isNull(tradeGoodCount)) tradeGoodCount = 0;
         scTradeGoods.put(sc, tradeGoodCount);
+    }
+
+    @JsonIgnore
+    public List<Integer> getSCList() {
+        return (new ArrayList<Integer>(getScTradeGoods().keySet()));
+    }
+
+    /** Add an additonal Strategy Card to use
+     * @param sc the integer value of the new strategy card
+     */
+    public void addSC(int sc) {
+        if(!getSCList().contains(sc)) {
+            setScTradeGood(sc, null);
+        }
+    }
+
+    public void purgeSC(int sc) {
+        scTradeGoods.remove(sc);
     }
 
     public void setScPlayed(HashMap<Integer, Boolean> scPlayed) {

@@ -1,13 +1,17 @@
 package ti4.commands.player;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -26,6 +30,7 @@ import ti4.message.MessageHelper;
 public class SCPlay extends PlayerSubcommandData {
     public SCPlay() {
         super(Constants.SC_PLAY, "Play SC");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Which SC to play. If you have more than 1 SC, this is mandatory"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
@@ -46,32 +51,38 @@ public class SCPlay extends PlayerSubcommandData {
             sendMessage("You're not a player of this game");
             return;
         }
-
-        int sc = player.getSC();
-        String emojiName = "SC" + String.valueOf(sc);
-        if (sc == 0) {
-            sendMessage("No SC selected by player");
+        
+        LinkedHashSet<Integer> playersSCs = player.getSCs();
+        if (playersSCs.isEmpty()) {
+            sendMessage("No SC has been selected by the player");
             return;
         }
+        
+        if (playersSCs.size() != 1 && event.getOption(Constants.STRATEGY_CARD) == null) { //Only one SC selected
+            sendMessage("Player has more than one SC. Please try again, using the `strategy_card` option.");
+            return;
+        }
+        
+        Integer scToPlay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
+        String emojiName = "SC" + String.valueOf(scToPlay);
 
-        Boolean isSCPlayed = activeMap.getScPlayed().get(sc);
-        if (isSCPlayed != null && isSCPlayed) {
+        if (activeMap.getPlayedSCs().contains(scToPlay)) {
             sendMessage("SC already played");
             return;
         }
         
-        activeMap.setSCPlayed(sc, true);
+        activeMap.setSCPlayed(scToPlay, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
-        String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc) + " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
+        String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToPlay) + " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
         if (activeMap.isFoWMode()) {
-            message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), sc) + " played.\n\n";
+            message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToPlay) + " played.\n\n";
         }
         if (!categoryForPlayers.isEmpty()) {
             message += categoryForPlayers + "\n";
         }
         message += "Please indicate your choice by pressing a button below and post additional details in the thread.";
 
-        String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(sc);
+        String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(scToPlay);
         TextChannel textChannel = (TextChannel) mainGameChannel;
         
         for (Player player2 : activeMap.getPlayers().values()) {
@@ -80,20 +91,22 @@ public class SCPlay extends PlayerSubcommandData {
             }
             String faction = player2.getFaction();
             if (faction == null || faction.isEmpty() || faction.equals("null")) continue;
-            player2.setSCFollowedStatus(sc, false);
+            player2.removeFollowedSC(scToPlay);
         }
         
-        //GET BUTTONS
-        ActionRow actionRow = ActionRow.of(getSCButtons(sc));
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
-        if (!actionRow.isEmpty()) baseMessageObject.addComponents(actionRow);
+        //GET BUTTONS
+        ActionRow actionRow = null;
+        List<Button> scButtons = getSCButtons(scToPlay);
+        if (scButtons != null && !scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
+        if (actionRow != null) baseMessageObject.addComponents(actionRow);
         
         final Player player_ = player;
         mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
             Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player_, message_); 
             if (reactionEmoji != null) {
                 message_.addReaction(reactionEmoji).queue();
-                player_.setSCFollowedStatus(sc, true);
+                player_.addFollowedSC(scToPlay);
             }
 
             if (activeMap.isFoWMode()) {
@@ -110,7 +123,7 @@ public class SCPlay extends PlayerSubcommandData {
         });
 
         //POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
-        if (!activeMap.isFoWMode() && sc == 3) { 
+        if (!activeMap.isFoWMode() && scToPlay == 3) { 
             String assignSpeakerMessage = Helper.getPlayerRepresentation(event, player) + ", please click a faction below to assign Speaker " + Emojis.SpeakerToken;
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons();
             if (assignSpeakerActionRow.isEmpty()) return;
@@ -131,7 +144,7 @@ public class SCPlay extends PlayerSubcommandData {
             case 6 -> getWarfareButtons();
             case 7 -> getTechnologyButtons();
             case 8 -> getImperialButtons();
-            default -> new ArrayList<>();
+            default -> getGenericButtons(sc);
         };
     }
 
@@ -202,5 +215,11 @@ public class SCPlay extends PlayerSubcommandData {
         Button noFollowButton = Button.primary("sc_no_follow", "Not Following #8");
         Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective));
         return List.of(followButton, noFollowButton, draw_so);
+    }
+
+    private List<Button> getGenericButtons(int sc) {
+        Button followButton = Button.success("sc_follow", "SC Follow #" + sc);
+        Button noFollowButton = Button.primary("sc_no_follow", "Not Following #" + sc);
+        return List.of(followButton, noFollowButton);
     }
 }

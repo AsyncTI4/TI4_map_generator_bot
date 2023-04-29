@@ -8,6 +8,7 @@ import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -44,7 +45,10 @@ public class SCTradeGoods extends StatusSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card must be from possible ones in Game");
                 return;
             }
-            Set<Integer> scPicked = activeMap.getPlayers().values().stream().map(Player::getSC).collect(Collectors.toSet());
+            Set<Integer> scPicked = new HashSet<>();
+            for (Player player_ : activeMap.getPlayers().values()) {
+                scPicked.addAll(player_.getSCs());
+            }
             if (scPicked.contains(sc)){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card is already picked, can't add Trade Goods");
                 return;
@@ -54,7 +58,10 @@ public class SCTradeGoods extends StatusSubcommandData {
         }
 
         LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
-        Set<Integer> scPicked = activeMap.getPlayers().values().stream().map(Player::getSC).collect(Collectors.toSet());
+        Set<Integer> scPicked = new HashSet<>();
+        for (Player player_ : activeMap.getPlayers().values()) {
+            scPicked.addAll(player_.getSCs());
+        }
         for (Integer scNumber :  scTradeGoods.keySet()) {
             if (!scPicked.contains(scNumber)){
                 Integer tgCount = scTradeGoods.get(scNumber);

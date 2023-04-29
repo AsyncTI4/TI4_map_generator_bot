@@ -1,6 +1,8 @@
 package ti4.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -98,6 +100,8 @@ public class WebHelper {
             }
 
             s3.putObject(request, RequestBody.fromBytes(out.toByteArray()));
+        } catch(SdkClientException e) {
+            // BotLogger.log("Could not add image to web server. Likely invalid credentials.", e);
         } catch (Exception e) {
             BotLogger.log("Could not add image to web server", e);
         }

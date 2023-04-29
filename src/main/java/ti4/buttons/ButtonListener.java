@@ -50,7 +50,7 @@ public class ButtonListener extends ListenerAdapter {
         MessageListener.setActiveGame(event.getMessageChannel(), id, "button");
         String buttonID = event.getButton().getId();
         String buttonLabel = event.getButton().getLabel();
-        String lastchar = StringUtils.right(buttonLabel, 1);
+        String lastchar = StringUtils.right(buttonLabel, 2).replace("#", "");
         if (buttonID == null) {
             event.getChannel().sendMessage("Button command not found").queue();
             return;
@@ -150,7 +150,7 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX)) {
             String faction = buttonID.replace(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX, "");
-            if (player.getSC() != 3) {
+            if (!player.getSCs().contains(3)) {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Only the player who played Politics can assign Speaker");
                 return;
             }
@@ -204,7 +204,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if(setstatus)
                     {
-                        player.setSCFollowedStatus(scnum, true);
+                        player.addFollowedSC(scnum);
                     }
                     addReaction(event, false, false, message, "");
                     
@@ -230,7 +230,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String message = "Drew Secret Objective";
                     activeMap.drawSecretObjective(player.getUserID());
-                    player.setSCFollowedStatus(8, true);
+                    player.addFollowedSC(8);
                     ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
                     addReaction(event, false, false, message, "");
                 }
@@ -240,14 +240,14 @@ public class ButtonListener extends ListenerAdapter {
                         break;
                     }
                     String message = deductCC(player, event);
-                    player.setSCFollowedStatus(5, true);
+                    player.addFollowedSC(5);
                     player.setCommodities(player.getCommoditiesTotal());
                     addReaction(event, false, false, message, "");
                     addReaction(event, false, false, "Replenishing Commodities", "");
                 }
                 case "sc_follow_leadership" -> {
                     String message = Helper.getPlayerPing(player) + " following.";
-                    player.setSCFollowedStatus(1, true);
+                    player.addFollowedSC(1);
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_no_follow" -> {
@@ -262,7 +262,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if(setstatus)
                     {
-                        player.setSCFollowedStatus(scnum2, true);
+                        player.addFollowedSC(scnum2);
                     }
                     addReaction(event, false, false, "Not Following", "");
                     Set<Player> players = playerUsedSC.get(messageID);
@@ -278,7 +278,7 @@ public class ButtonListener extends ListenerAdapter {
                         break;
                     }
                     player.setCommodities(player.getCommoditiesTotal());
-                    player.setSCFollowedStatus(5, true);
+                    player.addFollowedSC(5);
                     addReaction(event, false, false, "Replenishing Commodities", "");
                 }
                 case "sc_refresh_and_wash" -> {
@@ -290,11 +290,11 @@ public class ButtonListener extends ListenerAdapter {
                     int tg = player.getTg();
                     player.setTg(tg + commoditiesTotal);
                     player.setCommodities(0);
-                    player.setSCFollowedStatus(5, true);
+                    player.addFollowedSC(5);
                     addReaction(event, false, false, "Replenishing and washing", "");
                 }
                 case "trade_primary" -> {
-                    if (5 != player.getSC()){
+                    if (!player.getSCs().contains(5)) {
                         break;
                     }
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "Trade Primary");

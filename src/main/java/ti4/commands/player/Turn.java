@@ -63,25 +63,32 @@ public class Turn extends PlayerSubcommandData {
         Boolean privateGame = FoWHelper.isPrivateGame(map, event);
         boolean isFowPrivateGame = privateGame != null && privateGame;
 
+        //MAKE ALL NON-REAL PLAYERS PASSED
         for (Player player : map.getPlayers().values()) {
             if (!player.isRealPlayer()){
                 player.setPassed(true);
             }
         }
+
+        //DETERMINE IF NAALU IS PRESENT AND GET THEIR SC
         for (Player player : map.getPlayers().values()) {
-            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(player.getSC()));
-            if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                naaluSC = player.getSC();
-                naaluPresent = true;
-                break;
+            for (int sc : player.getSCs()) {
+                String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
+                if (scNumberIfNaaluInPlay.startsWith("0/")) {
+                    naaluSC = sc;
+                    naaluPresent = true;
+                    break;
+                }
             }
         }
-        if (max == naaluSC) {
+        if (max == naaluSC) { //quick fix if Naalu picks for e.g. the 8, max is now 7
             max--;
         }
+
+        //FIND CURRENT PLAYER AND ???
         for (Player player : map.getPlayers().values()) {
             if (mainPlayer.getUserID().equals(player.getUserID())) {
-                int sc = player.getSC();
+                int sc = player.getLowestSC();
                 scNext = sc;
                 String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
                 if (scNumberIfNaaluInPlay.startsWith("0/")) {
@@ -91,12 +98,14 @@ public class Turn extends PlayerSubcommandData {
                 break;
             }
         }
+
+        //CREATE LIST OF UNPASSED PLAYERS
         HashMap<Integer, Boolean> scPassed = new HashMap<>();
         for (Player player : map.getPlayers().values()) {
             if (player.isPassed()) {
                 continue;
             }
-            int sc = player.getSC();
+            int sc = player.getLowestSC();
             String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 scPassed.put(0, player.isPassed());
@@ -117,7 +126,7 @@ public class Turn extends PlayerSubcommandData {
 
         int tempProtection = 0;
         int nextSCFound = -1;
-        while (tempProtection < 20) {
+        while (tempProtection < (map.getSCList().size() + 5)) {
             Boolean isPassed = scPassed.get(scNext);
             if (isPassed != null && !isPassed) {
                 nextSCFound = scNext;
@@ -129,70 +138,45 @@ public class Turn extends PlayerSubcommandData {
         }
 
         for (Player player : map.getPlayers().values()) {
-            int sc = player.getSC();
+            int sc = player.getLowestSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
                 String text = Helper.getPlayerRepresentation(event, player, true) + " UP NEXT";
                 map.updateActivePlayer(player);
                 if (isFowPrivateGame) {
-                    boolean anyMissed = false;
-                    String missedNums = "";
                     String fail = "User for next faction not found. Report to ADMIN";
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, map, event, text, fail, success);
+                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(map, player));
                     map.setPingSystemCounter(0);
                     for(int x = 0; x < 10; x++)
                     {
                         map.setTileAsPinged(x, null);
                     }
-                    
-                    for(int x = 1; x <9; x++)
-                    {
-                        if(player.getSCFollowedStatus(x)==false && map.isStratPings())
-                        {
-                            if(!anyMissed)
-                            {
-                                missedNums = missedNums +x;
-                                anyMissed=true;
-                            }
-                            else
-                            {
-                                missedNums = missedNums + ", " +x;
-                            }
-                        }
-                    }
-                    if(anyMissed&& map.isStratPings())
-                    {
-                        MessageHelper.sendMessageToChannel(player.getPrivateChannel(), "This is a reminder that you have not yet followed SC(s) #"+missedNums);
-                    }
                     return "";
                 } else {
                     MessageHelper.sendMessageToChannel(gameChannel, text);
-                    boolean anyMissed = false;
-                    String missedNums = "";
-                    for(int x = 1; x <9; x++)
-                    {
-                        if(player.getSCFollowedStatus(x)==false && map.isStratPings())
-                        {
-                            if(!anyMissed)
-                                {
-                                    missedNums = missedNums +x;
-                                    anyMissed=true;
-                                }
-                            else
-                                {
-                                    missedNums = missedNums + ", " +x;
-                                }
-                        }
-                    }
-                    if(anyMissed && map.isStratPings())
-                    {
-                            MessageHelper.sendMessageToChannel(gameChannel, "This is a reminder that you have not yet followed SC(s) #"+missedNums);
-                    }
+                    MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(map, player));
                     return "";
                 }
             }
         }
         return "Next Player not found";
+    }
+
+    private String getMissedSCFollowsText(Map map, Player player) {
+        if (!map.isStratPings()) return null;
+        boolean sendReminder = false;
+        
+        StringBuilder sb = new StringBuilder("> Please react to ");
+
+        for (int sc : map.getPlayedSCs()) {
+            if (!player.hasFollowedSC(sc)) {   
+                sb.append(Helper.getSCBackEmojiFromInteger(sc));
+                sendReminder = true;
+            }
+        }
+        sb.append(" above before taking your turn.");
+        return sendReminder ? sb.toString() : null;
     }
 
     private void showPublicObjectivesWhenAllPassed(SlashCommandInteractionEvent event, Map map, MessageChannel gameChannel) {

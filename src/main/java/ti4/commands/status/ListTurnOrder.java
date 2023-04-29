@@ -11,6 +11,7 @@ import ti4.message.MessageHelper;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Set;
 
 public class ListTurnOrder extends StatusSubcommandData {
     public ListTurnOrder() {
@@ -31,23 +32,28 @@ public class ListTurnOrder extends StatusSubcommandData {
                 if (!player.isRealPlayer()){
                     continue;
                 }
-                int sc = player.getSC();
+
+                int sc = player.getLowestSC();
                 String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
                 if (scNumberIfNaaluInPlay.startsWith("0/")) {
                     naaluSC = sc;
                 }
                 boolean passed = player.isPassed();
+
+                Set<Integer> SCs = player.getSCs();
                 HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
-                Boolean found = scPlayed.get(sc);
-                boolean isPlayed = found != null ? found : false;
-                String scEmoji = isPlayed ? Helper.getSCBackEmojiFromInteger(sc) : Helper.getSCEmojiFromInteger(sc);
                 String text = "";
-                if (isPlayed) {
-                    text += "~~";
-                }
-                text += scEmoji + Helper.getSCAsMention(event.getGuild(), sc);
-                if (isPlayed) {
-                    text += "~~";
+                for (int sc_ : SCs) {
+                    Boolean found = scPlayed.get(sc_);
+                    boolean isPlayed = found != null ? found : false;
+                    String scEmoji = isPlayed ? Helper.getSCBackEmojiFromInteger(sc_) : Helper.getSCEmojiFromInteger(sc_);
+                    if (isPlayed) {
+                        text += "~~";
+                    }
+                    text += scEmoji + Helper.getSCAsMention(event.getGuild(), sc_);
+                    if (isPlayed) {
+                        text += "~~";
+                    }
                 }
                 if (passed) {
                     text += "~~";
@@ -62,6 +68,7 @@ public class ListTurnOrder extends StatusSubcommandData {
                 }
                 
                 order.put(sc, text);
+                
             }
             StringBuilder msg = new StringBuilder("__**Turn Order:**__\n");
 
