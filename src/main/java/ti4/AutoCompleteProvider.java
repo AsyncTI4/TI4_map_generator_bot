@@ -434,6 +434,9 @@ public class AutoCompleteProvider {
             case Constants.VERBOSITY -> {
                 event.replyChoiceStrings(Constants.VERBOSITY_OPTIONS).queue();
             }
+            case Constants.AUTO_ARCHIVE_DURATION -> {
+                event.replyChoiceStrings("1_HOUR", "24_HOURS", "3_DAYS", "1_WEEK").queue();
+            }
         }
     }
 }
