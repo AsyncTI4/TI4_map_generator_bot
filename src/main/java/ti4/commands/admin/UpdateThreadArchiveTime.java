@@ -44,10 +44,13 @@ public class UpdateThreadArchiveTime extends AdminSubcommandData {
         }
         
         Guild guild = event.getGuild();
+        if (guild == null) {
+            sendMessage("What did you do wrong this time?");
+            return;
+        }
 
-        if (guild == null) return;
-
-        List<ThreadChannel> threadChannels = guild.getThreadChannels().stream().filter(tc -> tc.getName().toLowerCase().contains(searchString)).toList();
+        final AutoArchiveDuration autoArchiveDuration_ = autoArchiveDuration;
+        List<ThreadChannel> threadChannels = guild.getThreadChannels().stream().filter(tc -> tc.getName().toLowerCase().contains(searchString) && !tc.getAutoArchiveDuration().equals(autoArchiveDuration_)).toList();
 
         StringBuilder sb = new StringBuilder("**__Threads Updated__**\n");
         for (ThreadChannel threadChannel : threadChannels) {
