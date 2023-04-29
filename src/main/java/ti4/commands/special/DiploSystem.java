@@ -40,7 +40,7 @@ public class DiploSystem extends SpecialSubcommandData {
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
         Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
         if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
