@@ -34,14 +34,14 @@ public class SwapTwoSystems extends SpecialSubcommandData {
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
         Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
         if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
         String tileIDTo = AliasHandler.resolveTile(tileOptionTo.getAsString().toLowerCase());
         Tile tileTo = AddRemoveUnits.getTile(event, tileIDTo, activeMap);
         if (tileTo == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileIDTo:  `" + tileID + "`. Tile not found");
             return;
         }
 

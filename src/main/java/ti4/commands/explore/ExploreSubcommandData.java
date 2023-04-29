@@ -93,7 +93,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             tile = activeMap.getTileByPosition(tileID);
         }
         if (tile == null) {
-            MessageHelper.replyToMessage(event, "Tile not found");
+            MessageHelper.replyToMessage(event, "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return null;
         }
         return tile;
