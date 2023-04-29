@@ -36,6 +36,7 @@ import ti4.message.MessageHelper;
 import ti4.map.Tile;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+import ti4.generator.Mapper;
 
 import javax.lang.model.util.ElementScanner14;
 
@@ -429,7 +430,7 @@ public class ButtonListener extends ListenerAdapter {
                     boolean failed = false;
                     if(labelP.contains("Inf") && labelP.contains("Mech"))
                     {
-                        message = message + mechOrInfCheck(planetName, activeMap);
+                        message = message + mechOrInfCheck(planetName, activeMap,player);
                         failed = message.contains("Please try again.");
                     }
                     if(!failed)
@@ -449,7 +450,7 @@ public class ButtonListener extends ListenerAdapter {
                     boolean failed = false;
                     if(labelP.contains("Inf") && labelP.contains("Mech"))
                     {
-                        message = message + mechOrInfCheck(planetName, activeMap);
+                        message = message + mechOrInfCheck(planetName, activeMap, player);
                         failed = message.contains("Please try again.");
                     }
 
@@ -467,7 +468,7 @@ public class ButtonListener extends ListenerAdapter {
                     boolean failed = false;
                     if(labelP.contains("Inf") && labelP.contains("Mech"))
                     {
-                        message = message + mechOrInfCheck(planetName, activeMap);
+                        message = message + mechOrInfCheck(planetName, activeMap, player);
                         failed = message.contains("Please try again.");
                     }
 
@@ -493,23 +494,26 @@ public class ButtonListener extends ListenerAdapter {
         MapSaveLoadManager.saveMap(activeMap, event);
     }
 
-    private String mechOrInfCheck(String planetName, Map activeMap)
+    private String mechOrInfCheck(String planetName, Map activeMap, Player player)
     {
         String message = "";
         Tile tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
         int numMechs = 0;
         int numInf = 0;
-        
+        System.out.println(unitHolder.getUnits());
         if (unitHolder.getUnits() != null)
         {
-            if(unitHolder.getUnits().get("grn_mf.png") != null)
+            String colorID = Mapper.getColorID(player.getColor());
+            String mechKey = colorID + "_mf.png";
+            String infKey = colorID + "_gf.png";
+            if(unitHolder.getUnits().get(mechKey) != null)
             {
-                numMechs = unitHolder.getUnits().get("grn_mf.png");
+                numMechs = unitHolder.getUnits().get(mechKey);
             }
-            if(unitHolder.getUnits().get("grn_gf.png")!=null)
+            if(unitHolder.getUnits().get(infKey)!=null)
             {
-                numInf = unitHolder.getUnits().get("grn_gf.png");
+                numInf = unitHolder.getUnits().get(infKey);
             }
         }
         if (numMechs > 0 || numInf > 0)
