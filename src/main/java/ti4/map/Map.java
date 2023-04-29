@@ -754,6 +754,31 @@ public class Map {
         return false;
     }
 
+    public boolean isCustodiansScored()
+    {
+
+        boolean custodiansTaken = false;
+        String idC = "";
+        for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+            if (po.getValue().equals(0)) {
+                idC = po.getKey();
+                break;
+            }
+        }
+        if (!idC.isEmpty())
+        {
+            List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(idC, key -> new ArrayList<>());
+            for(String playerID : players.keySet())
+            {
+                if(scoredPlayerList.contains(playerID))
+                {
+                    custodiansTaken = true;
+                }
+            }
+        }
+        return custodiansTaken;
+    }
+
     public boolean scorePublicObjective(String userID, Integer idNumber) {
         String id = "";
         for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
