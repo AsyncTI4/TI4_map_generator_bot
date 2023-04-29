@@ -791,6 +791,7 @@ public class Player {
 
     public void setSCs(LinkedHashSet<Integer> SCs) {
         this.SCs = SCs;
+        this.SCs.remove(0); // TEMPORARY MIGRATION TO REMOVE 0 IF PLAYER HAS IT FROM OLD SAVES
     }
 
     public void addSC(int sc) {
