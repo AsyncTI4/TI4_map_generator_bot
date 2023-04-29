@@ -1,6 +1,9 @@
 package ti4.commands.status;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -15,7 +18,12 @@ public class RevealStage2 extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
+        revealS2(event, event.getChannel());
+    }
+
+    public void revealS2(GenericInteractionCreateEvent event, MessageChannel channel)
+    {
+        Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
         java.util.Map.Entry<String, Integer> objective = activeMap.revealState2();
 
         String[] objectiveText = Mapper.getPublicObjective(objective.getKey()).split(";");
@@ -30,7 +38,7 @@ public class RevealStage2 extends StatusSubcommandData {
         sb.append("(").append(objective.getValue()).append(") ");
         sb.append(Emojis.Public2alt).append(" ");
         sb.append("**").append(objectiveName).append("** - ").append(objectiveDescription).append("\n");
-        MessageHelper.sendMessageToChannelAndPin(event.getChannel(), sb.toString());
+        MessageHelper.sendMessageToChannelAndPin(channel, sb.toString());
     }
 
     @Override

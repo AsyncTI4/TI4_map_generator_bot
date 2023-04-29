@@ -4,6 +4,8 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.*;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.*;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -14,11 +16,15 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
 import ti4.MessageListener;
+import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.map.UnitHolder;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.explore.ExploreSubcommandData;
+import ti4.commands.status.Cleanup;
+import ti4.commands.status.RevealStage1;
+import ti4.commands.status.RevealStage2;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.units.AddUnits;
 import ti4.commands.player.PlanetAdd;
@@ -164,6 +170,34 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
             }
+        } else if (buttonID.startsWith("reveal_stage")) {
+            String lastC = StringUtils.right(buttonLabel, 1);
+            if(lastC.equalsIgnoreCase("2"))
+            {
+                new RevealStage2().revealS2(event, event.getChannel());
+            }
+            else
+            {
+                new RevealStage1().revealS1(event, event.getChannel());
+            }
+            String message2 = "Resolve status homework using the buttons.";   
+            Button draw1AC = Button.success("draw_1_AC", "Draw 1 AC");
+            Button confirmCCs = Button.primary("confirm_cc", "Confirm Your CCs");
+            boolean custodiansTaken = activeMap.isCustodiansScored();
+            Button passOnAbilities;
+            if(custodiansTaken)
+            {
+                passOnAbilities = Button.danger("pass_on_abilities", "Pass on Political Stability/Ancient Burial Sites/Maw Of Worlds");
+            }
+            else
+            {
+                passOnAbilities = Button.danger("pass_on_abilities", "Pass on Political Stability/Summit/Manipulate Investments");
+            }
+            ActionRow actionRow4 = ActionRow.of(List.of(draw1AC, confirmCCs, passOnAbilities));
+            MessageCreateBuilder baseMessageObject4 = new MessageCreateBuilder().addContent(message2);
+            if (!actionRow4.isEmpty()) baseMessageObject4.addComponents(actionRow4);
+                    event.getChannel().sendMessage(baseMessageObject4.build()).queue(message4_ -> {
+            });
         } else {
             switch (buttonID) {
                 //AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
@@ -443,6 +477,17 @@ public class ButtonListener extends ListenerAdapter {
                 case "decline_explore" -> {
                     addReaction(event, false, false, "Declined Explore", "");
                 }
+                case "confirm_cc" -> {
+                    addReaction(event, false, false, "Confirmed CCs", "");
+                }
+                case "draw_1_AC" -> {
+                    activeMap.drawActionCard(player.getUserID());
+                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                    addReaction(event, false, false, "Drew 1 AC", "");
+                }
+                case "pass_on_abilities" -> {
+                    addReaction(event, false, false,"Passed"+event.getButton().getLabel().replace("Pass", ""), "");
+                }
                 case "planet_ready" -> {
                     String message = "";
                     String labelP = event.getButton().getLabel();
@@ -486,7 +531,11 @@ public class ButtonListener extends ListenerAdapter {
 
                     }
                     addReaction(event, false, false, message, "");
-
+                }
+                case "run_status_cleanup" -> {
+                    new Cleanup().runStatusCleanup(activeMap);
+                    addReaction(event, false, true, "Running Status Cleanup. ", "Status Cleanup Run!");
+                    
                 }
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
@@ -671,17 +720,32 @@ public class ButtonListener extends ListenerAdapter {
             MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
             if (reaction != null) matchingFactionReactions++;
         }
-
         int numberOfPlayers = activeMap.getPlayers().size();
-        if (matchingFactionReactions >= numberOfPlayers && !activeMap.isFoWMode()) { //TODO: @Jazzxhands to verify this will work for FoW
+        if (matchingFactionReactions >= numberOfPlayers) { //TODO: @Jazzxhands to verify this will work for FoW
             respondAllPlayersReacted(event);
         }
     }
 
     private static void respondAllPlayersReacted(ButtonInteractionEvent event) {
-        switch (event.getButton().getId()) {
+        String gameName = event.getChannel().getName();
+        gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+        gameName = gameName.substring(0, gameName.indexOf("-"));
+        Map activeMap = MapManager.getInstance().getMap(gameName);
+        String id = event.getButton().getId();
+        if (id != null && id.startsWith(Constants.PO_SCORING))
+        {
+            id = Constants.PO_SCORING;
+        }
+        switch (id) {
             case Constants.SC_FOLLOW, "sc_no_follow", "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so", "sc_follow_leadership" -> {
-                Helper.getThreadChannelIfExists(event).sendMessage("All players have reacted to this Strategy Card").queueAfter(5, TimeUnit.SECONDS);
+                if(activeMap.isFoWMode())
+                {
+                    event.getInteraction().getMessage().reply("All players have reacted to this Strategy Card").queueAfter(1, TimeUnit.SECONDS);
+                }
+                else
+                {
+                    Helper.getThreadChannelIfExists(event).sendMessage("All players have reacted to this Strategy Card").queueAfter(5, TimeUnit.SECONDS);
+                }
             }
             case "no_when" -> {
                 event.getInteraction().getMessage().reply("All players have indicated 'No Whens'").queueAfter(1, TimeUnit.SECONDS);
@@ -691,6 +755,28 @@ public class ButtonListener extends ListenerAdapter {
             }
             case "no_sabotage" -> {
                 event.getInteraction().getMessage().reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
+            }
+            case Constants.PO_SCORING, Constants.PO_NO_SCORING, Constants.SO_NO_SCORING -> {
+                String message2 = "All players have indicated scoring. Run Status Cleanup and then Draw PO using the buttons.";   
+                Button drawStage2= Button.success("reveal_stage_2", "Reveal Stage 2");
+                Button drawStage1 = Button.success("reveal_stage_1", "Reveal Stage 1");
+                Button runStatusCleanup = Button.primary("run_status_cleanup", "Run Status Cleanup");
+                ActionRow actionRow4 = ActionRow.of(List.of(runStatusCleanup,drawStage1, drawStage2));
+                MessageCreateBuilder baseMessageObject4 = new MessageCreateBuilder().addContent(message2);
+                if (!actionRow4.isEmpty()) baseMessageObject4.addComponents(actionRow4);
+                     event.getChannel().sendMessage(baseMessageObject4.build()).queue(message4_ -> {
+                });
+            }
+            case "draw_1_AC","pass_on_abilities","confirm_cc"-> {
+                if(activeMap.isCustodiansScored())
+                {
+                    new RevealAgenda().revealAgenda(event, false, activeMap, event.getChannel());
+                }
+                else
+                {
+                    event.getInteraction().getMessage().reply(Helper.getGamePing(event.getGuild(), activeMap) + " All players have indicated completion of status phase. Proceed to Strategy Phase.").queueAfter(1, TimeUnit.SECONDS);
+                }
+
             }
         }
     }

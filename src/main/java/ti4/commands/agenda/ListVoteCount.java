@@ -1,5 +1,7 @@
 package ti4.commands.agenda;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -24,6 +26,11 @@ public class ListVoteCount extends AgendaSubcommandData {
     }
 
     public static void turnOrder(SlashCommandInteractionEvent event, Map map) {
+        turnOrder(event, map, event.getChannel());
+    }
+
+
+    public static void turnOrder(GenericInteractionCreateEvent event, Map map, MessageChannel channel) {
         Boolean isPrivateFogGame = FoWHelper.isPrivateGame(event);
         boolean privateGame = isPrivateFogGame != null && isPrivateFogGame;
 
@@ -132,6 +139,6 @@ public class ListVoteCount extends AgendaSubcommandData {
             msg.append(i).append(". ").append(text).append("\n");
             i++;
         }
-        MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
+        MessageHelper.sendMessageToChannel(channel, msg.toString());
     }
 }
