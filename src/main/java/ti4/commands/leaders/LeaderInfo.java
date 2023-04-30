@@ -6,9 +6,11 @@ import java.util.List;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -43,8 +45,33 @@ public class LeaderInfo extends LeaderSubcommandData {
                 MessageHelper.sendMessageToUser(leaderInfo, user);
             }
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, Helper.getPlayerRepresentation(event, player));
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, leaderInfo);
+        sendLeadersInfo(activeMap, player, event);
+    }
+
+    public static void sendLeadersInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
+        sendLeadersInfo(activeMap, player);
+    }
+    
+    public static void sendLeadersInfo(Map activeMap, Player player) {
+        //LEADERS INFO
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getLeaderInfo(activeMap, player));
+
+        //BUTTONS
+        String leaderPlayMsg = "_ _\nClick a button below to exhaust or purge a Leader";
+        List<Button> leaderButtons = getLeaderButtons(activeMap, player);
+        if (leaderButtons != null && !leaderButtons.isEmpty()) {
+            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(leaderPlayMsg, leaderButtons);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
+            for (MessageCreateData message : messageList) {
+                cardsInfoThreadChannel.sendMessage(message).queue();
+            }
+        }
+    } 
+
+    private static List<Button> getLeaderButtons(Map activeMap, Player player) {
+        return null;
     }
 
     public static String getLeaderInfo(Map activeMap, Player player) {

@@ -7,6 +7,7 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.generator.Mapper;
@@ -31,23 +32,35 @@ public class SOInfo extends SOCardsSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
-        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        sendSecretObjectiveInfo(activeMap, player);
+        sendSecretObjectiveInfo(activeMap, player, event);
         sendMessage("SO Info Sent");
     }
 
+    public static void sendSecretObjectiveInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
+        sendSecretObjectiveInfo(activeMap, player);
+    }
+
+    public static void sendSecretObjectiveInfo(Map activeMap, Player player, ButtonInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(event, player) + " pressed button: " + event.getButton().getLabel();
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
+        sendSecretObjectiveInfo(activeMap, player);
+    }
+    
     public static void sendSecretObjectiveInfo(Map activeMap, Player player) {
-        //CARDS INFO
+        //SO INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getSecretObjectiveCardInfo(activeMap, player));
 
         //BUTTONS
         String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
         List<Button> soButtons = getUnscoredSecretObjectiveButtons(activeMap, player);
-        List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, soButtons);
-        ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
-        for (MessageCreateData message : messageList) {
-            cardsInfoThreadChannel.sendMessage(message).queue();
+        if (soButtons != null && !soButtons.isEmpty()) {
+            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, soButtons);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
+            for (MessageCreateData message : messageList) {
+                cardsInfoThreadChannel.sendMessage(message).queue();
+            }
         }
     }   
 
@@ -83,7 +96,6 @@ public class SOInfo extends SOCardsSubcommandData {
         }
         StringBuilder sb = new StringBuilder();
         int index = 1;
-        sb.append(Helper.getPlayerPing(player)).append("\n");
 
         //SCORED SECRET OBJECTIVES
         sb.append("**Scored Secret Objectives:**").append("\n");

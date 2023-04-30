@@ -74,7 +74,8 @@ public class ScoreSO extends SOCardsSubcommandData {
             FoWHelper.pingPlayersDifferentMessages(activeMap, event, player, message.toString(), "Scores changed");
             MessageHelper.sendMessageToChannel(channel, "All players notified");
         }
-        
+        String headerText = Helper.getPlayerRepresentation(event, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         SOInfo.sendSecretObjectiveInfo(activeMap, player);
         Helper.checkIfHeroUnlocked(event, activeMap, player);
     }

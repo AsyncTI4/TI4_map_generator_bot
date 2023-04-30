@@ -1,4 +1,4 @@
-package ti4.commands.cards;
+package ti4.commands.all_info;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -13,6 +13,10 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
+import ti4.commands.explore.RelicInfo;
+import ti4.commands.leaders.LeaderInfo;
+import ti4.commands.player.AbilityInfo;
+import ti4.commands.player.TechInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -21,11 +25,11 @@ import ti4.map.MapManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-public class CardsInfo implements Command {
+public class AllInfo implements Command {
 
     @Override
     public String getActionID() {
-        return Constants.CARDS_INFO;
+        return Constants.ALL_INFO;
     }
 
     @Override
@@ -95,13 +99,17 @@ public class CardsInfo implements Command {
         }
         String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
+        AbilityInfo.sendAbilityInfo(activeMap, player);
+        LeaderInfo.sendLeadersInfo(activeMap, player);
+        TechInfo.sendTechInfo(activeMap, player);
+        RelicInfo.sendRelicInfo(activeMap, player);
         SOInfo.sendSecretObjectiveInfo(activeMap, player);
         ACInfo.sendActionCardInfo(activeMap, player);
         PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
     }
 
     protected String getActionDescription() {
-        return "Send to your Cards Info thread: Scored & Unscored SOs, ACs, and PNs in both hand and Play Area";
+        return "Send all available info to your Cards Info thread.";
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

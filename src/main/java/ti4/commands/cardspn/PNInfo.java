@@ -32,23 +32,29 @@ public class PNInfo extends PNCardsSubcommandData {
             return;
         }
         checkAndAddPNs(activeMap, player);
-        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        sendPromissoryNoteInfo(activeMap, player, true);
+        sendPromissoryNoteInfo(activeMap, player, true, event);
         sendMessage("PN Info Sent");
     }
 
+    public static void sendPromissoryNoteInfo(Map activeMap, Player player, boolean longFormat, SlashCommandInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
+        sendPromissoryNoteInfo(activeMap, player, longFormat);
+    }
+
     public static void sendPromissoryNoteInfo(Map activeMap, Player player, boolean longFormat) {
-        //CARDS INFO
+        //PN INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getPromissoryNoteCardInfo(activeMap, player, longFormat));
 
         //BUTTONS
         String pnPlayMessage = "_ _\nClick a button below to play a Promissory Note";
         List<Button> pnButtons = getPlayablePNButtons(activeMap, player);
-        List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(pnPlayMessage, pnButtons);
-        ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
-        for (MessageCreateData message : messageList) {
-            cardsInfoThreadChannel.sendMessage(message).queue();
+        if (pnButtons != null && !pnButtons.isEmpty()) {
+            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(pnPlayMessage, pnButtons);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
+            for (MessageCreateData message : messageList) {
+                cardsInfoThreadChannel.sendMessage(message).queue();
+            }
         }
     }
 
