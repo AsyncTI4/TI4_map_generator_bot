@@ -530,7 +530,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "draw_1_AC" -> {
                     activeMap.drawActionCard(player.getUserID());
                     ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
-                    addReaction(event, false, false, "Drew 1 AC", "");
+                    addReaction(event, true, false, "Drew 1 AC", "");
                 }
                 case "pass_on_abilities" -> {
                     addReaction(event, false, false,"Passed"+event.getButton().getLabel().replace("Pass", ""), "");
@@ -727,10 +727,6 @@ public class ButtonListener extends ListenerAdapter {
         Message mainMessage = event.getInteraction().getMessage();
         Emoji emojiToUse = Helper.getPlayerEmoji(activeMap, player, mainMessage);
         String messageId = mainMessage.getId();
-
-        if (activeMap.isFoWMode()) {
-            event.getChannel().addReactionById(messageId, emojiToUse).queue();
-        }
         
         if (!skipReaction) {
             event.getChannel().addReactionById(messageId, emojiToUse).queue();
@@ -840,7 +836,7 @@ public class ButtonListener extends ListenerAdapter {
                      event.getChannel().sendMessage(baseMessageObject4.build()).queue(message4_ -> {
                 });
             }
-            case "draw_1_AC","pass_on_abilities","confirm_cc"-> {
+            case "pass_on_abilities"-> {
                 if(activeMap.isCustodiansScored())
                 {
                     new RevealAgenda().revealAgenda(event, false, activeMap, event.getChannel());
