@@ -233,6 +233,11 @@ public class GenerateMap {
                     WebHelper.putMap(map.getName(), mainImage);
                     WebHelper.putData(map.getName(), map.copy());
                 }).start();
+            } else if (!(isFoWPrivate==null) && isFoWPrivate) {
+                Player player = getFowPlayer(map, event);
+                new Thread(() -> {
+                        WebHelper.putMap(map.getName(), mainImage, true, player);
+                }).start();
             }
         } catch (IOException e) {
             BotLogger.log(map.getName() + ": Could not save generated map");
