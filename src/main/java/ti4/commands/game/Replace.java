@@ -59,8 +59,16 @@ public class Replace extends GameSubcommandData {
                 return;
             }
             User addedUser = addOption.getAsUser();
+            boolean notRealPlayer = players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()));
+            if(!notRealPlayer)
+            {
+                if(map.getPlayer(addedUser.getId()).getFaction() == null)
+                {
+                    map.removePlayer(addedUser.getId());
+                }
+            }
             if (players.stream().anyMatch(player -> player.getUserID().equals(removedPlayer.getUserID())) &&
-                    players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()))) {
+            players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()))) {
                 message = Helper.getGamePing(event, map) + " Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
                 Player player = map.getPlayer(removedPlayer.getUserID());
                 LinkedHashMap<String, List<String>> scoredPublicObjectives = map.getScoredPublicObjectives();
