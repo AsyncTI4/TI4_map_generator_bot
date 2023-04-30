@@ -13,6 +13,7 @@ import ti4.generator.Mapper;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.commands.player.PlanetAdd;
 import ti4.commands.player.PlanetRefresh;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -179,6 +180,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 for (int i = 0; i < count; i++) {
                     activeMap.drawActionCard(player.getUserID());
                 }
+                if(activeMap.isFoWMode())
+                {
+                    FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew 2 AC");
+                }
                 ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
                 break;
@@ -186,6 +191,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "dv2":
                  message = "Drew Secret Objective";
                 activeMap.drawSecretObjective(player.getUserID());
+                if(activeMap.isFoWMode())
+                {
+                    FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew SO");
+                }
                 ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
                 break;
@@ -196,8 +205,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 break;
             case "ms1":
             case "ms2":
+                message = "Replenished Commodifites (" +player.getCommodities() +"->"+player.getCommoditiesTotal()+")";
                 player.setCommodities(player.getCommoditiesTotal());
-                message = "Replenished Commodifites";
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + "\n" + message);
                 break;
             case "mirage":
@@ -260,7 +269,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     new AddUnits().unitParsing(event, player.getColor(), tile, "inf "+planetName, activeMap);
                 }
                 message = "Infantry added to the planet";
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + "\n" + message);
                 break;
             case "lf1":
             case "lf2":
@@ -282,21 +291,20 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "minent":
             case "majent":
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
-
                 if(cardID.equalsIgnoreCase("minent"))
                 {
                     player.setTg(player.getTg()+1);
-                    message = "Gained 1 tg. ";
+                    message = "Gained 1 tg (" +(player.getTg()-1) +"->"+player.getTg()+") ";
                 }
                 else if(cardID.equalsIgnoreCase("ent"))
                 {
                     player.setTg(player.getTg()+2);
-                    message = "Gained 2 tgs. ";
+                    message = "Gained 2 tgs (" +(player.getTg()-2) +"->"+player.getTg()+") ";
                 }
                 else if(cardID.equalsIgnoreCase("majent"))
                 {
                     player.setTg(player.getTg()+3);
-                    message = "Gained 3 tgs. ";
+                    message = "Gained 3 tgs (" +(player.getTg()-3) +"->"+player.getTg()+") ";
                 }
                 else 
                 {
