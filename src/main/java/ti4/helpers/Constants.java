@@ -645,6 +645,7 @@ public class Constants {
     public static final String UPDATE_THREAD_ARCHIVE_TIME = "update_thread_archive_time";
     public static final String THREAD_SEARCH_STRING = "thread_search_string";
     public static final String AUTO_ARCHIVE_DURATION = "auto_archive_duration";
+    public static final String ALL_INFO = "all_info";
 
     public static final String LEADERSHIP_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/1/1e/Ti07_strategy_1_leadership.png/revision/latest?cb=20200827003959";
     public static final String DIPLOMACY_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/a/a1/Untitled.png/revision/latest?cb=20210623202428";

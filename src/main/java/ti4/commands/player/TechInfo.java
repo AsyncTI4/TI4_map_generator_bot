@@ -5,7 +5,10 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -29,11 +32,30 @@ public class TechInfo extends PlayerSubcommandData {
             return;
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, Helper.getPlayerRepresentation(event, player));
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getTechInfoText(player));
-
+        sendTechInfo(activeMap, player);
     }
 
-    private String getTechInfoText(Player player) {
+    public static void sendTechInfo(Map activeMap, Player player) {
+        //TECH INFO
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getTechInfoText(player));
+
+        //BUTTONS
+        String exhaustTechMsg = "_ _\nClick a button below to exhaust an Action Card";
+        List<Button> techButtons = getTechButtons(activeMap, player);
+        if (techButtons != null && !techButtons.isEmpty()) {
+            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(exhaustTechMsg, techButtons);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
+            for (MessageCreateData message : messageList) {
+                cardsInfoThreadChannel.sendMessage(message).queue();
+            }
+        }
+    } 
+
+    private static List<Button> getTechButtons(Map activeMap, Player player) {
+        return null;
+    }
+
+    private static String getTechInfoText(Player player) {
         List<String> playerTechs = player.getTechs();
         StringBuilder sb = new StringBuilder("__**Tech Info**__\n");
         if (playerTechs == null || playerTechs.isEmpty()) {

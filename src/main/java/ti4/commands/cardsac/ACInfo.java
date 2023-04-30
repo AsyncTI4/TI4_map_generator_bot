@@ -38,16 +38,18 @@ public class ACInfo extends ACCardsSubcommandData {
     }
 
     public static void sendActionCardInfo(Map activeMap, Player player) {
-        //CARDS INFO
+        //AC INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getActionCardInfo(activeMap, player));
 
         //BUTTONS
         String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
         List<Button> acButtons = getPlayActionCardButtons(activeMap, player);
-        List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
-        ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
-        for (MessageCreateData message : messageList) {
-            cardsInfoThreadChannel.sendMessage(message).queue();
+        if (acButtons != null && !acButtons.isEmpty()) {
+            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
+            for (MessageCreateData message : messageList) {
+                cardsInfoThreadChannel.sendMessage(message).queue();
+            }
         }
     } 
 

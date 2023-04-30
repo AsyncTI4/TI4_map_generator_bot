@@ -38,16 +38,18 @@ public class SOInfo extends SOCardsSubcommandData {
     }
 
     public static void sendSecretObjectiveInfo(Map activeMap, Player player) {
-        //CARDS INFO
+        //SO INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getSecretObjectiveCardInfo(activeMap, player));
 
         //BUTTONS
         String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
         List<Button> soButtons = getUnscoredSecretObjectiveButtons(activeMap, player);
-        List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, soButtons);
-        ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
-        for (MessageCreateData message : messageList) {
-            cardsInfoThreadChannel.sendMessage(message).queue();
+        if (soButtons != null && !soButtons.isEmpty()) {
+            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, soButtons);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
+            for (MessageCreateData message : messageList) {
+                cardsInfoThreadChannel.sendMessage(message).queue();
+            }
         }
     }   
 

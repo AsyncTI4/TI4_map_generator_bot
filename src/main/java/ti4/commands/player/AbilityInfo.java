@@ -29,11 +29,15 @@ public class AbilityInfo extends PlayerSubcommandData {
             return;
         }
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, Helper.getPlayerRepresentation(event, player));
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getAbilityInfoText(player));
-
+        sendAbilityInfo(activeMap, player);
     }
 
-    private String getAbilityInfoText(Player player) {
+    public static void sendAbilityInfo(Map activeMap, Player player) {
+        //ABILITY INFO
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getAbilityInfoText(player));
+    } 
+
+    private static String getAbilityInfoText(Player player) {
         List<String> playerAbilities = player.getFactionAbilities().stream().sorted().toList();
         StringBuilder sb = new StringBuilder("__**Ability Info**__\n");
         if (playerAbilities == null || playerAbilities.isEmpty() || playerAbilities.get(0).isBlank()) {
