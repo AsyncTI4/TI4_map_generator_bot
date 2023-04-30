@@ -834,7 +834,7 @@ public class Helper {
     }
 
     public static String getLeaderLockedRepresentation(Player player, Leader leader) {
-        return getLeaderRepresentation(player.getFaction(), leader, false, false, true);
+        return getLeaderRepresentation(player.getFaction(), leader, true, true, true);
     }
 
     public static String getSCEmojiFromInteger(Integer strategy_card) {

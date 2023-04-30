@@ -27,7 +27,8 @@ public class RelicInfo extends ExploreSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, Helper.getPlayerRepresentation(event, player));
+        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendRelicInfo(activeMap, player);
     }
 

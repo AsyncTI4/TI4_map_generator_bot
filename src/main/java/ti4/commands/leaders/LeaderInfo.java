@@ -45,9 +45,9 @@ public class LeaderInfo extends LeaderSubcommandData {
                 MessageHelper.sendMessageToUser(leaderInfo, user);
             }
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, Helper.getPlayerRepresentation(event, player));
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, leaderInfo);
-    }
+        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
+        sendLeadersInfo(activeMap, player);    }
 
     public static void sendLeadersInfo(Map activeMap, Player player) {
         //LEADERS INFO
