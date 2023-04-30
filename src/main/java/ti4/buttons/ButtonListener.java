@@ -841,7 +841,7 @@ public class ButtonListener extends ListenerAdapter {
                 });
             }
             case "draw_1_AC","pass_on_abilities","confirm_cc"-> {
-                if(activeMap.isCustodiansScored())
+                if(false && activeMap.isCustodiansScored())
                 {
                     new RevealAgenda().revealAgenda(event, false, activeMap, event.getChannel());
                 }
