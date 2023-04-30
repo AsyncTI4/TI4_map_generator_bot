@@ -21,6 +21,7 @@ import ti4.commands.player.PlanetRemove;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 

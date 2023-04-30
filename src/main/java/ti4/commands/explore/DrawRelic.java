@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
@@ -46,7 +47,10 @@ public class DrawRelic extends GenericRelicAction {
                        .append(Helper.getPlayerRepresentation(event, player)).append(" scored 'Shard of the Throne'");
             }
         }
-
+        if(activeMap.isFoWMode())
+        {
+            FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, message.toString());
+        }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
     }
 }
