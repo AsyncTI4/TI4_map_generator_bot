@@ -2,6 +2,7 @@ package ti4.buttons;
 
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.*;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.*;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -758,7 +759,9 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 else
                 {
-                    Helper.getThreadChannelIfExists(event).sendMessage("All players have reacted to this Strategy Card").queueAfter(5, TimeUnit.SECONDS);
+                    GuildMessageChannel guildMessageChannel = Helper.getThreadChannelIfExists(event);
+                    guildMessageChannel.sendMessage("All players have reacted to this Strategy Card").queueAfter(10, TimeUnit.SECONDS);
+                    if (guildMessageChannel instanceof ThreadChannel) ((ThreadChannel) guildMessageChannel).getManager().setArchived(true).queueAfter(5, TimeUnit.MINUTES);
                 }
             }
             case "no_when" -> {
