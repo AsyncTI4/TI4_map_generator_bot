@@ -153,20 +153,20 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     private List<Button> getLeadershipButtons() {
-        Button followButton = Button.success("sc_follow_leadership", "SC Follow #1");
-        Button noFollowButton = Button.primary("sc_no_follow", "Not Following #1");
+        Button followButton = Button.success("sc_leadership_follow", "SC Follow");
+        Button noFollowButton = Button.primary("sc_no_follow_1", "Not Following");
         return List.of(followButton, noFollowButton);
     }
     
     private List<Button> getDiplomacyButtons() {
-        Button followButton = Button.success("sc_follow", "SC Follow #2");
-        Button noFollowButton = Button.primary("sc_no_follow", "Not Following #2");
+        Button followButton = Button.success("sc_follow_2", "SC Follow");
+        Button noFollowButton = Button.primary("sc_no_follow_2", "Not Following");
         return List.of(followButton, noFollowButton);
     }
     
     private List<Button> getPoliticsButtons() {
-        Button followButton = Button.success("sc_follow", "SC Follow #3");
-        Button noFollowButton = Button.primary("sc_no_follow", "Not Following #3");
+        Button followButton = Button.success("sc_follow_3", "SC Follow");
+        Button noFollowButton = Button.primary("sc_no_follow_3", "Not Following");
         Button draw_2_ac = Button.secondary("sc_ac_draw", "Draw 2 Action Cards").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
         return List.of(followButton, noFollowButton, draw_2_ac);
     }
@@ -188,43 +188,43 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     private List<Button> getConstructionButtons() {
-        Button followButton = Button.success("sc_follow", "SC Follow #4");
-        Button noFollowButton = Button.primary("sc_no_follow", "Not Following #4");
+        Button followButton = Button.success("sc_follow_4", "SC Follow");
+        Button noFollowButton = Button.primary("sc_no_follow_4", "Not Following");
         return List.of(followButton, noFollowButton);
     }
     
     private List<Button> getTradeButtons() {
-        Button trade_primary = Button.success("trade_primary", "Resolve Primary #5");
-        Button followButton = Button.success("sc_follow_trade", "SC Follow #5");
-        Button noFollowButton = Button.primary("sc_no_follow", "Not Following #5");
-        Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash for SC #5").withEmoji(Emoji.fromFormatted(Emojis.Wash));
-        Button refresh = Button.secondary("sc_refresh", "Replenish Commodities for SC #5").withEmoji(Emoji.fromFormatted(Emojis.comm));
+        Button trade_primary = Button.success("trade_primary", "Resolve Primary");
+        Button followButton = Button.success("sc_trade_follow", "SC Follow");
+        Button noFollowButton = Button.primary("sc_no_follow_5", "Not Following");
+        Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash for SC").withEmoji(Emoji.fromFormatted(Emojis.Wash));
+        Button refresh = Button.secondary("sc_refresh", "Replenish Commodities for SC").withEmoji(Emoji.fromFormatted(Emojis.comm));
         return List.of(trade_primary, followButton, noFollowButton, refresh, refresh_and_wash);
     }
     
     private List<Button> getWarfareButtons() {
-        Button followButton = Button.success("sc_follow", "SC Follow #6");
-        Button noFollowButton = Button.primary("sc_no_follow", "Not Following #6");
+        Button followButton = Button.success("sc_follow_6", "SC Follow");
+        Button noFollowButton = Button.primary("sc_no_follow_6", "Not Following");
         return List.of(followButton, noFollowButton);
     }
     
     private List<Button> getTechnologyButtons() {
-        Button followButton = Button.success("sc_follow", "SC Follow #7");
-        Button noFollowButton = Button.primary("sc_no_follow", "Not Following #7");
+        Button followButton = Button.success("sc_follow_7", "SC Follow");
+        Button noFollowButton = Button.primary("sc_no_follow_7", "Not Following");
         return List.of(followButton, noFollowButton);
     }
     
     private List<Button> getImperialButtons() {
-        Button followButton = Button.success("sc_follow", "SC Follow #8");
-        Button noFollowButton = Button.primary("sc_no_follow", "Not Following #8");
+        Button followButton = Button.success("sc_follow_8", "SC Follow");
+        Button noFollowButton = Button.primary("sc_no_follow_8", "Not Following");
         Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective));
         Button scoreImperial = Button.secondary("score_imperial", "Score Imperial").withEmoji(Emoji.fromFormatted(Emojis.MecatolRex));
         return List.of(followButton, noFollowButton, draw_so, scoreImperial);
     }
 
     private List<Button> getGenericButtons(int sc) {
-        Button followButton = Button.success("sc_follow", "SC Follow #" + sc);
-        Button noFollowButton = Button.primary("sc_no_follow", "Not Following #" + sc);
+        Button followButton = Button.success("sc_follow_"+sc, "SC Follow" );
+        Button noFollowButton = Button.primary("sc_no_follow_"+sc, "Not Following");
         return List.of(followButton, noFollowButton);
     }
 }
