@@ -171,6 +171,7 @@ public class Tile {
         if (unitHolder != null) {
             unitHolder.removeCC(ccID);
         }
+        
     }
 
     public void removeAllCC() {

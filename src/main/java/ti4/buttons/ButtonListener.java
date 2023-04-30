@@ -59,6 +59,7 @@ public class ButtonListener extends ListenerAdapter {
         String buttonID = event.getButton().getId();
         String buttonLabel = event.getButton().getLabel();
         String lastchar = StringUtils.right(buttonLabel, 2).replace("#", "");
+        String lastcharMod = StringUtils.right(buttonID, 1);
         if (buttonID == null) {
             event.getChannel().sendMessage("Button command not found").queue();
             return;
@@ -199,7 +200,45 @@ public class ButtonListener extends ListenerAdapter {
             if (!actionRow4.isEmpty()) baseMessageObject4.addComponents(actionRow4);
                     event.getChannel().sendMessage(baseMessageObject4.build()).queue(message4_ -> {
             });
-        } else {
+        } else if (buttonID.startsWith("sc_follow_")) {
+            boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
+            if (!used) {
+                String message = deductCC(player, event);
+                int scnum = 1;
+                boolean setstatus = true;
+                try{
+                    scnum = Integer.parseInt(lastcharMod);
+                } catch(NumberFormatException e) {
+                    setstatus = false;
+                }
+                if(setstatus)
+                {
+                    player.addFollowedSC(scnum);
+                }
+                addReaction(event, false, false, message, "");
+            }
+        }
+        else if (buttonID.startsWith("sc_no_follow_")) {
+            int scnum2 = 1;
+            boolean setstatus = true;
+            try{
+                scnum2 = Integer.parseInt(lastcharMod);
+            } catch(NumberFormatException e) {
+                setstatus = false;
+            }
+            if(setstatus)
+            {
+                player.addFollowedSC(scnum2);
+            }
+            addReaction(event, false, false, "Not Following", "");
+            Set<Player> players = playerUsedSC.get(messageID);
+            if (players == null) {
+                players = new HashSet<>();
+            }
+            players.remove(player);
+            playerUsedSC.put(messageID, players);
+        }
+        else {
             switch (buttonID) {
                 //AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
                 case Constants.PO_NO_SCORING -> {
@@ -223,27 +262,6 @@ public class ButtonListener extends ListenerAdapter {
                 case "no_sabotage" -> {
                     String message = activeMap.isFoWMode() ? "No sabotage" : null;
                     addReaction(event, false, false, message, "");
-                }
-                //AFTER AN SC HAS BEEN PLAYED
-                case "sc_follow" -> {
-                    boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
-                    if (used) {
-                        break;
-                    }
-                    String message = deductCC(player, event);
-                    int scnum = 1;
-                    boolean setstatus = true;
-                    try{
-                        scnum = Integer.parseInt(lastchar);
-                    } catch(NumberFormatException e) {
-                        setstatus = false;
-                    }
-                    if(setstatus)
-                    {
-                        player.addFollowedSC(scnum);
-                    }
-                    addReaction(event, false, false, message, "");
-                    
                 }
                 case "sc_ac_draw" -> {
                     boolean used = addUsedSCPlayer(messageID + "ac", activeMap, player, event, "");
@@ -270,7 +288,7 @@ public class ButtonListener extends ListenerAdapter {
                     ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
                     addReaction(event, false, false, message, "");
                 }
-                case "sc_follow_trade" -> {
+                case "sc_trade_follow" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
                     if (used) {
                         break;
@@ -281,32 +299,10 @@ public class ButtonListener extends ListenerAdapter {
                     addReaction(event, false, false, message, "");
                     addReaction(event, false, false, "Replenishing Commodities", "");
                 }
-                case "sc_follow_leadership" -> {
+                case "sc_leadership_follow" -> {
                     String message = Helper.getPlayerPing(player) + " following.";
                     player.addFollowedSC(1);
                     addReaction(event, false, false, message, "");
-                }
-                case "sc_no_follow" -> {
-
-                    
-                    int scnum2 = 1;
-                    boolean setstatus = true;
-                    try{
-                        scnum2 = Integer.parseInt(lastchar);
-                    } catch(NumberFormatException e) {
-                        setstatus = false;
-                    }
-                    if(setstatus)
-                    {
-                        player.addFollowedSC(scnum2);
-                    }
-                    addReaction(event, false, false, "Not Following", "");
-                    Set<Player> players = playerUsedSC.get(messageID);
-                    if (players == null) {
-                        players = new HashSet<>();
-                    }
-                    players.remove(player);
-                    playerUsedSC.put(messageID, players);
                 }
                 case "sc_refresh" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "Replenish");
@@ -328,6 +324,26 @@ public class ButtonListener extends ListenerAdapter {
                     player.setCommodities(0);
                     player.addFollowedSC(5);
                     addReaction(event, false, false, "Replenishing and washing", "");
+                }
+                case "sc_follow" -> {
+                    boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
+                    if (used) {
+                        break;
+                    }
+                    String message = deductCC(player, event);
+                    int scnum = 1;
+                    boolean setstatus = true;
+                    try{
+                        scnum = Integer.parseInt(lastchar);
+                    } catch(NumberFormatException e) {
+                        setstatus = false;
+                    }
+                    if(setstatus)
+                    {
+                        player.addFollowedSC(scnum);
+                    }
+                    addReaction(event, false, false, message, "");
+                    
                 }
                 case "trade_primary" -> {
                     if (!player.getSCs().contains(5)) {
@@ -520,6 +536,26 @@ public class ButtonListener extends ListenerAdapter {
                         message = message + "Readied "+ planetName;
                     }
                     addReaction(event, false, false, message, "");
+                }
+                case "sc_no_follow" -> {
+                    int scnum2 = 1;
+                    boolean setstatus = true;
+                    try{
+                        scnum2 = Integer.parseInt(lastchar);
+                    } catch(NumberFormatException e) {
+                        setstatus = false;
+                    }
+                    if(setstatus)
+                    {
+                        player.addFollowedSC(scnum2);
+                    }
+                    addReaction(event, false, false, "Not Following", "");
+                    Set<Player> players = playerUsedSC.get(messageID);
+                    if (players == null) {
+                        players = new HashSet<>();
+                    }
+                    players.remove(player);
+                    playerUsedSC.put(messageID, players);
                 }
                 case "gain_CC"-> {
                     String message = "";
@@ -751,8 +787,12 @@ public class ButtonListener extends ListenerAdapter {
         {
             id = Constants.PO_SCORING;
         }
+        if(id != null && (id.startsWith(Constants.SC_FOLLOW) || id.startsWith("sc_no_follow")))
+        {
+            id = Constants.SC_FOLLOW;
+        }
         switch (id) {
-            case Constants.SC_FOLLOW, "sc_no_follow", "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so", "sc_follow_leadership" -> {
+            case Constants.SC_FOLLOW, "sc_no_follow", "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so","sc_trade_follow", "sc_leadership_follow" -> {
                 if(activeMap.isFoWMode())
                 {
                     event.getInteraction().getMessage().reply("All players have reacted to this Strategy Card").queueAfter(1, TimeUnit.SECONDS);

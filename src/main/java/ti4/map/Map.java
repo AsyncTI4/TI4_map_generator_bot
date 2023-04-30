@@ -21,6 +21,7 @@ import ti4.commands.player.PlanetRemove;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 
@@ -374,6 +375,7 @@ public class Map {
             put("FoW", isFoWMode());
             put("Absol", isAbsolMode());
             put("DiscordantStars", isDiscordantStarsMode());
+            put("StratPings", isStratPings());
         }};
         return gameModes.entrySet().stream().filter(gm -> gm.getValue()).map(java.util.Map.Entry::getKey).collect(Collectors.joining(", "));
     }
