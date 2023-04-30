@@ -199,7 +199,7 @@ public class ButtonListener extends ListenerAdapter {
             if (!actionRow4.isEmpty()) baseMessageObject4.addComponents(actionRow4);
                     event.getChannel().sendMessage(baseMessageObject4.build()).queue(message4_ -> {
             });
-        } else if (buttonID.startsWith("sc_follow_")) {
+        } else if (buttonID.startsWith("sc_follow_") && (!buttonID.contains("leadership")) && (!buttonID.contains("trade"))) {
             boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
             if (!used) {
                 String message = deductCC(player, event);
@@ -297,6 +297,22 @@ public class ButtonListener extends ListenerAdapter {
                     player.setCommodities(player.getCommoditiesTotal());
                     addReaction(event, false, false, message, "");
                     addReaction(event, false, false, "Replenishing Commodities", "");
+                }
+                case "sc_follow_trade" -> {
+                    boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
+                    if (used) {
+                        break;
+                    }
+                    String message = deductCC(player, event);
+                    player.addFollowedSC(5);
+                    player.setCommodities(player.getCommoditiesTotal());
+                    addReaction(event, false, false, message, "");
+                    addReaction(event, false, false, "Replenishing Commodities", "");
+                }
+                case "sc_follow_leadership" -> {
+                    String message = Helper.getPlayerPing(player) + " following.";
+                    player.addFollowedSC(1);
+                    addReaction(event, false, false, message, "");
                 }
                 case "sc_leadership_follow" -> {
                     String message = Helper.getPlayerPing(player) + " following.";
