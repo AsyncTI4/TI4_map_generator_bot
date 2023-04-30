@@ -45,9 +45,10 @@ abstract public class AddRemoveUnits implements Command {
                 return;
             }
 
-            String tileOption = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString).toLowerCase(), " ");
+            OptionMapping option = event.getOption(Constants.TILE_NAME);
+            String tileOption = option != null ? StringUtils.substringBefore(event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString).toLowerCase(), " ") : "nombox";
             String tileID = AliasHandler.resolveTile(tileOption);
-            Tile tile = getTile(event, tileID, activeMap);
+            Tile tile = getTileObject(event, tileID, activeMap);
             if (tile == null) return;
 
             unitParsingForTile(event, color, tile, activeMap);
@@ -64,6 +65,10 @@ abstract public class AddRemoveUnits implements Command {
                 MessageHelper.replyToMessage(event, "Map update completed");
             }
         }
+    }
+
+    public Tile getTileObject(SlashCommandInteractionEvent event, String tileID, Map activeMap) {
+        return getTile(event, tileID, activeMap);
     }
 
     public static Tile getTile(SlashCommandInteractionEvent event, String tileID, Map activeMap) {
@@ -115,8 +120,11 @@ abstract public class AddRemoveUnits implements Command {
             if (unitInfoTokenizer.hasMoreTokens() && numberIsSet) {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
+
+            color = recheckColorForUnit(unit, color, event);
+
             String unitID = Mapper.getUnitID(unit, color);
-            String unitPath = tile.getUnitPath(unitID);
+            String unitPath = Tile.getUnitPath(unitID);
             if (unitPath == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
                 continue;
@@ -162,6 +170,10 @@ abstract public class AddRemoveUnits implements Command {
             }
         }
         actionAfterAll(event, tile, color, map);
+    }
+
+    protected String recheckColorForUnit(String unit, String color, SlashCommandInteractionEvent event) {
+        return color;
     }
 
     public void unitParsing(ButtonInteraction event, String color, Tile tile, String unitList, Map map) {

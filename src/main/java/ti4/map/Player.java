@@ -90,6 +90,8 @@ public class Player {
     private int numberOfTurns = 0;
     private long totalTimeSpent = 0;
 
+    private Tile nomboxTile = new Tile("nombox", "nombox");
+
     public Player() {
     }
 
@@ -97,6 +99,10 @@ public class Player {
                   @JsonProperty("userName") String userName) {
         this.userID = userID;
         this.userName = userName;
+    }
+
+    public Tile getNomboxTile() {
+        return nomboxTile;
     }
 
     public List<String> getMahactCC() {

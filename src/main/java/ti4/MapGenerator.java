@@ -12,6 +12,7 @@ import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.bothelper.BothelperCommand;
+import ti4.commands.capture.CaptureCommand;
 import ti4.commands.cards.CardsInfo;
 import ti4.commands.cardsac.ACCardsCommand;
 import ti4.commands.agenda.AgendaCommand;
@@ -151,6 +152,7 @@ public class MapGenerator {
         commandManager.addCommand(new FOWCommand());
         commandManager.addCommand(new MiltyCommand());
         commandManager.addCommand(new FrankenCommand());
+        commandManager.addCommand(new CaptureCommand());
 
         guildPrimary = jda.getGuildById(args[2]);
 

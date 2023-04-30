@@ -330,6 +330,7 @@ public class Constants {
     public static final String IRF = "industrial_relic_fragment";
     public static final String VRF = "void_relic_fragment";
     public static final String STRATEGY_CARD = "strategy_card";
+    public static final String CAPTURE = "capture";
     public static final String SC2 = "2nd_choice";
     public static final String SC3 = "3rd_choice";
     public static final String SC4 = "4th_choice";

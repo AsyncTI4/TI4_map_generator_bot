@@ -486,6 +486,16 @@ public class MapSaveLoadManager {
             writer.write(Constants.STASIS_INFANTRY + " " + player.getStasisInfantry());
             writer.write(System.lineSeparator());
 
+            UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
+            StringBuilder units = new StringBuilder();
+            if (unitHolder != null){
+                for (java.util.Map.Entry<String, Integer> entry : unitHolder.getUnits().entrySet()) {
+                    units.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
+                }
+            }
+            writer.write(Constants.CAPTURE + " " + units);
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.SO + " " + getSecretList(player.getSecrets()));
             writer.write(System.lineSeparator());
             writer.write(Constants.SO_SCORED + " " + getSecretList(player.getSecretsScored()));
@@ -1245,6 +1255,16 @@ public class MapSaveLoadManager {
                 case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.COMMODITIES -> player.setCommodities(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STASIS_INFANTRY -> player.setStasisInfantry(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.CAPTURE -> {
+                    UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
+                    StringTokenizer unitTokens = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (unitTokens.hasMoreTokens()) {
+                        StringTokenizer unitInfo = new StringTokenizer(unitTokens.nextToken(), ",");
+                        String id = unitInfo.nextToken();
+                        Integer index = Integer.parseInt(unitInfo.nextToken());
+                        unitHolder.addUnit(id, index);
+                    }
+                }
                 case Constants.AC -> {
                     StringTokenizer actionCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
                     while (actionCardToken.hasMoreTokens()) {
