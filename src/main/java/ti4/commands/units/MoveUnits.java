@@ -17,7 +17,11 @@ import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class MoveUnits extends AddRemoveUnits {
 
@@ -43,10 +47,19 @@ public class MoveUnits extends AddRemoveUnits {
 
         String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
-
-        String tileID = AliasHandler.resolveTile(event.getOption(Constants.TILE_NAME_TO).getAsString().toLowerCase());
         Map activeMap = mapManager.getUserActiveMap(userID);
-        tile = getTile(event, tileID, activeMap);
+
+        String tileID = null;
+        String tileOption = event.getOption(Constants.TILE_NAME_TO, null, OptionMapping::getAsString);
+        if (tileOption != null) { //get TILE_TO
+            tileOption = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME_TO, null, OptionMapping::getAsString).toLowerCase(), " ");
+            tileID = AliasHandler.resolveTile(tileOption);
+            tile = getTile(event, tileID, activeMap);
+        } else { //USE TILE_FROM
+            tileID = tile.getTileID();
+            tile = getTile(event, tileID, activeMap);
+        }
+
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Tile: " + tileID + " not found. Please try a different name or just use position coordinate");
             return;
@@ -59,15 +72,36 @@ public class MoveUnits extends AddRemoveUnits {
         }
 
         toAction = true;
-        unitList = event.getOption(Constants.UNIT_NAMES_TO).getAsString().toLowerCase();
+        String unitListTo = event.getOption(Constants.UNIT_NAMES_TO, null, OptionMapping::getAsString);
+        if (unitListTo != null) { //PROCEED AS NORMAL
+            unitList = unitListTo.toLowerCase();
+        } else { //USE UNIT_NAMES_FROM LIST
+            //CLEAN PLANETS FROM THE UNITLIST
+            System.out.println(unitList);
+            unitList = Arrays.asList(StringUtils.splitPreserveAllTokens(unitList, ","))
+                        .stream().map(String::trim).map(s -> {
+                            if (Arrays.asList(s.split(" ", -1)).size() > 2) {
+                                return StringUtils.substringBeforeLast(s, " ");
+                            }
+                            return s;
+                        })
+                        .collect(Collectors.joining(", "));
+            System.out.println(unitList);
+        }
+
+        //IF NO UNIT_LIST_TO AND TILE_NAME_TO THEN STOP, NO CHANGES HAPPEN
+        if (unitListTo == null && tileOption == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No change in tile or unit list. Please use either the `tile_name_to` option, the `unit_names_to` option, or both");
+            return;
+        }
+
         switch (unitList) {
-            case "0":
-            case "none":
+            case "0", "none" -> {
                 //Do nothing, as no unit was moved to
-                break;
-            default:
+            }
+            default -> {
                 unitParsing(event, color, tile, unitList, map);
-                break;
+            }
         }
 
         OptionMapping optionCC = event.getOption(Constants.CC_USE);
@@ -226,10 +260,10 @@ public class MoveUnits extends AddRemoveUnits {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "From System/Tile name").setRequired(true).setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns").setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "To System/Tile name").setRequired(true).setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Unit name/s. Example: Dread, 2 Warsuns").setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile to move units from").setRequired(true).setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Example: Dread, 2 Warsuns, 4 Infantry Sem-lore").setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile to move units to - Default: same tile in tile_name option (e.g. to land units)").setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option"))
                         .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type no or n to not add CC, r or retreat to add a CC without taking it from tactics").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units. Type in yes or y"))
