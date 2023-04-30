@@ -16,6 +16,7 @@ import ti4.commands.capture.CaptureCommand;
 import ti4.commands.cards.CardsInfo;
 import ti4.commands.cardsac.ACCardsCommand;
 import ti4.commands.agenda.AgendaCommand;
+import ti4.commands.all_info.AllInfo;
 import ti4.commands.cardspn.PNCardsCommand;
 import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.custom.CustomCommand;
@@ -117,6 +118,7 @@ public class MapGenerator {
         commandManager.addCommand(new RemoveUnits());
         commandManager.addCommand(new RemoveAllUnits());
         commandManager.addCommand(new CreateGame());
+        commandManager.addCommand(new AllInfo());
         commandManager.addCommand(new CardsInfo());
         commandManager.addCommand(new SetGame());
         commandManager.addCommand(new ShowGame());

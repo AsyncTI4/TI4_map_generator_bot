@@ -5,7 +5,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ACInfo_Legacy;
+import ti4.commands.cardsso.SOInfo;
+
 import org.jetbrains.annotations.NotNull;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
@@ -184,7 +187,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew 2 AC");
                 }
-                ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                ACInfo.sendActionCardInfo(activeMap, player, event);
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
                 break;
             case "dv1":
@@ -195,7 +198,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew SO");
                 }
-                ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
                 break;
             case "dw":

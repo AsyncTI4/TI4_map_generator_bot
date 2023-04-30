@@ -6,8 +6,10 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class DealSOToAll extends SOCardsSubcommandData {
     public DealSOToAll() {
@@ -29,7 +31,7 @@ public class DealSOToAll extends SOCardsSubcommandData {
                 for (int i = 0; i < count; i++) {
                     activeMap.drawSecretObjective(player.getUserID());
                 }
-                SOInfo.sendSecretObjectiveInfo(activeMap, player);
+                SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
             }
         }
         sendMessage(count + " SO Dealt to All");
