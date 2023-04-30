@@ -525,7 +525,7 @@ public class ButtonListener extends ListenerAdapter {
                     addReaction(event, false, false, "Declined Explore", "");
                 }
                 case "confirm_cc" -> {
-                    addReaction(event, true, false, "Confirmed CCs", "");
+                    addReaction(event, true, false, "Confirmed CCs: "+player.getTacticalCC()+"/"+player.getFleetCC()+"/"+player.getStrategicCC(), "");
                 }
                 case "draw_1_AC" -> {
                     activeMap.drawActionCard(player.getUserID());
