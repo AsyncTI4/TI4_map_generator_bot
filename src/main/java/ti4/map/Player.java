@@ -35,6 +35,7 @@ public class Player {
 
     private String faction;
     private String color;
+    private String autoCompleteRepresentation = null;
 
     private int tacticalCC = 3;
     private int fleetCC = 3;
@@ -1058,5 +1059,39 @@ public class Player {
     
     public void setTotalTurnTime(long totalTime) {
         totalTimeSpent = totalTime;
+    }
+
+    @JsonIgnore
+    public String getAutoCompleteRepresentation() {
+        return getAutoCompleteRepresentation(false);
+    }
+
+    @JsonIgnore
+    public String getAutoCompleteRepresentation(boolean reset) {
+        if (reset || this.autoCompleteRepresentation == null) {
+            String faction = getFaction();
+            if (faction == null || faction == "null") {
+                faction = "No Faction";
+            } else {
+                faction = Mapper.getFactionRepresentations().get(faction);
+            }
+    
+            String color = getColor();
+            if (color == null || color == "null") color = "No Color";
+    
+            String userName = getUserName();
+            if (userName == null || userName.isEmpty() || userName.isBlank()) {
+                userName = "No User";
+            }
+            
+            String representation = color + " / " + faction + " / " + userName;
+            setAutoCompleteRepresentation(representation);
+            return getAutoCompleteRepresentation();
+        }
+        return this.autoCompleteRepresentation;
+    }
+
+    public void setAutoCompleteRepresentation(String representation) {
+        this.autoCompleteRepresentation = representation;
     }
 }
