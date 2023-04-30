@@ -71,25 +71,35 @@ public class AutoCompleteProvider {
                 }
             }
             case Constants.FACTION_COLOR, Constants.FACTION_COLOR_1, Constants.FACTION_COLOR_2 -> {
-                String enteredValue = event.getFocusedOption().getValue();
-                List<String> factionColors = new ArrayList<>(Mapper.getFactions());
-                factionColors.addAll(Mapper.getColors());
+                if (activeMap == null) event.replyChoiceStrings("No game found in this channel").queue();
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                if (activeMap.isFoWMode()) {
+                    List<String> factionColors = new ArrayList<>(Mapper.getFactions());
+                    factionColors.addAll(Mapper.getColors());
 
-                List<String> factionColorsRetain = new ArrayList<>();
-                Boolean privateGame = FoWHelper.isPrivateGame(activeMap, null, event.getChannel());
-                for (Player player_ : activeMap.getPlayers().values()) {
-                    if (privateGame == null || !privateGame) {
-                        factionColorsRetain.add(player_.getFaction());
+                    List<String> factionColorsRetain = new ArrayList<>();
+                    Boolean privateGame = FoWHelper.isPrivateGame(activeMap, null, event.getChannel());
+                    for (Player player_ : activeMap.getPlayers().values()) {
+                        if (privateGame == null || !privateGame) {
+                            factionColorsRetain.add(player_.getFaction());
+                        }
+                        factionColorsRetain.add(player_.getColor());
                     }
-                    factionColorsRetain.add(player_.getColor());
-                }
-                factionColors.retainAll(factionColorsRetain);
-                List<Command.Choice> options = factionColors.stream()
-                        .filter(token -> token.contains(enteredValue))
+                    factionColors.retainAll(factionColorsRetain);
+                    List<Command.Choice> options = factionColors.stream()
+                    .filter(token -> token.contains(enteredValue))
+                    .limit(25)
+                    .map(token -> new Command.Choice(token, token))
+                    .collect(Collectors.toList());
+                    event.replyChoices(options).queue();
+                } else {
+                    List<Command.Choice> options = activeMap.getPlayers().values().stream()
+                        .filter(p -> p.getAutoCompleteRepresentation().toLowerCase().contains(enteredValue))
                         .limit(25)
-                        .map(token -> new Command.Choice(token, token))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
+                        .map(p -> new Command.Choice(p.getAutoCompleteRepresentation(), p.getColor()))
+                        .toList();
+                    event.replyChoices(options).queue();
+                }
             }
             case Constants.CC_USE -> {
                 String enteredValue = event.getFocusedOption().getValue();
