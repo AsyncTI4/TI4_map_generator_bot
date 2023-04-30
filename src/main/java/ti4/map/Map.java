@@ -374,6 +374,7 @@ public class Map {
             put("FoW", isFoWMode());
             put("Absol", isAbsolMode());
             put("DiscordantStars", isDiscordantStarsMode());
+            put("StratPings", isStratPings());
         }};
         return gameModes.entrySet().stream().filter(gm -> gm.getValue()).map(java.util.Map.Entry::getKey).collect(Collectors.joining(", "));
     }
