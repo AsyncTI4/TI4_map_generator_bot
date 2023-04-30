@@ -31,6 +31,10 @@ public class TechInfo extends PlayerSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
+        sendTechInfo(activeMap, player, event);
+    }
+
+    public static void sendTechInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
         String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendTechInfo(activeMap, player);

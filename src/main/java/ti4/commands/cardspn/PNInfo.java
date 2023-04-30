@@ -32,10 +32,14 @@ public class PNInfo extends PNCardsSubcommandData {
             return;
         }
         checkAndAddPNs(activeMap, player);
+        sendPromissoryNoteInfo(activeMap, player, true, event);
+        sendMessage("PN Info Sent");
+    }
+
+    public static void sendPromissoryNoteInfo(Map activeMap, Player player, boolean longFormat, SlashCommandInteractionEvent event) {
         String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        sendPromissoryNoteInfo(activeMap, player, true);
-        sendMessage("PN Info Sent");
+        sendPromissoryNoteInfo(activeMap, player, longFormat);
     }
 
     public static void sendPromissoryNoteInfo(Map activeMap, Player player, boolean longFormat) {

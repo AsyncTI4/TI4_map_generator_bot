@@ -31,10 +31,14 @@ public class ACInfo extends ACCardsSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
+        sendActionCardInfo(activeMap, player, event);
+        sendMessage("AC Info Sent");
+    }
+
+    public static void sendActionCardInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
         String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendActionCardInfo(activeMap, player);
-        sendMessage("AC Info Sent");
     }
 
     public static void sendActionCardInfo(Map activeMap, Player player) {

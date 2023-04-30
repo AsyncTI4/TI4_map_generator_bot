@@ -28,6 +28,10 @@ public class AbilityInfo extends PlayerSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
+        sendAbilityInfo(activeMap, player, event);
+    }
+
+    public static void sendAbilityInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
         String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendAbilityInfo(activeMap, player);

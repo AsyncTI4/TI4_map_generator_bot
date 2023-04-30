@@ -31,12 +31,16 @@ public class SOInfo extends SOCardsSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
-        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        sendSecretObjectiveInfo(activeMap, player);
+        sendSecretObjectiveInfo(activeMap, player, event);
         sendMessage("SO Info Sent");
     }
 
+    public static void sendSecretObjectiveInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
+        sendSecretObjectiveInfo(activeMap, player);
+    }
+    
     public static void sendSecretObjectiveInfo(Map activeMap, Player player) {
         //SO INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getSecretObjectiveCardInfo(activeMap, player));
@@ -85,7 +89,6 @@ public class SOInfo extends SOCardsSubcommandData {
         }
         StringBuilder sb = new StringBuilder();
         int index = 1;
-        sb.append(Helper.getPlayerPing(player)).append("\n");
 
         //SCORED SECRET OBJECTIVES
         sb.append("**Scored Secret Objectives:**").append("\n");

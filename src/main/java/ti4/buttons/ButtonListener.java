@@ -18,9 +18,11 @@ import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
 import ti4.MessageListener;
 import ti4.commands.agenda.RevealAgenda;
+import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.map.UnitHolder;
 import ti4.commands.cardsac.PlayAC;
+import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.status.Cleanup;
@@ -274,7 +276,7 @@ public class ButtonListener extends ListenerAdapter {
                     for (int i = 0; i < count; i++) {
                         activeMap.drawActionCard(player.getUserID());
                     }
-                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                    ACInfo.sendActionCardInfo(activeMap, player);
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_draw_so" -> {
@@ -285,7 +287,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = "Drew Secret Objective";
                     activeMap.drawSecretObjective(player.getUserID());
                     player.addFollowedSC(8);
-                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                    SOInfo.sendSecretObjectiveInfo(activeMap, player);
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_trade_follow" -> {
@@ -454,7 +456,7 @@ public class ButtonListener extends ListenerAdapter {
                         for (int i = 0; i < count2; i++) {
                             activeMap.drawActionCard(player.getUserID());
                         }
-                        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                        ACInfo.sendActionCardInfo(activeMap, player);
                         addReaction(event, false, false,"Spent 1 commodity for "+count2+ " AC", "");
                     }
                     else if(player.getTg() > 0)
@@ -463,7 +465,7 @@ public class ButtonListener extends ListenerAdapter {
                         for (int i = 0; i < count2; i++) {
                             activeMap.drawActionCard(player.getUserID());
                         }
-                        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                        ACInfo.sendActionCardInfo(activeMap, player);
                         addReaction(event, false, false,"Spent 1 tg for an AC", "");
 
                     }
@@ -529,7 +531,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "draw_1_AC" -> {
                     activeMap.drawActionCard(player.getUserID());
-                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                    ACInfo.sendActionCardInfo(activeMap, player);
                     addReaction(event, true, false, "Drew 1 AC", "");
                 }
                 case "pass_on_abilities" -> {
