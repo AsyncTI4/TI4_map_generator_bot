@@ -404,7 +404,7 @@ public class GenerateMap {
                             scText = getSCNumberIfNaaluInPlay(player, map, scText);
                         }
                         graphics.setColor(getSCColor(sc, map));
-                        
+
                         if (scText.contains("0/")) {
                             graphics.setFont(Storage.getFont64());
                             graphics.drawString("0", x + 90, y + 70 + yDelta);
@@ -484,6 +484,8 @@ public class GenerateMap {
                 y += 200;
 
                 int soCount = objectivesSO(map, yPlayArea + 150, player);
+
+                nombox(player, width - 450, yPlayArea);
 
                 int xDeltaSecondRow = xDelta;
                 int yPlayAreaSecondRow = yPlayArea + 160;
@@ -707,21 +709,15 @@ public class GenerateMap {
         if (unitCount.isEmpty()) {
             for (Tile tile : tileMap.values()) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    HashMap<String, Integer> units = unitHolder.getUnits();
-                    for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
-                        String key = unitEntry.getKey();
-                        Integer count = unitCount.get(key);
-                        if (count == null) {
-                            count = 0;
-                        }
-                        if (key.contains("gf") || key.contains("ff")) {
-                            count++;
-                        } else {
-                            count += unitEntry.getValue();
-                        }
-                        unitCount.put(key, count);
-                    }
+                    fillUnits(unitCount, unitHolder, false);
                 }
+            }
+            for (Player player_ : map.getPlayers().values()) {
+                UnitHolder unitHolder = player_.getNomboxTile().getUnitHolders().get(Constants.SPACE);
+                if (unitHolder == null){
+                    continue;
+                }
+                fillUnits(unitCount, unitHolder, true);
             }
         }
 
@@ -796,6 +792,171 @@ public class GenerateMap {
 
     }
 
+    private static void fillUnits(HashMap<String, Integer> unitCount, UnitHolder unitHolder, boolean ignoreInfantryFighters) {
+        HashMap<String, Integer> units = unitHolder.getUnits();
+        for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+            String key = unitEntry.getKey();
+            Integer count = unitCount.get(key);
+            if (count == null) {
+                count = 0;
+            }
+            if (key.contains("gf") || key.contains("ff")) {
+                if (ignoreInfantryFighters){
+                    continue;
+                }
+                count++;
+            } else {
+                count += unitEntry.getValue();
+            }
+            unitCount.put(key, count);
+        }
+    }
+
+    private void nombox(Player player, int x, int y) {
+
+        UnitHolder unitHolder = player.getNomboxTile().getUnitHolders().get(Constants.SPACE);
+        if (unitHolder == null || unitHolder.getUnits().isEmpty()) {
+            return;
+        }
+
+        Point infPoint = new Point(50, 75);
+        Point fighterPoint = new Point(50, 125);
+        Point mechPoint = new Point(100, 63);
+        Point destroyerPoint = new Point(144, 63);
+        Point cruiserPoint = new Point(185, 55);
+        Point carrierPoint = new Point(235, 58);
+        Point dreadnoughtPoint = new Point(284, 54);
+        Point flagshipPoint = new Point(335, 47);
+        Point warSunPoint = new Point(393, 56);
+
+        String faction = player.getFaction();
+        if (faction != null) {
+            String factionPath = getFactionPath(faction);
+            if (factionPath != null) {
+                try {
+                    BufferedImage bufferedImage = ImageIO.read(new File(factionPath));
+                    graphics.drawImage(bufferedImage, x + 178, y + 33, null);
+                } catch (IOException e) {
+                    BotLogger.log("Could not paint faction: " + faction, e);
+                }
+            }
+        }
+
+        drawPAImage(x, y, "pa_nombox.png");
+
+        HashMap<String, Integer> tempUnits = new HashMap<>(unitHolder.getUnits());
+        LinkedHashMap<String, Integer> units = new LinkedHashMap<>();
+
+
+        for (java.util.Map.Entry<String, Integer> entry : tempUnits.entrySet()) {
+            String id = entry.getKey();
+            //contains mech image
+            if (id != null && id.contains("mf")) {
+                units.put(id, entry.getValue());
+            }
+        }
+
+        for (String key : units.keySet()) {
+            tempUnits.remove(key);
+        }
+        units.putAll(tempUnits);
+
+        BufferedImage image = null;
+
+        List<String> order = List.of("_mf.png", "_dd.png", "_ca.png", "_cv.png", "_dn.png", "_fs.png", "_ws.png", "_ff.png", "_gf.png");
+
+        java.util.Map<String, List<java.util.Map.Entry<String, Integer>>> collect = units.entrySet().stream().collect(Collectors.groupingBy(key -> key.getKey().substring(key.getKey().lastIndexOf("_"))));
+        for (String orderKey : order) {
+            List<java.util.Map.Entry<String, Integer>> entry = collect.get(orderKey);
+            if (entry == null){
+                continue;
+            }
+
+            int countOfUnits = 0;
+            for (java.util.Map.Entry<String, Integer> entrySet : entry) {
+                countOfUnits += entrySet.getValue();
+            }
+            int deltaY = 0;
+            for (java.util.Map.Entry<String, Integer> unitEntry : entry) {
+                String unitID = unitEntry.getKey();
+                Integer unitCount = unitEntry.getValue();
+                Integer bulkUnitCount = null;
+
+                if (unitID.endsWith(Constants.COLOR_FF)) {
+                    unitID = unitID.replace(Constants.COLOR_FF, Constants.BULK_FF);
+                    bulkUnitCount = unitCount;
+                } else if (unitID.endsWith(Constants.COLOR_GF)) {
+                    unitID = unitID.replace(Constants.COLOR_GF, Constants.BULK_GF);
+                    bulkUnitCount = unitCount;
+                }
+                try {
+                    float scaleOfUnit = 1.0f;
+                    String unitPath = Tile.getUnitPath(unitID);
+                    image = resizeImage(ImageIO.read(new File(unitPath)), scaleOfUnit);
+                } catch (Exception e) {
+                    BotLogger.log("Could not parse unit file for: " + unitID, e);
+                }
+                if (bulkUnitCount != null && bulkUnitCount > 0) {
+                    unitCount = 1;
+                }
+                if (image == null) {
+                    BotLogger.log("Could not find unit image for: " + unitID);
+                    continue;
+                }
+
+
+                if (unitCount == null) {
+                    unitCount = 0;
+                }
+
+                Point position = new Point(x, y);
+                boolean justNumber = false;
+                if (unitID.contains("_tkn_ff.png")) {
+                    position.x += fighterPoint.x;
+                    position.y += fighterPoint.y;
+                    justNumber = true;
+                } else if (unitID.contains("_tkn_gf.png")) {
+                    position.x += infPoint.x;
+                    position.y += infPoint.y;
+                    justNumber = true;
+                } else if (unitID.contains("_ca.png")) {
+                    position.x += cruiserPoint.x;
+                    position.y += cruiserPoint.y;
+                } else if (unitID.contains("_cv.png")) {
+                    position.x += carrierPoint.x;
+                    position.y += carrierPoint.y;
+                } else if (unitID.contains("_dd.png")) {
+                    position.x += destroyerPoint.x;
+                    position.y += destroyerPoint.y;
+                } else if (unitID.contains("_mf.png")) {
+                    position.x += mechPoint.x;
+                    position.y += mechPoint.y;
+                } else if (unitID.contains("_dn.png")) {
+                    position.x += dreadnoughtPoint.x;
+                    position.y += dreadnoughtPoint.y;
+                } else if (unitID.contains("_fs.png")) {
+                    position.x += flagshipPoint.x;
+                    position.y += flagshipPoint.y;
+                } else if (unitID.contains("_ws.png")) {
+                    position.x += warSunPoint.x;
+                    position.y += warSunPoint.y;
+                }
+
+                if (justNumber){
+                    graphics.setFont(Storage.getFont40());
+                    graphics.setColor(Color.WHITE);
+                    graphics.drawString(Integer.toString(countOfUnits), position.x, position.y);
+                    break;
+                }
+                position.y -= (countOfUnits * 5);
+                for (int i = 0; i < unitCount; i++) {
+                    graphics.drawImage(image, position.x, position.y + deltaY, null);
+                    deltaY += 10;
+                }
+            }
+        }
+    }
+
     private void paintNumber(String unitID, int x, int y, int reinforcementsCount, String color) {
         String id = "number_" + unitID;
         UnitTokenPosition textPosition = PositionMapper.getReinforcementsPosition(id);
@@ -827,7 +988,7 @@ public class GenerateMap {
 
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
-        
+
         //RESOURCE/INFLUENCE TOTALS
         drawPAImage(x + deltaX - 2, y - 2, "pa_resinf_info.png");
         graphics.setColor(Color.WHITE);
@@ -881,9 +1042,9 @@ public class GenerateMap {
             if (player.getUserID().equals("203608548440014848")) graphics.setColor(Color.decode("#f616ce"));
             drawCenteredString(graphics, String.valueOf(availablePlayerFlex), new Rectangle(x + deltaX, y + 115, 150, 20), Storage.getFont18());
             // drawCenteredString(graphics, String.valueOf(totalPlayerFlex), new Rectangle(x + deltaX + 185, y + 109, 32, 32), Storage.getFont32());
-        
+
         }
-    
+
         deltaX += 156;
 
         boolean randomizeList = player != fowPlayer && isFoWPrivate != null && isFoWPrivate;
