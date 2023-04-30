@@ -257,6 +257,20 @@ public class Helper {
         };
     }
 
+    public static String getSCImageLink(Integer sc) {
+        return switch (sc) {
+            case 1 -> Constants.LEADERSHIP_IMAGE_LINK;
+            case 2 -> Constants.DIPLOMACY_IMAGE_LINK;
+            case 3 -> Constants.POLITICS_IMAGE_LINK;
+            case 4 -> Constants.CONSTRUCTION_IMAGE_LINK;
+            case 5 -> Constants.TRADE_IMAGE_LINK;
+            case 6 -> Constants.WARFARE_IMAGE_LINK;
+            case 7 -> Constants.TECHNOLOGY_IMAGE_LINK;
+            case 8 -> Constants.IMPERIAL_IMAGE_LINK;
+            default -> null;
+        };
+    }
+
     //private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
 
     @NotNull

@@ -94,6 +94,10 @@ public class SCPlay extends PlayerSubcommandData {
             player2.removeFollowedSC(scToPlay);
         }
         
+        if (activeMap.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
+            MessageHelper.sendMessageToChannel(mainGameChannel, Helper.getSCImageLink(scToPlay));
+        }
+
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
         //GET BUTTONS
         ActionRow actionRow = null;
