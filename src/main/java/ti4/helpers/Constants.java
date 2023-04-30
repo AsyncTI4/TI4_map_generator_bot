@@ -645,4 +645,13 @@ public class Constants {
     public static final String THREAD_SEARCH_STRING = "thread_search_string";
     public static final String AUTO_ARCHIVE_DURATION = "auto_archive_duration";
 
+    public static final String LEADERSHIP_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/1/1e/Ti07_strategy_1_leadership.png/revision/latest?cb=20200827003959";
+    public static final String DIPLOMACY_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/a/a1/Untitled.png/revision/latest?cb=20210623202428";
+    public static final String POLITICS_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/f/f1/Ti07_strategy_3_politics.png/revision/latest?cb=20200827005158";
+    public static final String CONSTRUCTION_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/5/5e/Newconstruction.png/revision/latest?cb=20210221060723";
+    public static final String TRADE_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/c/ca/Ti07_strategy_5_trade.png/revision/latest?cb=20200827005351";
+    public static final String WARFARE_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/0/02/Ti07_strategy_6_warfare.png/revision/latest?cb=20200827005450";
+    public static final String TECHNOLOGY_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/e/ea/Ti07_strategy_7_technology.png/revision/latest?cb=20200827005534";
+    public static final String IMPERIAL_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/2/24/Ti07_strategy_8_imperial.png/revision/latest?cb=20200827005806";
+
 }
