@@ -953,10 +953,10 @@ public class GenerateMap {
                     graphics.drawString(Integer.toString(countOfUnits), position.x, position.y);
                     break;
                 }
-                position.y -= (countOfUnits * 5);
+                position.y -= (countOfUnits * 7);
                 for (int i = 0; i < unitCount; i++) {
                     graphics.drawImage(image, position.x, position.y + deltaY, null);
-                    deltaY += 10;
+                    deltaY += 14;
                 }
             }
         }
