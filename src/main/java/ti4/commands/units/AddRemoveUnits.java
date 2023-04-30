@@ -26,6 +26,8 @@ import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang3.StringUtils;
+
 abstract public class AddRemoveUnits implements Command {
 
     @Override
@@ -43,7 +45,8 @@ abstract public class AddRemoveUnits implements Command {
                 return;
             }
 
-            String tileID = AliasHandler.resolveTile(event.getOption(Constants.TILE_NAME).getAsString().toLowerCase());
+            String tileOption = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString).toLowerCase(), " ");
+            String tileID = AliasHandler.resolveTile(tileOption);
             Tile tile = getTile(event, tileID, activeMap);
             if (tile == null) return;
 
@@ -192,7 +195,7 @@ abstract public class AddRemoveUnits implements Command {
             String unitID = Mapper.getUnitID(unit, color);
             String unitPath = tile.getUnitPath(unitID);
             if (unitPath == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
                 continue;
             }
             if (unitInfoTokenizer.hasMoreTokens()) {
@@ -204,7 +207,7 @@ abstract public class AddRemoveUnits implements Command {
                 // }
             }
 
-            planetName = getPlanet(event, tile, planetName);
+            planetName = getPlanet((GenericInteractionCreateEvent) event, tile, planetName);
             unitAction((GenericInteractionCreateEvent) event, tile, count, planetName, unitID, color);
             addPlanetToPlayArea(event, tile, planetName);
         }
@@ -300,7 +303,7 @@ abstract public class AddRemoveUnits implements Command {
         }
     }
 
-    public static String getPlanet(SlashCommandInteractionEvent event, Tile tile, String planetName) {
+    public static String getPlanet(GenericInteractionCreateEvent event, Tile tile, String planetName) {
         if (!tile.isSpaceHolderValid(planetName)) {
             Set<String> unitHolderIDs = new HashSet<>(tile.getUnitHolders().keySet());
             unitHolderIDs.remove(Constants.SPACE);
@@ -309,24 +312,10 @@ abstract public class AddRemoveUnits implements Command {
                     .collect(Collectors.toList());
             if (validUnitHolderIDs.size() == 1) {
                 planetName = validUnitHolderIDs.get(0);
+            } else if (validUnitHolderIDs.size() > 1) {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Multiple planets found that match `" + planetName + "`: `" + validUnitHolderIDs + "`");
             } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planetName + " is not valid and not supported.");
-            }
-        }
-        return planetName;
-    }
-
-    public static String getPlanet(ButtonInteraction event, Tile tile, String planetName) {
-        if (!tile.isSpaceHolderValid(planetName)) {
-            Set<String> unitHolderIDs = new HashSet<>(tile.getUnitHolders().keySet());
-            unitHolderIDs.remove(Constants.SPACE);
-            String finalPlanetName = planetName;
-            List<String> validUnitHolderIDs = unitHolderIDs.stream().filter(unitHolderID -> unitHolderID.startsWith(finalPlanetName))
-                    .collect(Collectors.toList());
-            if (validUnitHolderIDs.size() == 1) {
-                planetName = validUnitHolderIDs.get(0);
-            } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planetName + " is not valid and not supported.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet `" + planetName + "` could not be resolved. Valid options for tile `" + tile.getRepresentationForAutoComplete() + "` are: `" + unitHolderIDs + "`");
             }
         }
         return planetName;
