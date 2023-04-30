@@ -525,7 +525,7 @@ public class ButtonListener extends ListenerAdapter {
                     addReaction(event, false, false, "Declined Explore", "");
                 }
                 case "confirm_cc" -> {
-                    addReaction(event, false, false, "Confirmed CCs", "");
+                    addReaction(event, true, false, "Confirmed CCs", "");
                 }
                 case "draw_1_AC" -> {
                     activeMap.drawActionCard(player.getUserID());
@@ -732,7 +732,7 @@ public class ButtonListener extends ListenerAdapter {
             event.getChannel().addReactionById(messageId, emojiToUse).queue();
         }
         
-        if (!skipReaction || activeMap.isFoWMode()) {
+        if (!skipReaction) {
             event.getChannel().addReactionById(messageId, emojiToUse).queue();
             checkForAllReactions(event, activeMap);
             if (message == null || message.isEmpty()) return;
@@ -841,7 +841,7 @@ public class ButtonListener extends ListenerAdapter {
                 });
             }
             case "draw_1_AC","pass_on_abilities","confirm_cc"-> {
-                if(false && activeMap.isCustodiansScored())
+                if(activeMap.isCustodiansScored())
                 {
                     new RevealAgenda().revealAgenda(event, false, activeMap, event.getChannel());
                 }
