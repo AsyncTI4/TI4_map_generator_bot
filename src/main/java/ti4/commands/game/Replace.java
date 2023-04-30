@@ -25,7 +25,7 @@ public class Replace extends GameSubcommandData {
 
     public Replace() {
         super(Constants.REPLACE, "Replace player in game");
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Replace player in Faction/Color ").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Replace player in Faction/Color ").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Replacement player @playerName").setRequired(true));
     }
 
