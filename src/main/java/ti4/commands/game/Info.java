@@ -49,6 +49,7 @@ public class Info extends GameSubcommandData{
         if (map.isHasEnded()) sb.append(" - GAME HAS ENDED");
         sb.append(NEW_LINE);
         sb.append("Game Modes: " + map.getGameModesText()).append(NEW_LINE);
+        sb.append("Auto-Ping Time Interval (hrs): " + map.getAutoPingSpacer()).append(NEW_LINE);
         sb.append("Created: " + map.getCreationDate()).append(NEW_LINE);
         sb.append("Last Modified: " + Helper.getDateRepresentation(map.getLastModifiedDate())).append(NEW_LINE);
         if (privateGame == null || privateGame == false) {
