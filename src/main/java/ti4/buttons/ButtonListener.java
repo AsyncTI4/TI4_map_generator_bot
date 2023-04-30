@@ -259,7 +259,7 @@ public class ButtonListener extends ListenerAdapter {
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_draw_so" -> {
-                    boolean used = addUsedSCPlayer(messageID + "so", activeMap, player, event, "");
+                    boolean used = addUsedSCPlayer(messageID + "so", activeMap, player, event, " Drew a " + Emojis.SecretObjective);
                     if (used) {
                         break;
                     }
@@ -340,6 +340,20 @@ public class ButtonListener extends ListenerAdapter {
                     player.setTg(tg + 3);
                     player.setCommodities(player.getCommoditiesTotal());
                     addReaction(event, false, false, "gained 3" + Emojis.tg + " and replenished commodities (" + String.valueOf(player.getCommodities()) + Emojis.comm + ")", "");
+                }
+                case "score_imperial" -> {
+                    if (player == null || activeMap == null) {
+                        break;
+                    }
+                    if (!player.getSCs().contains(8)) {
+                        MessageHelper.sendMessageToChannel(privateChannel, "Only the player who has " + Helper.getSCBackRepresentation(event, 8) + " can score the Imperial point");
+                        break;
+                    }
+                    boolean used = addUsedSCPlayer(messageID + "score_imperial", activeMap, player, event, " scored Imperial");
+                    if (used) {
+                        break;
+                    }
+                    ScorePublic.scorePO(event, privateChannel, activeMap, player, 0);
                 }
                 //AFTER AN AGENDA HAS BEEN REVEALED
                 case "play_when" -> {
@@ -586,7 +600,7 @@ public class ButtonListener extends ListenerAdapter {
     }
 
 
-    private boolean addUsedSCPlayer(String messageID, Map map, Player player, @NotNull ButtonInteractionEvent event, String text) {
+    private boolean addUsedSCPlayer(String messageID, Map map, Player player, @NotNull ButtonInteractionEvent event, String defaultText) {
         Set<Player> players = playerUsedSC.get(messageID);
         if (players == null) {
             players = new HashSet<>();
@@ -595,8 +609,8 @@ public class ButtonListener extends ListenerAdapter {
         players.add(player);
         playerUsedSC.put(messageID, players);
         if (contains) {
-            String defaultText = text.isEmpty() ? "Secondary of Strategy Card" : text;
-            String message = "Player: " + Helper.getPlayerPing(player) + " already used " + defaultText;
+            String alreadyUsedMessage = defaultText.isEmpty() ? "used Secondary of Strategy Card" : defaultText;
+            String message = "Player: " + Helper.getPlayerPing(player) + " already " + alreadyUsedMessage;
             if (map.isFoWMode()) {
                 MessageHelper.sendPrivateMessageToPlayer(player, map, message);
             } else {
