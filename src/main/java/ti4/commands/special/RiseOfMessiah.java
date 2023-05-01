@@ -43,7 +43,7 @@ public class RiseOfMessiah extends SpecialSubcommandData {
                         }
                     }
                     if (ignorePlanet){
-                        break;
+                        continue;
                     }
                     new AddUnits().unitParsing(event, player.getColor(), tile, "inf "+unitHolder.getName(), activeMap);
                 }
