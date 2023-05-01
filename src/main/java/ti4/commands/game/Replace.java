@@ -69,9 +69,13 @@ public class Replace extends GameSubcommandData {
                 }
             }
 
+            //REMOVE ROLE
             Guild guild = event.getGuild();
             Member removedMember = guild.getMemberById(removedPlayer.getUserID());
-            if (removedMember != null) guild.removeRoleFromMember(removedMember, guild.getRolesByName(map.getName(),true).get(0)).queue();
+            List<Role> roles = guild.getRolesByName(map.getName(), true);
+            if (removedMember != null && roles != null && roles.size() == 1) {
+                guild.removeRoleFromMember(removedMember, roles.get(0)).queue();
+            }
 
             if (players.stream().anyMatch(player -> player.getUserID().equals(removedPlayer.getUserID())) &&
             players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()))) {
