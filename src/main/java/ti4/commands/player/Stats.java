@@ -14,6 +14,7 @@ import ti4.map.*;
 import ti4.message.MessageHelper;
 
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.StringTokenizer;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -49,14 +50,9 @@ public class Stats extends PlayerSubcommandData {
 			return;
 		}
 
-		//NO OPTIONS SELECTED, JUST DISPLAY STATS
-		if (event.getOptions().isEmpty() && !activeMap.isFoWMode()) {
-			sendMessage(getPlayersCurrentStatsText(player));
-			return;
-		}
-
-		sendMessage(Helper.getPlayerRepresentation(event, player, true) + " player stats changed:");
-
+		List<OptionMapping> optionMappings = event.getOptions();
+		
+		//DO CCs FIRST
 		OptionMapping optionCC = event.getOption(Constants.CC);
 		OptionMapping optionT = event.getOption(Constants.TACTICAL);
 		OptionMapping optionF = event.getOption(Constants.FLEET);
@@ -64,6 +60,7 @@ public class Stats extends PlayerSubcommandData {
 		if (optionCC != null && (optionT != null || optionF != null || optionS != null)) {
 			sendMessage("Use format 3/3/3 for command counters or individual values, not both");
 		} else {
+			String originalCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
 			if (optionCC != null) {
 				@SuppressWarnings("ConstantConditions")
 				String cc = AliasHandler.resolveFaction(optionCC.getAsString().toLowerCase());
@@ -72,12 +69,9 @@ public class Stats extends PlayerSubcommandData {
 					sendMessage("Wrong format for tokens count. Must be 3/3/3");
 				} else {
 					try {
-						setValue(event, activeMap, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC,
-								tokenizer.nextToken());
-						setValue(event, activeMap, player, "Fleet CC", player::setFleetCC, player::getFleetCC,
-								tokenizer.nextToken());
-						setValue(event, activeMap, player, "Strategy CC", player::setStrategicCC,
-								player::getStrategicCC, tokenizer.nextToken());
+						setValue(event, activeMap, player, "Tactics CC", player::setTacticalCC, player::getTacticalCC, tokenizer.nextToken(), true);
+						setValue(event, activeMap, player, "Fleet CC", player::setFleetCC, player::getFleetCC, tokenizer.nextToken(), true);
+						setValue(event, activeMap, player, "Strategy CC", player::setStrategicCC, player::getStrategicCC, tokenizer.nextToken(), true);
 					} catch (Exception e) {
 						sendMessage("Not number entered, check CC count again");
 					}
@@ -93,11 +87,27 @@ public class Stats extends PlayerSubcommandData {
 			if (optionS != null) {
 				setValue(event, activeMap, player, optionS, player::setStrategicCC, player::getStrategicCC);
 			}
+			if (optionT != null || optionF != null || optionS != null || optionCC != null) {
+				String newCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
+				sendMessage(Helper.getPlayerRepresentation(event, player) + " updated CCs: " + originalCCString + " -> " + newCCString);
+			}
 			if (optionT != null || optionF != null || optionS != null) {
 				Helper.isCCCountCorrect(event, activeMap, player.getColor());
 			}
 		}
+		optionMappings.remove(optionCC);
+		optionMappings.remove(optionT);
+		optionMappings.remove(optionF);
+		optionMappings.remove(optionS);
 
+		//NO OPTIONS SELECTED, JUST DISPLAY STATS
+		if (optionMappings.isEmpty() && !activeMap.isFoWMode()) {
+			sendMessage(getPlayersCurrentStatsText(player));
+			return;
+		}
+		
+		sendMessage(Helper.getPlayerRepresentation(event, player, true) + " player stats changed:");
+		
 		OptionMapping optionTG = event.getOption(Constants.TG);
 		if (optionTG != null) {
 			setValue(event, activeMap, player, optionTG, player::setTg, player::getTg);
@@ -280,13 +290,11 @@ public class Stats extends PlayerSubcommandData {
 
 	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, OptionMapping option,
 			Consumer<Integer> consumer, Supplier<Integer> supplier) {
-		setValue(event, map, player, option.getName(), consumer, supplier, option.getAsString());
+		setValue(event, map, player, option.getName(), consumer, supplier, option.getAsString(), false);
 	}
 
 	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, String optionName,
-			Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
-		if (event.getSubcommandName().equals(Constants.EXHAUST_LEADER))
-			return; // exit when adding TG to Artuno
+			Consumer<Integer> consumer, Supplier<Integer> supplier, String value, boolean suppressMessage) {
 		try {
 			boolean setValue = !value.startsWith("+") && !value.startsWith("-");
 			int number = Integer.parseInt(value);
@@ -294,7 +302,7 @@ public class Stats extends PlayerSubcommandData {
 			if (setValue) {
 				consumer.accept(number);
 				String messageToSend = getSetValueMessage(event, player, optionName, number, existingNumber);
-				sendMessage(messageToSend);
+				if (!suppressMessage) sendMessage(messageToSend);
 				if (map.isFoWMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(map, event, player, messageToSend);
 				}
@@ -303,7 +311,7 @@ public class Stats extends PlayerSubcommandData {
 				newNumber = Math.max(newNumber, 0);
 				consumer.accept(newNumber);
 				String messageToSend = getChangeValueMessage(event, player, optionName, number, existingNumber, newNumber);
-				sendMessage(messageToSend);
+				if (!suppressMessage) sendMessage(messageToSend);
 				if (map.isFoWMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(map, event, player, messageToSend);
 				}

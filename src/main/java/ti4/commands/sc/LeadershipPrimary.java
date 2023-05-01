@@ -59,11 +59,11 @@ public class LeadershipPrimary extends SCSubcommandData {
 				} else {
 					try {
 						stats.setValue(event, activeMap, player, "Tactics CC", player::setTacticalCC,
-								player::getTacticalCC, tokenizer.nextToken());
+								player::getTacticalCC, tokenizer.nextToken(), true);
 						stats.setValue(event, activeMap, player, "Fleet CC", player::setFleetCC, player::getFleetCC,
-								tokenizer.nextToken());
+								tokenizer.nextToken(), true);
 						stats.setValue(event, activeMap, player, "Strategy CC", player::setStrategicCC,
-								player::getStrategicCC, tokenizer.nextToken());
+								player::getStrategicCC, tokenizer.nextToken(), true);
 					} catch (Exception e) {
 						MessageHelper.sendMessageToChannel(event.getChannel(),
 								"Not number entered, check CC count again");
