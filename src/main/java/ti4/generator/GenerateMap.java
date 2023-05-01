@@ -2296,6 +2296,23 @@ public class GenerateMap {
                     }
                     graphics.drawString(position, tileX + tilePositionPoint.x - textOffset, tileY + tilePositionPoint.y);
 
+                    //ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
+                    List<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
+                    for (UnitHolder unitHolder : unitHolders) {
+                        boolean drawAnomaly = false;
+                        Set<String> tokenList = unitHolder.getTokenList();
+                        if (tokenList.contains("gravityrift") || tokenList.contains("wound") || tokenList.contains("sigil")) {
+                            drawAnomaly = true;
+                        }
+                        Set<String> unitList = unitHolder.getUnits().keySet();
+                        for (String unit : unitList) {
+                            if (unit.contains("csd.png")) drawAnomaly = true;
+                        }
+                        if (drawAnomaly) {
+                            BufferedImage anomalyImage = ImageIO.read(new File(ResourceHelper.getInstance().getTileFile("tile_anomaly.png")));
+                            graphics.drawImage(anomalyImage, tileX, tileY, null);
+                        }
+                    }
                 }
                 case Extras -> {
                     if (tileIsFoggy) return;
