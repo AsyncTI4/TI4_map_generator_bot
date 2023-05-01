@@ -2213,6 +2213,9 @@ public class GenerateMap {
     }
 
     private void addTile(Tile tile, Map map, TileStep step, boolean setupCheck) {
+        if (tile == null){
+            return;
+        }
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
             BufferedImage fogOfWar = ImageIO.read(new File(tile.getFowTilePath(fowPlayer)));
