@@ -49,8 +49,13 @@ public class Stats extends PlayerSubcommandData {
 			sendMessage("Player could not be found");
 			return;
 		}
-
+		
 		List<OptionMapping> optionMappings = event.getOptions();
+		//NO OPTIONS SELECTED, JUST DISPLAY STATS
+		if (optionMappings.isEmpty() && !activeMap.isFoWMode()) {
+			sendMessage(getPlayersCurrentStatsText(player));
+			return;
+		}
 		
 		//DO CCs FIRST
 		OptionMapping optionCC = event.getOption(Constants.CC);
@@ -99,13 +104,8 @@ public class Stats extends PlayerSubcommandData {
 		optionMappings.remove(optionT);
 		optionMappings.remove(optionF);
 		optionMappings.remove(optionS);
+		if (optionMappings.isEmpty()) return;
 
-		//NO OPTIONS SELECTED, JUST DISPLAY STATS
-		if (optionMappings.isEmpty() && !activeMap.isFoWMode()) {
-			sendMessage(getPlayersCurrentStatsText(player));
-			return;
-		}
-		
 		sendMessage(Helper.getPlayerRepresentation(event, player, true) + " player stats changed:");
 		
 		OptionMapping optionTG = event.getOption(Constants.TG);
