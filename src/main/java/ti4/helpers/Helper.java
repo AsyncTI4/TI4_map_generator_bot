@@ -1287,6 +1287,7 @@ public class Helper {
             TextChannelManager textChannelManager = textChannel.getManager();
             for (String playerID : activeMap.getPlayerIDs()) {
                 Member member = guild.getMemberById(playerID);
+                if (member == null) continue;
                 long allow = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
                 textChannelManager.putMemberPermissionOverride(member.getIdLong(), allow, 0);
             }
