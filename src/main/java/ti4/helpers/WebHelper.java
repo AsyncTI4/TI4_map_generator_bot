@@ -80,7 +80,7 @@ public class WebHelper {
                     .region(region)
                     .build();
             String mapPathFormat;
-            if (frog) {
+            if (frog != null && frog) {
                 mapPathFormat = "fogmap/" + player.getUserID() + "/%s/%s.png";
             } else {
                 mapPathFormat = "map/%s/%s.png";
