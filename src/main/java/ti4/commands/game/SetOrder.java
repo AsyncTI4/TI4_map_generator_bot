@@ -72,7 +72,7 @@ public class SetOrder extends GameSubcommandData {
             map.setPlayers(playersBackup);
         }
         MapSaveLoadManager.saveMap(map, event);
-        MessageHelper.replyToMessage(event, "Player order set for game:\n" + Info.getGameInfo(gameOption, MapManager.getInstance(), map, null));
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player order set.");
     }
 
     private void setPlayerOrder(LinkedHashMap<String, Player> newPlayerOrder, LinkedHashMap<String, Player> players, OptionMapping option1) {
