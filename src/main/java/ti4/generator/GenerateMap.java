@@ -3,6 +3,8 @@ package ti4.generator;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.MapGenerator;
@@ -2275,6 +2277,8 @@ public class GenerateMap {
                 } //do nothing
                 case Tile -> {
                     graphics.drawImage(image, tileX, tileY, null);
+                    
+                    //DRAW COORDINATE
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.WHITE);
                     if (tileIsFoggy) {
@@ -2297,6 +2301,7 @@ public class GenerateMap {
                         graphics.drawImage(fogOfWar, tileX, tileY, null);
                         graphics.drawString(tile.getFogLabel(fowPlayer), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
                     }
+
                     graphics.drawString(position, tileX + tilePositionPoint.x - textOffset, tileY + tilePositionPoint.y);
 
                     //ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
@@ -2304,7 +2309,7 @@ public class GenerateMap {
                     for (UnitHolder unitHolder : unitHolders) {
                         boolean drawAnomaly = false;
                         Set<String> tokenList = unitHolder.getTokenList();
-                        if (tokenList.contains("gravityrift") || tokenList.contains("wound") || tokenList.contains("sigil")) {
+                        if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png", "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
                             drawAnomaly = true;
                         }
                         Set<String> unitList = unitHolder.getUnits().keySet();
