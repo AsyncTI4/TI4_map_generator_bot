@@ -2215,7 +2215,7 @@ public class GenerateMap {
     }
 
     private void addTile(Tile tile, Map map, TileStep step, boolean setupCheck) {
-        if (tile == null){
+        if (tile == null && tile.getTileID() == null){
             return;
         }
         try {
