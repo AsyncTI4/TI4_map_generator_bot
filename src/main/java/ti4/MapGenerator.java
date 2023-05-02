@@ -201,7 +201,9 @@ public class MapGenerator {
 
         BotLogger.log("BOT STARTED UP: " + guildPrimary.getName());
         MapSaveLoadManager.loadMaps();
-        
+
         readyToReceiveCommands = true;
+        BotLogger.log("BOT HAS FINISHED LOADING MAPS");
+
     }
 }
