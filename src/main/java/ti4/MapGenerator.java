@@ -60,6 +60,8 @@ public class MapGenerator {
     public static List<Role> developerRoles = new ArrayList<>();
     public static List<Role> bothelperRoles = new ArrayList<>();
 
+    public static boolean readyToReceiveCommands = false;
+
     public static void main(String[] args)
             throws LoginException {
 
@@ -199,5 +201,7 @@ public class MapGenerator {
 
         BotLogger.log("BOT STARTED UP: " + guildPrimary.getName());
         MapSaveLoadManager.loadMaps();
+        
+        readyToReceiveCommands = true;
     }
 }
