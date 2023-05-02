@@ -2277,7 +2277,25 @@ public class GenerateMap {
                 } //do nothing
                 case Tile -> {
                     graphics.drawImage(image, tileX, tileY, null);
-                    
+
+                    //ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
+                    List<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
+                    for (UnitHolder unitHolder : unitHolders) {
+                        boolean drawAnomaly = false;
+                        Set<String> tokenList = unitHolder.getTokenList();
+                        if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png", "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
+                            drawAnomaly = true;
+                        }
+                        Set<String> unitList = unitHolder.getUnits().keySet();
+                        for (String unit : unitList) {
+                            if (unit.contains("csd.png")) drawAnomaly = true;
+                        }
+                        if (drawAnomaly) {
+                            BufferedImage anomalyImage = ImageIO.read(new File(ResourceHelper.getInstance().getTileFile("tile_anomaly.png")));
+                            graphics.drawImage(anomalyImage, tileX, tileY, null);
+                        }
+                    }
+
                     //DRAW COORDINATE
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.WHITE);
@@ -2301,26 +2319,7 @@ public class GenerateMap {
                         graphics.drawImage(fogOfWar, tileX, tileY, null);
                         graphics.drawString(tile.getFogLabel(fowPlayer), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
                     }
-
                     graphics.drawString(position, tileX + tilePositionPoint.x - textOffset, tileY + tilePositionPoint.y);
-
-                    //ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
-                    List<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
-                    for (UnitHolder unitHolder : unitHolders) {
-                        boolean drawAnomaly = false;
-                        Set<String> tokenList = unitHolder.getTokenList();
-                        if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png", "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
-                            drawAnomaly = true;
-                        }
-                        Set<String> unitList = unitHolder.getUnits().keySet();
-                        for (String unit : unitList) {
-                            if (unit.contains("csd.png")) drawAnomaly = true;
-                        }
-                        if (drawAnomaly) {
-                            BufferedImage anomalyImage = ImageIO.read(new File(ResourceHelper.getInstance().getTileFile("tile_anomaly.png")));
-                            graphics.drawImage(anomalyImage, tileX, tileY, null);
-                        }
-                    }
                 }
                 case Extras -> {
                     if (tileIsFoggy) return;
