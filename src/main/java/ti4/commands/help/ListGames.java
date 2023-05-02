@@ -78,7 +78,7 @@ public class ListGames extends HelpSubcommandData {
                 .collect(Collectors.joining("\n")));
         }
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        MessageHelper.sendMessageToThread(event.getChannel(), "Map List", sb.toString());
     }
 
     private String getRepresentationText(HashMap<String, Map> mapList, String mapName) {
