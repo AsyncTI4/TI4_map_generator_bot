@@ -380,6 +380,7 @@ public class Map {
     @JsonIgnore
     public String getGameModesText() {
         HashMap<String,Boolean> gameModes = new HashMap<>() {{
+            put("Normal", isNormalGame());
             put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
             put("Community", isCommunityMode());
             put("Alliance", isAllianceMode());
@@ -388,6 +389,10 @@ public class Map {
             put(Emojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
         }};
         return gameModes.entrySet().stream().filter(gm -> gm.getValue()).map(java.util.Map.Entry::getKey).collect(Collectors.joining(", "));
+    }
+
+    public boolean isNormalGame() {
+        return !(isCompetitiveTIGLGame() || isCommunityMode() || isAllianceMode() || isAbsolMode() || isDiscordantStarsMode() || isFoWMode());
     }
 
     @JsonIgnore

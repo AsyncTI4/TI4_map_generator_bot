@@ -1,5 +1,10 @@
 package ti4.commands.help;
 
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -17,12 +22,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+
+import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 public class ListGames extends HelpSubcommandData {
 
     public ListGames() {
         super(Constants.LIST_GAMES, "List all games");
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.NORMAL_GAME, "True to include Normal (none of the other modes) games"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "True to include TIGL games"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.COMMUNITY_MODE, "True to include community games"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ALLIANCE_MODE, "True to include alliance games"));
@@ -36,6 +45,7 @@ public class ListGames extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
+        boolean includeNormalGames = event.getOption(Constants.NORMAL_GAME, false, OptionMapping::getAsBoolean);
         boolean includeTIGLGames = event.getOption(Constants.TIGL_GAME, false, OptionMapping::getAsBoolean);
         boolean includeCommunityGames = event.getOption(Constants.COMMUNITY_MODE, false, OptionMapping::getAsBoolean);
         boolean includeAllianceGames = event.getOption(Constants.ALLIANCE_MODE, false, OptionMapping::getAsBoolean);
@@ -48,6 +58,7 @@ public class ListGames extends HelpSubcommandData {
 
         StringBuilder sb = new StringBuilder("__**Map List:**__\n");
         List<Entry<String, Map>> filteredListOfMaps = new ArrayList<>();
+        filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeNormalGames && map.getValue().isNormalGame()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeTIGLGames && map.getValue().isCompetitiveTIGLGame()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeCommunityGames && map.getValue().isCommunityMode()).toList());
         filteredListOfMaps.addAll(mapList.entrySet().stream().filter(map -> includeAllianceGames && map.getValue().isAllianceMode()).toList());
@@ -73,16 +84,15 @@ public class ListGames extends HelpSubcommandData {
     private String getRepresentationText(HashMap<String, Map> mapList, String mapName) {
         Map map = mapList.get(mapName);
         StringBuilder representationText = new StringBuilder("> **" + mapName + "**").append(" ");
-        representationText.append(" [" + map.getGameModesText()).append("] ");
+        representationText.append("   Created: ").append(map.getCreationDate());
+        representationText.append("   Last Modified: ").append(Helper.getDateRepresentation(map.getLastModifiedDate())).append("  ");
         for (Player player : map.getPlayers().values()) {
-            if (player.getFaction() != null) {
+            if (!map.isFoWMode() && player.getFaction() != null) {
                 representationText.append(Helper.getFactionIconFromDiscord(player.getFaction()));
             }
         }
-        representationText.append(": ").append(map.getMapStatus());
-        representationText.append("        Created: ").append(map.getCreationDate());
-        representationText.append("     Last Modified: ").append(Helper.getDateRepresentation(map.getLastModifiedDate()));
-        representationText.append("     Has Ended: ").append(map.isHasEnded());
+        representationText.append(" [" + map.getGameModesText()).append("] ");
+        if (map.isHasEnded()) representationText.append(" ENDED");
         return representationText.toString();
     }
 }
