@@ -280,7 +280,11 @@ public class MessageHelper {
 
 		//ADD BUTTONS
         if (buttons != null && !buttons.isEmpty()) {
-			buttons.removeIf(Objects::isNull);
+			try {
+				buttons.removeIf(Objects::isNull);
+			} catch (Exception e) {
+				//Do nothing
+			}
 			List<List<Button>> partitions = ListUtils.partition(buttons, 5);
 			List<ActionRow> buttonRows = new ArrayList<>();
 			for (List<Button> partition : partitions) {

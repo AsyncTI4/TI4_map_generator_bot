@@ -240,6 +240,9 @@ public class ButtonListener extends ListenerAdapter {
             players.remove(player);
             playerUsedSC.put(messageID, players);
         }
+        else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
+            addReaction(event, false, false, null, "");
+        }
         else {
             switch (buttonID) {
                 //AFTER THE LAST PLAYER PASS COMMAND, FOR SCORING
@@ -787,27 +790,26 @@ public class ButtonListener extends ListenerAdapter {
         }
         int numberOfPlayers = activeMap.getPlayers().size();
         if (matchingFactionReactions >= numberOfPlayers) { //TODO: @Jazzxhands to verify this will work for FoW
-            respondAllPlayersReacted(event);
+            respondAllPlayersReacted(event, map);
         }
     }
 
-    private static void respondAllPlayersReacted(ButtonInteractionEvent event) {
-        String gameName = event.getChannel().getName();
-        gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
-        gameName = gameName.substring(0, gameName.indexOf("-"));
-        Map activeMap = MapManager.getInstance().getMap(gameName);
-        String id = event.getButton().getId();
-        if (id != null && id.startsWith(Constants.PO_SCORING))
-        {
-            id = Constants.PO_SCORING;
+    private static void respondAllPlayersReacted(ButtonInteractionEvent event, Map map) {
+        String buttonID = event.getButton().getId();
+        if (event == null || map == null || buttonID == null) {
+            return;
         }
-        if(id != null && (id.startsWith(Constants.SC_FOLLOW) || id.startsWith("sc_no_follow")))
-        {
-            id = Constants.SC_FOLLOW;
+        if (buttonID.startsWith(Constants.PO_SCORING)) {
+            buttonID = Constants.PO_SCORING;
+        } else if((buttonID.startsWith(Constants.SC_FOLLOW) || buttonID.startsWith("sc_no_follow"))) {
+            buttonID = Constants.SC_FOLLOW;
+        } else if(buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
+            String buttonText = event.getButton().getLabel();
+            event.getInteraction().getMessage().reply("All players have reacted to '" + buttonText + "'").queue();
         }
-        switch (id) {
+        switch (buttonID) {
             case Constants.SC_FOLLOW, "sc_no_follow", "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so","sc_trade_follow", "sc_leadership_follow" -> {
-                if(activeMap.isFoWMode())
+                if(map.isFoWMode())
                 {
                     event.getInteraction().getMessage().reply("All players have reacted to this Strategy Card").queueAfter(1, TimeUnit.SECONDS);
                 }
@@ -839,13 +841,13 @@ public class ButtonListener extends ListenerAdapter {
                 });
             }
             case "pass_on_abilities"-> {
-                if(activeMap.isCustodiansScored())
+                if(map.isCustodiansScored())
                 {
-                    new RevealAgenda().revealAgenda(event, false, activeMap, event.getChannel());
+                    new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
                 }
                 else
                 {
-                    event.getInteraction().getMessage().reply(Helper.getGamePing(event.getGuild(), activeMap) + " All players have indicated completion of status phase. Proceed to Strategy Phase.").queueAfter(1, TimeUnit.SECONDS);
+                    event.getInteraction().getMessage().reply(Helper.getGamePing(event.getGuild(), map) + " All players have indicated completion of status phase. Proceed to Strategy Phase.").queueAfter(1, TimeUnit.SECONDS);
                 }
 
             }
