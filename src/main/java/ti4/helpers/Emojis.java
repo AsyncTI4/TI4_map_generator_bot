@@ -311,6 +311,8 @@ public class Emojis {
     public static final String Absol = "<:Absol:1079473959248068701>";
     public static final String DiscordantStars = "<:DS:1081308924084506706>";
     public static final String AsyncTI4Logo = "<:asyncti4:959703535258333264>";
+    public static final String TIGL = "<:TIGL:1038913368360222752>";
+
 
     //LIST OF SYMBOLS FOR FOG STUFF
     public static List<String> symbols = Arrays.asList(warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag, CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2, tg, comm, Sleeper, influence, resources, SemLord, Supernova, Asteroid, GravRift, Nebula, CyberneticTech, PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken, BortWindow);

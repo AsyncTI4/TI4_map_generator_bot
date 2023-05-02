@@ -659,4 +659,5 @@ public class Constants {
     public static final String BUTTON = "button";
     public static final String BUTTON_TEXT = "button_text";
     public static final String GENERIC_BUTTON_ID_PREFIX = "generic_button_id_";
+    public static final String TIGL_GAME = "is_tigl_game";
 }

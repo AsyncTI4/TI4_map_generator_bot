@@ -19,6 +19,7 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.RING_COUNT_FOR_MAP, "Specify ring count for map: Default between: 3 use standard map, 8 - for max map size. Default 4").setRequired(false));
         addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Specify game VP count").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Add Custom description to game").setRequired(false));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "Mark the game as TIGL"));
         addOptions(new OptionData(OptionType.STRING, Constants.COMMUNITY_MODE, "Set to YES if want to allow Community Mode for map, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.ALLIANCE_MODE, "Set to YES if want to allow Alliance Mode for map, FALSE to disable it").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FOW_MODE, "Set to YES if want to allow FoW Mode for map, FALSE to disable it").setRequired(false));
@@ -151,6 +152,11 @@ public class Setup extends GameSubcommandData {
         if (customOption != null){
             String customName = customOption.getAsString();
             activeMap.setCustomName(customName);
+        }
+
+        Boolean isTIGLGame = event.getOption(Constants.TIGL_GAME, null, OptionMapping::getAsBoolean);
+        if (isTIGLGame != null && isTIGLGame) {
+            getActiveMap().setCompetitiveTIGLGame(true);
         }
 
         OptionMapping absolModeOption = event.getOption(Constants.ABSOL_MODE);
