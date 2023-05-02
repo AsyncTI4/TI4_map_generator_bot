@@ -21,6 +21,7 @@ import ti4.commands.player.PlanetRemove;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
+import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
@@ -59,6 +60,8 @@ public class Map {
     private int ringCount = 4;
     @ExportableField
     private int vp = 10;
+    @ExportableField
+    private boolean competitiveTIGLGame = false;
     @ExportableField
     private boolean communityMode = false;
     @ExportableField
@@ -292,8 +295,15 @@ public class Map {
         listOfTilePinged[count] = tileName;
     }
 
-
     //GAME MODES
+    public boolean isCompetitiveTIGLGame() {
+        return competitiveTIGLGame;
+    }
+
+    public void setCompetitiveTIGLGame(boolean competitiveTIGLGame) {
+        this.competitiveTIGLGame = competitiveTIGLGame;
+    }
+
     public boolean isCommunityMode() {
         return communityMode;
     }
@@ -370,12 +380,12 @@ public class Map {
     @JsonIgnore
     public String getGameModesText() {
         HashMap<String,Boolean> gameModes = new HashMap<>() {{
+            put(Emojis.TIGL + "TIGL", isCompetitiveTIGLGame());
             put("Community", isCommunityMode());
             put("Alliance", isAllianceMode());
             put("FoW", isFoWMode());
-            put("Absol", isAbsolMode());
-            put("DiscordantStars", isDiscordantStarsMode());
-            put("StratPings", isStratPings());
+            put(Emojis.Absol + "Absol", isAbsolMode());
+            put(Emojis.DiscordantStars + "DiscordantStars", isDiscordantStarsMode());
         }};
         return gameModes.entrySet().stream().filter(gm -> gm.getValue()).map(java.util.Map.Entry::getKey).collect(Collectors.joining(", "));
     }
