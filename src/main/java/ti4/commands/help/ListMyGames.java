@@ -46,7 +46,7 @@ public class ListMyGames extends HelpSubcommandData {
             sb.append(Helper.rightpad("`" + index + ".`", 6)).append(getPlayerMapListRepresentation(map, userID, event)).append("\n");
             index++;
         }
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        MessageHelper.sendMessageToThread(event.getChannel(), user.getName() + "'s Game List", sb.toString());
     }
 
     private String getPlayerMapListRepresentation(Map map, String userID, GenericInteractionCreateEvent event) {

@@ -594,7 +594,7 @@ public class Mapper {
     }
 
     public static boolean isValidPlanet(String id) {
-        return AliasHandler.getPlanetList().contains(id);
+        return AliasHandler.getPlanetKeyList().contains(id);
     }
 
 
@@ -676,14 +676,14 @@ public class Mapper {
     }
 
     public static String getPlanetList() {
-        return "__**Planets:**__\n> " + AliasHandler.getPlanetList().stream()
+        return "__**Planets:**__\n> " + AliasHandler.getPlanetKeyList().stream()
                 .sorted()
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining("\n> "));
     }
 
     public static String getUnitList() {
-        return "__**Units:**__\n> " + AliasHandler.getUnitList().stream()
+        return "__**Units:**__\n> " + AliasHandler.getUnitValuesList().stream()
                 .sorted()
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining("\n> "));
