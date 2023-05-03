@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -197,6 +198,11 @@ public class Setup extends PlayerSubcommandData {
         }
 
         //STARTING TECH
+
+        //SEND STUFF
+        AbilityInfo.sendAbilityInfo(activeMap, player, event);
+        TechInfo.sendTechInfo(activeMap, player, event);
+        LeaderInfo.sendLeadersInfo(activeMap, player, event);
     }
 
     private void addUnits(String[] setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {
