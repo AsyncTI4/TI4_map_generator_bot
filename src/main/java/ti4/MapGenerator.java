@@ -134,6 +134,7 @@ public class MapGenerator {
         // commandManager.addCommand(new AddControl()); //disabled due to confusing players - /player planet_add should be used
         // commandManager.addCommand(new RemoveControl()); //disabled due to confusing players - /player planet_remove should be used
         commandManager.addCommand(new MoveUnits());
+        commandManager.addCommand(new MoveUnits2());
         commandManager.addCommand(new RemoveToken());
         commandManager.addCommand(new AddToken());
         commandManager.addCommand(new AddUnitDamage());
