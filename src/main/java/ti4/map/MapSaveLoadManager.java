@@ -364,7 +364,10 @@ public class MapSaveLoadManager {
         writer.write(Constants.MAIN_GAME_CHANNEL + " " + map.getMainGameChannelID());
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_MAP_CHANNEL + " " + map.getBotMapUpdatesThreadID());
+        writer.write(System.lineSeparator());
 
+        //GAME MODES
+        writer.write(Constants.TIGL_GAME + " " + map.isCompetitiveTIGLGame());
         writer.write(System.lineSeparator());
         writer.write(Constants.COMMUNITY_MODE + " " + map.isCommunityMode());
         writer.write(System.lineSeparator());
@@ -384,6 +387,7 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.BETA_TEST_MODE + " " + map.isTestBetaFeaturesMode());
         writer.write(System.lineSeparator());
+
         writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
         writer.write(System.lineSeparator());
         writer.write(ENDGAMEINFO);
@@ -1066,6 +1070,16 @@ public class MapSaveLoadManager {
                 case Constants.TABLE_TALK_CHANNEL ->  map.setTableTalkChannelID(info);
                 case Constants.MAIN_GAME_CHANNEL -> map.setMainGameChannelID(info);
                 case Constants.BOT_MAP_CHANNEL -> map.setBotMapUpdatesThreadID(info);
+
+                //GAME MODES
+                case Constants.TIGL_GAME -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setCompetitiveTIGLGame(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
                 case Constants.COMMUNITY_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);

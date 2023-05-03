@@ -3,6 +3,8 @@ package ti4.generator;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.MapGenerator;
@@ -2213,6 +2215,9 @@ public class GenerateMap {
     }
 
     private void addTile(Tile tile, Map map, TileStep step, boolean setupCheck) {
+        if (tile == null && tile.getTileID() == null){
+            return;
+        }
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
             BufferedImage fogOfWar = ImageIO.read(new File(tile.getFowTilePath(fowPlayer)));
@@ -2272,6 +2277,26 @@ public class GenerateMap {
                 } //do nothing
                 case Tile -> {
                     graphics.drawImage(image, tileX, tileY, null);
+
+                    //ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
+                    List<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
+                    for (UnitHolder unitHolder : unitHolders) {
+                        boolean drawAnomaly = false;
+                        Set<String> tokenList = unitHolder.getTokenList();
+                        if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png", "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
+                            drawAnomaly = true;
+                        }
+                        Set<String> unitList = unitHolder.getUnits().keySet();
+                        for (String unit : unitList) {
+                            if (unit.contains("csd.png")) drawAnomaly = true;
+                        }
+                        if (drawAnomaly) {
+                            BufferedImage anomalyImage = ImageIO.read(new File(ResourceHelper.getInstance().getTileFile("tile_anomaly.png")));
+                            graphics.drawImage(anomalyImage, tileX, tileY, null);
+                        }
+                    }
+
+                    //DRAW COORDINATE
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.WHITE);
                     if (tileIsFoggy) {
@@ -2295,7 +2320,6 @@ public class GenerateMap {
                         graphics.drawString(tile.getFogLabel(fowPlayer), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
                     }
                     graphics.drawString(position, tileX + tilePositionPoint.x - textOffset, tileY + tilePositionPoint.y);
-
                 }
                 case Extras -> {
                     if (tileIsFoggy) return;

@@ -1,8 +1,10 @@
 package ti4.message;
 
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -25,6 +27,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.ListUtils;
 import org.jetbrains.annotations.NotNull;
@@ -280,7 +283,11 @@ public class MessageHelper {
 
 		//ADD BUTTONS
         if (buttons != null && !buttons.isEmpty()) {
-			buttons.removeIf(Objects::isNull);
+			try {
+				buttons.removeIf(Objects::isNull);
+			} catch (Exception e) {
+				//Do nothing
+			}
 			List<List<Button>> partitions = ListUtils.partition(buttons, 5);
 			List<ActionRow> buttonRows = new ArrayList<>();
 			for (List<Button> partition : partitions) {
@@ -295,5 +302,13 @@ public class MessageHelper {
         return messageCreateDataList;
     }
 
+    public static void sendMessageToThread(MessageChannelUnion channel, String threadName, String messageToSend) {
+		if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty() || messageToSend.isEmpty()) return;
+        if (channel instanceof TextChannel) {
+            channel.asTextChannel().createThreadChannel("Map List").queueAfter(500, TimeUnit.MILLISECONDS, t -> MessageHelper.sendMessageToChannel(t, messageToSend));
+        } else if (channel instanceof ThreadChannel) {
+            MessageHelper.sendMessageToChannel(channel, messageToSend);
+        }
+    }
 
 }
