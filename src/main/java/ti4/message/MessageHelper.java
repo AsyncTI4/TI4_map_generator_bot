@@ -305,7 +305,7 @@ public class MessageHelper {
     public static void sendMessageToThread(MessageChannelUnion channel, String threadName, String messageToSend) {
 		if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty() || messageToSend.isEmpty()) return;
         if (channel instanceof TextChannel) {
-            channel.asTextChannel().createThreadChannel("Map List").queueAfter(500, TimeUnit.MILLISECONDS, t -> MessageHelper.sendMessageToChannel(t, messageToSend));
+            channel.asTextChannel().createThreadChannel(threadName).queueAfter(500, TimeUnit.MILLISECONDS, t -> MessageHelper.sendMessageToChannel(t, messageToSend));
         } else if (channel instanceof ThreadChannel) {
             MessageHelper.sendMessageToChannel(channel, messageToSend);
         }
