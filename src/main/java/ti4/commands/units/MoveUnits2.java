@@ -38,34 +38,30 @@ public class MoveUnits2 extends AddRemoveUnits {
         if (!mapManager.isUserWithActiveMap(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
-        } else {
-            Map activeMap = mapManager.getUserActiveMap(userID);
-            String color = Helper.getColor(activeMap, event);
-            if (!Mapper.isColorValid(color)) {
-                MessageHelper.replyToMessage(event, "Color/Faction not valid");
-                return;
-            }
-
-            OptionMapping option = event.getOption(Constants.TILE_NAME_FROM);
-            String tileOption = option != null ? StringUtils.substringBefore(event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString).toLowerCase(), " ") : "nombox";
-            String tileID = AliasHandler.resolveTile(tileOption);
-            Tile tile = getTileObject(event, tileID, activeMap);
-            if (tile == null) return;
-
-            unitParsingForTile(event, color, tile, activeMap);
-            for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-                addPlanetToPlayArea(event, tile, unitHolder_.getName());
-            }
-            MapSaveLoadManager.saveMap(activeMap, event);
-
-            OptionMapping optionMapGen = event.getOption(Constants.NO_MAPGEN);
-            if (optionMapGen == null) {
-                File file = GenerateMap.getInstance().saveImage(activeMap, event);
-                MessageHelper.replyToMessage(event, file);
-            } else {
-                MessageHelper.replyToMessage(event, "Map update completed");
-            }
         }
+
+        Map activeMap = mapManager.getUserActiveMap(userID);
+        String color = Helper.getColor(activeMap, event);
+        if (!Mapper.isColorValid(color)) {
+            MessageHelper.replyToMessage(event, "Color/Faction not valid");
+            return;
+        }
+
+        String tileOption = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME_FROM, null, OptionMapping::getAsString).toLowerCase(), " ");
+        if (tileOption != null) tileOption = StringUtils.substringBefore(tileOption.toLowerCase(), " "); //if discord sends bad autocomplete, e.g. 304 (Atlas), just grab the 304
+        String tileID = AliasHandler.resolveTile(tileOption);
+        Tile tile = getTileObject(event, tileID, activeMap);
+        if (tile == null) return;
+
+        unitParsingForTile(event, color, tile, activeMap);
+        for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
+            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+        }
+        MapSaveLoadManager.saveMap(activeMap, event);
+
+        File file = GenerateMap.getInstance().saveImage(activeMap, event);
+        MessageHelper.replyToMessage(event, file);
+        
     }
 
     @Override
@@ -126,12 +122,6 @@ public class MoveUnits2 extends AddRemoveUnits {
                         })
                         .collect(Collectors.joining(", "));
             System.out.println(unitList);
-        }
-
-        //IF NO UNIT_LIST_TO AND TILE_NAME_TO THEN STOP, NO CHANGES HAPPEN
-        if (unitListTo == null && tileOption == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No change in tile or unit list. Please use either the `tile_name_to` option, the `unit_names_to` option, or both");
-            return;
         }
 
         switch (unitList) {
@@ -302,14 +292,14 @@ public class MoveUnits2 extends AddRemoveUnits {
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_FROM, "System/Tile to move units from").setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_FROM, "Comma separated list of '{count} unit {planet}' Example: Dread, 2 Warsuns, 4 Infantry Sem-lore").setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile to move units to - Default: same tile in tile_name option (e.g. to land units)").setAutoComplete(true).setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option"))
                         // .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_FROM_2, "System/Tile to move units to - Default: same tile in tile_name option (e.g. to land units)").setAutoComplete(true))
                         // .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_FROM_2, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option"))
                         // .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_FROM_3, "System/Tile to move units to - Default: same tile in tile_name option (e.g. to land units)").setAutoComplete(true))
                         // .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_FROM_3, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option"))
                         // .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_FROM_4, "System/Tile to move units to - Default: same tile in tile_name option (e.g. to land units)").setAutoComplete(true))
                         // .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_FROM_4, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option"))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option"))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for units to move").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type no or n to not add CC, r or retreat to add a CC without taking it from tactics").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units. Type in yes or y"))
         );
