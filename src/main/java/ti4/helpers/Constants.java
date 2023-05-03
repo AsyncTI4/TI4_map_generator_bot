@@ -670,4 +670,6 @@ public class Constants {
     public static final String TIGL_GAME = "is_tigl_game";
     public static final String NORMAL_GAME = "normal_game";
     public static final String INCLUDE_ALIASES = "include_aliases";
+    public static final String LIST_ABILITIES = "list_abilities";
+    public static final String SEARCH = "search";
 }
