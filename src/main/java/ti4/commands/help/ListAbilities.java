@@ -28,7 +28,7 @@ public class ListAbilities extends HelpSubcommandData {
         HashMap<String, String> abilityList = Mapper.getFactionAbilities();
         String message = "**__Ability List__**\n" + abilityList.entrySet().stream()
             .map(e -> AbilityInfo.getAbilityRepresentation(e.getKey()))
-            .filter(s -> s.toLowerCase().contains(searchString))
+            .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
             .sorted()
             .collect(Collectors.joining("\n"));
         MessageHelper.sendMessageToThread(event.getChannel(), "Ability List", message);
