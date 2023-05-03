@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.ResourceHelper;
 import ti4.commands.tokens.AddCC;
+import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
@@ -17,6 +18,7 @@ import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.stream.Collectors;
@@ -28,6 +30,43 @@ public class MoveUnits2 extends AddRemoveUnits {
     private boolean toAction = false;
     private HashMap<String, Integer> unitsDamage = new HashMap<>();
     private boolean priorityDmg = true;
+
+    @Override
+    public void execute(SlashCommandInteractionEvent event) {
+        String userID = event.getUser().getId();
+        MapManager mapManager = MapManager.getInstance();
+        if (!mapManager.isUserWithActiveMap(userID)) {
+            MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
+            return;
+        } else {
+            Map activeMap = mapManager.getUserActiveMap(userID);
+            String color = Helper.getColor(activeMap, event);
+            if (!Mapper.isColorValid(color)) {
+                MessageHelper.replyToMessage(event, "Color/Faction not valid");
+                return;
+            }
+
+            OptionMapping option = event.getOption(Constants.TILE_NAME_FROM);
+            String tileOption = option != null ? StringUtils.substringBefore(event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString).toLowerCase(), " ") : "nombox";
+            String tileID = AliasHandler.resolveTile(tileOption);
+            Tile tile = getTileObject(event, tileID, activeMap);
+            if (tile == null) return;
+
+            unitParsingForTile(event, color, tile, activeMap);
+            for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
+                addPlanetToPlayArea(event, tile, unitHolder_.getName());
+            }
+            MapSaveLoadManager.saveMap(activeMap, event);
+
+            OptionMapping optionMapGen = event.getOption(Constants.NO_MAPGEN);
+            if (optionMapGen == null) {
+                File file = GenerateMap.getInstance().saveImage(activeMap, event);
+                MessageHelper.replyToMessage(event, file);
+            } else {
+                MessageHelper.replyToMessage(event, "Map update completed");
+            }
+        }
+    }
 
     @Override
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map map) {
@@ -42,7 +81,7 @@ public class MoveUnits2 extends AddRemoveUnits {
             }
         }
 
-        String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
+        String unitList = event.getOption(Constants.UNIT_NAMES_FROM).getAsString().toLowerCase();
         unitParsing(event, color, tile, unitList, map);
 
         String userID = event.getUser().getId();
