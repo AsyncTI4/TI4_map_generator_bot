@@ -44,6 +44,7 @@ import ti4.message.BotLogger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.login.LoginException;
 
@@ -206,5 +207,27 @@ public class MapGenerator {
         readyToReceiveCommands = true;
         BotLogger.log("BOT HAS FINISHED LOADING MAPS");
 
+        // Shutdown hook to run when SIGTERM is recieved
+        Thread mainThread = Thread.currentThread();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+                public void run() {
+                    try {
+                        mainThread.join();
+                        BotLogger.log("Bot shutting down for reboot");
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    readyToReceiveCommands = false;
+                    MapSaveLoadManager.saveMaps();
+                    BotLogger.log("All maps saved");
+                    try {
+                        BotLogger.log("Shhhhh... going to sleep now");
+                        Thread.sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
     }
 }
