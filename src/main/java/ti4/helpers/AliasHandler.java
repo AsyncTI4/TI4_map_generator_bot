@@ -10,6 +10,7 @@ import java.util.*;
 
 public class AliasHandler {
     private static HashMap<String, String> tileAliasList = new HashMap<>();
+    private static HashMap<String, String> tileAliasEntryList = new HashMap<>();
     private static HashMap<String, String> tilemapAliasList = new HashMap<>();
     private static HashMap<String, String> unitAliasList = new HashMap<>();
     private static ArrayList<String> unitValuesList = new ArrayList<>();
@@ -36,6 +37,7 @@ public class AliasHandler {
     public static void init()
     {
         readAliasFile("tile_alias.properties", tileAliasList, "Could not read tiles alias file");
+        readAliasFile("tile_alias.properties", tileAliasEntryList);
         readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
         readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
         readAliasFile("unit_alias.properties", unitValuesList, false);
@@ -361,5 +363,9 @@ public class AliasHandler {
 
     public static HashMap<String, String> getPlanetAliasEntryList() {
         return planetAliasEntryList;
+    }
+
+    public static HashMap<String, String> getTileAliasEntryList() {
+        return tileAliasEntryList;
     }
 }
