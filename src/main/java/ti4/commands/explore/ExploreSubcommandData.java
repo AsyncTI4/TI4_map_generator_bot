@@ -177,9 +177,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         switch (cardID) {
             case "lc1":
             case "lc2":
-                boolean isYssaril = player.getFaction().equals("yssaril");
-                message = isYssaril ? "Drew 3 Actions cards" : "Drew 2 Actions cards";
-                int count = isYssaril ? 3 : 2;
+                boolean hasSchemingAbility = player.getFactionAbilities().contains("scheming");
+                message = hasSchemingAbility ? "Drew 3 Actions Cards (Scheming) - please discard an Action Card from your hand" : "Drew 2 Actions cards";
+                int count = hasSchemingAbility ? 3 : 2;
                 for (int i = 0; i < count; i++) {
                     activeMap.drawActionCard(player.getUserID());
                 }
@@ -202,7 +202,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
                 break;
             case "dw":
-                message = "Drew relic";
+                message = "Drew Relic";
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
                 DrawRelic.drawRelicAndNotify(player,  event,  activeMap);
                 break;
