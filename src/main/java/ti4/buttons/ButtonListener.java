@@ -273,9 +273,9 @@ public class ButtonListener extends ListenerAdapter {
                     if (used) {
                         break;
                     }
-                    boolean isYssaril = player.getFaction().equals("yssaril");
-                    String message = isYssaril ? "Drew 3 Actions cards" : "Drew 2 Actions cards";
-                    int count = isYssaril ? 3 : 2;
+                    boolean hasSchemingAbility = player.getFactionAbilities().contains("scheming");
+                    String message = hasSchemingAbility ? "Drew 3 Actions Cards (Scheming) - please discard an Action Card from your hand" : "Drew 2 Actions cards";
+                    int count = hasSchemingAbility ? 3 : 2;
                     for (int i = 0; i < count; i++) {
                         activeMap.drawActionCard(player.getUserID());
                     }
@@ -451,8 +451,8 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
                 case "spend_comm_for_AC" -> {
-                    boolean isYssaril = player.getFaction().equals("yssaril");
-                    int count2 = isYssaril ? 2 : 1;
+                    boolean hasSchemingAbility = player.getFactionAbilities().contains("scheming");
+                    int count2 = hasSchemingAbility ? 2 : 1;
                     if(player.getCommodities() > 0)
                     {
                         player.setCommodities(player.getCommodities()-1);
@@ -460,7 +460,8 @@ public class ButtonListener extends ListenerAdapter {
                             activeMap.drawActionCard(player.getUserID());
                         }
                         ACInfo.sendActionCardInfo(activeMap, player, event);
-                        addReaction(event, false, false,"Spent 1 commodity for "+count2+ " AC", "");
+                        String message = hasSchemingAbility ? "Spent 1 commodity to draw " + count2 + " Action Card (Scheming) - please discard an Action Card from your hand" : "Spent 1 commodity to draw " + count2 + " AC";
+                        addReaction(event, false, false, message, "");
                     }
                     else if(player.getTg() > 0)
                     {

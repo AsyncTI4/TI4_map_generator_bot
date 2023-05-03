@@ -120,7 +120,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         }
 
         //ADD YSSARIL AGENT REFERENCE
-        if (player.getFaction().equals("yssaril")) {
+        if (player.getFaction().equals("yssaril")) { //TODO: If player.getLeaders().contains("yssarilagent")
             leaderSB.append("_ _\n");
             leaderSB.append("**Other Faction's Agents:**").append("\n");
             for (Player player_ : activeMap.getPlayers().values()) {
