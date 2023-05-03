@@ -80,6 +80,14 @@ public class Constants {
     public static final String UNIT_NAMES = "unit_names";
     public static final String PRIORITY_NO_DAMAGE = "priority_no_damage";
     public static final String UNIT_NAMES_TO = "unit_names_to";
+    public static final String UNIT_NAMES_FROM = "unit_names_from";
+    public static final String UNIT_NAMES_FROM_2 = "unit_names_from_2";
+    public static final String UNIT_NAMES_FROM_3 = "unit_names_from_3";
+    public static final String UNIT_NAMES_FROM_4 = "unit_names_from_4";
+    public static final String TILE_NAME_FROM = "tile_name_from";
+    public static final String TILE_NAME_FROM_2 = "tile_name_from_2";
+    public static final String TILE_NAME_FROM_3 = "tile_name_from_3";
+    public static final String TILE_NAME_FROM_4 = "tile_name_from_4";
     public static final String COLOR = "color";
     public static final String SEARCH_WARRANT = "search_warrant";
     public static final String ADD_CUSTOM_ADJACENT_TILES = "add_custom_adjacent_tiles";
@@ -107,6 +115,7 @@ public class Constants {
     public static final String ADD_UNITS = "add_units";
     public static final String ADD_UNIT_DAMAGE = "add_sustain_damage";
     public static final String MOVE_UNITS = "move_units";
+    public static final String MOVE_UNITS2 = "move_units2";
     public static final String NO_MAPGEN = "no_mapgen";
     public static final String REMOVE_UNITS = "remove_units";
     public static final String REMOVE_UNIT_DAMAGE = "remove_sustain_damage";
@@ -655,8 +664,7 @@ public class Constants {
     public static final String WARFARE_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/0/02/Ti07_strategy_6_warfare.png/revision/latest?cb=20200827005450";
     public static final String TECHNOLOGY_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/e/ea/Ti07_strategy_7_technology.png/revision/latest?cb=20200827005534";
     public static final String IMPERIAL_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/2/24/Ti07_strategy_8_imperial.png/revision/latest?cb=20200827005806";
-    
-    public static final String BUTTON = "button";
+        public static final String BUTTON = "button";
     public static final String BUTTON_TEXT = "button_text";
     public static final String GENERIC_BUTTON_ID_PREFIX = "generic_button_id_";
     public static final String TIGL_GAME = "is_tigl_game";
