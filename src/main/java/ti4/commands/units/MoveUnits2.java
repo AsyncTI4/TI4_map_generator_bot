@@ -23,7 +23,7 @@ import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-public class MoveUnits_Beta extends AddRemoveUnits {
+public class MoveUnits2 extends AddRemoveUnits {
 
     private boolean toAction = false;
     private HashMap<String, Integer> unitsDamage = new HashMap<>();
@@ -246,12 +246,12 @@ public class MoveUnits_Beta extends AddRemoveUnits {
 
     @Override
     protected String getActionDescription() {
-        return "Move units from one system to another system. BETA TESTING NEW WAY TO DO IT";
+        return "Move units from one system to another system. BETA TESTING";
     }
 
     @Override
     public String getActionID() {
-        return Constants.MOVE_UNITS_BETA;
+        return Constants.MOVE_UNITS2;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
@@ -264,12 +264,12 @@ public class MoveUnits_Beta extends AddRemoveUnits {
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_FROM, "Comma separated list of '{count} unit {planet}' Example: Dread, 2 Warsuns, 4 Infantry Sem-lore").setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile to move units to - Default: same tile in tile_name option (e.g. to land units)").setAutoComplete(true).setRequired(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option"))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_FROM_2, "System/Tile to move units to - Default: same tile in tile_name option (e.g. to land units)").setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_FROM_2, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option"))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_FROM_3, "System/Tile to move units to - Default: same tile in tile_name option (e.g. to land units)").setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_FROM_3, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option"))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_FROM_4, "System/Tile to move units to - Default: same tile in tile_name option (e.g. to land units)").setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_FROM_4, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option"))
+                        // .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_FROM_2, "System/Tile to move units to - Default: same tile in tile_name option (e.g. to land units)").setAutoComplete(true))
+                        // .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_FROM_2, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option"))
+                        // .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_FROM_3, "System/Tile to move units to - Default: same tile in tile_name option (e.g. to land units)").setAutoComplete(true))
+                        // .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_FROM_3, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option"))
+                        // .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_FROM_4, "System/Tile to move units to - Default: same tile in tile_name option (e.g. to land units)").setAutoComplete(true))
+                        // .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_FROM_4, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option"))
                         .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type no or n to not add CC, r or retreat to add a CC without taking it from tactics").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units. Type in yes or y"))
