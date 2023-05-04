@@ -64,10 +64,10 @@ public class SOInfo extends SOCardsSubcommandData {
         }
     }   
 
-    private static String getSecretObjectiveRepresentationShort(String soID) {
+    public static String getSecretObjectiveRepresentationShort(String soID) {
         return getSecretObjectiveRepresentationShort(soID, null);
     }
-    private static String getSecretObjectiveRepresentationShort(String soID, Integer soUniqueID) {
+    public static String getSecretObjectiveRepresentationShort(String soID, Integer soUniqueID) {
         StringBuilder sb = new StringBuilder();
         String[] soSplit = Mapper.getSecretObjective(soID).split(";");
         String soName = soSplit[0];
