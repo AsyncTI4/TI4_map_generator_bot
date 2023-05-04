@@ -221,7 +221,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 String planetTrait = Constants.CULTURAL;
                 String exploreID = activeMap.drawExplore(planetTrait);
                 if (exploreID == null) {
-                    sendMessage("Planet cannot be explored: " + mirageID);
+                    sendMessage("Planet cannot be explored: " + mirageID + "\n> The Cultural deck may be empty");
                     return;
                 }
                 StringBuilder exploredMessage = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" explored ");
