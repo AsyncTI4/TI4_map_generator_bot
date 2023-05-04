@@ -53,11 +53,11 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
-        event.getInteraction().deferReply().queue();
         if (!MapGenerator.readyToReceiveCommands) {
-            event.getInteraction().reply("Please wait a moment. The bot is rebooting.").queue();
+            event.getInteraction().reply("Please try again in a moment. The bot is rebooting.").queue();
             return;
         }
+        event.getInteraction().deferReply().queue();
 
         String userID = event.getUser().getId();
         Member member = event.getMember();
