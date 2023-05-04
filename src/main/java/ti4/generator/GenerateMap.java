@@ -502,6 +502,10 @@ public class GenerateMap {
 
                 reinforcements(player, map, width - 450, yPlayAreaSecondRow, unitCount);
 
+                if (player.getFactionAbilities().contains("ancient_blueprints")) {
+                    xDelta = bentorBluePrintInfo(player, xDelta, yPlayArea, map);
+                }
+
                 if (!player.getLeaders().isEmpty()) {
                     xDelta = leaderInfo(player, xDelta, yPlayArea, map);
                 }
@@ -528,6 +532,35 @@ public class GenerateMap {
             }
             y += 40;
         }
+    }
+
+    private int bentorBluePrintInfo(Player player, int x, int y, Map map) {
+        int deltaX = 0;
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+        graphics.setColor(Color.WHITE);
+        String bluePrintFileNamePrefix = "pa_ds_bent_blueprint_";
+        if (player.hasFoundCulFrag()) {
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "crf.png");
+            deltaX += 48;
+        }
+        if (player.hasFoundHazFrag()) {
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "hrf.png");
+            deltaX += 48;
+        }
+        if (player.hasFoundIndFrag()) {
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "irf.png");
+            deltaX += 48;
+        }
+        if (player.hasFoundUnkFrag()) {
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "urf.png");
+            deltaX += 48;
+        }
+        return x + deltaX + 20;
     }
 
     private int pnInfo(Player player, int x, int y, Map map) {
