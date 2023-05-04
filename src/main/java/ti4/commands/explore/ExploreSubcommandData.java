@@ -16,6 +16,7 @@ import ti4.generator.Mapper;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.commands.player.PlanetAdd;
 import ti4.commands.player.PlanetRefresh;
@@ -192,7 +193,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 break;
             case "dv1":
             case "dv2":
-                 message = "Drew Secret Objective";
+                message = "Drew Secret Objective";
                 activeMap.drawSecretObjective(player.getUserID());
                 if(activeMap.isFoWMode())
                 {
@@ -241,8 +242,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "fb4":
                 message = "Resolve using the buttons";
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
-                Button getACButton = Button.success("spend_comm_for_AC", "Spend 1 TG/Comm For An AC");
-                Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity");
+                Button getACButton = Button.success("spend_comm_for_AC", "Spend 1 TG/Comm For An AC").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
+                Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 ActionRow actionRow = ActionRow.of(List.of(getACButton, getCommButton));
                 MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
                 if (!actionRow.isEmpty()) baseMessageObject.addComponents(actionRow);
@@ -257,8 +258,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "aw4":
                 message = "Resolve using the buttons";
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
-                Button covert2CommButton = Button.success("covert_2_comms", "Covert 2 Commodities Into TG");
-                Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities");
+                Button covert2CommButton = Button.success("covert_2_comms", "Covert 2 Commodities Into TG").withEmoji(Emoji.fromFormatted(Emojis.Wash));
+                Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 ActionRow actionRow2 = ActionRow.of(List.of(covert2CommButton, get2CommButton));
                 MessageCreateBuilder baseMessageObject2 = new MessageCreateBuilder().addContent(message);
                 if (!actionRow2.isEmpty()) baseMessageObject2.addComponents(actionRow2);
@@ -281,8 +282,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "lf4":
                 message = "Resolve using the buttons";
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
-                Button getMechButton = Button.success("spend_comm_for_mech", "Spend 1 TG/Comm For A Mech On "+planetName);
-                Button getCommButton3 = Button.primary("gain_1_comms", "Gain 1 Commodity");
+                Button getMechButton = Button.success("spend_comm_for_mech", "Spend 1 TG/Comm For A Mech On "+planetName).withEmoji(Emoji.fromFormatted(Emojis.mech));
+                Button getCommButton3 = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 ActionRow actionRow3 = ActionRow.of(List.of(getMechButton, getCommButton3));
                 MessageCreateBuilder baseMessageObject3 = new MessageCreateBuilder().addContent(message);
                 if (!actionRow3.isEmpty()) baseMessageObject3.addComponents(actionRow3);
@@ -343,7 +344,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "cm3":
                 message = "Resolve explore using the buttons.";   
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
-                Button gainTG= Button.success("gain_1_tg", "Gain 1tg By Removing 1 Inf Or Having Mech On "+planetName);
+                Button gainTG= Button.success("gain_1_tg", "Gain 1tg By Removing 1 Inf Or Having Mech On "+planetName).withEmoji(Emoji.fromFormatted(Emojis.tg));
                 Button Decline2 = Button.danger("decline_explore", "Decline Explore");
                 ActionRow actionRow6 = ActionRow.of(List.of(gainTG,Decline2));
                 MessageCreateBuilder baseMessageObject6 = new MessageCreateBuilder().addContent(message);
