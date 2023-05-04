@@ -262,6 +262,9 @@ public class MessageHelper {
 	}
 
     /**
+	 * @message Message to send - can be large or null/empty
+	 * @buttons List of Button - can be large or null/empty
+	 * <p></p>
 	 * Example of use:
 	 * <pre>
 	* {@code
