@@ -86,6 +86,12 @@ public class Player {
     private List<String> exhaustedRelics = new ArrayList<>();
     private LinkedHashSet<Integer> SCs = new LinkedHashSet<>();
 
+    //BENTOR CONGLOMERATE ABILITY "Ancient Blueprints"
+    private boolean hasFoundCulFrag = false;
+    private boolean hasFoundHazFrag = false;
+    private boolean hasFoundIndFrag = false;
+    private boolean hasFoundUnkFrag = false;
+
     // Statistics
     private int numberOfTurns = 0;
     private long totalTimeSpent = 0;
@@ -470,10 +476,22 @@ public class Player {
         for (String cardID : fragments) {
             String color = Mapper.getExplore(cardID).split(";")[1].toLowerCase();
             switch (color) {
-                case Constants.CULTURAL -> crf++;
-                case Constants.INDUSTRIAL -> irf++;
-                case Constants.HAZARDOUS -> hrf++;
-                case Constants.FRONTIER -> vrf++;
+                case Constants.CULTURAL -> {
+                    crf++;
+                    hasFoundCulFrag = true;
+                }
+                case Constants.INDUSTRIAL -> {
+                    irf++;
+                    hasFoundIndFrag = true;
+                }
+                case Constants.HAZARDOUS -> {
+                    hrf++;
+                    hasFoundHazFrag = true;
+                }
+                case Constants.FRONTIER -> {
+                    vrf++;
+                    hasFoundUnkFrag = true;
+                }
             }
         }
     }
@@ -1099,5 +1117,38 @@ public class Player {
 
     public void setAutoCompleteRepresentation(String representation) {
         this.autoCompleteRepresentation = representation;
+    }
+
+    //BENTOR CONGLOMERATE ABILITY "Ancient Blueprints"
+    public boolean hasFoundCulFrag() {
+        return hasFoundCulFrag;
+    }
+
+    public void setHasFoundCulFrag(boolean hasFoundCulFrag) {
+        this.hasFoundCulFrag = hasFoundCulFrag;
+    }
+
+    public boolean hasFoundHazFrag() {
+        return hasFoundHazFrag;
+    }
+
+    public void setHasFoundHazFrag(boolean hasFoundHazFrag) {
+        this.hasFoundHazFrag = hasFoundHazFrag;
+    }
+    
+    public boolean hasFoundIndFrag() {
+        return hasFoundIndFrag;
+    }
+
+    public void setHasFoundIndFrag(boolean hasFoundIndFrag) {
+        this.hasFoundIndFrag = hasFoundIndFrag;
+    }
+
+    public boolean hasFoundUnkFrag() {
+        return hasFoundUnkFrag;
+    }
+
+    public void setHasFoundUnkFrag(boolean hasFoundUnkFrag) {
+        this.hasFoundUnkFrag = hasFoundUnkFrag;
     }
 }

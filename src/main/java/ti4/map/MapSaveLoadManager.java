@@ -442,6 +442,16 @@ public class MapSaveLoadManager {
             writer.write(Constants.DUMMY + " " + player.isDummy());
             writer.write(System.lineSeparator());
 
+            //BENTOR Ancient Blueprints
+            writer.write(Constants.BENTOR_HAS_FOUND_CFRAG + " " + player.hasFoundCulFrag());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.BENTOR_HAS_FOUND_HFRAG + " " + player.hasFoundHazFrag());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.BENTOR_HAS_FOUND_IFRAG + " " + player.hasFoundIndFrag());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.BENTOR_HAS_FOUND_UFRAG + " " + player.hasFoundUnkFrag());
+            writer.write(System.lineSeparator());
+
             writeCards(player.getActionCards(), writer, Constants.AC);
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
@@ -1380,6 +1390,10 @@ public class MapSaveLoadManager {
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BENTOR_HAS_FOUND_CFRAG -> player.setHasFoundCulFrag(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BENTOR_HAS_FOUND_HFRAG -> player.setHasFoundHazFrag(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BENTOR_HAS_FOUND_IFRAG -> player.setHasFoundIndFrag(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BENTOR_HAS_FOUND_UFRAG -> player.setHasFoundUnkFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
             }
         }
