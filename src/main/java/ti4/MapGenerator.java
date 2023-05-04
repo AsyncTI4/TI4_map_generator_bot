@@ -12,7 +12,7 @@ import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.bothelper.BothelperCommand;
-import ti4.commands.button.GenericButton;
+import ti4.commands.button.GenericButtonCommand;
 import ti4.commands.capture.CaptureCommand;
 import ti4.commands.cards.CardsInfo;
 import ti4.commands.cardsac.ACCardsCommand;
@@ -21,6 +21,7 @@ import ti4.commands.all_info.AllInfo;
 import ti4.commands.cardspn.PNCardsCommand;
 import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.custom.CustomCommand;
+import ti4.commands.ds.DiscordantStarsCommand;
 import ti4.commands.explore.ExploreCommand;
 import ti4.commands.fow.FOWCommand;
 import ti4.commands.franken.FrankenCommand;
@@ -159,7 +160,8 @@ public class MapGenerator {
         commandManager.addCommand(new MiltyCommand());
         commandManager.addCommand(new FrankenCommand());
         commandManager.addCommand(new CaptureCommand());
-        commandManager.addCommand(new GenericButton());
+        commandManager.addCommand(new GenericButtonCommand());
+        commandManager.addCommand(new DiscordantStarsCommand());
 
         guildPrimary = jda.getGuildById(args[2]);
 
