@@ -540,27 +540,32 @@ public class GenerateMap {
         g2.setStroke(new BasicStroke(2));
         graphics.setColor(Color.WHITE);
         String bluePrintFileNamePrefix = "pa_ds_bent_blueprint_";
+        boolean hasFoundAny = false;
         if (player.hasFoundCulFrag()) {
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "crf.png");
+            hasFoundAny = true;
             deltaX += 48;
         }
         if (player.hasFoundHazFrag()) {
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "hrf.png");
+            hasFoundAny = true;
             deltaX += 48;
         }
         if (player.hasFoundIndFrag()) {
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "irf.png");
+            hasFoundAny = true;
             deltaX += 48;
         }
         if (player.hasFoundUnkFrag()) {
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
             drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "urf.png");
+            hasFoundAny = true;
             deltaX += 48;
         }
-        return x + deltaX + 20;
+        return x + deltaX + (hasFoundAny ? 20 : 0);
     }
 
     private int pnInfo(Player player, int x, int y, Map map) {
