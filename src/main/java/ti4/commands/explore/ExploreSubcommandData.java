@@ -9,7 +9,6 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
 
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -19,10 +18,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.commands.player.PlanetAdd;
 import ti4.commands.player.PlanetRefresh;
-import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.util.List;
 
@@ -252,14 +248,14 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 {
                     new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetName, activeMap);
                 }
-                message = Emojis.infantry + " added to " + Helper.getPlanetRepresentationPlusEmoji(planetName);
+                message = Helper.getColourAsMention(event.getGuild(), player.getColor()) + Emojis.infantry + " added to " + Helper.getPlanetRepresentationPlusEmoji(planetName);
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + "\n" + message);
                 break;
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = "Resolve using the buttons";
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
-                Button getMechButton = Button.success("spend_comm_for_mech", "Spend 1 TG/Comm For A Mech On "+planetName).withEmoji(Emoji.fromFormatted(Emojis.mech));
+                Button getMechButton = Button.success("spend_comm_for_mech", "Spend 1 TG/Comm For A Mech On "+planetName).withEmoji(Emoji.fromFormatted(Emojis.mech)); //TODO: Button resolves using planet ID at end of label - add planetID to buttonId and use that instead
                 Button getCommButton3 = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 List<Button> buttons = List.of(getMechButton, getCommButton3);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
