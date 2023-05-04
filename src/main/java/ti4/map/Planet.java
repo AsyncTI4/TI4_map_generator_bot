@@ -87,12 +87,22 @@ public class Planet extends UnitHolder {
     }
 
     private void addRemoveTokenData(String tokenFileName, boolean removeTokenData) {
+        if (tokenFileName.equals("token_ds_gledgecore.png")) { //THIS TOKEN HARD SETS THE BASE RES/INF TO 2/0
+            if (removeTokenData) {
+                resetOriginalPlanetResInf();
+            } else {
+                resourcesOriginal = 2;
+                influenceOriginal = 0;
+            }
+        }
+        
         List<String> attachmentInfoAll = Mapper.getAttachmentInfoAll();
         for (String id : attachmentInfoAll) {
             String attachmentID = Mapper.getAttachmentID(id);
             if (tokenFileName.equals(attachmentID)) {
                 String attachmentInfo = Mapper.getAttachmentInfo(id);
                 String[] split = attachmentInfo.split(";");
+                
                 try {
                     if (removeTokenData) {
                         resourcesModifier -= Integer.parseInt(split[0]);
@@ -101,12 +111,13 @@ public class Planet extends UnitHolder {
                         resourcesModifier += Integer.parseInt(split[0]);
                         influenceModifier += Integer.parseInt(split[1]);
                     }
+
                 } catch (Exception e) {
                     BotLogger.log("Could not parse res/inf in token of unitHolder " + getName(), e);
                 }
 
                 //ADD TYPES
-                if (split.length > 2) {
+                if (split.length > 2) { 
                     String additional = split[2];
                     if (additional.contains(",")) {
                         String[] subSplit = additional.split(",");
