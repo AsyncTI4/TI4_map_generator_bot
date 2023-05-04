@@ -1,10 +1,14 @@
 package ti4.commands.cardsso;
 
+import java.util.HashMap;
+import java.util.List;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cardsac.ACInfo_Legacy;
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -34,7 +38,13 @@ public class UnscoreSO extends SOCardsSubcommandData {
 
         boolean scored = activeMap.unscoreSecretObjective(getUser().getId(), option.getAsInt());
         if (!scored) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Secret Objective ID found, please retry");
+            List<String> scoredSOs = activeMap.getScoredSecretObjective(getUser().getId()).entrySet().stream()
+                .map(e -> "> (" + e.getValue() + ") " + SOInfo.getSecretObjectiveRepresentationShort(e.getKey()))
+                .toList();
+            StringBuilder sb = new StringBuilder("Secret Objective ID found - please retry.\nYour current scored SOs are:\n");
+            scoredSOs.forEach(sb::append);
+            if (scoredSOs.isEmpty()) sb.append("> None");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
             return;
         }
 
