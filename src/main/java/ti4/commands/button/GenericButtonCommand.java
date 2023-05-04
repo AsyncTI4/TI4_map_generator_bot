@@ -16,7 +16,7 @@ import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.message.MessageHelper;
 
-public class GenericButton implements Command {
+public class GenericButtonCommand implements Command {
 
     @Override
     public String getActionID() {
