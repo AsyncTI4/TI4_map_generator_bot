@@ -1136,6 +1136,17 @@ public class GenerateMap {
                         drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName);
                     }
                 }
+                
+                // GLEDGE CORE
+                if (unitHolder.getTokenList().contains(Constants.GLEDGE_CORE_PNG)) {
+                    String tokenPath = ResourceHelper.getInstance().getTokenFile(Constants.GLEDGE_CORE_PNG);
+                    try {
+                        BufferedImage image = resizeImage(ImageIO.read(new File(tokenPath)), 0.25f);
+                        graphics.drawImage(image, x + deltaX + 15, y + 112, null);
+                    } catch (Exception e) {
+                        BotLogger.log("Could not parse control token file for: " + Constants.GLEDGE_CORE_PNG, e);
+                    }    
+                }
 
                 boolean hasAttachment = planetHolder.hasAttachment();
                 if (hasAttachment) {

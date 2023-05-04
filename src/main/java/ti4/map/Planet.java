@@ -1,6 +1,7 @@
 package ti4.map;
 
 import ti4.generator.Mapper;
+import ti4.helpers.Constants;
 import ti4.message.BotLogger;
 
 import java.awt.*;
@@ -87,7 +88,7 @@ public class Planet extends UnitHolder {
     }
 
     private void addRemoveTokenData(String tokenFileName, boolean removeTokenData) {
-        if (tokenFileName.equals("token_ds_gledgecore.png")) { //THIS TOKEN HARD SETS THE BASE RES/INF TO 2/0
+        if (tokenFileName.equals(Constants.GLEDGE_CORE_PNG)) { //THIS TOKEN HARD SETS THE BASE RES/INF TO 2/0
             if (removeTokenData) {
                 resetOriginalPlanetResInf();
             } else {
