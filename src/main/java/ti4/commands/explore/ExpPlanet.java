@@ -1,17 +1,17 @@
 package ti4.commands.explore;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.player.SendTG;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.*;
-import ti4.message.MessageHelper;
 
 public class ExpPlanet extends ExploreSubcommandData {
 
@@ -26,7 +26,7 @@ public class ExpPlanet extends ExploreSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping planetOption = event.getOption(Constants.PLANET);
         @SuppressWarnings("ConstantConditions")
-        String planetName = planetOption.getAsString();
+        String planetName = AliasHandler.resolvePlanet(StringUtils.substringBefore(planetOption.getAsString(), " ("));
         Map activeMap = getActiveMap();
         if (!activeMap.getPlanets().contains(planetName)) {
             sendMessage("Planet not found in map");
