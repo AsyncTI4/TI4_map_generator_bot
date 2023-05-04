@@ -20,7 +20,7 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
         super(Constants.ZELIAN_HERO, "Celestial Impact a system (replace with Zelian Asteroid field)");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color using Zelian Hero 'Cataclysm - Celestial Impact'").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.BOOLEAN, Constants.DESTROY_OTHER_UNITS, "True to also destroy other players' units on planets"));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.DESTROY_OTHER_UNITS, "True to also destroy other players' ground force units on planets"));
     }
 
     @Override
@@ -66,5 +66,4 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
         Tile asteroidTile = new Tile(AliasHandler.resolveTile("D36"), tile.getPosition(), space);
         activeMap.setTile(asteroidTile);
     }
-    
 }

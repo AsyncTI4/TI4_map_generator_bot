@@ -48,6 +48,6 @@ public abstract class DiscordantStarsSubcommandData extends SubcommandData {
     }
 
     public void reply(SlashCommandInteractionEvent event) {
-        //do nothing
+        DiscordantStarsCommand.reply(event);
     }
 }
