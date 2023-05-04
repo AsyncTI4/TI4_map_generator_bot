@@ -44,12 +44,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.Random;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
@@ -1458,5 +1460,28 @@ public class Helper {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static Set<Player> getNeighbouringPlayers(Map map, Player player) {
+        Set<Player> adjacentPlayers = new HashSet<>();
+        Set<Player> realPlayers = new HashSet<>(map.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
+
+        Set<Tile> playersTiles = new HashSet<>();
+        for (Tile tile : map.getTileMap().values()) {
+            if (FoWHelper.playerIsInSystem(map, tile, player)) {
+                playersTiles.add(tile);
+            }
+        }
+
+        for (Tile tile : playersTiles) {
+            adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(map, tile.getPosition()));
+            if (realPlayers.size() == adjacentPlayers.size()) return adjacentPlayers;
+        }
+        
+        return adjacentPlayers;
+    }
+
+    public static int getNeighbourCount(Map map, Player player) {
+        return getNeighbouringPlayers(map, player).size();
     }
 }
