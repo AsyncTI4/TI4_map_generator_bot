@@ -22,6 +22,8 @@ import ti4.commands.player.PlanetRefresh;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
+
 import java.util.List;
 
 import ti4.helpers.Helper;
@@ -208,57 +210,49 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + "\n" + message);
             }
             case "mirage" -> {
-                String planetName2 = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet("mirage"));
-                String planet2 = Mapper.getPlanet(planetName2);
-                if (planet2 == null) {
-                    sendMessage("Invalid planet");
+                String mirageID = Constants.MIRAGE;
+                String planetValue = Mapper.getPlanet(mirageID);
+                if (planetValue == null) {
+                    sendMessage("Invalid planet: " + mirageID);
                     return;
                 }
-                new PlanetAdd().doAction(player, planetName2, activeMap);
-                new PlanetRefresh().doAction(player, planetName2, activeMap);
-                String[] planetInfo2 = planet2.split(",");
-                String drawColor2 = planetInfo2[1];
-                String cardID2 = activeMap.drawExplore(drawColor2);
-                if (cardID2 == null) {
-                    sendMessage("Planet cannot be explored");
+                new PlanetAdd().doAction(player, mirageID, activeMap);
+                new PlanetRefresh().doAction(player, mirageID, activeMap);
+                String planetTrait = Constants.CULTURAL;
+                String exploreID = activeMap.drawExplore(planetTrait);
+                if (exploreID == null) {
+                    sendMessage("Planet cannot be explored: " + mirageID);
                     return;
                 }
-                StringBuilder messageText2 = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" explored ");
-                messageText2.append(Helper.getEmojiFromDiscord(drawColor2));
-                messageText2.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(planetName2) +" *(tile "+ tile.getPosition() + ")*").append(":\n");
-                messageText2.append(displayExplore(cardID2));
+                StringBuilder exploredMessage = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" explored ");
+                exploredMessage.append(Helper.getEmojiFromDiscord(planetTrait));
+                exploredMessage.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(mirageID) +" *(tile "+ tile.getPosition() + ")*").append(":\n");
+                exploredMessage.append(displayExplore(exploreID));
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
-                resolveExplore(event, cardID2, tile, planetName2, messageText2.toString(), false);
+                resolveExplore(event, exploreID, tile, mirageID, exploredMessage.toString(), false);
             }
             case "fb1", "fb2", "fb3", "fb4" -> {
                 message = "Resolve using the buttons";
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
                 Button getACButton = Button.success("spend_comm_for_AC", "Spend 1 TG/Comm For An AC").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
                 Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
-                ActionRow actionRow = ActionRow.of(List.of(getACButton, getCommButton));
-                MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
-                if (!actionRow.isEmpty()) baseMessageObject.addComponents(actionRow);
-                event.getChannel().sendMessage(baseMessageObject.build()).queue(message_ -> {
-                  //  Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player, message_); 
-                });
+                List<Button> buttons = List.of(getACButton, getCommButton);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
             case "aw1", "aw2", "aw3", "aw4" -> {
                 message = "Resolve using the buttons";
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
                 Button covert2CommButton = Button.success("covert_2_comms", "Covert 2 Commodities Into TG").withEmoji(Emoji.fromFormatted(Emojis.Wash));
                 Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
-                ActionRow actionRow2 = ActionRow.of(List.of(covert2CommButton, get2CommButton));
-                MessageCreateBuilder baseMessageObject2 = new MessageCreateBuilder().addContent(message);
-                if (!actionRow2.isEmpty()) baseMessageObject2.addComponents(actionRow2);
-                event.getChannel().sendMessage(baseMessageObject2.build()).queue(message2_ -> { 
-                });
+                List<Button> buttons = List.of(covert2CommButton, get2CommButton);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
             case "mo1", "mo2", "mo3" -> {
                 if(tile != null && planetName != null)
                 {
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf "+planetName, activeMap);
+                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetName, activeMap);
                 }
-                message = "Infantry added to the planet";
+                message = Emojis.infantry + " added to " + Helper.getPlanetRepresentationPlusEmoji(planetName);
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + "\n" + message);
                 break;
             }
@@ -267,26 +261,23 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
                 Button getMechButton = Button.success("spend_comm_for_mech", "Spend 1 TG/Comm For A Mech On "+planetName).withEmoji(Emoji.fromFormatted(Emojis.mech));
                 Button getCommButton3 = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
-                ActionRow actionRow3 = ActionRow.of(List.of(getMechButton, getCommButton3));
-                MessageCreateBuilder baseMessageObject3 = new MessageCreateBuilder().addContent(message);
-                if (!actionRow3.isEmpty()) baseMessageObject3.addComponents(actionRow3);
-                event.getChannel().sendMessage(baseMessageObject3.build()).queue(message3_ -> {
-                });
+                List<Button> buttons = List.of(getMechButton, getCommButton3);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
             case "kel1", "kel2", "ent", "minent", "majent" -> {
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
                 switch (cardID.toLowerCase()) {
                     case "minent" -> {
                         player.setTg(player.getTg()+1);
-                        message = "Gained 1 tg (" +(player.getTg()-1) +"->"+player.getTg()+") ";
+                        message = "Gained 1" + Emojis.tg + " (" +(player.getTg()-1) +" -> **"+player.getTg()+"**) ";
                     }
                     case "ent" -> {
                         player.setTg(player.getTg()+2);
-                        message = "Gained 2 tgs (" +(player.getTg()-2) +"->"+player.getTg()+") ";
+                        message = "Gained 2" + Emojis.tg + " (" +(player.getTg()-2) +" -> **"+player.getTg()+"**) ";
                     }
                     case "majent" -> {
                         player.setTg(player.getTg()+3);
-                        message = "Gained 3 tgs (" +(player.getTg()-3) +"->"+player.getTg()+") ";
+                        message = "Gained 3" + Emojis.tg + " (" +(player.getTg()-3) +" -> **"+player.getTg()+"**) ";
                     }
                     default -> message = "";
                 }
@@ -294,44 +285,32 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button getTactic= Button.success("incease_tactic_cc", "Gain 1 Tactic CC");
                 Button getFleet = Button.success("incease_fleet_cc", "Gain 1 Fleet CC");
                 Button getStrat= Button.success("incease_strategy_cc", "Gain 1 Strategy CC");
-                ActionRow actionRow4 = ActionRow.of(List.of(getTactic, getFleet, getStrat));
-                MessageCreateBuilder baseMessageObject4 = new MessageCreateBuilder().addContent(message);
-                if (!actionRow4.isEmpty()) baseMessageObject4.addComponents(actionRow4);
-                event.getChannel().sendMessage(baseMessageObject4.build()).queue(message4_ -> {
-                });
+                List<Button> buttons = List.of(getTactic, getFleet, getStrat);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
             case "exp1", "exp2", "exp3" -> {
                 message = "Resolve explore using the buttons.";   
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
                 Button ReadyPlanet= Button.success("planet_ready", "Remove Inf Or Have Mech To Ready "+planetName);
                 Button Decline = Button.danger("decline_explore", "Decline Explore");
-                ActionRow actionRow5 = ActionRow.of(List.of(ReadyPlanet,Decline));
-                MessageCreateBuilder baseMessageObject5 = new MessageCreateBuilder().addContent(message);
-                if (!actionRow5.isEmpty()) baseMessageObject5.addComponents(actionRow5);
-                event.getChannel().sendMessage(baseMessageObject5.build()).queue(message5_ -> {
-                });
+                List<Button> buttons = List.of(ReadyPlanet,Decline);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
             case "cm1", "cm2", "cm3" -> {
                 message = "Resolve explore using the buttons.";   
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
                 Button gainTG= Button.success("gain_1_tg", "Gain 1tg By Removing 1 Inf Or Having Mech On "+planetName).withEmoji(Emoji.fromFormatted(Emojis.tg));
                 Button Decline2 = Button.danger("decline_explore", "Decline Explore");
-                ActionRow actionRow6 = ActionRow.of(List.of(gainTG,Decline2));
-                MessageCreateBuilder baseMessageObject6 = new MessageCreateBuilder().addContent(message);
-                if (!actionRow6.isEmpty()) baseMessageObject6.addComponents(actionRow6);
-                event.getChannel().sendMessage(baseMessageObject6.build()).queue(message6_ -> {
-                });
+                List<Button> buttons = List.of(gainTG,Decline2);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
             case "vfs1", "vfs2", "vfs3" -> {
                 message = "Resolve explore using the buttons.";   
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
                 Button gainCC= Button.success("gain_CC", "Gain 1CC By Removing 1 Inf Or Having Mech On "+planetName);
                 Button Decline3 = Button.danger("decline_explore", "Decline Explore");
-                ActionRow actionRow7 = ActionRow.of(List.of(gainCC,Decline3));
-                MessageCreateBuilder baseMessageObject7 = new MessageCreateBuilder().addContent(message);
-                if (!actionRow7.isEmpty()) baseMessageObject7.addComponents(actionRow7);
-                event.getChannel().sendMessage(baseMessageObject7.build()).queue(message7_ -> {
-                });
+                List<Button> buttons = List.of(gainCC, Decline3);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }
             default -> MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
         }
