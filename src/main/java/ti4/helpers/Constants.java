@@ -664,7 +664,7 @@ public class Constants {
     public static final String WARFARE_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/0/02/Ti07_strategy_6_warfare.png/revision/latest?cb=20200827005450";
     public static final String TECHNOLOGY_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/e/ea/Ti07_strategy_7_technology.png/revision/latest?cb=20200827005534";
     public static final String IMPERIAL_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/2/24/Ti07_strategy_8_imperial.png/revision/latest?cb=20200827005806";
-        public static final String BUTTON = "button";
+    public static final String BUTTON = "button";
     public static final String BUTTON_TEXT = "button_text";
     public static final String GENERIC_BUTTON_ID_PREFIX = "generic_button_id_";
     public static final String TIGL_GAME = "is_tigl_game";
@@ -672,4 +672,8 @@ public class Constants {
     public static final String INCLUDE_ALIASES = "include_aliases";
     public static final String LIST_ABILITIES = "list_abilities";
     public static final String SEARCH = "search";
+    public static final String BENTOR_HAS_FOUND_CFRAG = "has_found_cfrag";
+    public static final String BENTOR_HAS_FOUND_HFRAG = "has_found_hfrag";
+    public static final String BENTOR_HAS_FOUND_IFRAG = "has_found_ifrag";
+    public static final String BENTOR_HAS_FOUND_UFRAG = "has_found_ufrag";
 }
