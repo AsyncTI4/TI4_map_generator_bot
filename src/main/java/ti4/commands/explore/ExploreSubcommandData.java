@@ -228,8 +228,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     sendMessage("Planet cannot be explored");
                     return;
                 }
-                StringBuilder messageText2 = new StringBuilder(Helper.getEmojiFromDiscord(drawColor2));
-                messageText2.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(planetName2) +" *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(event, player)).append(":\n");
+                StringBuilder messageText2 = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" explored ");
+                messageText2.append(Helper.getEmojiFromDiscord(drawColor2));
+                messageText2.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(planetName2) +" *(tile "+ tile.getPosition() + ")*").append(":\n");
                 messageText2.append(displayExplore(cardID2));
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
                 resolveExplore(event, cardID2, tile, planetName2, messageText2.toString(), false);
