@@ -13,10 +13,9 @@ import ti4.map.*;
 import ti4.message.MessageHelper;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.Map.Entry;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 
 public class ListVoteCount extends AgendaSubcommandData {
     public ListVoteCount() {
@@ -41,7 +40,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         StringBuilder msg = new StringBuilder();
         int i = 1;
         List<Player> orderList = new ArrayList<>();
-        orderList.addAll(map.getPlayers().values().stream().toList());
+        orderList.addAll(map.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
         String speakerName = map.getSpeaker();
         Optional<Player> optSpeaker = orderList.stream().filter(player -> player.getUserID().equals(speakerName))
                 .findFirst();
@@ -159,16 +158,40 @@ public class ListVoteCount extends AgendaSubcommandData {
             i++;
         }
         MessageHelper.sendMessageToChannel(channel, msg.toString());
+
+
+
+        StringBuilder sb = new StringBuilder("**__Vote Count:__**\n");
+        int itemNo = 1;
+        for (Player player : orderList) {
+            int voteCount = getVoteCountFromPlanets(map, player);
+            Entry<Integer, String> additionalVotes = getAdditionalVotesFromOtherSources(map, player);
+            sb.append("> `").append(itemNo).append(".` ");
+            sb.append(Helper.getPlayerRepresentation(event, player));
+            if (privateGame) {
+                sb.append(" vote count: **???***");
+            } else if (player.getFactionAbilities().contains("galactic_threat") && !Helper.playerHasXxchaCommanderUnlocked(map, player)) {
+                sb.append(" NOT VOTING.: **0*** (Galactic Threat)");
+            } else {
+                sb.append(" vote count: **" + voteCount);
+                if (additionalVotes.getKey() > 0) {
+                    sb.append(" + " + additionalVotes.getKey() + "** additional votes from: ").append(additionalVotes.getValue());
+                } else sb.append("**");
+            }
+            sb.append("\n");
+            itemNo++;
+        }
+        MessageHelper.sendMessageToChannel(channel, sb.toString());
     }
 
     public static int getVoteCountFromPlanets(Map map, Player player) {
-        int baseResourceCount = 0;
-        int baseInfluenceCount = 0;
-        int voteCount = 0;
-
         List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+        int baseResourceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+        int baseInfluenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+        int voteCount = baseInfluenceCount; //default
+
+        planets.removeAll(player.getExhaustedPlanets());
 
         //NEKRO unless XXCHA ALLIANCE
         if (player.getFactionAbilities().contains("galactic_threat") && !Helper.playerHasXxchaCommanderUnlocked(map, player)) {
@@ -177,25 +200,39 @@ public class ListVoteCount extends AgendaSubcommandData {
 
         //XXCHA
         if (player.getFaction().equals("xxcha")) {
-
+            Leader xxchaHero = player.getLeader("hero");
+            if (xxchaHero != null && !xxchaHero.isLocked()) {
+                voteCount = baseResourceCount + baseInfluenceCount;
+            }
         }
 
         //KHRASK
         if (player.getFactionAbilities().contains("lithoids")) { // Vote with planet resources, no influence
-            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-            .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+            return baseResourceCount;
+        }
+
+        //ZELIAN PURIFIER BIOPHOBIC ABILITY - 1 planet = 1 vote
+        if (player.getFactionAbilities().contains("biophobic")) {
+            return planets.size();
         }
 
         return voteCount;
     }
 
-    public static String getAdditionalVotesFromOtherSources(Map map, Player player) {
+    /**
+     * @param map
+     * @param player
+     * @return (K, V) -> K = additionalVotes / V = text explanation of votes
+     */
+    public static Entry<Integer, String> getAdditionalVotesFromOtherSources(Map map, Player player) {
         StringBuilder sb = new StringBuilder();
+        int additionalVotes = 0;
 
         //Argent Zeal
         if (player.getFactionAbilities().contains("zeal")) {
             long playerCount = map.getPlayers().values().stream().filter(Player::isRealPlayer).count() - 1;
             sb.append("(+" + playerCount + " votes for " + Emojis.Argent + "Zeal)");
+            additionalVotes += playerCount;
         }
 
         //Xxcha Alliance   
@@ -204,25 +241,29 @@ public class ListVoteCount extends AgendaSubcommandData {
             planets.removeAll(player.getExhaustedPlanets());
             int readyPlanetCount = planets.size();
             sb.append("(+" + readyPlanetCount + " votes for Xxcha Alliance (+1 vote per planet exhausted))");
+            additionalVotes += readyPlanetCount;
         }
 
         //Blood Pact
         if (player.getPromissoryNotesInPlayArea().contains("blood_pact")) {
             sb.append("(+4 potential votes for " + Emojis.Empyrean + Emojis.PN + "Blood Pact)");
+            additionalVotes += 4;
         }
             
         //Predictive Intelligence
         if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
             sb.append(" (+3 votes for " + Emojis.CyberneticTech + "Predictive Intelligence)");
+            additionalVotes += 3;
         }
 
         //Absol Shard of the Throne
         if (CollectionUtils.containsAny(player.getRelics(), List.of("absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3"))) {
             int count = player.getRelics().stream().filter(s -> s.contains("absol_shardofthethrone")).toList().size(); //  +2 votes per Absol shard
-            int additionalVotes = 2 * count;
-            sb.append(" (+" + additionalVotes + " votes for (" + count + "x) " + Emojis.Relic + "Shard of the Throne" + Emojis.Absol + ")");
+            int shardVotes = 2 * count;
+            sb.append(" (+" + shardVotes + " votes for (" + count + "x) " + Emojis.Relic + "Shard of the Throne" + Emojis.Absol + ")");
+            additionalVotes += shardVotes;
         }
 
-        return sb.toString();
+        return java.util.Map.entry(additionalVotes, sb.toString());
     }
 }

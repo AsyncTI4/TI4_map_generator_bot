@@ -1514,7 +1514,7 @@ public class Helper {
             return !player.getLeader(Constants.COMMANDER).isLocked();
         }
         List<String> playersPNs = player.getPromissoryNotesInPlayArea();
-        List<Player> xxchaPlayers = map.getRealPlayers().stream().filter(p -> p.getFaction().equals("xxcha")).toList();
+        ArrayList<Player> xxchaPlayers = new ArrayList<>(map.getRealPlayers().stream().filter(p -> p.getFaction().equals("xxcha")).toList());
         if (!xxchaPlayers.remove(player) && !xxchaPlayers.isEmpty() && xxchaPlayers.size() == 1) {
             Player xxchaPlayer = xxchaPlayers.get(0);
             Leader xxchaCommander = xxchaPlayer.getLeader(Constants.COMMANDER);
