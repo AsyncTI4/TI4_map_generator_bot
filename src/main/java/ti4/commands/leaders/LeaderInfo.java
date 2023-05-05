@@ -6,9 +6,11 @@ import java.util.List;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -43,8 +45,33 @@ public class LeaderInfo extends LeaderSubcommandData {
                 MessageHelper.sendMessageToUser(leaderInfo, user);
             }
         }
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, Helper.getPlayerRepresentation(event, player));
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, leaderInfo);
+        sendLeadersInfo(activeMap, player, event);
+    }
+
+    public static void sendLeadersInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
+        sendLeadersInfo(activeMap, player);
+    }
+    
+    public static void sendLeadersInfo(Map activeMap, Player player) {
+        //LEADERS INFO
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getLeaderInfo(activeMap, player));
+
+        //BUTTONS
+        String leaderPlayMsg = "_ _\nClick a button below to exhaust or purge a Leader";
+        List<Button> leaderButtons = getLeaderButtons(activeMap, player);
+        if (leaderButtons != null && !leaderButtons.isEmpty()) {
+            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(leaderPlayMsg, leaderButtons);
+            ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
+            for (MessageCreateData message : messageList) {
+                cardsInfoThreadChannel.sendMessage(message).queue();
+            }
+        }
+    } 
+
+    private static List<Button> getLeaderButtons(Map activeMap, Player player) {
+        return null;
     }
 
     public static String getLeaderInfo(Map activeMap, Player player) {
@@ -79,6 +106,7 @@ public class LeaderInfo extends LeaderSubcommandData {
                         for (Player player_ : activeMap.getPlayers().values()) {
                             if (player_.getColor().equalsIgnoreCase(colour)) {
                                 Leader playerLeader = player_.getLeader(Constants.COMMANDER);
+                                if (playerLeader == null) continue;
                                 leaderSB.append("ALLIANCE: ");
                                 if (playerLeader.isLocked()) {
                                     leaderSB.append("(LOCKED) ").append(Helper.getLeaderLockedRepresentation(player_, playerLeader)).append("\n");
@@ -93,15 +121,18 @@ public class LeaderInfo extends LeaderSubcommandData {
         }
 
         //ADD YSSARIL AGENT REFERENCE
-        if (player.getFaction().equals("yssaril")) {
+        if (player.getFaction().equals("yssaril")) { //TODO: If player.getLeaders().contains("yssarilagent")
             leaderSB.append("_ _\n");
             leaderSB.append("**Other Faction's Agents:**").append("\n");
             for (Player player_ : activeMap.getPlayers().values()) {
                 if (player_ != player) {
-                    if (player.getLeader(Constants.AGENT).isExhausted()) {
-                        leaderSB.append("EXHAUSTED: ").append(Helper.getLeaderFullRepresentation(player_, player_.getLeader(Constants.AGENT))).append("\n");
+                    Leader playerLeader = player.getLeader(Constants.AGENT);
+                    Leader otherPlayerAgent = player_.getLeader(Constants.AGENT);
+                    if (otherPlayerAgent == null) continue;
+                    if (playerLeader.isExhausted()) {
+                        leaderSB.append("EXHAUSTED: ").append(Helper.getLeaderFullRepresentation(player_, otherPlayerAgent)).append("\n");
                     } else {
-                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, player_.getLeader(Constants.AGENT))).append("\n");
+                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, otherPlayerAgent)).append("\n");
                     }
                 }
             }
@@ -114,7 +145,9 @@ public class LeaderInfo extends LeaderSubcommandData {
             for (Player player_ : activeMap.getPlayers().values()) {
                 if (player_ != player) {
                     if (player.getMahactCC().contains(player_.getColor())) {
-                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, player_.getLeader(Constants.COMMANDER))).append("\n");
+                        Leader leader = player_.getLeader(Constants.COMMANDER);
+                        if (leader == null) continue;
+                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, leader)).append("\n");
                     }
                 }
             }

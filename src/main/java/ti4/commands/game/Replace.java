@@ -1,5 +1,6 @@
 package ti4.commands.game;
 
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
@@ -67,6 +68,15 @@ public class Replace extends GameSubcommandData {
                     map.removePlayer(addedUser.getId());
                 }
             }
+
+            //REMOVE ROLE
+            Guild guild = event.getGuild();
+            Member removedMember = guild.getMemberById(removedPlayer.getUserID());
+            List<Role> roles = guild.getRolesByName(map.getName(), true);
+            if (removedMember != null && roles != null && roles.size() == 1) {
+                guild.removeRoleFromMember(removedMember, roles.get(0)).queue();
+            }
+
             if (players.stream().anyMatch(player -> player.getUserID().equals(removedPlayer.getUserID())) &&
             players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()))) {
                 message = Helper.getGamePing(event, map) + " Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();
@@ -96,9 +106,9 @@ public class Replace extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Specify player to remove and replacement");
             return;
         }
+        Helper.fixGameChannelPermissions(event.getGuild(), map);
         MapSaveLoadManager.saveMap(map, event);
         MapSaveLoadManager.reload(map);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
-        Helper.fixGameChannelPermissions(event.getGuild(), map);
     }
 }

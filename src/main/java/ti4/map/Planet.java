@@ -1,6 +1,7 @@
 package ti4.map;
 
 import ti4.generator.Mapper;
+import ti4.helpers.Constants;
 import ti4.message.BotLogger;
 
 import java.awt.*;
@@ -15,8 +16,10 @@ import com.fasterxml.jackson.annotation.JsonTypeName;
 @JsonTypeName("planet")
 public class Planet extends UnitHolder {
 
-    private int resources = 0;
-    private int influence = 0;
+    private int resourcesOriginal = 0;
+    private int influenceOriginal = 0;
+    private int resourcesModifier = 0;
+    private int influenceModifier = 0;
     private String originalPlanetType = "";
     private String originalTechSpeciality = "";
     private ArrayList<String> planetType = new ArrayList<>();
@@ -36,11 +39,19 @@ public class Planet extends UnitHolder {
             if (split.length > 5) {
                 hasAbility = true;
             }
+        }
+        resetOriginalPlanetResInf();
+    }
+
+    private void resetOriginalPlanetResInf() {
+        String planetInfo = Mapper.getPlanet(getName());
+        if (planetInfo != null) {
+            String[] split = planetInfo.split(",");
             try {
-                resources = Integer.parseInt(split[2]);
-                influence = Integer.parseInt(split[3]);
+                resourcesOriginal = Integer.parseInt(split[2]);
+                influenceOriginal = Integer.parseInt(split[3]);
             } catch (Exception e) {
-                BotLogger.log("Could not parse res/inf of unitHolder " + name, e);
+                BotLogger.log("Could not reset the original res/inf of unitHolder " + getName(), e);
             }
         }
     }
@@ -77,25 +88,37 @@ public class Planet extends UnitHolder {
     }
 
     private void addRemoveTokenData(String tokenFileName, boolean removeTokenData) {
+        if (tokenFileName.equals(Constants.GLEDGE_CORE_PNG)) { //THIS TOKEN HARD SETS THE BASE RES/INF TO 2/0
+            if (removeTokenData) {
+                resetOriginalPlanetResInf();
+            } else {
+                resourcesOriginal = 2;
+                influenceOriginal = 0;
+            }
+        }
+        
         List<String> attachmentInfoAll = Mapper.getAttachmentInfoAll();
         for (String id : attachmentInfoAll) {
             String attachmentID = Mapper.getAttachmentID(id);
             if (tokenFileName.equals(attachmentID)) {
                 String attachmentInfo = Mapper.getAttachmentInfo(id);
                 String[] split = attachmentInfo.split(";");
+                
                 try {
                     if (removeTokenData) {
-                        resources -= Integer.parseInt(split[0]);
-                        influence -= Integer.parseInt(split[1]);
+                        resourcesModifier -= Integer.parseInt(split[0]);
+                        influenceModifier -= Integer.parseInt(split[1]);
                     } else {
-                        resources += Integer.parseInt(split[0]);
-                        influence += Integer.parseInt(split[1]);
+                        resourcesModifier += Integer.parseInt(split[0]);
+                        influenceModifier += Integer.parseInt(split[1]);
                     }
+
                 } catch (Exception e) {
                     BotLogger.log("Could not parse res/inf in token of unitHolder " + getName(), e);
                 }
 
-                if (split.length > 2) {
+                //ADD TYPES
+                if (split.length > 2) { 
                     String additional = split[2];
                     if (additional.contains(",")) {
                         String[] subSplit = additional.split(",");
@@ -116,22 +139,25 @@ public class Planet extends UnitHolder {
                         }
                     }
                 }
+                break;
             }
         }
     }
 
+    @JsonIgnore
     public int getResources() {
-        return resources;
+        return resourcesOriginal + resourcesModifier;
     }
 
+    @JsonIgnore
     public int getInfluence() {
-        return influence;
+        return influenceOriginal + influenceModifier;
     }
 
     @JsonIgnore
     public int getOptimalResources() {
-        if (resources > influence) {
-            return resources;
+        if (getResources() > getInfluence()) {
+            return getResources();
         } else {
             return 0;
         }
@@ -139,8 +165,8 @@ public class Planet extends UnitHolder {
 
     @JsonIgnore
     public int getOptimalInfluence() {
-        if (influence > resources) {
-            return influence;
+        if (getInfluence() > getResources()) {
+            return getInfluence();
         } else {
             return 0;
         }
@@ -148,8 +174,8 @@ public class Planet extends UnitHolder {
 
     @JsonIgnore
     public int getFlexResourcesOrInfluence() {
-        if (influence == resources) {
-            return influence;
+        if (getInfluence() == getResources()) {
+            return getInfluence();
         } else {
             return 0;
         }
@@ -157,7 +183,7 @@ public class Planet extends UnitHolder {
 
     @JsonIgnore
     public int getSumResourcesInfluence() {
-        return resources + influence;
+        return getResources() + getInfluence();
     }
 
     public String getOriginalPlanetType() {

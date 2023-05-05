@@ -80,6 +80,14 @@ public class Constants {
     public static final String UNIT_NAMES = "unit_names";
     public static final String PRIORITY_NO_DAMAGE = "priority_no_damage";
     public static final String UNIT_NAMES_TO = "unit_names_to";
+    public static final String UNIT_NAMES_FROM = "unit_names_from";
+    public static final String UNIT_NAMES_FROM_2 = "unit_names_from_2";
+    public static final String UNIT_NAMES_FROM_3 = "unit_names_from_3";
+    public static final String UNIT_NAMES_FROM_4 = "unit_names_from_4";
+    public static final String TILE_NAME_FROM = "tile_name_from";
+    public static final String TILE_NAME_FROM_2 = "tile_name_from_2";
+    public static final String TILE_NAME_FROM_3 = "tile_name_from_3";
+    public static final String TILE_NAME_FROM_4 = "tile_name_from_4";
     public static final String COLOR = "color";
     public static final String SEARCH_WARRANT = "search_warrant";
     public static final String ADD_CUSTOM_ADJACENT_TILES = "add_custom_adjacent_tiles";
@@ -107,6 +115,7 @@ public class Constants {
     public static final String ADD_UNITS = "add_units";
     public static final String ADD_UNIT_DAMAGE = "add_sustain_damage";
     public static final String MOVE_UNITS = "move_units";
+    public static final String MOVE_UNITS2 = "move_units2";
     public static final String NO_MAPGEN = "no_mapgen";
     public static final String REMOVE_UNITS = "remove_units";
     public static final String REMOVE_UNIT_DAMAGE = "remove_sustain_damage";
@@ -649,6 +658,7 @@ public class Constants {
     public static final String UPDATE_THREAD_ARCHIVE_TIME = "update_thread_archive_time";
     public static final String THREAD_SEARCH_STRING = "thread_search_string";
     public static final String AUTO_ARCHIVE_DURATION = "auto_archive_duration";
+    public static final String ALL_INFO = "all_info";
 
     public static final String LEADERSHIP_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/1/1e/Ti07_strategy_1_leadership.png/revision/latest?cb=20200827003959";
     public static final String DIPLOMACY_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/a/a1/Untitled.png/revision/latest?cb=20210623202428";
@@ -658,5 +668,21 @@ public class Constants {
     public static final String WARFARE_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/0/02/Ti07_strategy_6_warfare.png/revision/latest?cb=20200827005450";
     public static final String TECHNOLOGY_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/e/ea/Ti07_strategy_7_technology.png/revision/latest?cb=20200827005534";
     public static final String IMPERIAL_IMAGE_LINK = "https://static.wikia.nocookie.net/twilight-imperium-4/images/2/24/Ti07_strategy_8_imperial.png/revision/latest?cb=20200827005806";
-
+    public static final String BUTTON = "button";
+    public static final String BUTTON_TEXT = "button_text";
+    public static final String GENERIC_BUTTON_ID_PREFIX = "generic_button_id_";
+    public static final String TIGL_GAME = "is_tigl_game";
+    public static final String NORMAL_GAME = "normal_game";
+    public static final String INCLUDE_ALIASES = "include_aliases";
+    public static final String LIST_ABILITIES = "list_abilities";
+    public static final String SEARCH = "search";
+    public static final String BENTOR_HAS_FOUND_CFRAG = "has_found_cfrag";
+    public static final String BENTOR_HAS_FOUND_HFRAG = "has_found_hfrag";
+    public static final String BENTOR_HAS_FOUND_IFRAG = "has_found_ifrag";
+    public static final String BENTOR_HAS_FOUND_UFRAG = "has_found_ufrag";
+    public static final String GLEDGE_CORE_PNG = "token_ds_gledgecore.png";
+    public static final String DS_COMMAND = "ds";
+    public static final String ZELIAN_HERO = "zelian_hero";
+    public static final String NAALU_COMMANDER = "naalu_commander";
+    public static final String MOVE_CREUSS_WORMHOLE = "move_creuss_wormhole";
 }

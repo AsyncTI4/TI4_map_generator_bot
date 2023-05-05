@@ -9,6 +9,7 @@ import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.ResourceHelper;
 import ti4.map.Map;
+import ti4.map.Player;
 import ti4.message.BotLogger;
 
 import javax.imageio.IIOImage;
@@ -67,12 +68,23 @@ public class WebHelper {
 
     }
 
+
     public static void putMap(String gameId, BufferedImage img) {
+        putMap(gameId, img, false, null);
+    }
+
+    public static void putMap(String gameId, BufferedImage img, Boolean frog, Player player) {
         try {
             Region region = Region.US_EAST_1;
             S3Client s3 = S3Client.builder()
                     .region(region)
                     .build();
+            String mapPathFormat;
+            if (frog != null && frog && player != null) {
+                mapPathFormat = "fogmap/" + player.getUserID() + "/%s/%s.png";
+            } else {
+                mapPathFormat = "map/%s/%s.png";
+            }
 
             LocalDateTime date = LocalDateTime.now();
             String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
@@ -80,7 +92,7 @@ public class WebHelper {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(webProperties.getProperty("bucket"))
-                    .key(String.format("map/%s/%s.png", gameId, dtstamp))
+                    .key(String.format(mapPathFormat, gameId, dtstamp))
                     .contentType("image/png")
                     .build();
 

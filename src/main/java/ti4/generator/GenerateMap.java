@@ -3,6 +3,8 @@ package ti4.generator;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.MapGenerator;
@@ -232,6 +234,11 @@ public class GenerateMap {
                 new Thread(() -> {
                     WebHelper.putMap(map.getName(), mainImage);
                     WebHelper.putData(map.getName(), map.copy());
+                }).start();
+            } else if (!(isFoWPrivate==null) && isFoWPrivate) {
+                Player player = getFowPlayer(map, event);
+                new Thread(() -> {
+                        WebHelper.putMap(map.getName(), mainImage, true, player);
                 }).start();
             }
         } catch (IOException e) {
@@ -495,6 +502,10 @@ public class GenerateMap {
 
                 reinforcements(player, map, width - 450, yPlayAreaSecondRow, unitCount);
 
+                if (player.getFactionAbilities().contains("ancient_blueprints")) {
+                    xDelta = bentorBluePrintInfo(player, xDelta, yPlayArea, map);
+                }
+
                 if (!player.getLeaders().isEmpty()) {
                     xDelta = leaderInfo(player, xDelta, yPlayArea, map);
                 }
@@ -521,6 +532,40 @@ public class GenerateMap {
             }
             y += 40;
         }
+    }
+
+    private int bentorBluePrintInfo(Player player, int x, int y, Map map) {
+        int deltaX = 0;
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+        graphics.setColor(Color.WHITE);
+        String bluePrintFileNamePrefix = "pa_ds_bent_blueprint_";
+        boolean hasFoundAny = false;
+        if (player.hasFoundCulFrag()) {
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "crf.png");
+            hasFoundAny = true;
+            deltaX += 48;
+        }
+        if (player.hasFoundHazFrag()) {
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "hrf.png");
+            hasFoundAny = true;
+            deltaX += 48;
+        }
+        if (player.hasFoundIndFrag()) {
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "irf.png");
+            hasFoundAny = true;
+            deltaX += 48;
+        }
+        if (player.hasFoundUnkFrag()) {
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, bluePrintFileNamePrefix + "urf.png");
+            hasFoundAny = true;
+            deltaX += 48;
+        }
+        return x + deltaX + (hasFoundAny ? 20 : 0);
     }
 
     private int pnInfo(Player player, int x, int y, Map map) {
@@ -948,10 +993,10 @@ public class GenerateMap {
                     graphics.drawString(Integer.toString(countOfUnits), position.x, position.y);
                     break;
                 }
-                position.y -= (countOfUnits * 5);
+                position.y -= (countOfUnits * 7);
                 for (int i = 0; i < unitCount; i++) {
                     graphics.drawImage(image, position.x, position.y + deltaY, null);
-                    deltaY += 10;
+                    deltaY += 14;
                 }
             }
         }
@@ -993,26 +1038,30 @@ public class GenerateMap {
         drawPAImage(x + deltaX - 2, y - 2, "pa_resinf_info.png");
         graphics.setColor(Color.WHITE);
         graphics.drawRect(x + deltaX - 2, y - 2, 152, 152);
-        if (player.getFaction().equals("xxcha") && !player.getLeader("hero").isLocked()) {
+        if (player.getFaction().equals("xxcha") && !player.getLeader("hero").isLocked()) { //XXCHA WITH UNLOCKED HERO
             int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, map);
             int totalPlayerResources = Helper.getPlayerResourcesTotal(player, map);
-
+            if (player.getUserID().equals("586504147746947090")) {
+                drawPAImageOpaque(x + deltaX - 2, y - 2, "pa_resinf_info_xxcha_gedsdead.png", 0.9f);
+            } else {
+                drawPAImageOpaque(x + deltaX - 2, y - 2, "pa_resinf_info_xxcha.png", 0.9f);
+            }
+            drawFactionIconImage(x + deltaX + 75 - 94/2, y + 75 - 94/2, "xxcha.png", 1f, 0.15f);
             graphics.setColor(Color.WHITE);
             drawCenteredString(graphics, String.valueOf(availablePlayerResources), new Rectangle(x + deltaX, y + 75 - 35 + 5, 150, 35), Storage.getFont35());
             graphics.setColor(Color.GRAY);
             drawCenteredString(graphics, String.valueOf(totalPlayerResources), new Rectangle(x + deltaX, y + 75 + 5, 150, 24), Storage.getFont24());
-
         } else { //NOT XXCHA WITH UNLOCKED HERO
             int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, map);
             int totalPlayerResources = Helper.getPlayerResourcesTotal(player, map);
             int availablePlayerResourcesOptimal = Helper.getPlayerOptimalResourcesAvailable(player, map);
-            int totalPlayerResourcesOptimal = Helper.getPlayerOptimalResourcesTotal(player, map);
+            // int totalPlayerResourcesOptimal = Helper.getPlayerOptimalResourcesTotal(player, map);
             int availablePlayerInfluence = Helper.getPlayerInfluenceAvailable(player, map);
             int totalPlayerInfluence = Helper.getPlayerInfluenceTotal(player, map);
             int availablePlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceAvailable(player, map);
-            int totalPlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceTotal(player, map);
+            // int totalPlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceTotal(player, map);
             int availablePlayerFlex = Helper.getPlayerFlexResourcesInfluenceAvailable(player, map);
-            int totalPlayerFlex = Helper.getPlayerFlexResourcesInfluenceTotal(player, map);
+            // int totalPlayerFlex = Helper.getPlayerFlexResourcesInfluenceTotal(player, map);
 
             //  RESOURCES
             graphics.setColor(Color.WHITE);
@@ -1090,6 +1139,17 @@ public class GenerateMap {
                         String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
                         drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName);
                     }
+                }
+                
+                // GLEDGE CORE
+                if (unitHolder.getTokenList().contains(Constants.GLEDGE_CORE_PNG)) {
+                    String tokenPath = ResourceHelper.getInstance().getTokenFile(Constants.GLEDGE_CORE_PNG);
+                    try {
+                        BufferedImage image = resizeImage(ImageIO.read(new File(tokenPath)), 0.25f);
+                        graphics.drawImage(image, x + deltaX + 15, y + 112, null);
+                    } catch (Exception e) {
+                        BotLogger.log("Could not parse control token file for: " + Constants.GLEDGE_CORE_PNG, e);
+                    }    
                 }
 
                 boolean hasAttachment = planetHolder.hasAttachment();
@@ -1325,6 +1385,21 @@ public class GenerateMap {
         }
     }
 
+    private void drawFactionIconImage(int x, int y, String resourceName, float scale, float opacity) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getFactionFile(resourceName);
+            @SuppressWarnings("ConstantConditions")
+            BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
+            resourceBufferedImage = resizeImage(resourceBufferedImage, scale);
+            Graphics2D g2 = (Graphics2D) graphics;
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+            g2.drawImage(resourceBufferedImage, x, y, null);
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        } catch (Exception e) {
+            BotLogger.log("Could not display planet: " + resourceName, e);
+        }
+    }
+
     private void drawPlanetImage(int x, int y, String resourceName) {
         try {
             String resourcePath = ResourceHelper.getInstance().getPlanetResource(resourceName);
@@ -1342,6 +1417,21 @@ public class GenerateMap {
             @SuppressWarnings("ConstantConditions")
             BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
             graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            BotLogger.log("Could not display play area: " + resourceName, e);
+        }
+    }
+
+    private void drawPAImageOpaque(int x, int y, String resourceName, float opacity) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            @SuppressWarnings("ConstantConditions")
+            BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
+            Graphics2D g2 = (Graphics2D) graphics;
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+            g2.drawImage(resourceBufferedImage, x, y, null);
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
         } catch (Exception e) {
             BotLogger.log("Could not display play area: " + resourceName, e);
         }
@@ -2208,6 +2298,9 @@ public class GenerateMap {
     }
 
     private void addTile(Tile tile, Map map, TileStep step, boolean setupCheck) {
+        if (tile == null && tile.getTileID() == null){
+            return;
+        }
         try {
             BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
             BufferedImage fogOfWar = ImageIO.read(new File(tile.getFowTilePath(fowPlayer)));
@@ -2267,6 +2360,26 @@ public class GenerateMap {
                 } //do nothing
                 case Tile -> {
                     graphics.drawImage(image, tileX, tileY, null);
+
+                    //ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
+                    List<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
+                    for (UnitHolder unitHolder : unitHolders) {
+                        boolean drawAnomaly = false;
+                        Set<String> tokenList = unitHolder.getTokenList();
+                        if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png", "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
+                            drawAnomaly = true;
+                        }
+                        Set<String> unitList = unitHolder.getUnits().keySet();
+                        for (String unit : unitList) {
+                            if (unit.contains("csd.png")) drawAnomaly = true;
+                        }
+                        if (drawAnomaly) {
+                            BufferedImage anomalyImage = ImageIO.read(new File(ResourceHelper.getInstance().getTileFile("tile_anomaly.png")));
+                            graphics.drawImage(anomalyImage, tileX, tileY, null);
+                        }
+                    }
+
+                    //DRAW COORDINATE
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(Color.WHITE);
                     if (tileIsFoggy) {
@@ -2290,7 +2403,6 @@ public class GenerateMap {
                         graphics.drawString(tile.getFogLabel(fowPlayer), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
                     }
                     graphics.drawString(position, tileX + tilePositionPoint.x - textOffset, tileY + tilePositionPoint.y);
-
                 }
                 case Extras -> {
                     if (tileIsFoggy) return;
@@ -2590,7 +2702,7 @@ public class GenerateMap {
                 }
                 String tokenPath = tile.getTokenPath(tokenID);
                 if (tokenPath == null) {
-                    BotLogger.log("Could not parse token file for: " + tokenID);
+                    BotLogger.log("Could not parse token file for: " + tokenID + " on tile: " + tile.getRepresentationForAutoComplete());
                     continue;
                 }
                 float scale = 1.00f;

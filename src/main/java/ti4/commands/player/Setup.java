@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -19,33 +20,37 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.StringTokenizer;
 
+import org.apache.commons.lang3.StringUtils;
+
 public class Setup extends PlayerSubcommandData {
     public Setup() {
         super(Constants.SETUP, "Player initialisation: Faction and Color");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION, "Faction Name").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set up faction"));
-        addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position"));
+        addOptions(new OptionData(OptionType.STRING, Constants.HS_TILE_POSITION, "HS tile position").setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         if (!activeMap.isMapOpen()) {
-            sendMessage("Can do faction setup only when map is open and not locked");
+            sendMessage("Can do faction setup only when map is open and not locked. Use `/game set_status open`");
             return;
         }
 
         @SuppressWarnings("ConstantConditions")
-        String faction = AliasHandler.resolveFaction(event.getOption(Constants.FACTION).getAsString().toLowerCase());
+        String factionOption = event.getOption(Constants.FACTION, null, OptionMapping::getAsString);
+        if (factionOption != null) factionOption = StringUtils.substringBefore(factionOption.toLowerCase().replace("the ", ""), " ");
+        String faction = AliasHandler.resolveFaction(factionOption);
         if (!Mapper.isFaction(faction)) {
-            sendMessage("Faction not valid");
+            sendMessage("Faction `" + faction + "` is not valid. Valid options are: " + Mapper.getFactions());
             return;
         }
         @SuppressWarnings("ConstantConditions")
         String color = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
         if (!Mapper.isColorValid(color)) {
-            sendMessage("Color not valid");
+            sendMessage("Color `" + color + "` is not valid. Options are: " + Mapper.getColors());
             return;
         }
         Player player = activeMap.getPlayer(getUser().getId());
@@ -191,6 +196,13 @@ public class Setup extends PlayerSubcommandData {
         } else {
             sendMessage("Player was set up.");
         }
+
+        //STARTING TECH
+
+        //SEND STUFF
+        AbilityInfo.sendAbilityInfo(activeMap, player, event);
+        TechInfo.sendTechInfo(activeMap, player, event);
+        LeaderInfo.sendLeadersInfo(activeMap, player, event);
     }
 
     private void addUnits(String[] setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {

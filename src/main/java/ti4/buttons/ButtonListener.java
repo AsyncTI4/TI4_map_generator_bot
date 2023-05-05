@@ -22,9 +22,11 @@ import ti4.MapGenerator;
 import ti4.MessageListener;
 import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.agenda.RevealAgenda;
+import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.map.UnitHolder;
 import ti4.commands.cardsac.PlayAC;
+import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.status.Cleanup;
@@ -244,6 +246,9 @@ public class ButtonListener extends ListenerAdapter {
             }
             players.remove(player);
             playerUsedSC.put(messageID, players);
+        }
+        else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
+            addReaction(event, false, false, null, "");
         }
         else if (buttonID.startsWith("exhaust_")) {
             String planetName = buttonID.substring(buttonID.indexOf("_")+1, buttonID.length());
@@ -766,13 +771,13 @@ public class ButtonListener extends ListenerAdapter {
                     if (used) {
                         break;
                     }
-                    boolean isYssaril = player.getFaction().equals("yssaril");
-                    String message = isYssaril ? "Drew 3 Actions cards" : "Drew 2 Actions cards";
-                    int count = isYssaril ? 3 : 2;
+                    boolean hasSchemingAbility = player.getFactionAbilities().contains("scheming");
+                    String message = hasSchemingAbility ? "Drew 3 Actions Cards (Scheming) - please discard an Action Card from your hand" : "Drew 2 Actions cards";
+                    int count = hasSchemingAbility ? 3 : 2;
                     for (int i = 0; i < count; i++) {
                         activeMap.drawActionCard(player.getUserID());
                     }
-                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                    ACInfo.sendActionCardInfo(activeMap, player, event);
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_draw_so" -> {
@@ -783,7 +788,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = "Drew Secret Objective";
                     activeMap.drawSecretObjective(player.getUserID());
                     player.addFollowedSC(8);
-                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                    SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_trade_follow" -> {
@@ -950,16 +955,17 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
                 case "spend_comm_for_AC" -> {
-                    boolean isYssaril = player.getFaction().equals("yssaril");
-                    int count2 = isYssaril ? 2 : 1;
+                    boolean hasSchemingAbility = player.getFactionAbilities().contains("scheming");
+                    int count2 = hasSchemingAbility ? 2 : 1;
                     if(player.getCommodities() > 0)
                     {
                         player.setCommodities(player.getCommodities()-1);
                         for (int i = 0; i < count2; i++) {
                             activeMap.drawActionCard(player.getUserID());
                         }
-                        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
-                        addReaction(event, false, false,"Spent 1 commodity for "+count2+ " AC", "");
+                        ACInfo.sendActionCardInfo(activeMap, player, event);
+                        String message = hasSchemingAbility ? "Spent 1 commodity to draw " + count2 + " Action Card (Scheming) - please discard an Action Card from your hand" : "Spent 1 commodity to draw " + count2 + " AC";
+                        addReaction(event, false, false, message, "");
                     }
                     else if(player.getTg() > 0)
                     {
@@ -967,7 +973,7 @@ public class ButtonListener extends ListenerAdapter {
                         for (int i = 0; i < count2; i++) {
                             activeMap.drawActionCard(player.getUserID());
                         }
-                        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                        ACInfo.sendActionCardInfo(activeMap, player, event);
                         addReaction(event, false, false,"Spent 1 tg for an AC", "");
 
                     }
@@ -1033,7 +1039,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "draw_1_AC" -> {
                     activeMap.drawActionCard(player.getUserID());
-                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                    ACInfo.sendActionCardInfo(activeMap, player, event);
                     addReaction(event, true, false, "Drew 1 AC", "");
                 }
                 case "draw_2_AC" -> {
@@ -1374,7 +1380,7 @@ public class ButtonListener extends ListenerAdapter {
         }
         int numberOfPlayers = activeMap.getPlayers().size();
         if (matchingFactionReactions >= numberOfPlayers) { //TODO: @Jazzxhands to verify this will work for FoW
-            respondAllPlayersReacted(event);
+            respondAllPlayersReacted(event, map);
         }
     }
 
@@ -1811,13 +1817,17 @@ public class ButtonListener extends ListenerAdapter {
         {
             id = Constants.PO_SCORING;
         }
-        if(id != null && (id.startsWith(Constants.SC_FOLLOW) || id.startsWith("sc_no_follow")))
-        {
-            id = Constants.SC_FOLLOW;
+        if (buttonID.startsWith(Constants.PO_SCORING)) {
+            buttonID = Constants.PO_SCORING;
+        } else if((buttonID.startsWith(Constants.SC_FOLLOW) || buttonID.startsWith("sc_no_follow"))) {
+            buttonID = Constants.SC_FOLLOW;
+        } else if(buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
+            String buttonText = event.getButton().getLabel();
+            event.getInteraction().getMessage().reply("All players have reacted to '" + buttonText + "'").queue();
         }
-        switch (id) {
+        switch (buttonID) {
             case Constants.SC_FOLLOW, "sc_no_follow", "sc_refresh", "sc_refresh_and_wash", "trade_primary", "sc_ac_draw", "sc_draw_so","sc_trade_follow", "sc_leadership_follow" -> {
-                if(activeMap.isFoWMode())
+                if(map.isFoWMode())
                 {
                     event.getInteraction().getMessage().reply("All players have reacted to this Strategy Card").queueAfter(1, TimeUnit.SECONDS);
                 }
@@ -1887,13 +1897,13 @@ public class ButtonListener extends ListenerAdapter {
                 });
             }
             case "pass_on_abilities"-> {
-                if(activeMap.isCustodiansScored())
+                if(map.isCustodiansScored())
                 {
-                    new RevealAgenda().revealAgenda(event, false, activeMap, event.getChannel());
+                    new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
                 }
                 else
                 {
-                    event.getInteraction().getMessage().reply(Helper.getGamePing(event.getGuild(), activeMap) + " All players have indicated completion of status phase. Proceed to Strategy Phase.").queueAfter(1, TimeUnit.SECONDS);
+                    event.getInteraction().getMessage().reply(Helper.getGamePing(event.getGuild(), map) + " All players have indicated completion of status phase. Proceed to Strategy Phase.").queueAfter(1, TimeUnit.SECONDS);
                 }
 
             }

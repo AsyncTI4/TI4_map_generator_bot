@@ -43,16 +43,27 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
+        if (!MapGenerator.readyToReceiveCommands) {
+            event.replyChoice("Please try again in a moment. The bot is rebooting.", 0).queue();
+            return;
+        }
+        
         try {
             AutoCompleteProvider.autoCompleteListener(event);
         } catch (Exception e) {
-            BotLogger.log("Auto complete issue in event: " + event.getName(), e);
+            String message = "Auto complete issue in event: " + event.getName() + "\n> Channel: " + event.getChannel().getAsMention() + "\n> Command: " + event.getCommandString();
+            BotLogger.log(message, e);
         }
     }
 
     @Override
     public void onSlashCommandInteraction(SlashCommandInteractionEvent event) {
+        if (!MapGenerator.readyToReceiveCommands) {
+            event.getInteraction().reply("Please try again in a moment. The bot is rebooting.").queue();
+            return;
+        }
         event.getInteraction().deferReply().queue();
+
         String userID = event.getUser().getId();
         Member member = event.getMember();
         if (member != null) event.getChannel().sendMessage("```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```").queue();

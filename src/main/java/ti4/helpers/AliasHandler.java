@@ -10,11 +10,13 @@ import java.util.*;
 
 public class AliasHandler {
     private static HashMap<String, String> tileAliasList = new HashMap<>();
+    private static HashMap<String, String> tileAliasEntryList = new HashMap<>();
     private static HashMap<String, String> tilemapAliasList = new HashMap<>();
     private static HashMap<String, String> unitAliasList = new HashMap<>();
-    private static ArrayList<String> unitList = new ArrayList<>();
-    private static ArrayList<String> planetList = new ArrayList<>();
+    private static ArrayList<String> unitValuesList = new ArrayList<>();
+    private static ArrayList<String> planetKeyList = new ArrayList<>();
     private static HashMap<String, String> planetAliasList = new HashMap<>();
+    private static HashMap<String, String> planetAliasEntryList = new HashMap<>();
     private static HashMap<String, String> cctokenAliasList = new HashMap<>();
     private static HashMap<String, String> attachmentAliasList = new HashMap<>();
     private static HashMap<String, String> tokenAliasList = new HashMap<>();
@@ -35,10 +37,12 @@ public class AliasHandler {
     public static void init()
     {
         readAliasFile("tile_alias.properties", tileAliasList, "Could not read tiles alias file");
+        readAliasFile("tile_alias.properties", tileAliasEntryList);
         readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
         readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
-        readAliasFile("unit_alias.properties", unitList);
-        readAliasFile("planet_alias.properties", planetList, true);
+        readAliasFile("unit_alias.properties", unitValuesList, false);
+        readAliasFile("planet_alias.properties", planetKeyList, true);
+        readAliasFile("planet_alias.properties", planetAliasEntryList);
         readAliasFile("planet_alias.properties", planetAliasList, "Could not read planet alias file");
         readAliasFile("cc_token_alias.properties", cctokenAliasList, "Could not read cc token alias file");
         readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
@@ -57,9 +61,30 @@ public class AliasHandler {
         readAliasFile("ttpg_token_alias.properties", ttpgTokenAliasList, "Could not read TTPG token_alias file");
         readAliasFile("ttpg_unit_alias.properties", ttpgUnitAliasList, "Could not read TTPG unit_alias file");
     }
-    private static void readAliasFile(String fileName, ArrayList<String> list) {
-        readAliasFile(fileName, list, false);
+
+    /** Loads aliases in a simple format - used primarily for displaying aliases to users with the /help commands
+     * @param fileName file with lines like: key=value1,value2,value3
+     * @param map map to load with key and values like: [key],[value1,value2,value3]
+     */
+    private static void readAliasFile(String fileName, Map<String, String> map) {
+        Properties aliasProperties = new Properties();
+        String aliasFile = ResourceHelper.getInstance().getAliasFile(fileName);
+        if (aliasFile != null) {
+            try (InputStream input = new FileInputStream(aliasFile)) {
+                aliasProperties.load(input);
+                aliasProperties.forEach((x, y) -> map.put(x.toString(), y.toString()));
+            } catch (IOException e) {
+                BotLogger.log("Could not read alias file", e);
+            }
+        }
     }
+
+    /** Loads just the key or value for aliases - use the list for simple ifExists / contains checks
+     * @param fileName file with lines like: key=value1,value2,value3
+     * @param list list to load
+     * @param keys true ->  load [key] into the list
+     * @param keys false -> load [value1,value2,value3] into the list
+     */
     private static void readAliasFile(String fileName, ArrayList<String> list, boolean keys) {
         Properties aliasProperties = new Properties();
         String aliasFile = ResourceHelper.getInstance().getAliasFile(fileName);
@@ -87,6 +112,11 @@ public class AliasHandler {
         }
     }
 
+    /** Load aliases for actually resolving aliases
+     * @param fileName file with lines like: key=value1,value2,value3
+     * @param aliasList map to load aliases like: (value1=key),(value2=key),(value=key)
+     * @param errorMessage error message provided
+     */
     private static void readAliasFile(String fileName, HashMap<String, String> aliasList, String errorMessage) {
         Properties aliasProperties = new Properties();
         String aliasFile = ResourceHelper.getInstance().getAliasFile(fileName);
@@ -168,12 +198,12 @@ public class AliasHandler {
         }
     }
 
-    public static ArrayList<String> getUnitList() {
-        return unitList;
+    public static ArrayList<String> getUnitValuesList() {
+        return unitValuesList;
     }
 
-    public static ArrayList<String> getPlanetList() {
-        return planetList;
+    public static ArrayList<String> getPlanetKeyList() {
+        return planetKeyList;
     }
 
     public static String resolvePlanet(String name)
@@ -329,5 +359,13 @@ public class AliasHandler {
         String aliasID = ttpgPositionAliasList.get(position);
         // System.out.println("resolving TTPG position: " + position + " to async position: " + aliasID);
         return aliasID != null ? aliasID : null;
+    }
+
+    public static HashMap<String, String> getPlanetAliasEntryList() {
+        return planetAliasEntryList;
+    }
+
+    public static HashMap<String, String> getTileAliasEntryList() {
+        return tileAliasEntryList;
     }
 }

@@ -62,6 +62,6 @@ public class ListCommands extends HelpSubcommandData {
                 }
             }
         }
-        event.getChannel().sendMessage("__**Command List**__").queue(m -> m.createThreadChannel("Command List").queue(t -> MessageHelper.sendMessageToChannel(t, sb.toString())));
+        MessageHelper.sendMessageToThread(event.getChannel(), "Command List", sb.toString());
     }
 }

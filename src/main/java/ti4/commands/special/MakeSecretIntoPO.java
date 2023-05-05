@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cardsac.ACInfo_Legacy;
+import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
@@ -62,7 +63,7 @@ public class MakeSecretIntoPO extends SpecialSubcommandData {
                 Mapper.getSecretObjectivesJustNames().get(soName) + "\n";
         MessageHelper.sendMessageToChannel(event.getChannel(), sb);
 
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, playerWithSO);
+        SOInfo.sendSecretObjectiveInfo(activeMap, playerWithSO, event);
 
     }
 }

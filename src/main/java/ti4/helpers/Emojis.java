@@ -279,9 +279,10 @@ public class Emojis {
     public static final String GoodDog = "<:GoodDog:1068567308819255316>";
     public static final String Ozzie = "<:Ozzie:1069446695689134140>";
     public static final String Summer = "<:Summer:1070283656037412884>";
+    public static final String Charlie = "<:Charlie:1096774713352650812>";
     
     //LIST OF GOOD DOGS
-    public static List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer);
+    public static List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer, Charlie);
 
     //TOES
     public static final String NoToes = "<:NoToes:1082312430706774016>";
@@ -299,6 +300,9 @@ public class Emojis {
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
     public static final String WHbeta = "<:WHbeta:1056593596012302366>";
     public static final String WHgamma = "<:WHgamma:1056593568766111814>";
+    public static final String CreussAlpha = "<:CreussAlpha:1103868613254971463>";
+    public static final String CreussBeta = "<:CreussBeta:1103868614777524274>";
+    public static final String CreussGamma = "<:CreussGamma:1103868615532482592>";
     public static final String LegendaryPlanet = "<:Legendaryplanet:947250386375426108>";
     public static final String SpeakerToken = "<:Speakertoken:965363466821050389>";
     public static final String Sabotage = "<:sabotage:962784058159546388>";
@@ -311,6 +315,8 @@ public class Emojis {
     public static final String Absol = "<:Absol:1079473959248068701>";
     public static final String DiscordantStars = "<:DS:1081308924084506706>";
     public static final String AsyncTI4Logo = "<:asyncti4:959703535258333264>";
+    public static final String TIGL = "<:TIGL:1038913368360222752>";
+
 
     //LIST OF SYMBOLS FOR FOG STUFF
     public static List<String> symbols = Arrays.asList(warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag, CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2, tg, comm, Sleeper, influence, resources, SemLord, Supernova, Asteroid, GravRift, Nebula, CyberneticTech, PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken, BortWindow);
