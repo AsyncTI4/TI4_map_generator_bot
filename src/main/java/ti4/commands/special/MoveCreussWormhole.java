@@ -59,10 +59,10 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
 
         StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(event, player));
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
-        sb.append(" moved Creuss Wormhole `" + tokenName + "` to " + tile.getRepresentation());
+        sb.append(" moved " + Helper.getEmojiFromDiscord(tokenName) + " to " + tile.getRepresentation());
         for (Tile tile_ : activeMap.getTileMap().values()) {
             if (!tile.equals(tile_) && tile_.removeToken(Mapper.getTokenID(tokenName), Constants.SPACE)) {
-                sb.append(" (moving it from " + tile_.getRepresentation() + ")");
+                sb.append(" (from " + tile_.getRepresentation() + ")");
                 break;
             }
         }
