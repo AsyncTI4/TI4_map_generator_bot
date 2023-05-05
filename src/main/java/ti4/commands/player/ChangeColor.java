@@ -3,15 +3,16 @@ package ti4.commands.player;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.Player;
-import ti4.map.Tile;
-import ti4.map.UnitHolder;
+import ti4.map.*;
+import ti4.message.MessageHelper;
 
+import java.io.File;
 import java.util.*;
 
 public class ChangeColor extends PlayerSubcommandData {
@@ -119,5 +120,16 @@ public class ChangeColor extends PlayerSubcommandData {
                 }
             }
         }
+    }
+
+    @Override
+    public void reply(SlashCommandInteractionEvent event) {
+        String userID = event.getUser().getId();
+        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        MapSaveLoadManager.saveMap(activeMap, event);
+        MapSaveLoadManager.saveMap(activeMap, event);
+
+        File file = GenerateMap.getInstance().saveImage(activeMap, event);
+        MessageHelper.replyToMessage(event, file);
     }
 }
