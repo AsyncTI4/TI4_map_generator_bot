@@ -1484,4 +1484,17 @@ public class Helper {
     public static int getNeighbourCount(Map map, Player player) {
         return getNeighbouringPlayers(map, player).size();
     }
+
+    public static List<String> getListFromCSV(String commaSeparatedString) {
+        StringTokenizer tokenizer = new StringTokenizer(commaSeparatedString, ",");
+        ArrayList<String> values = new ArrayList<>();
+        while (tokenizer.hasMoreTokens()) {
+            values.add(tokenizer.nextToken().trim());
+        }
+        return values;
+    }
+
+    public static Set<String> getSetFromCSV(String commaSeparatedString) {
+        return new HashSet<>(getListFromCSV(commaSeparatedString));
+    }
 }
