@@ -13,6 +13,10 @@ import ti4.map.*;
 import ti4.message.MessageHelper;
 
 import java.util.*;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class ListVoteCount extends AgendaSubcommandData {
     public ListVoteCount() {
@@ -67,6 +71,7 @@ public class ListVoteCount extends AgendaSubcommandData {
             boolean bloodPactPn = false;
             boolean hasXxchaAlliance = false;
             int influenceCount = 0;
+            int resourceCount = 0;
 
             //XXCHA SPECIAL CASE
             if ("xxcha".equals(player.getFaction())) {
@@ -83,7 +88,11 @@ public class ListVoteCount extends AgendaSubcommandData {
                             .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
                     influenceCount += influenceCountFromPlanetsRes;
                 }
-            } else if (!player.getPromissoryNotesInPlayArea().isEmpty()) {
+            }
+            if (player.getFactionAbilities().contains("lithoids")) { //Khrask Faction Ability Lithoids - Vote with RES, not INF
+
+            }
+            if (!player.getPromissoryNotesInPlayArea().isEmpty()) {
                 for (String pn : player.getPromissoryNotesInPlayArea()) {
                     String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(pn);
                     for (Player player_ : map.getPlayers().values()) {
@@ -140,10 +149,6 @@ public class ListVoteCount extends AgendaSubcommandData {
                 if (bloodPactPn) {
                     text += " (+4 votes for Blood Pact)";
                 }
-                //Predictive Intelligence
-                if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
-                    text += " (+3 votes for Predictive Intelligence)";
-                }
             }
 
             text += "**";
@@ -154,5 +159,66 @@ public class ListVoteCount extends AgendaSubcommandData {
             i++;
         }
         MessageHelper.sendMessageToChannel(channel, msg.toString());
+    }
+
+    public static int getVoteCountFromPlanets(Player player) {
+        int baseResourceCount = 0;
+        int baseInfluenceCount = 0;
+        int voteCount = 0;
+
+        //NEKRO
+
+        //XXCHA
+
+        //KHRASK
+
+        return voteCount;
+    }
+
+    public static String getAdditionalVotesFromOtherSources(Map map, Player player) {
+        StringBuilder sb = new StringBuilder();
+
+        //Argent Zeal
+        if (player.getFactionAbilities().contains("zeal")) {
+            long playerCount = map.getPlayers().values().stream().filter(Player::isRealPlayer).count() - 1;
+            sb.append("(+" + playerCount + " votes for " + Emojis.Argent + "Zeal)");
+        }
+
+        //Xxcha Alliance    //TODO: contains(xxcha) -> contains(playerWithXxchaCommander)
+        List<String> playersPNs = player.getPromissoryNotesInPlayArea();
+        List<Player> xxchaPlayers = map.getRealPlayers().stream().filter(p -> p.getFaction().equals("xxcha")).toList();
+        if (!xxchaPlayers.remove(player) && !xxchaPlayers.isEmpty() && xxchaPlayers.size() == 1) {
+            Player xxchaPlayer = xxchaPlayers.get(0);
+            Leader xxchaCommander = xxchaPlayer.getLeader(Constants.COMMANDER);
+            if (xxchaCommander != null && !xxchaCommander.isLocked()) {
+                for (String pn : playersPNs) {
+                    if (pn.contains(xxchaPlayer.getColor()) && pn.contains("_an")) {
+                        Set<String> planets = new HashSet<>(player.getPlanets());
+                        planets.removeAll(player.getExhaustedPlanets());
+                        int readyPlanetCount = planets.size();
+                        sb.append("(+" + readyPlanetCount + " votes for Xxcha Alliance (+1 vote per planet exhausted))");
+                    }
+                }
+            }
+        }
+
+        //Blood Pact
+        if (player.getPromissoryNotesInPlayArea().contains("blood_pact")) {
+            sb.append("(+4 potential votes for " + Emojis.Empyrean + Emojis.PN + "Blood Pact)");
+        }
+            
+        //Predictive Intelligence
+        if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
+            sb.append(" (+3 votes for " + Emojis.CyberneticTech + "Predictive Intelligence)");
+        }
+
+        //Absol Shard of the Throne
+        if (CollectionUtils.containsAny(player.getRelics(), List.of("absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3"))) {
+            int count = player.getRelics().stream().filter(s -> s.contains("absol_shardofthethrone")).toList().size(); //  +2 votes per Absol shard
+            int additionalVotes = 2 * count;
+            sb.append(" (+" + additionalVotes + " votes for (" + count + "x) " + Emojis.Relic + "Shard of the Throne" + Emojis.Absol + ")");
+        }
+
+        return sb.toString();
     }
 }
