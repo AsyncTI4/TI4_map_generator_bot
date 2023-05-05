@@ -56,121 +56,121 @@ public class ListVoteCount extends AgendaSubcommandData {
             orderList.add(0, argentPlayer.get());
         }
 
-        for (Player player : orderList) {
-            if (!player.isRealPlayer()) {
-                continue;
-            }
-            List<String> planets = new ArrayList<>(player.getPlanets());
-            planets.removeAll(player.getExhaustedPlanets());
-
-            String text = "";
-            text += Helper.getPlayerRepresentation(event, player);
-            HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
-            boolean bloodPactPn = false;
-            boolean hasXxchaAlliance = false;
-            int influenceCount = 0;
-            int resourceCount = 0;
-
-            //XXCHA SPECIAL CASE
-            if ("xxcha".equals(player.getFaction())) {
-                // add planet count if xxcha commander unlocked
-                Leader leader = player.getLeader(Constants.COMMANDER);
-                if (leader != null && !leader.isLocked()) {
-                    influenceCount += planets.size();
+        if (!map.isTestBetaFeaturesMode()) {
+            for (Player player : orderList) {
+                if (!player.isRealPlayer()) {
+                    continue;
                 }
+                List<String> planets = new ArrayList<>(player.getPlanets());
+                planets.removeAll(player.getExhaustedPlanets());
 
-                // add resources if xxcha hero unlocked
-                leader = player.getLeader(Constants.HERO);
-                if (leader != null && !leader.isLocked()) {
-                    int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                            .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
-                    influenceCount += influenceCountFromPlanetsRes;
+                String text = "";
+                text += Helper.getPlayerRepresentation(event, player);
+                HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+                boolean bloodPactPn = false;
+                boolean hasXxchaAlliance = false;
+                int influenceCount = 0;
+
+                //XXCHA SPECIAL CASE
+                if ("xxcha".equals(player.getFaction())) {
+                    // add planet count if xxcha commander unlocked
+                    Leader leader = player.getLeader(Constants.COMMANDER);
+                    if (leader != null && !leader.isLocked()) {
+                        influenceCount += planets.size();
+                    }
+
+                    // add resources if xxcha hero unlocked
+                    leader = player.getLeader(Constants.HERO);
+                    if (leader != null && !leader.isLocked()) {
+                        int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                                .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+                        influenceCount += influenceCountFromPlanetsRes;
+                    }
                 }
-            }
-            if (player.getFactionAbilities().contains("lithoids")) { //Khrask Faction Ability Lithoids - Vote with RES, not INF
+                if (player.getFactionAbilities().contains("lithoids")) { //Khrask Faction Ability Lithoids - Vote with RES, not INF
 
-            }
-            if (!player.getPromissoryNotesInPlayArea().isEmpty()) {
-                for (String pn : player.getPromissoryNotesInPlayArea()) {
-                    String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(pn);
-                    for (Player player_ : map.getPlayers().values()) {
-                        if (player_ != player) {
-                            String playerColor = player_.getColor();
-                            String playerFaction = player_.getFaction();
-                            boolean isCorrectPlayer = playerColor != null && playerColor.equals(promissoryNoteOwner) ||
-                                    playerFaction.equals(promissoryNoteOwner);
+                }
+                if (!player.getPromissoryNotesInPlayArea().isEmpty()) {
+                    for (String pn : player.getPromissoryNotesInPlayArea()) {
+                        String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(pn);
+                        for (Player player_ : map.getPlayers().values()) {
+                            if (player_ != player) {
+                                String playerColor = player_.getColor();
+                                String playerFaction = player_.getFaction();
+                                boolean isCorrectPlayer = playerColor != null && playerColor.equals(promissoryNoteOwner) ||
+                                        playerFaction.equals(promissoryNoteOwner);
 
-                            // add planet count if xxcha commander unlocked
-                            if ("xxcha".equals(playerFaction) && pn.endsWith("_an")) {
-                                if (isCorrectPlayer) {
-                                    Leader leader = player_.getLeader(Constants.COMMANDER);
-                                    if (leader != null && !leader.isLocked()) {
-                                        influenceCount += planets.size();
-                                        hasXxchaAlliance = true;
-                                        break;
+                                // add planet count if xxcha commander unlocked
+                                if ("xxcha".equals(playerFaction) && pn.endsWith("_an")) {
+                                    if (isCorrectPlayer) {
+                                        Leader leader = player_.getLeader(Constants.COMMANDER);
+                                        if (leader != null && !leader.isLocked()) {
+                                            influenceCount += planets.size();
+                                            hasXxchaAlliance = true;
+                                            break;
+                                        }
                                     }
                                 }
-                            }
 
-                            // add potential +votes if player has blood pact in player area
-                            if ("empyrean".equals(playerFaction) && "blood_pact".equals(pn)) {
-                                if (isCorrectPlayer) {
-                                    bloodPactPn = true;
+                                // add potential +votes if player has blood pact in player area
+                                if ("empyrean".equals(playerFaction) && "blood_pact".equals(pn)) {
+                                    if (isCorrectPlayer) {
+                                        bloodPactPn = true;
+                                    }
                                 }
                             }
                         }
                     }
                 }
-            }
-            int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                    .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
-            influenceCount += influenceCountFromPlanets;
-            
-            //ZELIAN PURIFIER BIOPHOBIC ABILITY - 1 planet = 1 vote
-            if (player.getFactionAbilities().contains("biophobic")) {
-                influenceCount = planets.size();
-            }
-
-            if (privateGame) {
-                text += " vote count: **???";
-            } else if (player.getFaction().equals("nekro") && !hasXxchaAlliance) {
-                text += " NOT VOTING.: **0";
-            } else {
-                text += " vote count: **" + influenceCount;
-                if ("argent".equals(player.getFaction())) {
-                    int numPlayers = 0;
-                    for (Player player_ : map.getPlayers().values()) {
-                        if (player_.isRealPlayer()) numPlayers++;
+                int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+                influenceCount += influenceCountFromPlanets;
+                
+                //ZELIAN PURIFIER BIOPHOBIC ABILITY - 1 planet = 1 vote
+                if (player.getFactionAbilities().contains("biophobic")) {
+                    influenceCount = planets.size();
+                }
+                
+                if (privateGame) {
+                    text += " vote count: **???";
+                } else if (player.getFaction().equals("nekro") && !hasXxchaAlliance) {
+                    text += " NOT VOTING.: **0";
+                } else {
+                    text += " vote count: **" + influenceCount;
+                    if ("argent".equals(player.getFaction())) {
+                        int numPlayers = 0;
+                        for (Player player_ : map.getPlayers().values()) {
+                            if (player_.isRealPlayer()) numPlayers++;
+                        }
+                        text += " (+" + numPlayers + " votes for Zeal)";
                     }
-                    text += " (+" + numPlayers + " votes for Zeal)";
+                    if (bloodPactPn) {
+                        text += " (+4 votes for Blood Pact)";
+                    }
                 }
-                if (bloodPactPn) {
-                    text += " (+4 votes for Blood Pact)";
+                
+                text += "**";
+                if (!privateGame && player.getUserID().equals(speakerName)) {
+                    text += " " + Emojis.SpeakerToken;
                 }
+                msg.append(i).append(". ").append(text).append("\n");
+                i++;
             }
-
-            text += "**";
-            if (!privateGame && player.getUserID().equals(speakerName)) {
-                text += " " + Emojis.SpeakerToken;
+            MessageHelper.sendMessageToChannel(channel, msg.toString());
+            
+        } else { //BETA TEST
+            StringBuilder sb = new StringBuilder("**__Vote Count:__**\n");
+            int itemNo = 1;
+            for (Player player : orderList) {
+                sb.append("`").append(itemNo).append(".` ");
+                sb.append(Helper.getPlayerRepresentation(event, player));
+                if (player.getUserID().equals(map.getSpeaker())) sb.append(Emojis.SpeakerToken);
+                sb.append(getPlayerVoteText(map, player));
+                sb.append("\n");
+                itemNo++;
             }
-            msg.append(i).append(". ").append(text).append("\n");
-            i++;
+            MessageHelper.sendMessageToChannel(channel, sb.toString());
         }
-        MessageHelper.sendMessageToChannel(channel, msg.toString());
-
-
-        //NEW WAY
-        StringBuilder sb = new StringBuilder("**__Vote Count:__**\n");
-        int itemNo = 1;
-        for (Player player : orderList) {
-            sb.append("`").append(itemNo).append(".` ");
-            sb.append(Helper.getPlayerRepresentation(event, player));
-            if (player.getUserID().equals(map.getSpeaker())) sb.append(Emojis.SpeakerToken);
-            sb.append(getPlayerVoteText(map, player));
-            sb.append("\n");
-            itemNo++;
-        }
-        MessageHelper.sendMessageToChannel(channel, sb.toString());
     }
 
     public static String getPlayerVoteText(Map map, Player player) {
