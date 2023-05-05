@@ -106,10 +106,9 @@ public class Replace extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Specify player to remove and replacement");
             return;
         }
+        Helper.fixGameChannelPermissions(event.getGuild(), map);
         MapSaveLoadManager.saveMap(map, event);
         MapSaveLoadManager.reload(map);
-        Map newMap = MapManager.getInstance().getMap(message);
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
-        Helper.fixGameChannelPermissions(event.getGuild(), newMap);
     }
 }

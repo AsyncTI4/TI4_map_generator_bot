@@ -279,9 +279,10 @@ public class Emojis {
     public static final String GoodDog = "<:GoodDog:1068567308819255316>";
     public static final String Ozzie = "<:Ozzie:1069446695689134140>";
     public static final String Summer = "<:Summer:1070283656037412884>";
+    public static final String Charlie = "<:Charlie:1096774713352650812>";
     
     //LIST OF GOOD DOGS
-    public static List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer);
+    public static List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer, Charlie);
 
     //TOES
     public static final String NoToes = "<:NoToes:1082312430706774016>";
@@ -299,6 +300,9 @@ public class Emojis {
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
     public static final String WHbeta = "<:WHbeta:1056593596012302366>";
     public static final String WHgamma = "<:WHgamma:1056593568766111814>";
+    public static final String CreussAlpha = "<:CreussAlpha:1103868613254971463>";
+    public static final String CreussBeta = "<:CreussBeta:1103868614777524274>";
+    public static final String CreussGamma = "<:CreussGamma:1103868615532482592>";
     public static final String LegendaryPlanet = "<:Legendaryplanet:947250386375426108>";
     public static final String SpeakerToken = "<:Speakertoken:965363466821050389>";
     public static final String Sabotage = "<:sabotage:962784058159546388>";

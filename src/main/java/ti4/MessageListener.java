@@ -43,6 +43,11 @@ public class MessageListener extends ListenerAdapter {
 
     @Override
     public void onCommandAutoCompleteInteraction(CommandAutoCompleteInteractionEvent event) {
+        if (!MapGenerator.readyToReceiveCommands) {
+            event.replyChoice("Please try again in a moment. The bot is rebooting.", 0).queue();
+            return;
+        }
+        
         try {
             AutoCompleteProvider.autoCompleteListener(event);
         } catch (Exception e) {
