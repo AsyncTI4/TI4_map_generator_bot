@@ -1250,7 +1250,7 @@ public class Helper {
     }
 
     public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Map activeMap) {
-        if (!activeMap.isFoWMode() && !activeMap.isCommunityMode()) {
+        if (activeMap != null && !activeMap.isFoWMode() && !activeMap.isCommunityMode()) {
             String gameName = activeMap.getName();
             List<Role> roles = guild.getRolesByName(gameName, true);
             Role role = null;
