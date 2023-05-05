@@ -67,11 +67,16 @@ public class ListVoteCount extends AgendaSubcommandData {
             boolean bloodPactPn = false;
             boolean hasXxchaAlliance = false;
             int influenceCount = 0;
+
+            //XXCHA SPECIAL CASE
             if ("xxcha".equals(player.getFaction())) {
+                // add planet count if xxcha commander unlocked
                 Leader leader = player.getLeader(Constants.COMMANDER);
                 if (leader != null && !leader.isLocked()) {
                     influenceCount += planets.size();
                 }
+
+                // add resources if xxcha hero unlocked
                 leader = player.getLeader(Constants.HERO);
                 if (leader != null && !leader.isLocked()) {
                     int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -87,6 +92,8 @@ public class ListVoteCount extends AgendaSubcommandData {
                             String playerFaction = player_.getFaction();
                             boolean isCorrectPlayer = playerColor != null && playerColor.equals(promissoryNoteOwner) ||
                                     playerFaction.equals(promissoryNoteOwner);
+
+                            // add planet count if xxcha commander unlocked
                             if ("xxcha".equals(playerFaction) && pn.endsWith("_an")) {
                                 if (isCorrectPlayer) {
                                     Leader leader = player_.getLeader(Constants.COMMANDER);
@@ -97,6 +104,8 @@ public class ListVoteCount extends AgendaSubcommandData {
                                     }
                                 }
                             }
+
+                            // add potential +votes if player has blood pact in player area
                             if ("empyrean".equals(playerFaction) && "blood_pact".equals(pn)) {
                                 if (isCorrectPlayer) {
                                     bloodPactPn = true;
