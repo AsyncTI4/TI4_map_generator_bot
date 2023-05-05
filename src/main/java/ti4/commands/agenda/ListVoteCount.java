@@ -166,19 +166,18 @@ public class ListVoteCount extends AgendaSubcommandData {
             sb.append("`").append(itemNo).append(".` ");
             sb.append(Helper.getPlayerRepresentation(event, player));
             if (player.getUserID().equals(map.getSpeaker())) sb.append(Emojis.SpeakerToken);
-            sb.append(getVoteText(map, player));
+            sb.append(getPlayerVoteText(map, player));
             sb.append("\n");
             itemNo++;
         }
         MessageHelper.sendMessageToChannel(channel, sb.toString());
     }
 
-    public static String getVoteText(Map map, Player player) {
+    public static String getPlayerVoteText(Map map, Player player) {
         StringBuilder sb = new StringBuilder();
         int voteCount = getVoteCountFromPlanets(map, player);
         Entry<Integer, String> additionalVotes = getAdditionalVotesFromOtherSources(map, player);
 
-        
         if (map.isFoWMode()) {
             sb.append(" vote count: **???**");
             return sb.toString();
@@ -186,11 +185,13 @@ public class ListVoteCount extends AgendaSubcommandData {
             sb.append(" NOT VOTING (Galactic Threat)");
             return sb.toString();
         } else if (Helper.playerHasXxchaHeroUnlocked(player)) {
-            sb.append(" vote count: **" + Emojis.ResInf + voteCount);
+            sb.append(" vote count: **" + Emojis.ResInf + " " + voteCount);
         } else if (player.getFactionAbilities().contains("lithoids")) { // Vote with planet resources, no influence
-            sb.append(" vote count: **" + Emojis.resources + voteCount);
-        } else {
-            sb.append(" vote count: **" + Emojis.influence + voteCount);
+            sb.append(" vote count: **" + Emojis.resources + " " + voteCount);
+        } else if (player.getFactionAbilities().contains("biophobic")) {
+            sb.append(" vote count: **" + Emojis.SemLor + " " + voteCount);
+        } else  {
+            sb.append(" vote count: **" + Emojis.influence + " " + voteCount);
         }
         if (additionalVotes.getKey() > 0) {
             sb.append(" + " + additionalVotes.getKey() + "** additional votes from: ").append(additionalVotes.getValue());
