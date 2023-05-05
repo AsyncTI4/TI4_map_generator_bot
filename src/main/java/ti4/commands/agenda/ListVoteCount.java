@@ -32,7 +32,6 @@ public class ListVoteCount extends AgendaSubcommandData {
         turnOrder(event, map, event.getChannel());
     }
 
-
     public static void turnOrder(GenericInteractionCreateEvent event, Map map, MessageChannel channel) {
         Boolean isPrivateFogGame = FoWHelper.isPrivateGame(event);
         boolean privateGame = isPrivateFogGame != null && isPrivateFogGame;
@@ -160,31 +159,44 @@ public class ListVoteCount extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannel(channel, msg.toString());
 
 
-
+        //NEW WAY
         StringBuilder sb = new StringBuilder("**__Vote Count:__**\n");
         int itemNo = 1;
         for (Player player : orderList) {
-            int voteCount = getVoteCountFromPlanets(map, player);
-            Entry<Integer, String> additionalVotes = getAdditionalVotesFromOtherSources(map, player);
-            
-            sb.append("> `").append(itemNo).append(".` ");
+            sb.append("`").append(itemNo).append(".` ");
             sb.append(Helper.getPlayerRepresentation(event, player));
             if (player.getUserID().equals(map.getSpeaker())) sb.append(Emojis.SpeakerToken);
-
-            if (privateGame) {
-                sb.append(" vote count: **???***");
-            } else if (player.getFactionAbilities().contains("galactic_threat") && !Helper.playerHasXxchaCommanderUnlocked(map, player)) {
-                sb.append(" NOT VOTING.: **0*** (Galactic Threat)");
-            } else {
-                sb.append(" vote count: **" + voteCount);
-                if (additionalVotes.getKey() > 0) {
-                    sb.append(" + " + additionalVotes.getKey() + "** additional votes from: ").append(additionalVotes.getValue());
-                } else sb.append("**");
-            }
+            sb.append(getVoteText(map, player));
             sb.append("\n");
             itemNo++;
         }
         MessageHelper.sendMessageToChannel(channel, sb.toString());
+    }
+
+    public static String getVoteText(Map map, Player player) {
+        StringBuilder sb = new StringBuilder();
+        int voteCount = getVoteCountFromPlanets(map, player);
+        Entry<Integer, String> additionalVotes = getAdditionalVotesFromOtherSources(map, player);
+
+        
+        if (map.isFoWMode()) {
+            sb.append(" vote count: **???**");
+            return sb.toString();
+        } else if (player.getFactionAbilities().contains("galactic_threat") && !Helper.playerHasXxchaCommanderUnlocked(map, player)) {
+            sb.append(" NOT VOTING (Galactic Threat)");
+            return sb.toString();
+        } else if (Helper.playerHasXxchaHeroUnlocked(player)) {
+            sb.append(" vote count: **" + Emojis.ResInf + voteCount);
+        } else if (player.getFactionAbilities().contains("lithoids")) { // Vote with planet resources, no influence
+            sb.append(" vote count: **" + Emojis.resources + voteCount);
+        } else {
+            sb.append(" vote count: **" + Emojis.influence + voteCount);
+        }
+        if (additionalVotes.getKey() > 0) {
+            sb.append(" + " + additionalVotes.getKey() + "** additional votes from: ").append(additionalVotes.getValue());
+        } else sb.append("**");
+
+        return sb.toString();
     }
 
     public static int getVoteCountFromPlanets(Map map, Player player) {
@@ -206,6 +218,7 @@ public class ListVoteCount extends AgendaSubcommandData {
             Leader xxchaHero = player.getLeader("hero");
             if (xxchaHero != null && !xxchaHero.isLocked()) {
                 voteCount = baseResourceCount + baseInfluenceCount;
+                return voteCount;
             }
         }
 

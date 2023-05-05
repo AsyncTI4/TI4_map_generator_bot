@@ -1528,4 +1528,12 @@ public class Helper {
         }
         return false;
     }
+
+    public static boolean playerHasXxchaHeroUnlocked(Player player) {
+        if (player.getFaction().equals("xxcha")) {
+            Leader xxchaHero = player.getLeader("hero");
+            return (xxchaHero != null && !xxchaHero.isLocked());
+        }
+        return false;
+    }
 }
