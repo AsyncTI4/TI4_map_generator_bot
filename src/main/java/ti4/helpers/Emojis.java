@@ -279,9 +279,10 @@ public class Emojis {
     public static final String GoodDog = "<:GoodDog:1068567308819255316>";
     public static final String Ozzie = "<:Ozzie:1069446695689134140>";
     public static final String Summer = "<:Summer:1070283656037412884>";
+    public static final String Charlie = "<:Charlie:1096774713352650812>";
     
     //LIST OF GOOD DOGS
-    public static List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer);
+    public static List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer, Charlie);
 
     //TOES
     public static final String NoToes = "<:NoToes:1082312430706774016>";
