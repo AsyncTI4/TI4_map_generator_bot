@@ -18,6 +18,7 @@ public class ChangeColor extends PlayerSubcommandData {
     public ChangeColor() {
         super(Constants.CHANGE_COLOR, "Player Color Change");
         addOptions(new OptionData(OptionType.STRING, Constants.COLOR, "Color of units").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));
     }
 
     @Override
@@ -72,7 +73,7 @@ public class ChangeColor extends PlayerSubcommandData {
                 promissoryNotesInPlayAreaChanged.add(replacedPN);
             }
             playerInfo.setPromissoryNotesInPlayArea(promissoryNotesInPlayAreaChanged);
-            List<String> mahactCC = playerInfo.getMahactCC();
+            List<String> mahactCC = new ArrayList<>(playerInfo.getMahactCC());
             for (String cc : mahactCC) {
                 String replacedCC = cc.replace(oldColor, color);
                 replacedCC = replacedCC.replace(oldColorID, colorID);
@@ -85,7 +86,7 @@ public class ChangeColor extends PlayerSubcommandData {
         for (Tile tile : activeMap.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 
-                HashMap<String, Integer> unitDamage = unitHolder.getUnitDamage();
+                HashMap<String, Integer> unitDamage = new HashMap<>(unitHolder.getUnitDamage());
                 for (java.util.Map.Entry<String, Integer> unitDmg : unitDamage.entrySet()) {
                     String key = unitDmg.getKey();
                     Integer value = unitDmg.getValue();
