@@ -161,16 +161,30 @@ public class ListVoteCount extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannel(channel, msg.toString());
     }
 
-    public static int getVoteCountFromPlanets(Player player) {
+    public static int getVoteCountFromPlanets(Map map, Player player) {
         int baseResourceCount = 0;
         int baseInfluenceCount = 0;
         int voteCount = 0;
 
-        //NEKRO
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+
+        //NEKRO unless XXCHA ALLIANCE
+        if (player.getFactionAbilities().contains("galactic_threat") && !Helper.playerHasXxchaCommanderUnlocked(map, player)) {
+            return 0;
+        }
 
         //XXCHA
+        if (player.getFaction().equals("xxcha")) {
+
+        }
 
         //KHRASK
+        if (player.getFactionAbilities().contains("lithoids")) { // Vote with planet resources, no influence
+            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+            .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+        }
 
         return voteCount;
     }
@@ -184,22 +198,12 @@ public class ListVoteCount extends AgendaSubcommandData {
             sb.append("(+" + playerCount + " votes for " + Emojis.Argent + "Zeal)");
         }
 
-        //Xxcha Alliance    //TODO: contains(xxcha) -> contains(playerWithXxchaCommander)
-        List<String> playersPNs = player.getPromissoryNotesInPlayArea();
-        List<Player> xxchaPlayers = map.getRealPlayers().stream().filter(p -> p.getFaction().equals("xxcha")).toList();
-        if (!xxchaPlayers.remove(player) && !xxchaPlayers.isEmpty() && xxchaPlayers.size() == 1) {
-            Player xxchaPlayer = xxchaPlayers.get(0);
-            Leader xxchaCommander = xxchaPlayer.getLeader(Constants.COMMANDER);
-            if (xxchaCommander != null && !xxchaCommander.isLocked()) {
-                for (String pn : playersPNs) {
-                    if (pn.contains(xxchaPlayer.getColor()) && pn.contains("_an")) {
-                        Set<String> planets = new HashSet<>(player.getPlanets());
-                        planets.removeAll(player.getExhaustedPlanets());
-                        int readyPlanetCount = planets.size();
-                        sb.append("(+" + readyPlanetCount + " votes for Xxcha Alliance (+1 vote per planet exhausted))");
-                    }
-                }
-            }
+        //Xxcha Alliance   
+        if (Helper.playerHasXxchaCommanderUnlocked(map, player)) {
+            Set<String> planets = new HashSet<>(player.getPlanets());
+            planets.removeAll(player.getExhaustedPlanets());
+            int readyPlanetCount = planets.size();
+            sb.append("(+" + readyPlanetCount + " votes for Xxcha Alliance (+1 vote per planet exhausted))");
         }
 
         //Blood Pact
