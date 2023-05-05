@@ -300,6 +300,9 @@ public class Emojis {
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
     public static final String WHbeta = "<:WHbeta:1056593596012302366>";
     public static final String WHgamma = "<:WHgamma:1056593568766111814>";
+    public static final String CreussAlpha = "<:CreussAlpha:1103868613254971463>";
+    public static final String CreussBeta = "<:CreussBeta:1103868614777524274>";
+    public static final String CreussGamma = "<:CreussGamma:1103868615532482592>";
     public static final String LegendaryPlanet = "<:Legendaryplanet:947250386375426108>";
     public static final String SpeakerToken = "<:Speakertoken:965363466821050389>";
     public static final String Sabotage = "<:sabotage:962784058159546388>";

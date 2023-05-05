@@ -664,6 +664,9 @@ public class Helper {
             case "whalpha" -> Emojis.WHalpha;
             case "whbeta" -> Emojis.WHbeta;
             case "whgamma" -> Emojis.WHgamma;
+            case "creussalpha" -> Emojis.CreussAlpha;
+            case "creussbeta" -> Emojis.CreussBeta;
+            case "creussgamma" -> Emojis.CreussGamma;
             case "influence" -> Emojis.influence;
             case "resources" -> Emojis.resources;
             case "legendaryplanet" -> Emojis.LegendaryPlanet;
