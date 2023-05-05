@@ -1475,9 +1475,9 @@ public class Helper {
 
         for (Tile tile : playersTiles) {
             adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(map, tile.getPosition()));
-            if (realPlayers.size() == adjacentPlayers.size()) return adjacentPlayers;
+            if (realPlayers.size() == adjacentPlayers.size()) break;
         }
-        
+        adjacentPlayers.remove(player);
         return adjacentPlayers;
     }
 
