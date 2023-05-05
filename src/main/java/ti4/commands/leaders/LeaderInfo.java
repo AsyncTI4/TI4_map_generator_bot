@@ -106,6 +106,7 @@ public class LeaderInfo extends LeaderSubcommandData {
                         for (Player player_ : activeMap.getPlayers().values()) {
                             if (player_.getColor().equalsIgnoreCase(colour)) {
                                 Leader playerLeader = player_.getLeader(Constants.COMMANDER);
+                                if (playerLeader == null) continue;
                                 leaderSB.append("ALLIANCE: ");
                                 if (playerLeader.isLocked()) {
                                     leaderSB.append("(LOCKED) ").append(Helper.getLeaderLockedRepresentation(player_, playerLeader)).append("\n");
@@ -125,10 +126,13 @@ public class LeaderInfo extends LeaderSubcommandData {
             leaderSB.append("**Other Faction's Agents:**").append("\n");
             for (Player player_ : activeMap.getPlayers().values()) {
                 if (player_ != player) {
-                    if (player.getLeader(Constants.AGENT).isExhausted()) {
-                        leaderSB.append("EXHAUSTED: ").append(Helper.getLeaderFullRepresentation(player_, player_.getLeader(Constants.AGENT))).append("\n");
+                    Leader playerLeader = player.getLeader(Constants.AGENT);
+                    Leader otherPlayerAgent = player_.getLeader(Constants.AGENT);
+                    if (otherPlayerAgent == null) continue;
+                    if (playerLeader.isExhausted()) {
+                        leaderSB.append("EXHAUSTED: ").append(Helper.getLeaderFullRepresentation(player_, otherPlayerAgent)).append("\n");
                     } else {
-                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, player_.getLeader(Constants.AGENT))).append("\n");
+                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, otherPlayerAgent)).append("\n");
                     }
                 }
             }
@@ -141,7 +145,9 @@ public class LeaderInfo extends LeaderSubcommandData {
             for (Player player_ : activeMap.getPlayers().values()) {
                 if (player_ != player) {
                     if (player.getMahactCC().contains(player_.getColor())) {
-                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, player_.getLeader(Constants.COMMANDER))).append("\n");
+                        Leader leader = player_.getLeader(Constants.COMMANDER);
+                        if (leader == null) continue;
+                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, leader)).append("\n");
                     }
                 }
             }
