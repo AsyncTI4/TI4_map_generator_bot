@@ -159,11 +159,12 @@ public class Tile {
             unitHolder.addToken(tokenID);
         }
     }
-    public void removeToken(String tokenID, String spaceHolder) {
+    public boolean removeToken(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
-            unitHolder.removeToken(tokenID);
+            if(unitHolder.removeToken(tokenID)) return true;
         }
+        return false;
     }
 
     public void removeCC(String ccID) {
