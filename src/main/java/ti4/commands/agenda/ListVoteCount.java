@@ -166,8 +166,11 @@ public class ListVoteCount extends AgendaSubcommandData {
         for (Player player : orderList) {
             int voteCount = getVoteCountFromPlanets(map, player);
             Entry<Integer, String> additionalVotes = getAdditionalVotesFromOtherSources(map, player);
+            
             sb.append("> `").append(itemNo).append(".` ");
             sb.append(Helper.getPlayerRepresentation(event, player));
+            if (player.getUserID().equals(map.getSpeaker())) sb.append(Emojis.SpeakerToken);
+
             if (privateGame) {
                 sb.append(" vote count: **???***");
             } else if (player.getFactionAbilities().contains("galactic_threat") && !Helper.playerHasXxchaCommanderUnlocked(map, player)) {
