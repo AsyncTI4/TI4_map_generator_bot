@@ -12,7 +12,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-
+import ti4.buttons.ButtonListener;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -120,6 +120,16 @@ public class PlayAC extends ACCardsSubcommandData {
         } else {
             List<Button> buttons = new ArrayList<>(List.of(sabotageButton, noSabotageButton));
             MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, sb.toString(), activeMap, player, buttons);
+
+            if(actionCardWindow.contains("After an agenda is revealed"))
+            {
+                if(actionCardTitle.contains("Rider") || actionCardTitle.contains("Sanction") )
+                {
+                    List<Button> riderButtons = new ButtonListener().getRiderButtons(actionCardTitle, activeMap);
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target", activeMap, player, riderButtons);
+                }
+
+            }
         }
         
         //Fog of war ping
