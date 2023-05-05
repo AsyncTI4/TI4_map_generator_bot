@@ -205,6 +205,8 @@ public class Constants {
     public static final String AC_REMOVE_FROM_GAME = "ac_remove_from_game";
     public static final String SO_ID = "so_id";
     public static final String AGENDA_ID = "agenda_id";
+    public static final String CURRENT_AGENDA_INFO = "current_agenda_info";
+    public static final String AGENDA_VOTE_INFO = "agenda_vote_info";
     public static final String AC_ID = "ac_id";
 
     public static final String INACTIVE_LEADER = "hero_unplay";
@@ -610,6 +612,8 @@ public class Constants {
     public static final String RELIC_LOOK_AT_TOP = "relic_look_at_top";
     public static final String CARDS_INFO_THREAD_CHANNEL_ID = "cards_info_thread_channel_id";
     public static final String LATEST_COMMAND = "latest_command";
+    public static final String LATEST_OUTCOME_VOTED_FOR = "latest_outcome_voted_for";
+    public static final String PLAYERS_WHO_HIT_PERSISTENT_PASS = "players_who_hit_persistent_no_after";
     public static final String LIST_MY_GAMES = "list_my_games";
     public static final String RELIC_SEND = "relic_send";
     public static final String FOLLOWED_SC = "followed_sc";
