@@ -225,6 +225,11 @@ public class ListVoteCount extends AgendaSubcommandData {
                     .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
             influenceCount += influenceCountFromPlanets;
             
+            //ZELIAN PURIFIER BIOPHOBIC ABILITY - 1 planet = 1 vote
+            if (player.getFactionAbilities().contains("biophobic")) {
+                influenceCount = planets.size();
+            }
+
             if (privateGame) {
                 text += " vote count: **???";
             } else if (player.getFaction().equals("nekro") && !hasXxchaAlliance) {

@@ -12,13 +12,16 @@ import ti4.buttons.ButtonListener;
 import ti4.commands.CommandManager;
 import ti4.commands.admin.AdminCommand;
 import ti4.commands.bothelper.BothelperCommand;
+import ti4.commands.button.GenericButtonCommand;
 import ti4.commands.capture.CaptureCommand;
 import ti4.commands.cards.CardsInfo;
 import ti4.commands.cardsac.ACCardsCommand;
 import ti4.commands.agenda.AgendaCommand;
+import ti4.commands.all_info.AllInfo;
 import ti4.commands.cardspn.PNCardsCommand;
 import ti4.commands.cardsso.SOCardsCommand;
 import ti4.commands.custom.CustomCommand;
+import ti4.commands.ds.DiscordantStarsCommand;
 import ti4.commands.explore.ExploreCommand;
 import ti4.commands.fow.FOWCommand;
 import ti4.commands.franken.FrankenCommand;
@@ -57,6 +60,8 @@ public class MapGenerator {
     public static List<Role> adminRoles = new ArrayList<>();
     public static List<Role> developerRoles = new ArrayList<>();
     public static List<Role> bothelperRoles = new ArrayList<>();
+
+    public static boolean readyToReceiveCommands = false;
 
     public static void main(String[] args)
             throws LoginException {
@@ -117,6 +122,7 @@ public class MapGenerator {
         commandManager.addCommand(new RemoveUnits());
         commandManager.addCommand(new RemoveAllUnits());
         commandManager.addCommand(new CreateGame());
+        commandManager.addCommand(new AllInfo());
         commandManager.addCommand(new CardsInfo());
         commandManager.addCommand(new SetGame());
         commandManager.addCommand(new ShowGame());
@@ -129,6 +135,7 @@ public class MapGenerator {
         // commandManager.addCommand(new AddControl()); //disabled due to confusing players - /player planet_add should be used
         // commandManager.addCommand(new RemoveControl()); //disabled due to confusing players - /player planet_remove should be used
         commandManager.addCommand(new MoveUnits());
+        commandManager.addCommand(new MoveUnits2());
         commandManager.addCommand(new RemoveToken());
         commandManager.addCommand(new AddToken());
         commandManager.addCommand(new AddUnitDamage());
@@ -153,6 +160,8 @@ public class MapGenerator {
         commandManager.addCommand(new MiltyCommand());
         commandManager.addCommand(new FrankenCommand());
         commandManager.addCommand(new CaptureCommand());
+        commandManager.addCommand(new GenericButtonCommand());
+        commandManager.addCommand(new DiscordantStarsCommand());
 
         guildPrimary = jda.getGuildById(args[2]);
 
@@ -195,5 +204,9 @@ public class MapGenerator {
 
         BotLogger.log("BOT STARTED UP: " + guildPrimary.getName());
         MapSaveLoadManager.loadMaps();
+
+        readyToReceiveCommands = true;
+        BotLogger.log("BOT HAS FINISHED LOADING MAPS");
+
     }
 }

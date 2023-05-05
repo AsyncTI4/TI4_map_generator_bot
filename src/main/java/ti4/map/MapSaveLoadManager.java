@@ -384,7 +384,10 @@ public class MapSaveLoadManager {
         writer.write(Constants.MAIN_GAME_CHANNEL + " " + map.getMainGameChannelID());
         writer.write(System.lineSeparator());
         writer.write(Constants.BOT_MAP_CHANNEL + " " + map.getBotMapUpdatesThreadID());
+        writer.write(System.lineSeparator());
 
+        //GAME MODES
+        writer.write(Constants.TIGL_GAME + " " + map.isCompetitiveTIGLGame());
         writer.write(System.lineSeparator());
         writer.write(Constants.COMMUNITY_MODE + " " + map.isCommunityMode());
         writer.write(System.lineSeparator());
@@ -404,6 +407,7 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.BETA_TEST_MODE + " " + map.isTestBetaFeaturesMode());
         writer.write(System.lineSeparator());
+
         writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
         writer.write(System.lineSeparator());
         writer.write(ENDGAMEINFO);
@@ -456,6 +460,16 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
 
             writer.write(Constants.DUMMY + " " + player.isDummy());
+            writer.write(System.lineSeparator());
+
+            //BENTOR Ancient Blueprints
+            writer.write(Constants.BENTOR_HAS_FOUND_CFRAG + " " + player.hasFoundCulFrag());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.BENTOR_HAS_FOUND_HFRAG + " " + player.hasFoundHazFrag());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.BENTOR_HAS_FOUND_IFRAG + " " + player.hasFoundIndFrag());
+            writer.write(System.lineSeparator());
+            writer.write(Constants.BENTOR_HAS_FOUND_UFRAG + " " + player.hasFoundUnkFrag());
             writer.write(System.lineSeparator());
 
             writeCards(player.getActionCards(), writer, Constants.AC);
@@ -1104,6 +1118,16 @@ public class MapSaveLoadManager {
                 case Constants.TABLE_TALK_CHANNEL ->  map.setTableTalkChannelID(info);
                 case Constants.MAIN_GAME_CHANNEL -> map.setMainGameChannelID(info);
                 case Constants.BOT_MAP_CHANNEL -> map.setBotMapUpdatesThreadID(info);
+
+                //GAME MODES
+                case Constants.TIGL_GAME -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setCompetitiveTIGLGame(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
                 case Constants.COMMUNITY_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
@@ -1404,6 +1428,10 @@ public class MapSaveLoadManager {
                 case Constants.PASSED -> player.setPassed(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.SEARCH_WARRANT -> player.setSearchWarrant(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.DUMMY -> player.setDummy(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BENTOR_HAS_FOUND_CFRAG -> player.setHasFoundCulFrag(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BENTOR_HAS_FOUND_HFRAG -> player.setHasFoundHazFrag(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BENTOR_HAS_FOUND_IFRAG -> player.setHasFoundIndFrag(Boolean.parseBoolean(tokenizer.nextToken()));
+                case Constants.BENTOR_HAS_FOUND_UFRAG -> player.setHasFoundUnkFrag(Boolean.parseBoolean(tokenizer.nextToken()));
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
             }
         }

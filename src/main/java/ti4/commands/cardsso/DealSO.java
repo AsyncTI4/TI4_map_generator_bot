@@ -11,6 +11,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class DealSO extends SOCardsSubcommandData {
     public DealSO() {
@@ -44,6 +45,6 @@ public class DealSO extends SOCardsSubcommandData {
             activeMap.drawSecretObjective(player_.getUserID());
         }
         sendMessage(count + " SO Dealt");
-        SOInfo.sendSecretObjectiveInfo(activeMap, player_);
+        SOInfo.sendSecretObjectiveInfo(activeMap, player_, event);
     }
 }

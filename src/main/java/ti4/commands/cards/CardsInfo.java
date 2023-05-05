@@ -9,7 +9,10 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.MapGenerator;
 import ti4.commands.Command;
+import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ACInfo_Legacy;
+import ti4.commands.cardspn.PNInfo;
+import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -92,7 +95,9 @@ public class CardsInfo implements Command {
         }
         String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
-        ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
+        SOInfo.sendSecretObjectiveInfo(activeMap, player);
+        ACInfo.sendActionCardInfo(activeMap, player);
+        PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
     }
 
     protected String getActionDescription() {

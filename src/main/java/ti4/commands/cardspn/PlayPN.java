@@ -87,7 +87,7 @@ public class PlayPN extends PNCardsSubcommandData {
                 String playerFaction = player_.getFaction();
                 if (playerColor != null && playerColor.equals(pnOwner) || playerFaction != null && playerFaction.equals(pnOwner)) {
                     player_.setPromissoryNote(id);
-                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player_);
+                    PNInfo.sendPromissoryNoteInfo(activeMap, player_, false, event);
                     pnOwner = player_.getFaction();
                     break;
                 }

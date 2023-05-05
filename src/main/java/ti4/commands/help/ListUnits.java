@@ -17,6 +17,7 @@ public class ListUnits extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String unitList = Mapper.getUnitList();
-        MessageHelper.sendMessageToChannel(event.getChannel(), unitList);
+        MessageHelper.sendMessageToThread(event.getChannel(), "Unit List", unitList);
+
     }
 }
