@@ -44,12 +44,14 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Map.Entry;
 import java.util.concurrent.TimeUnit;
 import java.util.Random;
+import java.util.Set;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
@@ -662,6 +664,9 @@ public class Helper {
             case "whalpha" -> Emojis.WHalpha;
             case "whbeta" -> Emojis.WHbeta;
             case "whgamma" -> Emojis.WHgamma;
+            case "creussalpha" -> Emojis.CreussAlpha;
+            case "creussbeta" -> Emojis.CreussBeta;
+            case "creussgamma" -> Emojis.CreussGamma;
             case "influence" -> Emojis.influence;
             case "resources" -> Emojis.resources;
             case "legendaryplanet" -> Emojis.LegendaryPlanet;
@@ -1245,7 +1250,7 @@ public class Helper {
     }
 
     public static void fixGameChannelPermissions(@NotNull Guild guild, @NotNull Map activeMap) {
-        if (!activeMap.isFoWMode() && !activeMap.isCommunityMode()) {
+        if (activeMap != null && !activeMap.isFoWMode() && !activeMap.isCommunityMode()) {
             String gameName = activeMap.getName();
             List<Role> roles = guild.getRolesByName(gameName, true);
             Role role = null;
@@ -1458,5 +1463,41 @@ public class Helper {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public static Set<Player> getNeighbouringPlayers(Map map, Player player) {
+        Set<Player> adjacentPlayers = new HashSet<>();
+        Set<Player> realPlayers = new HashSet<>(map.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
+
+        Set<Tile> playersTiles = new HashSet<>();
+        for (Tile tile : map.getTileMap().values()) {
+            if (FoWHelper.playerIsInSystem(map, tile, player)) {
+                playersTiles.add(tile);
+            }
+        }
+
+        for (Tile tile : playersTiles) {
+            adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(map, tile.getPosition()));
+            if (realPlayers.size() == adjacentPlayers.size()) break;
+        }
+        adjacentPlayers.remove(player);
+        return adjacentPlayers;
+    }
+
+    public static int getNeighbourCount(Map map, Player player) {
+        return getNeighbouringPlayers(map, player).size();
+    }
+
+    public static List<String> getListFromCSV(String commaSeparatedString) {
+        StringTokenizer tokenizer = new StringTokenizer(commaSeparatedString, ",");
+        ArrayList<String> values = new ArrayList<>();
+        while (tokenizer.hasMoreTokens()) {
+            values.add(tokenizer.nextToken().trim());
+        }
+        return values;
+    }
+
+    public static Set<String> getSetFromCSV(String commaSeparatedString) {
+        return new HashSet<>(getListFromCSV(commaSeparatedString));
     }
 }
