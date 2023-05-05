@@ -1038,26 +1038,30 @@ public class GenerateMap {
         drawPAImage(x + deltaX - 2, y - 2, "pa_resinf_info.png");
         graphics.setColor(Color.WHITE);
         graphics.drawRect(x + deltaX - 2, y - 2, 152, 152);
-        if (player.getFaction().equals("xxcha") && !player.getLeader("hero").isLocked()) {
+        if (player.getFaction().equals("xxcha") && !player.getLeader("hero").isLocked()) { //XXCHA WITH UNLOCKED HERO
             int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, map);
             int totalPlayerResources = Helper.getPlayerResourcesTotal(player, map);
-
+            if (player.getUserID().equals("586504147746947090")) {
+                drawPAImageOpaque(x + deltaX - 2, y - 2, "pa_resinf_info_xxcha_gedsdead.png", 0.9f);
+            } else {
+                drawPAImageOpaque(x + deltaX - 2, y - 2, "pa_resinf_info_xxcha.png", 0.9f);
+            }
+            drawFactionIconImage(x + deltaX + 75 - 94/2, y + 75 - 94/2, "xxcha.png", 1f, 0.15f);
             graphics.setColor(Color.WHITE);
             drawCenteredString(graphics, String.valueOf(availablePlayerResources), new Rectangle(x + deltaX, y + 75 - 35 + 5, 150, 35), Storage.getFont35());
             graphics.setColor(Color.GRAY);
             drawCenteredString(graphics, String.valueOf(totalPlayerResources), new Rectangle(x + deltaX, y + 75 + 5, 150, 24), Storage.getFont24());
-
         } else { //NOT XXCHA WITH UNLOCKED HERO
             int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, map);
             int totalPlayerResources = Helper.getPlayerResourcesTotal(player, map);
             int availablePlayerResourcesOptimal = Helper.getPlayerOptimalResourcesAvailable(player, map);
-            int totalPlayerResourcesOptimal = Helper.getPlayerOptimalResourcesTotal(player, map);
+            // int totalPlayerResourcesOptimal = Helper.getPlayerOptimalResourcesTotal(player, map);
             int availablePlayerInfluence = Helper.getPlayerInfluenceAvailable(player, map);
             int totalPlayerInfluence = Helper.getPlayerInfluenceTotal(player, map);
             int availablePlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceAvailable(player, map);
-            int totalPlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceTotal(player, map);
+            // int totalPlayerInfluenceOptimal = Helper.getPlayerOptimalInfluenceTotal(player, map);
             int availablePlayerFlex = Helper.getPlayerFlexResourcesInfluenceAvailable(player, map);
-            int totalPlayerFlex = Helper.getPlayerFlexResourcesInfluenceTotal(player, map);
+            // int totalPlayerFlex = Helper.getPlayerFlexResourcesInfluenceTotal(player, map);
 
             //  RESOURCES
             graphics.setColor(Color.WHITE);
@@ -1381,6 +1385,21 @@ public class GenerateMap {
         }
     }
 
+    private void drawFactionIconImage(int x, int y, String resourceName, float scale, float opacity) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getFactionFile(resourceName);
+            @SuppressWarnings("ConstantConditions")
+            BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
+            resourceBufferedImage = resizeImage(resourceBufferedImage, scale);
+            Graphics2D g2 = (Graphics2D) graphics;
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+            g2.drawImage(resourceBufferedImage, x, y, null);
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+        } catch (Exception e) {
+            BotLogger.log("Could not display planet: " + resourceName, e);
+        }
+    }
+
     private void drawPlanetImage(int x, int y, String resourceName) {
         try {
             String resourcePath = ResourceHelper.getInstance().getPlanetResource(resourceName);
@@ -1398,6 +1417,21 @@ public class GenerateMap {
             @SuppressWarnings("ConstantConditions")
             BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
             graphics.drawImage(resourceBufferedImage, x, y, null);
+        } catch (Exception e) {
+            BotLogger.log("Could not display play area: " + resourceName, e);
+        }
+    }
+
+    private void drawPAImageOpaque(int x, int y, String resourceName, float opacity) {
+        try {
+            String resourcePath = ResourceHelper.getInstance().getPAResource(resourceName);
+            @SuppressWarnings("ConstantConditions")
+            BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
+            Graphics2D g2 = (Graphics2D) graphics;
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, opacity));
+            g2.drawImage(resourceBufferedImage, x, y, null);
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 1f));
+
         } catch (Exception e) {
             BotLogger.log("Could not display play area: " + resourceName, e);
         }
