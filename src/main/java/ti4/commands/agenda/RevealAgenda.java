@@ -47,7 +47,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         String agendaName = agendaDetails[0];
         if(agendaName!= null && !agendaName.equalsIgnoreCase("Covert Legislation"))
         {
-            activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget);
+            activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget + "_"+uniqueID);
         }
         else
         {
@@ -59,17 +59,20 @@ public class RevealAgenda extends AgendaSubcommandData {
             activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget);
         }
         activeMap.resetCurrentAgendaVotes();
+        activeMap.setHackElectionStatus(false);
         activeMap.setPlayersWhoHitPersistentNoAfter("");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getAgendaRepresentation(id, uniqueID));
         String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you will **Play a When** or **Play an After** or not by pressing the buttons below:";
 
         Button playWhen = Button.danger("play_when", "Play When");
         Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-        List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen));
+        Button noWhenPersistent = Button.primary("no_when_persistent", "No Whens No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
+
+        List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
         
-        Button playAfter = Button.danger("play_after", "Play After");
+        Button playAfter = Button.danger("play_after", "Play A Non-AC Rider");
         Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromFormatted(Emojis.noafters));
-        Button noAfterPersistent = Button.primary("no_after_persistent", "No Afters No Matter What (locked in for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.noafters));
+        Button noAfterPersistent = Button.primary("no_after_persistent", "No Afters No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.noafters));
         List<Button> afterButtons = new ArrayList<>(List.of(playAfter, noAfter, noAfterPersistent));
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);

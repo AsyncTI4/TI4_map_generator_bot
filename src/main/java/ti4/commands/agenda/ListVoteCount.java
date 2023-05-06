@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -32,133 +33,10 @@ public class ListVoteCount extends AgendaSubcommandData {
     }
 
 
-    public static int[] getVoteTotal(GenericInteractionCreateEvent event, Player player, Map map)
-    {
-
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
-        HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
-        int hasXxchaAlliance = 0;
-        int hasXxchaHero = 0;
-        int influenceCount = 0;
-        int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
-        influenceCount += influenceCountFromPlanets;
-        if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeader(Constants.COMMANDER);
-            if (leader != null && !leader.isLocked()) {
-                influenceCount += planets.size(); 
-            }
-            leader = player.getLeader(Constants.HERO);
-            if (leader != null && !leader.isLocked()) {
-                int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                        .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
-                influenceCount += influenceCountFromPlanetsRes;
-                hasXxchaHero = 1;
-            }
-        } else if (!player.getPromissoryNotesInPlayArea().isEmpty()) {
-            for (String pn : player.getPromissoryNotesInPlayArea()) {
-                String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(pn);
-                for (Player player_ : map.getPlayers().values()) {
-                    if (player_ != player) {
-                        String playerColor = player_.getColor();
-                        String playerFaction = player_.getFaction();
-                        boolean isCorrectPlayer = playerColor != null && playerColor.equals(promissoryNoteOwner) ||
-                                playerFaction.equals(promissoryNoteOwner);
-                        if ("xxcha".equals(playerFaction) && pn.endsWith("_an")) {
-                            if (isCorrectPlayer) {
-                                Leader leader = player_.getLeader(Constants.COMMANDER);
-                                if (leader != null && !leader.isLocked()) {
-                                    influenceCount += planets.size();
-                                    hasXxchaAlliance = 1;
-                                    break;
-                                }
-                            }
-                        }
-                        if ("empyrean".equals(playerFaction) && "blood_pact".equals(pn)) {
-                            if (isCorrectPlayer && influenceCount > 0) {
-                                influenceCount += 4;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        
-
-        if ("argent".equals(player.getFaction())) {
-            int numPlayers = 0;
-            for (Player player_ : map.getPlayers().values()) {
-                if (player_.isRealPlayer()) numPlayers++;
-            }
-            if(influenceCount > 0)
-            {
-                influenceCount += numPlayers;
-            }
-            
-        }
-        //Predictive Intelligence
-        if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
-            if(influenceCount > 0)
-            {
-                influenceCount += 3;
-            }
-        }
-        if (player.getFaction().equals("nekro") && hasXxchaAlliance == 0) 
-        {
-            influenceCount = 0;
-        }
-        int[] voteArray = {influenceCount, hasXxchaHero, hasXxchaAlliance};
-        return voteArray;
-    }
-
-    public static Player getNextInLine(Player player1, List<Player> votingOrder)
-    {
-        boolean foundPlayer = false;
-        if (player1 == null)
-        {
-            return votingOrder.get(0);
-        }
-        for(Player player2 : votingOrder)
-        {
-            if(player2 == null || player2.isDummy())
-            {
-                continue;
-            }
-            if(foundPlayer && player2.isRealPlayer())
-            {
-                return player2;
-            }
-            if(player1.getColor().equalsIgnoreCase(player2.getColor()))
-            {
-                foundPlayer = true;
-            }
-        }
-        return player1;
-    }
+    
 
 
-    public static List<Player> getVotingOrder(Map map)
-    {
-        List<Player> orderList = new ArrayList<>();
-        orderList.addAll(map.getPlayers().values().stream().toList());
-        String speakerName = map.getSpeaker();
-        Optional<Player> optSpeaker = orderList.stream().filter(player -> player.getUserID().equals(speakerName))
-                .findFirst();
-
-        if (optSpeaker.isPresent()) {
-            int rotationDistance = orderList.size() - orderList.indexOf(optSpeaker.get()) - 1;
-            Collections.rotate(orderList, rotationDistance);
-        }
-
-        //Check if Argent Flight is in the game - if it is, put it at the front of the vote list.
-        Optional<Player> argentPlayer = orderList.stream().filter(player -> player.getFaction()!= null && player.getFaction().equals("argent")).findFirst();
-        if (argentPlayer.isPresent()) {
-            orderList.remove(argentPlayer.orElse(null));
-            orderList.add(0, argentPlayer.get());
-        }
-        return orderList;
-    }
+    
 
 
     public static void turnOrder(GenericInteractionCreateEvent event, Map map, MessageChannel channel) {
@@ -167,7 +45,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         String speakerName = map.getSpeaker();
         StringBuilder msg = new StringBuilder();
         int i = 1;
-        List<Player> orderList = getVotingOrder(map);
+        List<Player> orderList = AgendaHelper.getVotingOrder(map);
 
         for (Player player : orderList) {
             if (!player.isRealPlayer()) {

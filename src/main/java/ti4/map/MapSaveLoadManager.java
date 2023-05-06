@@ -269,7 +269,10 @@ public class MapSaveLoadManager {
         writer.write(Constants.AUTO_PING + " " + map.getAutoPingSpacer());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.PLAYERS_WHO_HIT_PERSISTENT_PASS + " " + map.getPlayersWhoHitPersistentNoAfter());
+        writer.write(Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER + " " + map.getPlayersWhoHitPersistentNoAfter());
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN + " " + map.getPlayersWhoHitPersistentNoWhen());
         writer.write(System.lineSeparator());
 
         writer.write(Constants.CURRENT_AGENDA_INFO + " " + map.getCurrentAgendaInfo());
@@ -1114,7 +1117,8 @@ public class MapSaveLoadManager {
                     }                    
                 }
                 case Constants.GAME_CUSTOM_NAME -> map.setCustomName(info);
-                case Constants.PLAYERS_WHO_HIT_PERSISTENT_PASS -> map.setPlayersWhoHitPersistentNoAfter(info);
+                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER -> map.setPlayersWhoHitPersistentNoAfter(info);
+                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN -> map.setPlayersWhoHitPersistentNoAfter(info);
                 case Constants.TABLE_TALK_CHANNEL ->  map.setTableTalkChannelID(info);
                 case Constants.MAIN_GAME_CHANNEL -> map.setMainGameChannelID(info);
                 case Constants.BOT_MAP_CHANNEL -> map.setBotMapUpdatesThreadID(info);
@@ -1124,6 +1128,14 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         map.setCompetitiveTIGLGame(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.HACK_ELECTION_STATUS -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setHackElectionStatus(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

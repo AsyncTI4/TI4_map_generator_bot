@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.StringTokenizer;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.ListUtils;
@@ -54,6 +55,26 @@ public class MessageHelper {
 
 	public static void sendMessageToChannelWithFactionReact(MessageChannel channel, String messageText, Map activeMap, Player player, List<Button> buttons) {
 		MessageFunction addFactionReact = (msg) -> addFactionReactToMessage(activeMap, player, msg);
+		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
+	}
+	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText, Map activeMap, List<Button> buttons, String whenOrAfter) {
+		MessageFunction addFactionReact = (msg) -> {
+			StringTokenizer players  = null;
+			if(whenOrAfter != null && whenOrAfter.equalsIgnoreCase("when"))
+			{
+				players = new StringTokenizer(activeMap.getPlayersWhoHitPersistentNoWhen(), "_");
+			}
+			else
+			{
+				players = new StringTokenizer(activeMap.getPlayersWhoHitPersistentNoAfter(), "_");
+			}
+			while (players.hasMoreTokens()) {
+				String player = players.nextToken();
+				Player player_ = Helper.getPlayerFromColorOrFaction(activeMap, player);
+				addFactionReactToMessage(activeMap, player_, msg);
+			}
+		};	
+		
 		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
 	}
 
