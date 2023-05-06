@@ -110,6 +110,28 @@ public class Helper {
         return player;
     }
 
+
+    @Nullable
+    public static Player getPlayerFromColorOrFaction(Map activeMap, String factionOrColor) {
+        Player player = null;
+        if (factionOrColor != null) {
+            String factionColor = AliasHandler.resolveColor(factionOrColor.toLowerCase());
+            factionColor = StringUtils.substringBefore(factionColor, " "); //TO HANDLE UNRESOLVED AUTOCOMPLETE
+            factionColor = AliasHandler.resolveFaction(factionColor);
+            for (Player player_ : activeMap.getPlayers().values()) {
+                if (Objects.equals(factionColor, player_.getFaction()) ||
+                        Objects.equals(factionColor, player_.getColor())) {
+                    player = player_;
+                    break;
+                }
+            }
+        }
+        return player;
+    }
+
+
+
+
     @Nullable
     public static String getColor(Map activeMap, SlashCommandInteractionEvent event) {
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);

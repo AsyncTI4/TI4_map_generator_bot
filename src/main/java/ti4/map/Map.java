@@ -113,6 +113,7 @@ public class Map {
     
     @ExportableField
     private String playersWhoHitPersistentNoAfter = "";
+    private String playersWhoHitPersistentNoWhen = "";
     @ExportableField
     private String[] listOfTilePinged =new String[10]; 
 
@@ -129,7 +130,7 @@ public class Map {
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
 
     private String currentAgendaInfo = null;
-
+    private boolean hasHackElectionBeenPlayed = false;
     private List<String> agendas;
     private LinkedHashMap<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
@@ -608,6 +609,12 @@ public class Map {
     public String getPlayersWhoHitPersistentNoAfter() {
         return playersWhoHitPersistentNoAfter;
     }
+    public String getPlayersWhoHitPersistentNoWhen() {
+        return playersWhoHitPersistentNoWhen;
+    }
+    public boolean getHackElectionStatus() {
+        return hasHackElectionBeenPlayed;
+    }
 
    
     public void addPlayersWhoHitPersistentNoAfter(String faction) {
@@ -620,10 +627,30 @@ public class Map {
             playersWhoHitPersistentNoAfter = faction;
         } 
     }
+    public void addPlayersWhoHitPersistentNoWhen(String faction) {
+        if(playersWhoHitPersistentNoWhen != null && playersWhoHitPersistentNoWhen.length() > 0)
+        {
+            playersWhoHitPersistentNoWhen = playersWhoHitPersistentNoWhen + "_"+faction;
+        }
+        else
+        {
+            playersWhoHitPersistentNoWhen = faction;
+        } 
+    }
 
     public void setPlayersWhoHitPersistentNoAfter(String persistent) {
         
         playersWhoHitPersistentNoAfter = persistent;
+        
+    }
+    public void setPlayersWhoHitPersistentNoWhen(String persistent) {
+        
+        playersWhoHitPersistentNoWhen = persistent;
+        
+    }
+    public void setHackElectionStatus(boolean hack) {
+        
+        hasHackElectionBeenPlayed = hack;
         
     }
 

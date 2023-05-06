@@ -433,7 +433,7 @@ public class FoWHelper {
 		for (Player player_ : players) {
 			if (!player_.isRealPlayer()) continue;
 			
-			String playerMessage = Helper.getPlayerRepresentation(event, player_, true) + " - System " + position + " has been pinged:\n>>> " + message;
+			String playerMessage = Helper.getPlayerRepresentation(event, player_, false) + " - System " + position + " has been pinged:\n>>> " + message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			successfulCount += success ? 1 : 0;
 		}
@@ -445,7 +445,7 @@ public class FoWHelper {
 		int succesfulCount = 0;
 
 		for (Player player_ : activeMap.getPlayers().values()) {
-			String playerMessage = Helper.getPlayerRepresentation(event, player_, true) + " all player ping\n>>> " + message;
+			String playerMessage = Helper.getPlayerRepresentation(event, player_, false) + " all player ping\n>>> " + message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			succesfulCount += success ? 1 : 0;
 		}
@@ -520,13 +520,13 @@ public class FoWHelper {
 			StringBuilder sb = new StringBuilder();
 			// first off let's give full info for someone that can see both sides
 			if (senderVisible) {
-				sb.append(Helper.getPlayerRepresentation(event, sendingPlayer));
+				sb.append(Helper.getPlayerRepresentation(event, sendingPlayer, false));
 			} else {
 				sb.append("???");
 			}
 			sb.append(" sent " + transactedObject + " to ");
 			if (receiverVisible) {
-				sb.append(Helper.getPlayerRepresentation(event, receivingPlayer));
+				sb.append(Helper.getPlayerRepresentation(event, receivingPlayer, false));
 			} else {
 				sb.append("???");
 			}
