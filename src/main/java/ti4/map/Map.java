@@ -46,6 +46,8 @@ public class Map {
 
     private String latestCommand = "";
 
+    private String latestOutcomeVotedFor = "";
+
     private MiltyDraftManager miltyDraftManager;
 
     @JsonIgnore
@@ -93,6 +95,8 @@ public class Map {
     private MapStatus mapStatus = MapStatus.open;
 
     private HashMap<Integer, Boolean> scPlayed = new HashMap<>();
+
+    private HashMap<String, String> currentAgendaVotes = new HashMap<>();
     @ExportableField
     private String speaker = "";
     @ExportableField
@@ -106,6 +110,10 @@ public class Map {
 
     @ExportableField
     private int pingSystemCounter = 0;
+    
+    @ExportableField
+    private String playersWhoHitPersistentNoAfter = "";
+    private String playersWhoHitPersistentNoWhen = "";
     @ExportableField
     private String[] listOfTilePinged =new String[10]; 
 
@@ -121,6 +129,8 @@ public class Map {
     private List<String> actionCards;
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
 
+    private String currentAgendaInfo = null;
+    private boolean hasHackElectionBeenPlayed = false;
     private List<String> agendas;
     private LinkedHashMap<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> discardAgendas = new LinkedHashMap<>();
@@ -198,6 +208,7 @@ public class Map {
         return m;
     }
 
+
     public HashMap<String, Object> getExportableFieldMap() {
         Class<? extends Map> aClass = this.getClass();
         Field[] fields = aClass.getDeclaredFields();
@@ -224,6 +235,16 @@ public class Map {
     public void setLatestCommand(String latestCommand) {
         this.latestCommand = latestCommand;
     }
+
+
+    public String getLatestOutcomeVotedFor() {
+        return latestOutcomeVotedFor;
+    }
+
+    public void setLatestOutcomeVotedFor(String outcomeVotedFor) {
+        latestOutcomeVotedFor = outcomeVotedFor;
+    }
+
 
     @JsonIgnore
     public MiltyDraftManager getMiltyDraftManager() {
@@ -264,6 +285,19 @@ public class Map {
         } else {
             this.round = round;
         }
+    }
+
+    public boolean isACInDiscard(String name)
+    {
+        boolean isInDiscard = false;
+        for (java.util.Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
+            
+            if(Mapper.getActionCard(ac.getKey()).contains(name))
+            {
+                return true;
+            }
+        }
+        return isInDiscard;
     }
 
     public String getCreationDate() {
@@ -517,6 +551,13 @@ public class Map {
         return scPlayed;
     }
 
+    public HashMap<String, String> getCurrentAgendaVotes() {
+        return currentAgendaVotes;
+    }
+    public void resetCurrentAgendaVotes() {
+        currentAgendaVotes = new HashMap<>();
+    }
+
     @JsonIgnore
     public List<Integer> getPlayedSCs() {
         return getScPlayed().entrySet().stream().filter(e -> e.getValue()).map(e -> e.getKey()).toList();
@@ -550,6 +591,10 @@ public class Map {
         this.scPlayed.put(scNumber, playedStatus);
     }
 
+    public void setCurrentAgendaVote(String outcome, String voteInfo) {
+        currentAgendaVotes.put(outcome, voteInfo);
+    }
+
     public String getSpeaker() {
         return speaker;
     }
@@ -559,6 +604,54 @@ public class Map {
      */
     public void setSpeaker(String speaker) {
         this.speaker = speaker;
+    }
+
+    public String getPlayersWhoHitPersistentNoAfter() {
+        return playersWhoHitPersistentNoAfter;
+    }
+    public String getPlayersWhoHitPersistentNoWhen() {
+        return playersWhoHitPersistentNoWhen;
+    }
+    public boolean getHackElectionStatus() {
+        return hasHackElectionBeenPlayed;
+    }
+
+   
+    public void addPlayersWhoHitPersistentNoAfter(String faction) {
+        if(playersWhoHitPersistentNoAfter != null && playersWhoHitPersistentNoAfter.length() > 0)
+        {
+            playersWhoHitPersistentNoAfter = playersWhoHitPersistentNoAfter + "_"+faction;
+        }
+        else
+        {
+            playersWhoHitPersistentNoAfter = faction;
+        } 
+    }
+    public void addPlayersWhoHitPersistentNoWhen(String faction) {
+        if(playersWhoHitPersistentNoWhen != null && playersWhoHitPersistentNoWhen.length() > 0)
+        {
+            playersWhoHitPersistentNoWhen = playersWhoHitPersistentNoWhen + "_"+faction;
+        }
+        else
+        {
+            playersWhoHitPersistentNoWhen = faction;
+        } 
+    }
+
+    public void setPlayersWhoHitPersistentNoAfter(String persistent) {
+        
+        playersWhoHitPersistentNoAfter = persistent;
+        
+    }
+    public void setPlayersWhoHitPersistentNoWhen(String persistent) {
+        
+        playersWhoHitPersistentNoWhen = persistent;
+        
+    }
+    public void setHackElectionStatus(boolean hack) {
+        
+        hasHackElectionBeenPlayed = hack;
+        
     }
 
     public String getActivePlayer() {
@@ -591,6 +684,13 @@ public class Map {
 
     public Date getLastActivePlayerPing() {
         return lastActivePlayerPing;
+    }
+
+    public void setCurrentAgendaInfo(String agendaInfo) {
+        currentAgendaInfo = agendaInfo;
+    }
+    public String getCurrentAgendaInfo() {
+        return currentAgendaInfo;
     }
 
     public Date getLastTimeGamesChecked() {
@@ -1189,6 +1289,11 @@ public class Map {
         int index = revealFromBottom ? agendas.size() - 1 : 0;
         String id = agendas.remove(index);
         addDiscardAgenda(id);
+        return id;
+    }
+    public String getNextAgenda(boolean revealFromBottom) {
+        int index = revealFromBottom ? agendas.size() - 1 : 0;
+        String id = agendas.get(index);
         return id;
     }
 
