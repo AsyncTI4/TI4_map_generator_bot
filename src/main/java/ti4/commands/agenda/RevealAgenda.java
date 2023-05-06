@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-
+import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -41,17 +41,39 @@ public class RevealAgenda extends AgendaSubcommandData {
         String id = activeMap.revealAgenda(revealFromBottom);
         LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(id);
-        
+        String[] agendaDetails = Mapper.getAgenda(id).split(";");
+        String agendaTarget = agendaDetails[2];
+        String agendaType = agendaDetails[1];
+        String agendaName = agendaDetails[0];
+        if(agendaName!= null && !agendaName.equalsIgnoreCase("Covert Legislation"))
+        {
+            activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget + "_"+uniqueID);
+        }
+        else
+        {
+            String id2 = activeMap.getNextAgenda(revealFromBottom);
+            String[] agendaDetails2 = Mapper.getAgenda(id2).split(";");
+            agendaTarget = agendaDetails2[2];
+            agendaType = agendaDetails2[1];
+            agendaName = agendaDetails[0];
+            activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget);
+        }
+        activeMap.resetCurrentAgendaVotes();
+        activeMap.setHackElectionStatus(false);
+        activeMap.setPlayersWhoHitPersistentNoAfter("");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getAgendaRepresentation(id, uniqueID));
         String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you will **Play a When** or **Play an After** or not by pressing the buttons below:";
 
         Button playWhen = Button.danger("play_when", "Play When");
         Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-        List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen));
+        Button noWhenPersistent = Button.primary("no_when_persistent", "No Whens No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
+
+        List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
         
-        Button playAfter = Button.danger("play_after", "Play After");
+        Button playAfter = Button.danger("play_after", "Play A Non-AC Rider");
         Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromFormatted(Emojis.noafters));
-        List<Button> afterButtons = new ArrayList<>(List.of(playAfter, noAfter));
+        Button noAfterPersistent = Button.primary("no_after_persistent", "No Afters No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.noafters));
+        List<Button> afterButtons = new ArrayList<>(List.of(playAfter, noAfter, noAfterPersistent));
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
         

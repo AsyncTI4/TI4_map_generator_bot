@@ -234,6 +234,9 @@ public class MapSaveLoadManager {
         writer.write(Constants.LATEST_COMMAND + " " + map.getLatestCommand());
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.LATEST_OUTCOME_VOTED_FOR + " " + map.getLatestOutcomeVotedFor());
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.SO + " " + String.join(",", map.getSecretObjectives()));
         writer.write(System.lineSeparator());
 
@@ -266,15 +269,34 @@ public class MapSaveLoadManager {
         writer.write(Constants.AUTO_PING + " " + map.getAutoPingSpacer());
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER + " " + map.getPlayersWhoHitPersistentNoAfter());
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN + " " + map.getPlayersWhoHitPersistentNoWhen());
+        writer.write(System.lineSeparator());
+
+        writer.write(Constants.CURRENT_AGENDA_INFO + " " + map.getCurrentAgendaInfo());
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " " + map.getLastActivePlayerChange().getTime());
         writer.write(System.lineSeparator());
 
         HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
+        
         StringBuilder sb = new StringBuilder();
         for (java.util.Map.Entry<Integer, Boolean> entry : scPlayed.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(Constants.SC_PLAYED + " " + sb);
+        writer.write(System.lineSeparator());
+
+
+        HashMap<String, String> agendaVoteInfo = map.getCurrentAgendaVotes();
+        StringBuilder sb2 = new StringBuilder();
+        for (java.util.Map.Entry<String, String> entry : agendaVoteInfo.entrySet()) {
+            sb2.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
+        }
+        writer.write(Constants.AGENDA_VOTE_INFO + " " + sb2);
         writer.write(System.lineSeparator());
 
         writer.write(Constants.AGENDAS + " " + String.join(",", map.getAgendas()));
@@ -308,6 +330,7 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.PURGED_PN + " " + String.join(",", map.getPurgedPN()));
         writer.write(System.lineSeparator());
+        
 
         DisplayType displayTypeForced = map.getDisplayTypeForced();
         if (displayTypeForced != null) {
@@ -918,6 +941,7 @@ public class MapSaveLoadManager {
             String info = tokenizer[1];
             switch (identification) {
                 case Constants.LATEST_COMMAND -> map.setLatestCommand(info);
+                case Constants.LATEST_OUTCOME_VOTED_FOR -> map.setLatestOutcomeVotedFor(info);
                 case Constants.SO -> map.setSecretObjectives(getCardList(info));
                 case Constants.AC -> map.setActionCards(getCardList(info));
                 case Constants.PO1 -> map.setPublicObjectives1(getCardList(info));
@@ -1016,6 +1040,13 @@ public class MapSaveLoadManager {
                         // do nothing
                     }
                 }
+                case Constants.CURRENT_AGENDA_INFO-> {
+                    try {
+                        map.setCurrentAgendaInfo(info);
+                    } catch (Exception e) {
+                        // do nothing
+                    }
+                }
 
                 case Constants.LAST_ACTIVE_PLAYER_CHANGE -> {
                     try {
@@ -1076,7 +1107,18 @@ public class MapSaveLoadManager {
                         map.setSCPlayed(scID, status);
                     }                    
                 }
+                case Constants.AGENDA_VOTE_INFO -> {
+                    StringTokenizer vote_info = new StringTokenizer(info, ";");
+                    while (vote_info.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
+                        String outcome = dataInfo.nextToken();
+                        String voteInfo = dataInfo.nextToken();
+                        map.setCurrentAgendaVote(outcome, voteInfo);
+                    }                    
+                }
                 case Constants.GAME_CUSTOM_NAME -> map.setCustomName(info);
+                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER -> map.setPlayersWhoHitPersistentNoAfter(info);
+                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN -> map.setPlayersWhoHitPersistentNoAfter(info);
                 case Constants.TABLE_TALK_CHANNEL ->  map.setTableTalkChannelID(info);
                 case Constants.MAIN_GAME_CHANNEL -> map.setMainGameChannelID(info);
                 case Constants.BOT_MAP_CHANNEL -> map.setBotMapUpdatesThreadID(info);
@@ -1086,6 +1128,14 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         map.setCompetitiveTIGLGame(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.HACK_ELECTION_STATUS -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setHackElectionStatus(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
