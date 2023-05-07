@@ -450,6 +450,8 @@ public class Constants {
 
     public static final String ACTION_CARD_ID = "action_card_id";
     public static final String DRAW_AC = "draw";
+    public static final String DRAW_SPECIFIC_AC = "draw_specific_ac";
+    public static final String MAKE_AC_COPIES = "make_ac_copies";
     public static final String SHUFFLE_AC_DECK = "shuffle_deck";
     public static final String SHOW_AC = "show";
     public static final String SHOW_ALL_AC = "show_all";

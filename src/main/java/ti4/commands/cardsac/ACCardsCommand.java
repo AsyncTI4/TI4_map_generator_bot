@@ -139,6 +139,8 @@ public class ACCardsCommand implements Command {
         subcommands.add(new RevealAndPutACIntoDiscard());
         subcommands.add(new SentAC());
         subcommands.add(new SentACRandom());
+        subcommands.add(new DrawSpecificAC());
+        subcommands.add(new MakeCopiesOfACs());
         return subcommands;
     }
 
