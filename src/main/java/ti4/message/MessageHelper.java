@@ -111,14 +111,10 @@ public class MessageHelper {
 			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
 			Map activeMap = MapManager.getInstance().getMap(gameName);
-			if (!activeMap.isFoWMode()
-					|| activeMap.isFoWMode() && event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
-				if (event.getChannel() instanceof MessageChannel) {
-					sendMessageWithFile((MessageChannel)event.getChannel(), file, messageText, pinMessage);
-				}
-			} else {
-				replyToMessage(event, "Map updated successfully. Use /special system_info to check the systems.");
+			if (event.getChannel() instanceof MessageChannel) {
+				sendMessageWithFile((MessageChannel)event.getChannel(), file, messageText, pinMessage);
 			}
+			
 		} catch (Exception e) {
 			replyToMessage(event, "Could not send response, use /show_game or contact Admins or Bothelper");
 		}

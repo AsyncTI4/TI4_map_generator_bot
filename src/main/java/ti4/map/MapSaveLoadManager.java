@@ -416,6 +416,10 @@ public class MapSaveLoadManager {
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.HACK_ELECTION_STATUS + " " + map.getHackElectionStatus());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.CC_N_PLASTIC_LIMIT + " " + map.getCCNPlasticLimit());
+        writer.write(System.lineSeparator());
         //Player information
         writer.write(PLAYERINFO);
         writer.write(System.lineSeparator());
@@ -1136,6 +1140,14 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         map.setHackElectionStatus(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.CC_N_PLASTIC_LIMIT -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setCCNPlasticLimit(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
