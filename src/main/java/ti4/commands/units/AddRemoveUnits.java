@@ -175,8 +175,12 @@ abstract public class AddRemoveUnits implements Command {
             {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
                 FoWHelper.pingSystem(map, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
-                map.setPingSystemCounter(count);
-                map.setTileAsPinged(count, tile.getPosition());
+                if(count <10)
+                {
+                    map.setPingSystemCounter(count);
+                    map.setTileAsPinged(count, tile.getPosition());
+                }
+                
             }
         }
         actionAfterAll(event, tile, color, map);

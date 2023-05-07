@@ -49,6 +49,7 @@ public class Map {
     private String latestOutcomeVotedFor = "";
 
     private MiltyDraftManager miltyDraftManager;
+    private boolean ccNPlasticLimit = true;
 
     @JsonIgnore
     private HashMap<String, UnitHolder> planets = new HashMap<>();
@@ -1754,6 +1755,13 @@ public class Map {
 
     public void setPlayers(LinkedHashMap<String, Player> players) {
         this.players = players;
+    }
+
+    public void setCCNPlasticLimit(boolean limit) {
+        ccNPlasticLimit = limit;
+    }
+    public boolean getCCNPlasticLimit() {
+        return ccNPlasticLimit;
     }
 
     public void setPlayer(String playerID, Player player) {
