@@ -280,11 +280,16 @@ public class Mapper {
     }
 
     public static String getActionCard(String id) {
+
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         return (String) actionCards.get(id);
     }
 
     @Nullable
     public static String getActionCardName(String id) {
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         String info = (String) actionCards.get(id);
         // if we would break trying to split the note, just return whatever is there
         if ((info == null) || !info.contains(";")) {
@@ -517,6 +522,13 @@ public class Mapper {
         HashMap<String, String> acList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : actionCards.entrySet()) {
             acList.put((String) entry.getKey(), (String) entry.getValue());
+        }
+        return acList;
+    }
+    public static HashMap<String, String> getActionCards(String extra) {
+        HashMap<String, String> acList = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : actionCards.entrySet()) {
+            acList.put(((String) entry.getKey()) +extra, (String) entry.getValue());
         }
         return acList;
     }
