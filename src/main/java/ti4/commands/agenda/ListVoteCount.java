@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -16,6 +17,7 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ObjectUtils.Null;
 
 public class ListVoteCount extends AgendaSubcommandData {
     public ListVoteCount() {
@@ -35,26 +37,10 @@ public class ListVoteCount extends AgendaSubcommandData {
     public static void turnOrder(GenericInteractionCreateEvent event, Map map, MessageChannel channel) {
         Boolean isPrivateFogGame = FoWHelper.isPrivateGame(event);
         boolean privateGame = isPrivateFogGame != null && isPrivateFogGame;
-
+        String speakerName = map.getSpeaker();
         StringBuilder msg = new StringBuilder();
         int i = 1;
-        List<Player> orderList = new ArrayList<>();
-        orderList.addAll(map.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
-        String speakerName = map.getSpeaker();
-        Optional<Player> optSpeaker = orderList.stream().filter(player -> player.getUserID().equals(speakerName))
-                .findFirst();
-
-        if (optSpeaker.isPresent()) {
-            int rotationDistance = orderList.size() - orderList.indexOf(optSpeaker.get()) - 1;
-            Collections.rotate(orderList, rotationDistance);
-        }
-
-        //Check if Argent Flight is in the game - if it is, put it at the front of the vote list.
-        Optional<Player> argentPlayer = orderList.stream().filter(player -> player.getFaction().equals("argent")).findFirst();
-        if (argentPlayer.isPresent()) {
-            orderList.remove(argentPlayer.orElse(null));
-            orderList.add(0, argentPlayer.get());
-        }
+        List<Player> orderList = AgendaHelper.getVotingOrder(map);
 
         if (!map.isTestBetaFeaturesMode()) {
             for (Player player : orderList) {
