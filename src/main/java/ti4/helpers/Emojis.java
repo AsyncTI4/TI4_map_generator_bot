@@ -223,6 +223,7 @@ public class Emojis {
     //RESOURCE AND INFLUENCE SYMBOLS
     public static final String influence = "<:influence:959575421337358336>";
     public static final String resources = "<:resources:959575421274451998>";
+    public static final String ResInf = "<:ResInf:1104118692897374379>";
     public static final String Resources_0 = "<:R0:864278976553156640>";
     public static final String Resources_1 = "<:R1:864278976524189727>";
     public static final String Resources_2 = "<:R2:864278977133019157>";

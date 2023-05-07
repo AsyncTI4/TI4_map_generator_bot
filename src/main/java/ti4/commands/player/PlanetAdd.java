@@ -1,9 +1,11 @@
 package ti4.commands.player;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.commands.status.ScorePublic;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
@@ -21,7 +23,7 @@ public class PlanetAdd extends PlanetAddRemove {
       doAction(player, planet, map, null);
     }
 
-    public void doAction(Player player, String planet, Map map, SlashCommandInteractionEvent event) {
+    public void doAction(Player player, String planet, Map map, GenericInteractionCreateEvent event) {
         player.addPlanet(planet);
         player.exhaustPlanet(planet);
         if (planet.equals("mirage")){
@@ -41,8 +43,8 @@ public class PlanetAdd extends PlanetAddRemove {
             } else if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
                 unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
                 map.scorePublicObjective(player.getUserID(), 0);
-                if (event != null){
-                    ScorePublic.informAboutScoring(event, event.getChannel(), map, player, 0);
+                if (event != null && event instanceof SlashCommandInteractionEvent) {
+                    ScorePublic.informAboutScoring(event, ((SlashCommandInteractionEvent) event).getChannel(), map, player, 0);
                 }
             }
         }
@@ -64,6 +66,5 @@ public class PlanetAdd extends PlanetAddRemove {
                 }
             }
         }
-
     }
 }

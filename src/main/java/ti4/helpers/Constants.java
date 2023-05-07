@@ -688,4 +688,6 @@ public class Constants {
     public static final String ZELIAN_HERO = "zelian_hero";
     public static final String NAALU_COMMANDER = "naalu_commander";
     public static final String MOVE_CREUSS_WORMHOLE = "move_creuss_wormhole";
+    public static final String GARDEN_WORLDS = "garden_worlds";
+    public static final String GARDEN_WORLDS_PNG = "attachment_garden_worlds.png";
 }
