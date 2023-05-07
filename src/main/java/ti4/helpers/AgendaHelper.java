@@ -343,6 +343,26 @@ public class AgendaHelper {
         int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
         influenceCount += influenceCountFromPlanets;
+
+
+        if ("mahact".equals(player.getFaction())) {
+            Player xxcha = Helper.getPlayerFromColorOrFaction(map, "xxcha");
+            if(xxcha != null)
+            {
+                if(player.getMahactCC().contains(xxcha.getColor()))
+                {
+                    Leader leader = xxcha.getLeader(Constants.COMMANDER);
+                    if (leader != null && !leader.isLocked()) {
+                        influenceCount += planets.size(); 
+                        hasXxchaAlliance = 1;
+                    }
+                }
+            }
+           
+        }
+
+
+
         if ("xxcha".equals(player.getFaction())) {
             Leader leader = player.getLeader(Constants.COMMANDER);
             if (leader != null && !leader.isLocked()) {
