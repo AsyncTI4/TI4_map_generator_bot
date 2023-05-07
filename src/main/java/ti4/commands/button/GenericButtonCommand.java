@@ -45,7 +45,14 @@ public class GenericButtonCommand implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String message = event.getOption(Constants.BUTTON_TEXT, "Button", OptionMapping::getAsString);
+        
+        if (message.length() > 80) {
+            event.getMessageChannel().sendMessage(message).queue();
+            message = "Record Response";
+        }
+
         Button button = Button.secondary(Constants.GENERIC_BUTTON_ID_PREFIX + event.getId(), message);
+        
         for (MessageCreateData messageCreateData : MessageHelper.getMessageCreateDataObjects(null, Collections.singletonList(button))) {
             event.getMessageChannel().sendMessage(messageCreateData).queue();
         }
@@ -61,7 +68,7 @@ public class GenericButtonCommand implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                .addOptions(new OptionData(OptionType.STRING, Constants.BUTTON_TEXT, "The text/prompt that will appear on the button itself").setRequired(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.BUTTON_TEXT, "The text/prompt that will appear on the button itself. Max 80 characters.").setRequired(true))
         );
     }
 }
