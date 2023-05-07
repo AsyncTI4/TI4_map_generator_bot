@@ -22,9 +22,9 @@ import ti4.message.MessageHelper;
 public class MoveCreussWormhole extends SpecialSubcommandData {
 
     public MoveCreussWormhole() {
-        super(Constants.MOVE_CREUSS_WORMHOLE, "Moves a creuss wormhole token.");
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TOKEN, "Token Name").setRequired(true).setAutoComplete(true));
+        super(Constants.MOVE_CREUSS_WORMHOLE, "Adds or moves a creuss wormhole token to the target system.");
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Target System/Tile name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CREUSS_TOKEN_NAME, "Token Name").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -50,7 +50,7 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
             return;
         }
 
-        String tokenName = event.getOption(Constants.TOKEN, null, OptionMapping::getAsString);
+        String tokenName = event.getOption(Constants.CREUSS_TOKEN_NAME, null, OptionMapping::getAsString);
         tokenName = AliasHandler.resolveToken(tokenName);
         if (!isValidCreussWormhole(tokenName)) {
             sendMessage("Token Name: " + tokenName + " is not a valid Creuss Wormhole Token.");
@@ -70,6 +70,7 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
     }
 
     private boolean isValidCreussWormhole(String tokenName) {
+        if (tokenName == null) return false;
         List<String> validNames = List.of("creussalpha", "creussbeta", "creussgamma");
         return validNames.contains(tokenName);
     }

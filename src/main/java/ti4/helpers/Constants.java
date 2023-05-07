@@ -690,4 +690,5 @@ public class Constants {
     public static final String MOVE_CREUSS_WORMHOLE = "move_creuss_wormhole";
     public static final String GARDEN_WORLDS = "garden_worlds";
     public static final String GARDEN_WORLDS_PNG = "attachment_garden_worlds.png";
+    public static final String CREUSS_TOKEN_NAME = "creuss_token_name";
 }
