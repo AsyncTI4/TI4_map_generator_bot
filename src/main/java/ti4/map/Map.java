@@ -1457,14 +1457,28 @@ public class Map {
     @Nullable
     public LinkedHashMap<String, Integer> drawSpecificActionCard(String acID, String userID) {
         if (!actionCards.isEmpty()) {
-            if(actionCards.indexOf(acID) > -1)
+            int tries = 0;
+            while(tries < 3)
             {
-                String id = acID;
-                Player player = getPlayer(userID);
-                if (player != null) {
-                    actionCards.remove(id);
-                    player.setActionCard(id);
-                    return player.getActionCards();
+                if(actionCards.indexOf(acID) > -1)
+                {
+                    String id = acID;
+                    Player player = getPlayer(userID);
+                    if (player != null) {
+                        actionCards.remove(id);
+                        player.setActionCard(id);
+                        return player.getActionCards();
+                    }
+                    tries = 12;
+                }
+                tries++;
+                if(acID.contains("extra1"))
+                {
+                    acID = acID.replace("extra1","extra2");
+                }
+                else
+                {
+                    acID = acID+"extra1";
                 }
             }
             
