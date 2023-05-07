@@ -85,6 +85,7 @@ public class AddTileList implements Command {
                 userActiveMap.setTile(tile);
                 if (!tileList.startsWith("{") && !tileList.contains("}")) {
                     tile = new Tile(AliasHandler.resolveTile(Constants.MR), "000");
+                    AddTile.addCustodianToken(tile);
                     userActiveMap.setTile(tile);
                 }
             } catch (Exception e) {
