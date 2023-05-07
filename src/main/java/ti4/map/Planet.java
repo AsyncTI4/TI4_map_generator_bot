@@ -74,7 +74,7 @@ public class Planet extends UnitHolder {
 
     @JsonIgnore
     public boolean hasGroundForces() {
-        return getUnits().keySet().stream().anyMatch(u -> CollectionUtils.containsAny(List.of("gf", "mf")));
+        return getUnits().keySet().stream().anyMatch(u -> u.contains("mf") || u.contains("gf"));
     }
 
     @Override
