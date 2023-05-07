@@ -186,6 +186,10 @@ public class ListVoteCount extends AgendaSubcommandData {
         return sb.toString();
     }
 
+    public static int getTotalVoteCount(Map map, Player player) {
+        return getVoteCountFromPlanets(map, player) + getAdditionalVotesFromOtherSources(map, player).getKey();
+    }
+
     public static int getVoteCountFromPlanets(Map map, Player player) {
         List<String> planets = new ArrayList<>(player.getPlanets());
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
