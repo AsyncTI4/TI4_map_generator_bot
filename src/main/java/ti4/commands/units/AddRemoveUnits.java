@@ -65,8 +65,6 @@ abstract public class AddRemoveUnits implements Command {
             addPlanetToPlayArea(event, tile, unitHolder_.getName());
         }
 
-        DiscordantStarsHelper.checkGardenWorlds(activeMap, player);
-
         MapSaveLoadManager.saveMap(activeMap, event);
 
         OptionMapping optionMapGen = event.getOption(Constants.NO_MAPGEN);

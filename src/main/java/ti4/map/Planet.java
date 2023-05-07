@@ -9,6 +9,8 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.collections4.CollectionUtils;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -68,6 +70,11 @@ public class Planet extends UnitHolder {
     @JsonIgnore
     public boolean hasAttachment() {
         return tokenList.stream().anyMatch(token -> !token.contains("sleeper") && !token.contains("dmz_large") && !Helper.isFakeAttachment(token));
+    }
+
+    @JsonIgnore
+    public boolean hasGroundForces() {
+        return getUnits().keySet().stream().anyMatch(u -> CollectionUtils.containsAny(List.of("gf", "mf")));
     }
 
     @Override

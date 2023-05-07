@@ -63,7 +63,6 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
         for (String planetID : planetIDs) {
             parseParameter(event, player, planetID, activeMap);
         }
-        DiscordantStarsHelper.checkGardenWorlds(activeMap, player);
     }
 
     private void parseParameter(SlashCommandInteractionEvent event, Player player, String planetID, Map map) {
