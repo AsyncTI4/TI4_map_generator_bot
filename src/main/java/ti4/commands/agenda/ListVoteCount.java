@@ -252,7 +252,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         //Argent Zeal
         if (player.getFactionAbilities().contains("zeal")) {
             long playerCount = map.getPlayers().values().stream().filter(Player::isRealPlayer).count();
-            sb.append("(+" + playerCount + " votes for " + Emojis.Argent + "Zeal)");
+            sb.append("(+" + playerCount + " for " + Emojis.Argent + "Zeal)");
             additionalVotes += playerCount;
         }
 
@@ -261,19 +261,19 @@ public class ListVoteCount extends AgendaSubcommandData {
             Set<String> planets = new HashSet<>(player.getPlanets());
             planets.removeAll(player.getExhaustedPlanets());
             int readyPlanetCount = planets.size();
-            sb.append("(+" + readyPlanetCount + " votes for Xxcha Alliance (+1 vote per planet exhausted))");
+            sb.append("(+" + readyPlanetCount + " for Xxcha Commander (+1 vote per planet exhausted))");
             additionalVotes += readyPlanetCount;
         }
 
         //Blood Pact
         if (player.getPromissoryNotesInPlayArea().contains("blood_pact")) {
-            sb.append("(+4 potential votes for " + Emojis.Empyrean + Emojis.PN + "Blood Pact)");
+            sb.append("(+4 potential for " + Emojis.Empyrean + Emojis.PN + "Blood Pact)");
             additionalVotes += 4;
         }
             
         //Predictive Intelligence
         if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
-            sb.append(" (+3 votes for " + Emojis.CyberneticTech + "Predictive Intelligence)");
+            sb.append(" (+3 for " + Emojis.CyberneticTech + "Predictive Intelligence)");
             additionalVotes += 3;
         }
 
@@ -281,7 +281,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         if (CollectionUtils.containsAny(player.getRelics(), List.of("absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3"))) {
             int count = player.getRelics().stream().filter(s -> s.contains("absol_shardofthethrone")).toList().size(); //  +2 votes per Absol shard
             int shardVotes = 2 * count;
-            sb.append(" (+" + shardVotes + " votes for (" + count + "x) " + Emojis.Relic + "Shard of the Throne" + Emojis.Absol + ")");
+            sb.append(" (+" + shardVotes + " for (" + count + "x) " + Emojis.Relic + "Shard of the Throne" + Emojis.Absol + ")");
             additionalVotes += shardVotes;
         }
 
