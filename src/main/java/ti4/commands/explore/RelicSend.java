@@ -3,6 +3,8 @@ package ti4.commands.explore;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -73,13 +75,25 @@ public class RelicSend extends GenericRelicAction {
         player2.addRelic(relicID);
 
         //HANDLE SHARD OF THE THRONE
-        if (relicID.equals("shard")) {
-            Integer shardPublicObjectiveID = activeMap.getCustomPublicVP().get("Shard of the Throne");
-            if (shardPublicObjectiveID != null) {
-                activeMap.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
-                activeMap.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
+        switch (relicID) {
+            case "shard" -> {
+                Integer shardPublicObjectiveID = activeMap.getCustomPublicVP().get("Shard of the Throne");
+                if (shardPublicObjectiveID != null) {
+                    activeMap.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
+                    activeMap.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
+                }
+            }
+            case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
+                int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
+                String customPOName = "Shard of the Throne (" + absolShardNum + ")";
+                Integer shardPublicObjectiveID = activeMap.getCustomPublicVP().get(customPOName);
+                if (shardPublicObjectiveID != null) {
+                    activeMap.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
+                    activeMap.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
+                }
             }
         }
+
 
         if (player1.getRelics().contains(relicID) || !player2.getRelics().contains(relicID)) {
             sendMessage("Something may have gone wrong - please check your relics and ping Bothelper if there is a problem.");
