@@ -1,14 +1,10 @@
 package ti4.map;
 
 import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.helpers.AliasHandler;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.StringTokenizer;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -18,11 +14,6 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-// @JsonTypeInfo(use = JsonTypeInfo.Id.DEDUCTION, )
-// @JsonSubTypes({
-//     @JsonSubTypes.Type(Space.class),
-//     @JsonSubTypes.Type(Planet.class) }
-// )
 @JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
 @JsonSubTypes({
     @JsonSubTypes.Type(value = Space.class, name = "space"),
@@ -158,6 +149,11 @@ abstract public class UnitHolder {
 
     public HashMap<String, Integer> getUnits() {
         return units;
+    }
+
+    @JsonIgnore
+    public boolean hasUnits() {
+        return !getUnits().isEmpty();
     }
 
     public HashMap<String, Integer> getUnitDamage() {

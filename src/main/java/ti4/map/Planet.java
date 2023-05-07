@@ -2,11 +2,14 @@ package ti4.map;
 
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -66,7 +69,12 @@ public class Planet extends UnitHolder {
 
     @JsonIgnore
     public boolean hasAttachment() {
-        return tokenList.stream().anyMatch(token -> !token.contains("sleeper") && !token.contains("dmz_large"));
+        return tokenList.stream().anyMatch(token -> !token.contains("sleeper") && !token.contains("dmz_large") && !Helper.isFakeAttachment(token));
+    }
+
+    @JsonIgnore
+    public boolean hasGroundForces() {
+        return getUnits().keySet().stream().anyMatch(u -> u.contains("mf") || u.contains("gf"));
     }
 
     @Override

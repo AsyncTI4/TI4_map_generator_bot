@@ -1158,6 +1158,11 @@ public class GenerateMap {
                     drawPlanetImage(x + deltaX + 26, y + 40, planetTypeName);
                 }
 
+                if (planetHolder.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
+                    String khraskGardenWorlds = "pc_ds_khraskbonus.png";
+                    drawPlanetImage(x + deltaX, y, khraskGardenWorlds);
+                }
+
                 boolean hasAbility = planetHolder.isHasAbility() || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge") || token.contains("legendary"));
                 if (hasAbility) {
                     String statusOfAbility = exhaustedPlanetsAbilities.contains(planet) ? "_exh" : "_rdy";

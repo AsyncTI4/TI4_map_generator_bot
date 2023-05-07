@@ -38,6 +38,7 @@ import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.MapGenerator;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
+import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
@@ -100,6 +101,8 @@ public class MapSaveLoadManager {
         } else {
             map.setLatestCommand("Last Command Unknown - No Event Provided");
         }
+
+        DiscordantStarsHelper.checkGardenWorlds(map);
         
         ObjectMapper mapper = new ObjectMapper();
         try {
