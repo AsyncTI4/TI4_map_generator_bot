@@ -1558,4 +1558,9 @@ public class Helper {
         }
         return false;
     }
+
+    public static boolean isFakeAttachment(String attachmentName) {
+        attachmentName = AliasHandler.resolveAttachment(attachmentName);
+        return Mapper.getSpecialCaseValues("fake_attachments").contains(attachmentName);
+    }
 }

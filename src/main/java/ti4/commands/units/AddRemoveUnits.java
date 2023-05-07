@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands.player.PlanetAdd;
@@ -14,6 +13,7 @@ import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.FoWHelper;
 import ti4.map.*;
@@ -40,6 +40,14 @@ abstract public class AddRemoveUnits implements Command {
             return;
         }
         Map activeMap = mapManager.getUserActiveMap(userID);
+        Player player = activeMap.getPlayer(userID);
+        player = Helper.getGamePlayer(activeMap, player, event, null);
+        player = Helper.getPlayer(activeMap, player, event);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            return;
+        }
+
         String color = Helper.getColor(activeMap, event);
         if (!Mapper.isColorValid(color)) {
             MessageHelper.replyToMessage(event, "Color/Faction not valid");
@@ -56,6 +64,9 @@ abstract public class AddRemoveUnits implements Command {
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
             addPlanetToPlayArea(event, tile, unitHolder_.getName());
         }
+
+        DiscordantStarsHelper.checkGardenWorlds(activeMap, player);
+
         MapSaveLoadManager.saveMap(activeMap, event);
 
         OptionMapping optionMapGen = event.getOption(Constants.NO_MAPGEN);

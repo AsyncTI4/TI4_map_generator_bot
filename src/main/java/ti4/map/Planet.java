@@ -2,6 +2,7 @@ package ti4.map;
 
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
+import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 
 import java.awt.*;
@@ -66,7 +67,7 @@ public class Planet extends UnitHolder {
 
     @JsonIgnore
     public boolean hasAttachment() {
-        return tokenList.stream().anyMatch(token -> !token.contains("sleeper") && !token.contains("dmz_large"));
+        return tokenList.stream().anyMatch(token -> !token.contains("sleeper") && !token.contains("dmz_large") && !Helper.isFakeAttachment(token));
     }
 
     @Override

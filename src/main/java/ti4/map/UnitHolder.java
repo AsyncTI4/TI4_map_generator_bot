@@ -153,7 +153,7 @@ abstract public class UnitHolder {
 
     @JsonIgnore
     public boolean hasUnits() {
-        return getUnits().isEmpty();
+        return !getUnits().isEmpty();
     }
 
     public HashMap<String, Integer> getUnitDamage() {
