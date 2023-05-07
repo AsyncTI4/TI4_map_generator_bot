@@ -1,10 +1,13 @@
 package ti4.commands.special;
 
+import java.io.File;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.units.AddRemoveUnits;
+import ti4.generator.GenerateMap;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.*;
@@ -44,5 +47,7 @@ public class IonFlip extends SpecialSubcommandData {
             tile.removeToken(Constants.TOKEN_ION_BETA_PNG, spaceUnitHolder.getName());
             tile.addToken(Constants.TOKEN_ION_ALPHA_PNG, spaceUnitHolder.getName());
         }
+        File file = GenerateMap.getInstance().saveImage(activeMap, event);
+        MessageHelper.replyToMessage(event, file);
     }
 }

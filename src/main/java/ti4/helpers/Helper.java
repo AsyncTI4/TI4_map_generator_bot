@@ -914,7 +914,7 @@ public class Helper {
 
     private static void informUserCCOverLimit(SlashCommandInteractionEvent event, Map map, String color, int ccCount) {
         boolean ccCountIsOver = ccCount > 16;
-        if (ccCountIsOver) {
+        if (ccCountIsOver && map.getCCNPlasticLimit()) {
             Player player = null;
             String factionColor = AliasHandler.resolveColor(color.toLowerCase());
             factionColor = AliasHandler.resolveFaction(factionColor);

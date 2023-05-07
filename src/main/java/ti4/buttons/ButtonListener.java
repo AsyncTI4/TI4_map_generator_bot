@@ -1559,7 +1559,7 @@ public class ButtonListener extends ListenerAdapter {
             case "no_sabotage" -> {
                 event.getInteraction().getMessage().reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
             }
-            case Constants.PO_SCORING, Constants.PO_NO_SCORING, Constants.SO_NO_SCORING -> {
+            case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {
                 String message2 = "All players have indicated scoring. Run Status Cleanup and then Draw PO using the buttons.";   
                 Button drawStage2= Button.success("reveal_stage_2", "Reveal Stage 2");
                 Button drawStage1 = Button.success("reveal_stage_1", "Reveal Stage 1");
