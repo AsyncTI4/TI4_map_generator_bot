@@ -1510,6 +1510,10 @@ public class Helper {
         return getNeighbouringPlayers(map, player).size();
     }
 
+    /**
+     * @param commaSeparatedString
+     * @return List of Strings
+     */
     public static List<String> getListFromCSV(String commaSeparatedString) {
         StringTokenizer tokenizer = new StringTokenizer(commaSeparatedString, ",");
         ArrayList<String> values = new ArrayList<>();
@@ -1519,7 +1523,44 @@ public class Helper {
         return values;
     }
 
+    /**
+     * @param commaSeparatedString
+     * @return Set of Strings (no duplicates)
+     */
     public static Set<String> getSetFromCSV(String commaSeparatedString) {
         return new HashSet<>(getListFromCSV(commaSeparatedString));
+    }
+
+    public static boolean playerHasXxchaCommanderUnlocked(@NotNull Map map, @NotNull Player player) {  //TODO: contains(xxcha) -> contains(playerWithXxchaCommander)
+        if (player.getFaction().equals("xxcha") && player.getLeader(Constants.COMMANDER) != null) {
+            return !player.getLeader(Constants.COMMANDER).isLocked();
+        }
+        List<String> playersPNs = player.getPromissoryNotesInPlayArea();
+        ArrayList<Player> xxchaPlayers = new ArrayList<>(map.getRealPlayers().stream().filter(p -> p.getFaction().equals("xxcha")).toList());
+        if (!xxchaPlayers.remove(player) && !xxchaPlayers.isEmpty() && xxchaPlayers.size() == 1) {
+            Player xxchaPlayer = xxchaPlayers.get(0);
+            Leader xxchaCommander = xxchaPlayer.getLeader(Constants.COMMANDER);
+            if (xxchaCommander != null && !xxchaCommander.isLocked()) {
+                for (String pn : playersPNs) {
+                    if (pn.contains(xxchaPlayer.getColor()) && pn.contains("_an")) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public static boolean playerHasXxchaHeroUnlocked(Player player) {
+        if (player.getFaction().equals("xxcha")) {
+            Leader xxchaHero = player.getLeader("hero");
+            return (xxchaHero != null && !xxchaHero.isLocked());
+        }
+        return false;
+    }
+
+    public static boolean isFakeAttachment(String attachmentName) {
+        attachmentName = AliasHandler.resolveAttachment(attachmentName);
+        return Mapper.getSpecialCaseValues("fake_attachments").contains(attachmentName);
     }
 }

@@ -1,11 +1,11 @@
 package ti4.commands.units;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.commands.player.PlanetAdd;
@@ -13,6 +13,7 @@ import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.Helper;
 import ti4.helpers.FoWHelper;
 import ti4.map.*;
@@ -37,34 +38,43 @@ abstract public class AddRemoveUnits implements Command {
         if (!mapManager.isUserWithActiveMap(userID)) {
             MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
             return;
-        } else {
-            Map activeMap = mapManager.getUserActiveMap(userID);
-            String color = Helper.getColor(activeMap, event);
-            if (!Mapper.isColorValid(color)) {
-                MessageHelper.replyToMessage(event, "Color/Faction not valid");
-                return;
-            }
-
-            OptionMapping option = event.getOption(Constants.TILE_NAME);
-            String tileOption = option != null ? StringUtils.substringBefore(event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString).toLowerCase(), " ") : "nombox";
-            String tileID = AliasHandler.resolveTile(tileOption);
-            Tile tile = getTileObject(event, tileID, activeMap);
-            if (tile == null) return;
-
-            unitParsingForTile(event, color, tile, activeMap);
-            for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-                addPlanetToPlayArea(event, tile, unitHolder_.getName());
-            }
-            MapSaveLoadManager.saveMap(activeMap, event);
-
-            OptionMapping optionMapGen = event.getOption(Constants.NO_MAPGEN);
-            if (optionMapGen == null) {
-                File file = GenerateMap.getInstance().saveImage(activeMap, event);
-                MessageHelper.replyToMessage(event, file);
-            } else {
-                MessageHelper.replyToMessage(event, "Map update completed");
-            }
         }
+        Map activeMap = mapManager.getUserActiveMap(userID);
+        Player player = activeMap.getPlayer(userID);
+        player = Helper.getGamePlayer(activeMap, player, event, null);
+        player = Helper.getPlayer(activeMap, player, event);
+        if (player == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            return;
+        }
+
+        String color = Helper.getColor(activeMap, event);
+        if (!Mapper.isColorValid(color)) {
+            MessageHelper.replyToMessage(event, "Color/Faction not valid");
+            return;
+        }
+
+        OptionMapping option = event.getOption(Constants.TILE_NAME);
+        String tileOption = option != null ? StringUtils.substringBefore(event.getOption(Constants.TILE_NAME, null, OptionMapping::getAsString).toLowerCase(), " ") : "nombox";
+        String tileID = AliasHandler.resolveTile(tileOption);
+        Tile tile = getTileObject(event, tileID, activeMap);
+        if (tile == null) return;
+
+        unitParsingForTile(event, color, tile, activeMap);
+        for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
+            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+        }
+
+        MapSaveLoadManager.saveMap(activeMap, event);
+
+        OptionMapping optionMapGen = event.getOption(Constants.NO_MAPGEN);
+        if (optionMapGen == null) {
+            File file = GenerateMap.getInstance().saveImage(activeMap, event);
+            MessageHelper.replyToMessage(event, file);
+        } else {
+            MessageHelper.replyToMessage(event, "Map update completed");
+        }
+        
     }
 
     public Tile getTileObject(SlashCommandInteractionEvent event, String tileID, Map activeMap) {
@@ -176,7 +186,7 @@ abstract public class AddRemoveUnits implements Command {
         return color;
     }
 
-    public void unitParsing(ButtonInteraction event, String color, Tile tile, String unitList, Map map) {
+    public void unitParsing(ButtonInteractionEvent event, String color, Tile tile, String unitList, Map map) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
         while (unitListTokenizer.hasMoreTokens()) {
@@ -219,8 +229,8 @@ abstract public class AddRemoveUnits implements Command {
                 // }
             }
 
-            planetName = getPlanet((GenericInteractionCreateEvent) event, tile, planetName);
-            unitAction((GenericInteractionCreateEvent) event, tile, count, planetName, unitID, color);
+            planetName = getPlanet(event, tile, planetName);
+            unitAction(event, tile, count, planetName, unitID, color);
             addPlanetToPlayArea(event, tile, planetName);
         }
         if (map.isFoWMode()) {
@@ -250,10 +260,7 @@ abstract public class AddRemoveUnits implements Command {
         }
     }
 
-
-
-
-    public void addPlanetToPlayArea(SlashCommandInteractionEvent event, Tile tile, String planetName) {
+    public void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName) {
         String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
         Map activeMap = mapManager.getUserActiveMap(userID);
@@ -274,37 +281,6 @@ abstract public class AddRemoveUnits implements Command {
                            if (unitColor.equals(colorID)){
                                if (!player.getPlanets().contains(planetName)) {
                                    new PlanetAdd().doAction(player, planetName, activeMap, event);
-                               }
-                               break;
-                           }
-                       }
-                   }
-               }
-            }
-        }
-    }
-
-    public void addPlanetToPlayArea(ButtonInteraction event, Tile tile, String planetName) {
-        String userID = event.getUser().getId();
-        MapManager mapManager = MapManager.getInstance();
-        Map activeMap = mapManager.getUserActiveMap(userID);
-        if (!activeMap.isAllianceMode() && !Constants.SPACE.equals(planetName)){
-            UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-            if (unitHolder != null){
-                Set<String> allUnitsOnPlanet = unitHolder.getUnits().keySet();
-                Set<String> unitColors = new HashSet<>();
-                for (String unit_ : allUnitsOnPlanet) {
-                    String unitColor = unit_.substring(0, unit_.indexOf("_"));
-                    unitColors.add(unitColor);
-                }
-               if (unitColors.size() == 1){
-                   String unitColor = unitColors.iterator().next();
-                   for (Player player : activeMap.getPlayers().values()) {
-                       if (player.getFaction() != null && player.getColor() != null) {
-                           String colorID = Mapper.getColorID(player.getColor());
-                           if (unitColor.equals(colorID)){
-                               if (!player.getPlanets().contains(planetName)) {
-                                   new PlanetAdd().doAction(player, planetName, activeMap);
                                }
                                break;
                            }

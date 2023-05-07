@@ -1742,6 +1742,16 @@ public class Map {
         return players;
     }
 
+    @JsonIgnore
+    public Set<Player> getRealPlayers() {
+        return getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toSet());
+    }
+
+    @JsonIgnore
+    public Set<String> getFactions() {
+        return getRealPlayers().stream().map(p -> p.getFaction()).collect(Collectors.toSet());
+    }
+
     public void setPlayers(LinkedHashMap<String, Player> players) {
         this.players = players;
     }
