@@ -13,6 +13,7 @@ import ti4.helpers.*;
 import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -803,6 +804,21 @@ public class GenerateMap {
                             graphics.drawImage(image, x + position.x, y + position.y, null);
                         } catch (Exception e) {
                             BotLogger.log("Could not parse unit file for reinforcements: " + unitID, e);
+                        }
+                    }
+                }
+                else
+                {
+                    if(remainingReinforcements < 0 && !map.isDiscordantStarsMode()  && map.getCCNPlasticLimit())
+                    {
+                        String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits";
+                        if(map.isFoWMode())
+                        {
+                            MessageHelper.sendMessageToChannel(player.getPrivateChannel(), warningMessage);
+                        }
+                        else
+                        {
+                            MessageHelper.sendMessageToChannel(map.getMainGameChannel(), warningMessage);
                         }
                     }
                 }

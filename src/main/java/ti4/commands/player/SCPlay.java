@@ -136,6 +136,41 @@ public class SCPlay extends PlayerSubcommandData {
                 mainGameChannel.sendMessage(messageCreateData).queue();
             }
         }
+
+        
+        if(player.getFaction().equalsIgnoreCase("winnu")&& scToPlay != 1)
+        {
+            for(Player player2 :activeMap.getPlayers().values())
+            {
+                if (!player2.getPromissoryNotes().isEmpty()) {
+                    for (String pn : player2.getPromissoryNotes().keySet()) {
+                        if (!player2.getFaction().equalsIgnoreCase("winnu") && pn.equalsIgnoreCase("acq")) {
+                            String acqMessage = Helper.getPlayerRepresentation(event, player2, true) + " reminder you can use Winnu's PN!";
+                            if(activeMap.isFoWMode())
+                            {
+                                MessageHelper.sendMessageToChannel(player2.getPrivateChannel(), acqMessage);
+                            }
+                            else
+                            {
+                                MessageHelper.sendMessageToChannel(event.getChannel(), acqMessage);
+                            }
+                        }
+
+                    }
+                }
+            }
+        }
+
+
+
+
+
+
+
+
+
+
+
     }
 
     private List<Button> getSCButtons(int sc) {       

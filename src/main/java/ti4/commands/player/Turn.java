@@ -23,6 +23,8 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
 import java.util.*;
@@ -183,6 +185,75 @@ public class Turn extends PlayerSubcommandData {
         String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, map);
         
         LinkedHashMap<String, Integer> revealedPublicObjectives = map.getRevealedPublicObjectives();
+        Player arborec = Helper.getPlayerFromColorOrFaction(map, "arborec");
+        if(arborec != null)
+        {
+            String mitosisMessage = Helper.getPlayerRepresentation(event, arborec, true) + " reminder to do mitosis!";
+            if(map.isFoWMode())
+            {
+                MessageHelper.sendMessageToChannel(arborec.getPrivateChannel(), mitosisMessage);
+            }
+            else
+            {
+                MessageHelper.sendMessageToChannel(gameChannel, mitosisMessage);
+            }
+        }
+        Player Sol =  Helper.getPlayerFromColorOrFaction(map, "sol");
+    
+        if(Sol != null)
+        {
+            String colorID = Mapper.getColorID(Sol.getColor());
+            String fsKey = colorID + "_fs.png";
+            String infKey = colorID + "_gf.png";
+            for (Tile tile : map.getTileMap().values()) {
+                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                    if (unitHolder.getUnits() != null)
+                    {
+                        if(unitHolder.getUnits().get(fsKey) != null && unitHolder.getUnits().get(fsKey) > 0)
+                        {
+                            unitHolder.addUnit(infKey, 1);
+                            String genesisMessage = Helper.getPlayerRepresentation(event, Sol, true) + " an infantry was added to the space area of your flagship automatically.";
+                            if(map.isFoWMode())
+                            {
+                                MessageHelper.sendMessageToChannel(Sol.getPrivateChannel(), genesisMessage);
+                            }
+                            else
+                            {
+                                MessageHelper.sendMessageToChannel(gameChannel, genesisMessage);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Player L1 =  Helper.getPlayerFromColorOrFaction(map, "l1z1x");
+
+        if(L1 != null)
+        {
+            for(Player player : map.getPlayers().values())
+            {
+ 
+                if (!player.getPromissoryNotes().isEmpty()) {
+                    for (String pn : player.getPromissoryNotes().keySet()) {
+                        
+                        if (!player.getFaction().equalsIgnoreCase("l1z1x") && pn.equalsIgnoreCase("ce")) {
+                            String cyberMessage = Helper.getPlayerRepresentation(event, player, true) + " reminder to use cybernetic enhancements!";
+                            if(map.isFoWMode())
+                            {
+                                MessageHelper.sendMessageToChannel(player.getPrivateChannel(), cyberMessage);
+                            }
+                            else
+                            {
+                                MessageHelper.sendMessageToChannel(gameChannel, cyberMessage);
+                            }
+                        }
+                            
+                        
+                    }
+                }
+            }
+        }
 
         HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
         HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
