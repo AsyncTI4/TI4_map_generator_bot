@@ -1548,6 +1548,19 @@ public class Helper {
                 }
             }
         }
+        if ("mahact".equals(player.getFaction())) {
+            Player xxcha = Helper.getPlayerFromColorOrFaction(map, "xxcha");
+            if(xxcha != null)
+            {
+                if(player.getMahactCC().contains(xxcha.getColor()))
+                {
+                    Leader leader = xxcha.getLeader(Constants.COMMANDER);
+                    if (leader != null && !leader.isLocked()) {
+                        return true;
+                    }
+                }
+            }    
+        }
         return false;
     }
 
