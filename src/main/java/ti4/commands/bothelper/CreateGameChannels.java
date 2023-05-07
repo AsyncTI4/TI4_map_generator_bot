@@ -171,6 +171,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
         //CREATE GAME
         CreateGame createGame = new CreateGame();
         Map map = createGame.createNewGame(event, gameName, gameOwner);
+
+        //ADD PLAYERS
+        for (Member member : members) {
+            map.addPlayer(member.getId(), member.getEffectiveName());
+        }
         
         //CREATE CHANNELS
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
@@ -205,12 +210,11 @@ public class CreateGameChannels extends BothelperSubcommandData {
         StringBuilder botGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - bot/map channel\n");
         botGetStartedMessage.append("__Use the following commands to get started:__\n");
         botGetStartedMessage.append("> `/game setup` to set player count and additional options\n");
-        botGetStartedMessage.append("> `/add_tile_list {mapString}`, replacing {mapString} with the actual map string\n");
-        botGetStartedMessage.append("> `/game add` to add players to the game - do this in speaker order (starting at top of map going clockwise)\n");
-        botGetStartedMessage.append("> `/game set_order` to fix the order if incorrect\n");
+        botGetStartedMessage.append("> `/add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n");
+        botGetStartedMessage.append("> `/game set_order` to set the starting speaker order\n");
         botGetStartedMessage.append("> `/player setup` to set player faction and colour\n");
-        botGetStartedMessage.append("> `/add_frontier_tokens` to place frontier tokens\n");
         botGetStartedMessage.append("> `/player tech_add` for factions who need to add tech\n");
+        botGetStartedMessage.append("> `/add_frontier_tokens` to place frontier tokens on empty spaces\n");
         botGetStartedMessage.append("> `/so deal_to_all (count:2)` to deal two" + Emojis.SecretObjective + " to all players\n");
         botGetStartedMessage.append("\n");
         botGetStartedMessage.append("__Other helpful commands:__\n");
@@ -219,7 +223,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         botGetStartedMessage.append("> `/role add` to add the game role to any replacing players\n");
         // botGetStartedMessage.append("> `/status po_reveal_stage1` to reveal the first" + Emojis.Public1 + "Stage 1 Public Objective\n");
         MessageHelper.sendMessageToChannelAndPin((MessageChannel) botThread, botGetStartedMessage.toString());
-        MessageHelper.sendMessageToChannelAndPin((MessageChannel) botThread, "Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
+        MessageHelper.sendMessageToChannelAndPin((MessageChannel) botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
 
         StringBuilder message = new StringBuilder("Role and Channels have been set up:\n");
         message.append("> " + role.getName() + "\n");

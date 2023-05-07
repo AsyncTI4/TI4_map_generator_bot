@@ -40,7 +40,7 @@
         <dependency>
             <groupId>net.dv8tion</groupId>
             <artifactId>JDA</artifactId>
-            <version>5.0.0-beta.3</version>
+            <version>5.0.0-beta.9</version>
         </dependency>
         <!-- https://mvnrepository.com/artifact/net.dv8tion/JDA -->
         <dependency>

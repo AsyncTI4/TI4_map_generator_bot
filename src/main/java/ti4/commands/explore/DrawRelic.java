@@ -1,5 +1,7 @@
 package ti4.commands.explore;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -45,6 +47,14 @@ public class DrawRelic extends GenericRelicAction {
                 activeMap.scorePublicObjective(player.getUserID(), poIndex);
                 message.append("Custom PO 'Shard of the Throne' has been added.\n")
                        .append(Helper.getPlayerRepresentation(event, player)).append(" scored 'Shard of the Throne'");
+            }
+            case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
+                int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
+                String customPOName = "Shard of the Throne (" + absolShardNum + ")";
+                Integer poIndex = activeMap.addCustomPO(customPOName, 1);
+                activeMap.scorePublicObjective(player.getUserID(), poIndex);
+                message.append("Custom PO '" + customPOName + "' has been added.\n")
+                       .append(Helper.getPlayerRepresentation(event, player)).append(" scored '" + customPOName + "'");
             }
         }
         if(activeMap.isFoWMode())

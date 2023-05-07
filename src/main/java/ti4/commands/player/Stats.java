@@ -84,13 +84,13 @@ public class Stats extends PlayerSubcommandData {
 				Helper.isCCCountCorrect(event, activeMap, player.getColor());
 			}
 			if (optionT != null) {
-				setValue(event, activeMap, player, optionT, player::setTacticalCC, player::getTacticalCC);
+				setValue(event, activeMap, player, optionT, player::setTacticalCC, player::getTacticalCC, true);
 			}
 			if (optionF != null) {
-				setValue(event, activeMap, player, optionF, player::setFleetCC, player::getFleetCC);
+				setValue(event, activeMap, player, optionF, player::setFleetCC, player::getFleetCC, true);
 			}
 			if (optionS != null) {
-				setValue(event, activeMap, player, optionS, player::setStrategicCC, player::getStrategicCC);
+				setValue(event, activeMap, player, optionS, player::setStrategicCC, player::getStrategicCC, true);
 			}
 			if (optionT != null || optionF != null || optionS != null || optionCC != null) {
 				String newCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
@@ -291,6 +291,11 @@ public class Stats extends PlayerSubcommandData {
 	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, OptionMapping option,
 			Consumer<Integer> consumer, Supplier<Integer> supplier) {
 		setValue(event, map, player, option.getName(), consumer, supplier, option.getAsString(), false);
+	}
+
+	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, OptionMapping option,
+			Consumer<Integer> consumer, Supplier<Integer> supplier, boolean suppressMessage) {
+		setValue(event, map, player, option.getName(), consumer, supplier, option.getAsString(), suppressMessage);
 	}
 
 	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, String optionName,
