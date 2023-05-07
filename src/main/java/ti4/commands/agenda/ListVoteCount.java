@@ -251,7 +251,7 @@ public class ListVoteCount extends AgendaSubcommandData {
 
         //Argent Zeal
         if (player.getFactionAbilities().contains("zeal")) {
-            long playerCount = map.getPlayers().values().stream().filter(Player::isRealPlayer).count() - 1;
+            long playerCount = map.getPlayers().values().stream().filter(Player::isRealPlayer).count();
             sb.append("(+" + playerCount + " votes for " + Emojis.Argent + "Zeal)");
             additionalVotes += playerCount;
         }
