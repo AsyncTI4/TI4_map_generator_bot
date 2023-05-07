@@ -1119,9 +1119,17 @@ public class MapSaveLoadManager {
                     StringTokenizer vote_info = new StringTokenizer(info, ";");
                     while (vote_info.hasMoreTokens()) {
                         StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
-                        String outcome = dataInfo.nextToken();
-                        String voteInfo = dataInfo.nextToken();
-                        map.setCurrentAgendaVote(outcome, voteInfo);
+                        String outcome = null;
+                        String voteInfo = null;
+                        if(dataInfo.hasMoreTokens())
+                        {
+                            outcome = dataInfo.nextToken();
+                        }
+                        if(dataInfo.hasMoreTokens())
+                        {
+                            voteInfo = dataInfo.nextToken();
+                            map.setCurrentAgendaVote(outcome, voteInfo);
+                        }
                     }                    
                 }
                 case Constants.GAME_CUSTOM_NAME -> map.setCustomName(info);
