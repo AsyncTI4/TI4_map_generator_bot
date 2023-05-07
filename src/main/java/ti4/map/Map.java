@@ -260,6 +260,12 @@ public class Map {
         this.purgedPN.remove(purgedPN);
     }
 
+    public void addActionCardDuplicates(List<String> ACs)
+    {
+        actionCards.addAll(ACs);
+        Collections.shuffle(this.actionCards);
+    }
+
     public void setPurgedPNs(ArrayList<String> purgedPN) {
         this.purgedPN = purgedPN;
     }
@@ -1444,6 +1450,24 @@ public class Map {
                     return player.getSecrets();
                 }
             }
+        }
+        return null;
+    }
+
+    @Nullable
+    public LinkedHashMap<String, Integer> drawSpecificActionCard(String acID, String userID) {
+        if (!actionCards.isEmpty()) {
+            if(actionCards.indexOf(acID) > -1)
+            {
+                String id = acID;
+                Player player = getPlayer(userID);
+                if (player != null) {
+                    actionCards.remove(id);
+                    player.setActionCard(id);
+                    return player.getActionCards();
+                }
+            }
+            
         }
         return null;
     }

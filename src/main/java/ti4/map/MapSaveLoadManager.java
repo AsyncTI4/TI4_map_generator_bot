@@ -413,16 +413,17 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.BETA_TEST_MODE + " " + map.isTestBetaFeaturesMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.HACK_ELECTION_STATUS + " " + map.getHackElectionStatus());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.CC_N_PLASTIC_LIMIT + " " + map.getCCNPlasticLimit());
+        writer.write(System.lineSeparator());
 
         writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
         writer.write(System.lineSeparator());
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.HACK_ELECTION_STATUS + " " + map.getHackElectionStatus());
-        writer.write(System.lineSeparator());
-        writer.write(Constants.CC_N_PLASTIC_LIMIT + " " + map.getCCNPlasticLimit());
-        writer.write(System.lineSeparator());
+        
         //Player information
         writer.write(PLAYERINFO);
         writer.write(System.lineSeparator());
