@@ -57,6 +57,20 @@ public class ListVoteCount extends AgendaSubcommandData {
                 boolean hasXxchaAlliance = false;
                 int influenceCount = 0;
 
+                if ("mahact".equals(player.getFaction())) {
+                    Player xxcha = Helper.getPlayerFromColorOrFaction(map, "xxcha");
+                    if(xxcha != null)
+                    {
+                        if(player.getMahactCC().contains(xxcha.getColor()))
+                        {
+                            Leader leader = xxcha.getLeader(Constants.COMMANDER);
+                            if (leader != null && !leader.isLocked()) {
+                                influenceCount += planets.size(); 
+                                
+                            }
+                        }
+                    } 
+                }
                 //XXCHA SPECIAL CASE
                 if ("xxcha".equals(player.getFaction())) {
                     // add planet count if xxcha commander unlocked
