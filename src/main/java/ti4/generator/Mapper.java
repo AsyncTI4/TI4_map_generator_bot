@@ -54,7 +54,7 @@ public class Mapper {
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
-        readData("units.properties", units, "Could not read unit name file");
+        readData("unit_image_suffixes.properties", units, "Could not read unit name file");
         readData("color.properties", colors, "Could not read color name file");
         readData("cc_tokens.properties", cc_tokens, "Could not read cc token name file");
         readData("attachments.properties", attachment_tokens, "Could not read attachment token name file");
