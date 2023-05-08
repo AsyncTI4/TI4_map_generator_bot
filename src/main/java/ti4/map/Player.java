@@ -65,16 +65,15 @@ public class Player {
     private List<Leader> leaders = new ArrayList<>();
 
     private HashMap<String,String> debt_tokens = new HashMap<>();
-    private HashMap<String,Integer> unit_limits = new HashMap<>();
     private HashMap<String,String> fow_seenTiles = new HashMap<>();
     private HashMap<String,String> fow_customLabels = new HashMap<>();
     private String fowFogFilter = null;
     private boolean fogInitialized = false;
 
     @Nullable
-    private Role roleForCommunity = null;
+    private String roleIDForCommunity = null;
     @Nullable
-    private MessageChannel privateChannel = null;
+    private String privateChannelID = null;
     @Nullable
     private String cardsInfoThreadID = null;
 
@@ -125,34 +124,37 @@ public class Player {
             mahactCC.add(cc);
         }
     }
-    public void setUnitLimit(String unit, int limit) {
-        unit_limits.put(unit, limit);
-    }
-    public int getUnitLimit(String unit) {
-        return unit_limits.get(unit);
-    }
-
 
     public void removeMahactCC(String cc) {
          mahactCC.remove(cc);
     }
 
-    @Nullable
+    public String getRoleIDForCommunity() {
+        return roleIDForCommunity;
+    }
+
+    public void setRoleIDForCommunity(String roleIDForCommunity) {
+        this.roleIDForCommunity = roleIDForCommunity;
+    }
+
+    @Nullable @JsonIgnore
     public Role getRoleForCommunity() {
-        return roleForCommunity;
+        if (getRoleIDForCommunity() == null) return null;
+        return MapGenerator.jda.getRoleById(getRoleIDForCommunity());
     }
 
-    public void setRoleForCommunity(Role roleForCommunity) {
-        this.roleForCommunity = roleForCommunity;
+    public String getPrivateChannelID() {
+        return privateChannelID;
     }
 
-    @Nullable
+    public void setPrivateChannelID(String privateChannelID) {
+        this.privateChannelID = privateChannelID;
+    }
+
+    @Nullable @JsonIgnore
     public MessageChannel getPrivateChannel() {
-        return privateChannel;
-    }
-
-    public void setPrivateChannel(MessageChannel privateChannel) {
-        this.privateChannel = privateChannel;
+        if (getPrivateChannelID() == null) return null;
+        return MapGenerator.jda.getTextChannelById(getPrivateChannelID());
     }
 
     public String getCardsInfoThreadID() {
@@ -174,9 +176,9 @@ public class Player {
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + getUserName().replaceAll("/", "");
         if(activeMap.isFoWMode())
-        {
-            threadName = activeMap.getName() + "-" + "cards-info-"+ getUserName().replaceAll("/", "") + "-private";
-        }
+            {
+                threadName = activeMap.getName() + "-" + "cards-info-"+ getUserName().replaceAll("/", "") + "-private";
+            }
 
         //ATTEMPT TO FIND BY ID
         String cardsInfoThreadID = getCardsInfoThreadID();
@@ -244,10 +246,6 @@ public class Player {
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
         boolean isPrivateChannel = (!activeMap.isCommunityMode() && !activeMap.isFoWMode());
-        if(activeMap.getName().equalsIgnoreCase("pbd100"))
-        {
-            isPrivateChannel = true;
-        }
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
         threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
         if (isPrivateChannel) {
