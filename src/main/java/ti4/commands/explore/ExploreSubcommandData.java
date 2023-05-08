@@ -278,9 +278,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     default -> message = "";
                 }
                 message = message + "Resolve cc gain using the buttons.";   
-                Button getTactic= Button.success("incease_tactic_cc", "Gain 1 Tactic CC");
-                Button getFleet = Button.success("incease_fleet_cc", "Gain 1 Fleet CC");
-                Button getStrat= Button.success("incease_strategy_cc", "Gain 1 Strategy CC");
+                Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+                Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+                Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             }

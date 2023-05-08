@@ -924,11 +924,16 @@ public class Helper {
                     player = player_;
                 }
             }
+            
             String msg = getGamePing(event, map) + " ";
-            if (player != null) {
-                msg += getFactionIconFromDiscord(player.getFaction()) + " " + player.getFaction() + " ";
-                msg += getPlayerPing(player) + " ";
+            if(!map.isFoWMode())
+            {
+                if (player != null) {
+                    msg += getFactionIconFromDiscord(player.getFaction()) + " " + player.getFaction() + " ";
+                    msg += getPlayerPing(player) + " ";
+                }
             }
+            
             msg += "(" + color + ") is over CC limit. CC used: " + ccCount;
             MessageHelper.replyToMessage(event, msg);
         }
