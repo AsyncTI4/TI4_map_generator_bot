@@ -192,9 +192,15 @@ public class ButtonListener extends ListenerAdapter {
             {
                 new RevealStage1().revealS1(event, event.getChannel());
             }
-            String message2 = "Resolve status homework using the buttons.";   
+            String message2 = "Resolve status homework using the buttons. Only the Pass on [abilities] button is essential to hit, all others are optional. ";   
             Button draw1AC = Button.success("draw_1_AC", "Draw 1 AC");
-            Button confirmCCs = Button.primary("confirm_cc", "Confirm Your CCs");
+            Button confirmCCs = Button.primary("confirm_cc", "Confirm Your CC Update is Complete & Final");
+            Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+            Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+            Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+            Button loseTactic= Button.danger("decrease_tactic_cc", "Lose 1 Tactic CC");
+            Button loseFleet = Button.danger("decrease_fleet_cc", "Lose 1 Fleet CC");
+            Button loseStrat= Button.danger("decrease_strategy_cc", "Lose 1 Strategy CC");
             boolean custodiansTaken = activeMap.isCustodiansScored();
             Button passOnAbilities;
             if(custodiansTaken)
@@ -205,7 +211,7 @@ public class ButtonListener extends ListenerAdapter {
             {
                 passOnAbilities = Button.danger("pass_on_abilities", "Pass on Pol. Stability/Summit/Man. Investments");
             }
-            List<Button> buttons = List.of(draw1AC, confirmCCs, passOnAbilities);
+            List<Button> buttons = List.of(draw1AC, getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat, confirmCCs, passOnAbilities);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
         } else if (buttonID.startsWith("sc_follow_") && (!buttonID.contains("leadership")) && (!buttonID.contains("trade"))) {
             boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
@@ -690,12 +696,14 @@ public class ButtonListener extends ListenerAdapter {
                     {
                         activeMap.addLaw(aID, winner);
                     }
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Added Law with "+winner+" as the elected!");
                 }
                 else
                 {
                     if(winner.equalsIgnoreCase("for"))
                     {
                         activeMap.addLaw(aID, null);
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "Added law to map!");
                     }
                     if(activeMap.getCurrentAgendaInfo().contains("Secret"))
                     {
@@ -1114,18 +1122,31 @@ public class ButtonListener extends ListenerAdapter {
                         addReaction(event, false, false, "Didn't have any comms/tg to spend, no mech placed", "");
                     }
                 }
-                case "incease_strategy_cc" -> {
+                case "increase_strategy_cc" -> {
                     addReaction(event, false, false, "Increased Strategy Pool CCs By 1 ("+player.getStrategicCC()+"->"+(player.getStrategicCC()+1)+").", "");
                     player.setStrategicCC(player.getStrategicCC()+1);
                 }
-                case "incease_tactic_cc" -> {
+                case "increase_tactic_cc" -> {
                     addReaction(event, false, false, "Increased Tactic Pool CCs By 1 ("+player.getTacticalCC()+ "->" +(player.getTacticalCC()+1)+").", "");
                     player.setTacticalCC(player.getTacticalCC()+1);
                 }
-                case "incease_fleet_cc" -> {
+                case "increase_fleet_cc" -> {
                     addReaction(event, false, false, "Increased Fleet Pool CCs By 1 ("+player.getFleetCC()+"->"+(player.getFleetCC()+1)+").", "");
 
                     player.setFleetCC(player.getFleetCC()+1);
+                }
+                case "decrease_strategy_cc" -> {
+                    addReaction(event, false, false, "Decreased Strategy Pool CCs By 1 ("+player.getStrategicCC()+"->"+(player.getStrategicCC()-1)+").", "");
+                    player.setStrategicCC(player.getStrategicCC()-1);
+                }
+                case "decrease_tactic_cc" -> {
+                    addReaction(event, false, false, "Decreased Tactic Pool CCs By 1 ("+player.getTacticalCC()+ "->" +(player.getTacticalCC()-1)+").", "");
+                    player.setTacticalCC(player.getTacticalCC()-1);
+                }
+                case "decrease_fleet_cc" -> {
+                    addReaction(event, false, false, "Decreased Fleet Pool CCs By 1 ("+player.getFleetCC()+"->"+(player.getFleetCC()-1)+").", "");
+
+                    player.setFleetCC(player.getFleetCC()-1);
                 }
                 case "gain_1_tg" -> {
 
@@ -1252,9 +1273,9 @@ public class ButtonListener extends ListenerAdapter {
                     if(!failed)
                     {
                         String message2 = "Resolve cc gain using the buttons.";   
-                        Button getTactic= Button.success("incease_tactic_cc", "Gain 1 Tactic CC");
-                        Button getFleet = Button.success("incease_fleet_cc", "Gain 1 Fleet CC");
-                        Button getStrat= Button.success("incease_strategy_cc", "Gain 1 Strategy CC");
+                        Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+                        Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+                        Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
                         List<Button> buttons = List.of(getTactic, getFleet, getStrat);
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
 
