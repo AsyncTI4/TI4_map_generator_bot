@@ -65,6 +65,7 @@ public class Player {
     private List<Leader> leaders = new ArrayList<>();
 
     private HashMap<String,String> debt_tokens = new HashMap<>();
+    private HashMap<String,Integer> unit_limits = new HashMap<>();
     private HashMap<String,String> fow_seenTiles = new HashMap<>();
     private HashMap<String,String> fow_customLabels = new HashMap<>();
     private String fowFogFilter = null;
@@ -124,6 +125,13 @@ public class Player {
             mahactCC.add(cc);
         }
     }
+    public void setUnitLimit(String unit, int limit) {
+        unit_limits.put(unit, limit);
+    }
+    public int getUnitLimit(String unit) {
+        return unit_limits.get(unit);
+    }
+
 
     public void removeMahactCC(String cc) {
          mahactCC.remove(cc);
