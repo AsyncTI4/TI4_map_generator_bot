@@ -777,6 +777,20 @@ public class Map {
         scTradeGoods.put(sc, tradeGoodCount);
     }
 
+    public boolean addSC(Integer sc) {
+        if (!this.scTradeGoods.keySet().contains(sc)) {
+            setScTradeGood(sc, 0);
+            return true;
+        } else return false;
+    }
+
+    public boolean removeSC(Integer sc) {
+        if (this.scTradeGoods.keySet().contains(sc)) {
+            this.scTradeGoods.remove(sc);
+            return true;
+        } else return false;
+    }
+
     @JsonIgnore
     public List<Integer> getSCList() {
         return (new ArrayList<Integer>(getScTradeGoods().keySet()));
