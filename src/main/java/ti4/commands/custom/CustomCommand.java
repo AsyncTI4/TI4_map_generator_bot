@@ -113,6 +113,8 @@ public class CustomCommand implements Command {
         subcommands.add(new SoRemoveFromGame());
         subcommands.add(new AgendaRemoveFromGame());
         subcommands.add(new ACRemoveFromGame());
+        subcommands.add(new SCAddToGame());
+        subcommands.add(new SCRemoveFromGame());
 
         return subcommands;
     }
