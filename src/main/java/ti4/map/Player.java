@@ -139,7 +139,7 @@ public class Player {
 
     @Nullable @JsonIgnore
     public Role getRoleForCommunity() {
-        if (getRoleIDForCommunity() == null) return null;
+        if (getRoleIDForCommunity() == null || getRoleIDForCommunity().isEmpty() || getRoleIDForCommunity().isBlank()) return null;
         return MapGenerator.jda.getRoleById(getRoleIDForCommunity());
     }
 
@@ -153,7 +153,7 @@ public class Player {
 
     @Nullable @JsonIgnore
     public MessageChannel getPrivateChannel() {
-        if (getPrivateChannelID() == null) return null;
+        if (getPrivateChannelID() == null || getPrivateChannelID().isEmpty() || getPrivateChannelID().isBlank()) return null;
         return MapGenerator.jda.getTextChannelById(getPrivateChannelID());
     }
 
