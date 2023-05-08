@@ -39,7 +39,7 @@ public class AgendaHelper {
         
         if(voteTotal-minVote > 20)
         {
-            for(int x = 10; x < voteTotal+10; x=+10)
+            for(int x = 10; x < voteTotal+10; x += 10)
             {
                 int y = x-9;
                 Button button = Button.secondary("fixerVotes_"+x, y+"-"+x);
