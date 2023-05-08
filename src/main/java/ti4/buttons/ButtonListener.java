@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.*;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.*;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -18,7 +19,10 @@ import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
 import ti4.MessageListener;
+import ti4.commands.agenda.DrawAgenda;
 import ti4.commands.agenda.ListVoteCount;
+import ti4.commands.agenda.PutAgendaBottom;
+import ti4.commands.agenda.PutAgendaTop;
 import ti4.commands.agenda.RevealAgenda;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ACInfo_Legacy;
@@ -657,6 +661,18 @@ public class ButtonListener extends ListenerAdapter {
             String message = activeMap.isFoWMode() ? "Turned down window" : null;
             addReaction(event, false, false, message, "");
         }
+        else if(buttonID.startsWith("topAgenda_"))
+        {
+            String agendaNumID = buttonID.substring(buttonID.indexOf("_")+1, buttonID.length());
+            new PutAgendaTop().putTop((GenericInteractionCreateEvent)event, Integer.parseInt(agendaNumID), activeMap);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Put "+agendaNumID + " on the top of the agenda deck.");
+        }
+        else if(buttonID.startsWith("bottomAgenda_"))
+        {
+            String agendaNumID = buttonID.substring(buttonID.indexOf("_")+1, buttonID.length());
+            new PutAgendaBottom().putBottom((GenericInteractionCreateEvent) event, Integer.parseInt(agendaNumID), activeMap);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Put "+agendaNumID + " on the bottom of the agenda deck.");
+        }
         else if(buttonID.startsWith("agendaResolution_"))
         {
             String winner = buttonID.substring(buttonID.indexOf("_")+1,buttonID.length());
@@ -804,6 +820,10 @@ public class ButtonListener extends ListenerAdapter {
                 case "no_sabotage" -> {
                     String message = activeMap.isFoWMode() ? "No sabotage" : null;
                     addReaction(event, false, false, message, "");
+                }
+                case "drawAgenda_2" -> {
+                    new DrawAgenda().drawAgenda(event, 2, activeMap, player);
+                    event.getMessage().delete().queue();
                 }
                 case "sc_ac_draw" -> {
                     boolean used = addUsedSCPlayer(messageID + "ac", activeMap, player, event, "");

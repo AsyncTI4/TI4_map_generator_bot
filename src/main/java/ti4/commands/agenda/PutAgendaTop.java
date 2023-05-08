@@ -1,5 +1,6 @@
 package ti4.commands.agenda;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -14,19 +15,23 @@ public class PutAgendaTop extends AgendaSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
     }
 
+    
+    public void putTop(GenericInteractionCreateEvent event, int agendaID, Map activeMap) {
+        boolean success = activeMap.putAgendaTop(agendaID);
+        if (success) {
+            MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "Agenda put at top");
+        } else {
+            MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "No Agenda ID found");
+        }
+    }
     @Override
     public void execute(SlashCommandInteractionEvent event) {
+        Map activeMap = getActiveMap();
         OptionMapping option = event.getOption(Constants.AGENDA_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID defined");
             return;
         }
-        Map activeMap = getActiveMap();
-        boolean success = activeMap.putAgendaTop(option.getAsInt());
-        if (success) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda put at top");
-        } else {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "No Agenda ID found");
-        }
+        putTop(event, option.getAsInt(),activeMap);
     }
 }
