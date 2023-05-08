@@ -1566,11 +1566,14 @@ public class GenerateMap {
         }
         HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
         int x = 20;
+        int horizontalSpacingIncrement = 70;
         for (java.util.Map.Entry<Integer, Integer> scTGs : scTradeGoods.entrySet()) {
             Integer sc = scTGs.getKey();
             if (sc == 0) {
                 continue;
             }
+            if (sc > 9) horizontalSpacingIncrement = 80;
+            if (sc > 19) horizontalSpacingIncrement = 100;
             if (!convertToGenericSC && !scPicked.contains(sc)) {
                 graphics.setColor(getSCColor(sc));
                 graphics.setFont(Storage.getFont64());
@@ -1587,7 +1590,7 @@ public class GenerateMap {
                 graphics.setFont(Storage.getFont64());
                 graphics.drawString(Integer.toString(sc), x, y);
             }
-            x += 80;
+            x += horizontalSpacingIncrement;
         }
         graphics.setColor(Color.WHITE);
         graphics.setFont(Storage.getFont64());
