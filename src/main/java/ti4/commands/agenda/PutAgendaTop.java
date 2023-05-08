@@ -19,7 +19,7 @@ public class PutAgendaTop extends AgendaSubcommandData {
     public void putTop(GenericInteractionCreateEvent event, int agendaID, Map activeMap) {
         boolean success = activeMap.putAgendaTop(agendaID);
         if (success) {
-            MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "Agenda put at top");
+            MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "Agenda put on top");
         } else {
             MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "No Agenda ID found");
         }

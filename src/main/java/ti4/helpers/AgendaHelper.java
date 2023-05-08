@@ -220,19 +220,19 @@ public class AgendaHelper {
         {
             outcomeActionRow = getForAgainstOutcomeButtons(ridername, "outcome");
         }
-        else if(agendaDetails.contains("Player"))
+        else if(agendaDetails.contains("Player") || agendaDetails.contains("player"))
         {
             outcomeActionRow = getPlayerOutcomeButtons(activeMap, ridername, "outcome");
         }
-        else if(agendaDetails.contains("Planet"))
+        else if(agendaDetails.contains("Planet") || agendaDetails.contains("planet"))
         {
             MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "Sorry, the bot will not track riders played on planet outcomes");
         }
-        else if(agendaDetails.contains("Secret"))
+        else if(agendaDetails.contains("Secret") || agendaDetails.contains("secret"))
         {
             outcomeActionRow = getSecretOutcomeButtons(activeMap, ridername, "outcome");
         }
-        else if(agendaDetails.contains("Strategy"))
+        else if(agendaDetails.contains("Strategy") || agendaDetails.contains("strategy"))
         {
             outcomeActionRow = getStrategyOutcomeButtons(ridername, "outcome");
         }
@@ -597,23 +597,23 @@ public class AgendaHelper {
         String agendaDetails = activeMap.getCurrentAgendaInfo();
         agendaDetails = agendaDetails.substring(agendaDetails.indexOf("_")+1, agendaDetails.length());
         List<Button> outcomeActionRow = null;
-        if(agendaDetails.contains("For"))
+        if(agendaDetails.contains("For") || agendaDetails.contains("for"))
         {
             outcomeActionRow = getForAgainstOutcomeButtons(null, "agendaResolution");
         }
-        else if(agendaDetails.contains("Player"))
+        else if(agendaDetails.contains("Player") || agendaDetails.contains("player"))
         {
             outcomeActionRow = getPlayerOutcomeButtons(activeMap, null, "agendaResolution");
         }
-        else if(agendaDetails.contains("Planet"))
+        else if(agendaDetails.contains("Planet") || agendaDetails.contains("planet"))
         {
             MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "Sorry, the bot will resolve all possible planets rn.");
         }
-        else if(agendaDetails.contains("Secret"))
+        else if(agendaDetails.contains("Secret") || agendaDetails.contains("secret"))
         {
             outcomeActionRow = getSecretOutcomeButtons(activeMap, null, "agendaResolution");
         }
-        else if(agendaDetails.contains("Strategy"))
+        else if(agendaDetails.contains("Strategy") || agendaDetails.contains("strategy"))
         {
             outcomeActionRow = getStrategyOutcomeButtons(null, "agendaResolution");
         }
