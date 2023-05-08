@@ -448,17 +448,11 @@ public class MapSaveLoadManager {
             writer.write(Constants.COLOR + " " + playerColor);
             writer.write(System.lineSeparator());
 
-            Role roleForCommunity = player.getRoleForCommunity();
-            if (roleForCommunity != null) {
-                writer.write(Constants.ROLE_FOR_COMMUNITY + " " + roleForCommunity.getId());
-                writer.write(System.lineSeparator());
-            }
+            writer.write(Constants.ROLE_FOR_COMMUNITY + " " + player.getRoleIDForCommunity());
+            writer.write(System.lineSeparator());
 
-            Channel channelForCommunity = player.getPrivateChannel();
-            if (channelForCommunity != null) {
-                writer.write(Constants.PLAYER_PRIVATE_CHANNEL + " " + channelForCommunity.getId());
-                writer.write(System.lineSeparator());
-            }
+            writer.write(Constants.PLAYER_PRIVATE_CHANNEL + " " + player.getPrivateChannelID());
+            writer.write(System.lineSeparator());
             
             String fogColor = player.getFogFilter() == null ? "" : player.getFogFilter();
             writer.write(Constants.FOG_FILTER + " " + fogColor);
@@ -1342,8 +1336,8 @@ public class MapSaveLoadManager {
             switch (data) {
                 case Constants.FACTION -> player.setFaction(tokenizer.nextToken());
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
-                case Constants.ROLE_FOR_COMMUNITY -> setRole(player, tokenizer);
-                case Constants.PLAYER_PRIVATE_CHANNEL -> setChannel(player, tokenizer);
+                case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
+                case Constants.PLAYER_PRIVATE_CHANNEL -> player.setPrivateChannelID(tokenizer.nextToken());
                 case Constants.TACTICAL -> player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
@@ -1471,18 +1465,6 @@ public class MapSaveLoadManager {
                 case Constants.CARDS_INFO_THREAD_CHANNEL_ID -> player.setCardsInfoThreadID(tokenizer.nextToken());
             }
         }
-    }
-
-    private static void setChannel(Player player, StringTokenizer tokenizer) {
-        String id = tokenizer.nextToken();
-        TextChannel channelById = MapGenerator.jda.getTextChannelById(id);
-        player.setPrivateChannel(channelById);
-    }
-
-    private static void setRole(Player player, StringTokenizer tokenizer) {
-        String id = tokenizer.nextToken();
-        Role roleById = MapGenerator.jda.getRoleById(id);
-        player.setRoleForCommunity(roleById);
     }
     
     private static Tile readTile(String tileData, Map map) {

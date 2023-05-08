@@ -101,7 +101,7 @@ public class SetupGameChannels extends GameSubcommandData {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify role for community mode: " + roleConstant + " is missing");
                     return;
                 } else {
-                    player_.setRoleForCommunity(role.getAsRole());
+                    player_.setRoleIDForCommunity(role.getAsRole().getId());
                 }
             }
             
@@ -110,7 +110,7 @@ public class SetupGameChannels extends GameSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify text channel for " + channelConstant);
                 return;
             }
-            player_.setPrivateChannel(channel.getAsChannel().asTextChannel());
+            player_.setPrivateChannelID(channel.getAsChannel().getId());
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify player and channel");
             return;
