@@ -66,7 +66,12 @@ public class MessageListener extends ListenerAdapter {
 
         String userID = event.getUser().getId();
         Member member = event.getMember();
-        if (member != null) event.getChannel().sendMessage("```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```").queue();
+
+        if (member != null) {
+            String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
+            event.getChannel().sendMessage(commandText).queue();
+            BotLogger.log(commandText); //TEMPORARY LOG ALL COMMANDS
+        }
 
         // CHECK IF CHANNEL IS MATCHED TO A GAME
         if (!event.getInteraction().getName().equals("help")) { //SKIP /help COMMANDS
