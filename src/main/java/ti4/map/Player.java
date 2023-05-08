@@ -139,8 +139,12 @@ public class Player {
 
     @Nullable @JsonIgnore
     public Role getRoleForCommunity() {
-        if (getRoleIDForCommunity() == null || getRoleIDForCommunity().isEmpty() || getRoleIDForCommunity().isBlank()) return null;
-        return MapGenerator.jda.getRoleById(getRoleIDForCommunity());
+        try {
+            return MapGenerator.jda.getRoleById(getRoleIDForCommunity());
+        } catch (Exception e) {
+            // BotLogger.log("Could not retrieve MainGameChannel for " + getName(), e);
+        }
+        return null;
     }
 
     public String getPrivateChannelID() {
@@ -152,9 +156,13 @@ public class Player {
     }
 
     @Nullable @JsonIgnore
-    public MessageChannel getPrivateChannel() {
-        if (getPrivateChannelID() == null || getPrivateChannelID().isEmpty() || getPrivateChannelID().isBlank()) return null;
-        return MapGenerator.jda.getTextChannelById(getPrivateChannelID());
+    public MessageChannel getPrivateChannel() {      
+        try {
+            return MapGenerator.jda.getTextChannelById(getPrivateChannelID());
+        } catch (Exception e) {
+            // BotLogger.log("Could not retrieve privateChannel for " + getName(), e);
+        }
+        return null;
     }
 
     public String getCardsInfoThreadID() {
