@@ -136,6 +136,13 @@ public class SCPlay extends PlayerSubcommandData {
                 mainGameChannel.sendMessage(messageCreateData).queue();
             }
         }
+        if (scToPlay == 3) { 
+            String assignSpeakerMessage = Helper.getPlayerRepresentation(event, player) + ", please click a faction below to assign Speaker " + Emojis.SpeakerToken;
+            List<Button> drawAgendaButton = new ArrayList<Button>();
+            Button draw2Agenda = Button.success("drawAgenda_2", "Draw 2 agendas into your cards info thread");
+            drawAgendaButton.add(draw2Agenda);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Politics player should click this button after assigning speaker.", drawAgendaButton);
+        }
 
         
         if(player.getFaction().equalsIgnoreCase("winnu")&& scToPlay != 1)
