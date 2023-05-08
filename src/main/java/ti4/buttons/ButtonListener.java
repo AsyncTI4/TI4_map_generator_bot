@@ -1167,24 +1167,24 @@ public class ButtonListener extends ListenerAdapter {
                     String agendaDetails = activeMap.getCurrentAgendaInfo();
                     agendaDetails = agendaDetails.substring(agendaDetails.indexOf("_")+1, agendaDetails.lastIndexOf("_"));
                     List<Button> outcomeActionRow = null;
-                    if(agendaDetails.contains("For"))
+                    if(agendaDetails.contains("For") || agendaDetails.contains("for"))
                     {
                         outcomeActionRow = AgendaHelper.getForAgainstOutcomeButtons(null, "outcome");
                     }
-                    else if(agendaDetails.contains("Player"))
+                    else if(agendaDetails.contains("Player") || agendaDetails.contains("player"))
                     {
                         outcomeActionRow = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, "outcome");
                     }
-                    else if(agendaDetails.contains("Planet"))
+                    else if(agendaDetails.contains("Planet") || agendaDetails.contains("planet"))
                     {
                         voteMessage= "Chose to Vote. Too many planets in the game to represent all as buttons. Click buttons for which player owns the planet you wish to elect.";
                         outcomeActionRow = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, "planetOutcomes");
                     }
-                    else if(agendaDetails.contains("Secret"))
+                    else if(agendaDetails.contains("Secret") || agendaDetails.contains("secret"))
                     {
                         outcomeActionRow = AgendaHelper.getSecretOutcomeButtons(activeMap, null, "outcome");
                     }
-                    else if(agendaDetails.contains("Strategy"))
+                    else if(agendaDetails.contains("Strategy") || agendaDetails.contains("strategy"))
                     {
                         outcomeActionRow = AgendaHelper.getStrategyOutcomeButtons(null, "outcome");
                     }
