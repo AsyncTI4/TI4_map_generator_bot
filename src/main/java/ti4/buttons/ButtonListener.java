@@ -72,7 +72,7 @@ public class ButtonListener extends ListenerAdapter {
             return;
         }
 
-        BotLogger.log(event, ""); //TEMPORARY LOG ALL BUTTONS
+        // BotLogger.log(event, ""); //TEMPORARY LOG ALL BUTTONS
 
         String messageID = event.getMessage().getId();
 
