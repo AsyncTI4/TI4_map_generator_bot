@@ -66,7 +66,6 @@ public class AddTileList implements Command {
                     MessageHelper.replyToMessage(event, "Could not find tile: " + tileID);
                     return;
                 }
-
                 Tile tile = new Tile(tileID, position);
                 AddTile.addCustodianToken(tile);
                 userActiveMap.setTile(tile);
