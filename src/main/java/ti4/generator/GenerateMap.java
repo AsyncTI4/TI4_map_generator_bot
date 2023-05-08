@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.utils.ImageProxy;
 
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import ti4.MapGenerator;
@@ -2228,8 +2229,10 @@ public class GenerateMap {
         return getSCColor(sc);
     }
 
-    private Color getSCColor(int sc) {
-        return switch (sc) {
+    private Color getSCColor(Integer sc) {
+        String scString = sc.toString();
+        Integer scGroup = Integer.parseInt(StringUtils.left(scString, 1));
+        return switch (scGroup) {
             case 1 -> new Color(255, 38, 38);
             case 2 -> new Color(253, 168, 24);
             case 3 -> new Color(247, 237, 28);
