@@ -70,7 +70,7 @@ public class MessageListener extends ListenerAdapter {
         if (member != null) {
             String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
             event.getChannel().sendMessage(commandText).queue();
-            BotLogger.log(commandText); //TEMPORARY LOG ALL COMMANDS
+            // BotLogger.log(commandText); //TEMPORARY LOG ALL COMMANDS
         }
 
         // CHECK IF CHANNEL IS MATCHED TO A GAME
