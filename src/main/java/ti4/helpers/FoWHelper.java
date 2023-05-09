@@ -308,11 +308,11 @@ public class FoWHelper {
 					wormholeIDs.add(Constants.GAMMA);
 				} else if (token.contains(Constants.DELTA)) {
 					wormholeIDs.add(Constants.DELTA);
-				} else if (token.equals(Constants.EPSILON)) { //exact match only
+				} else if (token.contains(Constants.EPSILON)) {
 					wormholeIDs.add(Constants.EPSILON);
-				} else if (token.equals(Constants.ZETA)) { //exact match only
+				} else if (token.contains(Constants.ZETA)) {
 					wormholeIDs.add(Constants.ZETA);
-				} else if (token.equals(Constants.ETA)) { //exact match only
+				} else if (token.contains(Constants.ETA)) {
 					wormholeIDs.add(Constants.ETA);
 				}
 			}
