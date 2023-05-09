@@ -295,9 +295,9 @@ public class MessageHelper {
 		List<MessageCreateData> messageCreateDataList = new ArrayList<>();
 
 		List<String> messageList = splitLargeText(message, 2000);
-		List<List<ActionRow>> partitionedButtons = getPartitionedButtonLists(buttons);
-
 		Iterator<String> messageIterator = messageList.iterator();
+
+		List<List<ActionRow>> partitionedButtons = getPartitionedButtonLists(buttons);
 		Iterator<List<ActionRow>> buttonIterator = partitionedButtons.iterator();
 
 		while (messageIterator.hasNext()) {
