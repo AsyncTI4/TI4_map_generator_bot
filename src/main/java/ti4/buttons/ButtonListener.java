@@ -258,9 +258,15 @@ public class ButtonListener extends ListenerAdapter {
         else if (buttonID.startsWith("exhaust_")) {
             String planetName = buttonID.substring(buttonID.indexOf("_")+1, buttonID.length());
             String votes = buttonLabel.substring(buttonLabel.indexOf("(")+1, buttonLabel.indexOf(")"));
-            if(!buttonID.contains("argent") && !buttonID.contains("blood") && !buttonID.contains("predictive"))
+            if(!buttonID.contains("argent") && !buttonID.contains("blood") && !buttonID.contains("predictive")&& !buttonID.contains("everything"))
             {
                 new PlanetExhaust().doAction(player, planetName, activeMap);
+            }
+            if(buttonID.contains("everything"))
+            {
+                for (String planet : player.getPlanets()) {
+                    player.exhaustPlanet(planet);
+                }
             }
             
             //List<ItemComponent> actionRow = event.getMessage().getActionRows().get(0).getComponents();
@@ -278,25 +284,47 @@ public class ButtonListener extends ListenerAdapter {
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }
-            
             String totalVotesSoFar = event.getMessage().getContentRaw();
-            if(totalVotesSoFar == null || totalVotesSoFar.equalsIgnoreCase(""))
+            if(!buttonID.contains("argent") && !buttonID.contains("blood") && !buttonID.contains("predictive") && !buttonID.contains("everything"))
             {
-                totalVotesSoFar = "Total votes exhausted so far: "+ votes;
+               
+                
+                if(totalVotesSoFar == null || totalVotesSoFar.equalsIgnoreCase(""))
+                {
+                    totalVotesSoFar = "Total votes exhausted so far: "+ votes +"\n Planets exhausted so far are: "+Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, activeMap);
+                }
+                else
+                {
+                    int totalVotes = Integer.parseInt(totalVotesSoFar.substring(totalVotesSoFar.indexOf(":")+2,totalVotesSoFar.indexOf("\n"))) + Integer.parseInt(votes);
+                    totalVotesSoFar = totalVotesSoFar.substring(0, totalVotesSoFar.indexOf(":")+2) + totalVotes + totalVotesSoFar.substring(totalVotesSoFar.indexOf("\n"), totalVotesSoFar.length()) + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, activeMap);
+                }
+                if(actionRow2.size() > 0)
+                {
+                    event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue(); 
+                }
+            // addReaction(event, true, false,"Exhausted "+Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, activeMap) + " as "+ votes + " votes", "");
             }
             else
             {
-                int totalVotes = Integer.parseInt(totalVotesSoFar.substring(totalVotesSoFar.indexOf(":")+2,totalVotesSoFar.length())) + Integer.parseInt(votes);
-                totalVotesSoFar = totalVotesSoFar.substring(0, totalVotesSoFar.indexOf(":")+2) + totalVotes;
-            }
-            if(actionRow2.size() > 0)
-            {
-                event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue(); 
+                if(totalVotesSoFar == null || totalVotesSoFar.equalsIgnoreCase(""))
+                {
+                    totalVotesSoFar = "Total votes exhausted so far: "+ votes +"\n Planets exhausted so far are: all planets";
+                }
+                else
+                {
+                    int totalVotes = Integer.parseInt(totalVotesSoFar.substring(totalVotesSoFar.indexOf(":")+2,totalVotesSoFar.indexOf("\n"))) + Integer.parseInt(votes);
+                    totalVotesSoFar = totalVotesSoFar.substring(0, totalVotesSoFar.indexOf(":")+2) + totalVotes + totalVotesSoFar.substring(totalVotesSoFar.indexOf("\n"), totalVotesSoFar.length());
+                }
+                if(actionRow2.size() > 0)
+                {
+                    event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue(); 
+                }
             }
 
             if(!buttonID.contains("argent") && !buttonID.contains("blood") && !buttonID.contains("predictive"))
             {
-                addReaction(event, true, false,"Exhausted "+planetName + " as "+ votes + " votes", "");
+               // addReaction(event, true, false,"Exhausted "+Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, activeMap) + " as "+ votes + " votes", "");
+               addReaction(event, true, false,"Exhausted all planets for "+ votes + " votes", "");
             }
             else
             {
@@ -580,7 +608,10 @@ public class ButtonListener extends ListenerAdapter {
             String voteMessage= "Chose to vote  "+votes+" votes for "+StringUtils.capitalize(activeMap.getLatestOutcomeVotedFor())+ ". Click buttons to choose which planets to exhaust for votes";
 
             List<Button> voteActionRow = AgendaHelper.getPlanetButtons(event, player, activeMap);
+            int allVotes = AgendaHelper.getVoteTotal(event, player, activeMap)[0];
+            Button exhausteverything = Button.danger("exhaust_everything_"+allVotes, "Exhaust everything ("+allVotes+")");
             Button concludeExhausting = Button.danger("delete_buttons_"+votes, "Done exhausting planets.");
+            voteActionRow.add(exhausteverything);
             voteActionRow.add(concludeExhausting);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,voteActionRow);
 
