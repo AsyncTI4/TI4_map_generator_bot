@@ -1,6 +1,7 @@
 on: workflow_dispatch
 name: RestartBot
-
+concurrency:
+  group: "Start Bot"
 jobs:
   build:
     name: Restart

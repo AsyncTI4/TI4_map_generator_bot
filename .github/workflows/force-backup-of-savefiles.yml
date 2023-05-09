@@ -1,6 +1,7 @@
 on: workflow_dispatch
 name: ForceSaveFileBackup
-
+concurrency:
+  group: "Start Bot"
 jobs:
   build:
     name: Build
