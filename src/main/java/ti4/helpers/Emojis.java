@@ -313,6 +313,7 @@ public class Emojis {
     public static final String Wash = "<a:Wash:1065334637532041298>";
     public static final String winemaking = "<:winemaking:1064244730000584754>";
     public static final String BortWindow = "<:bortwindow:1032312829585399880>";
+    public static final String SpoonAbides = "<:TheSpoonAbides:1003482035953860699>";
     public static final String Absol = "<:Absol:1079473959248068701>";
     public static final String DiscordantStars = "<:DS:1081308924084506706>";
     public static final String AsyncTI4Logo = "<:asyncti4:959703535258333264>";
