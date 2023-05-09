@@ -211,23 +211,25 @@ public class MapGenerator {
         Thread mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
-                public void run() {
-                    try {
-                        mainThread.join();
-                        BotLogger.log("Bot shutting down for reboot");
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    readyToReceiveCommands = false;
-                    MapSaveLoadManager.saveMaps();
-                    BotLogger.log("All maps saved");
-                    try {
-                        BotLogger.log("Shhhhh... going to sleep now");
-                        Thread.sleep(1000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+            public void run() {
+                try {
+                    BotLogger.log("Bot shutting down for reboot");
+                    mainThread.join();
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    BotLogger.log("Exception when bot shutting down for reboot", e);
                 }
-            });
+                MapGenerator.readyToReceiveCommands = false;
+                MapSaveLoadManager.saveMaps();
+                BotLogger.log("All maps saved");
+                try {
+                    BotLogger.log("Shhhhh... going to sleep now");
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                    BotLogger.log("Exception when attempting to sleep!", e);
+                }
+            }
+        });
     }
 }
