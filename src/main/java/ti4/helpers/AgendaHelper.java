@@ -478,11 +478,15 @@ public class AgendaHelper {
         {
             for(int x = 0; x < 6; x++)
             {
-                Player player = votingOrder.get(x);
-                if(player != null && !player.isDummy())
+                if(x < votingOrder.size())
                 {
-                    return player;
+                    Player player = votingOrder.get(x);
+                    if(player != null && !player.isDummy())
+                    {
+                        return player;
+                    }
                 }
+                
             }
             return null;
             

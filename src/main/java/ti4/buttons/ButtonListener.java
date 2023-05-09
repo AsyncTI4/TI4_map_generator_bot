@@ -1557,7 +1557,8 @@ public class ButtonListener extends ListenerAdapter {
                     {
                         break;
                     }
-                    while(voteInfo[0] < 1)
+                    int counter = 0;
+                    while(voteInfo[0] < 1 && counter < 10)
                     {
                         String skippedMessage = realIdentity+"You are being skipped because you either have 0 votes or have ridered";
                         if(map.isFoWMode())
@@ -1571,6 +1572,7 @@ public class ButtonListener extends ListenerAdapter {
                         nextInLine = AgendaHelper.getNextInLine(nextInLine, AgendaHelper.getVotingOrder(map), map);
                         realIdentity =Helper.getPlayerRepresentation(event, nextInLine, true);
                         voteInfo = AgendaHelper.getVoteTotal(event, nextInLine, map);
+                        counter = counter + 1;
                     }
                     
                     message = realIdentity + message;
@@ -1591,18 +1593,6 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
                     }
                 }
-
-
-
-
-
-
-
-
-
-
-
-
 
             }
             case "no_sabotage" -> {
