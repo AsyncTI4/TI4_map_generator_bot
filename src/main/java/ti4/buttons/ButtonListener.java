@@ -321,7 +321,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
 
-            if(!buttonID.contains("argent") && !buttonID.contains("blood") && !buttonID.contains("predictive"))
+            if(buttonID.contains("everything"))
             {
                // addReaction(event, true, false,"Exhausted "+Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, activeMap) + " as "+ votes + " votes", "");
                addReaction(event, true, false,"Exhausted all planets for "+ votes + " votes", "");
