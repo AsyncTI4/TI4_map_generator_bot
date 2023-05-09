@@ -476,7 +476,16 @@ public class AgendaHelper {
         boolean foundPlayer = false;
         if (player1 == null)
         {
-            return votingOrder.get(0);
+            for(int x = 0; x < 6; x++)
+            {
+                Player player = votingOrder.get(x);
+                if(player != null && !player.isDummy())
+                {
+                    return player;
+                }
+            }
+            return null;
+            
         }
         for(Player player2 : votingOrder)
         {
