@@ -733,8 +733,10 @@ public class Helper {
             return "";
         }
         String mention = userById.getAsMention();
-        if (player.getUserID().equals("154000388121559040")) {
+        if (player.getUserID().equals("154000388121559040")) { //mysonisalsonamedbort
             mention += " " + Emojis.BortWindow;
+        } else if (player.getUserID().equals("150809002974904321")) { //tispoon
+            mention += " " + Emojis.SpoonAbides;
         }
         return mention;
     }
