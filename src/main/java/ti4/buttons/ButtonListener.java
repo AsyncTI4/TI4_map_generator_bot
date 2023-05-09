@@ -1135,6 +1135,7 @@ public class ButtonListener extends ListenerAdapter {
 
                     player.setFleetCC(player.getFleetCC()+1);
                 }
+
                 case "decrease_strategy_cc" -> {
                     addReaction(event, false, false, "Decreased Strategy Pool CCs By 1 ("+player.getStrategicCC()+"->"+(player.getStrategicCC()-1)+").", "");
                     player.setStrategicCC(player.getStrategicCC()-1);
@@ -1552,6 +1553,10 @@ public class ButtonListener extends ListenerAdapter {
 
                     int[] voteInfo = AgendaHelper.getVoteTotal(event, nextInLine, map);
 
+                    if(nextInLine == null)
+                    {
+                        break;
+                    }
                     while(voteInfo[0] < 1)
                     {
                         String skippedMessage = realIdentity+"You are being skipped because you either have 0 votes or have ridered";
