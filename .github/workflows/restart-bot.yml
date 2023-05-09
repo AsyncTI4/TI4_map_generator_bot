@@ -1,12 +1,10 @@
-on:
-  push:
-    branches: [ "master" ]
-name: BuildAndDeploy
+on: workflow_dispatch
+name: RestartBot
 concurrency:
   group: "Start Bot"
 jobs:
   build:
-    name: Build
+    name: Restart
     runs-on: ubuntu-latest
     steps:
     - name: executing remote ssh commands using password
@@ -25,7 +23,6 @@ jobs:
           cd /root/ti4bot
           ./scheduled_upload.sh
           cd /root/ti4bot/TI4_map_generator_bot
-          git pull
           echo "Building docker image..."
           docker version
           docker build --build-arg BOT_KEY=$DISCORD_BOT_KEY --build-arg USER=$DISCORD_USER --build-arg SERVER=$DISCORD_SERVER --build-arg SERVER2=$DISCORD_SERVER2 --build-arg AWS_SECRET=$AWS_SECRET --build-arg AWS_KEY=$AWS_KEY -t tibot .
