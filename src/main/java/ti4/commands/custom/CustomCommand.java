@@ -98,9 +98,6 @@ public class CustomCommand implements Command {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         MapSaveLoadManager.saveMap(activeMap, event);
-
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
-        MessageHelper.replyToMessage(event, file);
     }
 
 
@@ -115,6 +112,7 @@ public class CustomCommand implements Command {
         subcommands.add(new ACRemoveFromGame());
         subcommands.add(new SCAddToGame());
         subcommands.add(new SCRemoveFromGame());
+        subcommands.add(new PoRemoveFromGame());
 
         return subcommands;
     }

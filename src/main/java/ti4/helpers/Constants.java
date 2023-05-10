@@ -704,4 +704,5 @@ public class Constants {
     public static final String LIST_ACTION_CARDS = "list_action_cards";
     public static final String LIST_RELICS = "list_relics";
     public static final String LIST_TECHS = "list_techs";
+    public static final String PO_REMOVE_FROM_GAME = "remove_po_from_game";
 }

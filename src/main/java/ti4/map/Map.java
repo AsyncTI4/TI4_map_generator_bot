@@ -985,6 +985,12 @@ public class Map {
         return secretObjectives.remove(id);
     }
 
+    public boolean removePOFromGame(String id) {
+        if (publicObjectives1.remove(id)) return true;
+        if (publicObjectives2.remove(id)) return true;
+        return false;
+    }
+
     public boolean removeACFromGame(String id) {
         return actionCards.remove(id);
     }
