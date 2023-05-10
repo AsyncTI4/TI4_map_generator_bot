@@ -543,6 +543,7 @@ public class ButtonListener extends ListenerAdapter {
             {
                 event.getMessage().delete().queue();
             }
+            MapSaveLoadManager.saveMap(activeMap, event);
             
         }
         else if(buttonID.startsWith("fixerVotes_"))
