@@ -737,6 +737,9 @@ public class Helper {
             mention += " " + Emojis.BortWindow;
         } else if (player.getUserID().equals("150809002974904321")) { //tispoon
             mention += " " + Emojis.SpoonAbides;
+        } else if (player.getUserID().equals("228999251328368640")) { //Jazzx
+            mention += " " + Emojis.Scout;
+
         }
         return mention;
     }
