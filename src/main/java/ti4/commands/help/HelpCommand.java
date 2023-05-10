@@ -104,6 +104,12 @@ public class HelpCommand implements Command {
         subcommands.add(new ListUnits());
         subcommands.add(new ListCommands());
         subcommands.add(new ListMyGames());
+        subcommands.add(new ListAgendas());
+        subcommands.add(new ListSecretObjectives());
+        subcommands.add(new ListPublicObjectives());
+        subcommands.add(new ListRelics());
+        subcommands.add(new ListActionCards());
+        subcommands.add(new ListTechs());
 
         return subcommands;
     }

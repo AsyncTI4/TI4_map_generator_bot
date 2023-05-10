@@ -75,7 +75,7 @@ public class SOInfo extends SOCardsSubcommandData {
         return sb.toString();
     }
 
-    private static String getSecretObjectiveRepresentation(String soID) {
+    public static String getSecretObjectiveRepresentation(String soID) {
         return getSecretObjectiveRepresentation(soID, null);
     }
     private static String getSecretObjectiveRepresentation(String soID, Integer soUniqueID) {
