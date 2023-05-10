@@ -99,6 +99,7 @@ public class GameCommand implements Command {
         subcommands.add(new SetupGameChannels());
         subcommands.add(new GameEnd());
         subcommands.add(new Ping());
+        subcommands.add(new SetUnitCap());
         return subcommands;
     }
 

@@ -534,6 +534,9 @@ public class MapSaveLoadManager {
             }
             writer.write(Constants.CAPTURE + " " + units);
             writer.write(System.lineSeparator());
+         
+            writer.write(Constants.UNIT_CAP + " " + getUnitCapList(player.getUnitCaps()));
+            writer.write(System.lineSeparator());
 
             writer.write(Constants.SO + " " + getSecretList(player.getSecrets()));
             writer.write(System.lineSeparator());
@@ -612,6 +615,14 @@ public class MapSaveLoadManager {
         StringBuilder sb = new StringBuilder();
         for (java.util.Map.Entry<String, Integer> so : secrets.entrySet()) {
             sb.append(so.getKey()).append(",").append(so.getValue()).append(";");
+        }
+        return sb.toString();
+    }
+
+    public static String getUnitCapList(HashMap<String, Integer> unitCaps) {
+        StringBuilder sb = new StringBuilder();
+        for (java.util.Map.Entry<String, Integer> unitCap : unitCaps.entrySet()) {
+            sb.append(unitCap.getKey()).append(",").append(unitCap.getValue()).append(";");
         }
         return sb.toString();
     }
@@ -1439,6 +1450,15 @@ public class MapSaveLoadManager {
                         String id = secretInfo.nextToken();
                         Integer index = Integer.parseInt(secretInfo.nextToken());
                         player.setSecret(id, index);
+                    }
+                }
+                case Constants.UNIT_CAP -> {
+                    StringTokenizer unitcaps = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (unitcaps.hasMoreTokens()) {
+                        StringTokenizer unitcap = new StringTokenizer(unitcaps.nextToken(), ",");
+                        String id = unitcap.nextToken();
+                        Integer cap = Integer.parseInt(unitcap.nextToken());
+                        player.setUnitCap(id, cap);
                     }
                 }
 
