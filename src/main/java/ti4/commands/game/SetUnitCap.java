@@ -24,7 +24,7 @@ public class SetUnitCap extends GameSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
 
-        OptionMapping unitOption = event.getOption(Constants.UNIT_NAMES);
+        OptionMapping unitOption = event.getOption(Constants.UNIT_NAME);
         OptionMapping unitCapOption = event.getOption(Constants.UNIT_CAP);
         
         String unit = unitOption.getAsString();
