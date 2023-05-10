@@ -79,19 +79,25 @@ public class ACInfo extends ACCardsSubcommandData {
                 sb.append("> None");
             } else {
                 for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
-                    String[] acSplit = Mapper.getActionCard(ac.getKey()).split(";");
-                    String acName = acSplit[0];
-                    String acPhase = acSplit[1];
-                    String acWindow = acSplit[2];
-                    String acDescription = acSplit[3];
                     Integer value = ac.getValue();
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
-                    sb.append(Emojis.ActionCard).append("__**" + acName + "**__").append(" *(").append(acPhase).append(" Phase)*: _").append(acWindow).append(":_ ").append(acDescription).append("\n");
+                    sb.append(getActionCardRepresentation(ac.getKey()));
                     index++;
                 }
             }
         }
 
+        return sb.toString();
+    }
+
+    public static String getActionCardRepresentation(String acID) {
+        StringBuilder sb = new StringBuilder();
+        String[] acSplit = Mapper.getActionCard(acID).split(";");
+        String acName = acSplit[0];
+        String acPhase = acSplit[1];
+        String acWindow = acSplit[2];
+        String acDescription = acSplit[3];
+        sb.append(Emojis.ActionCard).append("__**" + acName + "**__").append(" *(").append(acPhase).append(" Phase)*: _").append(acWindow).append(":_ ").append(acDescription).append("\n");
         return sb.toString();
     }
 
