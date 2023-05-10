@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 public class PoRemoveFromGame extends CustomSubcommandData {
     public PoRemoveFromGame() {
-        super(Constants.PO_REMOVE_FROM_GAME, "PO remove from game");
+        super(Constants.REMOVE_PO_FROM_GAME, "PO remove from game");
         addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret ID").setRequired(true).setAutoComplete(true));
     }
 
