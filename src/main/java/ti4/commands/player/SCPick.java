@@ -116,7 +116,7 @@ public class SCPick extends PlayerSubcommandData {
                 players.add(player_);
             }
         }
-
+        
         //INFORM ALL PLAYER HAVE PICKED
         if (allPicked) {
             msgExtra += Helper.getGamePing(event, activeMap) + "\nAll players picked SC";

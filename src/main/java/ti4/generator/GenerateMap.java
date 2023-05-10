@@ -793,8 +793,15 @@ public class GenerateMap {
                 count = 0;
             }
             UnitTokenPosition reinforcementsPosition = PositionMapper.getReinforcementsPosition(unitID);
+            
             if (reinforcementsPosition != null) {
-                int positionCount = reinforcementsPosition.getPositionCount(unitID);
+                int positionCount = player.getUnitCap(unitID);
+                boolean aboveCap = true;
+                if(positionCount == 0)
+                {
+                    positionCount = reinforcementsPosition.getPositionCount(unitID);
+                    aboveCap = false;
+                }
                 int remainingReinforcements = positionCount - count;
                 if (remainingReinforcements > 0) {
                     for (int i = 0; i < remainingReinforcements; i++) {
@@ -805,6 +812,10 @@ public class GenerateMap {
                             graphics.drawImage(image, x + position.x, y + position.y, null);
                         } catch (Exception e) {
                             BotLogger.log("Could not parse unit file for reinforcements: " + unitID, e);
+                        }
+                        if(aboveCap)
+                        {
+                            i = remainingReinforcements;
                         }
                     }
                 }
