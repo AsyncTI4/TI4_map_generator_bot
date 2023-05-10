@@ -66,6 +66,7 @@ public class Player {
 
     private HashMap<String,String> debt_tokens = new HashMap<>();
     private HashMap<String,String> fow_seenTiles = new HashMap<>();
+    private HashMap<String,Integer> unitCaps = new HashMap<>();
     private HashMap<String,String> fow_customLabels = new HashMap<>();
     private String fowFogFilter = null;
     private boolean fogInitialized = false;
@@ -282,6 +283,22 @@ public class Player {
 
     public HashSet<String> getFactionAbilities() {
         return factionAbilities;
+    }
+
+    public int getUnitCap(String unit) {
+        if(unitCaps.get(unit) == null)
+        {
+            return 0;
+        }
+        return unitCaps.get(unit);
+    }
+
+    public HashMap<String, Integer> getUnitCaps() {
+        return unitCaps;
+    }
+
+    public void setUnitCap(String unit, int cap) {
+        unitCaps.put(unit, cap);
     }
 
     public void setFactionAbilities(HashSet<String> factionAbilities) {

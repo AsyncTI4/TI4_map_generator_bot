@@ -39,6 +39,7 @@ public class Constants {
 
 
     public static final String SET_SETTING = "setting";
+    public static final String SET_UNIT_CAP = "set_unit_cap";
     public static final String SETTING_NAME = "setting_name";
     public static final String SETTING_VALUE = "setting_value";
     public static final String SETTING_TYPE = "setting_type";
@@ -74,10 +75,12 @@ public class Constants {
     public static final String HELP_DOCUMENTATION = "documentation";
     public static final String SETUP_TEMPLATES = "setup_templates";
 
+    public static final String UNIT_CAP = "unit_cap";
     public static final String PLANET_NAME = "planet_name";
     public static final String TOKEN = "token";
     public static final String TILE_LIST = "tile_list";
     public static final String UNIT_NAMES = "unit_names";
+    public static final String UNIT_NAME = "unit_name";
     public static final String PRIORITY_NO_DAMAGE = "priority_no_damage";
     public static final String UNIT_NAMES_TO = "unit_names_to";
     public static final String UNIT_NAMES_FROM = "unit_names_from";
