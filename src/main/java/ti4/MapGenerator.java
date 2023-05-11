@@ -207,27 +207,22 @@ public class MapGenerator {
         readyToReceiveCommands = true;
         BotLogger.log("BOT HAS FINISHED LOADING MAPS");
 
-        // Shutdown hook to run when SIGTERM is recieved
+        // Shutdown hook to run when SIGTERM is recieved from docker stop
         Thread mainThread = Thread.currentThread();
         Runtime.getRuntime().addShutdownHook(new Thread() {
             @Override
             public void run() {
                 try {
-                    BotLogger.log("Bot shutting down for reboot");
+                    System.out.println("Shutdown process started");
+                    MapGenerator.readyToReceiveCommands = false;
+                    System.out.println("Bot is no longer accepting commands");
+                    TimeUnit.SECONDS.sleep(5);
+                    MapSaveLoadManager.saveMaps();
+                    System.out.println("Maps have been saved");
+                    System.out.println("Shutdown process complete");
                     mainThread.join();
-                } catch (InterruptedException e) {
+                } catch (Exception e) {
                     e.printStackTrace();
-                    BotLogger.log("Exception when bot shutting down for reboot", e);
-                }
-                MapGenerator.readyToReceiveCommands = false;
-                MapSaveLoadManager.saveMaps();
-                BotLogger.log("All maps saved");
-                try {
-                    BotLogger.log("Shhhhh... going to sleep now");
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                    BotLogger.log("Exception when attempting to sleep!", e);
                 }
             }
         });
