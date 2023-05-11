@@ -225,9 +225,18 @@ public class MessageListener extends ListenerAdapter {
         if (msg.getContentRaw().contains("used /fow whisper")) {
             msg.delete().queue();
         }
+
         if (msg.getContentRaw().toLowerCase().startsWith("tored") || msg.getContentRaw().toLowerCase().startsWith("topurple")
         || msg.getContentRaw().toLowerCase().startsWith("toblue") || msg.getContentRaw().toLowerCase().startsWith("toyellow") 
-        || msg.getContentRaw().toLowerCase().startsWith("toorange") || msg.getContentRaw().toLowerCase().startsWith("togreen")) {
+        || msg.getContentRaw().toLowerCase().startsWith("toorange") || msg.getContentRaw().toLowerCase().startsWith("togreen") || msg.getContentRaw().toLowerCase().startsWith("tosunset")
+        || msg.getContentRaw().toLowerCase().startsWith("tobloodred") || msg.getContentRaw().toLowerCase().startsWith("tospring") 
+        || msg.getContentRaw().toLowerCase().startsWith("togray") || msg.getContentRaw().toLowerCase().startsWith("tochocolate") || msg.getContentRaw().toLowerCase().startsWith("tochrome")
+        || msg.getContentRaw().toLowerCase().startsWith("togold") || msg.getContentRaw().toLowerCase().startsWith("tonavy") 
+        || msg.getContentRaw().toLowerCase().startsWith("tolightgray") || msg.getContentRaw().toLowerCase().startsWith("toteal") || msg.getContentRaw().toLowerCase().startsWith("toforest")
+        || msg.getContentRaw().toLowerCase().startsWith("torose") || msg.getContentRaw().toLowerCase().startsWith("toturquoise") 
+        || msg.getContentRaw().toLowerCase().startsWith("tolime") || msg.getContentRaw().toLowerCase().startsWith("toemerald") || msg.getContentRaw().toLowerCase().startsWith("topetrol")
+        || msg.getContentRaw().toLowerCase().startsWith("tobrown") || msg.getContentRaw().toLowerCase().startsWith("totan") 
+        || msg.getContentRaw().toLowerCase().startsWith("toblack") || msg.getContentRaw().toLowerCase().startsWith("topink")) {
             
             String gameName = event.getChannel().getName();
 			gameName = gameName.substring(0, gameName.indexOf("-"));

@@ -1039,6 +1039,14 @@ public class Map {
         this.publicObjectives2 = publicObjectives2;
     }
 
+    public void removePublicObjective1(String key) {
+        publicObjectives1.remove(key);
+    }
+
+    public void removePublicObjective2(String key) {
+        publicObjectives2.remove(key);
+    }
+
     public ArrayList<String> getSoToPoList() {
         return soToPoList;
     }

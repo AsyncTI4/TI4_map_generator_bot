@@ -86,7 +86,7 @@ public class GameCommand implements Command {
     private Collection<GameSubcommandData> getSubcommands() {
         Collection<GameSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new Info());
-        subcommands.add(new SetStatus());
+        //subcommands.add(new SetStatus());
         subcommands.add(new Join());
         subcommands.add(new Leave());
         subcommands.add(new Add());
@@ -100,6 +100,7 @@ public class GameCommand implements Command {
         subcommands.add(new GameEnd());
         subcommands.add(new Ping());
         subcommands.add(new SetUnitCap());
+        subcommands.add(new ChangeToBaseGame());
         return subcommands;
     }
 

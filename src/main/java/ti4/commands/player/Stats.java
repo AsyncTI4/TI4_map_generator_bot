@@ -247,7 +247,7 @@ public class Stats extends PlayerSubcommandData {
 				return false;
 			}
 			if (activeMap.isMapOpen() && !activeMap.isCommunityMode()) {
-				activeMap.setMapStatus(MapStatus.locked);
+				activeMap.setMapStatus(MapStatus.open);
 			}
 			int scNumber = optionSC.getAsInt();
 			LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();

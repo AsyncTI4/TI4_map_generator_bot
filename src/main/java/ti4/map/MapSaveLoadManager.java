@@ -809,7 +809,8 @@ public class MapSaveLoadManager {
                     if (ENDMAPINFO.equals(data)) {
                         break;
                     }
-                    map.setMapStatus(MapStatus.valueOf(data));
+                   // map.setMapStatus(MapStatus.valueOf(data));
+                    map.setMapStatus(MapStatus.open);
 
                     while (myReader.hasNextLine()) {
                         data = myReader.nextLine();
