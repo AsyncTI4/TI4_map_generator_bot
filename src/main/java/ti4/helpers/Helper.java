@@ -1530,6 +1530,115 @@ public class Helper {
         return values;
     }
 
+    public static void removePoKComponents(Map activeMap, String codex)
+    {
+
+         //removing POK ACs
+         activeMap.removeACFromGame("divert_funding");
+         activeMap.removeACFromGame("nav_suite");
+         activeMap.removeACFromGame("refit");
+         activeMap.removeACFromGame("rout");
+         activeMap.removeACFromGame("dp1");
+         activeMap.removeACFromGame("dp2");
+         activeMap.removeACFromGame("dp3");
+         activeMap.removeACFromGame("dp4");
+         activeMap.removeACFromGame("scuttle");
+         activeMap.removeACFromGame("reveal_prototype");
+         activeMap.removeACFromGame("reverse_engineer");
+         activeMap.removeACFromGame("seize");
+         activeMap.removeACFromGame("waylay");
+         activeMap.removeACFromGame("probe");
+         activeMap.removeACFromGame("investments");
+         activeMap.removeACFromGame("arch_expedition");
+         activeMap.removeACFromGame("coup");
+         activeMap.removeACFromGame("confounding");
+         activeMap.removeACFromGame("deadly_plot");
+         activeMap.removeACFromGame("decoy");
+         
+ 
+         if(codex != null && codex.equalsIgnoreCase("y"))
+         {
+             //removing codex ACs
+             activeMap.removeACFromGame("war_machine1");
+             activeMap.removeACFromGame("war_machine2");
+             activeMap.removeACFromGame("war_machine3");
+             activeMap.removeACFromGame("war_machine4");
+             activeMap.removeACFromGame("plagiarize");
+             activeMap.removeACFromGame("solar_flare");
+             activeMap.removeACFromGame("scramble");
+             activeMap.removeACFromGame("ghost_squad");
+             activeMap.removeACFromGame("sanction");
+             activeMap.removeACFromGame("reflective");
+             activeMap.removeACFromGame("rally");
+             activeMap.removeACFromGame("master_plan");
+             activeMap.removeACFromGame("insider");
+             activeMap.removeACFromGame("impersonation");
+             activeMap.removeACFromGame("counterstroke");
+             activeMap.removeACFromGame("harness");
+             activeMap.removeACFromGame("hack");
+             activeMap.removeACFromGame("fsb");
+             activeMap.removeACFromGame("f_conscription");
+             activeMap.removeACFromGame("blitz");
+         }
+
+         //removing SOs
+         activeMap.removeSOFromGame("sb");
+         activeMap.removeSOFromGame("syc");
+         activeMap.removeSOFromGame("sai");
+         activeMap.removeSOFromGame("pe");
+         activeMap.removeSOFromGame("pem");
+         activeMap.removeSOFromGame("otf");
+         activeMap.removeSOFromGame("mtm");
+         activeMap.removeSOFromGame("hrm");
+         activeMap.removeSOFromGame("fc");
+         activeMap.removeSOFromGame("fwp");
+         activeMap.removeSOFromGame("eh");
+         activeMap.removeSOFromGame("dtd");
+         activeMap.removeSOFromGame("dp");
+         activeMap.removeSOFromGame("dhw");
+         activeMap.removeSOFromGame("dyp");
+         activeMap.removeSOFromGame("dhat");
+         activeMap.removeSOFromGame("dts");
+         activeMap.removeSOFromGame("btv");
+         activeMap.removeSOFromGame("baf");
+         activeMap.removeSOFromGame("bam");
+ 
+         //agendas
+         activeMap.removeAgendaFromGame("minister_antiquities");
+         activeMap.removeAgendaFromGame("rearmament");
+         activeMap.removeAgendaFromGame("articles_war");
+         activeMap.removeAgendaFromGame("nexus");
+ 
+         //stage 1s
+         activeMap.removePublicObjective1("amass_wealth");
+         activeMap.removePublicObjective1("build_defenses");
+         activeMap.removePublicObjective1("lost_outposts");
+         activeMap.removePublicObjective1("engineer_marvel");
+         activeMap.removePublicObjective1("deep_space");
+         activeMap.removePublicObjective1("infrastructure");
+         activeMap.removePublicObjective1("make_history");
+         activeMap.removePublicObjective1("outer_rim");
+         activeMap.removePublicObjective1("push_boundaries");
+         activeMap.removePublicObjective1("raise_fleet");
+ 
+         //stage 2s
+         activeMap.removePublicObjective2("supremacy");
+         activeMap.removePublicObjective2("become_legend");
+         activeMap.removePublicObjective2("command_armada");
+         activeMap.removePublicObjective2("massive_cities");
+         activeMap.removePublicObjective2("control_borderlands");
+         activeMap.removePublicObjective2("vast_reserves");
+         activeMap.removePublicObjective2("vast_territories");
+         activeMap.removePublicObjective2("protect_border");
+         activeMap.removePublicObjective2("ancient_monuments");
+         activeMap.removePublicObjective2("distant_lands");
+
+
+
+
+
+    }
+
     /**
      * @param commaSeparatedString
      * @return Set of Strings (no duplicates)

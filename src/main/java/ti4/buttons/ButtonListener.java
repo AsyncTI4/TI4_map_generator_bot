@@ -906,6 +906,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "flip_agenda" -> {
                     new RevealAgenda().revealAgenda(event, false, activeMap, event.getChannel());
+                    event.getMessage().delete().queue();
                 }
                 case "hack_election" -> {
                     activeMap.setHackElectionStatus(true);
@@ -1203,7 +1204,15 @@ public class ButtonListener extends ListenerAdapter {
                     addReaction(event, false, false, "Declined Explore", "");
                 }
                 case "confirm_cc" -> {
-                    addReaction(event, true, false, "Confirmed CCs: "+player.getTacticalCC()+"/"+player.getFleetCC()+"/"+player.getStrategicCC(), "");
+                    if(player.getMahactCC().size() > 0)
+                    {
+                        addReaction(event, true, false, "Confirmed CCs: "+player.getTacticalCC()+"/"+player.getFleetCC()+"(+"+player.getMahactCC().size()+")/"+player.getStrategicCC(), "");
+                    }
+                    else
+                    {
+                        addReaction(event, true, false, "Confirmed CCs: "+player.getTacticalCC()+"/"+player.getFleetCC()+"/"+player.getStrategicCC(), "");
+
+                    }
                 }
                 case "draw_1_AC" -> {
                     activeMap.drawActionCard(player.getUserID());
@@ -1642,6 +1651,9 @@ public class ButtonListener extends ListenerAdapter {
                 if(map.isCustodiansScored())
                 {
                     new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
+                    Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
+                    List<Button> buttons = List.of(flipAgenda);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now", buttons);
                 }
                 else
                 {
