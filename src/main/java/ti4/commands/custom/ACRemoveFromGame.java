@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 public class ACRemoveFromGame extends CustomSubcommandData {
     public ACRemoveFromGame() {
-        super(Constants.AC_REMOVE_FROM_GAME, "AC remove from game");
+        super(Constants.REMOVE_AC_FROM_GAME, "AC remove from game");
         addOptions(new OptionData(OptionType.STRING, Constants.AC_ID, "AC ID").setRequired(true).setAutoComplete(true));
     }
 
