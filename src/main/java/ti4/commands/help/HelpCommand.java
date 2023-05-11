@@ -110,6 +110,7 @@ public class HelpCommand implements Command {
         subcommands.add(new ListRelics());
         subcommands.add(new ListActionCards());
         subcommands.add(new ListTechs());
+        subcommands.add(new ListLeaders());
 
         return subcommands;
     }
