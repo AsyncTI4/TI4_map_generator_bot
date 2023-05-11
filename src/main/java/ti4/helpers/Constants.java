@@ -210,11 +210,21 @@ public class Constants {
     public static final String FACTION_COUNT = "faction_count";
     public static final String ANOMALIES_CAN_TOUCH = "anomalies_can_touch";
 
-
+    // /custom command
     public static final String CUSTOM = "custom";
-    public static final String SO_REMOVE_FROM_GAME = "so_remove_from_game";
-    public static final String AGENDA_REMOVE_FROM_GAME = "agenda_remove_from_game";
-    public static final String AC_REMOVE_FROM_GAME = "ac_remove_from_game";
+
+    public static final String ADD_AGENDA_TO_GAME = "add_agenda_from_game";
+    public static final String ADD_AC_TO_GAME = "add_ac_to_game";
+    public static final String ADD_SO_TO_GAME = "add_so_to_game";
+    public static final String ADD_PO_TO_GAME = "add_po_to_game";
+    public static final String ADD_SC_TO_GAME = "add_sc_to_game";
+
+    public static final String REMOVE_AGENDA_FROM_GAME = "remove_agenda_from_game";
+    public static final String REMOVE_AC_FROM_GAME = "remove_ac_from_game";
+    public static final String REMOVE_SO_FROM_GAME = "remove_so_from_game";
+    public static final String REMOVE_PO_FROM_GAME = "remove_po_from_game";
+    public static final String REMOVE_SC_FROM_GAME = "remove_sc_from_game";
+
     public static final String SO_ID = "so_id";
     public static final String AGENDA_ID = "agenda_id";
     public static final String CURRENT_AGENDA_INFO = "current_agenda_info";
@@ -696,8 +706,6 @@ public class Constants {
     public static final String GARDEN_WORLDS = "garden_worlds";
     public static final String GARDEN_WORLDS_PNG = "attachment_garden_worlds.png";
     public static final String CREUSS_TOKEN_NAME = "creuss_token_name";
-    public static final String ADD_SC_TO_GAME = "add_sc_to_game";
-    public static final String REMOVE_SC_FROM_GAME = "remove_sc_from_game";
     public static final String LIST_AGENDAS = "list_agendas";
     public static final String LIST_SECRET_OBJECTIVES = "list_secret_objectives";
     public static final String LIST_PUBLIC_OBJECTIVES = "list_public_objectives";

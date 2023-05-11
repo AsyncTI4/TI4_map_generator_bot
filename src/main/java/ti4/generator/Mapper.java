@@ -12,6 +12,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -609,6 +610,9 @@ public class Mapper {
         return AliasHandler.getPlanetKeyList().contains(id);
     }
 
+    public static Map<String, String> getPublicObjectives() {
+        return Stream.of(getPublicObjectivesState1(), getPublicObjectivesState2()).flatMap(m -> m.entrySet().stream()).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+    }
 
     public static HashMap<String, String> getPublicObjectivesState1() {
         return getPublicObjectives("1");
