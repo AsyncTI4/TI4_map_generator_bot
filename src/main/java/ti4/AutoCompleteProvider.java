@@ -437,7 +437,7 @@ public class AutoCompleteProvider {
                 }
                 event.replyChoice(latestCommand, Constants.LATEST_COMMAND).queue();
             }
-            case Constants.TILE_NAME, Constants.TILE_NAME_TO, Constants.HS_TILE_POSITION -> {
+            case Constants.TILE_NAME, Constants.TILE_NAME_FROM, Constants.TILE_NAME_TO, Constants.HS_TILE_POSITION -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 if (activeMap == null) {
                     event.replyChoiceStrings("No Active Map for this Channel").queue();
