@@ -379,10 +379,10 @@ public class AutoCompleteProvider {
             }
             case Constants.CREUSS_TOKEN_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue();
-                List<Command.Choice> options = Stream.of("creussalpha", "creussbeta", "creussgamma")
+                List<Command.Choice> options = Stream.of("alpha", "beta", "gamma")
                         .filter(value -> value.contains(enteredValue))
                         .limit(25)
-                        .map(value -> new Command.Choice(value, value))
+                        .map(value -> new Command.Choice(value, "creuss" + value))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
