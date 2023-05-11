@@ -45,6 +45,7 @@ import ti4.message.BotLogger;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.login.LoginException;
 
@@ -208,5 +209,24 @@ public class MapGenerator {
         readyToReceiveCommands = true;
         BotLogger.log("BOT HAS FINISHED LOADING MAPS");
 
+        // Shutdown hook to run when SIGTERM is recieved from docker stop
+        Thread mainThread = Thread.currentThread();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                try {
+                    System.out.println("Shutdown process started");
+                    MapGenerator.readyToReceiveCommands = false;
+                    System.out.println("Bot is no longer accepting commands");
+                    TimeUnit.SECONDS.sleep(5);
+                    MapSaveLoadManager.saveMaps();
+                    System.out.println("Maps have been saved");
+                    System.out.println("Shutdown process complete");
+                    mainThread.join();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }
