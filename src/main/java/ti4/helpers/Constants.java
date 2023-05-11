@@ -81,6 +81,8 @@ public class Constants {
     public static final String TILE_LIST = "tile_list";
     public static final String UNIT_NAMES = "unit_names";
     public static final String UNIT_NAME = "unit_name";
+    public static final String CHANGE_TO_BASE_GAME = "change_to_base_game";
+    public static final String REMOVE_CODEX_AC = "remove_codex_ac";
     public static final String PRIORITY_NO_DAMAGE = "priority_no_damage";
     public static final String UNIT_NAMES_TO = "unit_names_to";
     public static final String UNIT_NAMES_FROM = "unit_names_from";

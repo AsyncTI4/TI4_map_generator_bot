@@ -23,19 +23,11 @@ public class SetUnitCap extends GameSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-
-        OptionMapping unitOption = event.getOption(Constants.UNIT_NAME);
-        OptionMapping unitCapOption = event.getOption(Constants.UNIT_CAP);
-        
-        String unit = unitOption.getAsString();
-        int unitCap = unitCapOption.getAsInt();
+        String unit =event.getOption(Constants.UNIT_NAME).getAsString();
+        int unitCap = event.getOption(Constants.UNIT_CAP).getAsInt();
         if(unitCap > 14)
         {
             unitCap = 14;
-        }
-        if(unitCap < 0)
-        {
-            unitCap = 0;
         }
         Player player = Helper.getPlayer(activeMap, null, event);
         String unitID = AliasHandler.resolveUnit(unit);
