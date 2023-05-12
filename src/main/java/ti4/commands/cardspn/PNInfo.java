@@ -15,6 +15,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 public class PNInfo extends PNCardsSubcommandData {
@@ -119,7 +120,13 @@ public class PNInfo extends PNCardsSubcommandData {
 
     private static String getPromissoryNoteRepresentation(String pnID, Integer pnUniqueID, boolean longFormat) {
         StringBuilder sb = new StringBuilder();
-        String[] pnSplit = Mapper.getPromissoryNote(pnID, true).split(";");
+        String pnRawText = Mapper.getPromissoryNote(pnID, true);
+        if (pnRawText == null || pnRawText.isEmpty()) {
+            String error = "Could not find representation for PN ID: " + pnID;
+            BotLogger.log(error);
+            return error;
+        }
+        String[] pnSplit = pnRawText.split(";");
         //#Columns:  Name ; colour/faction ; Text
         String pnName = pnSplit[0];
         String pnFactionOrColour = pnSplit[1];
