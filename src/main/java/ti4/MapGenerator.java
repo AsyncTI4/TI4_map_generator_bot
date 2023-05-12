@@ -39,9 +39,11 @@ import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.GlobalSettings;
+import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -215,14 +217,15 @@ public class MapGenerator {
             @Override
             public void run() {
                 try {
-                    System.out.println("Shutdown process started");
+                    MessageHelper.sendMessageToBotLogWebhook("SHUTDOWN PROCESS STARTED");
                     MapGenerator.readyToReceiveCommands = false;
-                    System.out.println("Bot is no longer accepting commands");
+                    MessageHelper.sendMessageToBotLogWebhook("BOT IS NO LONGER ACCEPTING COMMANDS");
                     TimeUnit.SECONDS.sleep(5);
                     MapSaveLoadManager.saveMaps();
-                    System.out.println("Maps have been saved");
-                    System.out.println("Shutdown process complete");
+                    MessageHelper.sendMessageToBotLogWebhook("MAPS HAVE BEEN SAVED");
+                    MessageHelper.sendMessageToBotLogWebhook("SHUTDOWN PROCESS COMPLETE");
                     mainThread.join();
+                    //
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
