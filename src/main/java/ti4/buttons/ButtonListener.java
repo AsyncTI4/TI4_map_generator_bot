@@ -192,7 +192,6 @@ public class ButtonListener extends ListenerAdapter {
             {
                 new RevealStage1().revealS1(event, event.getChannel());
             }
-            String message2 = "Resolve status homework using the buttons. Only the Pass on [abilities] button is essential to hit, all others are optional. ";   
             Button draw1AC = Button.success("draw_1_AC", "Draw 1 AC");
             Button confirmCCs = Button.primary("confirm_cc", "Confirm Your CC Update is Complete & Final");
             Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
@@ -211,8 +210,37 @@ public class ButtonListener extends ListenerAdapter {
             {
                 passOnAbilities = Button.danger("pass_on_abilities", "Pass on Pol. Stability/Summit/Man. Investments");
             }
-            List<Button> buttons = List.of(draw1AC, getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat, confirmCCs, passOnAbilities);
+            List<Button> buttons = null;
+            String message2 = null;   
+
+            if(activeMap.isFoWMode())
+            {
+                buttons = List.of(draw1AC, getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat);
+                message2 = "Resolve status homework using the buttons";
+                for(Player p1 : activeMap.getPlayers().values())
+                {
+                    if(p1 == null || p1.isDummy() || p1.getFaction() == null || p1.getPrivateChannel() == null)
+                    {
+                        continue;
+                    }
+                    else
+                    {
+                        MessageHelper.sendMessageToChannelWithButtons(p1.getPrivateChannel(), message2, buttons);
+
+                    }
+                }
+                buttons = List.of(confirmCCs, passOnAbilities);
+            }
+            else
+            {
+
+                buttons = List.of(draw1AC, getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat, confirmCCs, passOnAbilities);
+            }
+            message2 = "Resolve status homework using the buttons. Only the Pass on [abilities] button is essential to hit, all others are optional. ";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+            event.getMessage().delete().queue();
+
+           
         } else if (buttonID.startsWith("sc_follow_") && (!buttonID.contains("leadership")) && (!buttonID.contains("trade"))) {
             boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
             if (!used) {
@@ -911,6 +939,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "flip_agenda" -> {
                     new RevealAgenda().revealAgenda(event, false, activeMap, event.getChannel());
                     event.getMessage().delete().queue();
+                    
                 }
                 case "hack_election" -> {
                     activeMap.setHackElectionStatus(true);
@@ -1330,6 +1359,23 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "run_status_cleanup" -> {
                     new Cleanup().runStatusCleanup(activeMap);
+                    List<ActionRow> actionRow2 = new ArrayList<>();
+                    for(ActionRow row : event.getMessage().getActionRows())
+                    {
+                        List<ItemComponent> buttonRow = row.getComponents();
+                        int buttonIndex = buttonRow.indexOf(event.getButton());
+                        if(buttonIndex>-1)
+                        {
+                            buttonRow.remove(buttonIndex); 
+                        }
+                        if(buttonRow.size() > 0)
+                        {
+                            actionRow2.add(ActionRow.of(buttonRow));
+                        }
+                    }
+                    String message3 = event.getMessage().getContentRaw();
+                    event.getMessage().editMessage(message3).setComponents(actionRow2).queue(); 
+
                     addReaction(event, false, true, "Running Status Cleanup. ", "Status Cleanup Run!");
                     
                 }
@@ -1654,7 +1700,7 @@ public class ButtonListener extends ListenerAdapter {
             case "pass_on_abilities"-> {
                 if(map.isCustodiansScored())
                 {
-                    new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
+                    //new RevealAgenda().revealAgenda(event, false, map, event.getChannel());
                     Button flipAgenda = Button.primary("flip_agenda", "Press this to flip agenda");
                     List<Button> buttons = List.of(flipAgenda);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now", buttons);
