@@ -36,7 +36,13 @@ public class AgendaHelper {
             for(int x = 10; x < voteTotal+10; x += 10)
             {
                 int y = x-9;
-                Button button = Button.secondary("fixerVotes_"+x, y+"-"+x);
+                int z = x;
+                if(x > voteTotal)
+                {
+                    z = voteTotal;
+                    y = z-9;
+                }
+                Button button = Button.secondary("fixerVotes_"+z, y+"-"+z);
                 voteButtons.add(button);
             }
         }
@@ -546,6 +552,17 @@ public class AgendaHelper {
         return planetButtons;
     }
 
+
+    public static List<Button> getPlanetRefreshButtons(GenericInteractionCreateEvent event, Player player, Map map) {
+        List<Button> planetButtons = new ArrayList<>();
+        List<String> planets = new ArrayList<>(player.getExhaustedPlanets());
+        for (String planet : planets) {
+            Button button = Button.success("refresh_"+planet, StringUtils.capitalize(planet) + "("+ Helper.getPlanetResources(planet, map)+"/"+Helper.getPlanetInfluence(planet, map) + ")");
+            planetButtons.add(button);     
+        }
+        
+        return planetButtons;
+    }
 
     public static String getSummaryOfVotes(Map activeMap, boolean capitalize)
     {

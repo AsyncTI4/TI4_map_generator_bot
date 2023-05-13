@@ -68,6 +68,11 @@ public class MessageHelper {
 			}
 			else
 			{
+				if(activeMap.getLatestOutcomeVotedFor() != null && activeMap.getLatestOutcomeVotedFor() != "")
+				{	
+					activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestOutcomeVotedFor()).queue();
+				}
+				activeMap.setLatestOutcomeVotedFor(msg.getId());
 				players = new StringTokenizer(activeMap.getPlayersWhoHitPersistentNoAfter(), "_");
 			}
 			while (players.hasMoreTokens()) {
@@ -75,6 +80,8 @@ public class MessageHelper {
 				Player player_ = Helper.getPlayerFromColorOrFaction(activeMap, player);
 				addFactionReactToMessage(activeMap, player_, msg);
 			}
+			
+			
 		};	
 		
 		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
