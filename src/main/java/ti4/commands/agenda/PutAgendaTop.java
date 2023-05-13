@@ -37,7 +37,11 @@ public class PutAgendaTop extends AgendaSubcommandData {
             }
 
         } else {
-            MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "No Agenda ID found");
+            if(!activeMap.isFoWMode())
+            {
+                MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "No Agenda ID found");
+            }
+            
         }
     }
     @Override

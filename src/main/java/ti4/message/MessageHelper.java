@@ -1,6 +1,7 @@
 package ti4.message;
 
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.Message.Interaction;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -294,34 +295,61 @@ public class MessageHelper {
     public static List<MessageCreateData> getMessageCreateDataObjects(String message, List<Button> buttons) {
 		List<MessageCreateData> messageCreateDataList = new ArrayList<>();
 
-		//ADD MESSAGES
-		if (message != null && !message.isEmpty()) {
-			for (String text : splitLargeText(message, 2000)) {
-				messageCreateDataList.add(new MessageCreateBuilder()
-						.addContent(text).build());
+		List<String> messageList = splitLargeText(message, 2000);
+		Iterator<String> messageIterator = messageList.iterator();
+
+		List<List<ActionRow>> partitionedButtons = getPartitionedButtonLists(buttons);
+		Iterator<List<ActionRow>> buttonIterator = partitionedButtons.iterator();
+
+		while (messageIterator.hasNext()) {
+			String smallMessage = messageIterator.next();
+
+			//More messages exists, so just frontload the plain messages
+			if (messageIterator.hasNext() && smallMessage != null && !smallMessage.isEmpty()) {
+				messageCreateDataList.add(new MessageCreateBuilder().addContent(smallMessage).build());
+
+			//We are at the last message, so try and add the first row of buttons
+			} else if (!messageIterator.hasNext() && smallMessage != null && !smallMessage.isEmpty()) {
+				MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
+				messageCreateBuilder.addContent(smallMessage);
+
+				//add first row of buttons if it exists
+				if (buttonIterator.hasNext()) {
+					List<ActionRow> actionRows = buttonIterator.next();
+					if (actionRows != null && !actionRows.isEmpty()) {
+						messageCreateBuilder.addComponents(actionRows);
+					}
+				}
+				messageCreateDataList.add(messageCreateBuilder.build());
 			}
 		}
 
-		//ADD BUTTONS
-        if (buttons != null && !buttons.isEmpty()) {
-			try {
-				buttons.removeIf(Objects::isNull);
-			} catch (Exception e) {
-				//Do nothing
-			}
-			List<List<Button>> partitions = ListUtils.partition(buttons, 5);
-			List<ActionRow> buttonRows = new ArrayList<>();
-			for (List<Button> partition : partitions) {
-				buttonRows.add(ActionRow.of(partition));
-			}
-			List<List<ActionRow>> partitionedButtonRows = ListUtils.partition(buttonRows, 5);
-			for (List<ActionRow> partitionActionRow : partitionedButtonRows) {
-				messageCreateDataList.add(new MessageCreateBuilder()
-						.addComponents(partitionActionRow).build());
+		//ADD REMAINING BUTTONS IF THEY EXIST
+		while (buttonIterator.hasNext()) {
+			List<ActionRow> actionRows = buttonIterator.next();
+			if (actionRows != null && !actionRows.isEmpty()) {
+				messageCreateDataList.add(new MessageCreateBuilder().addComponents(actionRows).build());
 			}
 		}
         return messageCreateDataList;
     }
+
+	private static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
+		List<List<ActionRow>> partitionedButtonRows = new ArrayList<>();
+		if (buttons == null || buttons.isEmpty()) return partitionedButtonRows;
+		try {
+			buttons.removeIf(Objects::isNull);
+		} catch (Exception e) {
+			//Do nothing
+		}
+		List<List<Button>> partitions = ListUtils.partition(buttons, 5);
+		List<ActionRow> buttonRows = new ArrayList<>();
+		for (List<Button> partition : partitions) {
+			buttonRows.add(ActionRow.of(partition));
+		}
+		partitionedButtonRows = ListUtils.partition(buttonRows, 5);
+		return partitionedButtonRows;
+	}
 
     public static void sendMessageToThread(MessageChannelUnion channel, String threadName, String messageToSend) {
 		if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty() || messageToSend.isEmpty()) return;
