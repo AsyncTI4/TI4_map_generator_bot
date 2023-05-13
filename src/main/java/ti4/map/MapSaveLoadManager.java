@@ -297,7 +297,7 @@ public class MapSaveLoadManager {
         HashMap<String, String> agendaVoteInfo = map.getCurrentAgendaVotes();
         StringBuilder sb2 = new StringBuilder();
         for (java.util.Map.Entry<String, String> entry : agendaVoteInfo.entrySet()) {
-            sb2.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
+            sb2.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
         }
         writer.write(Constants.AGENDA_VOTE_INFO + " " + sb2);
         writer.write(System.lineSeparator());
@@ -1122,7 +1122,7 @@ public class MapSaveLoadManager {
                     }                    
                 }
                 case Constants.AGENDA_VOTE_INFO -> {
-                    StringTokenizer vote_info = new StringTokenizer(info, ";");
+                    StringTokenizer vote_info = new StringTokenizer(info, ":");
                     while (vote_info.hasMoreTokens()) {
                         StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
                         String outcome = null;
