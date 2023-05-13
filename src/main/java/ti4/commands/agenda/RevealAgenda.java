@@ -61,6 +61,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         activeMap.resetCurrentAgendaVotes();
         activeMap.setHackElectionStatus(false);
         activeMap.setPlayersWhoHitPersistentNoAfter("");
+        activeMap.setLatestOutcomeVotedFor("");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getAgendaRepresentation(id, uniqueID));
         String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you will **Play a When** or **Play an After** or not by pressing the buttons below:";
 
