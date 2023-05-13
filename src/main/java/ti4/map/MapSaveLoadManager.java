@@ -1139,8 +1139,10 @@ public class MapSaveLoadManager {
                     }                    
                 }
                 case Constants.GAME_CUSTOM_NAME -> map.setCustomName(info);
-                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER -> map.setPlayersWhoHitPersistentNoAfter(info);
-                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN -> map.setPlayersWhoHitPersistentNoAfter(info);
+                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER -> {
+                    map.setPlayersWhoHitPersistentNoAfter(info);
+                }
+                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN -> map.setPlayersWhoHitPersistentNoWhen(info);
                 case Constants.TABLE_TALK_CHANNEL ->  map.setTableTalkChannelID(info);
                 case Constants.MAIN_GAME_CHANNEL -> map.setMainGameChannelID(info);
                 case Constants.BOT_MAP_CHANNEL -> map.setBotMapUpdatesThreadID(info);

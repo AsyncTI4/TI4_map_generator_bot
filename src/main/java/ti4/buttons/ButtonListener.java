@@ -319,17 +319,18 @@ public class ButtonListener extends ListenerAdapter {
                 {
                     event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue(); 
                 }
+                if(buttonID.contains("everything"))
+                {
+                // addReaction(event, true, false,"Exhausted "+Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, activeMap) + " as "+ votes + " votes", "");
+                addReaction(event, true, false,"Exhausted all planets for "+ votes + " votes", "");
+                }
+                else
+                {
+                    addReaction(event, true, false,"Used ability for "+ votes + " votes", "");
+                }
             }
 
-            if(buttonID.contains("everything"))
-            {
-               // addReaction(event, true, false,"Exhausted "+Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, activeMap) + " as "+ votes + " votes", "");
-               addReaction(event, true, false,"Exhausted all planets for "+ votes + " votes", "");
-            }
-            else
-            {
-                addReaction(event, true, false,"Used ability for "+ votes + " votes", "");
-            }
+            
         }
         else if (buttonID.startsWith("delete_buttons_"))
         {
@@ -614,7 +615,10 @@ public class ButtonListener extends ListenerAdapter {
             Button concludeExhausting = Button.danger("delete_buttons_"+votes, "Done exhausting planets.");
             voteActionRow.add(exhausteverything);
             voteActionRow.add(concludeExhausting);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,voteActionRow);
+            String voteMessage2 = "";
+            MessageHelper.sendMessageToChannel(event.getChannel(), voteMessage);
+
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage2,voteActionRow);
 
             event.getMessage().delete().queue(); 
         }
