@@ -28,12 +28,6 @@ import ti4.message.MessageHelper;
 
 
 public class AgendaHelper {
-
-
-
-
-
-
     public static List<Button> getVoteButtons(int minVote, int voteTotal) {
         List<Button> voteButtons = new ArrayList<>();
         
@@ -57,7 +51,6 @@ public class AgendaHelper {
         }
         return voteButtons;
     }
-
 
     public static List<Button> getForAgainstOutcomeButtons(String rider, String prefix) {
         List<Button> voteButtons = new ArrayList<>();
