@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
@@ -461,6 +462,16 @@ public class Helper {
             Planet planet = (Planet) unitHolder;
             return getPlanetRepresentationPlusEmoji(planetID) + " " + getResourceEmoji(planet.getResources());
         }        
+    }
+
+    public static List<Button> getPlanetRefreshButtons(GenericInteractionCreateEvent event, Player player, Map map) {
+        List<Button> planetButtons = new ArrayList<>();
+        List<String> planets = new ArrayList<>(player.getExhaustedPlanets());
+        for (String planet : planets) {
+            Button button = Button.success("refresh_"+planet, StringUtils.capitalize(planet) + "("+ Helper.getPlanetResources(planet, map)+"/"+Helper.getPlanetInfluence(planet, map) + ")");
+            planetButtons.add(button);     
+        }
+        return planetButtons;
     }
 
     public static int getPlanetResources(String planetID, Map map) {
