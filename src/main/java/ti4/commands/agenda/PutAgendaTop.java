@@ -35,6 +35,7 @@ public class PutAgendaTop extends AgendaSubcommandData {
                     MessageHelper.sendMessageToChannel((MessageChannel)threadChannel_, "Agenda put on top");
                 }
             }
+            
 
         } else {
             if(!activeMap.isFoWMode())
