@@ -481,6 +481,8 @@ public class MapSaveLoadManager {
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
             writer.write(System.lineSeparator());
+            writeCards(player.getTrapCards(), writer, Constants.LIZHO_TRAP_CARDS);
+            writeCardsStrings(player.getTrapCardsPlanets(), writer, Constants.LIZHO_TRAP_PLANETS);
 
             writer.write(Constants.FRAGMENTS + " " + String.join(",", player.getFragments()));
             writer.write(System.lineSeparator());
@@ -605,6 +607,15 @@ public class MapSaveLoadManager {
     private static void writeCards(LinkedHashMap<String, Integer> cardList, FileWriter writer, String saveID) throws IOException {
         StringBuilder sb = new StringBuilder();
         for (java.util.Map.Entry<String, Integer> entry : cardList.entrySet()) {
+            sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
+        }
+        writer.write(saveID + " " + sb);
+        writer.write(System.lineSeparator());
+    }
+
+    private static void writeCardsStrings(LinkedHashMap<String, String> cardList, FileWriter writer, String saveID) throws IOException {
+        StringBuilder sb = new StringBuilder();
+        for (java.util.Map.Entry<String, String> entry : cardList.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(saveID + " " + sb);
@@ -1378,6 +1389,24 @@ public class MapSaveLoadManager {
                         String id = actionCardInfo.nextToken();
                         Integer index = Integer.parseInt(actionCardInfo.nextToken());
                         player.setActionCard(id, index);
+                    }
+                }
+                case Constants.LIZHO_TRAP_CARDS -> {
+                    StringTokenizer trapCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (trapCardToken.hasMoreTokens()) {
+                        StringTokenizer trapCardInfo = new StringTokenizer(trapCardToken.nextToken(), ",");
+                        String id = trapCardInfo.nextToken();
+                        Integer index = Integer.parseInt(trapCardInfo.nextToken());
+                        player.setTrapCard(id, index);
+                    }
+                }
+                case Constants.LIZHO_TRAP_PLANETS -> {
+                    StringTokenizer trapCardToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    while (trapCardToken.hasMoreTokens()) {
+                        StringTokenizer trapCardInfo = new StringTokenizer(trapCardToken.nextToken(), ",");
+                        String id = trapCardInfo.nextToken();
+                        String planet = trapCardInfo.nextToken();
+                        player.setTrapCardPlanet(id, planet);
                     }
                 }
                 case Constants.PROMISSORY_NOTES -> {

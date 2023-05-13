@@ -49,6 +49,8 @@ public class Player {
     private Set<Integer> followedSCs = new HashSet<>();
 
     private LinkedHashMap<String, Integer> actionCards = new LinkedHashMap<>();
+    private LinkedHashMap<String, Integer> trapCards = new LinkedHashMap<>();
+    private LinkedHashMap<String, String> trapCardsPlanets = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> promissoryNotes = new LinkedHashMap<>();
@@ -307,7 +309,6 @@ public class Player {
 
     /**
      * @param abilityID The ID of the ability - does not check if valid
-     * @see faction_abilities.properties
      */
     public void addFactionAbility(String abilityID) {
         factionAbilities.add(abilityID);
@@ -319,6 +320,14 @@ public class Player {
 
     public LinkedHashMap<String, Integer> getActionCards() {
         return actionCards;
+    }
+
+    public LinkedHashMap<String, Integer> getTrapCards() {
+        return trapCards;
+    }
+
+    public LinkedHashMap<String, String> getTrapCardsPlanets() {
+        return trapCardsPlanets;
     }
 
     public LinkedHashMap<String, Integer> getPromissoryNotes() {
@@ -336,6 +345,19 @@ public class Player {
             identifier = new Random().nextInt(1000);
         }
         actionCards.put(id, identifier);
+    }
+
+    public void setTrapCard(String id) {
+        Collection<Integer> values = trapCards.values();
+        int identifier = new Random().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = new Random().nextInt(1000);
+        }
+        trapCards.put(id, identifier);
+    }
+
+    public void setTrapCardPlanet(String id, String planet) {
+        trapCardsPlanets.put(id, planet);
     }
 
     public void setPromissoryNote(String id) {
@@ -378,6 +400,10 @@ public class Player {
 
     public void setActionCard(String id, Integer identifier) {
         actionCards.put(id, identifier);
+    }
+
+    public void setTrapCard(String id, Integer identifier) {
+        trapCards.put(id, identifier);
     }
 
     public void setPromissoryNote(String id, Integer identifier) {
@@ -598,6 +624,15 @@ public class Player {
             }
         }
         setFactionAbilities(abilities);
+        if (faction.equals(Constants.LIZHO)){
+            Map<String, String> dsHandcards = Mapper.getDSHandcards();
+            for (Entry<String, String> entry : dsHandcards.entrySet()) {
+                String key = entry.getKey();
+                if (key.endsWith(Constants.LIZHO)){
+                    setTrapCard(key);
+                }
+            }
+        }
     }
 
     @JsonIgnore

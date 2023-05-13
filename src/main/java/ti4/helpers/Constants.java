@@ -171,6 +171,12 @@ public class Constants {
     public static final String RISE_OF_A_MESSIAH = "rise_of_a_messiah";
     public static final String FIGHTER_CONSCRIPTION = "fighter_conscription";
     public static final String SLEEPER_TOKEN = "sleeper_token";
+    public static final String LIZHO_TRAP = "lizho_trap";
+    public static final String LIZHO_TRAP_CARDS = "lizho_trap_cards";
+    public static final String LIZHO_TRAP_PLANETS = "lizho_trap_planets";
+    public static final String LIZHO_TRAP_ID = "trap_id";
+    public static final String LIZHO_REVEAL_TRAP = "lizho_reveal_trap";
+    public static final String LIZHO_SWAP_TRAP = "lizho_swap_trap";
     public static final String STELLAR_CONVERTER = "stellar_converter";
     public static final String SEND_DEBT = "send_debt";
     public static final String DEBT_COUNT = "debt_count";
@@ -178,6 +184,8 @@ public class Constants {
     public static final String DEBT = "debt";
     public static final String ION_TOKEN_FLIP = "ion_storm_flip";
     public static final String TOKEN_SLEEPER_PNG = "token_sleeper.png";
+    public static final String LIZHO_TRAP_PNG = "attachment_lizhotrap.png";
+    public static final String LIZHO = "lizho";
     public static final String WORLD_DESTROYED_PNG = "token_worlddestroyed.png";
     public static final String TOKEN_ION_ALPHA_PNG = "token_ionalpha.png";
     public static final String TOKEN_ION_BETA_PNG = "token_ionbeta.png";

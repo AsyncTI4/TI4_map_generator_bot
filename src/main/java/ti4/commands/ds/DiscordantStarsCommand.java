@@ -110,6 +110,9 @@ public class DiscordantStarsCommand implements Command {
     private Collection<DiscordantStarsSubcommandData> getSubcommands() {
         Collection<DiscordantStarsSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new ZelianHero());
+        subcommands.add(new TrapToken());
+        subcommands.add(new TrapReveal());
+        subcommands.add(new TrapSwap());
 
         return subcommands;
     }

@@ -1,9 +1,5 @@
 package ti4.commands.cardsac;
 
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -17,6 +13,11 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
 
 public class ACInfo extends ACCardsSubcommandData {
     public ACInfo() {
@@ -40,12 +41,75 @@ public class ACInfo extends ACCardsSubcommandData {
         String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendActionCardInfo(activeMap, player);
+        sendTrapCardInfo(activeMap, player);
+    }
+
+    private static void sendTrapCardInfo(Map activeMap, Player player) {
+        if (player.getFaction().equals(Constants.LIZHO)) {
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getTrapCardInfo(activeMap, player));
+        }
+    }
+
+    private static String getTrapCardInfo(Map activeMap, Player player) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("_ _\n");
+
+
+        //ACTION CARDS
+        sb.append("**Trap Cards:**").append("\n");
+        int index = 1;
+
+        LinkedHashMap<String, Integer> trapCards = player.getTrapCards();
+        LinkedHashMap<String, String> trapCardsPlanets = player.getTrapCardsPlanets();
+        if (trapCards != null) {
+            if (trapCards.isEmpty()) {
+                sb.append("> None");
+            } else {
+                for (java.util.Map.Entry<String, Integer> trapCard : trapCards.entrySet()) {
+                    Integer value = trapCard.getValue();
+                    sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
+                    sb.append(getTrapCardRepresentation(trapCard.getKey(), trapCardsPlanets));
+                    index++;
+                }
+            }
+        }
+
+        return sb.toString();
+    }
+
+    public static String getTrapCardRepresentation(String trapID, LinkedHashMap<String, String> trapCardsPlanets) {
+        StringBuilder sb = new StringBuilder();
+        java.util.Map<String, String> dsHandcards = Mapper.getDSHandcards();
+        String info = dsHandcards.get(trapID);
+        if (info == null) {
+            return "";
+        }
+        String[] split = info.split(";");
+        String trapType = split[0];
+        String trapName = split[1];
+        String trapText = split[2];
+        String planet = trapCardsPlanets.get(trapID);
+        sb.append("__**").append(trapName).append("**__").append(" - ").append(trapText);
+        if (planet != null) {
+            HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+            String representation = planetRepresentations.get(planet);
+            if (representation == null) {
+                representation = planet;
+            }
+            sb.append("__**");
+            sb.append(" Planet: ");
+            sb.append(representation);
+            sb.append("**__");
+        }
+        sb.append("\n");
+        return sb.toString();
     }
 
     public static void sendActionCardInfo(Map activeMap, Player player, ButtonInteractionEvent event) {
         String headerText = Helper.getPlayerRepresentation(event, player) + " pressed button: " + event.getButton().getLabel();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendActionCardInfo(activeMap, player);
+        sendTrapCardInfo(activeMap, player);
     }
 
     public static void sendActionCardInfo(Map activeMap, Player player) {
@@ -62,7 +126,9 @@ public class ACInfo extends ACCardsSubcommandData {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
         }
-    } 
+
+        sendTrapCardInfo(activeMap, player);
+    }
 
     private static String getActionCardInfo(Map activeMap, Player player) {
         StringBuilder sb = new StringBuilder();
@@ -92,7 +158,11 @@ public class ACInfo extends ACCardsSubcommandData {
 
     public static String getActionCardRepresentation(String acID) {
         StringBuilder sb = new StringBuilder();
-        String[] acSplit = Mapper.getActionCard(acID).split(";");
+        String actionCard = Mapper.getActionCard(acID);
+        if (actionCard == null){
+            return "";
+        }
+        String[] acSplit = actionCard.split(";");
         String acName = acSplit[0];
         String acPhase = acSplit[1];
         String acWindow = acSplit[2];

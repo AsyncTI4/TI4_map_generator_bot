@@ -51,6 +51,7 @@ public class Mapper {
     private static final Properties agendaRepresentation = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties wormholes = new Properties();
+    private static final Properties ds_handcards = new Properties();
     private static final HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = new HashMap<>();
 
     public static void init() {
@@ -86,6 +87,7 @@ public class Mapper {
         readData("agenda_representation.properties", agendaRepresentation, "Could not read agenda representaion file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
         readData("wormholes.properties", wormholes, "Could not read wormholes file");
+        readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -204,6 +206,13 @@ public class Mapper {
             unitMap.put((String) entry.getValue(), (String) entry.getKey());
         }
         return unitMap;
+    }
+    public static Map<String, String> getDSHandcards() {
+        Map<String, String> cards = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : ds_handcards.entrySet()) {
+            cards.put((String) entry.getKey(), (String) entry.getValue());
+        }
+        return cards;
     }
 
     public static String getUnitID(String unitID, String color) {
