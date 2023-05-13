@@ -148,7 +148,11 @@ public class Turn extends PlayerSubcommandData {
                     String fail = "User for next faction not found. Report to ADMIN";
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, map, event, text, fail, success);
-                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(map, player));
+                    if(getMissedSCFollowsText(map, player) != null && !getMissedSCFollowsText(map, player).equalsIgnoreCase(""))
+                    {
+                        MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(map, player));
+                    }
+                  
                     map.setPingSystemCounter(0);
                     for(int x = 0; x < 10; x++)
                     {
@@ -157,7 +161,10 @@ public class Turn extends PlayerSubcommandData {
                     return "";
                 } else {
                     MessageHelper.sendMessageToChannel(gameChannel, text);
-                    MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(map, player));
+                    if(getMissedSCFollowsText(map, player) != null && !getMissedSCFollowsText(map, player).equalsIgnoreCase(""))
+                    {
+                        MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(map, player));
+                    }
                     return "";
                 }
             }
