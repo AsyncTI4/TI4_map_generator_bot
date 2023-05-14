@@ -495,7 +495,7 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
-            Button button = Button.danger("place_"+unit+"_"+planet, StringUtils.capitalize(planet));
+            Button button = Button.danger("place_"+unit+"_"+planet, Helper.getPlanetRepresentation(planet, map));
             planetButtons.add(button);     
         }
         return planetButtons;
