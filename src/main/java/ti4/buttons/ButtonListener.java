@@ -184,6 +184,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
             }
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("reveal_stage")) {
             String lastC = StringUtils.right(buttonLabel, 1);
             if(lastC.equalsIgnoreCase("2"))
@@ -308,7 +309,8 @@ public class ButtonListener extends ListenerAdapter {
             {
                 event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue(); 
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Readied "+ Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, activeMap));
+            String ident = StringUtils.capitalize(player.getFaction()) + "(You)";
+            MessageHelper.sendMessageToChannel(event.getChannel(), ident+" Readied "+ Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, activeMap));
             
 
         }
@@ -350,9 +352,9 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
             String totalVotesSoFar = event.getMessage().getContentRaw();
-            
+            String ident = StringUtils.capitalize(player.getFaction()) + "(You)";
             event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue(); 
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Exhausted "+Helper.getPlanetRepresentation(planetName, activeMap));    
+            MessageHelper.sendMessageToChannel(event.getChannel(), ident+" Exhausted "+Helper.getPlanetRepresentation(planetName, activeMap));    
             
         }
         else if (buttonID.startsWith("exhaust_")) {
@@ -1109,6 +1111,12 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                 }
                 case "deleteButtons" -> {
+                    if(buttonLabel.equalsIgnoreCase("Done Gaining CCs"))
+                    {
+                        String playerRep = Helper.getPlayerRepresentation(event, player, false);
+                        String finalCCs = player.getTacticalCC() + "/"+ player.getFleetCC() + "/" + player.getStrategicCC();
+                        MessageHelper.sendMessageToChannel(event.getChannel(), playerRep + " Final CC Allocation Is "+ finalCCs);
+                    }
                     event.getMessage().delete().queue();
                 }
                 case "diploRefresh2" -> {
@@ -1172,8 +1180,9 @@ public class ButtonListener extends ListenerAdapter {
                     Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
                     Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
                     Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+                    Button exhaust = Button.danger("leadershipExhaust", "Exhaust Planets");
                     Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
-                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, exhaust, DoneGainingCC);
                     if(!activeMap.isFoWMode())
                     {
                         List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();

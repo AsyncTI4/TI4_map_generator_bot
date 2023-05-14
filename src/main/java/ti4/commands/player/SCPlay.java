@@ -122,9 +122,23 @@ public class SCPlay extends PlayerSubcommandData {
                 //only do thread in non-fow games
                 ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
                 threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
-                threadChannel.queue();
+                threadChannel.queue(m5 -> {
+                    List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+                    if (threadChannels != null) 
+                    {
+                        // SEARCH FOR EXISTING OPEN THREAD
+                        for (ThreadChannel threadChannel_ : threadChannels) {
+                            if (threadChannel_.getName().equals(threadName)) { 
+                                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) threadChannel_, "These buttons will work inside the thread", scButtons);
+                            }
+                        }
+                    }
+                });
+                
             }
         });
+
+
 
         //POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
         if (!activeMap.isFoWMode() && scToPlay == 3) { 
