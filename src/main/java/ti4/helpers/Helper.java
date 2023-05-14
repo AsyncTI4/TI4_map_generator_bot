@@ -433,6 +433,13 @@ public class Helper {
         String planetProper = Mapper.getPlanetRepresentations().get(planet);
         return Helper.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
     }
+    public static String getPlanetRepresentation(String planet, Map map) {
+        UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planet));
+        Planet planet2 = (Planet) unitHolder;
+        String planetProper = Mapper.getPlanetRepresentations().get(planet) + " (" +planet2.getResources() + "/"+planet2.getInfluence()+")";
+
+        return (Objects.isNull(planetProper) ? planet : planetProper);
+    }
 
     public static String getPlanetRepresentationPlusEmojiPlusResourceInfluence(String planetID, Map map) {
         UnitHolder unitHolder = map.getPlanetsInfo().get(AliasHandler.resolvePlanet(planetID));
@@ -468,8 +475,43 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getExhaustedPlanets());
         for (String planet : planets) {
-            Button button = Button.success("refresh_"+planet, StringUtils.capitalize(planet) + "("+ Helper.getPlanetResources(planet, map)+"/"+Helper.getPlanetInfluence(planet, map) + ")");
+            Button button = Button.success("refresh_"+planet, Helper.getPlanetRepresentation(planet, map));
             planetButtons.add(button);     
+        }
+        return planetButtons;
+    }
+    public static List<Button> getPlanetExhaustButtons(GenericInteractionCreateEvent event, Player player, Map map) {
+        List<Button> planetButtons = new ArrayList<>();
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+        for (String planet : planets) {
+            Button button = Button.danger("spend_"+planet, Helper.getPlanetRepresentation(planet, map));
+            planetButtons.add(button);     
+        }
+        return planetButtons;
+    }
+
+    public static List<Button> getPlanetPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Map map, String unit) {
+        List<Button> planetButtons = new ArrayList<>();
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        for (String planet : planets) {
+            Button button = Button.danger("place_"+unit+"_"+planet, StringUtils.capitalize(planet));
+            planetButtons.add(button);     
+        }
+        return planetButtons;
+    }
+
+    public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Map map) {
+        List<Button> planetButtons = new ArrayList<>();
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        for (String planet : planets) {
+            if(!Helper.getPlanetRepresentation(planet,map).toLowerCase().contains("mecatol"))
+            {
+                HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
+                Button button = Button.danger("diplo_"+planet, Helper.getPlanetRepresentation(planet,map) + " System");
+                planetButtons.add(button);
+            }
+                
         }
         return planetButtons;
     }
@@ -890,7 +932,7 @@ public class Helper {
         return Helper.getEmojiFromDiscord(scEmojiName);
     }
 
-    public static void isCCCountCorrect(SlashCommandInteractionEvent event, Map map, String color) {
+    public static void isCCCountCorrect(GenericInteractionCreateEvent event, Map map, String color) {
         int ccCount = getCCCount(map, color);
         informUserCCOverLimit(event, map, color, ccCount);
     }
@@ -928,7 +970,7 @@ public class Helper {
         return ccCount;
     }
 
-    private static void informUserCCOverLimit(SlashCommandInteractionEvent event, Map map, String color, int ccCount) {
+    private static void informUserCCOverLimit(GenericInteractionCreateEvent event, Map map, String color, int ccCount) {
         boolean ccCountIsOver = ccCount > 16;
         if (ccCountIsOver && map.getCCNPlasticLimit()) {
             Player player = null;

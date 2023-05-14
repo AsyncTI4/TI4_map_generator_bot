@@ -184,14 +184,19 @@ public class SCPlay extends PlayerSubcommandData {
 
     private List<Button> getLeadershipButtons() {
         Button followButton = Button.success("sc_leadership_follow", "SC Follow");
+        Button leadershipGenerateCCButtons = Button.success("leadershipGenerateCCButtons", "Gain CCs");
+        Button exhaust = Button.danger("leadershipExhaust", "Exhaust Planets");
         Button noFollowButton = Button.primary("sc_no_follow_1", "Not Following");
-        return List.of(followButton, noFollowButton);
+        return List.of(followButton, leadershipGenerateCCButtons, exhaust,noFollowButton);
     }
     
     private List<Button> getDiplomacyButtons() {
         Button followButton = Button.success("sc_follow_2", "SC Follow");
-        Button noFollowButton = Button.primary("sc_no_follow_2", "Not Following");
-        return List.of(followButton, noFollowButton);
+        Button diploSystemButton = Button.primary("diploSystem", "Diplo a System");
+        Button refreshButton = Button.success("diploRefresh2", "Ready 2 Planets");
+        
+        Button noFollowButton = Button.danger("sc_no_follow_2", "Not Following");
+        return List.of(followButton,diploSystemButton, refreshButton, noFollowButton);
     }
     
     private List<Button> getPoliticsButtons() {
@@ -219,8 +224,13 @@ public class SCPlay extends PlayerSubcommandData {
 
     private List<Button> getConstructionButtons() {
         Button followButton = Button.success("sc_follow_4", "SC Follow");
+        Button sdButton = Button.success("construction_sd", "Place A SD");
+        sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
+        Button pdsButton = Button.success("construction_pds", "Place a PDS");
+        
+        pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("pds")));
         Button noFollowButton = Button.primary("sc_no_follow_4", "Not Following");
-        return List.of(followButton, noFollowButton);
+        return List.of(followButton, sdButton, pdsButton, noFollowButton);
     }
     
     private List<Button> getTradeButtons() {
