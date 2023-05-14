@@ -230,7 +230,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "fb1", "fb2", "fb3", "fb4" -> {
                 message = "Resolve using the buttons";
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
-                Button getACButton = Button.success("spend_comm_for_AC", "Spend 1 TG/Comm For An AC").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
+                Button getACButton = Button.success("comm_for_AC", "Spend 1 TG/Comm For An AC").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
                 Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 List<Button> buttons = List.of(getACButton, getCommButton);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -255,7 +255,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = "Resolve using the buttons";
                 MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
-                Button getMechButton = Button.success("spend_comm_for_mech", "Spend 1 TG/Comm For A Mech On "+planetName).withEmoji(Emoji.fromFormatted(Emojis.mech)); //TODO: Button resolves using planet ID at end of label - add planetID to buttonId and use that instead
+                Button getMechButton = Button.success("comm_for_mech", "Spend 1 TG/Comm For A Mech On "+planetName).withEmoji(Emoji.fromFormatted(Emojis.mech)); //TODO: Button resolves using planet ID at end of label - add planetID to buttonId and use that instead
                 Button getCommButton3 = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 List<Button> buttons = List.of(getMechButton, getCommButton3);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
