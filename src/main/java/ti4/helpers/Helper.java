@@ -1429,6 +1429,81 @@ public class Helper {
         return techEmoji + "**" + techName + "**" + factionEmoji + "\n";
     }
 
+    public static List<Button> getTechButtons(List<String> techs, String techType) {
+        List<Button> techButtons = new ArrayList<Button>();
+
+        for(String tech : techs)
+        {
+            String techName = tech.substring(tech.lastIndexOf("_")+1, tech.length());
+            String techLabel = tech.replace("_", "");
+            String buttonID = "getTech_"+techName;
+            Button techB = null;
+            switch (techType) {
+                case "propulsion" -> {
+                    techB = Button.primary(buttonID, techName);
+                }
+                case "cybernetic" -> {
+                    techB = Button.secondary(buttonID,techName);
+                }
+                case "biotic" -> {
+                    techB = Button.success(buttonID, techName);
+                }
+                case "warfare" -> {
+                    techB = Button.danger(buttonID, techName);
+                }
+                case "unitupgrade" -> {
+                    techB = Button.secondary(buttonID,techName);
+                }
+                default -> {
+                    techB = Button.secondary(buttonID,techName);
+                }
+            }
+            techButtons.add(techB);
+        }
+
+        return techButtons;
+    }
+    public static List<String> getAllTechOfAType(String techType, String playerfaction, Player player) {
+        
+        List<String> techs = new ArrayList<String>();
+        //Columns: key = Proper Name | type | prerequisites | faction | text
+        for(String techRep : Mapper.getTechRepresentations().values())
+        {
+            StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
+            String techName = techRepTokenizer.nextToken();
+            String techType2 = techRepTokenizer.nextToken();
+            String techPrerequisites = techRepTokenizer.nextToken();
+            String techFaction = techRepTokenizer.nextToken();
+            String factionEmoji = "";
+            String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
+
+            if(techType2.equalsIgnoreCase(techType))
+            {
+
+                if(!player.getTechs().contains(techName))
+                {
+                    if (!techFaction.equals(" ")) 
+                    {
+                        if(playerfaction.equalsIgnoreCase(techFaction))
+                        {
+                            factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
+                            
+                            techs.add(techEmoji +"_"+ factionEmoji +"_"+techName);
+                        }
+                        
+                    }
+                    else
+                    {
+                        techs.add(techEmoji +"_"+ techName);
+                    }
+                }
+            }
+            // if(!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.length() + 1);
+            String techText = techRepTokenizer.nextToken();
+        }  
+        return techs;
+    }
+
     public static String getTechRepresentationLong(String techID) {
         String techRep = Mapper.getTechRepresentations().get(techID);
 

@@ -317,21 +317,43 @@ public class ButtonListener extends ListenerAdapter {
         else if (buttonID.startsWith("refreshVotes_"))
         {
             String votes = buttonID.replace("refreshVotes_", "");
-            List<Button> voteActionRow = Helper.getPlanetRefreshButtons(event, player, activeMap);
-           
+            List<Button> voteActionRow = Helper.getPlanetRefreshButtons(event, player, activeMap); 
             Button concludeRefreshing = Button.danger("delete_buttons_"+votes, "Done readying planets.");
-            
-            
             voteActionRow.add(concludeRefreshing);
             String voteMessage2 = "Use the buttons to ready planets. When you're done it will prompt the next person to vote.";
-
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage2,voteActionRow);
-
             event.getMessage().delete().queue(); 
+        }
+        
+        else if (buttonID.startsWith("getAllTechOfType_"))
+        {
+            String techType = buttonID.replace("getAllTechOfType_", "");
+            List<Button> buttons = Helper.getTechButtons(Helper.getAllTechOfAType(techType, player.getFaction(), player), techType);
+            
+            String message = Helper.getPlayerRepresentation(event, player, false)+" Use The Buttons To Get The Tech You Want";
+            
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+            
+            event.getMessage().delete().queue();
+        }
+        else if (buttonID.startsWith("getTech_")) {
 
+            String tech = buttonID.replace("getTech_", "");
+            String techFancy = buttonLabel;
+            String ident = StringUtils.capitalize(player.getFaction()) + "(You)";
+            String message = ident+ " Acquired The Tech " +  Helper.getTechRepresentation(AliasHandler.resolveTech(tech));
 
+            String trueIdentity = Helper.getPlayerRepresentation(event, player, true);
+            String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
+            player.addTech(AliasHandler.resolveTech(tech));
+            List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeMap);
+            Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
+            buttons.add(DoneExhausting);
 
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
 
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+            event.getMessage().delete().queue();
         }
         else if (buttonID.startsWith("spend_")) {
             String planetName = buttonID.substring(buttonID.indexOf("_")+1, buttonID.length());
@@ -1092,6 +1114,44 @@ public class ButtonListener extends ListenerAdapter {
                     String reply = activeMap.isFoWMode() ? "No public objective scored" : null;
                     addReaction(event, false, false, reply, "");
                 }
+                case "acquireATech" -> {
+
+                    List<Button> buttons = new ArrayList<Button>();
+                    Button bioticTech = Button.success("getAllTechOfType_biotic", "Get A Green Tech");
+                    bioticTech= bioticTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Biotictech")));
+                    buttons.add(bioticTech);
+                     Button warfareTech = Button.danger("getAllTechOfType_warfare", "Get A Red Tech");
+                    warfareTech= warfareTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Warfaretech")));
+                    buttons.add(warfareTech);
+                     Button propulsionTech = Button.primary("getAllTechOfType_propulsion", "Get A Blue Tech");
+                    propulsionTech = propulsionTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Propulsiontech")));
+                    buttons.add(propulsionTech);
+                     Button cyberneticTech = Button.secondary("getAllTechOfType_cybernetic", "Get A Yellow Tech");
+                    cyberneticTech=cyberneticTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Cybernetictech")));
+                    buttons.add(cyberneticTech);
+                     Button unitupgradesTech = Button.secondary("getAllTechOfType_unitupgrade", "Get A Unit Upgrade Tech");
+                    unitupgradesTech=unitupgradesTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("UnitUpgradeTech")));
+                    
+                    
+                    buttons.add(unitupgradesTech);
+                    String message = Helper.getPlayerRepresentation(event, player, false)+" What type of tech would you want?";
+                    if(!activeMap.isFoWMode())
+                    {
+                        List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+                        if (threadChannels == null) return;
+                        String threadName = activeMap.getName()+"-round-"+activeMap.getRound()+"-technology";
+                        // SEARCH FOR EXISTING OPEN THREAD
+                        for (ThreadChannel threadChannel_ : threadChannels) {
+                            if (threadChannel_.getName().equals(threadName)) { 
+                                MessageHelper.sendMessageToChannelWithButtons((MessageChannel)threadChannel_, message, buttons);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+                    }
+                }
                 case Constants.SO_NO_SCORING -> {
                     String message = Helper.getPlayerRepresentation(event, player) + " - no Secret Objective scored.";
                     if (!activeMap.isFoWMode()) {
@@ -1467,7 +1527,7 @@ public class ButtonListener extends ListenerAdapter {
                         addReaction(event, false, false,"Gained 1 Commodity", "");
                     }
                 }
-                case "spend_comm_for_AC" -> {
+                case "comm_for_AC" -> {
                     boolean hasSchemingAbility = player.getFactionAbilities().contains("scheming");
                     int count2 = hasSchemingAbility ? 2 : 1;
                     if(player.getCommodities() > 0)
@@ -1479,6 +1539,7 @@ public class ButtonListener extends ListenerAdapter {
                         ACInfo.sendActionCardInfo(activeMap, player, event);
                         String message = hasSchemingAbility ? "Spent 1 commodity to draw " + count2 + " Action Card (Scheming) - please discard an Action Card from your hand" : "Spent 1 commodity to draw " + count2 + " AC";
                         addReaction(event, false, false, message, "");
+                        event.getMessage().delete().queue();
                     }
                     else if(player.getTg() > 0)
                     {
@@ -1488,13 +1549,14 @@ public class ButtonListener extends ListenerAdapter {
                         }
                         ACInfo.sendActionCardInfo(activeMap, player, event);
                         addReaction(event, false, false,"Spent 1 tg for an AC", "");
-
+                        event.getMessage().delete().queue();
                     }
                     else{
                         addReaction(event, false, false,"Didn't have any comms/tg to spend, no AC drawn", "");
                     }
+                    
                 }
-                case "spend_comm_for_mech" -> {
+                case "comm_for_mech" -> {
                     String labelP = event.getButton().getLabel();
                     String planetName = labelP.substring(labelP.lastIndexOf(" ")+1, labelP.length());
                     if(player.getCommodities() > 0)
@@ -1502,12 +1564,14 @@ public class ButtonListener extends ListenerAdapter {
                         player.setCommodities(player.getCommodities()-1);
                          new AddUnits().unitParsing(event, player.getColor(), activeMap.getTile(AliasHandler.resolveTile(planetName)), "mech "+planetName, activeMap);
                         addReaction(event, false, false, "Spent 1 commodity for a mech on "+planetName, "");
+                        event.getMessage().delete().queue();
                     }
                     else if(player.getTg() > 0)
                     {
                         player.setTg(player.getTg()-1);
                         new AddUnits().unitParsing(event, player.getColor(), activeMap.getTile(AliasHandler.resolveTile(planetName)), "mech "+planetName, activeMap);
                         addReaction(event, false, false, "Spent 1 tg for a mech on "+ planetName, "");
+                        event.getMessage().delete().queue();
                     }
                     else{
                         addReaction(event, false, false, "Didn't have any comms/tg to spend, no mech placed", "");
@@ -1560,6 +1624,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "decline_explore" -> {
                     addReaction(event, false, false, "Declined Explore", "");
+                    event.getMessage().delete().queue();
                 }
                 case "confirm_cc" -> {
                     if(player.getMahactCC().size() > 0)
@@ -1647,6 +1712,7 @@ public class ButtonListener extends ListenerAdapter {
                     {
                         new PlanetRefresh().doAction(player, planetName, activeMap);
                         message = message + "Readied "+ planetName;
+                        event.getMessage().delete().queue();
                     }
                     addReaction(event, false, false, message, "");
                 }

@@ -264,8 +264,9 @@ public class SCPlay extends PlayerSubcommandData {
     
     private List<Button> getTechnologyButtons() {
         Button followButton = Button.success("sc_follow_7", "SC Follow");
+        Button getTech = Button.success("acquireATech", "Get a Tech");
         Button noFollowButton = Button.primary("sc_no_follow_7", "Not Following");
-        return List.of(followButton, noFollowButton);
+        return List.of(followButton, getTech ,noFollowButton);
     }
     
     private List<Button> getImperialButtons() {
