@@ -44,18 +44,17 @@ public class GenericButtonCommand implements Command {
     
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String message = event.getOption(Constants.BUTTON_TEXT, "Button", OptionMapping::getAsString);
-        
-        if (message.length() > 80) {
-            event.getMessageChannel().sendMessage(message).queue();
-            message = "Record Response";
+        String buttonText = event.getOption(Constants.BUTTON_TEXT, "Button", OptionMapping::getAsString);
+        String message = null;
+
+        if (buttonText.length() > 80) {
+            message = buttonText;
+            buttonText = "Record Response";
         }
 
-        Button button = Button.secondary(Constants.GENERIC_BUTTON_ID_PREFIX + event.getId(), message);
+        Button button = Button.secondary(Constants.GENERIC_BUTTON_ID_PREFIX + event.getId(), buttonText);
         
-        for (MessageCreateData messageCreateData : MessageHelper.getMessageCreateDataObjects(null, Collections.singletonList(button))) {
-            event.getMessageChannel().sendMessage(messageCreateData).queue();
-        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, Collections.singletonList(button));
     }
 
     protected String getActionDescription() {
