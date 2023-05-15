@@ -47,6 +47,7 @@ public class GenericButtonCommand implements Command {
         String buttonText = event.getOption(Constants.BUTTON_TEXT, "Button", OptionMapping::getAsString);
         String message = null;
 
+        // Max button text is 80, so if higher, post a separate message and just ask to record responses
         if (buttonText.length() > 80) {
             message = buttonText;
             buttonText = "Record Response";
