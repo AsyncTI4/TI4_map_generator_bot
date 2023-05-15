@@ -1022,12 +1022,14 @@ public class MapSaveLoadManager {
                 }
                 case Constants.SC_TRADE_GOODS -> {
                     StringTokenizer scTokenizer = new StringTokenizer(info, ";");
+                    LinkedHashMap<Integer, Integer> scTradeGoods = new LinkedHashMap<>();
                     while (scTokenizer.hasMoreTokens()) {
                         StringTokenizer cardInfo = new StringTokenizer(scTokenizer.nextToken(), ",");
                         Integer id = Integer.parseInt(cardInfo.nextToken());
                         Integer value = Integer.parseInt(cardInfo.nextToken());
-                        map.setScTradeGood(id, value);
+                        scTradeGoods.put(id, value);
                     }
+                    map.setScTradeGoods(scTradeGoods);
                 }
                 case Constants.SPEAKER -> map.setSpeaker(info);
                 case Constants.ACTIVE_PLAYER -> map.setActivePlayer(info);
