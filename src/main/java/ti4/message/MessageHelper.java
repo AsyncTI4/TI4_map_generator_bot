@@ -253,6 +253,7 @@ public class MessageHelper {
         }
 
         //SEND MESSAGES
+		if (messageText == null || messageText.isEmpty()) return;
         for (String text : splitLargeText(messageText, 2000)) {
             threadChannel.sendMessage(text).queue();
         }
@@ -302,32 +303,34 @@ public class MessageHelper {
     public static List<MessageCreateData> getMessageCreateDataObjects(String message, List<Button> buttons) {
 		List<MessageCreateData> messageCreateDataList = new ArrayList<>();
 
-		List<String> messageList = splitLargeText(message, 2000);
-		Iterator<String> messageIterator = messageList.iterator();
-
 		List<List<ActionRow>> partitionedButtons = getPartitionedButtonLists(buttons);
 		Iterator<List<ActionRow>> buttonIterator = partitionedButtons.iterator();
 
-		while (messageIterator.hasNext()) {
-			String smallMessage = messageIterator.next();
+		if (message != null && !message.isEmpty()) {
+			List<String> messageList = splitLargeText(message, 2000);
+			Iterator<String> messageIterator = messageList.iterator();
+			
+			while (messageIterator.hasNext()) {
+				String smallMessage = messageIterator.next();
+				
+				//More messages exists, so just frontload the plain messages
+				if (messageIterator.hasNext() && smallMessage != null && !smallMessage.isEmpty()) {
+					messageCreateDataList.add(new MessageCreateBuilder().addContent(smallMessage).build());
 
-			//More messages exists, so just frontload the plain messages
-			if (messageIterator.hasNext() && smallMessage != null && !smallMessage.isEmpty()) {
-				messageCreateDataList.add(new MessageCreateBuilder().addContent(smallMessage).build());
+				//We are at the last message, so try and add the first row of buttons
+				} else if (!messageIterator.hasNext() && smallMessage != null && !smallMessage.isEmpty()) {
+					MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
+					messageCreateBuilder.addContent(smallMessage);
 
-			//We are at the last message, so try and add the first row of buttons
-			} else if (!messageIterator.hasNext() && smallMessage != null && !smallMessage.isEmpty()) {
-				MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
-				messageCreateBuilder.addContent(smallMessage);
-
-				//add first row of buttons if it exists
-				if (buttonIterator.hasNext()) {
-					List<ActionRow> actionRows = buttonIterator.next();
-					if (actionRows != null && !actionRows.isEmpty()) {
-						messageCreateBuilder.addComponents(actionRows);
+					//add first row of buttons if it exists
+					if (buttonIterator.hasNext()) {
+						List<ActionRow> actionRows = buttonIterator.next();
+						if (actionRows != null && !actionRows.isEmpty()) {
+							messageCreateBuilder.addComponents(actionRows);
+						}
 					}
+					messageCreateDataList.add(messageCreateBuilder.build());
 				}
-				messageCreateDataList.add(messageCreateBuilder.build());
 			}
 		}
 
