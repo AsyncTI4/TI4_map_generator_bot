@@ -19,6 +19,7 @@ import ti4.MapGenerator;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.player.PlanetRemove;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
@@ -1925,6 +1926,32 @@ public class Map {
 
     public void clearPlanetsCache(){
         planets.clear();
+    }
+
+    public boolean isEmpyInTheGame(){
+        boolean empyPresent = false;
+        
+        for (Player player : getRealPlayers())
+        {
+            if(player.getFaction() != null && player.getFaction().equalsIgnoreCase("Empyrean"))
+            {
+                return true;
+            }
+        }
+        return empyPresent;
+    }
+    public boolean doesAnyoneHaveInstinctTraining(){
+        boolean empyPresent = false;
+        
+        for (Player player : getRealPlayers())
+        {
+            
+            if(player.getTechs().contains(AliasHandler.resolveTech("Instinct Training")))
+            {
+                return true;
+            }
+        }
+        return empyPresent;
     }
 
     @JsonIgnore

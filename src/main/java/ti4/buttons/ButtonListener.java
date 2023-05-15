@@ -379,6 +379,68 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(event.getChannel(), ident+" Exhausted "+Helper.getPlanetRepresentation(planetName, activeMap));    
             
         }
+        else if(buttonID.startsWith("sabotage_"))
+        {
+            String type = buttonID.replace("sabotage_", "");
+            String message = "Cancelling this AC using ";
+            String addMessage = "An AC has been cancelled!";
+            boolean sendReact = true;
+            if(type.equalsIgnoreCase("empy"))
+            {
+                message = message + "a Watcher mech! The Watcher should be removed now by the owner.";
+            }
+            else if(type.equalsIgnoreCase("xxcha"))
+            {
+                message = message + "a use of the Instinct Training tech! The tech has been exhausted and a strategy CC removed.";
+                if(player.getTechs().contains(AliasHandler.resolveTech("Instinct Training")))
+                {
+                    player.exhaustTech(AliasHandler.resolveTech("Instinct Training"));
+                    if(player.getStrategicCC() > 0)
+                    {
+                        player.setStrategicCC(player.getStrategicCC()-1);
+                    }
+                }
+                else
+                {
+                    sendReact = false;
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Someone clicked the Instinct Training button but did not have the tech.");
+                }
+            }
+            else if(type.equalsIgnoreCase("ac"))
+            {
+                message = message + "A Sabotage!";
+                boolean hasSabo = false;
+                String saboID = "3";
+                for(String AC : player.getActionCards().keySet())
+                {
+                    if(AC.contains("sabo"))
+                    {
+                        hasSabo = true;
+                        saboID = ""+player.getActionCards().get(AC);
+                        break;
+                    }
+                }
+                if(hasSabo)
+                {
+                    PlayAC.playAC(event, activeMap, player, saboID, event.getChannel(), activeMap.getGuild());
+                }
+                else
+                {
+                    addMessage = "";
+                    message = "Tried to play a sabo but found none in hand.";
+                    sendReact = false;
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Someone clicked the AC sabo button but did not have a sabo in hand.");
+                }
+
+            }
+
+            if(sendReact)
+            {
+                addReaction(event, true, true, message, addMessage);
+            }
+            
+
+        }
         else if (buttonID.startsWith("exhaust_")) {
             String planetName = buttonID.substring(buttonID.indexOf("_")+1, buttonID.length());
             String votes = buttonLabel.substring(buttonLabel.indexOf("(")+1, buttonLabel.indexOf(")"));
@@ -1161,7 +1223,6 @@ public class ButtonListener extends ListenerAdapter {
                     addReaction(event, false, false, reply, "");
                 }
                 //AFTER AN ACTION CARD HAS BEEN PLAYED
-                case "sabotage" -> addReaction(event, true, true, "Sabotaging Action Card Play", " Sabotage played");
                 case "no_sabotage" -> {
                     String message = activeMap.isFoWMode() ? "No sabotage" : null;
                     addReaction(event, false, false, message, "");
