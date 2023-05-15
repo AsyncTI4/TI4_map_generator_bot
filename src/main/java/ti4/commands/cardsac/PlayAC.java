@@ -112,14 +112,24 @@ public class PlayAC extends ACCardsSubcommandData {
         sb.append(Emojis.ActionCard).append("__**").append(actionCardTitle).append("**__ (").append(actionCardPhase).append(" Phase)\n");
         sb.append(">  _").append(actionCardWindow).append(":_\n");
         sb.append(">  ").append(actionCardText).append("\n");
-
-        Button sabotageButton = Button.danger("sabotage", "Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
+        List<Button> buttons = new ArrayList<Button>();
+        Button sabotageButton = Button.danger("sabotage_ac", "Cancel AC With Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
+        buttons.add(sabotageButton);
+        if(activeMap.isEmpyInTheGame() || activeMap.isFoWMode())
+        {
+            Button empyButton = Button.secondary("sabotage_empy", "Cancel AC With Empyrean Mech ").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
+            buttons.add(empyButton);
+        }
+        if(activeMap.doesAnyoneHaveInstinctTraining() || activeMap.isFoWMode())
+        {
+            Button instinctButton = Button.secondary("sabotage_xxcha", "Cancel AC With Instinct Training").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("Xxcha")));
+            buttons.add(instinctButton);
+        }
         Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(Emoji.fromFormatted(Emojis.NoSabotage));
-
+        buttons.add(noSabotageButton);
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannel(mainGameChannel, sb.toString());
         } else {
-            List<Button> buttons = new ArrayList<>(List.of(sabotageButton, noSabotageButton));
             MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, sb.toString(), activeMap, player, buttons);
 
             if(actionCardWindow.contains("After an agenda is revealed"))
