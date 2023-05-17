@@ -73,6 +73,8 @@ public class Map {
     @ExportableField
     private boolean fowMode = false;
     @ExportableField
+    private boolean homebrewSCMode = false;
+    @ExportableField
     private boolean stratPings = true;
     @ExportableField
     private String largeText = "small";
@@ -368,6 +370,13 @@ public class Map {
 
     public void setFoWMode(boolean fowMode) {
         this.fowMode = fowMode;
+    }
+    public boolean isHomeBrewSCMode() {
+        return homebrewSCMode;
+    }
+
+    public void setHomeBrewSCMode(boolean homeBrewSCMode) {
+        this.homebrewSCMode = homeBrewSCMode;
     }
 
     public boolean isStratPings() {

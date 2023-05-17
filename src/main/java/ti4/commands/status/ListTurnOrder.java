@@ -25,6 +25,7 @@ public class ListTurnOrder extends StatusSubcommandData {
     }
 
     public static void turnOrder(SlashCommandInteractionEvent event, Map map) {
+
         if (map.isFoWMode()) {
             MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup fow_mode:YES`");
             return;
@@ -90,7 +91,8 @@ public class ListTurnOrder extends StatusSubcommandData {
         if (event.getName().equals(Constants.PLAYER)) { // catch if called from /player sc_pick
             MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
         } else {
-            MessageHelper.replyToMessage(event, msg.toString());
+           MessageHelper.replyToMessage(event, msg.toString());
+
         }
     }
 
