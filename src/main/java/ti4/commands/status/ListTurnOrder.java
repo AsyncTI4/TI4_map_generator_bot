@@ -25,7 +25,7 @@ public class ListTurnOrder extends StatusSubcommandData {
     }
 
     public static void turnOrder(SlashCommandInteractionEvent event, Map map) {
-        if (!map.isCommunityMode() && !map.isFoWMode()) {
+        if (!map.isFoWMode()) {
             HashMap<Integer, String> order = new HashMap<>();
             int naaluSC = 0;
             for (Player player : map.getPlayers().values()) {
@@ -94,7 +94,7 @@ public class ListTurnOrder extends StatusSubcommandData {
                 MessageHelper.replyToMessage(event, msg.toString());
             }
         } else {
-            MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup community_mode:YES` or `/game setup fow_mode:YES`");
+            MessageHelper.replyToMessage(event, "Turn order does not display when  /game setup fow_mode:YES`");
         }
     }
 
