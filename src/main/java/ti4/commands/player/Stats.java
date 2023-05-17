@@ -263,7 +263,7 @@ public class Stats extends PlayerSubcommandData {
 			LinkedHashMap<String, Player> players = activeMap.getPlayers();
 			for (Player playerStats : players.values()) {
 				if (playerStats.getSCs().contains(scNumber)) {
-					MessageHelper.sendMessageToChannel(event.getChannel(), "SC #"+scNumber+" is already picked by this player.");
+					MessageHelper.sendMessageToChannel(event.getChannel(), "SC #"+scNumber+" is already picked.");
 					return false;
 				}
 			}

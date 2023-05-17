@@ -30,7 +30,8 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
         addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Pings for exceeding cc/plastic limits. Enter ON to turn on, or OFF to turn off."));
+        addOptions(new OptionData(OptionType.STRING, Constants.HOMEBREW_SC_MODE, "Disable SC buttons. ON to turn on, or OFF to turn off."));
+
 
     }
 
@@ -132,6 +133,17 @@ public class Setup extends GameSubcommandData {
                 activeMap.setCCNPlasticLimit(true);
             } else if ("OFF".equalsIgnoreCase(ccNP)){
                 activeMap.setCCNPlasticLimit(false);
+            }
+        }
+
+
+        OptionMapping homebrewSC = event.getOption(Constants.HOMEBREW_SC_MODE);
+        if (homebrewSC != null){
+            String ccNP = homebrewSC.getAsString();
+            if ("ON".equalsIgnoreCase(ccNP)){
+                activeMap.setHomeBrewSCMode(true);
+            } else if ("OFF".equalsIgnoreCase(ccNP)){
+                activeMap.setHomeBrewSCMode(false);
             }
         }
 

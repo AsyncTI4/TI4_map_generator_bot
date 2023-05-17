@@ -417,6 +417,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.CC_N_PLASTIC_LIMIT + " " + map.getCCNPlasticLimit());
         writer.write(System.lineSeparator());
+        writer.write(Constants.HOMEBREW_SC_MODE + " " + map.isHomeBrewSCMode());
+        writer.write(System.lineSeparator());
 
         writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
         writer.write(System.lineSeparator());
@@ -1205,6 +1207,14 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         map.setFoWMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.HOMEBREW_SC_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        map.setHomeBrewSCMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

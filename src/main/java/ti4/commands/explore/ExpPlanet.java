@@ -32,18 +32,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             sendMessage("Planet not found in map");
             return;
         }
-        Tile tile = null;
-        for (Tile tile_ : activeMap.getTileMap().values()) {
-            if (tile != null) {
-                break;
-            }
-            for (java.util.Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
-                if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
-                    tile = tile_;
-                    break;
-                }
-            }
-        }
+        Tile tile = Helper.getTileFromPlanet(planetName, activeMap);
         if (tile == null) {
             sendMessage("System not found that contains planet");
             return;
