@@ -1631,6 +1631,10 @@ public class GenerateMap {
         int index = 0;
         for (Player player : players) {
 
+            if(player.getFaction() == null || !player.isRealPlayer())
+            {
+                continue;
+            }
             if ((deltaY + PLAYER_STATS_HEIGHT) > (mapHeight - extraY) || (deltaY + PLAYER_STATS_HEIGHT) < extraY) {
                 playerRow++;
                 if (playerRow == 2) {
