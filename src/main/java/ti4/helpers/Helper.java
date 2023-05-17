@@ -1624,6 +1624,36 @@ public class Helper {
             return null;
         }
     }
+    public static Tile getTileFromPlanet(String planetName, Map activeMap)
+    {
+        Tile tile = null;
+        for (Tile tile_ : activeMap.getTileMap().values()) {
+            if (tile != null) {
+                break;
+            }
+            for (java.util.Map.Entry<String, UnitHolder> unitHolderEntry : tile_.getUnitHolders().entrySet()) {
+                if (unitHolderEntry.getValue() instanceof Planet && unitHolderEntry.getKey().equals(planetName)) {
+                    tile = tile_;
+                    break;
+                }
+            }
+        }
+        return tile;
+    }
+    public static String getExploreNameFromID(String cardID)
+    {
+        String card = Mapper.getExplore(cardID);
+        StringBuilder sb = new StringBuilder();
+        if (card != null) {
+            String[] cardInfo = card.split(";");
+            String name = cardInfo[0];
+            return name;
+        } else {
+            sb.append("Invalid ID ").append(cardID);
+        }
+        return sb.toString();
+        
+    }
 
     public static Set<Player> getNeighbouringPlayers(Map map, Player player) {
         Set<Player> adjacentPlayers = new HashSet<>();

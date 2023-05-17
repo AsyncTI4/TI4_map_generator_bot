@@ -309,7 +309,7 @@ public class ButtonListener extends ListenerAdapter {
             {
                 event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue(); 
             }
-            String ident = StringUtils.capitalize(player.getFaction()) + "(You)";
+            String ident = StringUtils.capitalize(player.getFaction());
             MessageHelper.sendMessageToChannel(event.getChannel(), ident+" Readied "+ Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, activeMap));
             
 
@@ -347,6 +347,21 @@ public class ButtonListener extends ListenerAdapter {
             String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
             player.addTech(AliasHandler.resolveTech(tech));
             List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeMap);
+            if(player.getTg() > 0)
+            {
+                Button lost1TG = Button.danger("reduceTG_1", "Spend 1 TG");
+                buttons.add(lost1TG);
+            }
+            if(player.getTg() > 1)
+            {
+                Button lost2TG = Button.danger("reduceTG_2", "Spend 2 TGs");
+                buttons.add(lost2TG);
+            }
+            if(player.getTg() > 2)
+            {
+                Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
+                buttons.add(lost3TG);
+            }
             Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
 
@@ -374,7 +389,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
             String totalVotesSoFar = event.getMessage().getContentRaw();
-            String ident = StringUtils.capitalize(player.getFaction()) + "(You)";
+            String ident = StringUtils.capitalize(player.getFaction());
             event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue(); 
             MessageHelper.sendMessageToChannel(event.getChannel(), ident+" Exhausted "+Helper.getPlanetRepresentation(planetName, activeMap));    
             
@@ -440,6 +455,23 @@ public class ButtonListener extends ListenerAdapter {
             }
             
 
+        }
+        else if (buttonID.startsWith("reduceTG_")) {
+            
+            int tgLoss = Integer.parseInt(buttonID.replace("reduceTG_", ""));
+            String ident = StringUtils.capitalize(player.getFaction()) + "";
+            String message = ident + "Reduced tgs by "+tgLoss+" ("+player.getTg()+"->"+(player.getTg()-tgLoss)+").";
+            if(tgLoss > player.getTg())
+            {
+                message = "You dont have "+tgLoss+" tgs. No change made.";
+            }
+            else
+            {
+                player.setTg(player.getTg()-tgLoss);
+            }
+            
+           
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
         }
         else if (buttonID.startsWith("exhaust_")) {
             String planetName = buttonID.substring(buttonID.indexOf("_")+1, buttonID.length());
@@ -629,8 +661,8 @@ public class ButtonListener extends ListenerAdapter {
                     realIdentity =Helper.getPlayerRepresentation(event,nextInLine, true);
                     String pFaction = StringUtils.capitalize(nextInLine.getFaction());
                     message = AgendaHelper.getSummaryOfVotes(activeMap, true) + "\n \n "+ realIdentity + message;
-                    Button Vote= Button.success("vote", pFaction+"(You) Choose To Vote");
-                    Button Abstain = Button.danger("delete_buttons_0", pFaction+"(You) Choose To Abstain");
+                    Button Vote= Button.success("vote", pFaction+" Choose To Vote");
+                    Button Abstain = Button.danger("delete_buttons_0", pFaction+" Choose To Abstain");
                     List<Button> buttons = List.of(Vote, Abstain);
                     if(activeMap.isFoWMode())
                     {
@@ -1272,6 +1304,22 @@ public class ButtonListener extends ListenerAdapter {
                     String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
 
                     List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeMap);
+                    
+                    if(player.getTg() > 0)
+                    {
+                        Button lost1TG = Button.danger("reduceTG_1", "Spend 1 TG");
+                        buttons.add(lost1TG);
+                    }
+                    if(player.getTg() > 1)
+                    {
+                        Button lost2TG = Button.danger("reduceTG_2", "Spend 2 TGs");
+                        buttons.add(lost2TG);
+                    }
+                    if(player.getTg() > 2)
+                    {
+                        Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
+                        buttons.add(lost3TG);
+                    }
                     Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
                     if(!activeMap.isFoWMode())
@@ -2131,8 +2179,8 @@ public class ButtonListener extends ListenerAdapter {
 
                     String pFaction = StringUtils.capitalize(nextInLine.getFaction());
                     message = realIdentity + message;
-                    Button Vote= Button.success("vote", pFaction+"(You) Choose To Vote");
-                    Button Abstain = Button.danger("delete_buttons_0", pFaction+"(You) Choose To Abstain");
+                    Button Vote= Button.success("vote", pFaction+" Choose To Vote");
+                    Button Abstain = Button.danger("delete_buttons_0", pFaction+" Choose To Abstain");
                     List<Button> buttons = List.of(Vote, Abstain);
                     if(map.isFoWMode())
                     {

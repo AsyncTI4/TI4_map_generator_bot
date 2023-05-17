@@ -12,6 +12,7 @@ public class Constants {
     public static final String COMMUNITY_MODE = "community_mode";
     public static final String ALLIANCE_MODE = "alliance_mode";
     public static final String FOW_MODE = "fow_mode";
+    public static final String HOMEBREW_SC_MODE = "homebrew_sc_mode";
     public static final String ABSOL_MODE = "absol_mode";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
     public static final String ROLE_FOR_COMMUNITY = "roleForCommunity";

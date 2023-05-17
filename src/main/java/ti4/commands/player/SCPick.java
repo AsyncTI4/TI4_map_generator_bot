@@ -61,25 +61,27 @@ public class SCPick extends PlayerSubcommandData {
         
         Stats stats = new Stats();
         boolean pickSuccessful = stats.pickSC(event, activeMap, player, option);
+        LinkedHashSet<Integer> playerSCs = player.getSCs();
         if (!pickSuccessful) {
+            if (activeMap.isFoWMode()) {
+                String[] scs = {Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6};
+                int c = 0;
+                while(playerSCs.isEmpty() && c < 5)
+                {
+                    if (event.getOption(scs[c]) != null)
+                    {
+                        stats.pickSC(event, activeMap, player, event.getOption(scs[c]));
+                    }
+                    playerSCs = player.getSCs();
+                    c++;
+                }
+            }
             return;
         }
-        LinkedHashSet<Integer> playerSCs = player.getSCs();
+        
 
         //ONLY DEAL WITH EXTRA PICKS IF IN FoW
-        if (activeMap.isFoWMode()) {
-            String[] scs = {Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6};
-            int c = 0;
-            while(playerSCs.isEmpty() && c < 5)
-            {
-                if (event.getOption(scs[c]) != null)
-                {
-                    stats.pickSC(event, activeMap, player, event.getOption(scs[c]));
-                }
-                playerSCs = player.getSCs();
-                c++;
-            }
-        }
+        
 
         if (playerSCs.isEmpty()) {
             sendMessage("No SC picked.");
