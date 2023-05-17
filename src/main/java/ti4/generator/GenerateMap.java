@@ -1624,7 +1624,11 @@ public class GenerateMap {
         int deltaX = mapWidth - extraX - (extraRow ? extraX : 0);
         int deltaY = extraY;
 
+        int playerCount = map.getPlayerCountForMap();
+        int ringCount = map.getRingCount();
+
         boolean inverted = false;
+        int index = 0;
         for (Player player : players) {
 
             if ((deltaY + PLAYER_STATS_HEIGHT) > (mapHeight - extraY) || (deltaY + PLAYER_STATS_HEIGHT) < extraY) {
@@ -1640,8 +1644,79 @@ public class GenerateMap {
                 } else if (playerRow == 4) {
                     deltaX = mapWidth + 10;
                     deltaY = deltaY - PLAYER_STATS_HEIGHT;
-                    ;
                     inverted = true;
+                }
+            }
+            int deltaSplitX = 0;
+            int deltaSplitY = 0;
+            boolean specialCase = false;
+            if (playerCount == 6 && ringCount == 3){
+                String tileID = Constants.setup6p.get(index);
+                Point tilePosition = PositionMapper.getTilePosition(tileID);
+                if (tilePosition != null) {
+                    tilePosition = getTilePosition(map, "", tilePosition.x, tilePosition.y);
+                    if (index == 0) {
+                        deltaX = tilePosition.x + extraX + 80;
+                        deltaY = tilePosition.y - 80;
+                        deltaSplitX = 200;
+                    } else if (index == 1) {
+                        deltaX = tilePosition.x + 360 + extraX;
+                        deltaY = tilePosition.y + extraY;
+                    } else if (index == 2) {
+                        deltaX = tilePosition.x + 360 + extraX;
+                        deltaY = tilePosition.y + extraY;
+                    } else if (index == 3) {
+                        deltaX = tilePosition.x + extraX;
+                        deltaY = tilePosition.y + 360  + extraY;
+                        deltaSplitX = 200;
+                    } else if (index == 4) {
+                        deltaX = 10;
+                        deltaY = tilePosition.y + extraY;
+                    } else if (index == 5) {
+                        deltaX = 10;
+                        deltaY = tilePosition.y + extraY;
+                    }
+                    index++;
+                }
+            }else if (playerCount == 8 && ringCount == 4){
+                String tileID = Constants.setup8p.get(index);
+                Point tilePosition = PositionMapper.getTilePosition(tileID);
+                if (tilePosition != null) {
+                    tilePosition = getTilePosition(map, "", tilePosition.x, tilePosition.y);
+                    if (index == 0) {
+                        deltaX = tilePosition.x + extraX + 80;
+                        deltaY = tilePosition.y - 80;
+                        deltaSplitX = 200;
+                    } else if (index == 1) {
+                        deltaX = tilePosition.x + extraX + 80;
+                        deltaY = tilePosition.y - 80;
+                        deltaSplitX = 200;
+                    } else if (index == 2) {
+                        deltaX = tilePosition.x + 360 + extraX;
+                        deltaY = tilePosition.y + extraY;
+                    } else if (index == 3) {
+                        deltaX = tilePosition.x + extraX + 50;
+                        deltaY = tilePosition.y + 360  + extraY;
+                        deltaSplitX = 200;
+                        specialCase = true;
+                    } else if (index == 4) {
+                        deltaX = tilePosition.x + extraX;
+                        deltaY = tilePosition.y + 360  + extraY;
+                        deltaSplitX = 200;
+                    } else if (index == 5) {
+                        deltaX = tilePosition.x + extraX/2;
+                        deltaY = tilePosition.y + 360 + extraY;
+                        deltaSplitX = 200;
+                    }else if (index == 6) {
+                        deltaX = 10;
+                        deltaY = tilePosition.y + extraY;
+                    }else if (index == 7) {
+                        deltaX = tilePosition.x + 80;
+                        deltaY = tilePosition.y - 80;
+                        deltaSplitX = 200;
+                        specialCase = true;
+                    }
+                    index++;
                 }
             }
 
@@ -1701,10 +1776,13 @@ public class GenerateMap {
             point = PositionMapper.getPlayerStats(Constants.STATS_CC);
             int x = point.x + deltaX;
             int y = point.y + deltaY;
-            drawCCOfPlayer(ccID, x, y, player.getTacticalCC(), false, null, map);
+            if (deltaSplitX != 0){
+                deltaSplitY = point.y;
+            }
+            drawCCOfPlayer(ccID, x + deltaSplitX, y - deltaSplitY, player.getTacticalCC(), false, null, map);
 //            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), "letnev".equals(player.getFaction()));
-            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), false, player, map);
-            drawCCOfPlayer(ccID, x, y + 130, player.getStrategicCC(), false, null, map);
+            drawCCOfPlayer(fleetCCID, x + deltaSplitX, y + 65 - deltaSplitY, player.getFleetCC(), false, player, map);
+            drawCCOfPlayer(ccID, x + deltaSplitX, y + 130 - deltaSplitY, player.getStrategicCC(), false, null, map);
 
             if (player == speaker) {
                 String speakerID = Mapper.getTokenID(Constants.SPEAKER);
@@ -1717,7 +1795,8 @@ public class GenerateMap {
                         BotLogger.log("Could not read speaker file", e);
                     }
                     point = PositionMapper.getPlayerStats(Constants.STATS_SPEAKER);
-                    graphics.drawImage(bufferedImage, point.x + deltaX, point.y + deltaY, null);
+                    int negativeDelta = specialCase ? 200 : 0;
+                    graphics.drawImage(bufferedImage, point.x + deltaX + deltaSplitX + negativeDelta, point.y + deltaY - deltaSplitY, null);
                     graphics.setColor(Color.WHITE);
                 }
             }
@@ -2368,26 +2447,7 @@ public class GenerateMap {
                 }
             }
 
-            int ringCount = map.getRingCount();
-            if (ringCount < RING_MAX_COUNT) {
-                int lower = RING_MAX_COUNT - ringCount;
-
-                if (position.equalsIgnoreCase("tl")) {
-                    y -= 150;
-                } else if (position.equalsIgnoreCase("bl")) {
-                    y -= lower * 600 - 150;
-                } else if (position.equalsIgnoreCase("tr")) {
-                    x -= lower * 520;
-                    y -= 150;
-                } else if (position.equalsIgnoreCase("br")) {
-                    x -= lower * 520;
-                    y -= lower * 600 - 150;
-                } else {
-                    x -= lower * 260;
-                    y -= lower * 300;
-                }
-                positionPoint = new Point(x, y);
-            }
+            positionPoint = getTilePosition(map, position, x, y);
 
 
             int tileX = positionPoint.x + extraX;
@@ -2489,6 +2549,30 @@ public class GenerateMap {
         } catch (Exception exception) {
             BotLogger.log("Tile Error, when building map: " + tile.getTileID(), exception);
         }
+    }
+
+    private static Point getTilePosition(Map map, String position, int x, int y) {
+        int ringCount = map.getRingCount();
+        if (ringCount < RING_MAX_COUNT) {
+            int lower = RING_MAX_COUNT - ringCount;
+
+            if (position.equalsIgnoreCase("tl")) {
+                y -= 150;
+            } else if (position.equalsIgnoreCase("bl")) {
+                y -= lower * 600 - 150;
+            } else if (position.equalsIgnoreCase("tr")) {
+                x -= lower * 520;
+                y -= 150;
+            } else if (position.equalsIgnoreCase("br")) {
+                x -= lower * 520;
+                y -= lower * 600 - 150;
+            } else {
+                x -= lower * 260;
+                y -= lower * 300;
+            }
+            return new Point(x, y);
+        }
+        return new Point(x, y);
     }
 
     public static BufferedImage resizeImage(BufferedImage originalImage, float percent) throws IOException {
