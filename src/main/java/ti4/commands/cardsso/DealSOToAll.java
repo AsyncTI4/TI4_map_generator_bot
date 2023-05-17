@@ -28,6 +28,9 @@ public class DealSOToAll extends SOCardsSubcommandData {
         }
         for (Player player : activeMap.getPlayers().values()) {
             if (player.getFaction() != null && player.getColor() != null && !player.getColor().equals("null")) {
+                if (player.isDummy()){
+                    continue;
+                }
                 for (int i = 0; i < count; i++) {
                     activeMap.drawSecretObjective(player.getUserID());
                 }
