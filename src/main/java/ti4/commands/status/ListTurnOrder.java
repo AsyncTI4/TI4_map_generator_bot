@@ -25,76 +25,72 @@ public class ListTurnOrder extends StatusSubcommandData {
     }
 
     public static void turnOrder(SlashCommandInteractionEvent event, Map map) {
-        if (!map.isCommunityMode() && !map.isFoWMode()) {
-            HashMap<Integer, String> order = new HashMap<>();
-            int naaluSC = 0;
-            for (Player player : map.getPlayers().values()) {
-                if (!player.isRealPlayer()){
-                    continue;
-                }
+        if (map.isFoWMode()) {
+            MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup fow_mode:YES`");
+            return;
+        }
 
-                int sc = player.getLowestSC();
-                String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
-                if (scNumberIfNaaluInPlay.startsWith("0/")) {
-                    naaluSC = sc;
-                }
-                boolean passed = player.isPassed();
+        HashMap<Integer, String> order = new HashMap<>();
+        int naaluSC = 0;
+        for (Player player : map.getRealPlayers()) {
+            int sc = player.getLowestSC();
+            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
+            if (scNumberIfNaaluInPlay.startsWith("0/")) {
+                naaluSC = sc;
+            }
+            boolean passed = player.isPassed();
 
-                Set<Integer> SCs = player.getSCs();
-                HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
-                String text = "";
-                for (int sc_ : SCs) {
-                    Boolean found = scPlayed.get(sc_);
-                    boolean isPlayed = found != null ? found : false;
-                    String scEmoji = isPlayed ? Helper.getSCBackEmojiFromInteger(sc_) : Helper.getSCEmojiFromInteger(sc_);
-                    if (isPlayed) {
-                        text += "~~";
-                    }
-                    text += scEmoji + Helper.getSCAsMention(event.getGuild(), sc_);
-                    if (isPlayed) {
-                        text += "~~";
-                    }
-                }
-                if (passed) {
+            Set<Integer> SCs = player.getSCs();
+            HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
+            String text = "";
+            for (int sc_ : SCs) {
+                Boolean found = scPlayed.get(sc_);
+                boolean isPlayed = found != null ? found : false;
+                String scEmoji = isPlayed ? Helper.getSCBackEmojiFromInteger(sc_) : Helper.getSCEmojiFromInteger(sc_);
+                if (isPlayed) {
                     text += "~~";
                 }
-                text += Helper.getPlayerRepresentation(event, player);
-                if (passed) {
-                    text += "~~ - PASSED";
+                text += scEmoji + Helper.getSCAsMention(event.getGuild(), sc_);
+                if (isPlayed) {
+                    text += "~~";
                 }
-                
-                if(player.getUserID().equals(map.getSpeaker())) {
-                    text += " " + Emojis.SpeakerToken;
-                }
-                
-                order.put(sc, text);
-                
             }
-            StringBuilder msg = new StringBuilder("__**Turn Order:**__\n");
+            if (passed) {
+                text += "~~";
+            }
+            text += Helper.getPlayerRepresentation(event, player);
+            if (passed) {
+                text += "~~ - PASSED";
+            }
 
+            if (player.getUserID().equals(map.getSpeaker())) {
+                text += " " + Emojis.SpeakerToken;
+            }
 
-            if (naaluSC != 0) {
-                String text = order.get(naaluSC);
-                msg.append("`").append(0).append(".`").append(text).append("\n");
+            order.put(sc, text);
+
+        }
+        StringBuilder msg = new StringBuilder("__**Turn Order:**__\n");
+
+        if (naaluSC != 0) {
+            String text = order.get(naaluSC);
+            msg.append("`").append(0).append(".`").append(text).append("\n");
+        }
+        Integer max = Collections.max(map.getScTradeGoods().keySet());
+        for (int i = 1; i <= max; i++) {
+            if (naaluSC != 0 && i == naaluSC) {
+                continue;
             }
-            Integer max = Collections.max(map.getScTradeGoods().keySet());
-            for (int i = 1; i <= max; i++) {
-                if (naaluSC != 0 && i == naaluSC) {
-                    continue;
-                }
-                String text = order.get(i);
-                if (text != null) {
-                    msg.append("`").append(i).append(".`").append(text).append("\n");
-                }
+            String text = order.get(i);
+            if (text != null) {
+                msg.append("`").append(i).append(".`").append(text).append("\n");
             }
-            msg.append("_ _"); //forced extra line
-            if (event.getName().equals(Constants.PLAYER)) { //catch if called from /player sc_pick
-                MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
-            } else {
-                MessageHelper.replyToMessage(event, msg.toString());
-            }
+        }
+        msg.append("_ _"); // forced extra line
+        if (event.getName().equals(Constants.PLAYER)) { // catch if called from /player sc_pick
+            MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
         } else {
-            MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup community_mode:YES` or `/game setup fow_mode:YES`");
+            MessageHelper.replyToMessage(event, msg.toString());
         }
     }
 
