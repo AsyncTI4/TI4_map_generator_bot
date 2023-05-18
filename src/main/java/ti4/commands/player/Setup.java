@@ -15,6 +15,7 @@ import ti4.map.Map;
 import ti4.map.MapStringMapper;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.model.FactionModel;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -87,10 +88,10 @@ public class Setup extends PlayerSubcommandData {
             }
         }
 
-        String[] setupInfo = player.getFactionSetupInfo();
+        FactionModel setupInfo = player.getFactionSetupInfo();
        
         //HOME SYSTEM
-        String hsTile = setupInfo[1];
+        String hsTile = setupInfo.homeSystemTile;
 
         ArrayList<String> setup;
         boolean useSpecified = false;
@@ -169,8 +170,8 @@ public class Setup extends PlayerSubcommandData {
         }
 
         //STARTING COMMODITIES
-        player.setCommoditiesTotal(Integer.parseInt(setupInfo[3]));
-        for (String tech : setupInfo[5].split(",")) {
+        player.setCommoditiesTotal(setupInfo.commodities);
+        for (String tech : setupInfo.startingTech) {
             if (tech.trim().isEmpty()){
                 continue;
             }
@@ -178,7 +179,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         //STARTING PLANETS
-        for (String planet : setupInfo[6].split(",")) {
+        for (String planet : setupInfo.homePlanets) {
             if (planet.isEmpty()){
                 continue;
             }
@@ -205,8 +206,8 @@ public class Setup extends PlayerSubcommandData {
         LeaderInfo.sendLeadersInfo(activeMap, player, event);
     }
 
-    private void addUnits(String[] setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {
-        String units = setupInfo[2];
+    private void addUnits(FactionModel setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {
+        String units = setupInfo.startingFleet;
         units = units.replace(", ", ",");
         StringTokenizer tokenizer = new StringTokenizer(units, ",");
         while (tokenizer.hasMoreTokens()) {

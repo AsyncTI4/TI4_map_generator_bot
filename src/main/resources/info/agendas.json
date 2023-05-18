@@ -1,0 +1,994 @@
+{
+  "agendas": [
+    {
+      "alias": "revolution",
+      "name": "Anti-Intellectual Revolution",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: After a player researches a technology, that player must destroy 1 of their non-fighter ships.",
+      "text2": "Against: At the start of the next strategy phase, each player chooses and exhausts 1 planet for each technology that they own.",
+      "source": "PoK"
+    },
+    {
+      "alias": "secret",
+      "name": "Archived Secret",
+      "type": "Directive",
+      "target": "Elect Player",
+      "text1": "The elected player draws 1 secret objective.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "arms_reduction",
+      "name": "Arms Reduction",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Each player destroys all but 2 of their dreadnoughts and all but 4 of their cruisers.",
+      "text2": "Against: At the start of the next strategy phase, each player exhausts each of their planets that have a technology specialty.",
+      "source": "PoK"
+    },
+    {
+      "alias": "classified",
+      "name": "Classified Document Leaks",
+      "type": "Law",
+      "target": "Elect Scored Secret Objective (When this agenda is revealed, if there are no scored secret objectives, discard this card and reveal another agenda from the top of the deck.)",
+      "text1": "The elected secret objective becomes a public objective - place it near the other public objectives in the common play area.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "redistribution",
+      "name": "Colonial Redistribution",
+      "type": "Directive",
+      "target": "Elect Non-Home Planet Other Than Mecatol Rex",
+      "text1": "Destroy each unit on the elected planet. Then, the player who controls that planet chooses 1 player with the fewest victory points - that player may place 1 infantry from their reinforcements on that planet.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "committee",
+      "name": "Committee Formation",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card. Before players vote on an agenda that requires a player to be elected, the owner of this card may discard this card to choose a player to be elected. Players do not vote on that agenda.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "disarmamament",
+      "name": "Compensated Disarmament",
+      "type": "Directive",
+      "target": "Elect Planet",
+      "text1": "Destroy each ground force on the elected planet. for each unit that was destroyed, the player who control that planet gains 1 trade good.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "conventions",
+      "name": "Conventions of War",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Players cannot use Bombardment against units that are on cultural planets.",
+      "text2": "Against: Each player that voted \"Against\" discards all of their action cards.",
+      "source": "PoK"
+    },
+    {
+      "alias": "economic_equality",
+      "name": "Economic Equality",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Each player returns all of their trade goods to the supply. Then, each player gains 5 trade goods.",
+      "text2": "Against: Each player returns all of their trade goods to the supply.",
+      "source": "PoK"
+    },
+    {
+      "alias": "travel_ban",
+      "name": "Enforced Travel Ban",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Alpha and beta wormholes have no effect during movement.",
+      "text2": "Against: Destroy each PDS in or adjacent to a system that contains a wormhole.",
+      "source": "PoK"
+    },
+    {
+      "alias": "sanctions",
+      "name": "Executive Sanctions",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Each player can have a maximum of 3 action cards in their hand.",
+      "text2": "Against: Each player discards 1 random action card from their hand.",
+      "source": "PoK"
+    },
+    {
+      "alias": "regulations",
+      "name": "Fleet Regulations",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Each player cannot have more than 4 tokens in their fleet pool.",
+      "text2": "Against: Each player places 1 command token from their reinforcements in their fleet pool.",
+      "source": "PoK"
+    },
+    {
+      "alias": "defense_act",
+      "name": "Homeland Defense Act",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Each player can have any number of PDS units on planets they control.",
+      "text2": "Against: Each player destroys 1 of their PDS units.",
+      "source": "PoK"
+    },
+    {
+      "alias": "arbiter",
+      "name": "Imperial Arbiter",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card. At the end of the strategy phase, the owner of this card may discard this card to swap 1 of their strategy cards with 1 of another player's strategy cards.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "incentive",
+      "name": "Incentive Program",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Draw and reveal 1 stage I public objective from the deck and place it near the public objectives.",
+      "text2": "Against: Draw and reveal 1 stage II public from the deck and place it near the public objectives.",
+      "source": "PoK"
+    },
+    {
+      "alias": "artifact",
+      "name": "Ixthian Artifact",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: The speaker rolls 1 die. If the result is 6-10, each player may research 2 technologies. If the result is 1-5, destroy all units in Mecatol Rex's system, and each player with units in systems adjacent to Mecatol Rex's system destroys 3 of their own units in each of those systems.",
+      "text2": "Against: No effect.",
+      "source": "PoK"
+    },
+    {
+      "alias": "abolishment",
+      "name": "Judicial Abolishment",
+      "type": "Directive",
+      "target": "Elect law (When this agenda is revealed, if there are no Elect laws in play, discard this card and reveal another agenda from the top of the deck.)",
+      "text1": "Discard the elected law from play.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "minister_commrece",
+      "name": "Minister of Commerce",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card. After the owner of this card replenishes commodities, they gain 1 trade good for each player that is their neighbor.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "minister_exploration",
+      "name": "Minister of Exploration",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card. When the owner of this card gains control of a planet, they gain 1 trade good.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "minister_industry",
+      "name": "Minister of Industry",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card. When the owner of this card places a space dock in a system, their units in that system may use their Production abilities.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "minister_peace",
+      "name": "Minister of Peace",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card. After a player activates a system that contains 1 or more of a different player's units, the owner of this card may discard this card - immediately end the active player's turn.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "minister_policy",
+      "name": "Minister of Policy",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card. At the end of the status phase, the owner of this card draws 1 action card.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "minister_sciences",
+      "name": "Minister of Sciences",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card. When the owner of this card resolves the primary or secondary ability of the \"Technology\" strategy card, they do not need to spend resources to research technology.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "minister_war",
+      "name": "Minister of War",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card. The owner of this card may discard this card after performing an action to remove 1 of their command counters from the game board and return it to their reinforcements - then they may perform 1 additional action.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "miscount",
+      "name": "Miscount Disclosed",
+      "type": "Directive",
+      "target": "Elect law (When this agenda is revealed, if there are no Elect laws in play, discard this card and reveal another agenda from the top of the deck.)",
+      "text1": "Vote on the elected law as if it were just revealed from the top of the deck.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "mutiny",
+      "name": "Mutiny",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Each player that voted \"For\" gains 1 victory point.",
+      "text2": "Against: Each player that voted \"For\" loses 1 victory point.",
+      "source": "PoK"
+    },
+    {
+      "alias": "constitution",
+      "name": "New Constitution",
+      "type": "Directive",
+      "target": "For/Against (When this agenda is revealed, if there are no Elect laws in play, discard this card and reveal another agenda from the top of the deck.)",
+      "text1": "For: Discard all laws from play. At the start of the next strategy phase, each player exhausts each planet in their home system.",
+      "text2": "Against: No effect.",
+      "source": "PoK"
+    },
+    {
+      "alias": "prophecy",
+      "name": "Prophecy of Ixth",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card. The owner of this card applies +1 to the result of their fighter's combat rolls. When the owner of this card uses Production, they discard this card unless they produce 2 or more fighters.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "execution",
+      "name": "Public Execution",
+      "type": "Directive",
+      "target": "Elect Player",
+      "text1": "The elected player discards all of their action cards. If they have the speaker token, they give it to the player on their left. The elected player cannot vote on any agendas during this agenda phase.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "schematics",
+      "name": "Publicize Weapon Schematics",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: If any player owns a war sun technology, all players may ignore all prerequisites on war sun technologies. All war suns lose Sustain Damage.",
+      "text2": "Against: Each player that owns a war sun technology discards all of their action cards.",
+      "source": "PoK"
+    },
+    {
+      "alias": "conscription",
+      "name": "Regulated Conscription",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: When a player produces units, they produce only 1 fighter and infantry for its cost instead of 2.",
+      "text2": "Against: No effect.",
+      "source": "PoK"
+    },
+    {
+      "alias": "seed_empire",
+      "name": "Seed of an Empire",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: The player with the most victory points gains 1 victory point.",
+      "text2": "Against: The player with the fewest victory points gains 1 victory point.",
+      "source": "PoK"
+    },
+    {
+      "alias": "shared_research",
+      "name": "Shared Research",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Each player's units can move through nebulae.",
+      "text2": "Against: Each player places a command token from their reinforcements in their home system, if able.",
+      "source": "PoK"
+    },
+    {
+      "alias": "plowshares",
+      "name": "Swords to Plowshares",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Each player destroys half of their infantry on each planet they controls, rounded up. Then, each player gains trade goods equal to the number of their infantry that were destroyed.",
+      "text2": "Against: Each player places 1 infantry from their reinforcements on each planet they control.",
+      "source": "PoK"
+    },
+    {
+      "alias": "unconventional",
+      "name": "Unconventional Measures",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Each player that voted \"For\" draws 2 action cards.",
+      "text2": "Against: Each player that voted \"For\" discards all of their action cards.",
+      "source": "PoK"
+    },
+    {
+      "alias": "wormhole_recon",
+      "name": "Wormhole Reconstruction",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: All systems that contain either an alpha or beta wormhole are adjacent to each other.",
+      "text2": "Against: Each player places a command token from their reinforcements in each system that contains a wormhole and 1 or more of their ships.",
+      "source": "PoK"
+    },
+    {
+      "alias": "wormhole_research",
+      "name": "Wormhole Research",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Each player who has 1 or more ships in a system that contains a wormhole may research 1 technology. Then, destroy all ships in systems that contain an alpha or beta wormhole.",
+      "text2": "Against: Each player that voted \"Against\" removes 1 command token from their command sheet and returns it to their reinforcements.",
+      "source": "PoK"
+    },
+    {
+      "alias": "standardization",
+      "name": "Armed Forces Standardization",
+      "type": "Directive",
+      "target": "Elect Player",
+      "text1": "The elected player place command tokens from their reinforcements so that they have 3 tokens in their tactic pool, 3 tokens in their fleet pool, and 2 tokens in their strategy pool. They return any excess tokens to their reinforcements.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "articles_war",
+      "name": "Articles of War",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: All mechs lose their printed abilities except for Sustain Damage.",
+      "text2": "Against: Each player that voted \"For\" gets 3 trade goods.",
+      "source": "PoK"
+    },
+    {
+      "alias": "checks",
+      "name": "Checks and Balances",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: When a player chooses a strategy card during the strategy phase, they give that strategy card to another player who does not have 1 (or a player who does not have 2 is a three- or four-player game), if able.",
+      "text2": "Against: Each player readies only 3 of their planets at the end of this agenda phase.",
+      "source": "PoK"
+    },
+    {
+      "alias": "cladenstine",
+      "name": "Clandestine Operations",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Each player removes 2 command tokens from their command sheet and return those tokens to their reinforcements.",
+      "text2": "Against: Each player removes 1 command token from their fleet pool and returns that token to their reinforcements.",
+      "source": "PoK"
+    },
+    {
+      "alias": "covert",
+      "name": "Covert Legislation",
+      "type": "Directive",
+      "target": "When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect Elect Player, etc.) the other Players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects.",
+      "text1": "",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "crisis",
+      "name": "Galactic Crisis Pact",
+      "type": "Directive",
+      "target": "Elect Strategy Card",
+      "text1": "Each player may perform the secondary ability of the elected strategy card without spending a command token - command tokens placed by the ability are placed from a player's reinforcements instead.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "minister_antiquities",
+      "name": "Minister of Antiquities",
+      "type": "Directive",
+      "target": "Elect Player",
+      "text1": "The elected player gains 1 relic.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "nexus",
+      "name": "Nexus Sovereignty",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Alpha and beta wormholes in the wormhole nexus have no effect during movement.",
+      "text2": "Against: Place a gamma wormhole token in the Mecatol Rex system.",
+      "source": "PoK"
+    },
+    {
+      "alias": "censure",
+      "name": "Political Censure",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card and 1 victory point. The elected player cannot play action cards. If the owner of this card loses this card, they lose 1 victory point.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "rearmament",
+      "name": "Rearmament Agreement",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Each player places 1 mech from their reinforcements on a planet they control in their home system.",
+      "text2": "Against: Each player replaces each of their mechs with 1 infantry from their reinforcements.",
+      "source": "PoK"
+    },
+    {
+      "alias": "rep_govt",
+      "name": "Representative Government",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Players cannot exhaust planets to cast votes during the agenda phase. each player may cast 1 vote on each agenda instead. Players cannot cast additional votes.",
+      "text2": "Against: At the start of the next strategy phase, each player that voted \"Against\" exhausts all of their cultural planets.",
+      "source": "PoK"
+    },
+    {
+      "alias": "grant_reallocation",
+      "name": "Research Grant Reallocation",
+      "type": "Directive",
+      "target": "Elect Player",
+      "text1": "The elected player gains any 1 technology of their choice. Then, for each prerequisite on that technology, they remove 1 token from their fleet pool and return it to their reinforcements.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "warrant",
+      "name": "Search Warrant",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card and draws 2 secret objectives. The owner of this card plays with their secret objectives revealed.",
+      "text2": "",
+      "source": "PoK"
+    },
+    {
+      "alias": "absol_affirmation",
+      "name": "Affimation of Divine Right",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Mecatol Rex is a legendary planet. At the end of the each strategy phase, each other player must give one promissory note from their hand to the player who controls Mecatol Rex.",
+      "text2": "Against: Exhaust the Imperial strategy card. Place this card with the current laws, and place the Custodians token on this card. The player who had the Custodians token loses 1 victory point. While this law is in play with the custodians token on it, players cannot gain victory points for controlling Mecatol Rex from the Imperial strategy card. If this law is discarded, the player that controls Mecatol Rex gains the custodian token and 1 victory point.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_revolution",
+      "name": "Anti-Intellectual Revolution",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: When resolved, each player that voted \"For\" or abstained returns one technology they own with the most prerequisites to their technology decks. Double the prerequisites on all technologies.",
+      "text2": "Against: Exhaust the Technology strategy card and remove any Trade Goods from it. Any player that voted \"Against\" or abstained destroys a number of units on the game board with a combined cost of at least 6 resources.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_secret",
+      "name": "Archived Secret",
+      "type": "Directive",
+      "target": "Elect Player",
+      "text1": "The elected player draws 2 secret objectives, then gives one promissory note from their hand to the other player that cast the most votes for them.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_standardization",
+      "name": "Armed Forces Standardization",
+      "type": "Directive",
+      "target": "Elect Player",
+      "text1": "The elected player places command tokens from their reinforcements so that they have 3 tokens in their tactic pool, 3 tokens in their fleet pool, and 2 tokens in their strategy pool. They return any excess tokens to their reinforcements, then look at the promissory notes of the other player that cast the most votes for them and take any 1 promissory note.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_reduction",
+      "name": "Arms Reduction",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Each player destroys all but 2 of their dreadnoughts and all but 4 of their cruisers. The player that cast the most votes \"For\" adds a command token from their reinforcements to their strategy pool.",
+      "text2": "Against: At the start of the next strategy phase, each player exhausts each of their planets that have a technology specialty. The player that cast the most votes \"Against\" may research a unit upgrade technology.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_articleswar",
+      "name": "Articles of War",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Place a control token for the player that cast the most votes \"For\" on this card. All mechs lose their printed abilities except for Sustain Damage. After any player activates a system, a player whose control token is on this card may discard that control token to ignore the effects of this law during that activation.",
+      "text2": "Against: Players that voted \"For\" or abstained must remove all their mechs from the game board. The player that cast the most votes \"Against\" may place any mechs in their reinforcements on any planet or planets they control.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_checks",
+      "name": "Checks and Balances",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: The player that cast the most votes \"For\" places a control token on this card. When a player chooses a strategy card during the strategy phase, they give that strategy card to another player who does not have 1 (or a player who does not have 2 in a three- or four-player game), if able. If they do not currently have a strategy card, a player whose control token on this card may discard that token to keep the chosen strategy card, instead.",
+      "text2": "Against: Remove all control tokens from public objectives and shuffle all scored secret objectives back into the deck. Players do not gain or lose victory points as a result of this.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_operations",
+      "name": "Clandestine Operations",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: The player who cast the most votes \"For\" gains 2 command tokens and takes the Speaker token. Then, each player removes 1 command token from the command sheet of the player to their left and returns it to that players reinforcements.",
+      "text2": "Against: Each player removes 1 command token from their fleet pool. Exhaust the Politics strategy card.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_leak",
+      "name": "Classified Document Leak",
+      "type": "Law",
+      "target": "Elect Scored Secret Objective",
+      "text1": "The elected secret objective becomes a public objective. The player that cast the most votes for that objective may immediately score it, if they meet the requirements.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_redistribution",
+      "name": "Colonial Redistribution",
+      "type": "Directive",
+      "target": "Elect non-home planet other than Mecatol Rex",
+      "text1": "Remove each unit on the elected planet. The player who controls that planet places the removed units on a planet in their home system, if able, then chooses one other player with the fewest victory points| that player may place 3 infantry from their reinforcements on the elected planet.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_formation",
+      "name": "Committee Formation",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card and gives the other player that cast the most votes for them one promissory note from their hand. Before players vote on an agenda that requires a player to be elected, the owner of this card may discard this card to choose the player to be elected. Players do not vote on that agenda. The owner of this card is considered to have cast the most votes for the resolved outcome.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_disarmamament",
+      "name": "Compensated Disarmamanet",
+      "type": "Directive",
+      "target": "Elect non-home planet",
+      "text1": "Remove each ground force on the elected planet| the player that controls that planet gains 1 trade good for each infantry removed and 2 trade goods for each mech removed. The other player that controls the elected planet gives the other player that cast the most votes for that planet 1 promissory note from their hand.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_conventionswar",
+      "name": "Conventions of War",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Players cannot use Bombardment against Cultural planets. The player who cast the most votes \"For\" gains 1 trade good for each of their Cultural planets.",
+      "text2": "Against: Players who voted \"Against\" or abstained discard all of their action cards. The player who cast the most votes \"Against\" must give 1 promissory note to the other player with the most Cultural planets, if able.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_covert",
+      "name": "Covert Legislation",
+      "type": "Directive",
+      "target": "When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other players. If it is Emergency Session, it is played as normal and the speaker draws the next card. The speaker reads the eligible outcomes aloud (for, against, elect player, etc.)| the other players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects.",
+      "text1": "",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_spending",
+      "name": "Discretionary Spending",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: All players gain trade goods equal to the number of planets they control. The player that cast the most votes \"For\" refreshes their commodities. In voting order, all players may spend any number of trade goods as follows, with the listed costs: use the PRODUCTION ability of units in a system (Cost)| research up to 2 technologies (4 each)| Place a space dock or PDS on a planet they control (3)| draw 3 action cards (2)| explore a planet they control or a frontier token in a system that containst their ships (1).",
+      "text2": "Against: All players except the player that cast the most votes \"Against\" lose half of their trade goods (rounded up).",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_equality",
+      "name": "Economic Equality",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Each player returns all their trade goods to the supply. Each player gains 2 commodities. The player that cast the most votes \"For\" gainst the Speaker token.",
+      "text2": "Against: The player that cast the most votes \"Against\" gains a number of trade goods equal to their current number of trade goods. If they gained more trade goods than the number of players, all other players lose 1 trade good, if able.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_emergency1",
+      "name": "Emergency Session",
+      "type": "Agenda Phase",
+      "target": "",
+      "text1": "When this card is revealed, place it in the common play area. This card is not an agenda, and players do not vote on this card. For each copy of Emergency Session in the common play area, players vote on one additional agenda during the agenda phase. At the end of the agenda phase, discard all Emergency Session cards currently in play.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_emergency2",
+      "name": "Emergency Session",
+      "type": "Agenda Phase",
+      "target": "",
+      "text1": "When this card is revealed, place it in the common play area. This card is not an agenda, and players do not vote on this card. For each copy of Emergency Session in the common play area, players vote on one additional agenda during the agenda phase. At the end of the agenda phase, discard all Emergency Session cards currently in play.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_emergency3",
+      "name": "Emergency Session",
+      "type": "Agenda Phase",
+      "target": "",
+      "text1": "When this card is revealed, place it in the common play area. This card is not an agenda, and players do not vote on this card. For each copy of Emergency Session in the common play area, players vote on one additional agenda during the agenda phase. At the end of the agenda phase, discard all Emergency Session cards currently in play.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_emergency4",
+      "name": "Emergency Session",
+      "type": "Agenda Phase",
+      "target": "",
+      "text1": "When this card is revealed, place it in the common play area. This card is not an agenda, and players do not vote on this card. For each copy of Emergency Session in the common play area, players vote on one additional agenda during the agenda phase. At the end of the agenda phase, discard all Emergency Session cards currently in play.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_travelban",
+      "name": "Enforced Travel Ban",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Place a control token for the player that cast the most votes \"For\" on this card. Alpha and beta wormholes have no effect during movement. When activating a system, a player whose control token is on this card may discard that control token to ignore the effects of this law during that activation.",
+      "text2": "Against: Players who voted \"Against\" gain 1 trade good for each wormhole in systems that contain 1 or more of their units. Players that gained trade goods also gain 1 commodity for each of their neighbors.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_sanctions",
+      "name": "Executive Sanctions",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Place a control token for the player who cast the most votes \"For\" on this card. Any player who does not have a control token on this card has an action card hand limit of 3. A player whose control token is on this card has an action card hand limit of 5.",
+      "text2": "Against: The player who cast the most votes \"Against\" draws 5 action cards.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_regulations",
+      "name": "Fleet Regulations",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Place a control token for the player that cast the most votes \"For\" on this card. Any player who does not have a control token on this card can have a maximum of 4 of their command tokens in their fleet pool. A player whose control token is on this card can have a maximum of 5 of their command tokens in their fleet pool.",
+      "text2": "Against: The player who cast the most votes \"Against\" places 3 command tokens from their reinforcements in their fleet pool.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_crisis",
+      "name": "Glactic Crisis Pact",
+      "type": "Directive",
+      "target": "Elect strategy card",
+      "text1": "Each player may perform the secondary ability of the elected strategy card without spending a command token| command tokens placed by the ability are placed from a player\"s reinforcements, instead. The player that cast the most votes for the elected strategy card may choose to perform the primary ability, instead.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_defenseact",
+      "name": "Homeland Defense Act",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: When placing a PDS on a planet, players may place 2 PDS instead of 1. The player who cast the most votes \"For\" may immediately place a PDS on each planet they control in one system.",
+      "text2": "Against: Each player destroys 1 of their PDS units. Each player that voted \"Against\" or abstained must give a promissory note from their hand to a player that voted \"For,\" if able.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_hyperlane",
+      "name": "Hyperlane Development Program",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Systems that contain no planets or anomalies do not cost movement for ships to move through. Players may allow other players\" ships to move through those systems. The player that cast the most votes \"For\" may research 1 propulsion technology.",
+      "text2": "Against: Exhaust the Trade strategy card. All players lose 3 trade goods, or all their trade goods if they have less than 3. The player who cast the most \"Against\" may place 1 cruiser or destroyer from their reinforcements in each system that contains their ships and no planets or anomalies.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_arbiter",
+      "name": "Imperial Arbiter",
+      "type": "Law",
+      "target": "Elect player",
+      "text1": "The elected player gains this card and gives each other player that voted for them 1 promissory note from their hand (from most votes to least), if able. At the start of the action phase, the owner of this card may spend 1 command token from their strategy pool and up to 8 influence to swap 1 of their strategy cards with a strategy card with an initiative value equal to the influence spent.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_incentive",
+      "name": "Incentive Program",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Draw and reveal 1 stage I public objective from the deck and place it near the public objectives. The player that cast the most votes \"For\" may immediately score that objective, if they meet the requirements.",
+      "text2": "Against: Draw and reveal 1 stage II public objective from the deck and place it near the public objectives. The player that cast the most votes \"Against\" may immediately score that objective, if they meet the requirements.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_artifact",
+      "name": "Ixthian Artifact",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: The speaker rolls 1 die. If the result is 7-10, each player may research 2 technologies. If the result is 1-6, destroy all units in Mecatol Rex\"s system, and each player with units in systems adjacent to Mecatol Rex\"s system destroys 3 of their own units in each of those systems.",
+      "text2": "Against: Attach this card to the Mecatol Rex planet card. The player that controls Mecatol Rex gains 1 victory point, and loses 1 victory point if they lose control of Mecatol Rex.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_abolishment",
+      "name": "Judicial Abolishment",
+      "type": "Directive",
+      "target": "Elect law",
+      "text1": "When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck. Discard the elected law. The player that cast the most votes for the elected law places a command token from their reinforcements in their strategy pool, then gives a promissory note from their hand to any player who owned or had a control token on the law.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_minsantique",
+      "name": "Minister of Antiquities",
+      "type": "Law",
+      "target": "Elect player",
+      "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Imperial strategy card without spending a command token. Whenever the owner of this card would draw a secret objective, they may spend a command token from their strategy pool to instead draw a relic.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_minscomm",
+      "name": "Minister of Commerce",
+      "type": "Law",
+      "target": "Elect player",
+      "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Trade strategy card without spending a command token. Whenever the owner of this card refreshes their commodities, they gain 1 trade good per player that is their neighbor.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_minsexp",
+      "name": "Minister of Exploration",
+      "type": "Law",
+      "target": "Elect player",
+      "text1": "The elected player gains this card. When gaining command tokens as part of the secondary ability of the leadsership strategy card, the owner of this card gains 1 addition command token. After performing a tactical action, the owner of this card may explore one planet in the active system that contains their units.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_minsindus",
+      "name": "Minister of Industry",
+      "type": "Law",
+      "target": "Elect player",
+      "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Construction strategy card without spending or placing a command token. The owner of this card doubles the production value of their space docks.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_minspeace",
+      "name": "Minister of Peace",
+      "type": "Law",
+      "target": "Elect player",
+      "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Diplomacy strategy card without spending a command token. After a player activates a system that contains 1 or more of another player\"s units, the owner of this card may spend a command token from their strategy pool and give the active player a promissory note from their hand to immediately end the active player\"s turn.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_minspolicy",
+      "name": "Minister of Policy",
+      "type": "Law",
+      "target": "Elect player",
+      "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Politics strategy card without spending a command token. Players no longer draw action cards in the status phase. Instead, the owner of this card looks at a number of action cards from the deck equal to the number of players plus 1, adds 2 to their hand, then gives one to each other player. Players with technologies or abilities that increase the number of action cards drawn may then use those abilities to draw additional action cards, as normal.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_minssci",
+      "name": "Minister of Sciences",
+      "type": "Law",
+      "target": "Elect player",
+      "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Technology strategy card without spending a command token. The owner of this card does not need to spend resources to research technology as part of the Technology strategy card.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_minswar",
+      "name": "Minister of War",
+      "type": "Law",
+      "target": "Elect player",
+      "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Warfare strategy card without spending a command token. The owner of this card may perform the following component action: Action:Exhaust this card and spend 1 command token from their strategy pool to perform the primary ability of the Warfare strategy card.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_miscount",
+      "name": "Miscount Disclosed",
+      "type": "Directive",
+      "target": "Elect law",
+      "text1": "When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck. Vote on the elected law, as if it were just revealed from the top of the deck. The player that cast the most votes for the elected law casts 2 additional votes per player when voting on the elected law.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_mutiny",
+      "name": "Mutiny",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Exhaust the Politics strategy card and remove all trade goods from it. The player who cast the most votes \"For\" takes the speaker token. All palyers that voted \"For\" gain 1 victory point. If all players voted \"For,\" the speaker gains 1 additional victory point.",
+      "text2": "Against: Each player who voted \"For\" loses 1 victory point and must give the speaker a promissory note from their hand. If all players voted \"Against\" or abstained, the Speaker and the other player who cast the most votes \"Against\" gain 1 victory point.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_constitution",
+      "name": "New Constitution",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Discard all laws in play, if any. The player that cast the most votes \"For\" takes the speaker token, then reveals cards from the bottom of the agenda deck until a law is revealed. Players vote on that law as if it had just been revealed from the top of the deck. Shuffle the other revealed cards (except for any Emergency Sessions) back into the agenda deck.",
+      "text2": "Against: Every player that voted \"Against\" or abstained must give a player that voted \"For\" a promissory note from their hand, if possible.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_nexus",
+      "name": "Nexus Sovereignty",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Alpha and beta wormholes in the wormhole nexus have no effect on movement. The player that controls Mallice may spend 1 influence at any time to ignore the effects of this law for the duration of the current active player\"s turn.",
+      "text2": "Against: Place a gamma wormhole token in the Mecatol Rex system. Destroy 1 non-fighter ship belonging to the player that cast the most votes \"Against\" in all systems in and adjacent to the wormhole nexus.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_pax",
+      "name": "Pax Magnifica, Bellum Gloriosum",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: Exhaust the Warfare strategy card. The player who cast the most votes \"For\" adds 2 command tokens from their reinforcements to their strategy pool. Players reveal all Ceasefire promissory notes in their hand, then give each Ceasefire matching their color to another player. Players may not receive Ceasefire promissory notes matching their color as part of transactions.",
+      "text2": "Against: Exhaust the Diplomacy strategy card. The player who cast the most votes \"Against\" adds 2 command tokens from their reinforcements to their fleet pool. Players may use the PRODUCTION ability of any number of their units.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_censure",
+      "name": "Political Censure",
+      "type": "Law",
+      "target": "Elect player",
+      "text1": "The elected player gains this card and 1 victory point. If they are the speaker, the other player that cast the most votes for them takes the speaker token. The electd player cannot play action cards or take or be given the speaker token. If the elected player loses this card, they lose 1 victory point.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_sites",
+      "name": "Preservation of Historical Sites",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: The player who cast the most votes \"For\" gains 2 trade goods for each legendary planet and planet with attachments that they control. Players must spend 1 influence to explore industrial planets and 2 influence to explore cultural planets.",
+      "text2": "Against: The player who cast the most votes \"Against\" may immediately explore every planet they control.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_prophecy",
+      "name": "Prophecy of Ixth",
+      "type": "Law",
+      "target": "Elect Player",
+      "text1": "The elected player gains this card. The owner of this card applies +1 to the results of their fighter\"s combat rolls. Hits produced by their fighter must be applied to non-fighter ships, if possible. When the other of this card uses produciton, they discard this card unless they produced 2 or more fighters.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_execution",
+      "name": "Public Execution",
+      "type": "Directive",
+      "target": "Elect player",
+      "text1": "The player who cast the most votes for the elected player looks at the elected player\"s action cards and adds up to 2 to their hand. The elected player discards all of their action cards and exhausts all of their planets. If they have the speaker token, they give it to the player who cast the most votes for them.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_schematics",
+      "name": "Publicize Weapon Schematics",
+      "type": "Law",
+      "target": "Elect owned non-faction unit upgrade technology",
+      "text1": "Every player may ignore the prerequisites on the elected technology. That unit upgrade loses the Sustain Damage ability if it has it . The player that cast the most votes for the elected technology may immediately gain that technology.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_agreement",
+      "name": "Rearmament Agreement",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Each player places one mech from their reinforcements on a planet they control in their home system. The player that cast the most votes \"For\" places an additional mech from their reinforcements on any planet they control and adds a command token from their reinforcements to their fleet pool.",
+      "text2": "Against: Each player replaces each of their mechs with an infantry from their reinforcements. The player that cast the most votes \"Against\" places 1 command token from their reinforcements in their strategy pool for every 2 planets they control that do not contain ground forces.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_conscription",
+      "name": "Regulated Conscription",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: When a player produces units, they produce only 1 fighter and infantry for its cost, instead of 2. The player that cast the most votes \"For\" gains 1 trade good for every industrial planet they control.",
+      "text2": "Against: The player who cast the most votes \"Against\" must give 1 promissory note to the other player with the most Industrial planets. At the start of the strategy phase, players who voted \"Against\" or abstained must exhaust all of their industrial planets.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_government",
+      "name": "Representative Government",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: The player who cast the most votes \"For\" takes the speaker token. Players cannot exhaust planets to cast votes during the Agenda phase| each player may cast 1 vote on each agenda instead, except the player who control Mecatol Rex, who may cast 2 votes on each agenda. Players cannot cast additional votes.",
+      "text2": "Against: At the start of the next strategy phase, each player that voted \"Against\" or abstained exhausts all of their cultural planets and may not select the Politics strategy card.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_grant",
+      "name": "Research Grant Allocation",
+      "type": "Directive",
+      "target": "Elect player",
+      "text1": "The elected player researched any 1 non-faction technology. The player that cast the most votes for the elected player may gain that technology by paying 2 trade goods for each prerequisite on that technology.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_warrant",
+      "name": "Search Warrant",
+      "type": "Law",
+      "target": "Elect player",
+      "text1": "Place a control token for the non-elected player that cast the most votes for the elected player on this card. The elected player gains this card and draws 4 secret objectives. The owner of this card plays with their secret objectives revealed. When the owner of this card would discard a secret objective, a player whose control token is on this card may take that secret objective instead.",
+      "text2": "",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_seeds",
+      "name": "Seed of an Empire",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: The player with the most victory points (speaker breaks ties) gains the speaker token and 1 victory point, then gives one promissory note to each other player that voted \"For\" (from most to least votes), if able.",
+      "text2": "Against: The player with the least victory points (speaker breaks ties) gainst 1 victory point, draws 3 action cards, and adds 1 command token from their reinforcements to each of their tactics, fleet, and strategy pools.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_shared",
+      "name": "Shared Research",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: During tactical actions, the active player may decide that any anomaly that does not contain a Frontier token does not affect movement. The player who cast the most votes \"For\" may immediately explore any Frontier tokens in anomaly systems that contain their ships.",
+      "text2": "Against: The player who cast the most votes \"For\" takes one command token from the reinforcements of each player who voted \"Against\" or abstained and places them in any number of anomaly systems of their choice.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_swords",
+      "name": "Swords to Plowshares",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Each player removes half of their infantry on each planet they control, rounding down. Then, each player gains trade goods equal to the number of their infantry removed. The player who cast the most votes \"For\" may explore every planet from which infantry were removed.",
+      "text2": "Against: The player who cast the most votes \"Against\" places 1 infantry from their reinforcements on each planet they control.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_limits",
+      "name": "Term Limits",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: The player who cast the most votes \"For\" takes the speaker token. When resolving an agenda, if the agenda resolves in the way the speaker voted or predicted, or if the speaker broke a tie to choose the resolution, the other player who cast the most votes for an outcome that was not resolved takes the speaker token.",
+      "text2": "Against: The player who cast the most votes \"Against\" takes the speaker token. Exhaust the Politics strategy card and remove all trade goods from it. Players who voted \"Against\" or abstained must give one promissory note from their hand to a player who voted \"For,\" if able.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_measures",
+      "name": "Unconventional Measures",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Each player who voted \"For\" draws 2 action cards. Each player who voted \"Against\" places a command token from their reinforcements into their strategy pool.",
+      "text2": "Against: Each player who voted \"For\" or abstained discards their action cards. The player that cast the most votes \"Agaisnt\" chooses one strategy card to become exhausted and removed all trade goods from it.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_recon",
+      "name": "Wormhole Reconstruction",
+      "type": "Law",
+      "target": "For/Against",
+      "text1": "For: The player who cast the most votes \"For\" places their control token on this card| players may treat alpha wormholes as beta wormholes during movement, and vice versa. A player whose control token is on this card gains 1 commodity every time another player does so.",
+      "text2": "Against: The player who cast the most votes \"For\" takes a command token from the reinforcements of each player who voted \"Against\" or abstained and places them into any number of systems that contain alpha or beta wormholes of their choice.",
+      "source": "absol"
+    },
+    {
+      "alias": "absol_whresearch",
+      "name": "Wormhole Research",
+      "type": "Directive",
+      "target": "For/Against",
+      "text1": "For: Players may research 1 technology for each type of wormhole in systems that contain their ships. The player who cast the most votes \"For\" may ignore 1 prerequisite on each technology they research as a result.",
+      "text2": "Against: Each player who voted \"For\" destroys 1 ship for each alpha or beta wormhole in systems that contain their ships. Each player who voted \"Against\" or abstained removes 1 command token from their command sheet and returns it to their reinforcements.",
+      "source": "absol"
+    }
+  ]
+}
