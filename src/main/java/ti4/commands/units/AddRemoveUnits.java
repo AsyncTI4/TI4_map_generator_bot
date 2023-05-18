@@ -270,6 +270,89 @@ abstract public class AddRemoveUnits implements Command {
         actionAfterAll(event, tile, color, map);
     }
 
+    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Map map, String planetName) {
+        unitList = unitList.replace(", ", ",");
+        StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
+        while (unitListTokenizer.hasMoreTokens()) {
+            String unitListToken = unitListTokenizer.nextToken();
+            StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
+            
+            int tokenCount = unitInfoTokenizer.countTokens();
+            if (tokenCount > 3) {
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
+            }
+
+            int count = 1;
+            boolean numberIsSet = false;
+            
+            String unit = "";
+            if (unitInfoTokenizer.hasMoreTokens()) {
+                String ifNumber = unitInfoTokenizer.nextToken();
+                try {
+                    count = Integer.parseInt(ifNumber);
+                    numberIsSet = true;
+                } catch (Exception e) {
+                    unit = AliasHandler.resolveUnit(ifNumber);
+                }
+            }
+            if (unitInfoTokenizer.hasMoreTokens() && numberIsSet) {
+                unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
+            }
+
+            color = recheckColorForUnit(unit, color, event);
+
+            String unitID = Mapper.getUnitID(unit, color);
+            String unitPath = Tile.getUnitPath(unitID);
+            if (unitPath == null) {
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
+                continue;
+            }
+            if (unitInfoTokenizer.hasMoreTokens()) {
+                String planetToken = unitInfoTokenizer.nextToken();
+                planetName = AliasHandler.resolvePlanet(planetToken);
+                // if (!Mapper.isValidPlanet(planetName)) {
+                //     MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: `" + planetToken + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
+                //     continue;
+                // }
+            }
+
+            planetName = getPlanet(event, tile, planetName);
+            unitAction(event, tile, count, planetName, unitID, color);
+            
+
+            addPlanetToPlayArea(event, tile, planetName);
+        }
+        if (map.isFoWMode()) {
+            boolean pingedAlready = false;
+            int count = 0;
+            String[] tileList = map.getListOfTilesPinged();
+            while(count < 10 && !pingedAlready)
+            {
+                String tilePingedAlready = tileList[count];
+                if(tilePingedAlready != null)
+                {
+                    pingedAlready = tilePingedAlready.equalsIgnoreCase(tile.getPosition());
+                    count++;
+                }
+                else
+                {
+                    break;
+                }
+            }
+            if(!pingedAlready)
+            {
+                String colorMention = Helper.getColourAsMention(event.getGuild(), color);
+                FoWHelper.pingSystem(map, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
+                if(count <10)
+                {
+                    map.setPingSystemCounter(count);
+                    map.setTileAsPinged(count, tile.getPosition());
+                }
+                
+            }
+        }
+        actionAfterAll(event, tile, color, map);
+    }
 
 
     protected String recheckColorForUnit(String unit, String color, GenericInteractionCreateEvent event) {
