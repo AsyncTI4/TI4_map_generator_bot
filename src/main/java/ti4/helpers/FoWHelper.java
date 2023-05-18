@@ -415,8 +415,11 @@ public class FoWHelper {
 			units.putAll(unitHolder.getUnits());
 		}
 		for (String key : units.keySet()) {
-			if (key.startsWith(colorID)) {
-				return true;
+			if(key != null)
+			{
+				if (key.startsWith(colorID)) {
+					return true;
+				}
 			}
 		}
 		return false;

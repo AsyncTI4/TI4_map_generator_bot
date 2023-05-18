@@ -46,6 +46,10 @@ public class AddCC extends AddRemoveToken {
     {
         addCC(event, color, tile, true);
     }
+    public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile) 
+    {
+        addCC(event, color, tile, true);
+    }
 
 
 
