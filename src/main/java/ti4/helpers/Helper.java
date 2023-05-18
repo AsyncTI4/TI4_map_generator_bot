@@ -1484,7 +1484,7 @@ public class Helper {
                 {
                     if (!techFaction.equals(" ")) 
                     {
-                        if(playerfaction.equalsIgnoreCase(techFaction))
+                        if(playerfaction.equalsIgnoreCase(techFaction) || (playerfaction.toLowerCase().startsWith("keleres") && techFaction.equalsIgnoreCase("Keleres")))
                         {
                             factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
                             
