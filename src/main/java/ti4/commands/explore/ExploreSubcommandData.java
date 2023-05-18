@@ -277,12 +277,15 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                     default -> message = "";
                 }
-                message = message + "Resolve cc gain using the buttons.";   
                 Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
                 Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
                 Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
-                List<Button> buttons = List.of(getTactic, getFleet, getStrat);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+                List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+                String trueIdentity = Helper.getPlayerRepresentation(event, player, true);
+                String message2 = trueIdentity + "! Your current CCs are "+Helper.getPlayerCCs(player)+". Use buttons to gain CCs";
+                MessageHelper.sendMessageToChannel(event.getChannel(), message);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             }
             case "exp1", "exp2", "exp3" -> {
                 message = "Resolve explore using the buttons.";   
