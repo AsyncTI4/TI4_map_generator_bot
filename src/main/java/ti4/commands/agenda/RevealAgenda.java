@@ -13,6 +13,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
+import ti4.model.AgendaModel;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -41,10 +42,11 @@ public class RevealAgenda extends AgendaSubcommandData {
         String id = activeMap.revealAgenda(revealFromBottom);
         LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(id);
-        String[] agendaDetails = Mapper.getAgenda(id).split(";");
-        String agendaTarget = agendaDetails[2];
-        String agendaType = agendaDetails[1];
-        String agendaName = agendaDetails[0];
+        
+        AgendaModel agendaDetails = Mapper.getAgenda(id);
+        String agendaTarget = agendaDetails.target;
+        String agendaType = agendaDetails.type;
+        String agendaName = agendaDetails.name;
         if(agendaName!= null && !agendaName.equalsIgnoreCase("Covert Legislation"))
         {
             activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget + "_"+uniqueID);
@@ -52,10 +54,10 @@ public class RevealAgenda extends AgendaSubcommandData {
         else
         {
             String id2 = activeMap.getNextAgenda(revealFromBottom);
-            String[] agendaDetails2 = Mapper.getAgenda(id2).split(";");
-            agendaTarget = agendaDetails2[2];
-            agendaType = agendaDetails2[1];
-            agendaName = agendaDetails[0];
+            AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
+            agendaTarget = agendaDetails2.target;
+            agendaType = agendaDetails2.type;
+            agendaName = agendaDetails.name;
             activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget);
         }
         activeMap.resetCurrentAgendaVotes();

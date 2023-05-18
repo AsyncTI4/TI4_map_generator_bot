@@ -12,6 +12,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.message.BotLogger;
+import ti4.model.FactionModel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -34,6 +35,11 @@ public class Player {
     private boolean isDummy = false;
 
     private String faction;
+    private Faction faction_;
+    //abilities
+    //factiontech
+    //home
+
     private String color;
     private String autoCompleteRepresentation = null;
 
@@ -634,27 +640,20 @@ public class Player {
     }
 
     @JsonIgnore
-    public String[] getFactionSetupInfo() {
+    public FactionModel getFactionSetupInfo() {
         if (faction == null || faction.equals("null") || faction.equals("keleres")) return null;
-        String factionSetupInfo = Mapper.getPlayerSetup(faction);
+        FactionModel factionSetupInfo = Mapper.getFactionSetup(faction);
         if (factionSetupInfo == null) {
             BotLogger.log("Could not get faction setup info for: " + faction);
             return null;
         }
-        long count = factionSetupInfo.chars().filter(ch -> ch == ';').count();
-        int expectedTokenCount = 7;
-        if (count != expectedTokenCount) {
-            BotLogger.log("Faction setup raw text is incorrectly formatted (needs " + (expectedTokenCount - 1) + " ; to split properly):\n> " + factionSetupInfo);
-            return null;
-        }
-        String[] setupInfo = factionSetupInfo.split(";");
-        return setupInfo;
+        return factionSetupInfo;
     }
     
     private List<String> getFactionStartingAbilities() {
-        String[] factionSetupInfo = getFactionSetupInfo();
+        FactionModel factionSetupInfo = getFactionSetupInfo();
         if(factionSetupInfo == null) return new ArrayList<String>();
-        return Arrays.asList(getFactionSetupInfo()[7].split(","));
+        return new ArrayList<String>(factionSetupInfo.abilities);
     }
 
     public void initLeaders() {
