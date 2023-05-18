@@ -26,6 +26,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
+import ti4.model.AgendaModel;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -1151,11 +1152,11 @@ public class Map {
     }
 
     public void resetAgendas() {
-        HashMap<String, String> agendas = Mapper.getAgendas(); //ALL agendas, including absol
+        HashMap<String, AgendaModel> agendas = Mapper.getAgendas(); //ALL agendas, including absol
         if (this.absolMode) {
-            this.agendas = new ArrayList<>(agendas.keySet().stream().filter(a -> a.startsWith("absol_")).toList());
+            this.agendas = new ArrayList<>(agendas.entrySet().stream().filter(a -> a.getValue().source.equals("absol")).map(a -> a.getKey()).toList());
         } else { //ALL agendas, except absol - if more decks get added, this will need to be rebuilt
-            this.agendas = new ArrayList<>(agendas.keySet().stream().filter(Predicate.not(a -> a.startsWith("absol_"))).toList());
+            this.agendas = new ArrayList<>(agendas.entrySet().stream().filter(a -> a.getValue().source.equals("PoK")).map(a -> a.getKey()).toList());
         }
         Collections.shuffle(this.agendas);
         discardAgendas = new LinkedHashMap<>();

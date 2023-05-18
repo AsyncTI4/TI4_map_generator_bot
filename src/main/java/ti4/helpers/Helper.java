@@ -37,6 +37,7 @@ import ti4.generator.Mapper;
 import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.AgendaModel;
 
 import java.awt.*;
 import java.text.SimpleDateFormat;
@@ -1530,13 +1531,13 @@ public class Helper {
 
     public static String getAgendaRepresentation(@NotNull String agendaID, @Nullable Integer uniqueID) {
         StringBuilder sb = new StringBuilder();
-        String[] agendaDetails = Mapper.getAgenda(agendaID).split(";");
-        String agendaName = agendaDetails[0];
-        String agendaType = agendaDetails[1];
-        String agendaTarget = agendaDetails[2];
-        String arg1 = agendaDetails[3];
-        String arg2 = agendaDetails[4];
-        String agendaSource = agendaDetails[5];
+        AgendaModel agendaDetails = Mapper.getAgenda(agendaID);
+        String agendaName = agendaDetails.name;
+        String agendaType = agendaDetails.type;
+        String agendaTarget = agendaDetails.target;
+        String arg1 = agendaDetails.text1;
+        String arg2 = agendaDetails.text2;
+        String agendaSource = agendaDetails.source;
 
         if (agendaName == null || agendaType == null || agendaTarget == null || arg1 == null || arg2 == null || agendaSource == null) {
             BotLogger.log("Agenda improperly formatted: " + agendaID);

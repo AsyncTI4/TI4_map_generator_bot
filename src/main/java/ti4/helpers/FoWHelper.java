@@ -21,6 +21,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.FactionModel;
 
 public class FoWHelper {
 
@@ -135,10 +136,9 @@ public class FoWHelper {
 		} else if ("ghost".equals(faction)) {
 			hsIDs.add("51");
 		} else {
-			String playerSetup = Mapper.getPlayerSetup(faction);
+			FactionModel playerSetup = Mapper.getFactionSetup(faction);
 			if (playerSetup != null) {
-				String[] setupInfo = playerSetup.split(";");
-				hsIDs.add(setupInfo[1]);
+				hsIDs.add(playerSetup.homeSystemTile);
 			}
 		}
 
@@ -409,11 +409,9 @@ public class FoWHelper {
 
 	/** Check if the player has units in the system */
 	public static boolean playerHasUnitsInSystem(Player player, Tile tile) {
-		if (!player.isRealPlayer())
-		{
-			return false;
-		}
-			String colorID = Mapper.getColorID(player.getColor());
+		String colorID = Mapper.getColorID(player.getColor());
+		if (colorID == null) return false; // player doesn't have a color
+
 		HashMap<String, Integer> units = new HashMap<>();
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			units.putAll(unitHolder.getUnits());
