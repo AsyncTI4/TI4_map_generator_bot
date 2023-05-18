@@ -46,7 +46,7 @@ public class SCPick extends PlayerSubcommandData {
         }
 
         Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
-                .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("null"))
+                .filter(player_ -> player_.isRealPlayer())
                 .collect(Collectors.toList());
         int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
 
