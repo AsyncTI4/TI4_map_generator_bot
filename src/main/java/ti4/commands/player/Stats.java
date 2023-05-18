@@ -118,11 +118,14 @@ public class Stats extends PlayerSubcommandData {
 			setValue(event, activeMap, player, optionC, player::setCommodities, player::getCommodities);
 		}
 
-		OptionMapping optionCT = event.getOption(Constants.COMMODITIES_TOTAL);
-		if (optionCT != null) {
-			player.setCommoditiesTotal(optionCT.getAsInt());
-			StringBuilder message = new StringBuilder(getGeneralMessage(event, player, optionCT));
-			sendMessage(message.toString());
+		Integer commoditiesTotalCount = event.getOption(Constants.COMMODITIES_TOTAL, null, OptionMapping::getAsInt);
+		if (commoditiesTotalCount != null) {
+			if (commoditiesTotalCount < 1 || commoditiesTotalCount > 10) {
+				sendMessage("**Warning:** Total Commodities count seems like a wrong value:");
+			}
+			player.setCommoditiesTotal(commoditiesTotalCount);
+			String message = ">  set **Total Commodities** to " + commoditiesTotalCount + Emojis.comm;
+			sendMessage(message);
 		}
 
 		OptionMapping optionSpeaker = event.getOption(Constants.SPEAKER);
