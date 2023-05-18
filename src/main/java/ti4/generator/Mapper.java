@@ -2,10 +2,16 @@ package ti4.generator;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.JsonNodeType;
+
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.message.BotLogger;
+import ti4.model.*;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -17,6 +23,8 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Mapper {
+    private static ObjectMapper objectMapper = new ObjectMapper();
+
     private static final Properties tiles = new Properties();
     private static final Properties units = new Properties();
     private static final Properties colors = new Properties();
@@ -29,7 +37,6 @@ public class Mapper {
     private static final Properties general = new Properties();
     private static final Properties secretObjectives = new Properties();
     private static final Properties actionCards = new Properties();
-    private static final Properties agendas = new Properties();
     private static final Properties publicObjectives = new Properties();
     private static final Properties promissoryNotes = new Properties();
     private static final Properties techs = new Properties();
@@ -46,12 +53,16 @@ public class Mapper {
     private static final Properties unit_representation = new Properties();
     private static final Properties attachmentInfo = new Properties();
     private static final Properties leaders = new Properties();
-    private static final Properties playerSetup = new Properties();
     private static final Properties miltyDraft = new Properties();
     private static final Properties agendaRepresentation = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties wormholes = new Properties();
     private static final Properties ds_handcards = new Properties();
+
+    //TODO: (Jazz) Finish moving all files over from properties to json
+    private static final HashMap<String, AgendaModel> agendas = new HashMap<>();
+    private static final HashMap<String, FactionModel> factionSetup = new HashMap<>();
+
     private static final HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = new HashMap<>();
 
     public static void init() {
@@ -67,7 +78,7 @@ public class Mapper {
         readData("factions.properties", factions, "Could not read factions name file");
         readData("secret_objectives.properties", secretObjectives, "Could not read secret objectives file");
         readData("action_cards.properties", actionCards, "Could not read action cards file");
-        readData("agendas.properties", agendas, "Could not read agendas file");
+        readJsonData("agendas.json", agendas, AgendaModel::new, "agendas", "Could not read agendas file");
         readData("public_objective.properties", publicObjectives, "Could not read public objective file");
         readData("promissory_notes.properties", promissoryNotes, "Could not read promissory notes file");
         readData("exploration.properties", explore, "Could not read explore file");
@@ -82,7 +93,7 @@ public class Mapper {
         readData("tile_representation.properties", tile_representation, "Could not read tile representation file");
         readData("leader_representation.properties", leader_representation, "Could not read leader representation file");
         readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
-        readData("faction_setup.properties", playerSetup, "Could not read player setup file");
+        readJsonData("faction_setup.json", factionSetup, FactionModel::new, "factions", "Could not read faction setup file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("agenda_representation.properties", agendaRepresentation, "Could not read agenda representaion file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
@@ -101,6 +112,36 @@ public class Mapper {
         }
     }
 
+    interface ModelContructor<T> {
+        T construct(JsonNode j);
+    }
+
+    private static <T extends Model> void readJsonData(String jsonFileName, HashMap<String, T> objectList, ModelContructor<T> constructor, String listPath, String error) {
+        String jsonSource = ResourceHelper.getInstance().getInfoFile(jsonFileName);
+        if (jsonSource != null) {
+            try (InputStream input = new FileInputStream(jsonSource)) {
+                String jsonContents = new String(input.readAllBytes());
+                JsonNode json = objectMapper.readTree(jsonContents);
+                JsonNode jsonList = json.get(listPath);
+                
+                if (jsonList.getNodeType() == JsonNodeType.ARRAY) {
+                    jsonList.elements().forEachRemaining(node -> {
+                        T obj = constructor.construct(node);
+                        if (obj.isValid()) {
+                            objectList.put(obj.alias, obj);
+                        } else {
+                            throw new NullPointerException(obj.alias + " is improperly formatted.");
+                        }
+                    });
+                }
+            } catch (NullPointerException e) {
+                BotLogger.log(e.getMessage());
+            } catch (Exception e) {
+                BotLogger.log(error);
+            }
+        }
+    }
+    
     public static List<String> getPromissoryNotes(String color, String faction) {
         List<String> pnList = new ArrayList<>();
         color = AliasHandler.resolveColor(color);
@@ -135,7 +176,7 @@ public class Mapper {
     }
 
     public static String getColorID(String color) {
-        return colors.getProperty(color);
+        return color != null ? colors.getProperty(color) : null;
     }
 
     public static String getSpecialCaseValues(String id) {
@@ -245,8 +286,8 @@ public class Mapper {
         return tokens.getProperty(tokenID);
     }
 
-    public static String getPlayerSetup(String factionID) {
-        return playerSetup.getProperty(factionID);
+    public static FactionModel getFactionSetup(String factionID) {
+        return factionSetup.get(factionID);
     }
 
     public static String getControlID(String color) {
@@ -341,8 +382,8 @@ public class Mapper {
         return (String) publicObjectives.get(id);
     }
 
-    public static String getAgenda(String id) {
-        return (String) agendas.get(id);
+    public static AgendaModel getAgenda(String id) {
+        return agendas.get(id);
     }
 
     public static String getExplore(String id) {
@@ -370,25 +411,20 @@ public class Mapper {
     }
 
     public static String getAgendaForOnly(String id) {
-        StringBuilder agenda = new StringBuilder((String) agendas.get(id));
-        try {
-            String[] split = agenda.toString().split(";");
-            agenda = new StringBuilder();
-            boolean justAddNext = false;
-            for (String part : split) {
-                if ("For/Against".equals(part)) {
-                    justAddNext = true;
-                    continue;
-                }
-                agenda.append(part).append(";");
-                if (justAddNext) {
-                    break;
-                }
+        AgendaModel agenda = agendas.get(id);
+        StringBuilder sb = new StringBuilder();
+        sb.append(agenda.name).append(";");
+        sb.append(agenda.type).append(";");
+        if (agenda.target.contains("For/Against")) {
+            sb.append(agenda.text1);
+        } else {
+            sb.append(agenda.target).append(";");
+            sb.append(agenda.text1);
+            if(agenda.text2.length() > 0) {
+                sb.append(";").append(agenda.text2);
             }
-        } catch (Exception e) {
-            agenda = new StringBuilder((String) agendas.get(id));
         }
-        return agenda.toString();
+        return sb.toString();
     }
 
     @Nullable
@@ -495,12 +531,8 @@ public class Mapper {
 
     public static HashMap<String, String> getAgendaJustNames() {
         HashMap<String, String> agendaList = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : agendas.entrySet()) {
-            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-            String value = tokenizer.nextToken();
-            value = value.replace("_", "");
-            value = value.replace("*", "");
-            agendaList.put((String) entry.getKey(), value);
+        for (AgendaModel agenda : agendas.values()) {
+            agendaList.put(agenda.alias, agenda.name);
         }
         return agendaList;
     }
@@ -668,11 +700,8 @@ public class Mapper {
         return relicList;
     }
 
-    public static HashMap<String, String> getAgendas() {
-        HashMap<String, String> agendaList = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : agendas.entrySet()) {
-            agendaList.put((String) entry.getKey(), (String) entry.getValue());
-        }
+    public static HashMap<String, AgendaModel> getAgendas() {
+        HashMap<String, AgendaModel> agendaList = new HashMap<>(agendas);
         return agendaList;
     }
 

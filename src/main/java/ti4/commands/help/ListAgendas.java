@@ -11,6 +11,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.model.AgendaModel;
 
 public class ListAgendas extends HelpSubcommandData {
 
@@ -22,9 +23,9 @@ public class ListAgendas extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        HashMap<String, String> agendaList = Mapper.getAgendas();
-        String message = "**__Agenda List__**\n" + agendaList.entrySet().stream()
-            .map(e -> e.getKey() + " = " + Helper.getAgendaRepresentation(e.getKey()))
+        HashMap<String, AgendaModel> agendaList = Mapper.getAgendas();
+        String message = "**__Agenda List__**\n" + agendaList.keySet().stream()
+            .map(agendaKey -> agendaKey + " = " + Helper.getAgendaRepresentation(agendaKey))
             .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
             .sorted()
             .collect(Collectors.joining("\n"));
