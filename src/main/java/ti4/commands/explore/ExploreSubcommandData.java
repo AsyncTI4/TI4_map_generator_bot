@@ -250,7 +250,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "mo1", "mo2", "mo3" -> {
                 if(tile != null && planetName != null)
                 {
-                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetName, activeMap);
+                    new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetName, activeMap, planetName);
                 }
                 message = Helper.getColourAsMention(event.getGuild(), player.getColor()) + Emojis.infantry + " added to " + Helper.getPlanetRepresentationPlusEmoji(planetName);
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + "\n" + message);
