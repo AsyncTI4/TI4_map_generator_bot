@@ -1300,7 +1300,7 @@ public class ButtonListener extends ListenerAdapter {
                         if(event.getMessage().getContentRaw().contains("Net gain"))
                         {
                             String editedMessage = event.getMessage().getContentRaw();
-                            int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length()));
+                            int netGain = Integer.parseInt(editedMessage.substring(editedMessage.lastIndexOf(":")+2, editedMessage.length()));
                             finalCCs = finalCCs + ". Net CC gain was "+netGain;
                         }
                         MessageHelper.sendMessageToChannel(event.getChannel(), playerRep + " Final CC Allocation Is "+ finalCCs);
@@ -1757,7 +1757,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     else
                     {
-                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length())) +1;
+                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.lastIndexOf(":")+2, editedMessage.length())) +1;
                         editedMessage = editedMessage.substring(0,editedMessage.indexOf("->")+3) + Helper.getPlayerCCs(player)+". Net gain of: " +netGain;
                     }
                      event.getMessage().editMessage(editedMessage).queue();
@@ -1772,7 +1772,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     else
                     {
-                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length())) +1;
+                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.lastIndexOf(":")+2, editedMessage.length())) +1;
                         editedMessage = editedMessage.substring(0,editedMessage.indexOf("->")+3) + Helper.getPlayerCCs(player)+". Net gain of: " +netGain;
                     }
                      event.getMessage().editMessage(editedMessage).queue();
@@ -1788,7 +1788,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     else
                     {
-                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length())) +1;
+                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.lastIndexOf(":")+2, editedMessage.length())) +1;
                         editedMessage = editedMessage.substring(0,editedMessage.indexOf("->")+3) + Helper.getPlayerCCs(player)+". Net gain of: " +netGain;
                     }
                      event.getMessage().editMessage(editedMessage).queue();
@@ -1805,7 +1805,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     else
                     {
-                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length())) -1;
+                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.lastIndexOf(":")+2, editedMessage.length())) -1;
                         editedMessage = editedMessage.substring(0,editedMessage.indexOf("->")+3) + Helper.getPlayerCCs(player)+". Net gain of: " +netGain;
                     }
                      event.getMessage().editMessage(editedMessage).queue();
@@ -1821,7 +1821,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     else
                     {
-                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length())) -1;
+                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.lastIndexOf(":")+2, editedMessage.length())) -1;
                         editedMessage = editedMessage.substring(0,editedMessage.indexOf("->")+3) + Helper.getPlayerCCs(player)+". Net gain of: " +netGain;
                     }
                      event.getMessage().editMessage(editedMessage).queue();
@@ -1837,7 +1837,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     else
                     {
-                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length())) -1;
+                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.lastIndexOf(":")+2, editedMessage.length())) -1;
                         editedMessage = editedMessage.substring(0,editedMessage.indexOf("->")+3) + Helper.getPlayerCCs(player)+". Net gain of: " +netGain;
                     }
                      event.getMessage().editMessage(editedMessage).queue();
