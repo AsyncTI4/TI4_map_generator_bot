@@ -1654,6 +1654,11 @@ public class Helper {
         return sb.toString();
         
     }
+    public static String getPlayerCCs(Player player)
+    {
+        return player.getTacticalCC()+"/"+player.getFleetCC()+"/"+player.getStrategicCC();
+        
+    }
 
     public static Set<Player> getNeighbouringPlayers(Map map, Player player) {
         Set<Player> adjacentPlayers = new HashSet<>();

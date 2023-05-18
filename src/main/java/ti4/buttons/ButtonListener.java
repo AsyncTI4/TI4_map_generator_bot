@@ -197,12 +197,7 @@ public class ButtonListener extends ListenerAdapter {
             }
             Button draw1AC = Button.success("draw_1_AC", "Draw 1 AC");
             Button confirmCCs = Button.primary("confirm_cc", "Confirm Your CC Update is Complete & Final");
-            Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
-            Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
-            Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
-            Button loseTactic= Button.danger("decrease_tactic_cc", "Lose 1 Tactic CC");
-            Button loseFleet = Button.danger("decrease_fleet_cc", "Lose 1 Fleet CC");
-            Button loseStrat= Button.danger("decrease_strategy_cc", "Lose 1 Strategy CC");
+            Button getCCs= Button.success("redistributeCCButtons", "Redistribute & Gain CCs");
             boolean custodiansTaken = activeMap.isCustodiansScored();
             Button passOnAbilities;
             if(custodiansTaken)
@@ -218,7 +213,7 @@ public class ButtonListener extends ListenerAdapter {
 
             if(activeMap.isFoWMode())
             {
-                buttons = List.of(draw1AC, getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat);
+                buttons = List.of(draw1AC, getCCs);
                 message2 = "Resolve status homework using the buttons";
                 for(Player p1 : activeMap.getPlayers().values())
                 {
@@ -237,7 +232,7 @@ public class ButtonListener extends ListenerAdapter {
             else
             {
 
-                buttons = List.of(draw1AC, getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat, confirmCCs, passOnAbilities);
+                buttons = List.of(draw1AC, getCCs, confirmCCs, passOnAbilities);
             }
             message2 = "Resolve status homework using the buttons. Only the Pass on [abilities] button is essential to hit, all others are optional. ";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
@@ -1264,10 +1259,17 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                 }
                 case "deleteButtons" -> {
-                    if(buttonLabel.equalsIgnoreCase("Done Gaining CCs"))
+                    if(buttonLabel.equalsIgnoreCase("Done Gaining CCs") || buttonLabel.equalsIgnoreCase("Done Redistributing CCs"))
                     {
+                        
                         String playerRep = Helper.getPlayerRepresentation(event, player, false);
                         String finalCCs = player.getTacticalCC() + "/"+ player.getFleetCC() + "/" + player.getStrategicCC();
+                        if(event.getMessage().getContentRaw().contains("Net gain"))
+                        {
+                            String editedMessage = event.getMessage().getContentRaw();
+                            int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length()));
+                            finalCCs = finalCCs + ". Net CC gain was "+netGain;
+                        }
                         MessageHelper.sendMessageToChannel(event.getChannel(), playerRep + " Final CC Allocation Is "+ finalCCs);
                     }
                     event.getMessage().delete().queue();
@@ -1339,12 +1341,37 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
                     }
                 }
+                case "redistributeCCButtons" -> {
+                    
+                    String trueIdentity = Helper.getPlayerRepresentation(event, player, true);
+                    String message = trueIdentity + "! Your current CCs are "+Helper.getPlayerCCs(player)+". Use buttons to gain CCs";
+
+                    Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+                    Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+                    Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+                    Button loseTactic= Button.danger("decrease_tactic_cc", "Lose 1 Tactic CC");
+                    Button loseFleet = Button.danger("decrease_fleet_cc", "Lose 1 Fleet CC");
+                    Button loseStrat= Button.danger("decrease_strategy_cc", "Lose 1 Strategy CC");
+                   
+                    Button DoneGainingCC = Button.danger("deleteButtons", "Done Redistributing CCs");
+                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat, DoneGainingCC);
+                    if(!activeMap.isFoWMode())
+                    {
+                    
+                        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                         
+                    }
+                    else
+                    {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+                    }
+                }
                 
                 case "leadershipGenerateCCButtons" -> {
                     player.addFollowedSC(1);
                     addReaction(event, false, false, "", "");
                     String trueIdentity = Helper.getPlayerRepresentation(event, player, true);
-                    String message = trueIdentity + " Use the buttons to gain ccs";
+                    String message = trueIdentity + "! Your current CCs are "+Helper.getPlayerCCs(player)+". Use buttons to gain CCs";
 
                     Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
                     Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
@@ -1687,31 +1714,100 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
                 case "increase_strategy_cc" -> {
-                    addReaction(event, false, false, "Increased Strategy Pool CCs By 1 ("+player.getStrategicCC()+"->"+(player.getStrategicCC()+1)+").", "");
-                    player.setStrategicCC(player.getStrategicCC()+1);
+                   // addReaction(event, false, false, "Increased Strategy Pool CCs By 1 ("+player.getStrategicCC()+"->"+(player.getStrategicCC()+1)+").", "");
+                   String originalCCs = Helper.getPlayerCCs(player);
+                   player.setStrategicCC(player.getStrategicCC()+1);
+                   String editedMessage = event.getMessage().getContentRaw();
+                    if(editedMessage.contains("Use buttons to gain CCs"))
+                    {
+                        editedMessage = editedMessage.replace("Your current CCs are "+originalCCs+". Use buttons to gain CCs", "CCs have gone from " +originalCCs+" -> " +Helper.getPlayerCCs(player)+". Net gain of: 1");
+                    }
+                    else
+                    {
+                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length())) +1;
+                        editedMessage = editedMessage.substring(0,editedMessage.indexOf("->")+3) + Helper.getPlayerCCs(player)+". Net gain of: " +netGain;
+                    }
+                     event.getMessage().editMessage(editedMessage).queue();
                 }
                 case "increase_tactic_cc" -> {
-                    addReaction(event, false, false, "Increased Tactic Pool CCs By 1 ("+player.getTacticalCC()+ "->" +(player.getTacticalCC()+1)+").", "");
+                    String originalCCs = Helper.getPlayerCCs(player);
                     player.setTacticalCC(player.getTacticalCC()+1);
+                    String editedMessage = event.getMessage().getContentRaw();
+                    if(editedMessage.contains("Use buttons to gain CCs"))
+                    {
+                        editedMessage = editedMessage.replace("Your current CCs are "+originalCCs+". Use buttons to gain CCs", "CCs have gone from " +originalCCs+" -> " +Helper.getPlayerCCs(player)+". Net gain of: 1");
+                    }
+                    else
+                    {
+                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length())) +1;
+                        editedMessage = editedMessage.substring(0,editedMessage.indexOf("->")+3) + Helper.getPlayerCCs(player)+". Net gain of: " +netGain;
+                    }
+                     event.getMessage().editMessage(editedMessage).queue();
                 }
                 case "increase_fleet_cc" -> {
-                    addReaction(event, false, false, "Increased Fleet Pool CCs By 1 ("+player.getFleetCC()+"->"+(player.getFleetCC()+1)+").", "");
-
+                   // addReaction(event, false, false, "Increased Fleet Pool CCs By 1 ("+player.getFleetCC()+"->"+(player.getFleetCC()+1)+").", "");
+                   String originalCCs = Helper.getPlayerCCs(player);
                     player.setFleetCC(player.getFleetCC()+1);
+                    String editedMessage = event.getMessage().getContentRaw();
+                    if(editedMessage.contains("Use buttons to gain CCs"))
+                    {
+                        editedMessage = editedMessage.replace("Your current CCs are "+originalCCs+". Use buttons to gain CCs", "CCs have gone from " +originalCCs+" -> " +Helper.getPlayerCCs(player)+". Net gain of: 1");
+                    }
+                    else
+                    {
+                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length())) +1;
+                        editedMessage = editedMessage.substring(0,editedMessage.indexOf("->")+3) + Helper.getPlayerCCs(player)+". Net gain of: " +netGain;
+                    }
+                     event.getMessage().editMessage(editedMessage).queue();
                 }
 
                 case "decrease_strategy_cc" -> {
-                    addReaction(event, false, false, "Decreased Strategy Pool CCs By 1 ("+player.getStrategicCC()+"->"+(player.getStrategicCC()-1)+").", "");
-                    player.setStrategicCC(player.getStrategicCC()-1);
+                  //  addReaction(event, false, false, "Decreased Strategy Pool CCs By 1 ("+player.getStrategicCC()+"->"+(player.getStrategicCC()-1)+").", "");
+                  String originalCCs = Helper.getPlayerCCs(player);
+                  player.setStrategicCC(player.getStrategicCC()-1);
+                  String editedMessage = event.getMessage().getContentRaw();
+                    if(editedMessage.contains("Use buttons to gain CCs"))
+                    {
+                        editedMessage = editedMessage.replace("Your current CCs are "+originalCCs+". Use buttons to gain CCs", "CCs have gone from " +originalCCs+" -> " +Helper.getPlayerCCs(player)+". Net gain of: -1");
+                    }
+                    else
+                    {
+                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length())) -1;
+                        editedMessage = editedMessage.substring(0,editedMessage.indexOf("->")+3) + Helper.getPlayerCCs(player)+". Net gain of: " +netGain;
+                    }
+                     event.getMessage().editMessage(editedMessage).queue();
                 }
                 case "decrease_tactic_cc" -> {
-                    addReaction(event, false, false, "Decreased Tactic Pool CCs By 1 ("+player.getTacticalCC()+ "->" +(player.getTacticalCC()-1)+").", "");
-                    player.setTacticalCC(player.getTacticalCC()-1);
+                   // addReaction(event, false, false, "Decreased Tactic Pool CCs By 1 ("+player.getTacticalCC()+ "->" +(player.getTacticalCC()-1)+").", "");
+                   String originalCCs = Helper.getPlayerCCs(player);
+                   player.setTacticalCC(player.getTacticalCC()-1);
+                   String editedMessage = event.getMessage().getContentRaw();
+                    if(editedMessage.contains("Use buttons to gain CCs"))
+                    {
+                        editedMessage = editedMessage.replace("Your current CCs are "+originalCCs+". Use buttons to gain CCs", "CCs have gone from " +originalCCs+" -> " +Helper.getPlayerCCs(player)+". Net gain of: -1");
+                    }
+                    else
+                    {
+                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length())) -1;
+                        editedMessage = editedMessage.substring(0,editedMessage.indexOf("->")+3) + Helper.getPlayerCCs(player)+". Net gain of: " +netGain;
+                    }
+                     event.getMessage().editMessage(editedMessage).queue();
                 }
                 case "decrease_fleet_cc" -> {
-                    addReaction(event, false, false, "Decreased Fleet Pool CCs By 1 ("+player.getFleetCC()+"->"+(player.getFleetCC()-1)+").", "");
-
+                   // addReaction(event, false, false, "Decreased Fleet Pool CCs By 1 ("+player.getFleetCC()+"->"+(player.getFleetCC()-1)+").", "");
+                   String originalCCs = Helper.getPlayerCCs(player);
                     player.setFleetCC(player.getFleetCC()-1);
+                    String editedMessage = event.getMessage().getContentRaw();
+                    if(editedMessage.contains("Use buttons to gain CCs"))
+                    {
+                        editedMessage = editedMessage.replace("Your current CCs are "+originalCCs+". Use buttons to gain CCs", "CCs have gone from " +originalCCs+" -> " +Helper.getPlayerCCs(player)+". Net gain of: -1");
+                    }
+                    else
+                    {
+                        int netGain = Integer.parseInt(editedMessage.substring(editedMessage.indexOf(":")+2, editedMessage.length())) -1;
+                        editedMessage = editedMessage.substring(0,editedMessage.indexOf("->")+3) + Helper.getPlayerCCs(player)+". Net gain of: " +netGain;
+                    }
+                     event.getMessage().editMessage(editedMessage).queue();
                 }
                 case "gain_1_tg" -> {
 
@@ -1858,11 +1954,13 @@ public class ButtonListener extends ListenerAdapter {
 
                     if(!failed)
                     {
-                        String message2 = "Resolve cc gain using the buttons.";   
+                        String trueIdentity = Helper.getPlayerRepresentation(event, player, true);
+                        String message2 = trueIdentity + "! Your current CCs are "+Helper.getPlayerCCs(player)+". Use buttons to gain CCs"; 
                         Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
                         Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
                         Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
-                        List<Button> buttons = List.of(getTactic, getFleet, getStrat);
+                        Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+                        List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
 
                     }
