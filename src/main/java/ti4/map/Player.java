@@ -219,7 +219,6 @@ public class Player {
                 }
             }
         } catch (Exception e) {
-            // TODO: handle exception
             BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using ID: " + cardsInfoThreadID + " for potential thread name: " + threadName, e);
         }
 
@@ -250,7 +249,6 @@ public class Player {
                 }
             }
         } catch (Exception e) {
-            // TODO: handle exception
             BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using name: " + threadName, e);
         }
         

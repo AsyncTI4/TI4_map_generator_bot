@@ -724,4 +724,5 @@ public class Constants {
     public static final String LIST_RELICS = "list_relics";
     public static final String LIST_TECHS = "list_techs";
     public static final String LIST_LEADERS = "list_leaders";
+    public static final String IS_MY_TURN = "is_my_turn";
 }

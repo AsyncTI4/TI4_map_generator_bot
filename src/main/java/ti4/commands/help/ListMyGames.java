@@ -20,16 +20,19 @@ import ti4.message.MessageHelper;
 public class ListMyGames extends HelpSubcommandData {
     public ListMyGames() {
         super(Constants.LIST_MY_GAMES, "List all of your games you are currently in");
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.IS_MY_TURN, "True to only show games where it is your turn"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ENDED_GAMES, "True to show ended games as well (default = false)"));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
+        boolean onlyMyTurn = event.getOption(Constants.IS_MY_TURN, false, OptionMapping::getAsBoolean);
         boolean includeEndedGames = event.getOption(Constants.ENDED_GAMES, false, OptionMapping::getAsBoolean);
         User user = event.getUser();
         String userID = user.getId();
 
-        Predicate<Map> mapFilter = includeEndedGames ? m -> !m.isFoWMode() && m.getPlayerIDs().contains(userID) : m -> !m.isHasEnded() && !m.isFoWMode() && m.getPlayerIDs().contains(userID);
+        Predicate<Map> onlyMyTurnFilter = onlyMyTurn ? m -> m.getActivePlayer().equals(userID) : m -> true;
+        Predicate<Map> endedGamesFilter = includeEndedGames ? m -> !m.isFoWMode() && m.getPlayerIDs().contains(userID) : m -> !m.isHasEnded() && !m.isFoWMode() && m.getPlayerIDs().contains(userID);
 
         Comparator<Map> mapSort = new Comparator<Map>() {
             @Override
@@ -38,7 +41,7 @@ public class ListMyGames extends HelpSubcommandData {
             }
         };
 
-        List<Map> maps = MapManager.getInstance().getMapList().values().stream().filter(mapFilter).sorted(mapSort).toList();
+        List<Map> maps = MapManager.getInstance().getMapList().values().stream().filter(onlyMyTurnFilter).filter(endedGamesFilter).sorted(mapSort).toList();
 
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
