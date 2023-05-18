@@ -1850,7 +1850,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "draw_2_AC" -> {
                     activeMap.drawActionCard(player.getUserID());
                     activeMap.drawActionCard(player.getUserID());
-                    ACInfo_Legacy.sentUserCardInfo(event, activeMap, player, false);
+                    ACInfo.sendActionCardInfo(activeMap, player, event);
                     addReaction(event, true, false, "Drew 2 AC", "");
                 }
                 case "pass_on_abilities" -> {
