@@ -56,12 +56,23 @@ public class AddCC extends AddRemoveToken {
         if (ccPath == null) {
             MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
-
         if (activeMap.isFoWMode() && ping) {
             String colorMention = Helper.getColourAsMention(event.getGuild(), color);
             FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has placed a token in the system");
         }
-
+        tile.addCC(ccID);
+    }
+    public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile, boolean ping) {
+        Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
+        String ccID = Mapper.getCCID(color);
+        String ccPath = tile.getCCPath(ccID);
+        if (ccPath == null) {
+            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+        }
+        if (activeMap.isFoWMode() && ping) {
+            String colorMention = Helper.getColourAsMention(event.getGuild(), color);
+            FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has placed a token in the system");
+        }
         tile.addCC(ccID);
     }
 
