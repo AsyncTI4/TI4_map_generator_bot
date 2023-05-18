@@ -409,6 +409,10 @@ public class FoWHelper {
 
 	/** Check if the player has units in the system */
 	public static boolean playerHasUnitsInSystem(Player player, Tile tile) {
+		if (!player.isRealPlayer())
+		{
+			return false;
+		}
 			String colorID = Mapper.getColorID(player.getColor());
 		HashMap<String, Integer> units = new HashMap<>();
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
