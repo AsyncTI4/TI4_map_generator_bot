@@ -2,6 +2,8 @@ package ti4.commands.explore;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -24,10 +26,10 @@ public class DrawRelic extends GenericRelicAction {
         drawRelicAndNotify(player, event, activeMap);
     }
 
-    public static void drawRelicAndNotify(Player player, SlashCommandInteractionEvent event, Map activeMap) {
+    public static void drawRelicAndNotify(Player player, GenericInteractionCreateEvent event, Map activeMap) {
         String relicID = activeMap.drawRelic();
         if (relicID.isEmpty()) {
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Relic deck is empty");
+            MessageHelper.sendMessageToChannel((MessageChannel) event.getMessageChannel(), "Relic deck is empty");
             return;
         }
         player.addRelic(relicID);

@@ -30,6 +30,8 @@ import ti4.map.UnitHolder;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
+import ti4.commands.explore.ExpPlanet;
+import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
@@ -281,6 +283,37 @@ public class ButtonListener extends ListenerAdapter {
         else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
             addReaction(event, false, false, null, "");
         }
+        else if (buttonID.startsWith("distant_suns_")) {
+            String bID = buttonID.replace("distant_suns_", "");
+            String[] info = bID.split("_");
+            String message = "";
+            if(info[0].equalsIgnoreCase("decline"))
+            {
+                message = "Rejected Distant Suns Ability";
+                new ExpPlanet().explorePlanet(event, Helper.getTileFromPlanet(info[1], activeMap), info[1], info[2], player, true, activeMap, 1);
+            }
+            else
+            {
+                message = "Exploring twice";
+                new ExpPlanet().explorePlanet(event, Helper.getTileFromPlanet(info[1], activeMap), info[1], info[2], player, true, activeMap, 2);
+            }
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            event.getMessage().delete().queue();
+        }
+        else if (buttonID.startsWith("resolve_explore_")) {
+            String bID = buttonID.replace("resolve_explore_", "");
+            String[] info = bID.split("_");
+            String cardID = info[0];
+            String planetName = info[1];
+            Tile tile = Helper.getTileFromPlanet(planetName, activeMap);
+            StringBuilder messageText = new StringBuilder();
+            messageText.append(Helper.getPlayerRepresentation(event, player)).append(" explored ");
+
+            messageText.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(planetName) +" *(tile "+ tile.getPosition() + ")*:\n");
+            messageText.append("> ").append(new ExpPlanet().displayExplore(cardID));
+            new ExpPlanet().resolveExplore(event, cardID, tile, planetName, messageText.toString(), false, player, activeMap);
+            event.getMessage().delete().queue();
+        }
         else if (buttonID.startsWith("refresh_"))
         {
             String planetName = buttonID.replace("refresh_", "");
@@ -455,7 +488,7 @@ public class ButtonListener extends ListenerAdapter {
             
             int tgLoss = Integer.parseInt(buttonID.replace("reduceTG_", ""));
             String ident = StringUtils.capitalize(player.getFaction()) + "";
-            String message = ident + "Reduced tgs by "+tgLoss+" ("+player.getTg()+"->"+(player.getTg()-tgLoss)+").";
+            String message = ident + " reduced tgs by "+tgLoss+" ("+player.getTg()+"->"+(player.getTg()-tgLoss)+").";
             if(tgLoss > player.getTg())
             {
                 message = "You dont have "+tgLoss+" tgs. No change made.";
@@ -1560,7 +1593,7 @@ public class ButtonListener extends ListenerAdapter {
                     int tg = player.getTg();
                     player.setTg(tg + 3);
                     player.setCommodities(player.getCommoditiesTotal());
-                    addReaction(event, false, false, "gained 3" + Emojis.tg + " and replenished commodities (" + String.valueOf(player.getCommodities()) + Emojis.comm + ")", "");
+                    addReaction(event, false, false, " gained 3" + Emojis.tg + " and replenished commodities (" + String.valueOf(player.getCommodities()) + Emojis.comm + ")", "");
                 }
                 case "score_imperial" -> {
                     if (player == null || activeMap == null) {

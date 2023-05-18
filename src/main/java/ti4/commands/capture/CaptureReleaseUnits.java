@@ -1,5 +1,6 @@
 package ti4.commands.capture;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -52,7 +53,7 @@ abstract class CaptureReleaseUnits extends CaptureSubcommandData {
         }
     }
 
-    public String getPlayerColor(SlashCommandInteractionEvent event){
+    public String getPlayerColor(GenericInteractionCreateEvent event){
         Player player = getActiveMap().getPlayer(getUser().getId());
         return player.getColor();
     }

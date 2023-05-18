@@ -18,6 +18,7 @@ import ti4.helpers.Helper;
 import ti4.helpers.FoWHelper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 
 import java.io.File;
@@ -102,7 +103,7 @@ abstract public class AddRemoveUnits implements Command {
         unitParsing(event, color, tile, unitList, map);
     }
 
-    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Map map) {
+    public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Map map) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
         while (unitListTokenizer.hasMoreTokens()) {
@@ -111,7 +112,7 @@ abstract public class AddRemoveUnits implements Command {
             
             int tokenCount = unitInfoTokenizer.countTokens();
             if (tokenCount > 3) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
             }
 
             int count = 1;
@@ -136,7 +137,7 @@ abstract public class AddRemoveUnits implements Command {
             String unitID = Mapper.getUnitID(unit, color);
             String unitPath = Tile.getUnitPath(unitID);
             if (unitPath == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Unit: `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
                 continue;
             }
             if (unitInfoTokenizer.hasMoreTokens()) {
@@ -186,7 +187,7 @@ abstract public class AddRemoveUnits implements Command {
         actionAfterAll(event, tile, color, map);
     }
 
-    protected String recheckColorForUnit(String unit, String color, SlashCommandInteractionEvent event) {
+    protected String recheckColorForUnit(String unit, String color, GenericInteractionCreateEvent event) {
         return color;
     }
 
@@ -317,6 +318,9 @@ abstract public class AddRemoveUnits implements Command {
     abstract protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color);
 
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map){
+        //do nothing, overriden by child classes
+    }
+    protected void actionAfterAll(GenericInteractionCreateEvent event, Tile tile, String color, Map map){
         //do nothing, overriden by child classes
     }
 

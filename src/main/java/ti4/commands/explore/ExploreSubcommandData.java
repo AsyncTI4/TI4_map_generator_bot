@@ -1,6 +1,8 @@
 package ti4.commands.explore;
 
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -69,7 +71,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
     }
 
-    protected String displayExplore(String cardID) {
+    public String displayExplore(String cardID) {
         String card = Mapper.getExplore(cardID);
         StringBuilder sb = new StringBuilder();
         if (card != null) {
@@ -99,19 +101,21 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         return tile;
     }
 
-    protected void resolveExplore(SlashCommandInteractionEvent event, String cardID, Tile tile, String planetName, String messageText, boolean enigmatic) {
+    public void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetName, String messageText, boolean enigmatic, Player player, Map map) {
         String message = "Card has been discarded. Resolve effects manually.";
+        if(map != null)
+        {
+            activeMap = map;
+        }
         if (enigmatic){
             message = "Card has been added to play area.";
             activeMap.purgeExplore(cardID);
         }
         String card = Mapper.getExplore(cardID);
         String[] cardInfo = card.split(";");
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        player = Helper.getPlayer(activeMap, player, event);
+        
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Player could not be found");
             return;
         }
 
@@ -183,7 +187,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew 2 AC");
                 }
                 ACInfo.sendActionCardInfo(activeMap, player, event);
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + message);
             }
             case "dv1", "dv2" -> {
                 message = "Drew Secret Objective";
@@ -193,17 +197,17 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew SO");
                 }
                 SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + message);
             }
             case "dw" -> {
                 message = "Drew Relic";
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + message);
                 DrawRelic.drawRelicAndNotify(player,  event,  activeMap);
             }
             case "ms1", "ms2" -> {
                 message = "Replenished Commodifites (" +player.getCommodities() +"->"+player.getCommoditiesTotal()+")";
                 player.setCommodities(player.getCommoditiesTotal());
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + "\n" + message);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + "\n" + message);
             }
             case "mirage" -> {
                 String mirageID = Constants.MIRAGE;
@@ -224,24 +228,24 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 exploredMessage.append(Helper.getEmojiFromDiscord(planetTrait));
                 exploredMessage.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(mirageID) +" *(tile "+ tile.getPosition() + ")*").append(":\n");
                 exploredMessage.append(displayExplore(exploreID));
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
-                resolveExplore(event, exploreID, tile, mirageID, exploredMessage.toString(), false);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + message);
+                resolveExplore(event, exploreID, tile, mirageID, exploredMessage.toString(), false, player, activeMap);
             }
             case "fb1", "fb2", "fb3", "fb4" -> {
                 message = "Resolve using the buttons";
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
                 Button getACButton = Button.success("comm_for_AC", "Spend 1 TG/Comm For An AC").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
                 Button getCommButton = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 List<Button> buttons = List.of(getACButton, getCommButton);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
             case "aw1", "aw2", "aw3", "aw4" -> {
                 message = "Resolve using the buttons";
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
                 Button covert2CommButton = Button.success("covert_2_comms", "Covert 2 Commodities Into TG").withEmoji(Emoji.fromFormatted(Emojis.Wash));
                 Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 List<Button> buttons = List.of(covert2CommButton, get2CommButton);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
             case "mo1", "mo2", "mo3" -> {
                 if(tile != null && planetName != null)
@@ -249,19 +253,19 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetName, activeMap);
                 }
                 message = Helper.getColourAsMention(event.getGuild(), player.getColor()) + Emojis.infantry + " added to " + Helper.getPlanetRepresentationPlusEmoji(planetName);
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + "\n" + message);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + "\n" + message);
                 break;
             }
             case "lf1", "lf2", "lf3", "lf4" -> {
                 message = "Resolve using the buttons";
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
                 Button getMechButton = Button.success("comm_for_mech", "Spend 1 TG/Comm For A Mech On "+planetName).withEmoji(Emoji.fromFormatted(Emojis.mech)); //TODO: Button resolves using planet ID at end of label - add planetID to buttonId and use that instead
                 Button getCommButton3 = Button.primary("gain_1_comms", "Gain 1 Commodity").withEmoji(Emoji.fromFormatted(Emojis.comm));
                 List<Button> buttons = List.of(getMechButton, getCommButton3);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
             case "kel1", "kel2", "ent", "minent", "majent" -> {
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
                 switch (cardID.toLowerCase()) {
                     case "minent" -> {
                         player.setTg(player.getTg()+1);
@@ -284,34 +288,34 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
                 String trueIdentity = Helper.getPlayerRepresentation(event, player, true);
                 String message2 = trueIdentity + "! Your current CCs are "+Helper.getPlayerCCs(player)+". Use buttons to gain CCs";
-                MessageHelper.sendMessageToChannel(event.getChannel(), message);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), message);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message2, buttons);
             }
             case "exp1", "exp2", "exp3" -> {
                 message = "Resolve explore using the buttons.";   
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
                 Button ReadyPlanet= Button.success("planet_ready", "Remove Inf Or Have Mech To Ready "+planetName);
                 Button Decline = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(ReadyPlanet,Decline);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
             case "cm1", "cm2", "cm3" -> {
                 message = "Resolve explore using the buttons.";   
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
                 Button gainTG= Button.success("gain_1_tg", "Gain 1tg By Removing 1 Inf Or Having Mech On "+planetName).withEmoji(Emoji.fromFormatted(Emojis.tg));
                 Button Decline2 = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainTG,Decline2);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
             case "vfs1", "vfs2", "vfs3" -> {
                 message = "Resolve explore using the buttons.";   
-                MessageHelper.sendMessageToChannel(event.getChannel(), messageText);
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
                 Button gainCC= Button.success("gain_CC", "Gain 1CC By Removing 1 Inf Or Having Mech On "+planetName);
                 Button Decline3 = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(gainCC, Decline3);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
-            default -> MessageHelper.sendMessageToChannel(event.getChannel(), messageText + "\n" + message);
+            default -> MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + message);
         }
     }
 }
