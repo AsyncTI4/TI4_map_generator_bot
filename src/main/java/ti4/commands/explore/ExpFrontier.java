@@ -39,7 +39,7 @@ public class ExpFrontier extends ExploreSubcommandData {
             StringBuilder messageText = new StringBuilder(Emojis.Frontier);
             messageText.append("Frontier *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(event, player)).append(":\n");
             messageText.append(displayExplore(cardID));
-            resolveExplore(event, cardID, tile, null, messageText.toString(), checkIfEngimaticDevice(player, cardID));
+            resolveExplore(event, cardID, tile, null, messageText.toString(), checkIfEngimaticDevice(player, cardID), player, activeMap);
         } else {
             sendMessage("No frontier token in given system.");
         }

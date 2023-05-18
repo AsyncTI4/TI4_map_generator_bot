@@ -6,6 +6,7 @@ import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -38,6 +39,11 @@ public class SOInfo extends SOCardsSubcommandData {
 
     public static void sendSecretObjectiveInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
         String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
+        sendSecretObjectiveInfo(activeMap, player);
+    }
+    public static void sendSecretObjectiveInfo(Map activeMap, Player player, GenericInteractionCreateEvent event) {
+        String headerText = Helper.getPlayerRepresentation(event, player) + " used something";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendSecretObjectiveInfo(activeMap, player);
     }

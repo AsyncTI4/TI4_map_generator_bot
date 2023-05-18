@@ -1,5 +1,6 @@
 package ti4.commands.capture;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
 import ti4.map.Map;
@@ -20,7 +21,7 @@ public class RemoveUnits extends CaptureReleaseUnits {
             }
 
             @Override
-            protected String recheckColorForUnit(String unit, String color, SlashCommandInteractionEvent event) {
+            protected String recheckColorForUnit(String unit, String color, GenericInteractionCreateEvent event) {
                 if (unit.contains("ff") || unit.contains("gf")) {
                     return RemoveUnits.this.getPlayerColor(event);
                 }

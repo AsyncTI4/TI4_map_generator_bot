@@ -1660,6 +1660,41 @@ public class Helper {
         
     }
 
+
+
+
+
+
+    public static boolean mechCheck(String planetName, Map activeMap, Player player)
+    {
+        String message = "";
+        Tile tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
+        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        int numMechs = 0;
+        
+        String colorID = Mapper.getColorID(player.getColor());
+        String mechKey = colorID + "_mf.png";
+        
+        if (unitHolder.getUnits() != null)
+        {
+            
+            if(unitHolder.getUnits().get(mechKey) != null)
+            {
+                numMechs = unitHolder.getUnits().get(mechKey);
+            }
+            
+        }
+        if (numMechs > 0 )
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
+        
+    }
+
     public static Set<Player> getNeighbouringPlayers(Map map, Player player) {
         Set<Player> adjacentPlayers = new HashSet<>();
         Set<Player> realPlayers = new HashSet<>(map.getPlayers().values().stream().filter(Player::isRealPlayer).toList());
