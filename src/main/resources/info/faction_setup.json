@@ -80,7 +80,7 @@
     {
       "alias": "l1z1x",
       "factionName": "The L1Z1X Mindnet",
-      "homeSystem": "6",
+      "homeSystem": "06",
       "startingFleet": "dn, cv, 3 ff, 5 inf 0,sd 0,pds 0",
       "commodities": 2,
       "factionTech": ["it", "sdn2"],
@@ -113,7 +113,7 @@
     {
       "alias": "mentak",
       "factionName": "The Mentak Coalition",
-      "homeSystem": "2",
+      "homeSystem": "02",
       "startingFleet": "cv,2 cr,3 ff,4 inf m,pds m,sd m",
       "commodities": 2,
       "factionTech": ["mc", "so"],
@@ -124,7 +124,7 @@
     {
       "alias": "muaat",
       "factionName": "The Embers of Muaat",
-      "homeSystem": "4",
+      "homeSystem": "04",
       "startingFleet": "ws,2 ff,4 inf m,sd m",
       "commodities": 4,
       "factionTech": ["pws2", "mr"],
@@ -135,7 +135,7 @@
     {
       "alias": "naalu",
       "factionName": "The Naalu Collective",
-      "homeSystem": "9",
+      "homeSystem": "09",
       "startingFleet": "cv,cr,dd,3 ff,2 inf m,2 inf d,pds m,sd d",
       "commodities": 3,
       "factionTech": ["ng", "hcf2"],
@@ -146,7 +146,7 @@
     {
       "alias": "nekro",
       "factionName": "The Nekro Virus",
-      "homeSystem": "8",
+      "homeSystem": "08",
       "startingFleet": "dn,cv,cr,2 ff,2 inf m,sd m",
       "commodities": 3,
       "factionTech": ["vax", "vay"],
@@ -205,7 +205,7 @@
     {
       "alias": "sol",
       "factionName": "The Federation of Sol",
-      "homeSystem": "1",
+      "homeSystem": "01",
       "startingFleet": "2 cv, dd, 3 ff,5 inf j, sd j",
       "commodities": 4,
       "factionTech": ["so2", "ac2"],
@@ -227,7 +227,7 @@
     {
       "alias": "winnu",
       "factionName": "The Winnu",
-      "homeSystem": "7",
+      "homeSystem": "07",
       "startingFleet": "cv,cr,2 ff,2 inf w,pds w, sd w",
       "commodities": 3,
       "factionTech": ["lgf", "htp"],
@@ -249,7 +249,7 @@
     {
       "alias": "yin",
       "factionName": "The Yin Brotherhood",
-      "homeSystem": "3",
+      "homeSystem": "03",
       "startingFleet": "2 cv,dd,4 ff,4 inf d,sd d",
       "commodities": 2,
       "factionTech": ["yso", "ic"],
