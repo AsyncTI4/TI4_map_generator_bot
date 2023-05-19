@@ -95,7 +95,14 @@ public class SCPick extends PlayerSubcommandData {
         
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getPlayerRepresentation(event, player, true));
-        sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(event, scPicked));
+        if (!activeMap.isHomeBrewSCMode())
+        {
+            sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(event, scPicked));
+        }
+        else
+        {
+            sb.append(" Picked: ").append(Helper.getSCBackRepresentation(event, scPicked));
+        }
 
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
