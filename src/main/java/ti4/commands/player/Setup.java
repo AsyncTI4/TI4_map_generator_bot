@@ -91,7 +91,7 @@ public class Setup extends PlayerSubcommandData {
         FactionModel setupInfo = player.getFactionSetupInfo();
        
         //HOME SYSTEM
-        String hsTile = setupInfo.homeSystemTile;
+        String hsTile = AliasHandler.resolveTile(setupInfo.homeSystemTile);
 
         ArrayList<String> setup;
         boolean useSpecified = false;
