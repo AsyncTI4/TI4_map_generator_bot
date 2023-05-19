@@ -26,10 +26,17 @@ public class FactionModel extends Model {
             startingFleet = json.get("startingFleet").asText();
             commodities = json.get("commodities").intValue();
 
-            factionTech = new ArrayList<String>(json.findValuesAsText("factionTech"));
-            startingTech = new ArrayList<String>(json.findValuesAsText("startingTech"));
-            homePlanets = new ArrayList<String>(json.findValuesAsText("homePlanets"));
-            abilities = new ArrayList<String>(json.findValuesAsText("abilities"));
+            factionTech = new ArrayList<String>();
+            json.get("factionTech").elements().forEachRemaining(val -> factionTech.add(val.asText()));
+            
+            startingTech = new ArrayList<String>();
+            json.get("startingTech").elements().forEachRemaining(val -> startingTech.add(val.asText()));
+            
+            homePlanets = new ArrayList<String>();
+            json.get("homePlanets").elements().forEachRemaining(val -> homePlanets.add(val.asText()));
+            
+            abilities = new ArrayList<String>();
+            json.get("abilities").elements().forEachRemaining(val -> abilities.add(val.asText()));
         } catch (Exception e) {
             BotLogger.log("Could not load faction setup.");
         }
