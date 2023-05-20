@@ -176,7 +176,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         
         switch (cardID) {
             case "lc1", "lc2" -> {
-                boolean hasSchemingAbility = player.getFactionAbilities().contains("scheming");
+                boolean hasSchemingAbility = player.hasAbility("scheming");
                 message = hasSchemingAbility ? "Drew 3 Actions Cards (Scheming) - please discard an Action Card from your hand" : "Drew 2 Actions cards";
                 int count = hasSchemingAbility ? 3 : 2;
                 for (int i = 0; i < count; i++) {

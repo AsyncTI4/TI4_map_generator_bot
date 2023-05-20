@@ -504,7 +504,7 @@ public class GenerateMap {
 
                 reinforcements(player, map, width - 450, yPlayAreaSecondRow, unitCount);
 
-                if (player.getFactionAbilities().contains("ancient_blueprints")) {
+                if (player.hasAbility("ancient_blueprints")) {
                     xDelta = bentorBluePrintInfo(player, xDelta, yPlayArea, map);
                 }
 
