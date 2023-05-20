@@ -713,7 +713,7 @@ public class GenerateMap {
             String leaderInfoFileName = "pa_leaders_" + leader.getId() + "_" + player.getFaction() + extraInfo + status + ".png";
             drawPAImage(x + deltaX, y, leaderInfoFileName);
             deltaX += 48;
-            if (leader.getId().equals(Constants.COMMANDER) && player.getFaction().equals("mahact")) {
+            if (leader.getId().equals(Constants.COMMANDER) && player.hasAbility("imperia")) {
                 List<String> mahactCCs = player.getMahactCC();
 
                 Collection<Player> players = map.getPlayers().values();
@@ -721,7 +721,7 @@ public class GenerateMap {
                     if (player_ != player) {
                         String playerColor = player_.getColor();
                         String playerFaction = player_.getFaction();
-                        if (playerColor != null && player.hasAbility("imperia") && mahactCCs.contains(playerColor)) {
+                        if (playerColor != null && mahactCCs.contains(playerColor)) {
                             Leader leader_ = player_.getLeader(Constants.COMMANDER);
                             if (leader_ != null) {
                                 boolean locked = leader_.isLocked();
