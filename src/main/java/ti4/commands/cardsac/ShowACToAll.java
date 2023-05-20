@@ -54,7 +54,7 @@ public class ShowACToAll extends ACCardsSubcommandData {
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Showed Action Card:").append("\n");
 
-        sb.append(Mapper.getActionCard(acID)).append("\n");
+        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
         if (!scored) {
             player.setActionCard(acID);
         }

@@ -55,7 +55,7 @@ public class ShowAC extends ACCardsSubcommandData {
         sb.append("Player: ").append(Helper.getPlayerRepresentation(event, player));
         sb.append("\n");
         sb.append("Showed Action Cards:").append("\n");
-        sb.append(Mapper.getActionCard(acID)).append("\n");
+        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
         sb.append("---------\n");
         player.setActionCard(acID);
 

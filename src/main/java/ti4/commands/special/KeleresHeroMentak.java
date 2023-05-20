@@ -54,7 +54,6 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
             }
             ActionCardModel actionCard = Mapper.getActionCard(acKey);
             String acName = actionCard.name;
-            String acPhase = actionCard.phase;
             String acWindow = actionCard.window;
             String acDescription = actionCard.text;
             if (acWindow.equalsIgnoreCase("Action")) {
