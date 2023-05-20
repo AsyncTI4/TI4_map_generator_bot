@@ -15,6 +15,7 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.SecretObjectiveModel;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -57,10 +58,10 @@ public class ScoreSO extends SOCardsSubcommandData {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }
-            String[] soText = Mapper.getSecretObjective(entry.getKey()).split(";");
-            String soName = soText[0];
-            String soPhase = soText[1];
-            String soDescription = soText[2];
+            SecretObjectiveModel so = Mapper.getSecretObjective(entry.getKey());
+            String soName = so.name;
+            String soPhase = so.phase;
+            String soDescription = so.text;
             message.append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
         }
         if (event != null && channel.getName().equalsIgnoreCase(event.getChannel().getName())) {

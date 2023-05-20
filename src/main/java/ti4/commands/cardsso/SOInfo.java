@@ -18,6 +18,7 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.SecretObjectiveModel;
 
 public class SOInfo extends SOCardsSubcommandData {
     public SOInfo() {
@@ -75,8 +76,8 @@ public class SOInfo extends SOCardsSubcommandData {
     }
     public static String getSecretObjectiveRepresentationShort(String soID, Integer soUniqueID) {
         StringBuilder sb = new StringBuilder();
-        String[] soSplit = Mapper.getSecretObjective(soID).split(";");
-        String soName = soSplit[0];
+        SecretObjectiveModel so = Mapper.getSecretObjective(soID);
+        String soName = so.name;
         sb.append(Emojis.SecretObjective).append("__" + soName + "__").append("\n");
         return sb.toString();
     }
@@ -86,10 +87,10 @@ public class SOInfo extends SOCardsSubcommandData {
     }
     private static String getSecretObjectiveRepresentation(String soID, Integer soUniqueID) {
         StringBuilder sb = new StringBuilder();
-        String[] soSplit = Mapper.getSecretObjective(soID).split(";");
-        String soName = soSplit[0];
-        String soPhase = soSplit[1];
-        String soDescription = soSplit[2];
+        SecretObjectiveModel so = Mapper.getSecretObjective(soID);
+        String soName = so.name;
+        String soPhase = so.phase;
+        String soDescription = so.text;
         sb.append(Emojis.SecretObjective).append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
         return sb.toString();
     }
@@ -125,8 +126,7 @@ public class SOInfo extends SOCardsSubcommandData {
                 sb.append("> None");
             } else {
                 for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
-                    String[] soSplit = Mapper.getSecretObjective(so.getKey()).split(";");
-                    String soName = soSplit[0];
+                    SecretObjectiveModel so_ = Mapper.getSecretObjective(so.getKey());
                     Integer idValue = so.getValue();
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + idValue, 4)).append(")`");
                     sb.append(getSecretObjectiveRepresentation(so.getKey()));
@@ -142,8 +142,8 @@ public class SOInfo extends SOCardsSubcommandData {
         List<Button> soButtons = new ArrayList<>();
         if (secretObjective != null && !secretObjective.isEmpty()) {
             for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
-                String[] soSplit = Mapper.getSecretObjective(so.getKey()).split(";");
-                String soName = soSplit[0];
+                SecretObjectiveModel so_ = Mapper.getSecretObjective(so.getKey());
+                String soName = so_.name;
                 Integer idValue = so.getValue();
                 if (soName != null) {
                     soButtons.add(Button.primary(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
