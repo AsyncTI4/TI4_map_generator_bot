@@ -23,8 +23,8 @@ public class ListPublicObjectives extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        HashMap<String, String> poList = Mapper.getPublicObjectivesState1();
-        poList.putAll(Mapper.getPublicObjectivesState2());
+        HashMap<String, String> poList = Mapper.getPublicObjectivesStage1();
+        poList.putAll(Mapper.getPublicObjectivesStage2());
         String message = "**__Public Objective List__**\n" + poList.entrySet().stream()
             .map(e -> e.getKey() + " = " + Mapper.getPublicObjective(e.getKey()))
             .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))

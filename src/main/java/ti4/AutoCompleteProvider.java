@@ -13,6 +13,7 @@ import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
+import ti4.model.PublicObjectiveModel;
 
 import java.io.File;
 import java.util.*;
@@ -171,11 +172,11 @@ public class AutoCompleteProvider {
             }
             case Constants.PO_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                java.util.Map<String, String> publicObjectives = Mapper.getPublicObjectives();
+                java.util.Map<String, PublicObjectiveModel> publicObjectives = Mapper.getPublicObjectives();
                 List<Command.Choice> options = publicObjectives.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                        .filter(value -> value.getValue().name.toLowerCase().contains(enteredValue))
                         .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .map(value -> new Command.Choice(value.getValue().name, value.getKey()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
