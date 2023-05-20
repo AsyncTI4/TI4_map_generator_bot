@@ -45,7 +45,7 @@ public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
         sb.append("Game: ").append(activeMap.getName()).append(" ");
         sb.append("Player: ").append(getUser().getName()).append("\n");
         sb.append("Card shuffled back into deck from discards: ");
-        sb.append(Mapper.getActionCard(acID)).append("\n");
+        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 }

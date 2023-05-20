@@ -110,9 +110,7 @@ public class PlayAC extends ACCardsSubcommandData {
         } else {
             sb.append(Helper.getPlayerRepresentation(event, player)).append(" played an Action Card:\n");
         }
-        sb.append(Emojis.ActionCard).append("__**").append(actionCardTitle).append("**__ (").append(actionCardPhase).append(" Phase)\n");
-        sb.append(">  _").append(actionCardWindow).append(":_\n");
-        sb.append(">  ").append(actionCardText).append("\n");
+        sb.append(actionCard.getRepresentation());
         List<Button> buttons = new ArrayList<Button>();
         Button sabotageButton = Button.danger("sabotage_ac", "Cancel AC With Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
         buttons.add(sabotageButton);

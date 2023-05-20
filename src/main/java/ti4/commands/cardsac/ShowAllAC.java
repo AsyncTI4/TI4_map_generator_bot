@@ -36,7 +36,7 @@ public class ShowAllAC extends ACCardsSubcommandData {
         Collections.shuffle(actionCards);
         int index = 1;
         for (String id : actionCards) {
-            sb.append(index).append(". ").append(Mapper.getActionCard(id)).append("\n");
+            sb.append(index).append(". ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
             index++;
         }
 
