@@ -87,7 +87,7 @@ public class ListVoteCount extends AgendaSubcommandData {
                         influenceCount += influenceCountFromPlanetsRes;
                     }
                 }
-                if (player.getFactionAbilities().contains("lithoids")) { //Khrask Faction Ability Lithoids - Vote with RES, not INF
+                if (player.hasAbility("lithoids")) { //Khrask Faction Ability Lithoids - Vote with RES, not INF
 
                 }
                 if (!player.getPromissoryNotesInPlayArea().isEmpty()) {
@@ -127,7 +127,7 @@ public class ListVoteCount extends AgendaSubcommandData {
                 influenceCount += influenceCountFromPlanets;
                 
                 //ZELIAN PURIFIER BIOPHOBIC ABILITY - 1 planet = 1 vote
-                if (player.getFactionAbilities().contains("biophobic")) {
+                if (player.hasAbility("biophobic")) {
                     influenceCount = planets.size();
                 }
                 
@@ -181,14 +181,14 @@ public class ListVoteCount extends AgendaSubcommandData {
         if (map.isFoWMode()) {
             sb.append(" vote count: **???**");
             return sb.toString();
-        } else if (player.getFactionAbilities().contains("galactic_threat") && !Helper.playerHasXxchaCommanderUnlocked(map, player)) {
+        } else if (player.hasAbility("galactic_threat") && !Helper.playerHasXxchaCommanderUnlocked(map, player)) {
             sb.append(" NOT VOTING (Galactic Threat)");
             return sb.toString();
         } else if (Helper.playerHasXxchaHeroUnlocked(player)) {
             sb.append(" vote count: **" + Emojis.ResInf + " " + voteCount);
-        } else if (player.getFactionAbilities().contains("lithoids")) { // Vote with planet resources, no influence
+        } else if (player.hasAbility("lithoids")) { // Vote with planet resources, no influence
             sb.append(" vote count: **" + Emojis.resources + " " + voteCount);
-        } else if (player.getFactionAbilities().contains("biophobic")) {
+        } else if (player.hasAbility("biophobic")) {
             sb.append(" vote count: **" + Emojis.SemLor + " " + voteCount);
         } else  {
             sb.append(" vote count: **" + Emojis.influence + " " + voteCount);
@@ -214,7 +214,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         planets.removeAll(player.getExhaustedPlanets());
 
         //NEKRO unless XXCHA ALLIANCE
-        if (player.getFactionAbilities().contains("galactic_threat") && !Helper.playerHasXxchaCommanderUnlocked(map, player)) {
+        if (player.hasAbility("galactic_threat") && !Helper.playerHasXxchaCommanderUnlocked(map, player)) {
             return 0;
         }
 
@@ -228,12 +228,12 @@ public class ListVoteCount extends AgendaSubcommandData {
         }
 
         //KHRASK
-        if (player.getFactionAbilities().contains("lithoids")) { // Vote with planet resources, no influence
+        if (player.hasAbility("lithoids")) { // Vote with planet resources, no influence
             return baseResourceCount;
         }
 
         //ZELIAN PURIFIER BIOPHOBIC ABILITY - 1 planet = 1 vote
-        if (player.getFactionAbilities().contains("biophobic")) {
+        if (player.hasAbility("biophobic")) {
             return planets.size();
         }
 
@@ -250,7 +250,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         int additionalVotes = 0;
 
         //Argent Zeal
-        if (player.getFactionAbilities().contains("zeal")) {
+        if (player.hasAbility("zeal")) {
             long playerCount = map.getPlayers().values().stream().filter(Player::isRealPlayer).count();
             sb.append("(+" + playerCount + " for " + Emojis.Argent + "Zeal)");
             additionalVotes += playerCount;

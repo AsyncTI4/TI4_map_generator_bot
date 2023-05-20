@@ -9,7 +9,7 @@ import ti4.map.UnitHolder;
 public class DiscordantStarsHelper {
     public static void checkGardenWorlds(Map map) {
         for (Player player : map.getPlayers().values()) {
-            if (player.getFactionAbilities().contains(Constants.GARDEN_WORLDS)) {
+            if (player.hasAbility(Constants.GARDEN_WORLDS)) {
                 for (Tile tile : map.getTileMap().values()) {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                         if (unitHolder != null && unitHolder instanceof Planet) {
