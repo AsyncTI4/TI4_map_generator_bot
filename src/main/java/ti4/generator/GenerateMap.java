@@ -1548,7 +1548,7 @@ public class GenerateMap {
     }
 
     public static String getSCNumberIfNaaluInPlay(Player player, Map map, String scText) {
-        if (Constants.NAALU.equals(player.getFaction())) {
+        if (player.hasAbility("telepathic")) { //naalu 0 token ability
             boolean giftPlayed = false;
             Collection<Player> activePlayers = map.getPlayers().values().stream().filter(player_ -> player_.isRealPlayer()).toList();
             for (Player player_ : activePlayers) {
