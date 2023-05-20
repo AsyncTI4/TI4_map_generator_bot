@@ -1903,8 +1903,8 @@ public class GenerateMap {
         LinkedHashMap<String, List<String>> scoredPublicObjectives = new LinkedHashMap<>(map.getScoredPublicObjectives());
         LinkedHashMap<String, Integer> revealedPublicObjectives = new LinkedHashMap<>(map.getRevealedPublicObjectives());
         LinkedHashMap<String, Player> players = map.getPlayers();
-        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
-        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
+        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
+        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
         HashMap<String, String> secretObjectives = Mapper.getSecretObjectivesJustNames();
         LinkedHashMap<String, Integer> customPublicVP = map.getCustomPublicVP();
         LinkedHashMap<String, String> customPublics = customPublicVP.keySet().stream().collect(Collectors.toMap(key -> key, name -> {

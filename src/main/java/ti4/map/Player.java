@@ -13,6 +13,7 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
+import ti4.model.PublicObjectiveModel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -793,10 +794,9 @@ public class Player {
             if (scoredPOEntry.getValue().contains(getUserID())) {
                 String poID = scoredPOEntry.getKey();
                 try {
-                    String poText = Mapper.getPublicObjective(poID);
-                    if (poText != null) {//IS A PO 
-                        int poValue = Integer.valueOf(poText.split(";")[3]);
-                        vpCount += poValue;
+                    PublicObjectiveModel po = Mapper.getPublicObjective(poID);
+                    if (po != null) {//IS A PO 
+                        vpCount += po.points;
                     } else { //IS A CUSTOM PO
                         int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
                         int poValue = map.getCustomPublicVP().getOrDefault(poID, 0);

@@ -22,6 +22,7 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 
 public class PlayAC extends ACCardsSubcommandData {
     public PlayAC() {
@@ -86,11 +87,11 @@ public class PlayAC extends ACCardsSubcommandData {
             //sendMessage();
             return "No such Action Card ID found, please retry";
         }
-        String[] actionCard = Mapper.getActionCard(acID).split(";");
-        String actionCardTitle = actionCard[0];
-        String actionCardPhase = actionCard[1];
-        String actionCardWindow = actionCard[2];
-        String actionCardText = actionCard[3];
+        ActionCardModel actionCard = Mapper.getActionCard(acID);
+        String actionCardTitle = actionCard.name;
+        String actionCardPhase = actionCard.phase;
+        String actionCardWindow = actionCard.window;
+        String actionCardText = actionCard.text;
 
         String activePlayerID = activeMap.getActivePlayer();
         if (player.isPassed() && activePlayerID != null) {

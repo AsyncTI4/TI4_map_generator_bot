@@ -3,6 +3,7 @@ package ti4.generator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import com.amazonaws.services.batch.model.Secret;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.JsonNodeType;
@@ -35,9 +36,6 @@ public class Mapper {
     private static final Properties faction_abilities = new Properties();
     private static final Properties factions = new Properties();
     private static final Properties general = new Properties();
-    private static final Properties secretObjectives = new Properties();
-    private static final Properties actionCards = new Properties();
-    private static final Properties publicObjectives = new Properties();
     private static final Properties promissoryNotes = new Properties();
     private static final Properties techs = new Properties();
     private static final Properties explore = new Properties();
@@ -58,11 +56,14 @@ public class Mapper {
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties wormholes = new Properties();
     private static final Properties ds_handcards = new Properties();
-
+    
     //TODO: (Jazz) Finish moving all files over from properties to json
+    private static final HashMap<String, ActionCardModel> actionCards = new HashMap<>();
     private static final HashMap<String, AgendaModel> agendas = new HashMap<>();
     private static final HashMap<String, FactionModel> factionSetup = new HashMap<>();
-
+    private static final HashMap<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
+    private static final HashMap<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
+    
     private static final HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = new HashMap<>();
 
     public static void init() {
@@ -76,10 +77,10 @@ public class Mapper {
         readData("general.properties", general, "Could not read general token name file");
         readData("faction_abilities.properties", faction_abilities, "Could not read faction abilities file");
         readData("factions.properties", factions, "Could not read factions name file");
-        readData("secret_objectives.properties", secretObjectives, "Could not read secret objectives file");
-        readData("action_cards.properties", actionCards, "Could not read action cards file");
-        readJsonData("agendas.json", agendas, AgendaModel::new, "agendas", "Could not read agendas file");
-        readData("public_objective.properties", publicObjectives, "Could not read public objective file");
+        readJsonData("secret_objectives.json", secretObjectives, SecretObjectiveModel::new, "Could not read secret objectives file");
+        readJsonData("action_cards.json", actionCards, ActionCardModel::new, "Could not read action cards file");
+        readJsonData("agendas.json", agendas, AgendaModel::new, "Could not read agendas file");
+        readJsonData("public_objectives.json", publicObjectives, PublicObjectiveModel::new, "Could not read public objective file");
         readData("promissory_notes.properties", promissoryNotes, "Could not read promissory notes file");
         readData("exploration.properties", explore, "Could not read explore file");
         readData("leaders.properties", leaders, "Could not read leaders file");
@@ -93,7 +94,7 @@ public class Mapper {
         readData("tile_representation.properties", tile_representation, "Could not read tile representation file");
         readData("leader_representation.properties", leader_representation, "Could not read leader representation file");
         readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
-        readJsonData("faction_setup.json", factionSetup, FactionModel::new, "factions", "Could not read faction setup file");
+        readJsonData("faction_setup.json", factionSetup, FactionModel::new, "Could not read faction setup file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("agenda_representation.properties", agendaRepresentation, "Could not read agenda representaion file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
@@ -116,14 +117,13 @@ public class Mapper {
         T construct(JsonNode j);
     }
 
-    private static <T extends Model> void readJsonData(String jsonFileName, HashMap<String, T> objectList, ModelContructor<T> constructor, String listPath, String error) {
+    private static <T extends Model> void readJsonData(String jsonFileName, HashMap<String, T> objectList, ModelContructor<T> constructor, String error) {
         String jsonSource = ResourceHelper.getInstance().getInfoFile(jsonFileName);
         if (jsonSource != null) {
             try (InputStream input = new FileInputStream(jsonSource)) {
                 String jsonContents = new String(input.readAllBytes());
-                JsonNode json = objectMapper.readTree(jsonContents);
-                JsonNode jsonList = json.get(listPath);
-                
+                JsonNode jsonList = objectMapper.readTree(jsonContents);
+                 
                 if (jsonList.getNodeType() == JsonNodeType.ARRAY) {
                     jsonList.elements().forEachRemaining(node -> {
                         T obj = constructor.construct(node);
@@ -326,28 +326,24 @@ public class Mapper {
         return tokensToName;
     }
 
-    public static String getSecretObjective(String id) {
-        return (String) secretObjectives.get(id);
+    public static SecretObjectiveModel getSecretObjective(String id) {
+        return secretObjectives.get(id);
     }
 
-    public static String getActionCard(String id) {
-
+    public static ActionCardModel getActionCard(String id) {
         id = id.replace("extra1", "");
         id = id.replace("extra2", "");
-        return (String) actionCards.get(id);
+        return actionCards.get(id);
     }
 
     @Nullable
     public static String getActionCardName(String id) {
-        id = id.replace("extra1", "");
-        id = id.replace("extra2", "");
-        String info = (String) actionCards.get(id);
+        ActionCardModel info = getActionCard(id);
         // if we would break trying to split the note, just return whatever is there
-        if ((info == null) || !info.contains(";")) {
-            return info;
+        if (info == null) {
+            return "unknown action card, contact developer";
         }
-        String[] split = info.split(";");
-        return split[0];
+        return info.name;
     }
 
     public static String getPromissoryNote(String id, boolean longDisplay) {
@@ -378,8 +374,8 @@ public class Mapper {
         return pns[1].toLowerCase();
     }
 
-    public static String getPublicObjective(String id) {
-        return (String) publicObjectives.get(id);
+    public static PublicObjectiveModel getPublicObjective(String id) {
+        return publicObjectives.get(id);
     }
 
     public static AgendaModel getAgenda(String id) {
@@ -456,11 +452,8 @@ public class Mapper {
         return split[2];
     }
 
-    public static HashMap<String, String> getSecretObjectives() {
-        HashMap<String, String> soList = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : secretObjectives.entrySet()) {
-            soList.put((String) entry.getKey(), (String) entry.getValue());
-        }
+    public static HashMap<String, SecretObjectiveModel> getSecretObjectives() {
+        HashMap<String, SecretObjectiveModel> soList = new HashMap<>(secretObjectives);
         return soList;
     }
 
@@ -522,9 +515,8 @@ public class Mapper {
 
     public static HashMap<String, String> getSecretObjectivesJustNames() {
         HashMap<String, String> soList = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : secretObjectives.entrySet()) {
-            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-            soList.put((String) entry.getKey(), tokenizer.nextToken());
+        for (Map.Entry<String, SecretObjectiveModel> entry : secretObjectives.entrySet()) {
+            soList.put(entry.getKey(), entry.getValue().name);
         }
         return soList;
     }
@@ -560,29 +552,25 @@ public class Mapper {
         return tokenPath;
     }
 
-    public static HashMap<String, String> getActionCards() {
-        HashMap<String, String> acList = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : actionCards.entrySet()) {
-            acList.put((String) entry.getKey(), (String) entry.getValue());
-        }
+    public static HashMap<String, ActionCardModel> getActionCards() {
+        HashMap<String, ActionCardModel> acList = new HashMap<>(actionCards);
         return acList;
     }
-    public static HashMap<String, String> getActionCards(String extra) {
-        HashMap<String, String> acList = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : actionCards.entrySet()) {
-            acList.put(((String) entry.getKey()) +extra, (String) entry.getValue());
+    
+    public static HashMap<String, ActionCardModel> getActionCards(String extra) {
+        HashMap<String, ActionCardModel> acList = new HashMap<>();
+        for (Map.Entry<String, ActionCardModel> entry : actionCards.entrySet()) {
+            acList.put(entry.getKey() + extra, entry.getValue());
         }
         return acList;
     }
 
     public static HashMap<String, String> getACJustNames() {
-        HashMap<String, String> agendaList = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : actionCards.entrySet()) {
-            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-            String value = tokenizer.nextToken();
-            agendaList.put((String) entry.getKey(), value);
+        HashMap<String, String> acNameList = new HashMap<>();
+        for (Map.Entry<String, ActionCardModel> entry : actionCards.entrySet()) {
+            acNameList.put(entry.getKey(), entry.getValue().name);
         }
-        return agendaList;
+        return acNameList;
     }
 
     public static String getTechType(String id) {
@@ -651,32 +639,27 @@ public class Mapper {
         return AliasHandler.getPlanetKeyList().contains(id);
     }
 
-    public static Map<String, String> getPublicObjectives() {
-        return Stream.of(getPublicObjectivesState1(), getPublicObjectivesState2()).flatMap(m -> m.entrySet().stream()).collect(Collectors.toMap(Entry::getKey, Entry::getValue));
+    
+    public static HashMap<String, PublicObjectiveModel> getPublicObjectives() {
+        HashMap<String, PublicObjectiveModel> poList = new HashMap<>(publicObjectives);
+        return poList;
     }
 
-    public static HashMap<String, String> getPublicObjectivesState1() {
-        return getPublicObjectives("1");
+    public static HashMap<String, String> getPublicObjectivesStage1() {
+        return getPublicObjectives(1);
     }
 
-    public static HashMap<String, String> getPublicObjectivesState2() {
-        return getPublicObjectives("2");
+    public static HashMap<String, String> getPublicObjectivesStage2() {
+        return getPublicObjectives(2);
     }
 
     @NotNull
-    private static HashMap<String, String> getPublicObjectives(String requiredStage) {
+    private static HashMap<String, String> getPublicObjectives(int requiredStage) {
         HashMap<String, String> poList = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : publicObjectives.entrySet()) {
-            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
-            if (tokenizer.countTokens() == 4) {
-                String name = tokenizer.nextToken();
-                String category = tokenizer.nextToken();
-                String description = tokenizer.nextToken();
-                String stage = tokenizer.nextToken();
-                if (requiredStage.equals(stage)) {
-//                    poList.put((String) entry.getKey(), name + ";" + category + ";" + description);
-                    poList.put((String) entry.getKey(), name);
-                }
+        for (Map.Entry<String, PublicObjectiveModel> entry : publicObjectives.entrySet()) {
+            PublicObjectiveModel po = entry.getValue();
+            if (requiredStage == po.points) {
+                poList.put((String) entry.getKey(), po.name);
             }
         }
         return poList;
