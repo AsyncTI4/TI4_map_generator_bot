@@ -721,7 +721,7 @@ public class GenerateMap {
                     if (player_ != player) {
                         String playerColor = player_.getColor();
                         String playerFaction = player_.getFaction();
-                        if (playerColor != null && mahactCCs.contains(playerColor)) {
+                        if (playerColor != null && player.hasAbility("imperia") && mahactCCs.contains(playerColor)) {
                             Leader leader_ = player_.getLeader(Constants.COMMANDER);
                             if (leader_ != null) {
                                 boolean locked = leader_.isLocked();
