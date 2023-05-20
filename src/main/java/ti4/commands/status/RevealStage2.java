@@ -10,6 +10,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
+import ti4.model.PublicObjectiveModel;
 
 public class RevealStage2 extends StatusSubcommandData {
     public RevealStage2() {
@@ -26,12 +27,10 @@ public class RevealStage2 extends StatusSubcommandData {
         Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
         java.util.Map.Entry<String, Integer> objective = activeMap.revealState2();
 
-        String[] objectiveText = Mapper.getPublicObjective(objective.getKey()).split(";");
-        String objectiveName = objectiveText[0];
-        // String objectivePhase = objectiveText[1];
-        String objectiveDescription = objectiveText[2];
-        // String objectiveValue = objectiveText[3];
-
+        PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
+        String objectiveName = po.name;
+        String objectiveDescription = po.text;
+        
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getGamePing(event, activeMap));
         sb.append(" **Stage 2 Public Objective Revealed**").append("\n");
