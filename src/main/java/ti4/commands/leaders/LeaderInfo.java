@@ -139,7 +139,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         }
 
         //ADD MAHACT IMPERIA REFERENCE
-        if (player.getFaction().equals("mahact")) {
+        if (player.hasAbility("imperia")) {
             leaderSB.append("_ _\n");
             leaderSB.append("**Imperia Commanders:**").append("\n");
             for (Player player_ : activeMap.getPlayers().values()) {

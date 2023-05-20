@@ -1458,7 +1458,7 @@ public class ButtonListener extends ListenerAdapter {
                     if (used) {
                         break;
                     }
-                    boolean hasSchemingAbility = player.getFactionAbilities().contains("scheming");
+                    boolean hasSchemingAbility = player.hasAbility("scheming");
                     String message = hasSchemingAbility ? "Drew 3 Actions Cards (Scheming) - please discard an Action Card from your hand" : "Drew 2 Actions cards";
                     int count = hasSchemingAbility ? 3 : 2;
                     for (int i = 0; i < count; i++) {
@@ -1697,7 +1697,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
                 case "comm_for_AC" -> {
-                    boolean hasSchemingAbility = player.getFactionAbilities().contains("scheming");
+                    boolean hasSchemingAbility = player.hasAbility("scheming");
                     int count2 = hasSchemingAbility ? 2 : 1;
                     if(player.getCommodities() > 0)
                     {

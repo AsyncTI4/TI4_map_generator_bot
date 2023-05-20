@@ -344,7 +344,7 @@ public class AgendaHelper {
         influenceCount += influenceCountFromPlanets;
 
 
-        if ("mahact".equals(player.getFaction())) {
+        if (player.hasAbility("imperia")) {
             Player xxcha = Helper.getPlayerFromColorOrFaction(map, "xxcha");
             if(xxcha != null)
             {

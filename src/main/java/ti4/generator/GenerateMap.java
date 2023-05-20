@@ -504,7 +504,7 @@ public class GenerateMap {
 
                 reinforcements(player, map, width - 450, yPlayAreaSecondRow, unitCount);
 
-                if (player.getFactionAbilities().contains("ancient_blueprints")) {
+                if (player.hasAbility("ancient_blueprints")) {
                     xDelta = bentorBluePrintInfo(player, xDelta, yPlayArea, map);
                 }
 
@@ -1548,7 +1548,7 @@ public class GenerateMap {
     }
 
     public static String getSCNumberIfNaaluInPlay(Player player, Map map, String scText) {
-        if (Constants.NAALU.equals(player.getFaction())) {
+        if (player.hasAbility("telepathic")) { //naalu 0 token ability
             boolean giftPlayed = false;
             Collection<Player> activePlayers = map.getPlayers().values().stream().filter(player_ -> player_.isRealPlayer()).toList();
             for (Player player_ : activePlayers) {
@@ -1783,9 +1783,9 @@ public class GenerateMap {
             if (deltaSplitX != 0){
                 deltaSplitY = point.y;
             }
+            boolean hasArmadaAbility = player.hasAbility("armada");
             drawCCOfPlayer(ccID, x + deltaSplitX, y - deltaSplitY, player.getTacticalCC(), false, null, map);
-//            drawCCOfPlayer(fleetCCID, x, y + 65, player.getFleetCC(), "letnev".equals(player.getFaction()));
-            drawCCOfPlayer(fleetCCID, x + deltaSplitX, y + 65 - deltaSplitY, player.getFleetCC(), false, player, map);
+            drawCCOfPlayer(fleetCCID, x + deltaSplitX, y + 65 - deltaSplitY, player.getFleetCC(), hasArmadaAbility, player, map);
             drawCCOfPlayer(ccID, x + deltaSplitX, y + 130 - deltaSplitY, player.getStrategicCC(), false, null, map);
 
             if (player == speaker) {
@@ -1833,10 +1833,22 @@ public class GenerateMap {
             BufferedImage ccImage = ImageIO.read(new File(ccPath));
             int delta = 20;
             if (isLetnev) {
+                String armadaCCID = Mapper.getCCID(player.getColor());
+                String armadaCCPath = Mapper.getCCPath(armadaCCID);
+                BufferedImage armadaCCImage = ImageIO.read(new File(armadaCCPath));
+                String armadaFaction = player.getFaction();
+                BufferedImage armadaFactionImage = null;
+                if (armadaFaction != null) {
+                    String armadaFactionImagePath = Mapper.getCCPath("control_faction_" + armadaFaction + ".png");
+                    if (armadaFactionImagePath != null) {
+                        armadaFactionImage = ImageIO.read(new File(armadaFactionImagePath));
+                    }
+                }
+
                 for (int i = 0; i < 2; i++) {
-                    graphics.drawImage(ccImage, x + (delta * i), y, null);
-                    if (factionImage != null) {
-                        graphics.drawImage(factionImage, x + (delta * i) + DELTA_X, y + DELTA_Y, null);
+                    graphics.drawImage(armadaCCImage, x + (delta * i), y, null);
+                    if (armadaFactionImage != null) {
+                        graphics.drawImage(armadaFactionImage, x + (delta * i) + DELTA_X, y + DELTA_Y, null);
                     }
                 }
                 x += 20;
