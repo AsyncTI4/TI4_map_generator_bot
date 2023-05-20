@@ -10,7 +10,7 @@
       "startingTech": ["md"],
       "homePlanets": ["Nestphar"],
       "abilities": ["mitosis"],
-      "leaders": []
+      "leaders": ["arborecagent", "arboreccommander", "arborechero"]
     },
     {
       "alias": "argent",
@@ -22,7 +22,7 @@
       "startingTech": [],
       "homePlanets": ["Valk", "Ylir", "Avar"],
       "abilities": ["zeal", "raid_formation"],
-      "leaders": []
+      "leaders": ["argentagent", "argentcommander", "argenthero"]
     },
     {
       "alias": "cabal",
@@ -34,7 +34,7 @@
       "startingTech": ["sar"],
       "homePlanets": ["Acheron"],
       "abilities": ["devour", "amalgamation", "riftmeld"],
-      "leaders": []
+      "leaders": ["cabalagent", "cabalcommander", "cabalhero"]
     },
     {
       "alias": "ghost",
@@ -46,7 +46,7 @@
       "startingTech": ["gd"],
       "homePlanets": ["Creuss"],
       "abilities": ["quantum_entanglement", "slipstream", "creuss_gate"],
-      "leaders": []
+      "leaders": ["ghostagent", "ghostcommander", "ghosthero"]
     },
     {
       "alias": "empyrean",
@@ -58,7 +58,7 @@
       "startingTech": ["det"],
       "homePlanets": ["TheDark"],
       "abilities": ["voidborn", "aetherpassage", "dark_whispers"],
-      "leaders": []
+      "leaders": ["empyreanagent", "empyreancommander", "empyreanhero"]
     },
     {
       "alias": "hacan",
@@ -70,7 +70,7 @@
       "startingTech": ["st", "amd"],
       "homePlanets": ["Arretze", "Hercant", "Kamdorn"],
       "abilities": ["master_of_trade", "guild_ships", "arbiters"],
-      "leaders": []
+      "leaders": ["hacanagent", "hacancommander", "hacanhero"]
     },
     {
       "alias": "jolnar",
@@ -82,7 +82,7 @@
       "startingTech": ["amd", "st", "nm", "ps"],
       "homePlanets": ["Jol", "Nar"],
       "abilities": ["fragile", "brilliant", "analytical"],
-      "leaders": []
+      "leaders": ["jolnaragent", "jolnarcommander", "jolnarhero"]
     },
     {
       "alias": "l1z1x",
@@ -94,7 +94,7 @@
       "startingTech": ["ps", "nm"],
       "homePlanets": ["[0.0.0]"],
       "abilities": ["assimilate", "harrow"],
-      "leaders": []
+      "leaders": ["l1z1xagent", "l1z1xcommander", "l1z1xhero"]
     },
     {
       "alias": "letnev",
@@ -106,7 +106,7 @@
       "startingTech": ["amd", "ps"],
       "homePlanets": ["ArcPrime", "WrenTerra"],
       "abilities": ["munitions", "armada"],
-      "leaders": []
+      "leaders": ["letnevagent", "letnevcommander", "letnevhero"]
     },
     {
       "alias": "mahact",
@@ -118,7 +118,7 @@
       "startingTech": ["pi", "bs"],
       "homePlanets": ["Ixth"],
       "abilities": ["edict", "imperia", "hubris"],
-      "leaders": []
+      "leaders": ["mahactagent", "mahactcommander", "mahacthero"]
     },
     {
       "alias": "mentak",
@@ -130,7 +130,7 @@
       "startingTech": ["ps", "st"],
       "homePlanets": ["MollPrimus"],
       "abilities": ["ambush", "pillage"],
-      "leaders": []
+      "leaders": ["mentakagent", "mentakcommander", "mentakhero"]
     },
     {
       "alias": "muaat",
@@ -142,7 +142,7 @@
       "startingTech": ["ps"],
       "homePlanets": ["Muaat"],
       "abilities": ["star_forge", "gashlai_physiology"],
-      "leaders": []
+      "leaders": ["muaatagent", "muaatcommander", "muaathero"]
     },
     {
       "alias": "naalu",
@@ -154,7 +154,7 @@
       "startingTech": ["st", "nm"],
       "homePlanets": ["Maaluk", "Druaa"],
       "abilities": ["telepathic", "foresight"],
-      "leaders": []
+      "leaders": ["naaluagent", "naalucommander", "naaluhero"]
     },
     {
       "alias": "nekro",
@@ -170,7 +170,7 @@
         "technological_singularity",
         "propagation"
       ],
-      "leaders": []
+      "leaders": ["nekroagent", "nekrocommander", "nekrohero"]
     },
     {
       "alias": "nomad",
@@ -182,7 +182,7 @@
       "startingTech": ["sr"],
       "homePlanets": ["Arcturus"],
       "abilities": ["the_company", "future_sight"],
-      "leaders": []
+      "leaders": ["nomadagentmercer", "nomadagentthundarian", "nomadagentartuno", "nomadcommander", "nomadhero"]
     },
     {
       "alias": "naaz",
@@ -194,7 +194,7 @@
       "startingTech": ["pa", "aida"],
       "homePlanets": ["Naazir", "Rokha"],
       "abilities": ["distant_suns", "fabrication"],
-      "leaders": []
+      "leaders": ["naazagent", "naazcommander", "naazhero"]
     },
     {
       "alias": "saar",
@@ -206,7 +206,7 @@
       "startingTech": ["amd"],
       "homePlanets": ["Ragh", "LisisII"],
       "abilities": ["scavenge", "nomadic"],
-      "leaders": []
+      "leaders": ["saaragent", "saarcommander", "saarhero"]
     },
     {
       "alias": "sardakk",
@@ -218,7 +218,7 @@
       "startingTech": [],
       "homePlanets": ["Quinarra", "Trenlak"],
       "abilities": ["unrelenting"],
-      "leaders": []
+      "leaders": ["sardakkagent", "sardakkcommander", "sardakkhero"]
     },
     {
       "alias": "sol",
@@ -230,7 +230,7 @@
       "startingTech": ["amd", "nm"],
       "homePlanets": ["Jord"],
       "abilities": ["orbital_drop", "versatile"],
-      "leaders": []
+      "leaders": ["solagent", "solcommander", "solhero"]
     },
     {
       "alias": "titans",
@@ -242,7 +242,7 @@
       "startingTech": ["amd", "sdn"],
       "homePlanets": ["Elysium"],
       "abilities": ["terragenesis", "awaken", "coalescence"],
-      "leaders": []
+      "leaders": ["titansagent", "titanscommander", "titanshero"]
     },
     {
       "alias": "winnu",
@@ -254,7 +254,7 @@
       "startingTech": [],
       "homePlanets": ["Winnu"],
       "abilities": ["blood_ties", "reclamation"],
-      "leaders": []
+      "leaders": ["winnuagent", "winnucommander", "winnuhero"]
     },
     {
       "alias": "xxcha",
@@ -266,7 +266,7 @@
       "startingTech": ["gls"],
       "homePlanets": ["ArchonRen", "ArchonTau"],
       "abilities": ["peace_accords", "quash"],
-      "leaders": []
+      "leaders": ["xxchaagent", "xxchacommander", "xxchahero"]
     },
     {
       "alias": "yin",
@@ -278,7 +278,7 @@
       "startingTech": ["st"],
       "homePlanets": ["Darien"],
       "abilities": ["indoctrination", "devotion"],
-      "leaders": []
+      "leaders": ["yinagent", "yincommander", "yinhero"]
     },
     {
       "alias": "yssaril",
@@ -290,7 +290,7 @@
       "startingTech": ["nm"],
       "homePlanets": ["Retillion", "Shalloq"],
       "abilities": ["stall_tactics", "scheming", "crafty"],
-      "leaders": []
+      "leaders": ["yssarilagent", "yssarilcommander", "yssarilhero"]
     },
     {
       "alias": "keleresm",
@@ -302,7 +302,7 @@
       "startingTech": [],
       "homePlanets": ["MollPrimusk"],
       "abilities": ["the_tribuni", "council_patronage", "laws_order"],
-      "leaders": []
+      "leaders": ["keleresagent", "kelerescommander", "keleresheroharka"]
     },
     {
       "alias": "keleresx",
@@ -314,7 +314,7 @@
       "startingTech": [],
       "homePlanets": ["ArchonRenk", "ArchonTauk"],
       "abilities": ["the_tribuni", "council_patronage", "laws_order"],
-      "leaders": []
+      "leaders": ["keleresagent", "kelerescommander", "keleresheroxodlynn"]
     },
     {
       "alias": "keleresa",
@@ -326,7 +326,7 @@
       "startingTech": [],
       "homePlanets": ["Valkk", "Ylirk", "Avark"],
       "abilities": ["the_tribuni", "council_patronage", "laws_order"],
-      "leaders": []
+      "leaders": ["keleresagent", "kelerescommander", "keleresherokuuasi"]
     },
     {
       "alias": "admins",
@@ -338,7 +338,7 @@
       "startingTech": ["sar", "gd"],
       "homePlanets": ["Somna", "Tera", "Hospoona"],
       "abilities": [],
-      "leaders": []
+      "leaders": ["adminsagent", "adminscommander", "adminshero"]
     },
     {
       "alias": "augers",
@@ -350,7 +350,7 @@
       "startingTech": ["aida", "sdn", "det", "pa"],
       "homePlanets": ["chrion", "demis"],
       "abilities": ["oracle_ai", "limited_vision", "probability_algorithms"],
-      "leaders": []
+      "leaders": ["augersagent", "augerscommander", "augershero"]
     },
     {
       "alias": "axis",
@@ -362,7 +362,7 @@
       "startingTech": ["st", "aida"],
       "homePlanets": ["axis"],
       "abilities": ["military_industrial_complex", "arms_dealers"],
-      "leaders": []
+      "leaders": ["axisagent", "axiscommander", "axishero"]
     },
     {
       "alias": "bentor",
@@ -374,7 +374,7 @@
       "startingTech": [],
       "homePlanets": ["benc", "hau"],
       "abilities": ["secret_maps", "ancient_blueprints", "fortune_seekers"],
-      "leaders": []
+      "leaders": ["bentoragent", "bentorcommander", "bentorhero"]
     },
     {
       "alias": "blex",
@@ -386,7 +386,7 @@
       "startingTech": [],
       "homePlanets": ["avicenna"],
       "abilities": ["blight", "contagion", "plague_reservoir"],
-      "leaders": []
+      "leaders": ["blexagent", "blexcommander", "blexhero"]
     },
     {
       "alias": "celdauri",
@@ -398,7 +398,7 @@
       "startingTech": [],
       "homePlanets": ["louk", "auldane"],
       "abilities": ["projection_of_power", "industrialists"],
-      "leaders": []
+      "leaders": ["celdauriagent", "celdauricommander", "celdaurihero"]
     },
     {
       "alias": "cheiran",
@@ -410,7 +410,7 @@
       "startingTech": [],
       "homePlanets": ["arche", "gghurntheta"],
       "abilities": ["teeming", "moult", "byssus"],
-      "leaders": []
+      "leaders": ["cheiranagent", "cheirancommander", "cheiranhero"]
     },
     {
       "alias": "cymiae",
@@ -422,7 +422,7 @@
       "startingTech": ["nm", "aida"],
       "homePlanets": ["cymiae"],
       "abilities": ["autonetic_memory", "cybernetic_madness"],
-      "leaders": []
+      "leaders": ["cymiaeagent", "cymiaecommander", "cymiaehero"]
     },
     {
       "alias": "dihmohn",
@@ -434,7 +434,7 @@
       "startingTech": ["sdn", "det"],
       "homePlanets": ["abyssus"],
       "abilities": ["capital_fleet", "migrant_fleet", "flotilla"],
-      "leaders": []
+      "leaders": ["dihmohnagent", "dihmohncommander", "dihmohnhero"]
     },
     {
       "alias": "edyn",
@@ -446,7 +446,7 @@
       "startingTech": ["aida", "sdn", "det", "pa"],
       "homePlanets": ["edyn", "ekko", "okke"],
       "abilities": ["enlightenment", "grace", "royal_decree"],
-      "leaders": []
+      "leaders": ["edynagent", "edyncommander", "edynhero"]
     },
     {
       "alias": "florzen",
@@ -458,7 +458,7 @@
       "startingTech": ["nm", "sdn"],
       "homePlanets": ["delmor", "kyd"],
       "abilities": ["mercenaries", "data_leak", "black_markets"],
-      "leaders": []
+      "leaders": ["florzenagent", "florzencommander", "florzenhero"]
     },
     {
       "alias": "freesystems",
@@ -470,7 +470,7 @@
       "startingTech": ["pa"],
       "homePlanets": ["idyn", "kroll", "cyrra"],
       "abilities": ["rally_to_the_cause", "diplomats", "free_people"],
-      "leaders": []
+      "leaders": ["freesystemsagent", "freesystemscommander", "freesystemshero"]
     },
     {
       "alias": "ghemina",
@@ -482,7 +482,7 @@
       "startingTech": ["pa", "det"],
       "homePlanets": ["drah", "trykk"],
       "abilities": ["the_lady_and_the_lord", "rule_of_two"],
-      "leaders": []
+      "leaders": ["gheminaagent", "gheminacommander", "gheminahero"]
     },
     {
       "alias": "ghoti",
@@ -494,7 +494,7 @@
       "startingTech": [],
       "homePlanets": ["varies"],
       "abilities": ["mobile_command", "spawning_grounds"],
-      "leaders": []
+      "leaders": ["ghotiagent", "ghoticommander", "ghotihero"]
     },
     {
       "alias": "gledge",
@@ -506,7 +506,7 @@
       "startingTech": [],
       "homePlanets": ["laststop"],
       "abilities": ["mantle_cracking", "celestial_reclamation", "deep_mining"],
-      "leaders": []
+      "leaders": ["gledgeagent", "gledgecommander", "gledgehero"]
     },
     {
       "alias": "khrask",
@@ -518,7 +518,7 @@
       "startingTech": ["ps", "sdn"],
       "homePlanets": ["bohlduhr"],
       "abilities": ["lithoids", "garden_worlds", "meteor_slings"],
-      "leaders": []
+      "leaders": ["khraskagent", "khraskcommander", "khraskhero"]
     },
     {
       "alias": "kjalengard",
@@ -530,7 +530,7 @@
       "startingTech": [],
       "homePlanets": ["kjalengard", "hulgade"],
       "abilities": ["heroic_tales", "for_glory", "military_engineers"],
-      "leaders": []
+      "leaders": ["kjalengardagent", "kjalengardcommander", "kjalengardhero"]
     },
     {
       "alias": "kollecc",
@@ -542,7 +542,7 @@
       "startingTech": ["sdn"],
       "homePlanets": ["susuros"],
       "abilities": ["cloaked_fleets", "shroud_of_lith", "treasure_hunters"],
-      "leaders": []
+      "leaders": ["kolleccagent", "kollecccommander", "kollecchero"]
     },
     {
       "alias": "kolume",
@@ -554,7 +554,7 @@
       "startingTech": [],
       "homePlanets": ["alesna", "azle"],
       "abilities": ["starfall_gunnery", "deliberate_action", "meditation"],
-      "leaders": []
+      "leaders": ["kolumeagent", "kolumecommander", "kolumehero"]
     },
     {
       "alias": "kortali",
@@ -566,7 +566,7 @@
       "startingTech": ["ps", "pa"],
       "homePlanets": ["ogdun", "brthkul"],
       "abilities": ["fervor", "ruthless"],
-      "leaders": []
+      "leaders": ["kortaliagent", "kortalicommander", "kortalihero"]
     },
     {
       "alias": "lanefir",
@@ -578,7 +578,7 @@
       "startingTech": [],
       "homePlanets": ["aysisrest", "solitude"],
       "abilities": ["a_new_edifice", "iconoclasm", "war_stories"],
-      "leaders": []
+      "leaders": ["lanefiragent", "lanefircommander", "lanefirhero"]
     },
     {
       "alias": "lizho",
@@ -590,7 +590,7 @@
       "startingTech": ["pa", "amd"],
       "homePlanets": ["pax", "vess", "kyr"],
       "abilities": ["cunning", "subterfuge"],
-      "leaders": []
+      "leaders": ["lizhoagent", "lizhocommander", "lizhohero"]
     },
     {
       "alias": "mirveda",
@@ -602,7 +602,7 @@
       "startingTech": ["aida"],
       "homePlanets": ["aldra", "beata"],
       "abilities": ["privileged_citizenry", "combat_drones"],
-      "leaders": []
+      "leaders": ["mirvedaagent", "mirvedacommander", "mirvedahero"]
     },
     {
       "alias": "mortheus",
@@ -614,7 +614,7 @@
       "startingTech": ["det", "st"],
       "homePlanets": ["blaheo", "empero"],
       "abilities": ["facsimile", "illusory_presence"],
-      "leaders": []
+      "leaders": ["mortheusagent", "mortheuscommander", "mortheushero"]
     },
     {
       "alias": "mykomentori",
@@ -626,7 +626,7 @@
       "startingTech": ["pi"],
       "homePlanets": ["shihalaum"],
       "abilities": ["prescient_memories", "divination", "necrophage"],
-      "leaders": []
+      "leaders": ["mykomentoriagent", "mykomentoricommander", "mykomentorihero"]
     },
     {
       "alias": "nivyn",
@@ -638,7 +638,7 @@
       "startingTech": ["ps", "det"],
       "homePlanets": ["ellas"],
       "abilities": ["celestial_guides", "singularity_point", "voidsailors"],
-      "leaders": []
+      "leaders": ["nivynagent", "nivyncommander", "nivynhero"]
     },
     {
       "alias": "nokar",
@@ -650,7 +650,7 @@
       "startingTech": [],
       "homePlanets": ["zarr", "nokk"],
       "abilities": ["hired_guns", "private_fleet", "desperados"],
-      "leaders": []
+      "leaders": ["nokaragent", "nokarcommander", "nokarhero"]
     },
     {
       "alias": "olradin",
@@ -662,7 +662,7 @@
       "startingTech": ["pa", "sdn"],
       "homePlanets": ["sanctuary"],
       "abilities": ["policies"],
-      "leaders": []
+      "leaders": ["olradinagent", "olradincommander", "olradinhero"]
     },
     {
       "alias": "rohdhna",
@@ -674,7 +674,7 @@
       "startingTech": ["pa", "st"],
       "homePlanets": ["prind"],
       "abilities": ["industrious", "recycled_materials", "orbital_foundries"],
-      "leaders": []
+      "leaders": ["rohdhnaagent", "rohdhnacommander", "rohdhnahero"]
     },
     {
       "alias": "tnelis",
@@ -690,7 +690,7 @@
         "information_brokers",
         "stealth_insertion"
       ],
-      "leaders": []
+      "leaders": ["tnelisagent", "tneliscommander", "tnelishero"]
     },
     {
       "alias": "vaden",
@@ -702,7 +702,7 @@
       "startingTech": [],
       "homePlanets": ["vadarian", "norvus"],
       "abilities": ["fine_print", "collateralized_loans", "binding_debts"],
-      "leaders": []
+      "leaders": ["vadenagent", "vadencommander", "vadenhero"]
     },
     {
       "alias": "vaylerian",
@@ -714,7 +714,7 @@
       "startingTech": ["nm", "det"],
       "homePlanets": ["vaylar"],
       "abilities": ["cargo_raiders", "scour", "raze"],
-      "leaders": []
+      "leaders": ["vaylerianagent", "vayleriancommander", "vaylerianhero"]
     },
     {
       "alias": "veldyr",
@@ -730,7 +730,7 @@
         "holding_company",
         "targeted_acquisition"
       ],
-      "leaders": []
+      "leaders": ["veldyragent", "veldyrcommander", "veldyrhero"]
     },
     {
       "alias": "zealots",
@@ -742,7 +742,7 @@
       "startingTech": ["bs"],
       "homePlanets": ["poh", "orad"],
       "abilities": ["conspirators", "ancient_knowledge"],
-      "leaders": []
+      "leaders": ["zealotsagent", "zealotscommander", "zealotshero"]
     },
     {
       "alias": "zelian",
@@ -754,7 +754,7 @@
       "startingTech": ["aida", "amd"],
       "homePlanets": ["zelian", "gen"],
       "abilities": ["obsessive_designs", "biophobic", "paranoia"],
-      "leaders": []
+      "leaders": ["zelianagent", "zeliancommander", "zelianhero"]
     }
   ]
 }
