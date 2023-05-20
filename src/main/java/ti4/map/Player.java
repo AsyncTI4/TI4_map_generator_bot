@@ -291,6 +291,14 @@ public class Player {
         return factionAbilities;
     }
 
+    public void setFactionAbilities(HashSet<String> factionAbilities) {
+        this.factionAbilities = factionAbilities;
+    }
+
+    public boolean hasAbility(String ability) {
+        return getFactionAbilities().contains(ability);
+    }
+
     public int getUnitCap(String unit) {
         if(unitCaps.get(unit) == null)
         {
@@ -305,10 +313,6 @@ public class Player {
 
     public void setUnitCap(String unit, int cap) {
         unitCaps.put(unit, cap);
-    }
-
-    public void setFactionAbilities(HashSet<String> factionAbilities) {
-        this.factionAbilities = factionAbilities;
     }
 
     /**
