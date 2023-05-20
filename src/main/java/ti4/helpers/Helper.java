@@ -1033,7 +1033,7 @@ public class Helper {
                 sb.append("-1");
             }
             sb.append(" ");
-        }     
+        }
         return sb.toString().trim();
     }
 
