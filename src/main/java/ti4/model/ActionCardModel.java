@@ -3,6 +3,7 @@ package ti4.model;
 import com.fasterxml.jackson.databind.JsonNode;
 
 import ti4.message.BotLogger;
+import ti4.helpers.Emojis;
 
 public class ActionCardModel extends Model {
     public String name;
@@ -34,5 +35,12 @@ public class ActionCardModel extends Model {
             && text != null
             && flavorText != null
             && source != null;
+    }
+
+    public String getRepresentation() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(Emojis.ActionCard).append("__**" + name + "**__").append(" *(").append(phase).append(" Phase)*: ");
+        sb.append("_").append(window).append(":_ ").append(text).append("\n");
+        return sb.toString();
     }
 }

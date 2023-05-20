@@ -25,7 +25,7 @@ public class ListActionCards extends HelpSubcommandData {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         HashMap<String, ActionCardModel> acList = Mapper.getActionCards();
         String message = "**__Action Card List__**\n" + acList.entrySet().stream()
-            .map(e -> e.getKey() + " = " + ACInfo.getActionCardRepresentation(e.getKey()))
+            .map(e -> e.getKey() + " = " + e.getValue().getRepresentation())
             .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
             .sorted()
             .collect(Collectors.joining("\n"));

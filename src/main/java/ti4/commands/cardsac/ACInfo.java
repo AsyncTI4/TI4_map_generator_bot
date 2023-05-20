@@ -154,27 +154,14 @@ public class ACInfo extends ACCardsSubcommandData {
             } else {
                 for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                     Integer value = ac.getValue();
+                    ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
-                    sb.append(getActionCardRepresentation(ac.getKey()));
+                    sb.append(actionCard.getRepresentation());
                     index++;
                 }
             }
         }
 
-        return sb.toString();
-    }
-
-    public static String getActionCardRepresentation(String acID) {
-        StringBuilder sb = new StringBuilder();
-        ActionCardModel actionCard = Mapper.getActionCard(acID);
-        if (actionCard == null){
-            return "";
-        }
-        String acName = actionCard.name;
-        String acPhase = actionCard.phase;
-        String acWindow = actionCard.window;
-        String acDescription = actionCard.text;
-        sb.append(Emojis.ActionCard).append("__**" + acName + "**__").append(" *(").append(acPhase).append(" Phase)*: _").append(acWindow).append(":_ ").append(acDescription).append("\n");
         return sb.toString();
     }
 
