@@ -1,5 +1,6 @@
 package ti4.commands.cardsso;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -28,15 +29,19 @@ public class DiscardSO extends SOCardsSubcommandData {
         }
         OptionMapping option = event.getOption(Constants.SECRET_OBJECTIVE_ID);
         if (option == null) {
-            sendMessage("Please select what Secret Objective to discard");
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap,"Please select what Secret Objective to discard");
             return;
         }
-        boolean removed = activeMap.discardSecretObjective(player.getUserID(), option.getAsInt());
+        discardSO(event, player, option.getAsInt(), activeMap);
+    }
+    public void discardSO(GenericInteractionCreateEvent event, Player player, int SOID, Map activeMap) {
+       
+        boolean removed = activeMap.discardSecretObjective(player.getUserID(), SOID);
         if (!removed) {
-            sendMessage("No such Secret Objective ID found, please retry");
+            MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap,"No such Secret Objective ID found, please retry");
             return;
         }
-        sendMessage("SO Discarded");
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap,"SO Discarded");
         SOInfo.sendSecretObjectiveInfo(activeMap, player);
     }
 }

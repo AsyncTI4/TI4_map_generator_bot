@@ -65,10 +65,12 @@ public class RevealAgenda extends AgendaSubcommandData {
         activeMap.setPlayersWhoHitPersistentNoAfter("");
         activeMap.setPlayersWhoHitPersistentNoWhen("");
         activeMap.setLatestOutcomeVotedFor("");
+        activeMap.setLatestWhenMsg("");
+        activeMap.setLatestAfterMsg("");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getAgendaRepresentation(id, uniqueID));
         String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you will **Play a When** or **Play an After** or not by pressing the buttons below:";
 
-        Button playWhen = Button.danger("play_when", "Play When");
+        Button playWhen = Button.danger("play_when", "Play A Non-AC When");
         Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
         Button noWhenPersistent = Button.primary("no_when_persistent", "No Whens No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
 
@@ -81,8 +83,13 @@ public class RevealAgenda extends AgendaSubcommandData {
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
         
-        MessageHelper.sendMessageToChannelWithButtons(channel, Emojis.nowhens, whenButtons);
-        MessageHelper.sendMessageToChannelWithButtons(channel, Emojis.noafters, afterButtons);
+        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, Emojis.nowhens, activeMap, whenButtons, "when");
+        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, Emojis.noafters,activeMap, afterButtons,"after");
+        
         ListVoteCount.turnOrder(event, activeMap, channel);
+        Button proceed = Button.danger( "proceedToVoting", "Proceed to voting without waiting for everyone to react");
+        List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
+        MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters", proceedButtons);
+       
     }
 }
