@@ -184,11 +184,11 @@ public class Helper {
         String file = "adjacent_";
         switch (direction) {
             case 0 -> file += "north.png";
-            case 1 -> file += "northeast.png";
-            case 2 -> file += "southeast.png";
+            case 1 -> file += "north.png";
+            case 2 -> file += "south.png";
             case 3 -> file += "south.png";
-            case 4 -> file += "southwest.png";
-            case 5 -> file += "northwest.png";
+            case 4 -> file += "south.png";
+            case 5 -> file += "north.png";
         }
         String tokenPath = ResourceHelper.getInstance().getResourceFromFolder("extra/", file, "Could not find adjacency file for direction: " + direction);
         if (tokenPath == null) {
