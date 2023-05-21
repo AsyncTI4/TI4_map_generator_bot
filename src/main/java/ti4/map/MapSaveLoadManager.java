@@ -1576,7 +1576,7 @@ public class MapSaveLoadManager {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
-            if (token.startsWith(Constants.COMMAND)) {
+            if (token.startsWith(Constants.COMMAND) || token.startsWith(Constants.SWEEP)) {
                 tile.addCC(token);
             } else if (token.startsWith(Constants.CONTROL)) {
                 tile.addControl(token, unitHolderName);

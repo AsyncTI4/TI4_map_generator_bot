@@ -124,7 +124,13 @@ public class CreateGameChannels extends BothelperSubcommandData {
             sendMessage("Category: **" + category.getName() + "** is full on server **" + guild.getName() + "**. Create a new category then try again.");
             return;
         } else if (category.getChannels().size() > 45) {
-            BotLogger.log(event, "Warning: Category: **" + category.getName() + "** is almost full on server **" + guild.getName() + "**.");
+            String message = "Warning: Category: **" + category.getName() + "** is almost full on server **" + guild.getName() + "**.";
+            TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
+            if (bothelperLoungeChannel != null) {
+                MessageHelper.sendMessageToChannel(bothelperLoungeChannel, message);
+            } else {
+                BotLogger.log(event, message);
+            }
         }
 
         

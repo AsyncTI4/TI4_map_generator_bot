@@ -129,6 +129,7 @@ public class Constants {
     public static final String REMOVE_ALL_UNIT_DAMAGE = "remove_all_sustain_damage";
     public static final String SPACE = "space";
     public static final String COMMAND = "command_";
+    public static final String SWEEP = "sweep_";
     public static final String CONTROL = "control_";
     public static final String GF = "gf";
     public static final String FF = "ff";
@@ -665,6 +666,11 @@ public class Constants {
     public static final String SC_FOLLOW_6 = "sc_follow_6";
     public static final String SC_FOLLOW_7 = "sc_follow_7";
     public static final String SC_FOLLOW_8 = "sc_follow_8";
+
+    //Installation constants
+    public static final String INSTALLATION = "installation";
+    public static final String ADD_SWEEP_TOKEN = "add_sweep_token";
+    public static final String REMOVE_SWEEP_TOKEN = "remove_sweep_token";
 
     public static final String STATS_USERNAME="userName";
     public static final String STATS_VP ="vp";

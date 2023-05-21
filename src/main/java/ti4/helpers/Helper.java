@@ -1711,7 +1711,7 @@ public class Helper {
         }
 
         for (Tile tile : playersTiles) {
-            adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(map, tile.getPosition()));
+            adjacentPlayers.addAll(FoWHelper.getAdjacentPlayers(map, tile.getPosition(), false));
             if (realPlayers.size() == adjacentPlayers.size()) break;
         }
         adjacentPlayers.remove(player);

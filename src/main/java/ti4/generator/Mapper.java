@@ -273,7 +273,7 @@ public class Mapper {
         return cc_tokens.get("cc") + property + ".png";
     }
 
-    public static String getFleeCCID(String color) {
+    public static String getFleetCCID(String color) {
         String property = colors.getProperty(color);
         return cc_tokens.get("fleet") + property + ".png";
     }
@@ -293,6 +293,11 @@ public class Mapper {
     public static String getControlID(String color) {
         String property = colors.getProperty(color);
         return cc_tokens.get("control") + property + ".png";
+    }
+
+    public static String getSweepID(String color) {
+        String property = colors.getProperty(color);
+        return cc_tokens.get("sweep") + property + ".png";
     }
 
     public static List<String> getColors() {
@@ -545,7 +550,7 @@ public class Mapper {
         if (tokenPath == null || !(new File(tokenPath).exists())) {
             tokenPath = ResourceHelper.getInstance().getTokenFile(tokenID);
             if (tokenPath == null) {
-                BotLogger.log("Could not find token: " + tokenID);
+                BotLogger.log("Could not find token path: " + tokenID);
                 return null;
             }
         }

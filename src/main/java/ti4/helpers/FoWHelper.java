@@ -99,12 +99,16 @@ public class FoWHelper {
 			tilePositionsToShow.addAll(adjacentTiles);
 		}
 
+		String playerSweep = Mapper.getSweepID(player.getColor());
 		for (Tile tile : map.getTileMap().values()) {
+			if (tile.hasCC(playerSweep)) {
+				tilePositionsToShow.add(tile.getPosition());
+			}
 			boolean tileHasFog = !tilePositionsToShow.contains(tile.getPosition());
 			tile.setTileFog(player, tileHasFog);
 		}
 
-		updatePlayerFogTiles(map, player, tilePositionsToShow);
+		updatePlayerFogTiles(map, player);
 		player.setFogInitialized(true);
 	}
 
@@ -112,11 +116,9 @@ public class FoWHelper {
 		initializeFog(map, player, true);
 	}
 
-    private static void updatePlayerFogTiles(Map map, Player player, Set<String> tileKeys) {
-        for (String key_ : tileKeys) {
-            Tile tileToUpdate = map.getTileByPosition(key_);
-
-            if (tileToUpdate != null) {
+    private static void updatePlayerFogTiles(Map map, Player player) {
+        for (Tile tileToUpdate : map.getTileMap().values()) {
+            if (!tileToUpdate.hasFog(player)) {
                 player.updateFogTile(tileToUpdate, "Round " + map.getRound());
             }
         }
@@ -366,14 +368,20 @@ public class FoWHelper {
 	 *  <p>
 	 *  WARNING: This function returns information that certain players may not be privy to
 	 */
-	public static List<Player> getAdjacentPlayers(Map map, String position) {
+	public static List<Player> getAdjacentPlayers(Map map, String position, boolean includeSweep) {
 		List<Player> players = new ArrayList<>();
 		Set<String> tilesToCheck = getAdjacentTiles(map, position, null);
+		Tile startingTile = map.getTileByPosition(position);
 
 		for (Player player_ : map.getPlayers().values()) {
 			Set<String> tiles = new HashSet<>(tilesToCheck);
 			if ("ghost".equals(player_.getFaction())) {
 				tiles.addAll(getWormholeAdjacencies(map, position, player_));
+			}
+
+			if (includeSweep && startingTile.hasCC(Mapper.getSweepID(player_.getColor()))) {
+				players.add(player_);
+				continue;
 			}
 
 			for (String position_ : tiles) {
@@ -430,7 +438,7 @@ public class FoWHelper {
 	/** Ping the players adjacent to a given system */
 	public static void pingSystem(Map activeMap, GenericInteractionCreateEvent event, String position, String message) {
 		// get players adjacent
-		List<Player> players = getAdjacentPlayers(activeMap, position);
+		List<Player> players = getAdjacentPlayers(activeMap, position, true);
 		int successfulCount = 0;
 		for (Player player_ : players) {
 			if (!player_.isRealPlayer()) continue;
