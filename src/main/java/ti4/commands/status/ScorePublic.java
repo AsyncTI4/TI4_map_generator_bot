@@ -67,8 +67,8 @@ public class ScorePublic extends StatusSubcommandData {
                 break;
             }
         }
-        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
-        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
+        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
+        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
         String poName1 = publicObjectivesState1.get(id);
         String poName2 = publicObjectivesState2.get(id);
         String poName = id;

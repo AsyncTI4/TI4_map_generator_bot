@@ -277,8 +277,8 @@ public class Turn extends PlayerSubcommandData {
             }
         }
 
-        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesState1();
-        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesState2();
+        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
+        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
         LinkedHashMap<String, Integer> customPublicVP = map.getCustomPublicVP();
         List<Button> poButtons = new ArrayList<>();
         List<Button> poButtons1 = new ArrayList<>();

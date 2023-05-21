@@ -14,6 +14,7 @@ import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 
 public class KeleresHeroMentak extends SpecialSubcommandData {
 
@@ -51,11 +52,10 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
                 acID = ac.getValue();
                 acKey = ac.getKey();
             }
-            String[] actionCardData = Mapper.getActionCard(acKey).split(";");
-            String acName = actionCardData[0];
-            String acPhase = actionCardData[1];
-            String acWindow = actionCardData[2];
-            String acDescription = actionCardData[3];
+            ActionCardModel actionCard = Mapper.getActionCard(acKey);
+            String acName = actionCard.name;
+            String acWindow = actionCard.window;
+            String acDescription = actionCard.text;
             if (acWindow.equalsIgnoreCase("Action")) {
                 acDrawMessage.append("> `").append(String.format("%02d", index)).append(".` ").append(Emojis.ActionCard).append("Action Card: __**").append(acName).append("**__: *").append(acWindow).append(":* ").append(acDescription).append("\n");
                 componentActionACCount++;
