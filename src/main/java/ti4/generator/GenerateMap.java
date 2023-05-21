@@ -18,6 +18,8 @@ import ti4.message.MessageHelper;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -2603,45 +2605,44 @@ public class GenerateMap {
     private BufferedImage addAdjacencyArrow(Tile tile, int direction, String secondaryTile, BufferedImage image, int tileX, int tileY, Map map) {
         int deltaX = 0;
         int deltaY = 0;
-        int textOffsetX = 0;
-        int textOffsetY = 0;
+        int textOffsetX = 12;
+        int textOffsetY = 40;
         BufferedImage arrowImage = null;
+
+        int degrees = 0;
         switch (direction) {
             case 0 -> {
-                deltaX = 128;
-                deltaY = -18;
-                textOffsetX = 5;
-                textOffsetY = 30;
+                deltaX = 118;
+                deltaY = -28;
+                degrees = 0;
             }
             case 1 -> {
-                deltaX = 267;
-                deltaY = 36;
-                textOffsetX = 6;
-                textOffsetY = 21;
+                deltaX = 257;
+                deltaY = 26;
+                degrees = 60;
             }
             case 2 -> {
-                deltaX = 293;
-                deltaY = 177;
-                textOffsetX = 7;
-                textOffsetY = 32;
+                deltaX = 283;
+                deltaY = 167;
+                degrees = 300;
+                textOffsetY = 25;
             }
             case 3 -> {
-                deltaX = 177;
-                deltaY = 283;
-                textOffsetX = 5;
-                textOffsetY = 20;
+                deltaX = 167;
+                deltaY = 273;
+                degrees = 0;
+                textOffsetY = 25;
             }
             case 4 -> {
-                deltaX = 38;
-                deltaY = 220;
-                textOffsetX = 5;
-                textOffsetY = 30;
+                deltaX = 28;
+                deltaY = 210;
+                degrees = 60;
+                textOffsetY = 25;
             }
             case 5 -> {
-                deltaX = 40;
-                deltaY = 34;
-                textOffsetX = 5;
-                textOffsetY = 25;
+                deltaX = 0;
+                deltaY = 69;
+                degrees = 300;
             }
         }
         try {
@@ -2649,12 +2650,20 @@ public class GenerateMap {
             arrowImage = outputImage;
 
             Graphics arrow = arrowImage.getGraphics();
-            arrow.setFont(Storage.getFont20());
+            
+            arrow.setFont(Storage.getFont16());
             arrow.setColor(Color.BLACK);
             arrow.drawString(secondaryTile, textOffsetX, textOffsetY);
+
+            double rotation = Math.toRadians(degrees);
+            double rotateX = arrowImage.getWidth() / 2;
+            double rotateY = arrowImage.getHeight() / 2;
+            AffineTransform tx = AffineTransform.getRotateInstance(rotation, rotateX, rotateY);
+            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+
+            graphics.drawImage(op.filter(arrowImage, null), tileX + deltaX, tileY + deltaY, null);
         } catch (Exception e) {
         }
-        graphics.drawImage(arrowImage, tileX + deltaX, tileY + deltaY, null);
 
         return image;
     }
