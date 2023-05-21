@@ -145,7 +145,7 @@ public class AliasHandler {
         if (aliasID != null) {
             return aliasID;
         } else {
-            //System.out.println("Could not find an alias for Tile: " + name);
+            System.out.println("Could not find an alias for Tile: " + name);
             return name;
         }
     }
