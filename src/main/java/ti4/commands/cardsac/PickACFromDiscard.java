@@ -54,7 +54,7 @@ public class PickACFromDiscard extends ACCardsSubcommandData {
         sb.append("Game: ").append(activeMap.getName()).append(" ");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Picked card from Discards: ");
-        sb.append(Mapper.getActionCard(acID)).append("\n");
+        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
 
         ACInfo.sendActionCardInfo(activeMap, player);

@@ -14,6 +14,7 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -153,28 +154,14 @@ public class ACInfo extends ACCardsSubcommandData {
             } else {
                 for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                     Integer value = ac.getValue();
+                    ActionCardModel actionCard = Mapper.getActionCard(ac.getKey());
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + value, 4)).append(")`");
-                    sb.append(getActionCardRepresentation(ac.getKey()));
+                    sb.append(actionCard.getRepresentation());
                     index++;
                 }
             }
         }
 
-        return sb.toString();
-    }
-
-    public static String getActionCardRepresentation(String acID) {
-        StringBuilder sb = new StringBuilder();
-        String actionCard = Mapper.getActionCard(acID);
-        if (actionCard == null){
-            return "";
-        }
-        String[] acSplit = actionCard.split(";");
-        String acName = acSplit[0];
-        String acPhase = acSplit[1];
-        String acWindow = acSplit[2];
-        String acDescription = acSplit[3];
-        sb.append(Emojis.ActionCard).append("__**" + acName + "**__").append(" *(").append(acPhase).append(" Phase)*: _").append(acWindow).append(":_ ").append(acDescription).append("\n");
         return sb.toString();
     }
 

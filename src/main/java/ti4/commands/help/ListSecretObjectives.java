@@ -10,8 +10,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.model.SecretObjectiveModel;
 
 public class ListSecretObjectives extends HelpSubcommandData {
 
@@ -23,7 +23,7 @@ public class ListSecretObjectives extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        HashMap<String, String> soList = Mapper.getSecretObjectives();
+        HashMap<String, SecretObjectiveModel> soList = Mapper.getSecretObjectives();
         String message = "**__Secret Objective List__**\n" + soList.entrySet().stream()
             .map(e -> e.getKey() + " = " + SOInfo.getSecretObjectiveRepresentation(e.getKey()))
             .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))

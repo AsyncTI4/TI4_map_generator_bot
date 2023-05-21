@@ -26,7 +26,9 @@ import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
+import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
+import ti4.model.SecretObjectiveModel;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -182,18 +184,18 @@ public class Map {
         
         miltyDraftManager = new MiltyDraftManager();
 
-        HashMap<String, String> secretObjectives = Mapper.getSecretObjectives();
+        HashMap<String, SecretObjectiveModel> secretObjectives = Mapper.getSecretObjectives();
         this.secretObjectives = new ArrayList<>(secretObjectives.keySet());
         Collections.shuffle(this.secretObjectives);
 
-        HashMap<String, String> actionCards = Mapper.getActionCards();
+        HashMap<String, ActionCardModel> actionCards = Mapper.getActionCards();
         this.actionCards = new ArrayList<>(actionCards.keySet());
         Collections.shuffle(this.actionCards);
 
         resetAgendas();
 
-        Set<String> po1 = Mapper.getPublicObjectivesState1().keySet();
-        Set<String> po2 = Mapper.getPublicObjectivesState2().keySet();
+        Set<String> po1 = Mapper.getPublicObjectivesStage1().keySet();
+        Set<String> po2 = Mapper.getPublicObjectivesStage2().keySet();
         publicObjectives1.addAll(po1);
         publicObjectives2.addAll(po2);
         Collections.shuffle(publicObjectives1);
@@ -319,7 +321,7 @@ public class Map {
         boolean isInDiscard = false;
         for (java.util.Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
             
-            if(Mapper.getActionCard(ac.getKey()).contains(name))
+            if(Mapper.getActionCard(ac.getKey()).name.contains(name))
             {
                 return true;
             }
@@ -908,8 +910,8 @@ public class Map {
         }
         if (!id.isEmpty()) {
             revealedPublicObjectives.remove(id);
-            Set<String> po1 = Mapper.getPublicObjectivesState1().keySet();
-            Set<String> po2 = Mapper.getPublicObjectivesState2().keySet();
+            Set<String> po1 = Mapper.getPublicObjectivesStage1().keySet();
+            Set<String> po2 = Mapper.getPublicObjectivesStage2().keySet();
             if (po1.contains(id)) {
                 publicObjectives1.add(id);
                 Collections.shuffle(publicObjectives1);
