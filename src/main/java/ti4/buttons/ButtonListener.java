@@ -345,6 +345,16 @@ public class ButtonListener extends ListenerAdapter {
         else if (buttonID.startsWith(Constants.GENERIC_BUTTON_ID_PREFIX)) {
             addReaction(event, false, false, null, "");
         }
+        else if (buttonID.startsWith("movedNExplored_")) {
+            String bID = buttonID.replace("movedNExplored_", "");
+            String[] info = bID.split("_");
+            String message = "";
+            
+           
+            new ExpPlanet().explorePlanet(event, Helper.getTileFromPlanet(info[1], activeMap), info[1], info[2], player, false, activeMap, 1);
+            
+            event.getMessage().delete().queue();
+        }
         else if (buttonID.startsWith("distant_suns_")) {
             String bID = buttonID.replace("distant_suns_", "");
             String[] info = bID.split("_");
