@@ -22,10 +22,10 @@ public class ChangeToBaseGame extends GameSubcommandData {
         Map activeMap = getActiveMap();
         OptionMapping codexOption = event.getOption(Constants.REMOVE_CODEX_AC);
         String codex = "";
-        if(codexOption != null)
+        if (codexOption != null)
         {
             codex = codexOption.getAsString();
-            if(codex.equalsIgnoreCase("y"))
+            if (codex.equalsIgnoreCase("y"))
             {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Codex ACs.");
             }

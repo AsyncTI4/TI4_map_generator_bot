@@ -484,6 +484,7 @@ public class Helper {
         }
         return planetButtons;
     }
+    
     public static List<Button> getPlanetExhaustButtons(GenericInteractionCreateEvent event, Player player, Map map) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
@@ -509,7 +510,7 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
-            if(!Helper.getPlanetRepresentation(planet,map).toLowerCase().contains("mecatol"))
+            if (!Helper.getPlanetRepresentation(planet,map).toLowerCase().contains("mecatol"))
             {
                 HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
                 Button button = Button.danger("diplo_"+planet, Helper.getPlanetRepresentation(planet,map) + " System");
@@ -801,26 +802,32 @@ public class Helper {
         return mention;
     }
 
-    /**
-     * Get the player's in-game representation. ":Faction: @player _@color_"
-     * <p>
-     * Does not resolve community mode or fog of war
-     */
-    public static String getPlayerRepresentation(Player player) {
-        StringBuilder sb = new StringBuilder(Helper.getFactionIconFromDiscord(player.getFaction()));
-        sb.append(" ").append(Helper.getPlayerPing(player));
-        if (player.getColor() != null && !"null".equals(player.getColor())) {
-            sb.append(" _").append(getColourAsMention(player.getColor())).append("_");
-        }
-        return sb.toString();
+    // Pass the buck
+    public static String getPlayerRepresentation(Player player, Map activeMap) {
+        if (activeMap == null) return getPlayerRepresentation(player, null, null, false);
+        return getPlayerRepresentation(player, activeMap, activeMap.getGuild(), false);
     }
 
-    /**
-     * Get the player's in-game representation. ":Faction: @player _@color_"
-     * <p>
-     * Does not resolve community mode or fog of war
-     */
-    public static String getPlayerRepresentation(Guild guild, Player player) {
+    // One representation to rule them all
+    public static String getPlayerRepresentation(Player player, Map activeMap, Guild guild, boolean overrideFow) {
+        Boolean privateGame = FoWHelper.isPrivateGame(activeMap);
+        if (privateGame != null && privateGame && !overrideFow){
+            return getColourAsMention(guild, player.getColor());
+        }
+
+        if (activeMap != null && activeMap.isCommunityMode()) {
+            Role roleForCommunity = player.getRoleForCommunity();
+            if (roleForCommunity == null) {
+                return "[No Community Role Found]";
+            } else {
+                return getRoleMentionByName(guild, roleForCommunity.getName());
+            }
+        }
+
+        return defaultPlayerRepresentation(player, guild);
+    }
+
+    private static String defaultPlayerRepresentation(Player player, Guild guild) {
         StringBuilder sb = new StringBuilder(Helper.getFactionIconFromDiscord(player.getFaction()));
         sb.append(" ").append(Helper.getPlayerPing(player));
         if (player.getColor() != null && !"null".equals(player.getColor())) {
@@ -828,43 +835,6 @@ public class Helper {
         }
         return sb.toString();
     }
-
-    /**
-     * Get the player's in-game representation.
-     * <p>
-     * Resolves community mode & handles fog of war
-     */
-    @Nullable
-    public static String getPlayerRepresentation(GenericInteractionCreateEvent event, Player player) {
-        return getPlayerRepresentation(event, player, false);
-    }
- 
-    /**
-     * Get the player's in-game representation.
-     * <p>
-     * Resolves community mode & handles fog of war
-     */
-    @Nullable
-    public static String getPlayerRepresentation(GenericInteractionCreateEvent event, Player player, boolean overrideFow) {
-        Boolean privateGame = FoWHelper.isPrivateGame(event);
-        if (privateGame != null && privateGame && !overrideFow){
-            return getColourAsMention(event.getGuild(), player.getColor());
-        }
-        if (event == null) {
-            return getPlayerRepresentation(player);
-        }
-        Map userActiveMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
-        if (userActiveMap != null && userActiveMap.isCommunityMode()) {
-            Role roleForCommunity = player.getRoleForCommunity();
-            if (roleForCommunity == null) {
-                return "[No Community Role Found]";
-            } else {
-                return getRoleMentionByName(event.getGuild(), roleForCommunity.getName());
-            }
-        }
-        return getPlayerRepresentation(event.getGuild(), player);
-    }
-
     
     public static String getFactionLeaderEmoji(String faction, Leader leader) {
         return getEmojiFromDiscord(faction + leader.getId() + leader.getName());
@@ -988,7 +958,7 @@ public class Helper {
             }
             
             String msg = getGamePing(event, map) + " ";
-            if(!map.isFoWMode())
+            if (!map.isFoWMode())
             {
                 if (player != null) {
                     msg += getFactionIconFromDiscord(player.getFaction()) + " " + player.getFaction() + " ";
@@ -1262,7 +1232,7 @@ public class Helper {
     }
 
     public static String getPlayerResourceInfluenceRepresentation(Player player, Map map) {
-        StringBuilder sb = new StringBuilder(getPlayerRepresentation(player)).append(":\n");
+        StringBuilder sb = new StringBuilder(getPlayerRepresentation(player, map)).append(":\n");
         sb.append("Resources: ").append(getPlayerResourcesAvailable(player, map)).append("/").append(getPlayerResourcesTotal(player, map)).append("  Optimal: " + getPlayerOptimalResourcesAvailable(player, map)).append("/").append(getPlayerOptimalResourcesTotal(player, map)).append("\n");
         sb.append("Influence: ").append(getPlayerInfluenceAvailable(player, map)).append("/").append(getPlayerInfluenceTotal(player, map)).append("  Optimal: " + getPlayerOptimalInfluenceAvailable(player, map)).append("/").append(getPlayerOptimalInfluenceTotal(player, map)).append("\n");
         return sb.toString();
@@ -1305,7 +1275,7 @@ public class Helper {
 
         if (threadCount >= 975) {
             BotLogger.log("`Helper.checkThreadLimitAndArchive:` Thread count is too high ( " + threadCount + " ) - auto-archiving  " + closeCount + " threads:");
-            if(false) { // Here to keep in case it's needed.
+            if (false) { // Here to keep in case it's needed.
                 BotLogger.log(ListOldThreads.getOldThreadsMessage(guild, closeCount));
             } else {
                 BotLogger.log("> The oldest thread was " + ListOldThreads.getHowOldOldestThreadIs(guild));
@@ -1428,7 +1398,7 @@ public class Helper {
         String factionEmoji = "";
         if (!techFaction.equals(" ")) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
         String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
-        // if(!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.length() + 1);
+        // if (!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.length() + 1);
         String techText = techRepTokenizer.nextToken();
         return techEmoji + "**" + techName + "**" + factionEmoji + "\n";
     }
@@ -1436,7 +1406,7 @@ public class Helper {
     public static List<Button> getTechButtons(List<String> techs, String techType, Player player) {
         List<Button> techButtons = new ArrayList<Button>();
 
-        for(String tech : techs)
+        for (String tech : techs)
         {
             String techName = tech.substring(tech.lastIndexOf("_")+1, tech.length());
             String techLabel = tech.replace("_", "");
@@ -1471,7 +1441,7 @@ public class Helper {
         
         List<String> techs = new ArrayList<String>();
         //Columns: key = Proper Name | type | prerequisites | faction | text
-        for(String techRep : Mapper.getTechRepresentations().values())
+        for (String techRep : Mapper.getTechRepresentations().values())
         {
             StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
             String techName = techRepTokenizer.nextToken();
@@ -1481,14 +1451,14 @@ public class Helper {
             String factionEmoji = "";
             String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
 
-            if(techType2.equalsIgnoreCase(techType))
+            if (techType2.equalsIgnoreCase(techType))
             {
 
-                if(!player.getTechs().contains(techName))
+                if (!player.getTechs().contains(techName))
                 {
                     if (!techFaction.equals(" ")) 
                     {
-                        if(playerfaction.equalsIgnoreCase(techFaction) || (playerfaction.toLowerCase().startsWith("keleres") && techFaction.equalsIgnoreCase("Keleres")))
+                        if (playerfaction.equalsIgnoreCase(techFaction) || (playerfaction.toLowerCase().startsWith("keleres") && techFaction.equalsIgnoreCase("Keleres")))
                         {
                             factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
                             
@@ -1502,7 +1472,7 @@ public class Helper {
                     }
                 }
             }
-            // if(!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.length() + 1);
+            // if (!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.length() + 1);
             String techText = techRepTokenizer.nextToken();
         }  
         return techs;
@@ -1520,7 +1490,7 @@ public class Helper {
         String factionEmoji = "";
         if (!techFaction.equals(" ")) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
         String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
-        // if(!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.replace(" ","").length() + 1);
+        // if (!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.replace(" ","").length() + 1);
         String techText = techRepTokenizer.nextToken();
         StringBuilder sb = new StringBuilder();
         sb.append(techEmoji + "**" + techName + "**" + factionEmoji + "\n");
@@ -1682,7 +1652,7 @@ public class Helper {
         if (unitHolder.getUnits() != null)
         {
             
-            if(unitHolder.getUnits().get(mechKey) != null)
+            if (unitHolder.getUnits().get(mechKey) != null)
             {
                 numMechs = unitHolder.getUnits().get(mechKey);
             }
@@ -1803,9 +1773,9 @@ public class Helper {
         }
         if (player.hasAbility("imperia")) {
             Player xxcha = Helper.getPlayerFromColorOrFaction(map, "xxcha");
-            if(xxcha != null)
+            if (xxcha != null)
             {
-                if(player.getMahactCC().contains(xxcha.getColor()))
+                if (player.getMahactCC().contains(xxcha.getColor()))
                 {
                     Leader leader = xxcha.getLeader(Constants.COMMANDER);
                     if (leader != null && !leader.isLocked()) {

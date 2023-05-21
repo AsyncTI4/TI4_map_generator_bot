@@ -1,14 +1,12 @@
 package ti4.message;
 
 import net.dv8tion.jda.api.entities.*;
-import net.dv8tion.jda.api.entities.Message.Interaction;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -62,9 +60,9 @@ public class MessageHelper {
 	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText, Map activeMap, List<Button> buttons, String whenOrAfter) {
 		MessageFunction addFactionReact = (msg) -> {
 			StringTokenizer players  = null;
-			if(whenOrAfter != null && whenOrAfter.equalsIgnoreCase("when"))
+			if (whenOrAfter != null && whenOrAfter.equalsIgnoreCase("when"))
 			{
-				if(activeMap.getLatestWhenMsg() != null && activeMap.getLatestWhenMsg() != "")
+				if (activeMap.getLatestWhenMsg() != null && activeMap.getLatestWhenMsg() != "")
 				{	
 					activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestWhenMsg()).queue();
 				}
@@ -73,7 +71,7 @@ public class MessageHelper {
 			}
 			else
 			{
-				if(activeMap.getLatestAfterMsg() != null && activeMap.getLatestAfterMsg() != "")
+				if (activeMap.getLatestAfterMsg() != null && activeMap.getLatestAfterMsg() != "")
 				{	
 					activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestAfterMsg()).queue();
 				}

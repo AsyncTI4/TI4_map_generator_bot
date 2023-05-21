@@ -77,8 +77,8 @@ public class SendFragments extends ExploreSubcommandData {
 			default -> "";	
 		};
 
-		String p1 = Helper.getPlayerRepresentation(event, sender);
-		String p2 = Helper.getPlayerRepresentation(event, receiver);
+		String p1 = Helper.getPlayerRepresentation(sender, activeMap);
+		String p2 = Helper.getPlayerRepresentation(receiver, activeMap);
 		String fragString = count + " " + trait + " " + Helper.getEmojiFromDiscord(emojiName) + " relic fragments";
 		String message =  p1 + " sent " + fragString + " to " + p2;
 		sendMessage(message);

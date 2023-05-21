@@ -106,7 +106,7 @@ public class SetupGameChannels extends GameSubcommandData {
             }
             
             //set private channel data
-            if(channel.getChannelType() != ChannelType.TEXT) {
+            if (channel.getChannelType() != ChannelType.TEXT) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify text channel for " + channelConstant);
                 return;
             }

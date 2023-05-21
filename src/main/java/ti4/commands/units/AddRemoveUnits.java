@@ -158,10 +158,10 @@ abstract public class AddRemoveUnits implements Command {
             boolean pingedAlready = false;
             int count = 0;
             String[] tileList = map.getListOfTilesPinged();
-            while(count < 10 && !pingedAlready)
+            while (count < 10 && !pingedAlready)
             {
                 String tilePingedAlready = tileList[count];
-                if(tilePingedAlready != null)
+                if (tilePingedAlready != null)
                 {
                     pingedAlready = tilePingedAlready.equalsIgnoreCase(tile.getPosition());
                     count++;
@@ -171,11 +171,11 @@ abstract public class AddRemoveUnits implements Command {
                     break;
                 }
             }
-            if(!pingedAlready)
+            if (!pingedAlready)
             {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
                 FoWHelper.pingSystem(map, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
-                if(count <10)
+                if (count <10)
                 {
                     map.setPingSystemCounter(count);
                     map.setTileAsPinged(count, tile.getPosition());
@@ -241,10 +241,10 @@ abstract public class AddRemoveUnits implements Command {
             boolean pingedAlready = false;
             int count = 0;
             String[] tileList = map.getListOfTilesPinged();
-            while(count < 10 && !pingedAlready)
+            while (count < 10 && !pingedAlready)
             {
                 String tilePingedAlready = tileList[count];
-                if(tilePingedAlready != null)
+                if (tilePingedAlready != null)
                 {
                     pingedAlready = tilePingedAlready.equalsIgnoreCase(tile.getPosition());
                     count++;
@@ -254,11 +254,11 @@ abstract public class AddRemoveUnits implements Command {
                     break;
                 }
             }
-            if(!pingedAlready)
+            if (!pingedAlready)
             {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
                 FoWHelper.pingSystem(map, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
-                if(count <10)
+                if (count <10)
                 {
                     map.setPingSystemCounter(count);
                     map.setTileAsPinged(count, tile.getPosition());
@@ -325,10 +325,10 @@ abstract public class AddRemoveUnits implements Command {
             boolean pingedAlready = false;
             int count = 0;
             String[] tileList = map.getListOfTilesPinged();
-            while(count < 10 && !pingedAlready)
+            while (count < 10 && !pingedAlready)
             {
                 String tilePingedAlready = tileList[count];
-                if(tilePingedAlready != null)
+                if (tilePingedAlready != null)
                 {
                     pingedAlready = tilePingedAlready.equalsIgnoreCase(tile.getPosition());
                     count++;
@@ -338,11 +338,11 @@ abstract public class AddRemoveUnits implements Command {
                     break;
                 }
             }
-            if(!pingedAlready)
+            if (!pingedAlready)
             {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
                 FoWHelper.pingSystem(map, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
-                if(count <10)
+                if (count <10)
                 {
                     map.setPingSystemCounter(count);
                     map.setTileAsPinged(count, tile.getPosition());
@@ -409,10 +409,10 @@ abstract public class AddRemoveUnits implements Command {
             boolean pingedAlready = false;
             int count = 0;
             String[] tileList = map.getListOfTilesPinged();
-            while(count < 10 && !pingedAlready)
+            while (count < 10 && !pingedAlready)
             {
                 String tilePingedAlready = tileList[count];
-                if(tilePingedAlready != null)
+                if (tilePingedAlready != null)
                 {
                     pingedAlready = tilePingedAlready.equalsIgnoreCase(tile.getPosition());
                     count++;
@@ -422,7 +422,7 @@ abstract public class AddRemoveUnits implements Command {
                     break;
                 }
             }
-            if(!pingedAlready)
+            if (!pingedAlready)
             {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
                 FoWHelper.pingSystem(map, (GenericInteractionCreateEvent) event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);

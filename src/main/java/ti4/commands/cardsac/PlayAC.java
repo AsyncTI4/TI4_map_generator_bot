@@ -108,18 +108,18 @@ public class PlayAC extends ACCardsSubcommandData {
         if (activeMap.isFoWMode()) {
             sb.append("Someone played an Action Card:\n");
         } else {
-            sb.append(Helper.getPlayerRepresentation(event, player)).append(" played an Action Card:\n");
+            sb.append(Helper.getPlayerRepresentation(player, activeMap)).append(" played an Action Card:\n");
         }
         sb.append(actionCard.getRepresentation());
         List<Button> buttons = new ArrayList<Button>();
         Button sabotageButton = Button.danger("sabotage_ac", "Cancel AC With Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
         buttons.add(sabotageButton);
-        if(activeMap.isEmpyInTheGame() || activeMap.isFoWMode())
+        if (activeMap.isEmpyInTheGame() || activeMap.isFoWMode())
         {
             Button empyButton = Button.secondary("sabotage_empy", "Cancel AC With Empyrean Mech ").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
             buttons.add(empyButton);
         }
-        if(activeMap.doesAnyoneHaveInstinctTraining() || activeMap.isFoWMode())
+        if (activeMap.doesAnyoneHaveInstinctTraining() || activeMap.isFoWMode())
         {
             Button instinctButton = Button.secondary("sabotage_xxcha", "Cancel AC With Instinct Training").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("Xxcha")));
             buttons.add(instinctButton);
@@ -131,7 +131,7 @@ public class PlayAC extends ACCardsSubcommandData {
         } else {
             MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, sb.toString(), activeMap, player, buttons);
 
-            if(actionCardWindow.contains("After an agenda is revealed"))
+            if (actionCardWindow.contains("After an agenda is revealed"))
             {
                 Button playAfter = Button.danger("play_after", "Play A Non-AC Rider");
                 Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromFormatted(Emojis.noafters));
@@ -140,12 +140,12 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", activeMap, afterButtons, "after");
                 
 
-                if(actionCardTitle.contains("Rider") || actionCardTitle.contains("Sanction") )
+                if (actionCardTitle.contains("Rider") || actionCardTitle.contains("Sanction") )
                 {
                     List<Button> riderButtons = AgendaHelper.getRiderButtons(actionCardTitle, activeMap);
                     MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target", activeMap, player, riderButtons);
                 }
-                if(actionCardTitle.contains("Hack Election") )
+                if (actionCardTitle.contains("Hack Election") )
                 {
                     Button setHack = Button.danger("hack_election", "Set the voting order as reversed");
                     List<Button> hackButtons =  List.of(setHack);
@@ -153,7 +153,7 @@ public class PlayAC extends ACCardsSubcommandData {
                 }
 
             }
-            if(actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto"))
+            if (actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto"))
             {
                 Button playWhen = Button.danger("play_when", "Play When");
                 Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
@@ -170,7 +170,7 @@ public class PlayAC extends ACCardsSubcommandData {
         
         //Fog of war ping
 		if (activeMap.isFoWMode()) {
-            String fowMessage = Helper.getPlayerRepresentation(event, player, false) + " played an Action Card: " + actionCardTitle;
+            String fowMessage = Helper.getPlayerRepresentation(player, activeMap) + " played an Action Card: " + actionCardTitle;
 			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, fowMessage);
             MessageHelper.sendPrivateMessageToPlayer(player, activeMap, "Played action card: " + actionCardTitle);
 		}

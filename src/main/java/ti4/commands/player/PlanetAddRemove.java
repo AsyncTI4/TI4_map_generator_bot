@@ -58,7 +58,7 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
 
         LinkedHashSet<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(p -> p.getAsString()).map(s -> AliasHandler.resolvePlanet(StringUtils.substringBefore(s, " (").replace(" ", ""))).toList());
 
-        sendMessage(getActionHeaderMessage(event, player) + resolveSpendAs(event, planetIDs) + ":");
+        sendMessage(getActionHeaderMessage(activeMap, player) + resolveSpendAs(event, planetIDs) + ":");
 
         for (String planetID : planetIDs) {
             parseParameter(event, player, planetID, activeMap);
@@ -94,12 +94,12 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
     public abstract void doAction(Player player, String techID, Map map);
     
     /** Customize the initial header response depending on ActionID (which /player planet_* action is used)
-     * @param event
+     * @param activeMap
      * @param player
      * @return
      */
-    private String getActionHeaderMessage(SlashCommandInteractionEvent event, Player player) {
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" ");
+    private String getActionHeaderMessage(Map activeMap, Player player) {
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap)).append(" ");
         return switch (getActionID()) {
             case Constants.PLANET_ADD -> message.append(" added planet(s)").toString();
             case Constants.PLANET_REMOVE -> message.append(" removed planet(s)").toString();

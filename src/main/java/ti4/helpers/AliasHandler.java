@@ -128,7 +128,7 @@ public class AliasHandler {
                     while (tokenizer.hasMoreTokens())
                     {
                         String aliasToken = tokenizer.nextToken();
-                        if(!aliasToken.isEmpty()) {
+                        if (!aliasToken.isEmpty()) {
                             aliasList.put(aliasToken.toLowerCase(), id);
                         }
                     }

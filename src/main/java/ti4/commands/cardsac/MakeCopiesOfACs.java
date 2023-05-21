@@ -31,7 +31,7 @@ public class MakeCopiesOfACs extends ACCardsSubcommandData {
         if (option != null) {
             int providedCount = option.getAsInt();
             count = providedCount;
-            if(count > 3 || count < 1)
+            if (count > 3 || count < 1)
             {
                 return;
             }
@@ -42,7 +42,7 @@ public class MakeCopiesOfACs extends ACCardsSubcommandData {
             List<String> ACs = new ArrayList<>(actionCards.keySet());
             activeMap.addActionCardDuplicates(ACs);
         }
-        if(count ==3)
+        if (count ==3)
         {
             HashMap<String, ActionCardModel> actionCards2 = Mapper.getActionCards("extra1");
             List<String> ACs2 = new ArrayList<>(actionCards2.keySet());

@@ -91,9 +91,9 @@ public class SwapSC extends SpecialSubcommandData {
         player2.removeSC(player2SC);
 
         StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(event, player1)).append(" swapped SC with ").append(Helper.getPlayerRepresentation(event, player2)).append("\n");
-        sb.append("> ").append(Helper.getPlayerRepresentation(event, player2)).append(Helper.getSCEmojiFromInteger(player2SC)).append(" ").append(":arrow_right:").append(" ").append(Helper.getSCEmojiFromInteger(player1SC)).append("\n");
-        sb.append("> ").append(Helper.getPlayerRepresentation(event, player1)).append(Helper.getSCEmojiFromInteger(player1SC)).append(" ").append(":arrow_right:").append(" ").append(Helper.getSCEmojiFromInteger(player2SC)).append("\n");
+        sb.append(Helper.getPlayerRepresentation(player1, activeMap)).append(" swapped SC with ").append(Helper.getPlayerRepresentation(player2, activeMap)).append("\n");
+        sb.append("> ").append(Helper.getPlayerRepresentation(player2, activeMap)).append(Helper.getSCEmojiFromInteger(player2SC)).append(" ").append(":arrow_right:").append(" ").append(Helper.getSCEmojiFromInteger(player1SC)).append("\n");
+        sb.append("> ").append(Helper.getPlayerRepresentation(player1, activeMap)).append(Helper.getSCEmojiFromInteger(player1SC)).append(" ").append(":arrow_right:").append(" ").append(Helper.getSCEmojiFromInteger(player2SC)).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
         // ListTurnOrder.turnOrder(event, activeMap);
     }

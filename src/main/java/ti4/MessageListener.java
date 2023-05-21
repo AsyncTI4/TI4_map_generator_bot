@@ -187,20 +187,7 @@ public class MessageListener extends ListenerAdapter {
                             long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
                             if (milliSinceLastPing > (1000 *60*60* activeMap.getAutoPingSpacer())) 
                             {
-                                String realIdentity = "";
-                                if(activeMap.isCommunityMode())
-                                {
-                                    if(player.getRoleForCommunity() == null)
-                                    {
-                                        return;
-                                    }
-                                    GuildChannel guildGetter = (GuildChannel) activeMap.getMainGameChannel();
-                                    realIdentity = Helper.getRoleMentionByName(guildGetter.getGuild(), player.getRoleForCommunity().getName()); //need to get right guild later
-                                }
-                                else
-                                {
-                                    realIdentity = Helper.getPlayerRepresentation(player);
-                                }
+                                String realIdentity = Helper.getPlayerRepresentation(player, activeMap);
                                 String ping = realIdentity + " this is a gentle reminder that it is your turn.";
                                 if(activeMap.isFoWMode()) {
                                     MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);

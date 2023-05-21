@@ -51,7 +51,7 @@ public class ListVoteCount extends AgendaSubcommandData {
                 planets.removeAll(player.getExhaustedPlanets());
 
                 String text = "";
-                text += Helper.getPlayerRepresentation(event, player);
+                text += Helper.getPlayerRepresentation(player, map);
                 HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
                 boolean bloodPactPn = false;
                 boolean hasXxchaAlliance = false;
@@ -59,9 +59,9 @@ public class ListVoteCount extends AgendaSubcommandData {
 
                 if ("mahact".equals(player.getFaction())) {
                     Player xxcha = Helper.getPlayerFromColorOrFaction(map, "xxcha");
-                    if(xxcha != null)
+                    if (xxcha != null)
                     {
-                        if(player.getMahactCC().contains(xxcha.getColor()))
+                        if (player.getMahactCC().contains(xxcha.getColor()))
                         {
                             Leader leader = xxcha.getLeader(Constants.COMMANDER);
                             if (leader != null && !leader.isLocked()) {
@@ -163,7 +163,7 @@ public class ListVoteCount extends AgendaSubcommandData {
             int itemNo = 1;
             for (Player player : orderList) {
                 sb.append("`").append(itemNo).append(".` ");
-                sb.append(Helper.getPlayerRepresentation(event, player));
+                sb.append(Helper.getPlayerRepresentation(player, map));
                 if (player.getUserID().equals(map.getSpeaker())) sb.append(Emojis.SpeakerToken);
                 sb.append(getPlayerVoteText(map, player));
                 sb.append("\n");

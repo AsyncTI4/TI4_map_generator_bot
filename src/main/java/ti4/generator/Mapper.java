@@ -421,7 +421,7 @@ public class Mapper {
         } else {
             sb.append(agenda.target).append(";");
             sb.append(agenda.text1);
-            if(agenda.text2.length() > 0) {
+            if (agenda.text2.length() > 0) {
                 sb.append(";").append(agenda.text2);
             }
         }

@@ -40,6 +40,10 @@ public class FoWHelper {
 	public static Boolean isPrivateGame(@Nullable Map map, GenericInteractionCreateEvent event) {
 		return isPrivateGame(map, event, null);
 	}
+
+	public static Boolean isPrivateGame(Map map) {
+		return isPrivateGame(map, null, null);
+	}
 	
 	/** Method to determine of a viewing player should be able to see the stats of a particular faction */
 	public static boolean canSeeStatsOfFaction(Map map, String faction, Player viewingPlayer) {
@@ -425,7 +429,7 @@ public class FoWHelper {
 			units.putAll(unitHolder.getUnits());
 		}
 		for (String key : units.keySet()) {
-			if(key != null)
+			if (key != null)
 			{
 				if (key.startsWith(colorID)) {
 					return true;
@@ -443,7 +447,7 @@ public class FoWHelper {
 		for (Player player_ : players) {
 			if (!player_.isRealPlayer()) continue;
 			
-			String playerMessage = Helper.getPlayerRepresentation(event, player_, false) + " - System " + position + " has been pinged:\n>>> " + message;
+			String playerMessage = Helper.getPlayerRepresentation(player_, activeMap) + " - System " + position + " has been pinged:\n>>> " + message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			successfulCount += success ? 1 : 0;
 		}
@@ -455,7 +459,7 @@ public class FoWHelper {
 		int succesfulCount = 0;
 
 		for (Player player_ : activeMap.getPlayers().values()) {
-			String playerMessage = Helper.getPlayerRepresentation(event, player_, false) + " all player ping\n>>> " + message;
+			String playerMessage = Helper.getPlayerRepresentation(player_, activeMap) + " all player ping\n>>> " + message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			succesfulCount += success ? 1 : 0;
 		}
@@ -468,7 +472,7 @@ public class FoWHelper {
 				.collect(Collectors.toSet());
 		int succesfulCount = 0;
 
-		String playerMessage = Helper.getPlayerRepresentation(event, playerWithChange, false) + " stats changed:\n" + message;
+		String playerMessage = Helper.getPlayerRepresentation(playerWithChange, activeMap) + " stats changed:\n" + message;
 		for (Player player_ : playersToPing) {
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			succesfulCount += success ? 1 : 0;
@@ -530,13 +534,13 @@ public class FoWHelper {
 			StringBuilder sb = new StringBuilder();
 			// first off let's give full info for someone that can see both sides
 			if (senderVisible) {
-				sb.append(Helper.getPlayerRepresentation(event, sendingPlayer, false));
+				sb.append(Helper.getPlayerRepresentation(sendingPlayer, activeMap));
 			} else {
 				sb.append("???");
 			}
 			sb.append(" sent " + transactedObject + " to ");
 			if (receiverVisible) {
-				sb.append(Helper.getPlayerRepresentation(event, receivingPlayer, false));
+				sb.append(Helper.getPlayerRepresentation(receivingPlayer, activeMap));
 			} else {
 				sb.append("???");
 			}

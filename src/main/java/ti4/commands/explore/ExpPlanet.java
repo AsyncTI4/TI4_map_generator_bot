@@ -67,17 +67,17 @@ public class ExpPlanet extends ExploreSubcommandData {
 
     public void explorePlanet(GenericInteractionCreateEvent event, Tile tile, String planetName, String drawColor, Player player, boolean NRACheck, Map activeMap, int numExplores)
     {
-        if(!player.getPlanets().contains(planetName) && !activeMap.isAllianceMode())
+        if (!player.getPlanets().contains(planetName) && !activeMap.isAllianceMode())
         {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not own this planet, thus cannot explore it.");
             return;
         }
         
-        if(player.getFaction().equalsIgnoreCase("naaz"))
+        if (player.getFaction().equalsIgnoreCase("naaz"))
         {
-            if(Helper.mechCheck(planetName, activeMap, player))
+            if (Helper.mechCheck(planetName, activeMap, player))
             {
-                if(!NRACheck)
+                if (!NRACheck)
                 {
                     String message = "Please decide whether or not to use your distant suns (explore twice) ability.";
                     Button resolveExplore1  = Button.success("distant_suns_accept_"+planetName+"_"+drawColor, "Choose to Explore Twice");
@@ -88,7 +88,7 @@ public class ExpPlanet extends ExploreSubcommandData {
                 }
                 else
                 {
-                    if(numExplores == 2)
+                    if (numExplores == 2)
                     {
                         String cardID = activeMap.drawExplore(drawColor);
                         if (cardID == null) {
@@ -123,12 +123,12 @@ public class ExpPlanet extends ExploreSubcommandData {
             return;
         }
         StringBuilder messageText = new StringBuilder();
-        messageText.append(Helper.getPlayerRepresentation(event, player)).append(" explored ");
+        messageText.append(Helper.getPlayerRepresentation(player, activeMap)).append(" explored ");
         messageText.append(Helper.getEmojiFromDiscord(drawColor));
         messageText.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(planetName) +" *(tile "+ tile.getPosition() + ")*:\n");
         messageText.append("> ").append(displayExplore(cardID));
         resolveExplore(event, cardID, tile, planetName, messageText.toString(), false, player, activeMap);
-        if(player.getTechs().contains(AliasHandler.resolveTech("Pre-Fab Arcologies")))
+        if (player.getTechs().contains(AliasHandler.resolveTech("Pre-Fab Arcologies")))
         {
             new PlanetRefresh().doAction(player, planetName, activeMap);
             MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");

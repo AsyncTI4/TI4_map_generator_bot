@@ -36,7 +36,7 @@ public class PutAgendaBottom extends AgendaSubcommandData {
 
 
         } else {
-            if(!activeMap.isFoWMode())
+            if (!activeMap.isFoWMode())
             {
                 MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "No Agenda ID found");
             }

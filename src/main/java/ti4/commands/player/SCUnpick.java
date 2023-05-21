@@ -70,7 +70,7 @@ public class SCUnpick extends PlayerSubcommandData {
             }
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += Helper.getPlayerRepresentation(event, player_, true) + " To Pick SC";
+                msgExtra += Helper.getPlayerRepresentation(player_, activeMap, event.getGuild(), true) + " To Pick SC";
                 privatePlayer = player_;
                 allPicked = false;
                 break;
@@ -119,7 +119,7 @@ public class SCUnpick extends PlayerSubcommandData {
 
             //INFORM FIRST PLAYER IS UP FOR ACTION
             if (nextPlayer != null) {
-                msgExtra += " " + Helper.getPlayerRepresentation(event, nextPlayer) + " is up for an action";
+                msgExtra += " " + Helper.getPlayerRepresentation(nextPlayer, activeMap) + " is up for an action";
                 privatePlayer = nextPlayer;
                 activeMap.updateActivePlayer(nextPlayer);
             }
@@ -128,7 +128,7 @@ public class SCUnpick extends PlayerSubcommandData {
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame ) {
             if (allPicked) {
-                msgExtra = Helper.getPlayerRepresentation(event, privatePlayer, true) + " UP NEXT";
+                msgExtra = Helper.getPlayerRepresentation(privatePlayer, activeMap, event.getGuild(), true) + " UP NEXT";
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";

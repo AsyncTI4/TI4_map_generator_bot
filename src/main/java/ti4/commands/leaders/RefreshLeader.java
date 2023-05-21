@@ -1,13 +1,13 @@
 package ti4.commands.leaders;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class RefreshLeader extends LeaderAction {
     public RefreshLeader() {
@@ -25,7 +25,7 @@ public class RefreshLeader extends LeaderAction {
             int tgCount = playerLeader.getTgCount();
             refreshLeader(player, playerLeader);
             sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
-            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
+            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
                     .append(" readied ")
                     .append(Helper.getLeaderShortRepresentation(player, playerLeader));
             if (tgCount > 0) {

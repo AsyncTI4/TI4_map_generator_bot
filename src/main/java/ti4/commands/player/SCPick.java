@@ -66,7 +66,7 @@ public class SCPick extends PlayerSubcommandData {
             if (activeMap.isFoWMode()) {
                 String[] scs = {Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6};
                 int c = 0;
-                while(playerSCs.isEmpty() && c < 5)
+                while (playerSCs.isEmpty() && c < 5)
                 {
                     if (event.getOption(scs[c]) != null)
                     {
@@ -94,7 +94,7 @@ public class SCPick extends PlayerSubcommandData {
         Player privatePlayer = null;
         
         StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(event, player, true));
+        sb.append(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true));
         if (!activeMap.isHomeBrewSCMode())
         {
             sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(event, scPicked));
@@ -113,7 +113,7 @@ public class SCPick extends PlayerSubcommandData {
             }
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += Helper.getPlayerRepresentation(event, player_, true) + " To Pick SC";
+                msgExtra += Helper.getPlayerRepresentation(player_, activeMap, event.getGuild(), true) + " To Pick SC";
                 privatePlayer = player_;
                 allPicked = false;
                 break;
@@ -162,7 +162,7 @@ public class SCPick extends PlayerSubcommandData {
 
             //INFORM FIRST PLAYER IS UP FOR ACTION
             if (nextPlayer != null) {
-                msgExtra += " " + Helper.getPlayerRepresentation(event, nextPlayer) + " is up for an action";
+                msgExtra += " " + Helper.getPlayerRepresentation(nextPlayer, activeMap) + " is up for an action";
                 privatePlayer = nextPlayer;
                 activeMap.updateActivePlayer(nextPlayer);
             }
@@ -173,7 +173,7 @@ public class SCPick extends PlayerSubcommandData {
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame ) {
             if (allPicked) {
-                msgExtra = Helper.getPlayerRepresentation(event, privatePlayer, true) + " UP NEXT";
+                msgExtra = Helper.getPlayerRepresentation(privatePlayer, activeMap, event.getGuild(), true) + " UP NEXT";
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";

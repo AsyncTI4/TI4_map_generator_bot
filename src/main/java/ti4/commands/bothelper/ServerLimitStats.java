@@ -50,7 +50,7 @@ public class ServerLimitStats extends BothelperSubcommandData {
         long inLimboChannelCount = inLimboChannels.size();
         long inLimboThreadCount = 0;
         for (GuildChannel channel : inLimboChannels) {
-            if(channel.getType() == ChannelType.TEXT) {
+            if (channel.getType() == ChannelType.TEXT) {
                 inLimboThreadCount += ((TextChannel) channel).getThreadChannels().size();
             }
         }

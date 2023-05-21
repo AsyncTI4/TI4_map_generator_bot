@@ -321,7 +321,7 @@ public class Map {
         boolean isInDiscard = false;
         for (java.util.Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
             
-            if(Mapper.getActionCard(ac.getKey()).name.contains(name))
+            if (Mapper.getActionCard(ac.getKey()).name.contains(name))
             {
                 return true;
             }
@@ -657,7 +657,7 @@ public class Map {
 
    
     public void addPlayersWhoHitPersistentNoAfter(String faction) {
-        if(playersWhoHitPersistentNoAfter != null && playersWhoHitPersistentNoAfter.length() > 0)
+        if (playersWhoHitPersistentNoAfter != null && playersWhoHitPersistentNoAfter.length() > 0)
         {
             playersWhoHitPersistentNoAfter = playersWhoHitPersistentNoAfter + "_"+faction;
         }
@@ -667,7 +667,7 @@ public class Map {
         } 
     }
     public void addPlayersWhoHitPersistentNoWhen(String faction) {
-        if(playersWhoHitPersistentNoWhen != null && playersWhoHitPersistentNoWhen.length() > 0)
+        if (playersWhoHitPersistentNoWhen != null && playersWhoHitPersistentNoWhen.length() > 0)
         {
             playersWhoHitPersistentNoWhen = playersWhoHitPersistentNoWhen + "_"+faction;
         }
@@ -832,7 +832,7 @@ public class Map {
      * @param sc the integer value of the new strategy card
      */
     public void addSC(int sc) {
-        if(!getSCList().contains(sc)) {
+        if (!getSCList().contains(sc)) {
             setScTradeGood(sc, null);
         }
     }
@@ -938,9 +938,9 @@ public class Map {
         if (!idC.isEmpty())
         {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(idC, key -> new ArrayList<>());
-            for(String playerID : players.keySet())
+            for (String playerID : players.keySet())
             {
-                if(scoredPlayerList.contains(playerID))
+                if (scoredPlayerList.contains(playerID))
                 {
                     custodiansTaken = true;
                 }
@@ -1518,9 +1518,9 @@ public class Map {
     public LinkedHashMap<String, Integer> drawSpecificActionCard(String acID, String userID) {
         if (!actionCards.isEmpty()) {
             int tries = 0;
-            while(tries < 3)
+            while (tries < 3)
             {
-                if(actionCards.indexOf(acID) > -1)
+                if (actionCards.indexOf(acID) > -1)
                 {
                     String id = acID;
                     Player player = getPlayer(userID);
@@ -1532,7 +1532,7 @@ public class Map {
                     tries = 12;
                 }
                 tries++;
-                if(acID.contains("extra1"))
+                if (acID.contains("extra1"))
                 {
                     acID = acID.replace("extra1","extra2");
                 }
@@ -1964,7 +1964,7 @@ public class Map {
         
         for (Player player : getRealPlayers())
         {
-            if(player.getFaction() != null && player.getFaction().equalsIgnoreCase("Empyrean"))
+            if (player.getFaction() != null && player.getFaction().equalsIgnoreCase("Empyrean"))
             {
                 return true;
             }
@@ -1977,7 +1977,7 @@ public class Map {
         for (Player player : getRealPlayers())
         {
             
-            if(player.getTechs().contains(AliasHandler.resolveTech("Instinct Training")))
+            if (player.getTechs().contains(AliasHandler.resolveTech("Instinct Training")))
             {
                 return true;
             }

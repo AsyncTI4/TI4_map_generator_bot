@@ -53,7 +53,7 @@ public class Stats extends PlayerSubcommandData {
 		List<OptionMapping> optionMappings = event.getOptions();
 		//NO OPTIONS SELECTED, JUST DISPLAY STATS
 		if (optionMappings.isEmpty() && !activeMap.isFoWMode()) {
-			sendMessage(getPlayersCurrentStatsText(player));
+			sendMessage(getPlayersCurrentStatsText(player, activeMap));
 			return;
 		}
 		
@@ -94,7 +94,7 @@ public class Stats extends PlayerSubcommandData {
 			}
 			if (optionT != null || optionF != null || optionS != null || optionCC != null) {
 				String newCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
-				sendMessage(Helper.getPlayerRepresentation(event, player) + " updated CCs: " + originalCCString + " -> " + newCCString);
+				sendMessage(Helper.getPlayerRepresentation(player, activeMap) + " updated CCs: " + originalCCString + " -> " + newCCString);
 			}
 			if (optionT != null || optionF != null || optionS != null) {
 				Helper.isCCCountCorrect(event, activeMap, player.getColor());
@@ -106,7 +106,7 @@ public class Stats extends PlayerSubcommandData {
 		optionMappings.remove(optionS);
 		if (optionMappings.isEmpty()) return;
 
-		sendMessage(Helper.getPlayerRepresentation(event, player, true) + " player stats changed:");
+		sendMessage(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " player stats changed:");
 		
 		OptionMapping optionTG = event.getOption(Constants.TG);
 		if (optionTG != null) {
@@ -197,8 +197,8 @@ public class Stats extends PlayerSubcommandData {
 
 	}
 
-	private String getPlayersCurrentStatsText(Player player) {
-		StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(getEvent(), player, false) + " player's current stats:\n");
+	private String getPlayersCurrentStatsText(Player player, Map activeMap) {
+		StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " player's current stats:\n");
 
 		sb.append("> VP: ").append(player.getTotalVictoryPoints(getActiveMap()));
 		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/").append(player.getStrategicCC());

@@ -61,9 +61,9 @@ public class Replace extends GameSubcommandData {
             }
             User addedUser = addOption.getAsUser();
             boolean notRealPlayer = players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()));
-            if(!notRealPlayer)
+            if (!notRealPlayer)
             {
-                if(map.getPlayer(addedUser.getId()).getFaction() == null)
+                if (map.getPlayer(addedUser.getId()).getFaction() == null)
                 {
                     map.removePlayer(addedUser.getId());
                 }

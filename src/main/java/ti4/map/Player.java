@@ -193,7 +193,7 @@ public class Player {
         }
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + getUserName().replaceAll("/", "");
-        if(activeMap.isFoWMode())
+        if (activeMap.isFoWMode())
             {
                 threadName = activeMap.getName() + "-" + "cards-info-"+ getUserName().replaceAll("/", "") + "-private";
             }
@@ -301,7 +301,7 @@ public class Player {
     }
 
     public int getUnitCap(String unit) {
-        if(unitCaps.get(unit) == null)
+        if (unitCaps.get(unit) == null)
         {
             return 0;
         }
@@ -657,7 +657,7 @@ public class Player {
     
     private List<String> getFactionStartingAbilities() {
         FactionModel factionSetupInfo = getFactionSetupInfo();
-        if(factionSetupInfo == null) return new ArrayList<String>();
+        if (factionSetupInfo == null) return new ArrayList<String>();
         return new ArrayList<String>(factionSetupInfo.abilities);
     }
 
@@ -1024,7 +1024,7 @@ public class Player {
 
     public void refreshPlanet(String planet) {
         boolean isRemoved = exhaustedPlanets.remove(planet);
-        if(isRemoved) refreshPlanet(planet);
+        if (isRemoved) refreshPlanet(planet);
     }
 
     public void refreshPlanetAbility(String planet) {
@@ -1077,7 +1077,7 @@ public class Player {
 
     public void addFogTile(String tileID, String position, String label) {
         fow_seenTiles.put(position, tileID);
-        if(label != null && !label.equals(".") && !label.equals("")) {
+        if (label != null && !label.equals(".") && !label.equals("")) {
             fow_customLabels.put(position, label);
         }
     }

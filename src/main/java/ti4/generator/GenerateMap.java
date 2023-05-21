@@ -799,7 +799,7 @@ public class GenerateMap {
             if (reinforcementsPosition != null) {
                 int positionCount = player.getUnitCap(unitID);
                 boolean aboveCap = true;
-                if(positionCount == 0)
+                if (positionCount == 0)
                 {
                     positionCount = reinforcementsPosition.getPositionCount(unitID);
                     aboveCap = false;
@@ -815,7 +815,7 @@ public class GenerateMap {
                         } catch (Exception e) {
                             BotLogger.log("Could not parse unit file for reinforcements: " + unitID, e);
                         }
-                        if(aboveCap)
+                        if (aboveCap)
                         {
                             i = remainingReinforcements;
                         }
@@ -823,10 +823,10 @@ public class GenerateMap {
                 }
                 else
                 {
-                    if(remainingReinforcements < 0 && !map.isDiscordantStarsMode()  && map.getCCNPlasticLimit())
+                    if (remainingReinforcements < 0 && !map.isDiscordantStarsMode()  && map.getCCNPlasticLimit())
                     {
                         String warningMessage = playerColor + " is exceeding unit plastic or cardboard limits";
-                        if(map.isFoWMode())
+                        if (map.isFoWMode())
                         {
                             MessageHelper.sendMessageToChannel(player.getPrivateChannel(), warningMessage);
                         }
@@ -1633,7 +1633,7 @@ public class GenerateMap {
         int index = 0;
         for (Player player : players) {
 
-            if(player.getFaction() == null || !player.isRealPlayer())
+            if (player.getFaction() == null || !player.isRealPlayer())
             {
                 continue;
             }

@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
@@ -88,7 +87,7 @@ public class SCPlay extends PlayerSubcommandData {
         
         activeMap.setSCPlayed(scToPlay, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
-        String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToDisplay) + (pbd100or500 ? " Group " + pbd100group : "") + " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
+        String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToDisplay) + (pbd100or500 ? " Group " + pbd100group : "") + " played by " + Helper.getPlayerRepresentation(player, activeMap) + "\n\n";
         if (activeMap.isFoWMode()) {
             message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToDisplay) + " played.\n\n";
         }
@@ -114,7 +113,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
 
 
-        if(!activeMap.isHomeBrewSCMode())
+        if (!activeMap.isHomeBrewSCMode())
         {
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
             //GET BUTTONS
@@ -164,7 +163,7 @@ public class SCPlay extends PlayerSubcommandData {
 
         //POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
         if (!activeMap.isFoWMode() && scToPlay == 3) { 
-            String assignSpeakerMessage = Helper.getPlayerRepresentation(event, player) + ", please click a faction below to assign Speaker " + Emojis.SpeakerToken;
+            String assignSpeakerMessage = Helper.getPlayerRepresentation(player, activeMap) + ", please click a faction below to assign Speaker " + Emojis.SpeakerToken;
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons();
             if (assignSpeakerActionRow.isEmpty()) return;
 
@@ -189,15 +188,15 @@ public class SCPlay extends PlayerSubcommandData {
 
 
 
-        if(player.getFaction().equalsIgnoreCase("winnu")&& scToPlay != 1)
+        if (player.getFaction().equalsIgnoreCase("winnu")&& scToPlay != 1)
         {
-            for(Player player2 :activeMap.getPlayers().values())
+            for (Player player2 :activeMap.getPlayers().values())
             {
                 if (!player2.getPromissoryNotes().isEmpty()) {
                     for (String pn : player2.getPromissoryNotes().keySet()) {
                         if (!player2.getFaction().equalsIgnoreCase("winnu") && pn.equalsIgnoreCase("acq")) {
-                            String acqMessage = Helper.getPlayerRepresentation(event, player2, true) + " reminder you can use Winnu's PN!";
-                            if(activeMap.isFoWMode())
+                            String acqMessage = Helper.getPlayerRepresentation(player2, activeMap, event.getGuild(), true) + " reminder you can use Winnu's PN!";
+                            if (activeMap.isFoWMode())
                             {
                                 MessageHelper.sendMessageToChannel(player2.getPrivateChannel(), acqMessage);
                             }
