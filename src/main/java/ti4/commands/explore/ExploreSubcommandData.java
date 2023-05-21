@@ -1,6 +1,7 @@
 package ti4.commands.explore;
 
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -21,6 +22,7 @@ import ti4.helpers.FoWHelper;
 import ti4.commands.player.PlanetAdd;
 import ti4.commands.player.PlanetRefresh;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import software.amazon.awssdk.utils.StringUtils;
 
 import java.util.List;
 
@@ -117,6 +119,12 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         if (player == null) {
             MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Player could not be found");
             return;
+        }
+
+        if(map != null && !map.isFoWMode() && ((TextChannel)event.getChannel() != map.getActionsChannel()))
+        {
+            String pF = StringUtils.capitalize(player.getFaction());
+            MessageHelper.sendMessageToChannel(map.getActionsChannel(), pF + " found a "+cardInfo[0]+ " on "+Helper.getPlanetRepresentation(planetName, map));
         }
 
         String cardType = cardInfo[3];

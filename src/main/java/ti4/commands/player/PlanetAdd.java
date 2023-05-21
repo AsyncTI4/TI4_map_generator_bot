@@ -2,11 +2,13 @@ package ti4.commands.player;
 
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.commands.status.ScorePublic;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
@@ -48,6 +50,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 }
             }
         }
+        boolean alreadyOwned = false;
         for (Player player_ : map.getPlayers().values()) {
             if (player_ != player) {
                 List<String> planets = player_.getPlanets();
@@ -55,6 +58,7 @@ public class PlanetAdd extends PlanetAddRemove {
                     if (player_.getExhaustedPlanetsAbilities().contains(planet)) {
                         player.exhaustPlanetAbility(planet);
                     }
+                    alreadyOwned = true;
                     player_.removePlanet(planet);
                     if (moveTitanPN){
                        if (player_.getPromissoryNotesInPlayArea().contains(Constants.TERRAFORM)){
@@ -65,6 +69,22 @@ public class PlanetAdd extends PlanetAddRemove {
                     }
                 }
             }
+        }
+        System.out.println("Made it here1");
+        if(!alreadyOwned)
+        {
+            Planet planetReal = (Planet) unitHolder;
+            System.out.println(planetReal.getOriginalPlanetType());
+            if( planetReal != null && planetReal.getOriginalPlanetType() != null && !planetReal.getOriginalPlanetType().equalsIgnoreCase(""))
+            {
+                String message = "Click Button To Explore";
+                String drawColor = planetReal.getOriginalPlanetType();
+                Button resolveExplore2 = Button.success("movedNExplored_filler_"+planet+"_"+drawColor, "Explore "+Helper.getPlanetRepresentation(planet, map));
+                List<Button> buttons = List.of(resolveExplore2);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+
+            }
+           
         }
     }
 }
