@@ -165,6 +165,15 @@ public class SCPlay extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Politics player should click this button after assigning speaker.", drawAgendaButton);
         }
 
+        List<Button> conclusionButtons = new ArrayList<Button>();
+        Button endTurn = Button.danger("turnEnd", "End Turn");
+        Button deleteButton = Button.danger("deleteButtons", "Do Another Action");
+        conclusionButtons.add(endTurn);
+        conclusionButtons.add(deleteButton);
+        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to end turn or take another action.", conclusionButtons);
+
+
+
         if(player.getFaction().equalsIgnoreCase("winnu")&& scToPlay != 1)
         {
             for(Player player2 :activeMap.getPlayers().values())

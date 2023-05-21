@@ -52,6 +52,9 @@ public class Map {
 
     private String latestOutcomeVotedFor = "";
 
+    private String latestAfterMsg = "";
+    private String latestWhenMsg = "";
+
     private MiltyDraftManager miltyDraftManager;
     private boolean ccNPlasticLimit = true;
 
@@ -248,8 +251,21 @@ public class Map {
         return latestOutcomeVotedFor;
     }
 
+    public String getLatestAfterMsg() {
+        return latestAfterMsg;
+    }
+    public String getLatestWhenMsg() {
+        return latestWhenMsg;
+    }
+
     public void setLatestOutcomeVotedFor(String outcomeVotedFor) {
         latestOutcomeVotedFor = outcomeVotedFor;
+    }
+    public void setLatestAfterMsg(String latestAfter) {
+        latestAfterMsg = latestAfter;
+    }
+    public void setLatestWhenMsg(String latestWhen) {
+        latestWhenMsg = latestWhen;
     }
 
 
@@ -613,6 +629,9 @@ public class Map {
 
     public void setCurrentAgendaVote(String outcome, String voteInfo) {
         currentAgendaVotes.put(outcome, voteInfo);
+    }
+    public void removeOutcomeAgendaVote(String outcome) {
+        currentAgendaVotes.remove(outcome);
     }
 
     public String getSpeaker() {

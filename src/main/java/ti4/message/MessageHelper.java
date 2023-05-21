@@ -64,15 +64,20 @@ public class MessageHelper {
 			StringTokenizer players  = null;
 			if(whenOrAfter != null && whenOrAfter.equalsIgnoreCase("when"))
 			{
+				if(activeMap.getLatestWhenMsg() != null && activeMap.getLatestWhenMsg() != "")
+				{	
+					activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestWhenMsg()).queue();
+				}
+				activeMap.setLatestWhenMsg(msg.getId());
 				players = new StringTokenizer(activeMap.getPlayersWhoHitPersistentNoWhen(), "_");
 			}
 			else
 			{
-				if(activeMap.getLatestOutcomeVotedFor() != null && activeMap.getLatestOutcomeVotedFor() != "")
+				if(activeMap.getLatestAfterMsg() != null && activeMap.getLatestAfterMsg() != "")
 				{	
-					activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestOutcomeVotedFor()).queue();
+					activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestAfterMsg()).queue();
 				}
-				activeMap.setLatestOutcomeVotedFor(msg.getId());
+				activeMap.setLatestAfterMsg(msg.getId());
 				players = new StringTokenizer(activeMap.getPlayersWhoHitPersistentNoAfter(), "_");
 			}
 			while (players.hasMoreTokens()) {
@@ -182,8 +187,8 @@ public class MessageHelper {
 	 * @param successText Feedback if the message successfully sent
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Map map, SlashCommandInteractionEvent event, String messageText, String failText, String successText) {
-		return sendPrivateMessageToPlayer(player, map, event.getChannel(), messageText, failText, successText);
+	public static boolean sendPrivateMessageToPlayer(Player player, Map map, GenericInteractionCreateEvent event, String messageText, String failText, String successText) {
+		return sendPrivateMessageToPlayer(player, map, event.getMessageChannel(), messageText, failText, successText);
 	}
 
 	/**

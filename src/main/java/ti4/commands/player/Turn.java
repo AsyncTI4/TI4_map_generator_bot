@@ -4,6 +4,8 @@ import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -48,15 +50,28 @@ public class Turn extends PlayerSubcommandData {
             return;
         }
         if(map.isFoWMode()) {
-            sendMessage("_ _");
+            MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
         } else {
-            sendMessage(Helper.getPlayerRepresentation(event, mainPlayer) + " ended turn");
+            MessageHelper.sendMessageToChannel(map.getMainGameChannel(),Helper.getPlayerRepresentation(event, mainPlayer));
+        }
+        String nextMessage = pingNextPlayer(event, map, mainPlayer);
+        if (!nextMessage.isEmpty()) sendMessage(nextMessage);
+    }
+    public void execute(GenericInteractionCreateEvent event, Player mainPlayer, Map map) {
+
+        if(map.isFoWMode()) {
+           MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
+        } else {
+            MessageHelper.sendMessageToChannel(map.getMainGameChannel(),Helper.getPlayerRepresentation(event, mainPlayer));
+            
         }
         String nextMessage = pingNextPlayer(event, map, mainPlayer);
         if (!nextMessage.isEmpty()) sendMessage(nextMessage);
     }
 
-    public String pingNextPlayer(SlashCommandInteractionEvent event, Map map, Player mainPlayer) {
+
+
+    public String pingNextPlayer(GenericInteractionCreateEvent event, Map map, Player mainPlayer) {
         int scNext = -1;
         boolean naaluPresent = false;
         int naaluSC = 0;
@@ -119,7 +134,7 @@ public class Turn extends PlayerSubcommandData {
             }
         }
 
-        MessageChannel gameChannel = map.getMainGameChannel() == null ? event.getChannel() : map.getMainGameChannel();
+        MessageChannel gameChannel = map.getMainGameChannel() == null ? event.getMessageChannel() : map.getMainGameChannel();
         if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value) || map.getPlayers().values().stream().allMatch(Player::isPassed)) {
             map.updateActivePlayer(null);
             showPublicObjectivesWhenAllPassed(event, map, gameChannel);
@@ -188,7 +203,7 @@ public class Turn extends PlayerSubcommandData {
         return sendReminder ? sb.toString() : null;
     }
 
-    private void showPublicObjectivesWhenAllPassed(SlashCommandInteractionEvent event, Map map, MessageChannel gameChannel) {
+    private void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Map map, MessageChannel gameChannel) {
         String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, map);
         
         LinkedHashMap<String, Integer> revealedPublicObjectives = map.getRevealedPublicObjectives();

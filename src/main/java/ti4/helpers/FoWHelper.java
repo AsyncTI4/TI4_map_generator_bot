@@ -37,7 +37,7 @@ public class FoWHelper {
 		return isPrivateGame(null, event);
 	}
 
-	public static Boolean isPrivateGame(@Nullable Map map, GenericCommandInteractionEvent event) {
+	public static Boolean isPrivateGame(@Nullable Map map, GenericInteractionCreateEvent event) {
 		return isPrivateGame(map, event, null);
 	}
 	
@@ -172,7 +172,7 @@ public class FoWHelper {
 		return mahactCCs.contains(player.getColor());
 	}
 
-	public static Boolean isPrivateGame(Map map, @Nullable GenericCommandInteractionEvent event, @Nullable Channel channel_) {
+	public static Boolean isPrivateGame(Map map, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
 		Boolean isFoWPrivate = null;
 		Channel eventChannel = event == null ? null : event.getChannel();
 		Channel channel = channel_ != null ? channel_ : eventChannel;
