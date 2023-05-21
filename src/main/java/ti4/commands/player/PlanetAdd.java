@@ -71,7 +71,7 @@ public class PlanetAdd extends PlanetAddRemove {
             }
         }
         
-        if(!alreadyOwned)
+        if(!alreadyOwned && !map.isAllianceMode())
         {
             Planet planetReal = (Planet) unitHolder;
             boolean oneOfThree = false;
