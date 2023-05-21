@@ -71,15 +71,15 @@ public class PlanetAdd extends PlanetAddRemove {
             }
         }
         
-        if(!alreadyOwned && !map.isAllianceMode())
+        if (!alreadyOwned && !map.isAllianceMode())
         {
             Planet planetReal = (Planet) unitHolder;
             boolean oneOfThree = false;
-            if(planetReal != null && planetReal.getOriginalPlanetType() != null && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous")))
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous")))
             {
                 oneOfThree = true;
             }
-            if( oneOfThree)
+            if ( oneOfThree)
             {
                 String message = "Click Button To Explore";
                 String drawColor = planetReal.getOriginalPlanetType();

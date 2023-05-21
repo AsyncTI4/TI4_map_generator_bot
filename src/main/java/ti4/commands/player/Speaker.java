@@ -7,10 +7,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class Speaker extends PlayerSubcommandData {
     public Speaker() {
@@ -32,7 +29,7 @@ public class Speaker extends PlayerSubcommandData {
             return;
         }
         activeMap.setSpeaker(player.getUserID());
-        String msg = Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(event, player);
+        String msg = Emojis.SpeakerToken + " Speaker assigned to: " + Helper.getPlayerRepresentation(player, activeMap);
         sendMessage(msg);
     }
 }

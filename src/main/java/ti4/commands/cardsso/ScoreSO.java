@@ -53,7 +53,7 @@ public class ScoreSO extends SOCardsSubcommandData {
             return;
         }
 
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player) + " scored " + Emojis.SecretObjectiveAlt + " ");
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " scored " + Emojis.SecretObjectiveAlt + " ");
         for (java.util.Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
@@ -71,11 +71,11 @@ public class ScoreSO extends SOCardsSubcommandData {
         }
         
         // FoW logic, specific for players with visilibty, generic for the rest
-        if(activeMap.isFoWMode()) {
+        if (activeMap.isFoWMode()) {
             FoWHelper.pingPlayersDifferentMessages(activeMap, event, player, message.toString(), "Scores changed");
             MessageHelper.sendMessageToChannel(channel, "All players notified");
         }
-        String headerText = Helper.getPlayerRepresentation(event, player);
+        String headerText = Helper.getPlayerRepresentation(player, activeMap);
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         SOInfo.sendSecretObjectiveInfo(activeMap, player);
         Helper.checkIfHeroUnlocked(event, activeMap, player);

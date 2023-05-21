@@ -106,7 +106,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
     public void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetName, String messageText, boolean enigmatic, Player player, Map map) {
         String message = "Card has been discarded. Resolve effects manually.";
-        if(map != null)
+        if (map != null)
         {
             activeMap = map;
         }
@@ -122,10 +122,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             return;
         }
 
-        if(map != null && !map.isFoWMode() &&(event.getChannel() !=  map.getActionsChannel()))
+        if (map != null && !map.isFoWMode() &&(event.getChannel() !=  map.getActionsChannel()))
         {
             String pF = StringUtils.capitalize(player.getFaction());
-            if(planetName != null)
+            if (planetName != null)
             {
                 MessageHelper.sendMessageToChannel(map.getActionsChannel(), pF + " found a "+cardInfo[0]+ " on "+Helper.getPlanetRepresentation(planetName, map));
             }
@@ -198,7 +198,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 for (int i = 0; i < count; i++) {
                     activeMap.drawActionCard(player.getUserID());
                 }
-                if(activeMap.isFoWMode())
+                if (activeMap.isFoWMode())
                 {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew 2 AC");
                 }
@@ -208,7 +208,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "dv1", "dv2" -> {
                 message = "Drew Secret Objective";
                 activeMap.drawSecretObjective(player.getUserID());
-                if(activeMap.isFoWMode())
+                if (activeMap.isFoWMode())
                 {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew SO");
                 }
@@ -240,7 +240,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     sendMessage("Planet cannot be explored: " + mirageID + "\n> The Cultural deck may be empty");
                     return;
                 }
-                StringBuilder exploredMessage = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" explored ");
+                StringBuilder exploredMessage = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap)).append(" explored ");
                 exploredMessage.append(Helper.getEmojiFromDiscord(planetTrait));
                 exploredMessage.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(mirageID) +" *(tile "+ tile.getPosition() + ")*").append(":\n");
                 exploredMessage.append(displayExplore(exploreID));
@@ -264,7 +264,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
             case "mo1", "mo2", "mo3" -> {
-                if(tile != null && planetName != null)
+                if (tile != null && planetName != null)
                 {
                     new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetName, activeMap, planetName);
                 }
@@ -302,7 +302,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
                 Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
-                String trueIdentity = Helper.getPlayerRepresentation(event, player, true);
+                String trueIdentity = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true);
                 String message2 = trueIdentity + "! Your current CCs are "+Helper.getPlayerCCs(player)+". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), message);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message2, buttons);

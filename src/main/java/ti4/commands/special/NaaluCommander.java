@@ -74,7 +74,7 @@ public class NaaluCommander extends SpecialSubcommandData {
             sb.append(PNInfo.getPromissoryNoteCardInfo(activeMap, player_, false));
         }
 
-        if (!activeMap.isFoWMode()) MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), Helper.getPlayerRepresentation(event, player) + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
+        if (!activeMap.isFoWMode()) MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), Helper.getPlayerRepresentation(player, activeMap) + " is using Naalu Commander to look at the top & bottom agenda, and their neighbour's promissory notes.");
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
     }
 }

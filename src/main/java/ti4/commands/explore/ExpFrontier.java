@@ -10,7 +10,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.*;
-import ti4.message.MessageHelper;
 
 public class ExpFrontier extends ExploreSubcommandData {
     public ExpFrontier() {
@@ -37,7 +36,7 @@ public class ExpFrontier extends ExploreSubcommandData {
             space.removeToken(frontierFilename);
             String cardID = activeMap.drawExplore(Constants.FRONTIER);
             StringBuilder messageText = new StringBuilder(Emojis.Frontier);
-            messageText.append("Frontier *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(event, player)).append(":\n");
+            messageText.append("Frontier *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(player, activeMap)).append(":\n");
             messageText.append(displayExplore(cardID));
             resolveExplore(event, cardID, tile, null, messageText.toString(), checkIfEngimaticDevice(player, cardID), player, activeMap);
         } else {

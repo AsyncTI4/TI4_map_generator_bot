@@ -47,7 +47,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         String agendaTarget = agendaDetails.target;
         String agendaType = agendaDetails.type;
         String agendaName = agendaDetails.name;
-        if(agendaName!= null && !agendaName.equalsIgnoreCase("Covert Legislation"))
+        if (agendaName!= null && !agendaName.equalsIgnoreCase("Covert Legislation"))
         {
             activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget + "_"+uniqueID);
         }

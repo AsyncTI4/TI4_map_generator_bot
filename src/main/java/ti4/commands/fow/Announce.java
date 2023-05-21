@@ -48,12 +48,12 @@ public class Announce extends FOWSubcommandData {
                 }
                 else
                 {
-                     message = Helper.getPlayerRepresentation(event, player) + " announces: " + msg;
+                     message = Helper.getPlayerRepresentation(player, activeMap) + " announces: " + msg;
                 }
             }
             else
             {
-                message = Helper.getPlayerRepresentation(event, player) + " announces: " + msg;
+                message = Helper.getPlayerRepresentation(player, activeMap) + " announces: " + msg;
             }
 
             MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? event.getChannel() : activeMap.getMainGameChannel();

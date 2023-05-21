@@ -1148,11 +1148,11 @@ public class MapSaveLoadManager {
                         StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
                         String outcome = null;
                         String voteInfo = null;
-                        if(dataInfo.hasMoreTokens())
+                        if (dataInfo.hasMoreTokens())
                         {
                             outcome = dataInfo.nextToken();
                         }
-                        if(dataInfo.hasMoreTokens())
+                        if (dataInfo.hasMoreTokens())
                         {
                             voteInfo = dataInfo.nextToken();
                             map.setCurrentAgendaVote(outcome, voteInfo);

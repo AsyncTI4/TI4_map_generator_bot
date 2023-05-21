@@ -80,7 +80,7 @@ public class ScorePublic extends StatusSubcommandData {
             poName = poName2;
             emojiName = Emojis.Public2alt;
         }
-        String message = Helper.getPlayerRepresentation(event, player) + " scored " + emojiName + " __**" + poName + "**__";
+        String message = Helper.getPlayerRepresentation(player, activeMap) + " scored " + emojiName + " __**" + poName + "**__";
         MessageHelper.sendMessageToChannel(channel, message);
 		if (activeMap.isFoWMode()) {
 			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, message);

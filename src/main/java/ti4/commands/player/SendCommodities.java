@@ -48,8 +48,8 @@ public class SendCommodities extends PlayerSubcommandData {
             player_.setTg(targetTG);
 
             
-			String p1 = Helper.getPlayerRepresentation(event, player);
-			String p2 = Helper.getPlayerRepresentation(event, player_);
+			String p1 = Helper.getPlayerRepresentation(player, activeMap);
+			String p2 = Helper.getPlayerRepresentation(player_, activeMap);
 			String commString = sendCommodities + " " + Emojis.comm + " commodities";
 			String message =  p1 + " sent " + commString + " to " + p2;
 			sendMessage(message);

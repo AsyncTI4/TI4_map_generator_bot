@@ -35,7 +35,7 @@ public class Tile {
     public Tile(String tileID, String position, Player player, Boolean fog_, String fogLabel_) {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
-        if(player != null)
+        if (player != null)
         {
         	fog.put(player, fog_);
         	fogLabel.put(player, fogLabel_);
@@ -162,7 +162,7 @@ public class Tile {
     public boolean removeToken(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
-            if(unitHolder.removeToken(tokenID)) return true;
+            if (unitHolder.removeToken(tokenID)) return true;
         }
         return false;
     }
@@ -284,10 +284,10 @@ public class Tile {
         String fogTileColorSuffix = "_" + fogTileColor;
         String fowTileID = "fow" + fogTileColorSuffix;
         
-        if(this.tileID.equals("82b") || this.tileID.equals("51")) { //mallice || creuss
+        if (this.tileID.equals("82b") || this.tileID.equals("51")) { //mallice || creuss
             fowTileID = "fowb" + fogTileColorSuffix;
         }
-        if(this.tileID.equals("82a")) { //mallicelocked
+        if (this.tileID.equals("82a")) { //mallicelocked
             fowTileID = "fowc" + fogTileColorSuffix;
         }
 

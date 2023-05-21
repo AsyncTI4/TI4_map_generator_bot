@@ -40,7 +40,7 @@ public class PNReset extends PNCardsSubcommandData {
             }
         }
         checkAndAddPNs(activeMap, player);
-        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendPromissoryNoteInfo(activeMap, player, true);
         sendMessage("PN Info Sent");

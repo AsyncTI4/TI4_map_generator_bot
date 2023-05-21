@@ -228,7 +228,7 @@ public class MoveUnits2 extends AddRemoveUnits {
             boolean otherUnitHoldersContainUnit = tile.getUnitHolders().values().stream()
                     .filter(planetTemp -> !planetTemp.getName().equals(planetName)).anyMatch(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID, 0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID, 0) > 0);
             
-            if(nonEmptyUnitHolders == 1) {
+            if (nonEmptyUnitHolders == 1) {
                    unitHolder = tile.getUnitHolders().values().stream()
                            .filter(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID,0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID,0) > 0).findFirst().get();
                    
@@ -256,15 +256,15 @@ public class MoveUnits2 extends AddRemoveUnits {
             tile.removeUnitDamage(unitHolder.getName(), unitID, countToRemove);
             
             // Check to see if we should remove from other unitHolders
-            if((totalUnitsOnHex == count) && otherUnitHoldersContainUnit) {
-                   for(String unitHolderName : tile.getUnitHolders().keySet()) {
-                           if(!unitHolderName.equals(planetName)) {
+            if ((totalUnitsOnHex == count) && otherUnitHoldersContainUnit) {
+                   for (String unitHolderName : tile.getUnitHolders().keySet()) {
+                           if (!unitHolderName.equals(planetName)) {
                                    int tempCount = tile.getUnitHolders().get(unitHolderName).getUnits().getOrDefault(unitID,0);
-                                   if(tempCount != 0) {
+                                   if (tempCount != 0) {
                                        tile.removeUnit(unitHolderName, unitID, tempCount);
                                    }
                                    tempCount = tile.getUnitHolders().get(unitHolderName).getUnitDamage().getOrDefault(unitID,0);
-                                   if(tempCount != 0) {
+                                   if (tempCount != 0) {
                                        tile.removeUnitDamage(unitHolderName, unitID, tempCount);
                                    }
                            }

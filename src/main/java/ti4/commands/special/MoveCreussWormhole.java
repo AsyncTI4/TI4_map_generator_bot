@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.tokens.RemoveToken;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -17,7 +16,6 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.MessageHelper;
 
 public class MoveCreussWormhole extends SpecialSubcommandData {
 
@@ -57,7 +55,7 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
             return;
         }
 
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(event, player));
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap));
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
         sb.append(" moved " + Helper.getEmojiFromDiscord(tokenName) + " to " + tile.getRepresentation());
         for (Tile tile_ : activeMap.getTileMap().values()) {

@@ -192,8 +192,8 @@ public class Setup extends PlayerSubcommandData {
 
         //STARTING UNITS
         addUnits(setupInfo, tile, color, event);
-        if(!activeMap.isFoWMode()) {
-            sendMessage("Player: " + Helper.getPlayerRepresentation(event, player) + " has been set up");
+        if (!activeMap.isFoWMode()) {
+            sendMessage("Player: " + Helper.getPlayerRepresentation(player, activeMap) + " has been set up");
         } else {
             sendMessage("Player was set up.");
         }

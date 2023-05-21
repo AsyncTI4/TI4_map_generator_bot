@@ -220,7 +220,7 @@ public class Storage {
 
     public static void init() {
         String resource = getStoragePath();
-        if(resource!=null) {
+        if (resource!=null) {
             createDirectory(resource, DELETED_MAPS);
             createDirectory(resource, MAPS);
             createDirectory(resource, MAPS_JSON);

@@ -14,7 +14,7 @@ public class AbilityAdd extends AbilityAddRemove {
     
     @Override
     public void doAction(Player player, List<String> abilityIDs) {
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(getEvent(), player)).append(" added abilities:\n");
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveMap())).append(" added abilities:\n");
         for (String abilityID : abilityIDs ){
             if (player.hasAbility(abilityID)) {
                 sb.append("> ").append(abilityID).append(" (player had this ability)");
