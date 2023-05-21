@@ -160,9 +160,18 @@ public class SCPlay extends PlayerSubcommandData {
 
         if (scToPlay == 3 && !activeMap.isHomeBrewSCMode()) { 
             List<Button> drawAgendaButton = new ArrayList<Button>();
-            Button draw2Agenda = Button.success("drawAgenda_2", "Draw 2 agendas into your cards info thread");
+            Button draw2Agenda = Button.success("FFCC_"+player.getFaction()+"_"+"drawAgenda_2", "Draw 2 agendas");
             drawAgendaButton.add(draw2Agenda);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Politics player should click this button after assigning speaker.", drawAgendaButton);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Politics holder should click this after assigning speaker.", drawAgendaButton);
+        }
+
+        if (scToPlay == 6 && !activeMap.isHomeBrewSCMode()) { 
+            List<Button> redistributeButton = new ArrayList<Button>();
+            Button redistribute= Button.success("FFCC_"+player.getFaction()+"_"+"redistributeCCButtons", "Redistribute & Gain CCs");
+            Button deleButton= Button.danger("FFCC_"+player.getFaction()+"_"+"deleteButtons", "Delete These Buttons");
+            redistributeButton.add(redistribute);
+            redistributeButton.add(deleButton);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Warfare holder should click this after picking up a CC.", redistributeButton);
         }
 
         List<Button> conclusionButtons = new ArrayList<Button>();
@@ -273,8 +282,9 @@ public class SCPlay extends PlayerSubcommandData {
     
     private List<Button> getWarfareButtons() {
         Button followButton = Button.success("sc_follow_6", "SC Follow");
+        Button homeBuild = Button.success("warfareBuild", "Build At Home");
         Button noFollowButton = Button.primary("sc_no_follow_6", "Not Following");
-        return List.of(followButton, noFollowButton);
+        return List.of(followButton,homeBuild, noFollowButton);
     }
     
     private List<Button> getTechnologyButtons() {
