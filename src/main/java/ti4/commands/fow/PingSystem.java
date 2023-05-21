@@ -49,7 +49,7 @@ public class PingSystem extends FOWSubcommandData {
         }
 
         //get players adjacent
-        List<Player> players = FoWHelper.getAdjacentPlayers(activeMap, position);
+        List<Player> players = FoWHelper.getAdjacentPlayers(activeMap, position, true);
         int successfulCount = 0;
         for (Player player_ : players) {
             String playerMessage = Helper.getPlayerRepresentation(event, player_, true) + " - System " + position + " has been pinged:\n> " + message;

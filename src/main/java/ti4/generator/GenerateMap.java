@@ -1778,7 +1778,7 @@ public class GenerateMap {
             graphics.setColor(Color.WHITE);
             graphics.setFont(Storage.getFont32());
             String ccID = Mapper.getCCID(player.getColor());
-            String fleetCCID = Mapper.getFleeCCID(player.getColor());
+            String fleetCCID = Mapper.getFleetCCID(player.getColor());
             point = PositionMapper.getPlayerStats(Constants.STATS_CC);
             int x = point.x + deltaX;
             int y = point.y + deltaY;
@@ -1871,7 +1871,7 @@ public class GenerateMap {
                 if (!mahactCC.isEmpty()) {
                     for (String ccColor : mahactCC) {
                         lastCCPosition++;
-                        String fleetCCID = Mapper.getCCPath(Mapper.getFleeCCID(ccColor));
+                        String fleetCCID = Mapper.getCCPath(Mapper.getFleetCCID(ccColor));
 
                         faction = getFactionByControlMarker(map.getPlayers().values(), fleetCCID);
                         factionImage = null;
@@ -2306,7 +2306,8 @@ public class GenerateMap {
             if (player_.getColor() != null && player_.getFaction() != null) {
                 String playerControlMarker = Mapper.getControlID(player_.getColor());
                 String playerCC = Mapper.getCCID(player_.getColor());
-                if (controlID.equals(playerControlMarker) || controlID.equals(playerCC)) {
+                String playerSweep = Mapper.getSweepID(player_.getColor());
+                if (controlID.equals(playerControlMarker) || controlID.equals(playerCC) || controlID.equals(playerSweep)) {
                     faction = player_.getFaction();
                     break;
                 }
@@ -2321,7 +2322,8 @@ public class GenerateMap {
             if (player_.getColor() != null && player_.getFaction() != null) {
                 String playerControlMarker = Mapper.getControlID(player_.getColor());
                 String playerCC = Mapper.getCCID(player_.getColor());
-                if (controlID.equals(playerControlMarker) || controlID.equals(playerCC)) {
+                String playerSweep = Mapper.getSweepID(player_.getColor());
+                if (controlID.equals(playerControlMarker) || controlID.equals(playerCC) || controlID.equals(playerSweep)) {
                     player = player_;
                     break;
                 }
@@ -2678,14 +2680,14 @@ public class GenerateMap {
         for (String ccID : ccList) {
             String ccPath = tile.getCCPath(ccID);
             if (ccPath == null) {
-//                LoggerHandler.log("Could not parse cc file for: " + ccID);
                 continue;
             }
             try {
+                
                 image = ImageIO.read(new File(ccPath));
-
+                
                 Point centerPosition = unitHolder.getHolderCenterPosition();
-
+                
                 String faction = getFactionByControlMarker(map.getPlayers().values(), ccID);
                 Player player = getPlayerByControlMarker(map.getPlayers().values(), ccID);
                 BufferedImage factionImage = null;
@@ -2698,12 +2700,22 @@ public class GenerateMap {
                         }
                     }
                 }
-                graphics.drawImage(image, tileX + 10 + deltaX, tileY + centerPosition.y - 40 + deltaY, null);
-                if (factionImage != null) {
-                    graphics.drawImage(factionImage, tileX + 10 + deltaX + DELTA_X, tileY + centerPosition.y - 40 + deltaY + DELTA_Y, null);
+                
+                boolean generateImage = true;
+                if (ccID.startsWith("sweep")) {
+                    factionImage = null;
+                    if (player != fowPlayer) {
+                        generateImage = false;
+                    }
+                }
+                
+                if (generateImage) {
+                    graphics.drawImage(image, tileX + 10 + deltaX, tileY + centerPosition.y - 40 + deltaY, null);
+                    if (factionImage != null) {
+                        graphics.drawImage(factionImage, tileX + 10 + deltaX + DELTA_X, tileY + centerPosition.y - 40 + deltaY + DELTA_Y, null);
+                    }
                 }
             } catch (Exception e) {
-//                LoggerHandler.log("Could not parse cc file for: " + ccID, e);
             }
 
 
