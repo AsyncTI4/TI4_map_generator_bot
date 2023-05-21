@@ -122,7 +122,8 @@ public class ButtonListener extends ListenerAdapter {
             buttonID = buttonID.replace("FFCC_", "");
             String factionWhoGeneratedButton = buttonID.substring(0, buttonID.indexOf("_"));
             buttonID = buttonID.replace(factionWhoGeneratedButton+"_", "");
-            if(!player.getFaction().equalsIgnoreCase(factionWhoGeneratedButton))
+            String factionWhoIsUp = player.getFaction();
+            if(!player.getFaction().equalsIgnoreCase(factionWhoGeneratedButton) && !buttonLabel.toLowerCase().contains(factionWhoIsUp))
             {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "To "+ StringUtils.capitalize(player.getFaction()) +": you are not the faction who these buttons are meant for.");
                 return;
@@ -698,7 +699,7 @@ public class ButtonListener extends ListenerAdapter {
                     {
                         pfaction2 = player.getFaction();
                     }
-                    if( buttonLabel.indexOf("(") != -1 && (pfaction2 != null && pfaction2.equalsIgnoreCase(buttonLabel.substring(0, buttonLabel.indexOf(" "))))     )
+                    if(pfaction2 != null && buttonLabel.toLowerCase().contains(pfaction2))
                     {
                         addReaction(event, true, true,"Abstained.", "");
                     }
@@ -1991,7 +1992,7 @@ public class ButtonListener extends ListenerAdapter {
                     {
                         pfaction2 = player.getFaction();
                     }
-                    if( (pfaction2 != null && pfaction2.equalsIgnoreCase(buttonLabel.substring(0, buttonLabel.indexOf(" "))))     )
+                    if( pfaction2 != null && buttonLabel.toLowerCase().contains(pfaction2))
                     {
                         String voteMessage= "Chose to Vote. Click buttons for which outcome to vote for.";
                         String agendaDetails = activeMap.getCurrentAgendaInfo();
