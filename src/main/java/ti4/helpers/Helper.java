@@ -505,6 +505,65 @@ public class Helper {
         }
         return planetButtons;
     }
+    public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Map map, Tile tile, boolean warfare) {
+        List<Button> unitButtons = new ArrayList<>();
+        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+        tile.getUnitHolders();
+        String tp = tile.getPosition();
+        Button wsButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_warsun_"+tp, "Produce Warsun" );
+        wsButton = wsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("warsun")));
+        unitButtons.add(wsButton); 
+        Button fsButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_flagship_"+tp, "Produce Flagship" );
+        fsButton = fsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("flagship")));
+        unitButtons.add(fsButton); 
+        Button dnButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_dreadnought_"+tp, "Produce Dreadnought" );
+        dnButton = dnButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("dreadnought")));
+        unitButtons.add(dnButton); 
+        Button cvButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_carrier_"+tp, "Produce Carrier" );
+        cvButton = cvButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("carrier")));
+        unitButtons.add(cvButton); 
+        Button caButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_cruiser_"+tp, "Produce Cruiser" );
+        caButton = caButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("cruiser")));
+        unitButtons.add(caButton); 
+        Button ddButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_destroyer_"+tp, "Produce Destroyer" );
+        ddButton = ddButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("destroyer")));
+        unitButtons.add(ddButton); 
+        Button ff1Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_fighter_"+tp, "Produce 1 Fighter" );
+        ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
+        unitButtons.add(ff1Button); 
+        Button ff2Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_2ff_"+tp, "Produce 2 Fighters" );
+        ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
+        unitButtons.add(ff2Button); 
+       
+        for (UnitHolder unitHolder : unitHolders.values()) {
+            if (unitHolder instanceof Planet planet) {
+                String colorID = Mapper.getColorID(player.getColor());
+                String sdKey =  colorID+ "_sd.png";
+               
+                if(warfare)
+                {
+                    
+                    if((planet.getUnits().get(sdKey) == null || planet.getUnits().get(sdKey) == 0) && !player.getFaction().equalsIgnoreCase("saar"))
+                    {
+                        continue;
+                    }
+                }
+                String pp = planet.getName();
+                Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_infantry_"+pp, "Produce 1 Infantry on "+Helper.getPlanetRepresentation(pp, map));
+                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                unitButtons.add(inf1Button); 
+                Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_2gf_"+pp, "Produce 2 Infantry on "+Helper.getPlanetRepresentation(pp, map) );
+                inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                unitButtons.add(inf2Button); 
+                Button mfButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_mech_"+pp, "Produce Mech on "+Helper.getPlanetRepresentation(pp, map) );
+                mfButton = mfButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
+                unitButtons.add(mfButton); 
+            }
+        }
+        Button DoneProducingUnits = Button.danger("deleteButtons", "Done Producing Units");
+        unitButtons.add(DoneProducingUnits);
+        return unitButtons;
+    }
 
     public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Map map) {
         List<Button> planetButtons = new ArrayList<>();
