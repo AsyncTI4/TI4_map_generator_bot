@@ -2652,6 +2652,9 @@ public class GenerateMap {
             Graphics arrow = arrowImage.getGraphics();
             
             arrow.setFont(Storage.getFont16());
+            if (secondaryTile.length() > 3) {
+                arrow.setFont(Storage.getFont14());
+            }
             arrow.setColor(Color.BLACK);
             arrow.drawString(secondaryTile, textOffsetX, textOffsetY);
 
