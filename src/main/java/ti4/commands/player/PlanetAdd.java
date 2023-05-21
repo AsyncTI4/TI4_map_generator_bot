@@ -70,12 +70,12 @@ public class PlanetAdd extends PlanetAddRemove {
                 }
             }
         }
-        System.out.println("Made it here1");
+        
         if(!alreadyOwned)
         {
             Planet planetReal = (Planet) unitHolder;
-            System.out.println(planetReal.getOriginalPlanetType());
-            if( planetReal != null && planetReal.getOriginalPlanetType() != null && !planetReal.getOriginalPlanetType().equalsIgnoreCase(""))
+            
+            if( planetReal != null && planetReal.getOriginalPlanetType() != null && !planetReal.getOriginalPlanetType().equalsIgnoreCase("mr"))
             {
                 String message = "Click Button To Explore";
                 String drawColor = planetReal.getOriginalPlanetType();
