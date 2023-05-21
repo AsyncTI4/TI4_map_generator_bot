@@ -88,7 +88,7 @@ public class SCPlay extends PlayerSubcommandData {
         
         activeMap.setSCPlayed(scToPlay, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
-        String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToDisplay) + (pbd100 ? " Group " + pbd100group : "") + " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
+        String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToDisplay) + (pbd100or500 ? " Group " + pbd100group : "") + " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
         if (activeMap.isFoWMode()) {
             message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToDisplay) + " played.\n\n";
         }
@@ -97,7 +97,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
         message += "Please indicate your choice by pressing a button below and post additional details in the thread.";
 
-        String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(scToDisplay) + (pbd100 ? "-group_" + pbd100group : "");
+        String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(scToDisplay) + (pbd100or500 ? "-group_" + pbd100group : "");
         TextChannel textChannel = (TextChannel) mainGameChannel;
         
         for (Player player2 : activeMap.getPlayers().values()) {
