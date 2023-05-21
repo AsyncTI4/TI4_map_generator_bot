@@ -161,8 +161,8 @@ public class SOInfo extends SOCardsSubcommandData {
         List<Button> soButtons = new ArrayList<>();
         if (secretObjective != null && !secretObjective.isEmpty()) {
             for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
-                String[] soSplit = Mapper.getSecretObjective(so.getKey()).split(";");
-                String soName = soSplit[0];
+                SecretObjectiveModel so_ = Mapper.getSecretObjective(so.getKey());
+                String soName = so_.name;
                 Integer idValue = so.getValue();
                 if (soName != null) {
                     soButtons.add(Button.danger("SODISCARD_" + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
