@@ -74,8 +74,12 @@ public class PlanetAdd extends PlanetAddRemove {
         if(!alreadyOwned)
         {
             Planet planetReal = (Planet) unitHolder;
-            
-            if( planetReal != null && planetReal.getOriginalPlanetType() != null && !planetReal.getOriginalPlanetType().equalsIgnoreCase("mr"))
+            boolean oneOfThree = false;
+            if(planetReal != null && planetReal.getOriginalPlanetType() != null && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous")))
+            {
+                oneOfThree = true;
+            }
+            if( oneOfThree)
             {
                 String message = "Click Button To Explore";
                 String drawColor = planetReal.getOriginalPlanetType();
