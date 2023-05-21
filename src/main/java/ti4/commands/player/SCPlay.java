@@ -64,6 +64,21 @@ public class SCPlay extends PlayerSubcommandData {
         }
         
         Integer scToPlay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
+        Integer scToDisplay = scToPlay; 
+        String pbd100group = null;
+        boolean pbd100 = activeMap.getName().equals("pbd100");
+        if (pbd100) {
+            scToDisplay = scToPlay / 10;
+            int groupNum = scToPlay % 10;
+            switch (groupNum) {
+                case 1 -> pbd100group = "A";
+                case 2 -> pbd100group = "B";
+                case 3 -> pbd100group = "C";
+                case 4 -> pbd100group = "D";
+                default -> pbd100group = "Unknown";
+            }
+        }
+
         String emojiName = "SC" + String.valueOf(scToPlay);
 
         if (activeMap.getPlayedSCs().contains(scToPlay)) {
@@ -73,16 +88,16 @@ public class SCPlay extends PlayerSubcommandData {
         
         activeMap.setSCPlayed(scToPlay, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
-        String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToPlay) + " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
+        String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToDisplay) + (pbd100 ? " Group " + pbd100group : "") + " played by " + Helper.getPlayerRepresentation(event, player) + "\n\n";
         if (activeMap.isFoWMode()) {
-            message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToPlay) + " played.\n\n";
+            message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToDisplay) + " played.\n\n";
         }
         if (!categoryForPlayers.isEmpty()) {
             message += categoryForPlayers + "\n";
         }
         message += "Please indicate your choice by pressing a button below and post additional details in the thread.";
 
-        String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(scToPlay);
+        String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-" + Helper.getSCName(scToDisplay) + (pbd100 ? "-group_" + pbd100group : "");
         TextChannel textChannel = (TextChannel) mainGameChannel;
         
         for (Player player2 : activeMap.getPlayers().values()) {
@@ -95,7 +110,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
         
         if (activeMap.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
-            MessageHelper.sendMessageToChannel(mainGameChannel, Helper.getSCImageLink(scToPlay));
+            MessageHelper.sendMessageToChannel(mainGameChannel, Helper.getSCImageLink(scToDisplay));
         }
 
 
@@ -104,7 +119,7 @@ public class SCPlay extends PlayerSubcommandData {
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
             //GET BUTTONS
             ActionRow actionRow = null;
-            List<Button> scButtons = getSCButtons(scToPlay);
+            List<Button> scButtons = getSCButtons(scToDisplay);
             if (scButtons != null && !scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
             if (actionRow != null) baseMessageObject.addComponents(actionRow);
             
@@ -197,7 +212,7 @@ public class SCPlay extends PlayerSubcommandData {
         }
     }
 
-    private List<Button> getSCButtons(int sc) {       
+    private List<Button> getSCButtons(int sc) {   
         return switch (sc) {
             case 1 -> getLeadershipButtons();
             case 2 -> getDiplomacyButtons();
