@@ -496,7 +496,7 @@ public class Helper {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
-            Button button = Button.danger("place_"+unit+"_"+planet, Helper.getPlanetRepresentation(planet, map));
+            Button button = Button.danger("FFCC_"+player.getFaction()+"_"+"place_"+unit+"_"+planet, Helper.getPlanetRepresentation(planet, map));
             planetButtons.add(button);     
         }
         return planetButtons;
@@ -1430,14 +1430,14 @@ public class Helper {
         return techEmoji + "**" + techName + "**" + factionEmoji + "\n";
     }
 
-    public static List<Button> getTechButtons(List<String> techs, String techType) {
+    public static List<Button> getTechButtons(List<String> techs, String techType, Player player) {
         List<Button> techButtons = new ArrayList<Button>();
 
         for(String tech : techs)
         {
             String techName = tech.substring(tech.lastIndexOf("_")+1, tech.length());
             String techLabel = tech.replace("_", "");
-            String buttonID = "getTech_"+techName;
+            String buttonID = "FFCC_"+player.getFaction()+"_getTech_"+techName;
             Button techB = null;
             switch (techType) {
                 case "propulsion" -> {

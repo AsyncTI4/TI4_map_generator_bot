@@ -205,7 +205,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 DrawRelic.drawRelicAndNotify(player,  event,  activeMap);
             }
             case "ms1", "ms2" -> {
-                message = "Replenished Commodifites (" +player.getCommodities() +"->"+player.getCommoditiesTotal()+")";
+                message = "Replenished Commodities (" +player.getCommodities() +"->"+player.getCommoditiesTotal()+")";
                 player.setCommodities(player.getCommoditiesTotal());
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + "\n" + message);
             }
