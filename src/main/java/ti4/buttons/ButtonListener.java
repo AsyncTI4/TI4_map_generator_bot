@@ -1110,45 +1110,96 @@ public class ButtonListener extends ListenerAdapter {
         else if(buttonID.startsWith("place_"))
         {
             String unitNPlanet = buttonID.replace("place_","");
-            String unit = unitNPlanet.substring(0, unitNPlanet.indexOf("_"));
-            String planetName = unitNPlanet.replace(unit+"_","");
-
+            String unitLong = unitNPlanet.substring(0, unitNPlanet.indexOf("_"));
+            String planetName = unitNPlanet.replace(unitLong+"_","");
+            String unit = AliasHandler.resolveUnit(unitLong);
 
             String successMessage = "";
             String playerRep = Helper.getPlayerRepresentation(event, player, false);
+            
+               
+            
             if(unit.equalsIgnoreCase("sd"))
             {
                 if(player.getFaction().equalsIgnoreCase("saar"))
                 {
                     new AddUnits().unitParsing(event, player.getColor(), activeMap.getTile(AliasHandler.resolveTile(planetName)), unit, activeMap);
-                    successMessage = playerRep+" Placed a space dock in the space area of the "+Helper.getPlanetRepresentation(planetName, activeMap) +" system.";
+                    successMessage = "Placed a space dock in the space area of the "+Helper.getPlanetRepresentation(planetName, activeMap) +" system.";
                 }
                 else if(player.getFaction().equalsIgnoreCase("cabal"))
                 {
                     new AddUnits().unitParsing(event, player.getColor(), activeMap.getTile(AliasHandler.resolveTile(planetName)), "csd "+planetName, activeMap);
-                    successMessage = playerRep+" Placed a cabal space dock on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
+                    successMessage = "Placed a cabal space dock on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
                 }
                 else
                 {
                     new AddUnits().unitParsing(event, player.getColor(), activeMap.getTile(AliasHandler.resolveTile(planetName)), unit+" "+planetName, activeMap);
-                    successMessage = playerRep+" Placed a space dock on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
+                    successMessage =  "Placed a "+ Helper.getEmojiFromDiscord("spacedock")+" on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
                 }
             }
-            if(unit.equalsIgnoreCase("pds"))
+            else if(unit.equalsIgnoreCase("pds"))
             {
                 new AddUnits().unitParsing(event, player.getColor(), activeMap.getTile(AliasHandler.resolveTile(planetName)), unit+" "+planetName, activeMap);
-                successMessage = playerRep+" Placed a pds on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
+                successMessage = "Placed a "+ Helper.getEmojiFromDiscord("pds")+" on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
+            else
+            {
+                if(unit.equalsIgnoreCase("gf") || unit.equalsIgnoreCase("mf") || unitLong.equalsIgnoreCase("2gf"))
+                {
+                    if(unitLong.equalsIgnoreCase("2gf"))
+                    {
+                        new AddUnits().unitParsing(event, player.getColor(), activeMap.getTile(AliasHandler.resolveTile(planetName)), "2 gf "+planetName, activeMap);
+                        successMessage = "Produced 2 "+ Helper.getEmojiFromDiscord("infantry")+" on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
+                    }
+                    else
+                    {
+                        new AddUnits().unitParsing(event, player.getColor(), activeMap.getTile(AliasHandler.resolveTile(planetName)), unit+" "+planetName, activeMap);
+                        successMessage = "Produced a "+Helper.getEmojiFromDiscord(unitLong) +" on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
+                    }
+                }
+                else
+                {
+                    if(unitLong.equalsIgnoreCase("2ff"))
+                    {
+                        new AddUnits().unitParsing(event, player.getColor(), activeMap.getTileByPosition(planetName), "2 ff", activeMap);
+                        successMessage = "Produced 2 "+Helper.getEmojiFromDiscord("fighter") +" in tile "+ AliasHandler.resolveTile(planetName) + ".";
+                    }
+                    else
+                    {
+                        new AddUnits().unitParsing(event, player.getColor(), activeMap.getTileByPosition(planetName), unit, activeMap);
+                        successMessage = "Produced a "+Helper.getEmojiFromDiscord(unitLong) +" in tile "+ AliasHandler.resolveTile(planetName) + ".";
+                    }
+                    
+                }
+            }
+           
 
-            String message = playerRep+" Would you like to put a cc from reinforcements in the same system?";
-            
-            Button placeCCInSystem= Button.success( finsFactionCheckerPrefix+"reinforcements_cc_placement_"+planetName, "Place A CC From Reinforcements In The System.");
-            Button NoDontWantTo = Button.primary( finsFactionCheckerPrefix+"deleteButtons", "Don't Place A CC In The System.");
-            List<Button> buttons = List.of(placeCCInSystem, NoDontWantTo);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
 
-            event.getMessage().delete().queue();
+            if(unit.equalsIgnoreCase("sd") || unit.equalsIgnoreCase("pds"))
+            {
+                MessageHelper.sendMessageToChannel(event.getChannel(), playerRep+ " "+successMessage);
+                String message = playerRep+" Would you like to put a cc from reinforcements in the same system?";
+                Button placeCCInSystem= Button.success( finsFactionCheckerPrefix+"reinforcements_cc_placement_"+planetName, "Place A CC From Reinforcements In The System.");
+                Button NoDontWantTo = Button.primary( finsFactionCheckerPrefix+"deleteButtons", "Don't Place A CC In The System.");
+                List<Button> buttons = List.of(placeCCInSystem, NoDontWantTo);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                event.getMessage().delete().queue();
+
+            }
+            else
+            {
+                String editedMessage = event.getMessage().getContentRaw();
+                if(editedMessage.contains("Produced"))
+                {
+                    editedMessage = editedMessage + "\n "+successMessage;
+                }
+                else
+                {
+                    editedMessage = playerRep+ " "+successMessage;
+                }
+                event.getMessage().editMessage(editedMessage).queue();
+            }
+           
 
         }
         else if(buttonID.startsWith("reinforcements_cc_placement_"))
@@ -1319,6 +1370,27 @@ public class ButtonListener extends ListenerAdapter {
                     String reply = activeMap.isFoWMode() ? "No public objective scored" : null;
                     addReaction(event, false, false, reply, "");
                 }
+                case "warfareBuild" -> {
+                    List<Button> buttons = new ArrayList<Button>();
+                    buttons = Helper.getPlaceUnitButtons(event, player, activeMap,  activeMap.getTile(AliasHandler.resolveTile(player.getFaction())), true);
+                    String message = Helper.getPlayerRepresentation(event, player, false)+" Use the buttons to produce. Reminder that when following warfare, you can only use 1 dock in your home system.";
+                    if(!activeMap.isFoWMode())
+                    {
+                        List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+                        if (threadChannels == null) return;
+                        String threadName = activeMap.getName()+"-round-"+activeMap.getRound()+"-warfare";
+                        // SEARCH FOR EXISTING OPEN THREAD
+                        for (ThreadChannel threadChannel_ : threadChannels) {
+                            if (threadChannel_.getName().equals(threadName)) { 
+                                MessageHelper.sendMessageToChannelWithButtons((MessageChannel)threadChannel_, message, buttons);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+                    }
+                }
                 case "acquireATech" -> {
 
                     List<Button> buttons = new ArrayList<Button>();
@@ -1397,11 +1469,38 @@ public class ButtonListener extends ListenerAdapter {
                         }
                         MessageHelper.sendMessageToChannel(event.getChannel(), playerRep + " Final CC Allocation Is "+ finalCCs);
                     }
-                    if(buttonLabel.equalsIgnoreCase("Done Exhausting Planets"))
+                    if(buttonLabel.equalsIgnoreCase("Done Exhausting Planets") ||buttonLabel.equalsIgnoreCase("Done Producing Units"))
                     {
                         String editedMessage = event.getMessage().getContentRaw();
                         MessageHelper.sendMessageToChannel(event.getChannel(), editedMessage);
+                        if(buttonLabel.equalsIgnoreCase("Done Producing Units"))
+                        {
+                            String trueIdentity = Helper.getPlayerRepresentation(event, player, true);
+                            String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
+                            
+                            List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeMap);
+                            if(player.getTg() > 0)
+                            {
+                                Button lost1TG = Button.danger("reduceTG_1", "Spend 1 TG");
+                                buttons.add(lost1TG);
+                            }
+                            if(player.getTg() > 1)
+                            {
+                                Button lost2TG = Button.danger("reduceTG_2", "Spend 2 TGs");
+                                buttons.add(lost2TG);
+                            }
+                            if(player.getTg() > 2)
+                            {
+                                Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
+                                buttons.add(lost3TG);
+                            }
+                            Button DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
+                            buttons.add(DoneExhausting);
+                            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+
+                        }
                     }
+                    
                     event.getMessage().delete().queue();
                 }
                 case "diploRefresh2" -> {
