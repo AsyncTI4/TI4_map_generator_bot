@@ -60,14 +60,18 @@ public class SOInfo extends SOCardsSubcommandData {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getSecretObjectiveCardInfo(activeMap, player));
 
         //BUTTONS
-        String secretScoreMsg = "_ _\nClick a button below to score your Secret Objective";
+        String secretMsg = "_ _\nClick a button to either score or discard a secret objective";
         List<Button> soButtons = getUnscoredSecretObjectiveButtons(activeMap, player);
         if (soButtons != null && !soButtons.isEmpty()) {
-            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, soButtons);
+            List<Button> buttons = new ArrayList<Button>();
+            Button scoreB = Button.primary("get_so_score_buttons", "Score an SO");
+            Button discardB = Button.danger("get_so_discard_buttons", "Discard an SO");
             ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
-            for (MessageCreateData message : messageList) {
-                cardsInfoThreadChannel.sendMessage(message).queue();
-            }
+            buttons.add(scoreB);
+            buttons.add(discardB);
+            MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);
+           
+            
         }
     }   
 
@@ -137,7 +141,7 @@ public class SOInfo extends SOCardsSubcommandData {
         return sb.toString();
     }
 
-    private static List<Button> getUnscoredSecretObjectiveButtons(Map activeMap, Player player) {
+    public static List<Button> getUnscoredSecretObjectiveButtons(Map activeMap, Player player) {
         LinkedHashMap<String, Integer> secretObjective = activeMap.getSecretObjective(player.getUserID());
         List<Button> soButtons = new ArrayList<>();
         if (secretObjective != null && !secretObjective.isEmpty()) {
@@ -147,6 +151,21 @@ public class SOInfo extends SOCardsSubcommandData {
                 Integer idValue = so.getValue();
                 if (soName != null) {
                     soButtons.add(Button.primary(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
+                }
+            }
+        }
+        return soButtons;
+    }
+    public static List<Button> getUnscoredSecretObjectiveDiscardButtons(Map activeMap, Player player) {
+        LinkedHashMap<String, Integer> secretObjective = activeMap.getSecretObjective(player.getUserID());
+        List<Button> soButtons = new ArrayList<>();
+        if (secretObjective != null && !secretObjective.isEmpty()) {
+            for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
+                String[] soSplit = Mapper.getSecretObjective(so.getKey()).split(";");
+                String soName = soSplit[0];
+                Integer idValue = so.getValue();
+                if (soName != null) {
+                    soButtons.add(Button.danger("SODISCARD_" + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
                 }
             }
         }

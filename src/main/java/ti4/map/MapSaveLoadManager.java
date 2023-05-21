@@ -239,6 +239,10 @@ public class MapSaveLoadManager {
 
         writer.write(Constants.LATEST_OUTCOME_VOTED_FOR + " " + map.getLatestOutcomeVotedFor());
         writer.write(System.lineSeparator());
+        writer.write(Constants.LATEST_AFTER_MSG + " " + map.getLatestWhenMsg());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.LATEST_WHEN_MSG + " " + map.getLatestWhenMsg());
+        writer.write(System.lineSeparator());
 
         writer.write(Constants.SO + " " + String.join(",", map.getSecretObjectives()));
         writer.write(System.lineSeparator());
@@ -969,6 +973,8 @@ public class MapSaveLoadManager {
             switch (identification) {
                 case Constants.LATEST_COMMAND -> map.setLatestCommand(info);
                 case Constants.LATEST_OUTCOME_VOTED_FOR -> map.setLatestOutcomeVotedFor(info);
+                case Constants.LATEST_AFTER_MSG -> map.setLatestAfterMsg(info);
+                case Constants.LATEST_WHEN_MSG -> map.setLatestWhenMsg(info);
                 case Constants.SO -> map.setSecretObjectives(getCardList(info));
                 case Constants.AC -> map.setActionCards(getCardList(info));
                 case Constants.PO1 -> map.setPublicObjectives1(getCardList(info));

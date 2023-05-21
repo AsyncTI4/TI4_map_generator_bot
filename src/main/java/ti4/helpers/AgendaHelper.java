@@ -1,5 +1,6 @@
 package ti4.helpers;
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
@@ -75,6 +76,63 @@ public class AgendaHelper {
         voteButtons.add(button);
         voteButtons.add(button2);
         return voteButtons;
+    }
+
+    public static void startTheVoting(Map map, GenericInteractionCreateEvent event) {
+        if(map.getCurrentAgendaInfo() != null)
+        {
+
+            String message = " up to vote! Resolve using buttons. \n \n" + AgendaHelper.getSummaryOfVotes(map, true);
+            Player nextInLine = AgendaHelper.getNextInLine(null, AgendaHelper.getVotingOrder(map), map);
+            String realIdentity =Helper.getPlayerRepresentation(event, nextInLine, true);
+            int[] voteInfo = AgendaHelper.getVoteTotal(event, nextInLine, map);
+            if(nextInLine == null)
+            {
+                return;
+            }
+            int counter = 0;
+            while(voteInfo[0] < 1 && counter < 10)
+            {
+                String skippedMessage = realIdentity+"You are being skipped because you either have 0 votes or have ridered";
+                if(map.isFoWMode())
+                {
+                    MessageHelper.sendPrivateMessageToPlayer(nextInLine, map, skippedMessage);
+                }
+                else
+                {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),skippedMessage);
+                }
+                nextInLine = AgendaHelper.getNextInLine(nextInLine, AgendaHelper.getVotingOrder(map), map);
+                realIdentity =Helper.getPlayerRepresentation(event, nextInLine, true);
+                voteInfo = AgendaHelper.getVoteTotal(event, nextInLine, map);
+                counter = counter + 1;
+            }
+
+            String pFaction = StringUtils.capitalize(nextInLine.getFaction());
+            message = realIdentity + message;
+            Button Vote= Button.success("vote", pFaction+" Choose To Vote");
+            Button Abstain = Button.danger("delete_buttons_0", pFaction+" Choose To Abstain");
+            Button EraseVote = Button.danger("FFCC_"+pFaction+"_eraseMyVote", pFaction+" Erase Any Of Your Previous Votes");
+
+            List<Button> buttons = List.of(Vote, Abstain, EraseVote);
+            if(map.isFoWMode())
+            {
+                if(nextInLine.getPrivateChannel() != null)
+                {
+
+                    MessageHelper.sendMessageToChannelWithButtons(nextInLine.getPrivateChannel(), message, buttons);
+                    event.getMessageChannel().sendMessage("Voting started. Notified first in next in line").queue();
+                }
+            }
+            else
+            {
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
+            }
+        }
+        else
+        {
+            event.getMessageChannel().sendMessage("Cannot find voting info, sorry. Please resolve automatically").queue();
+        }
     }
 
     public static List<Button> getLawOutcomeButtons(Map activeMap, String rider, String prefix) {
@@ -321,7 +379,11 @@ public class AgendaHelper {
                     Player loser = Helper.getPlayerFromColorOrFaction(activeMap, faction.toLowerCase());
                     if(loser != null)
                     {
-                        losers.add(loser);
+                        if(!losers.contains(loser))
+                        {
+                            losers.add(loser);
+                        }
+                        
                     }     
                 }
             }
@@ -480,7 +542,7 @@ public class AgendaHelper {
                 if(x < votingOrder.size())
                 {
                     Player player = votingOrder.get(x);
-                    if(player != null && !player.isDummy())
+                    if(player != null && !player.isDummy() && player.isRealPlayer())
                     {
                         return player;
                     }
@@ -564,6 +626,58 @@ public class AgendaHelper {
         return planetButtons;
     }
 
+
+    public static void eraseVotesOfFaction(Map activeMap, String faction)
+    {
+       
+        HashMap<String, String> outcomes = activeMap.getCurrentAgendaVotes();
+        
+        if(outcomes.keySet().size() == 0)
+        {
+            return;
+        }
+        else
+        {
+            String voteSumm = "";
+           
+            for(String outcome : outcomes.keySet())
+            {
+                voteSumm = "";
+                StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
+                
+                
+                while (vote_info.hasMoreTokens()) {
+                    
+                    String specificVote = vote_info.nextToken();
+                    String faction2 = specificVote.substring(0, specificVote.indexOf("_"));
+                    String vote = specificVote.substring(specificVote.indexOf("_")+1,specificVote.length());
+                    if(vote.contains("Rider") || vote.contains("Sanction"))
+                    {
+                        voteSumm = voteSumm +";"+ specificVote;
+                        continue;
+                    }
+                    else if(faction2.equals(faction))
+                    {
+                        continue;
+                    }
+                    else{
+                        voteSumm = voteSumm +";"+ specificVote;
+                        continue;
+                    }
+                }
+                if(voteSumm.equalsIgnoreCase(""))
+                {
+                    activeMap.removeOutcomeAgendaVote(outcome);
+                }
+                else
+                {
+                    activeMap.setCurrentAgendaVote(outcome, voteSumm);
+                }
+                
+            }
+        }
+    }
+
     public static String getSummaryOfVotes(Map activeMap, boolean capitalize)
     {
         String summary = "";
@@ -591,24 +705,52 @@ public class AgendaHelper {
                     String faction = specificVote.substring(0, specificVote.indexOf("_"));
                     if(capitalize)
                     {
-                        faction = StringUtils.capitalize(faction);
+                        faction = Helper.getFactionIconFromDiscord(faction);
+                        
                         if(activeMap.isFoWMode())
                         {
                             faction = "Someone";
                         }
-                    }
-                    String vote = specificVote.substring(specificVote.indexOf("_")+1,specificVote.length());
-                    if(!vote.contains("Rider"))
-                    {
-                        totalVotes += Integer.parseInt(vote);
-                        outcomeSummary = outcomeSummary + faction +" voted "+ vote + " votes. ";
+                        String vote = specificVote.substring(specificVote.indexOf("_")+1,specificVote.length());
+                        if(!vote.contains("Rider") && !vote.contains("Sanction"))
+                        {
+                            totalVotes += Integer.parseInt(vote);
+                            outcomeSummary = outcomeSummary + faction +"-"+ vote + ", ";
+                        }
+                        else
+                        {
+                            outcomeSummary = outcomeSummary + faction +"-"+ vote + ", ";
+                        }
                     }
                     else
                     {
-                        outcomeSummary = outcomeSummary + faction +" cast a "+ vote + ". ";
+                        String vote = specificVote.substring(specificVote.indexOf("_")+1,specificVote.length());
+                        if(!vote.contains("Rider") && !vote.contains("Sanction"))
+                        {
+                            totalVotes += Integer.parseInt(vote);
+                            outcomeSummary = outcomeSummary + faction +" voted "+ vote + " votes. ";
+                        }
+                        else
+                        {
+                            outcomeSummary = outcomeSummary + faction +" cast a "+ vote + ". ";
+                        }
+
                     }
+                    
                 }
-                summary = summary + outcome+": Total votes "+totalVotes +". " +outcomeSummary + "\n";   
+                if(capitalize)
+                {
+                    if(outcomeSummary != null && outcomeSummary.length() > 2)
+                    {
+                        outcomeSummary = outcomeSummary.substring(0, outcomeSummary.length()-2);
+                    }
+                    summary = summary + outcome+": "+totalVotes +". (" +outcomeSummary + ")\n";   
+                }
+                else
+                {
+                    summary = summary + outcome+": Total votes "+totalVotes +". " +outcomeSummary + "\n";   
+                }
+                
             }
         }
         return summary;

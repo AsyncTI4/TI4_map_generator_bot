@@ -648,6 +648,8 @@ public class Constants {
     public static final String CARDS_INFO_THREAD_CHANNEL_ID = "cards_info_thread_channel_id";
     public static final String LATEST_COMMAND = "latest_command";
     public static final String LATEST_OUTCOME_VOTED_FOR = "latest_outcome_voted_for";
+    public static final String LATEST_AFTER_MSG = "latest_after_msg";
+    public static final String LATEST_WHEN_MSG = "latest_when_msg";
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER = "players_who_hit_persistent_no_after";
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN = "players_who_hit_persistent_no_when";
     public static final String HACK_ELECTION_STATUS = "hack_election_status";

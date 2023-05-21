@@ -4,12 +4,14 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.commands.player.PlanetRefresh;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -121,6 +123,11 @@ public class ExpPlanet extends ExploreSubcommandData {
         messageText.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(planetName) +" *(tile "+ tile.getPosition() + ")*:\n");
         messageText.append("> ").append(displayExplore(cardID));
         resolveExplore(event, cardID, tile, planetName, messageText.toString(), false, player, activeMap);
+        if(player.getTechs().contains(AliasHandler.resolveTech("Pre-Fab Arcologies")))
+        {
+            new PlanetRefresh().doAction(player, planetName, activeMap);
+            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
+        }
         return;
     }
 }
