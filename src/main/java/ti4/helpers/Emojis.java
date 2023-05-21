@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class Emojis {
-    //FACTIONS
+    // FACTIONS
     public static final String Arborec = "<:Arborec:946891797567799356>";
     public static final String Argent = "<:Argent:946891797366472725>";
     public static final String Cabal = "<:cabal:946891797236441089>";
@@ -32,7 +32,7 @@ public class Emojis {
     public static final String Lazax = "<:Lazax:946891797639073884>";
     public static final String Keleres = "<:Keleres:968233661654765578>";
 
-    //FACTIONS - DISCORDANT STARS
+    // FACTIONS - DISCORDANT STARS
     public static final String augers = "<:augurs:1082705489722363904>";
     public static final String axis = "<:axis:1082705549092737044>";
     public static final String bentor = "<:bentor:1082705559897264199>";
@@ -68,10 +68,10 @@ public class Emojis {
     public static final String zealots = "<:zealots:1082724497083334827>";
     public static final String zelian = "<:zelian:1082724503190249547>";
 
-    //FACTIONS - OTHER
+    // FACTIONS - OTHER
     public static final String AdminsFaction = "<:Admins:1084476380584083527>";
 
-    //EXPLORATION
+    // EXPLORATION
     public static final String HFrag = "<:HFrag:1053857012766752788>";
     public static final String CFrag = "<:CFrag:1053856733849722880>";
     public static final String IFrag = "<:IFrag:1053857037131460648>";
@@ -82,7 +82,7 @@ public class Emojis {
     public static final String Hazardous = "<:Hazardous:946892033006645318>";
     public static final String Frontier = "<:Frontier:966025493805678632>";
 
-    //CARDS
+    // CARDS
     public static final String SC1 = "<:SC1:1056594715673366548>";
     public static final String SC1Back = "<:SC1Back:1065285486425411705>";
     public static final String SC2 = "<:SC2:1056594746023366716>";
@@ -107,22 +107,22 @@ public class Emojis {
     public static final String AgendaBlack = "<:Agendablack:1060073912442036336>";
     public static final String PN = "<:PN:1054660504175521882>";
     public static final String PNALt = "<:PNALt:1064838292467613766>";
-    
-    //OBJECTIVES
+
+    // OBJECTIVES
     public static final String SecretObjective = "<:Secretobjective:1054660535544729670>";
     public static final String Public1 = "<:Public1:1054075764510826539>";
     public static final String Public2 = "<:Public2:1054075738602622986>";
     public static final String Public1alt = "<:Public1Alt:1058978029243728022>";
     public static final String Public2alt = "<:Public2Alt:1058977929725493398>";
     public static final String SecretObjectiveAlt = "<:SecretobjectiveAlt:1058977803728584734>";
-    
-    //COMPONENTS
+
+    // COMPONENTS
     public static final String tg = "<:tg:1053857635570553024>";
     public static final String comm = "<:comm:1053857614028607538>";
     public static final String Sleeper = "<:Sleeper:1047871121451663371>";
     public static final String SleeperB = "<:SleeperB:1047871220831506484>";
-    
-    //UNITS
+
+    // UNITS
     public static final String warsun = "<:warsun:993064568626614375>";
     public static final String spacedock = "<:spacedock:993064508828418159>";
     public static final String pds = "<:pds:993064415639384064>";
@@ -134,8 +134,8 @@ public class Emojis {
     public static final String destroyer = "<:destroyer:993063959840182323>";
     public static final String carrier = "<:carrier:993063885168967700>";
     public static final String cruiser = "<:cruiser:993063818844459098>";
-    
-    //LEADERS - AGENTS
+
+    // LEADERS - AGENTS
     public static final String ArborecAgent = "<:ArborecAgent:1059670895989374986>";
     public static final String ArgentAgent = "<:ArgentAgent:1059671022384713789>";
     public static final String CabalAgent = "<:CabalAgent:1059671042215391282>";
@@ -163,8 +163,8 @@ public class Emojis {
     public static final String XxchaAgent = "<:XxchaAgent:1059671321606373407>";
     public static final String YinAgent = "<:YinAgent:1059671325561593956>";
     public static final String YssarilAgent = "<:YssarilAgent:1059671329407762593>";
-    
-    //LEADERS - COMMANDERS
+
+    // LEADERS - COMMANDERS
     public static final String ArborecCommander = "<:ArborecCommander:1060184772086866062>";
     public static final String ArgentCommander = "<:ArgentCommander:1060184777552048239>";
     public static final String CabalCommander = " <:CabalCommander:1060184786263609394>";
@@ -190,8 +190,8 @@ public class Emojis {
     public static final String XxchaCommander = "<:XxchaCommander:1060184899404972112>";
     public static final String YinCommander = "<:YinCommander:1060184905046315080>";
     public static final String YssarilCommander = "<:YssarilCommander:1060184910880583792>";
-    
-    //LEADERS - HEROES
+
+    // LEADERS - HEROES
     public static final String ArborecHero = "<:ArborecHero:1062743673076469851>";
     public static final String ArgentHero = "<:ArgentHero:1062743679984467988>";
     public static final String CabalHero = "<:CabalHero:1062743685952978994>";
@@ -220,7 +220,7 @@ public class Emojis {
     public static final String YinHero = "<:YinHero:1062743826256642058>";
     public static final String YssarilHero = "<:YssarilHero:1062743831323365406>";
 
-    //RESOURCE AND INFLUENCE SYMBOLS
+    // RESOURCE AND INFLUENCE SYMBOLS
     public static final String influence = "<:influence:959575421337358336>";
     public static final String resources = "<:resources:959575421274451998>";
     public static final String ResInf = "<:ResInf:1104118692897374379>";
@@ -245,7 +245,7 @@ public class Emojis {
     public static final String Influence_8 = "<:I8:864278934173253653>";
     public static final String Influence_9 = "<:I9:864278934509322300>";
 
-    //PLANETS
+    // PLANETS
     public static final String MecatolRex = "<:MecatolRex:1072083209250152489>";
     public static final String HopesEnd = "<:HopesEnd:1068567741264572557>";
     public static final String Primor = "<:Primor:1068567710990077952>";
@@ -259,34 +259,33 @@ public class Emojis {
     public static final String SemLord = "<:SemLord:1072076401462738965>";
     public static final String SemiLor = "<:SemiLor:1072076567053869106>";
 
-    //LIST OF SEM-LORES
+    // LIST OF SEM-LORES
     public static List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor);
 
+    // ANOMOLIES - THESE HAVE BEEN REMOVED
+    // public static final String Supernova = "<:Supernova:1068081584978284635>";
+    // public static final String Asteroid = "<:Asteroid:1068567369305292842>";
+    // public static final String GravRift = "<:GravRift:1068079069893234750>";
+    // public static final String Nebula = "<:Nebula:1068567639498166313>";
 
-    //ANOMOLIES
-    public static final String Supernova = "<:Supernova:1068081584978284635>";
-    public static final String Asteroid = "<:Asteroid:1068567369305292842>";
-    public static final String GravRift = "<:GravRift:1068079069893234750>";
-    public static final String Nebula = "<:Nebula:1068567639498166313>";
-
-    //TECHNOLOGY
+    // TECHNOLOGY
     public static final String CyberneticTech = "<:Cybernetictech:947250608149245972>";
     public static final String PropulsionTech = "<:Propulsiontech:947250608145068074>";
     public static final String BioticTech = "<:Biotictech:947250608107315210>";
     public static final String WarfareTech = "<:Warfaretech:947250607855644743>";
-    public static final String UnitUpgradeTech = "<:UnitUpgradeTech:1085495745018331146>";
-    
-    //GOOD DOGS
+    public static final String UnitUpgradeTech = "<:UnitUpgradeTech:1085495745018331146>"; //TODO this can go in the list
+
+    // GOOD DOGS
     public static final String GoodDog = "<:GoodDog:1068567308819255316>";
     public static final String Ozzie = "<:Ozzie:1069446695689134140>";
     public static final String Summer = "<:Summer:1070283656037412884>";
     public static final String Charlie = "<:Charlie:1096774713352650812>";
     public static final String Scout = "<:scout_face_2:1071965098639360081>";
-    
-    //LIST OF GOOD DOGS
+
+    // LIST OF GOOD DOGS
     public static List<String> GoodDogs = Arrays.asList(GoodDog, Ozzie, Summer, Charlie, Scout);
 
-    //TOES
+    // TOES
     public static final String NoToes = "<:NoToes:1082312430706774016>";
     public static final String OneToe = "<:OneToe:1082312540450734111>";
     public static final String TwoToes = "<:TwoToes:1082312612978634793>";
@@ -298,7 +297,7 @@ public class Emojis {
     public static final String EightToes = "<:EightToes:1082312762572685352>";
     public static final String NineToes = "<:NineToes:1082312788241817661>";
 
-    //OTHER
+    // OTHER
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
     public static final String WHbeta = "<:WHbeta:1056593596012302366>";
     public static final String WHgamma = "<:WHgamma:1056593568766111814>";
@@ -320,7 +319,13 @@ public class Emojis {
     public static final String AsyncTI4Logo = "<:asyncti4:959703535258333264>";
     public static final String TIGL = "<:TIGL:1038913368360222752>";
 
-
-    //LIST OF SYMBOLS FOR FOG STUFF
-    public static List<String> symbols = Arrays.asList(warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag, CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2, tg, comm, Sleeper, influence, resources, SemLord, Supernova, Asteroid, GravRift, Nebula, CyberneticTech, PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken, BortWindow);
+    // LIST OF SYMBOLS FOR FOG STUFF
+    public static List<String> symbols = 
+        Arrays.asList(
+            warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag,
+            CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2,
+            tg, comm, Sleeper, influence, resources, SemLord, ActionCard, Agenda, PN, NoToes, CyberneticTech,
+            PropulsionTech, BioticTech, WarfareTech, WHalpha, WHbeta, WHgamma, LegendaryPlanet, SpeakerToken,
+            BortWindow
+        );
 }

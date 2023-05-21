@@ -66,8 +66,8 @@ public class SCPlay extends PlayerSubcommandData {
         Integer scToPlay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
         Integer scToDisplay = scToPlay; 
         String pbd100group = null;
-        boolean pbd100 = activeMap.getName().equals("pbd100");
-        if (pbd100) {
+        boolean pbd100or500 = activeMap.getName().equals("pbd100") || activeMap.getName().equals("pbd500");
+        if (pbd100or500) {
             scToDisplay = scToPlay / 10;
             int groupNum = scToPlay % 10;
             switch (groupNum) {
