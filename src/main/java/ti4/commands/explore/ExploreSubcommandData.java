@@ -24,6 +24,7 @@ import ti4.commands.player.PlanetRefresh;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import software.amazon.awssdk.utils.StringUtils;
 
+import java.nio.channels.Channel;
 import java.util.List;
 
 import ti4.helpers.Helper;
@@ -121,7 +122,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             return;
         }
 
-        if(map != null && !map.isFoWMode() && ((TextChannel)event.getChannel() != map.getActionsChannel()))
+        if(map != null && !map.isFoWMode() && (event.getChannel() !=  map.getActionsChannel()))
         {
             String pF = StringUtils.capitalize(player.getFaction());
             MessageHelper.sendMessageToChannel(map.getActionsChannel(), pF + " found a "+cardInfo[0]+ " on "+Helper.getPlanetRepresentation(planetName, map));
