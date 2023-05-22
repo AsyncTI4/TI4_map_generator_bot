@@ -18,7 +18,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 
 	public PurgeFragments() {
 		super(Constants.PURGE_FRAGMENTS, "Purge a number of relic fragments (for example, to gain a relic. Can use unknown fragments)");
-		addOptions(typeOption.setRequired(true), 
+		addOptions(typeOption.setRequired(true),
 				new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA or black market forgery)"));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
 		addOptions(new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"));
@@ -51,11 +51,11 @@ public class PurgeFragments extends ExploreSubcommandData {
 				unknowns.add(id);
 			}
 		}
-		
+
 		while (fragmentsToPurge.size() > count) {
 			fragmentsToPurge.remove(0);
 		}
-		
+
 		while (fragmentsToPurge.size() < count) {
 			if (unknowns.size() == 0) {
 				sendMessage("Not enough fragments");
@@ -63,7 +63,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 			}
 			fragmentsToPurge.add(unknowns.remove(0));
 		}
-		
+
 		for (String id : fragmentsToPurge) {
 			activePlayer.removeFragment(id);
 		}
@@ -78,5 +78,5 @@ public class PurgeFragments extends ExploreSubcommandData {
 			}
 		}
 	}
-	
+
 }

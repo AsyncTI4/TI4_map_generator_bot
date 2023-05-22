@@ -55,7 +55,7 @@ public class NovaSeed extends SpecialSubcommandData {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         space.removeAllTokens();
         activeMap.removeTile(tile.getPosition());
-        
+
         //Add the muaat supernova to the map and copy over the space unitholder
         Tile novaTile = new Tile(AliasHandler.resolveTile("81"), tile.getPosition(), space);
         activeMap.setTile(novaTile);

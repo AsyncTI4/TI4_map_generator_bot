@@ -27,7 +27,7 @@ import java.util.Map.Entry;
 import java.util.*;
 
 public class Player {
-    
+
     private String userID;
     private String userName;
 
@@ -166,7 +166,7 @@ public class Player {
     }
 
     @Nullable @JsonIgnore
-    public MessageChannel getPrivateChannel() {      
+    public MessageChannel getPrivateChannel() {
         try {
             return MapGenerator.jda.getTextChannelById(getPrivateChannelID());
         } catch (Exception e) {
@@ -193,8 +193,7 @@ public class Player {
         }
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + getUserName().replaceAll("/", "");
-        if (activeMap.isFoWMode())
-            {
+        if (activeMap.isFoWMode()) {
                 threadName = activeMap.getName() + "-" + "cards-info-"+ getUserName().replaceAll("/", "") + "-private";
             }
 
@@ -204,10 +203,10 @@ public class Player {
             if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !cardsInfoThreadID.equals("null")) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
                 if (threadChannels == null) return null;
-    
+
                 ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null) return threadChannel;
-                
+
                 // SEARCH FOR EXISTING OPEN THREAD
                 for (ThreadChannel threadChannel_ : threadChannels) {
                     if (threadChannel_.getId().equals(cardsInfoThreadID)) {
@@ -215,7 +214,7 @@ public class Player {
                         return threadChannel_;
                     }
                 }
-                
+
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
                 List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
@@ -234,10 +233,10 @@ public class Player {
             if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !cardsInfoThreadID.equals("null")) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
                 if (threadChannels == null) return null;
-    
+
                 ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null) return threadChannel;
-                
+
                 // SEARCH FOR EXISTING OPEN THREAD
                 for (ThreadChannel threadChannel_ : threadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
@@ -245,7 +244,7 @@ public class Player {
                         return threadChannel_;
                     }
                 }
-                
+
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
                 List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
@@ -258,7 +257,7 @@ public class Player {
         } catch (Exception e) {
             BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using name: " + threadName, e);
         }
-        
+
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
         boolean isPrivateChannel = (!activeMap.isCommunityMode() && !activeMap.isFoWMode());
@@ -301,8 +300,7 @@ public class Player {
     }
 
     public int getUnitCap(String unit) {
-        if (unitCaps.get(unit) == null)
-        {
+        if (unitCaps.get(unit) == null) {
             return 0;
         }
         return unitCaps.get(unit);
@@ -480,9 +478,9 @@ public class Player {
         return secretsScored;
     }
 
-    public void setSecretScored(String id, ti4.map.Map map) {
+    public void setSecretScored(String id, ti4.map.Map activeMap) {
         Collection<Integer> values = secretsScored.values();
-        List<Integer> allIDs = map.getPlayers().values().stream().flatMap(player -> player.getSecretsScored().values().stream()).toList();
+        List<Integer> allIDs = activeMap.getPlayers().values().stream().flatMap(player -> player.getSecretsScored().values().stream()).toList();
         int identifier = new Random().nextInt(1000);
         while (values.contains(identifier) || allIDs.contains(identifier)) {
             identifier = new Random().nextInt(1000);
@@ -654,7 +652,7 @@ public class Player {
         }
         return factionSetupInfo;
     }
-    
+
     private List<String> getFactionStartingAbilities() {
         FactionModel factionSetupInfo = getFactionSetupInfo();
         if (factionSetupInfo == null) return new ArrayList<String>();
@@ -787,23 +785,23 @@ public class Player {
         return tg;
     }
 
-    public int getPublicVictoryPoints(ti4.map.Map map) {
-        LinkedHashMap<String, List<String>> scoredPOs = map.getScoredPublicObjectives();
+    public int getPublicVictoryPoints(ti4.map.Map activeMap) {
+        LinkedHashMap<String, List<String>> scoredPOs = activeMap.getScoredPublicObjectives();
         int vpCount = 0;
         for (Entry<String, List<String>> scoredPOEntry : scoredPOs.entrySet()) {
             if (scoredPOEntry.getValue().contains(getUserID())) {
                 String poID = scoredPOEntry.getKey();
                 try {
                     PublicObjectiveModel po = Mapper.getPublicObjective(poID);
-                    if (po != null) {//IS A PO 
+                    if (po != null) {//IS A PO
                         vpCount += po.points;
                     } else { //IS A CUSTOM PO
                         int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
-                        int poValue = map.getCustomPublicVP().getOrDefault(poID, 0);
+                        int poValue = activeMap.getCustomPublicVP().getOrDefault(poID, 0);
                         vpCount += poValue * frequency;
                     }
                 } catch (Exception e) {
-                    BotLogger.log("`Player.getPublicVictoryPoints   map=" + map.getName() + "  player=" + getUserName() + "` - error finding value of `PO_ID=" + poID, e);
+                    BotLogger.log("`Player.getPublicVictoryPoints   map=" + activeMap.getName() + "  player=" + getUserName() + "` - error finding value of `PO_ID=" + poID, e);
                 }
             }
         }
@@ -1117,7 +1115,7 @@ public class Player {
     public boolean isDummy() {
         return isDummy;
     }
-    
+
     public void setDummy(boolean isDummy) {
         this.isDummy = isDummy;
     }
@@ -1143,7 +1141,7 @@ public class Player {
     public int getNumberTurns() {
         return numberOfTurns;
     }
-    
+
     public void setNumberTurns(int numTurns) {
         numberOfTurns = numTurns;
     }
@@ -1151,7 +1149,7 @@ public class Player {
     public long getTotalTurnTime() {
         return totalTimeSpent;
     }
-    
+
     public void setTotalTurnTime(long totalTime) {
         totalTimeSpent = totalTime;
     }
@@ -1170,15 +1168,15 @@ public class Player {
             } else {
                 faction = Mapper.getFactionRepresentations().get(faction);
             }
-    
+
             String color = getColor();
             if (color == null || color == "null") color = "No Color";
-    
+
             String userName = getUserName();
             if (userName == null || userName.isEmpty() || userName.isBlank()) {
                 userName = "No User";
             }
-            
+
             String representation = color + " / " + faction + " / " + userName;
             setAutoCompleteRepresentation(representation);
             return getAutoCompleteRepresentation();
@@ -1206,7 +1204,7 @@ public class Player {
     public void setHasFoundHazFrag(boolean hasFoundHazFrag) {
         this.hasFoundHazFrag = hasFoundHazFrag;
     }
-    
+
     public boolean hasFoundIndFrag() {
         return hasFoundIndFrag;
     }

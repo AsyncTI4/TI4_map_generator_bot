@@ -12,8 +12,8 @@ import ti4.message.MessageHelper;
 import ti4.map.MapSaveLoadManager;
 
 public class PingActivePlayer extends FOWSubcommandData {
-    
-    
+
+
     public PingActivePlayer() {
         super(Constants.PING_ACTIVE_PLAYER, "Ping the active player in this game");
     }
@@ -35,8 +35,7 @@ public class PingActivePlayer extends FOWSubcommandData {
         playerOrig = Helper.getGamePlayer(activeMap, player, event, null);
         long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
         boolean samePlayer = false;
-        if (playerOrig != null)
-        {
+        if (playerOrig != null) {
             samePlayer = playerOrig.getUserID().equalsIgnoreCase(player.getUserID());
         }
 

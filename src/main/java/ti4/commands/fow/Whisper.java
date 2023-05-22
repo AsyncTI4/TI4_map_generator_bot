@@ -16,8 +16,8 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class Whisper extends FOWSubcommandData {
-    
-    
+
+
     public Whisper() {
         super(Constants.WHISPER, "Send a private message to a player");
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send the message").setAutoComplete(true).setRequired(true));
@@ -80,5 +80,5 @@ public class Whisper extends FOWSubcommandData {
         return;
     }
 
-    
+
 }

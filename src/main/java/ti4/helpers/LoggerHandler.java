@@ -15,11 +15,11 @@ public class LoggerHandler {
     private LoggerHandler() {
         //noinspection ConstantConditions
         String logFilePropertiesPath = ResourceHelper.getInstance().getInfoFile("logging.properties");
-        
+
         try (InputStream stream = new FileInputStream(logFilePropertiesPath)) {
             LogManager.getLogManager().readConfiguration(stream);
             logger = Logger.getLogger(LoggerHandler.class.getName());
-            File logFilePath = Storage.getLoggerFile(); 
+            File logFilePath = Storage.getLoggerFile();
             System.out.println("Initializing log file to  " + logFilePath.getAbsolutePath());
             @SuppressWarnings("ConstantConditions")
             FileHandler fileHandler = new FileHandler(logFilePath.getAbsolutePath(), true);

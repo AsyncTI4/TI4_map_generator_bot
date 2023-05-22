@@ -54,7 +54,7 @@ public class TechInfo extends PlayerSubcommandData {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
         }
-    } 
+    }
 
     private static List<Button> getTechButtons(Map activeMap, Player player) {
         return null;
@@ -103,7 +103,7 @@ public class TechInfo extends PlayerSubcommandData {
                 sb.append(Helper.getTechRepresentationLong(techID));
             }
         }
-        
+
         return sb.toString();
     }
 }

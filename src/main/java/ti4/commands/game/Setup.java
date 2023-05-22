@@ -157,17 +157,14 @@ public class Setup extends GameSubcommandData {
         OptionMapping pingHours = event.getOption(Constants.AUTO_PING);
         if (pingHours != null) {
             int pinghrs = pingHours.getAsInt();
-            if (pinghrs == 0)
-            {
+            if (pinghrs == 0) {
                 activeMap.setAutoPing(false);
                 activeMap.setAutoPingSpacer(pinghrs);
-            }
-            else
-            {
+            } else {
                 activeMap.setAutoPing(true);
                 if (pinghrs < 1){
                     pinghrs = 1;
-                } 
+                }
                 activeMap.setAutoPingSpacer(pinghrs);
             }
         }

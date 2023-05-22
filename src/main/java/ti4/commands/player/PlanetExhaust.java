@@ -6,8 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.BotLogger;
-
 public class PlanetExhaust extends PlanetAddRemove {
     public PlanetExhaust() {
         super(Constants.PLANET_EXHAUST, "Exhaust Planet");
@@ -15,7 +13,7 @@ public class PlanetExhaust extends PlanetAddRemove {
     }
 
     @Override
-    public void doAction(Player player, String planet, Map map) {
+    public void doAction(Player player, String planet, Map activeMap) {
         player.exhaustPlanet(planet);
     }
 }

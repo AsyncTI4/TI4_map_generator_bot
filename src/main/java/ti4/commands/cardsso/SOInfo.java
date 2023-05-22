@@ -54,7 +54,7 @@ public class SOInfo extends SOCardsSubcommandData {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendSecretObjectiveInfo(activeMap, player);
     }
-    
+
     public static void sendSecretObjectiveInfo(Map activeMap, Player player) {
         //SO INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getSecretObjectiveCardInfo(activeMap, player));
@@ -70,10 +70,10 @@ public class SOInfo extends SOCardsSubcommandData {
             buttons.add(scoreB);
             buttons.add(discardB);
             MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);
-           
-            
+
+
         }
-    }   
+    }
 
     public static String getSecretObjectiveRepresentationShort(String soID) {
         return getSecretObjectiveRepresentationShort(soID, null);

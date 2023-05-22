@@ -36,7 +36,7 @@ public class DrawRelic extends GenericRelicAction {
         String[] relicData = Mapper.getRelic(relicID).split(";");
         StringBuilder message = new StringBuilder();
         message.append(Helper.getPlayerRepresentation(player, activeMap)).append(" drew a Relic:\n").append(Emojis.Relic).append(" __**").append(relicData[0]).append("**__\n> ").append(relicData[1]).append("\n");
-       
+
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
             case "nanoforge" -> {
@@ -59,8 +59,7 @@ public class DrawRelic extends GenericRelicAction {
                        .append(Helper.getPlayerRepresentation(player, activeMap)).append(" scored '" + customPOName + "'");
             }
         }
-        if (activeMap.isFoWMode())
-        {
+        if (activeMap.isFoWMode()) {
             FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, message.toString());
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());

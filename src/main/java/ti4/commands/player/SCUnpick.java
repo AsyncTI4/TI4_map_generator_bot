@@ -30,10 +30,10 @@ public class SCUnpick extends PlayerSubcommandData {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
-        
+
         Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
         boolean isFowPrivateGame = (privateGame != null && privateGame);
-        
+
         if (player == null) {
             sendMessage("You're not a player of this game");
             return;
@@ -43,12 +43,12 @@ public class SCUnpick extends PlayerSubcommandData {
                 .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("null"))
                 .collect(Collectors.toList());
         int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
-        
+
         OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
         int scUnpicked = option.getAsInt();
-        
+
         player.removeSC(scUnpicked);
-        
+
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
             return;
@@ -60,7 +60,7 @@ public class SCUnpick extends PlayerSubcommandData {
         String msgExtra = "";
         boolean allPicked = true;
         Player privatePlayer = null;
-        
+
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
         while (players.iterator().hasNext()) {
@@ -92,7 +92,7 @@ public class SCUnpick extends PlayerSubcommandData {
             for (Player player_ : activePlayers) {
                 scPickedList.addAll(player_.getSCs());
             }
-            
+
             //ADD A TG TO UNPICKED SC
             for (Integer scNumber : scTradeGoods.keySet()) {
                 if (!scPickedList.contains(scNumber) && scNumber != 0) {

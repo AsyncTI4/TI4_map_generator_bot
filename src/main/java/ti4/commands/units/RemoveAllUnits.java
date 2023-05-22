@@ -14,7 +14,7 @@ import ti4.map.UnitHolder;
 public class RemoveAllUnits extends AddRemoveUnits {
 
     @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map map) {
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
         tile.removeAllUnits(color);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
             addPlanetToPlayArea(event, tile, unitHolder.getName());

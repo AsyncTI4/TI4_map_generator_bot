@@ -23,7 +23,7 @@ public class Speaker extends PlayerSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
-        
+
         if (player == null) {
             sendMessage("Player could not be found");
             return;

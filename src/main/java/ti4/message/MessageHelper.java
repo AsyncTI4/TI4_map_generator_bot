@@ -45,9 +45,9 @@ public class MessageHelper {
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
 		splitAndSent(messageText, channel, buttons);
 	}
-	
+
 	private static void addFactionReactToMessage(Map activeMap, Player player, Message message) {
-		Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player, message); 
+		Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player, message);
 		if (reactionEmoji != null) {
 			message.addReaction(reactionEmoji).queue();
 		}
@@ -60,19 +60,14 @@ public class MessageHelper {
 	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText, Map activeMap, List<Button> buttons, String whenOrAfter) {
 		MessageFunction addFactionReact = (msg) -> {
 			StringTokenizer players  = null;
-			if (whenOrAfter != null && whenOrAfter.equalsIgnoreCase("when"))
-			{
-				if (activeMap.getLatestWhenMsg() != null && activeMap.getLatestWhenMsg() != "")
-				{	
+			if (whenOrAfter != null && whenOrAfter.equalsIgnoreCase("when")) {
+				if (activeMap.getLatestWhenMsg() != null && activeMap.getLatestWhenMsg() != "") {
 					activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestWhenMsg()).queue();
 				}
 				activeMap.setLatestWhenMsg(msg.getId());
 				players = new StringTokenizer(activeMap.getPlayersWhoHitPersistentNoWhen(), "_");
-			}
-			else
-			{
-				if (activeMap.getLatestAfterMsg() != null && activeMap.getLatestAfterMsg() != "")
-				{	
+			} else {
+				if (activeMap.getLatestAfterMsg() != null && activeMap.getLatestAfterMsg() != "") {
 					activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestAfterMsg()).queue();
 				}
 				activeMap.setLatestAfterMsg(msg.getId());
@@ -83,10 +78,10 @@ public class MessageHelper {
 				Player player_ = Helper.getPlayerFromColorOrFaction(activeMap, player);
 				addFactionReactToMessage(activeMap, player_, msg);
 			}
-			
-			
-		};	
-		
+
+
+		};
+
 		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
 	}
 
@@ -126,7 +121,7 @@ public class MessageHelper {
 			if (event.getChannel() instanceof MessageChannel) {
 				sendMessageWithFile((MessageChannel)event.getChannel(), file, messageText, pinMessage);
 			}
-			
+
 		} catch (Exception e) {
 			replyToMessage(event, "Could not send response, use /show_game or contact Admins or Bothelper");
 		}
@@ -176,17 +171,17 @@ public class MessageHelper {
 
 	/**
 	 * Send a private message to the player.
-	 * 
+	 *
 	 * @param player      Player to send a message to
-	 * @param map         Active map
+	 * @param activeMap   Active map
 	 * @param event       Event that caused the message
 	 * @param messageText Message to send
 	 * @param failText    Feedback if the message failed to send
 	 * @param successText Feedback if the message successfully sent
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Map map, GenericInteractionCreateEvent event, String messageText, String failText, String successText) {
-		return sendPrivateMessageToPlayer(player, map, event.getMessageChannel(), messageText, failText, successText);
+	public static boolean sendPrivateMessageToPlayer(Player player, Map activeMap, GenericInteractionCreateEvent event, String messageText, String failText, String successText) {
+		return sendPrivateMessageToPlayer(player, activeMap, event.getMessageChannel(), messageText, failText, successText);
 	}
 
 	/**
@@ -195,26 +190,26 @@ public class MessageHelper {
 	 * This implementation does not provide feedback
 	 *
 	 * @param player      Player to send a message to
-	 * @param map         Active map
+	 * @param activeMap   Active map
 	 * @param messageText Message to send
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Map map, String messageText) {
-		return sendPrivateMessageToPlayer(player, map, (MessageChannel) null, messageText, null, null);
+	public static boolean sendPrivateMessageToPlayer(Player player, Map activeMap, String messageText) {
+		return sendPrivateMessageToPlayer(player, activeMap, (MessageChannel) null, messageText, null, null);
 	}
 
 	/**
 	 * Send a private message to the player.
-	 * 
+	 *
 	 * @param player          Player to send a message to
-	 * @param map             Active map
+	 * @param activeMap       Active map
 	 * @param feedbackChannel Channel to send feedback to
 	 * @param messageText     Message to send
 	 * @param failText        Feedback if the message failed to send
 	 * @param successText     Feedback if the message successfully sent
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Map map, MessageChannel feedbackChannel, String messageText, String failText, String successText) {
+	public static boolean sendPrivateMessageToPlayer(Player player, Map activeMap, MessageChannel feedbackChannel, String messageText, String failText, String successText) {
         if (messageText == null || messageText.length() == 0) return true; // blank message counts as a success
 		User user = MapGenerator.jda.getUserById(player.getUserID());
 		if (user == null) {
@@ -223,7 +218,7 @@ public class MessageHelper {
 		} else {
 			MessageChannel privateChannel = player.getPrivateChannel();
 			if (privateChannel == null) {
-				sendMessageToUser(map.getName() + " " + messageText, user);
+				sendMessageToUser(activeMap.getName() + " " + messageText, user);
 			} else {
 				sendMessageToChannel(privateChannel, messageText);
 			}
@@ -235,7 +230,7 @@ public class MessageHelper {
     public static void sendMessageToUser(String messageText, GenericInteractionCreateEvent event) {
         sendMessageToUser(messageText, event.getUser());
     }
-    
+
     public static void sendMessageToUser(String messageText, User user) {
         user.openPrivateChannel().queue(channel -> {
             splitAndSent(messageText, channel);
@@ -265,7 +260,7 @@ public class MessageHelper {
 	/**
 	 * Given a text string and a maximum length, will return a List<String> split by
 	 * either the max length or the last newline "\n"
-	 * 
+	 *
 	 * @param messageText any non-null, non-empty string
 	 * @param maxLength   maximum length, any positive integer
 	 * @return
@@ -312,10 +307,10 @@ public class MessageHelper {
 
 		List<String> messageList = splitLargeText(message, 2000);
 		Iterator<String> messageIterator = messageList.iterator();
-		
+
 		while (messageIterator.hasNext()) {
 			String smallMessage = messageIterator.next();
-			
+
 			//More messages exists, so just frontload the plain messages
 			if (messageIterator.hasNext() && smallMessage != null && !smallMessage.isEmpty()) {
 				messageCreateDataList.add(new MessageCreateBuilder().addContent(smallMessage).build());

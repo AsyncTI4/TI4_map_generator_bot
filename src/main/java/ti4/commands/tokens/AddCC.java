@@ -42,12 +42,10 @@ public class AddCC extends AddRemoveToken {
         }
     }
 
-    public static void addCC(GenericInteractionCreateEvent event, String color, Tile tile) 
-    {
+    public static void addCC(GenericInteractionCreateEvent event, String color, Tile tile) {
         addCC(event, color, tile, true);
     }
-    public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile) 
-    {
+    public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile) {
         addCC(event, color, tile, true);
     }
 

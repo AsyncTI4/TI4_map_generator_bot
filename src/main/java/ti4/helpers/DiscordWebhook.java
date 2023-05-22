@@ -15,7 +15,7 @@ import java.util.Set;
 /**
  * Class used to execute Discord Webhooks with low effort
  * https://gist.github.com/k3kdude/fba6f6b37594eae3d6f9475330733bdb
- * 
+ *
  * EXAMPLE USAGE:
         DiscordWebhook webhook = new DiscordWebhook("https://discordapp.com/api/webhooks/...");
         webhook.setContent("Any message!");

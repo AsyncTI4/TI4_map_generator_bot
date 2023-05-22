@@ -122,5 +122,5 @@ public class CardsInfo implements Command {
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false))
         );
     }
-    
+
 }

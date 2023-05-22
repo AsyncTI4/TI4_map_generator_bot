@@ -38,7 +38,7 @@ public class PingSystem extends FOWSubcommandData {
             MessageHelper.replyToMessage(event, "Specify position");
             return;
         }
-        
+
         OptionMapping messageMapping = event.getOption(Constants.MESSAGE);
         String message = messageMapping == null ? "" : messageMapping.getAsString();
 

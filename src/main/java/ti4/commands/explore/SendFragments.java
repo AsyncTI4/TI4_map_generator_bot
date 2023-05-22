@@ -48,8 +48,8 @@ public class SendFragments extends ExploreSubcommandData {
         int count = 1;
         if (countOption != null) {
         	count = countOption.getAsInt();
-        } 
-        
+        }
+
         ArrayList<String> fragments = new ArrayList<>();
         for (String cardID : sender.getFragments()) {
         	String[] card = Mapper.getExplore(cardID).split(";");
@@ -57,7 +57,7 @@ public class SendFragments extends ExploreSubcommandData {
         		fragments.add(cardID);
         	}
         }
-        
+
         if (fragments.size() >= count) {
         	for (int i=0; i<count; i++) {
         		String fragID = fragments.get(i);
@@ -74,7 +74,7 @@ public class SendFragments extends ExploreSubcommandData {
 			case "hazardous" -> "HFrag";
 			case "industrial" -> "IFrag";
 			case "frontier" -> "UFrag";
-			default -> "";	
+			default -> "";
 		};
 
 		String p1 = Helper.getPlayerRepresentation(sender, activeMap);
@@ -87,7 +87,7 @@ public class SendFragments extends ExploreSubcommandData {
 			String fail = "User for faction not found. Report to ADMIN";
 			String success = "The other player has been notified";
 			MessageHelper.sendPrivateMessageToPlayer(receiver, activeMap, event, message, fail, success);
-                
+
 			// Add extra message for transaction visibility
 			FoWHelper.pingPlayersTransaction(activeMap, event, sender, receiver, fragString, null);
 		}

@@ -320,7 +320,7 @@ public class Emojis {
     public static final String TIGL = "<:TIGL:1038913368360222752>";
 
     // LIST OF SYMBOLS FOR FOG STUFF
-    public static List<String> symbols = 
+    public static List<String> symbols =
         Arrays.asList(
             warsun, spacedock, pds, mech, infantry, flagship, fighter, dreadnought, destroyer, carrier, cruiser, HFrag,
             CFrag, IFrag, UFrag, Relic, Cultural, Industrial, Hazardous, Frontier, SecretObjective, Public1, Public2,

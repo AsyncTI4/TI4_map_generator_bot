@@ -22,7 +22,7 @@ public class Tile {
     private final String tileID;
     private String position;
     private HashMap<String, UnitHolder> unitHolders = new HashMap<>();
-    
+
     private HashMap<Player,Boolean> fog = new HashMap<>();
     private HashMap<Player,String> fogLabel = new HashMap<>();
 
@@ -35,8 +35,7 @@ public class Tile {
     public Tile(String tileID, String position, Player player, Boolean fog_, String fogLabel_) {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
-        if (player != null)
-        {
+        if (player != null) {
         	fog.put(player, fog_);
         	fogLabel.put(player, fogLabel_);
         }
@@ -172,7 +171,7 @@ public class Tile {
         if (unitHolder != null) {
             unitHolder.removeCC(ccID);
         }
-        
+
     }
 
     public void removeAllCC() {
@@ -283,7 +282,7 @@ public class Tile {
         String fogTileColor = player == null ? "default" : player.getFogFilter();
         String fogTileColorSuffix = "_" + fogTileColor;
         String fowTileID = "fow" + fogTileColorSuffix;
-        
+
         if (this.tileID.equals("82b") || this.tileID.equals("51")) { //mallice || creuss
             fowTileID = "fowb" + fogTileColorSuffix;
         }
@@ -306,7 +305,7 @@ public class Tile {
     @JsonIgnore
     public String getRepresentation() {
         try {
-            return Mapper.getTileRepresentations().get(getTileID());     
+            return Mapper.getTileRepresentations().get(getTileID());
         } catch (Exception e) {
             // TODO: handle exception
         }

@@ -21,18 +21,18 @@ public class ServerLimitStats extends BothelperSubcommandData {
 
     public void execute(SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
-        
+
         int memberCount = guild.getMemberCount();
         int memberMax = guild.getMaxMembers();
         int boostCount = guild.getBoostCount();
         int roleCount = guild.getRoles().size(); //250
-        
+
         //CHANNELS
         List<GuildChannel> channels = guild.getChannels();
         int channelCount = channels.size(); //500
         long pbdChannelCount = channels.stream().filter(c -> c.getName().startsWith("pbd")).count();
         long categoryChannelCount = channels.stream().filter(c -> c.getType() == ChannelType.CATEGORY).count();
-        
+
         //THREADS
         List<ThreadChannel> threadChannels = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).toList();
         int threadCount = threadChannels.size(); //1000
@@ -54,8 +54,8 @@ public class ServerLimitStats extends BothelperSubcommandData {
                 inLimboThreadCount += ((TextChannel) channel).getThreadChannels().size();
             }
         }
-        
-        
+
+
 
         int emojiCount = guild.getEmojis().size();
         int emojiMax = guild.getMaxEmojis();

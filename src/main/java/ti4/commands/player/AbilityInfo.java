@@ -40,7 +40,7 @@ public class AbilityInfo extends PlayerSubcommandData {
     public static void sendAbilityInfo(Map activeMap, Player player) {
         //ABILITY INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getAbilityInfoText(player));
-    } 
+    }
 
     private static String getAbilityInfoText(Player player) {
         List<String> playerAbilities = player.getFactionAbilities().stream().sorted().toList();
@@ -54,7 +54,7 @@ public class AbilityInfo extends PlayerSubcommandData {
             sb.append("`").append(index).append(".` ");
             sb.append(getAbilityRepresentation(abilityID)).append("\n");
             index++;
-        }        
+        }
         return sb.toString();
     }
 

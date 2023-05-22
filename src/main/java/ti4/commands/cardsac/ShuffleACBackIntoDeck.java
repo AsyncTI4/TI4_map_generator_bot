@@ -18,7 +18,7 @@ public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-        
+
         OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to draw from discard pile");
