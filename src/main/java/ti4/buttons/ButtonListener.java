@@ -969,8 +969,8 @@ public class ButtonListener extends ListenerAdapter {
                     successMessage =  "Placed a "+ Helper.getEmojiFromDiscord("spacedock")+" on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
                 }
             }
-            else if (unit.equalsIgnoreCase("pds")) {
-                new AddUnits().unitParsing(event, player.getColor(), activeMap.getTile(AliasHandler.resolveTile(planetName)), unit+" "+planetName, activeMap);
+            else if (unitLong.equalsIgnoreCase("pds")) {
+                new AddUnits().unitParsing(event, player.getColor(), activeMap.getTile(AliasHandler.resolveTile(planetName)), unitLong+" "+planetName, activeMap);
                 successMessage = "Placed a "+ Helper.getEmojiFromDiscord("pds")+" on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
             } else {
                 if (unit.equalsIgnoreCase("gf") || unit.equalsIgnoreCase("mf") || unitLong.equalsIgnoreCase("2gf")) {
