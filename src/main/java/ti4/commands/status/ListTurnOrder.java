@@ -1,5 +1,7 @@
 package ti4.commands.status;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -24,7 +26,7 @@ public class ListTurnOrder extends StatusSubcommandData {
         turnOrder(event, activeMap);
     }
 
-    public static void turnOrder(SlashCommandInteractionEvent event, Map activeMap) {
+    public static void turnOrder(GenericInteractionCreateEvent event, Map activeMap) {
 
         if (activeMap.isFoWMode()) {
             MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup fow_mode:YES`");
@@ -88,12 +90,9 @@ public class ListTurnOrder extends StatusSubcommandData {
             }
         }
         msg.append("_ _"); // forced extra line
-        if (event.getName().equals(Constants.PLAYER)) { // catch if called from /player sc_pick
-            MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
-        } else {
-           MessageHelper.replyToMessage(event, msg.toString());
-
-        }
+        
+        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), msg.toString());
+        
     }
 
     @Override
