@@ -74,6 +74,10 @@ public class ExpPlanet extends ExploreSubcommandData {
         if (player.getFaction().equalsIgnoreCase("naaz")) {
             if (Helper.mechCheck(planetName, activeMap, player)) {
                 if (!NRACheck) {
+                    if (player.getTechs().contains(AliasHandler.resolveTech("Pre-Fab Arcologies"))) {
+                        new PlanetRefresh().doAction(player, planetName, activeMap);
+                        MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
+                    }
                     String message = "Please decide whether or not to use your distant suns (explore twice) ability.";
                     Button resolveExplore1  = Button.success("distant_suns_accept_"+planetName+"_"+drawColor, "Choose to Explore Twice");
                     Button resolveExplore2 = Button.success("distant_suns_decline_"+planetName+"_"+drawColor, "Decline Distant Suns");
@@ -101,8 +105,23 @@ public class ExpPlanet extends ExploreSubcommandData {
                         List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                         //code to draw 2 explores and get their names
                         //Send Buttons to decide which one to explore
-                        String message = "Please decide whether or not to use your distant suns ability.";
+                        String message = "Please decide which card to resolve.";
+
+                        if (activeMap != null && !activeMap.isFoWMode() &&(event.getChannel() !=  activeMap.getActionsChannel())) {
+                            String pF = StringUtils.capitalize(player.getFaction());
+                            MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "Using Distant Suns " + pF + " found a "+name1+" and a " +name2+ " on "+Helper.getPlanetRepresentation(planetName, activeMap));
+                            
+                        }
+                        else
+                        {
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a "+name1+" and a " +name2+ " on "+Helper.getPlanetRepresentation(planetName, activeMap));
+                        }
+
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+
+
+
+
                         return;
                     }
                 }
