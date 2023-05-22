@@ -1371,6 +1371,7 @@ public class ButtonListener extends ListenerAdapter {
                     addReaction(event, false, false, reply, "");
                 }
                 case "warfareBuild" -> {
+                    player.addFollowedSC(6);
                     List<Button> buttons = new ArrayList<Button>();
                     buttons = Helper.getPlaceUnitButtons(event, player, activeMap,  activeMap.getTile(AliasHandler.resolveTile(player.getFaction())), true);
                     String message = Helper.getPlayerRepresentation(event, player, false)+" Use the buttons to produce. Reminder that when following warfare, you can only use 1 dock in your home system.";

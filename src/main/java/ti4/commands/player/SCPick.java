@@ -66,16 +66,18 @@ public class SCPick extends PlayerSubcommandData {
             if (activeMap.isFoWMode()) {
                 String[] scs = {Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6};
                 int c = 0;
-                while(playerSCs.isEmpty() && c < 5)
+                while(playerSCs.isEmpty() && c < 5 && !pickSuccessful)
                 {
                     if (event.getOption(scs[c]) != null)
                     {
-                        stats.pickSC(event, activeMap, player, event.getOption(scs[c]));
+                        pickSuccessful = stats.pickSC(event, activeMap, player, event.getOption(scs[c]));
                     }
                     playerSCs = player.getSCs();
                     c++;
                 }
             }
+        }
+        if (!pickSuccessful) {
             return;
         }
         
@@ -101,7 +103,7 @@ public class SCPick extends PlayerSubcommandData {
         }
         else
         {
-            sb.append(" Picked: ").append(Helper.getSCBackRepresentation(event, scPicked));
+            sb.append(" Picked: ").append("SC #"+scPicked);
         }
 
         boolean nextCorrectPing = false;
