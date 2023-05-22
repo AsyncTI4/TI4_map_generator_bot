@@ -1,5 +1,7 @@
 package ti4.commands.player;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -245,7 +247,7 @@ public class Stats extends PlayerSubcommandData {
 		GenerateMap.getInstance().saveImage(activeMap, event);
 	}
 
-	public boolean pickSC(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping optionSC) {
+	public boolean pickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, OptionMapping optionSC) {
 			if (optionSC == null) {
 				return false;
 			}
@@ -253,20 +255,25 @@ public class Stats extends PlayerSubcommandData {
 				activeMap.setMapStatus(MapStatus.open);
 			}
 			int scNumber = optionSC.getAsInt();
+			return secondHalfOfPickSC(event, activeMap, player, scNumber);
+	}
+
+	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, int scNumber)
+	{
 			LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
 			if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
-				MessageHelper.sendMessageToChannel(event.getChannel(), "Can pick SC only if faction and color picked");
+				MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Can pick SC only if faction and color picked");
 				return false;
 			}
 			if (!scTradeGoods.containsKey(scNumber)) {
-				MessageHelper.sendMessageToChannel(event.getChannel(),"Strategy Card must be from possible ones in Game");
+				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),"Strategy Card must be from possible ones in Game");
 				return false;
 			}
 
 			LinkedHashMap<String, Player> players = activeMap.getPlayers();
 			for (Player playerStats : players.values()) {
 				if (playerStats.getSCs().contains(scNumber)) {
-					MessageHelper.sendMessageToChannel(event.getChannel(), "SC #"+scNumber+" is already picked.");
+					MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "SC #"+scNumber+" is already picked.");
 					return false;
 				}
 			}
@@ -281,7 +288,7 @@ public class Stats extends PlayerSubcommandData {
 				int tg = player.getTg();
 				tg += tgCount;
 				messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
-				MessageHelper.sendMessageToChannel(event.getChannel(),"You gained "+tgCount +" tgs from picking SC #"+scNumber);
+				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),"You gained "+tgCount +" tgs from picking SC #"+scNumber);
 				if (activeMap.isFoWMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
 				}
@@ -289,6 +296,7 @@ public class Stats extends PlayerSubcommandData {
 				player.setTg(tg);
 			}
 			return true;
+
 	}
 
 	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping option,
