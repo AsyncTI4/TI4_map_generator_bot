@@ -14,7 +14,7 @@ public class ChangeToBaseGame extends GameSubcommandData {
     public ChangeToBaseGame() {
         super(Constants.CHANGE_TO_BASE_GAME, "Remove PoK ACs/SOs/POs/Agendas");
         addOptions(new OptionData(OptionType.STRING, Constants.REMOVE_CODEX_AC, "Remove Codex AC too? (y/n)").setRequired(false));
-        
+
     }
 
     @Override
@@ -22,14 +22,12 @@ public class ChangeToBaseGame extends GameSubcommandData {
         Map activeMap = getActiveMap();
         OptionMapping codexOption = event.getOption(Constants.REMOVE_CODEX_AC);
         String codex = "";
-        if(codexOption != null)
-        {
+        if (codexOption != null) {
             codex = codexOption.getAsString();
-            if(codex.equalsIgnoreCase("y"))
-            {
+            if (codex.equalsIgnoreCase("y")) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Removed Codex ACs.");
             }
-           
+
         }
         Helper.removePoKComponents(activeMap, codex);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Removed PoK components.");

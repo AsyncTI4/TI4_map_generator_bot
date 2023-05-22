@@ -12,7 +12,7 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public abstract class ACCardsSubcommandData extends SubcommandData {
-    
+
     private SlashCommandInteractionEvent event;
     private Map activeMap;
     private User user;

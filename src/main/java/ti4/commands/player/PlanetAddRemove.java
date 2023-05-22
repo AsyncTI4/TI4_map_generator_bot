@@ -47,7 +47,7 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
             sendMessage("Player could not be found");
             return;
         }
-        
+
         ArrayList<OptionMapping> planetOptions = new ArrayList<>();
         planetOptions.add(event.getOption(Constants.PLANET));
         planetOptions.add(event.getOption(Constants.PLANET2));
@@ -58,20 +58,20 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
 
         LinkedHashSet<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(p -> p.getAsString()).map(s -> AliasHandler.resolvePlanet(StringUtils.substringBefore(s, " (").replace(" ", ""))).toList());
 
-        sendMessage(getActionHeaderMessage(event, player) + resolveSpendAs(event, planetIDs) + ":");
+        sendMessage(getActionHeaderMessage(activeMap, player) + resolveSpendAs(event, planetIDs) + ":");
 
         for (String planetID : planetIDs) {
             parseParameter(event, player, planetID, activeMap);
         }
     }
 
-    private void parseParameter(SlashCommandInteractionEvent event, Player player, String planetID, Map map) {
+    private void parseParameter(SlashCommandInteractionEvent event, Player player, String planetID, Map activeMap) {
         try {
             if (Mapper.isValidPlanet(planetID)) {
-                doAction(player, planetID, map);
+                doAction(player, planetID, activeMap);
                 sendMessage("> " + resolvePlanetMessage(planetID));
             } else {
-                Set<String> planets = map.getPlanets();
+                Set<String> planets = activeMap.getPlanets();
                 List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
                 if (possiblePlanets.isEmpty()){
                     sendMessage("> No matching Planet '" + planetID + "'' found - please try again.");
@@ -82,7 +82,7 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
                 }
                 String planet = possiblePlanets.get(0);
                 BotLogger.log(event, "`PlanetAddRemove.parseParameter - " + getActionID() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet);
-                doAction(player, planet, map);
+                doAction(player, planet, activeMap);
                 sendMessage("> " + resolvePlanetMessage(planet));
             }
         } catch (Exception e) {
@@ -91,15 +91,15 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
         }
     }
 
-    public abstract void doAction(Player player, String techID, Map map);
-    
+    public abstract void doAction(Player player, String techID, Map activeMap);
+
     /** Customize the initial header response depending on ActionID (which /player planet_* action is used)
-     * @param event
+     * @param activeMap
      * @param player
      * @return
      */
-    private String getActionHeaderMessage(SlashCommandInteractionEvent event, Player player) {
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" ");
+    private String getActionHeaderMessage(Map activeMap, Player player) {
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap)).append(" ");
         return switch (getActionID()) {
             case Constants.PLANET_ADD -> message.append(" added planet(s)").toString();
             case Constants.PLANET_REMOVE -> message.append(" removed planet(s)").toString();

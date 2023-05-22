@@ -74,7 +74,7 @@ abstract public class AddRemoveUnits implements Command {
         } else {
             MessageHelper.replyToMessage(event, "Map update completed");
         }
-        
+
     }
 
     public Tile getTileObject(SlashCommandInteractionEvent event, String tileID, Map activeMap) {
@@ -97,18 +97,18 @@ abstract public class AddRemoveUnits implements Command {
         return tile;
     }
 
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map map) {
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
-        unitParsing(event, color, tile, unitList, map);
+        unitParsing(event, color, tile, unitList, activeMap);
     }
 
-    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Map map) {
+    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Map activeMap) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
         while (unitListTokenizer.hasMoreTokens()) {
             String unitListToken = unitListTokenizer.nextToken();
             StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
-            
+
             int tokenCount = unitInfoTokenizer.countTokens();
             if (tokenCount > 3) {
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
@@ -150,48 +150,42 @@ abstract public class AddRemoveUnits implements Command {
 
             planetName = getPlanet(event, tile, planetName);
             unitAction(event, tile, count, planetName, unitID, color);
-            
+
 
             addPlanetToPlayArea(event, tile, planetName);
         }
-        if (map.isFoWMode()) {
+        if (activeMap.isFoWMode()) {
             boolean pingedAlready = false;
             int count = 0;
-            String[] tileList = map.getListOfTilesPinged();
-            while(count < 10 && !pingedAlready)
-            {
+            String[] tileList = activeMap.getListOfTilesPinged();
+            while (count < 10 && !pingedAlready) {
                 String tilePingedAlready = tileList[count];
-                if(tilePingedAlready != null)
-                {
+                if (tilePingedAlready != null) {
                     pingedAlready = tilePingedAlready.equalsIgnoreCase(tile.getPosition());
                     count++;
-                }
-                else
-                {
+                } else {
                     break;
                 }
             }
-            if(!pingedAlready)
-            {
+            if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-                FoWHelper.pingSystem(map, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
-                if(count <10)
-                {
-                    map.setPingSystemCounter(count);
-                    map.setTileAsPinged(count, tile.getPosition());
+                FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
+                if (count <10) {
+                    activeMap.setPingSystemCounter(count);
+                    activeMap.setTileAsPinged(count, tile.getPosition());
                 }
-                
+
             }
         }
-        actionAfterAll(event, tile, color, map);
+        actionAfterAll(event, tile, color, activeMap);
     }
-    public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Map map, String planetName) {
+    public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Map activeMap, String planetName) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
         while (unitListTokenizer.hasMoreTokens()) {
             String unitListToken = unitListTokenizer.nextToken();
             StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
-            
+
             int tokenCount = unitInfoTokenizer.countTokens();
             if (tokenCount > 3) {
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
@@ -199,7 +193,7 @@ abstract public class AddRemoveUnits implements Command {
 
             int count = 1;
             boolean numberIsSet = false;
-            
+
             String unit = "";
             if (unitInfoTokenizer.hasMoreTokens()) {
                 String ifNumber = unitInfoTokenizer.nextToken();
@@ -233,49 +227,43 @@ abstract public class AddRemoveUnits implements Command {
 
             planetName = getPlanet(event, tile, planetName);
             unitAction(event, tile, count, planetName, unitID, color);
-            
+
 
             addPlanetToPlayArea(event, tile, planetName);
         }
-        if (map.isFoWMode()) {
+        if (activeMap.isFoWMode()) {
             boolean pingedAlready = false;
             int count = 0;
-            String[] tileList = map.getListOfTilesPinged();
-            while(count < 10 && !pingedAlready)
-            {
+            String[] tileList = activeMap.getListOfTilesPinged();
+            while (count < 10 && !pingedAlready) {
                 String tilePingedAlready = tileList[count];
-                if(tilePingedAlready != null)
-                {
+                if (tilePingedAlready != null) {
                     pingedAlready = tilePingedAlready.equalsIgnoreCase(tile.getPosition());
                     count++;
-                }
-                else
-                {
+                } else {
                     break;
                 }
             }
-            if(!pingedAlready)
-            {
+            if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-                FoWHelper.pingSystem(map, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
-                if(count <10)
-                {
-                    map.setPingSystemCounter(count);
-                    map.setTileAsPinged(count, tile.getPosition());
+                FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
+                if (count <10) {
+                    activeMap.setPingSystemCounter(count);
+                    activeMap.setTileAsPinged(count, tile.getPosition());
                 }
-                
+
             }
         }
-        actionAfterAll(event, tile, color, map);
+        actionAfterAll(event, tile, color, activeMap);
     }
 
-    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Map map, String planetName) {
+    public void unitParsing(SlashCommandInteractionEvent event, String color, Tile tile, String unitList, Map activeMap, String planetName) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
         while (unitListTokenizer.hasMoreTokens()) {
             String unitListToken = unitListTokenizer.nextToken();
             StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
-            
+
             int tokenCount = unitInfoTokenizer.countTokens();
             if (tokenCount > 3) {
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
@@ -283,7 +271,7 @@ abstract public class AddRemoveUnits implements Command {
 
             int count = 1;
             boolean numberIsSet = false;
-            
+
             String unit = "";
             if (unitInfoTokenizer.hasMoreTokens()) {
                 String ifNumber = unitInfoTokenizer.nextToken();
@@ -317,40 +305,34 @@ abstract public class AddRemoveUnits implements Command {
 
             planetName = getPlanet(event, tile, planetName);
             unitAction(event, tile, count, planetName, unitID, color);
-            
+
 
             addPlanetToPlayArea(event, tile, planetName);
         }
-        if (map.isFoWMode()) {
+        if (activeMap.isFoWMode()) {
             boolean pingedAlready = false;
             int count = 0;
-            String[] tileList = map.getListOfTilesPinged();
-            while(count < 10 && !pingedAlready)
-            {
+            String[] tileList = activeMap.getListOfTilesPinged();
+            while (count < 10 && !pingedAlready) {
                 String tilePingedAlready = tileList[count];
-                if(tilePingedAlready != null)
-                {
+                if (tilePingedAlready != null) {
                     pingedAlready = tilePingedAlready.equalsIgnoreCase(tile.getPosition());
                     count++;
-                }
-                else
-                {
+                } else {
                     break;
                 }
             }
-            if(!pingedAlready)
-            {
+            if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-                FoWHelper.pingSystem(map, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
-                if(count <10)
-                {
-                    map.setPingSystemCounter(count);
-                    map.setTileAsPinged(count, tile.getPosition());
+                FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
+                if (count <10) {
+                    activeMap.setPingSystemCounter(count);
+                    activeMap.setTileAsPinged(count, tile.getPosition());
                 }
-                
+
             }
         }
-        actionAfterAll(event, tile, color, map);
+        actionAfterAll(event, tile, color, activeMap);
     }
 
 
@@ -358,13 +340,13 @@ abstract public class AddRemoveUnits implements Command {
         return color;
     }
 
-    public void unitParsing(ButtonInteractionEvent event, String color, Tile tile, String unitList, Map map) {
+    public void unitParsing(ButtonInteractionEvent event, String color, Tile tile, String unitList, Map activeMap) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
         while (unitListTokenizer.hasMoreTokens()) {
             String unitListToken = unitListTokenizer.nextToken();
             StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
-            
+
             int tokenCount = unitInfoTokenizer.countTokens();
             if (tokenCount > 3) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
@@ -405,29 +387,24 @@ abstract public class AddRemoveUnits implements Command {
             unitAction(event, tile, count, planetName, unitID, color);
             addPlanetToPlayArea(event, tile, planetName);
         }
-        if (map.isFoWMode()) {
+        if (activeMap.isFoWMode()) {
             boolean pingedAlready = false;
             int count = 0;
-            String[] tileList = map.getListOfTilesPinged();
-            while(count < 10 && !pingedAlready)
-            {
+            String[] tileList = activeMap.getListOfTilesPinged();
+            while (count < 10 && !pingedAlready) {
                 String tilePingedAlready = tileList[count];
-                if(tilePingedAlready != null)
-                {
+                if (tilePingedAlready != null) {
                     pingedAlready = tilePingedAlready.equalsIgnoreCase(tile.getPosition());
                     count++;
-                }
-                else
-                {
+                } else {
                     break;
                 }
             }
-            if(!pingedAlready)
-            {
+            if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-                FoWHelper.pingSystem(map, (GenericInteractionCreateEvent) event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
-                map.setPingSystemCounter(count);
-                map.setTileAsPinged(count, tile.getPosition());
+                FoWHelper.pingSystem(activeMap, (GenericInteractionCreateEvent) event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
+                activeMap.setPingSystemCounter(count);
+                activeMap.setTileAsPinged(count, tile.getPosition());
             }
         }
     }
@@ -484,10 +461,10 @@ abstract public class AddRemoveUnits implements Command {
     abstract protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color);
     abstract protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color);
 
-    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map){
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map activeMap){
         //do nothing, overriden by child classes
     }
-    protected void actionAfterAll(GenericInteractionCreateEvent event, Tile tile, String color, Map map){
+    protected void actionAfterAll(GenericInteractionCreateEvent event, Tile tile, String color, Map activeMap){
         //do nothing, overriden by child classes
     }
 

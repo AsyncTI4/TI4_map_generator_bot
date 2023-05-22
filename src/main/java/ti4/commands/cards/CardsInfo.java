@@ -97,10 +97,9 @@ public class CardsInfo implements Command {
     }
 
     public static void sendCardsInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendCardsInfo(activeMap, player);
-
     }
 
     public static void sendCardsInfo(Map activeMap, Player player) {
@@ -123,5 +122,5 @@ public class CardsInfo implements Command {
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false))
         );
     }
-    
+
 }

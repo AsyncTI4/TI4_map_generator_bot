@@ -15,7 +15,7 @@ public class ShowDiscardActionCards extends ACCardsSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-        
+
         StringBuilder sb = new StringBuilder();
         sb.append("Action card discard list: ").append("\n");
         int index = 1;

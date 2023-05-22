@@ -7,7 +7,7 @@ import ti4.message.BotLogger;
 import java.util.*;
 
 public class FactionModel extends Model {
-    
+
     public String factionName;
     public String homeSystemTile;
     public String startingFleet;
@@ -28,13 +28,13 @@ public class FactionModel extends Model {
 
             factionTech = new ArrayList<String>();
             json.get("factionTech").elements().forEachRemaining(val -> factionTech.add(val.asText()));
-            
+
             startingTech = new ArrayList<String>();
             json.get("startingTech").elements().forEachRemaining(val -> startingTech.add(val.asText()));
-            
+
             homePlanets = new ArrayList<String>();
             json.get("homePlanets").elements().forEachRemaining(val -> homePlanets.add(val.asText()));
-            
+
             abilities = new ArrayList<String>();
             json.get("abilities").elements().forEachRemaining(val -> abilities.add(val.asText()));
         } catch (Exception e) {
@@ -43,9 +43,9 @@ public class FactionModel extends Model {
     }
 
     public boolean isValid() {
-        return super.isValid() 
-            && factionName != null 
-            && homeSystemTile != null 
+        return super.isValid()
+            && factionName != null
+            && homeSystemTile != null
             && startingFleet != null
             && factionTech != null
             && startingTech != null

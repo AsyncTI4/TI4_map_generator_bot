@@ -298,7 +298,7 @@ public class AutoCompleteProvider {
             case Constants.TTPG_FILE_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 String dir = Storage.getTTPGExportDirectory().getPath();
-                
+
                 Set<String> fileSet = Stream.of(new File(dir).listFiles())
                     .filter(file -> !file.isDirectory())
                     .map(File::getName)
@@ -403,7 +403,7 @@ public class AutoCompleteProvider {
                         }
                     } else {
                         abilities = Mapper.getFactionAbilities();
-                    }   
+                    }
                 } catch (Exception e) {
                     BotLogger.log(event, "Ability Autocomplete Setup Error", e);
                     abilities = Mapper.getFactionAbilities();
@@ -416,14 +416,14 @@ public class AutoCompleteProvider {
                     factionName = Mapper.getFactionRepresentations().get(factionName);
                     return factionName + " - " + abilityName;
                 });
-                
+
                 List<Command.Choice> options = abilities.entrySet().stream()
                     .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                     .limit(25)
                     .map(value -> new Command.Choice(value.getValue(), value.getKey()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
-                
+
             }
             case Constants.LATEST_COMMAND -> {
                 if (activeMap == null) {
@@ -432,7 +432,7 @@ public class AutoCompleteProvider {
                 }
                 String latestCommand = "";
                 if (activeMap.isFoWMode()) { //!event.getUser().getID().equals(activeMap.getGMID()); //TODO: Validate that the user running the command is the FoW GM, if so, display command.
-                    latestCommand = "Game is Fog of War mode - last command is hidden."; 
+                    latestCommand = "Game is Fog of War mode - last command is hidden.";
                 } else {
                     latestCommand = StringUtils.left(activeMap.getLatestCommand(), 100);
                 }
@@ -452,7 +452,7 @@ public class AutoCompleteProvider {
                         .map(value -> new Command.Choice(value, value))
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
-                } else {                    
+                } else {
                     List<Command.Choice> options = activeMap.getTileNameAutocompleteOptionsCache().stream()
                         .filter(value -> value.getKey().toLowerCase().contains(enteredValue))
                         .limit(25)

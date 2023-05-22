@@ -109,8 +109,7 @@ public class SentPN extends PNCardsSubcommandData {
 		PNInfo.sendPromissoryNoteInfo(activeMap, targetPlayer, false);
 		PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
 		String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-		String message = Helper.getPlayerRepresentation(event, player) + " sent " + Emojis.PN + text + "PN to "
-				+ Helper.getPlayerRepresentation(event, targetPlayer);
+		String message = Helper.getPlayerRepresentation(player, activeMap) + " sent " + Emojis.PN + text + "PN to " + Helper.getPlayerRepresentation(targetPlayer, activeMap);
 		if (activeMap.isFoWMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
 			String success = message + "\nThe other player has been notified";

@@ -25,10 +25,10 @@ public class DrawAgenda extends AgendaSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Count of how many to draw, default 1"));
     }
 
-    
+
     public void drawAgenda(GenericInteractionCreateEvent event, int count, Map activeMap, Player player) {
-        
-        
+
+
         StringBuilder sb = new StringBuilder();
         sb.append("-----------\n");
         sb.append("Game: ").append(activeMap.getName()).append("\n");
@@ -49,7 +49,7 @@ public class DrawAgenda extends AgendaSubcommandData {
             }
         }
         sb.append("-----------\n");
-        
+
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null){
             MessageHelper.sendMessageToUser(sb.toString(), event);
@@ -58,7 +58,7 @@ public class DrawAgenda extends AgendaSubcommandData {
             if (userById != null) {
                 if (activeMap.isCommunityMode() && player.getPrivateChannel() instanceof MessageChannel) {
                    // MessageHelper.sendMessageToChannel((MessageChannel) player.getPrivateChannel(), sb.toString());
-                    
+
                     MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player.getCardsInfoThread(activeMap), sb.toString(), buttons);
                 } else {
                     //MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
@@ -72,8 +72,7 @@ public class DrawAgenda extends AgendaSubcommandData {
 
 
 
-    public void execute(SlashCommandInteractionEvent event)
-    {
+    public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.COUNT);
         int count = 1;
         if (option != null) {

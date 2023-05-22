@@ -39,8 +39,7 @@ public class StasisInfantry extends SpecialSubcommandData {
 
     }
 
-    public void setValue(SlashCommandInteractionEvent event, Map map, Player player,
-                         Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
+    public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, Consumer<Integer> consumer, Supplier<Integer> supplier, String value) {
         try {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             int number = Integer.parseInt(value);

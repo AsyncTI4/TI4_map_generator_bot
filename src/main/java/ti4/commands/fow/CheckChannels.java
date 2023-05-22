@@ -14,8 +14,8 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class CheckChannels extends FOWSubcommandData {
-    
-    
+
+
     public CheckChannels() {
         super(Constants.CHECK_CHANNELS, "Ping each channel that is set up");
     }
@@ -42,7 +42,7 @@ public class CheckChannels extends FOWSubcommandData {
                 output.append(channel.getAsMention());
             }
             output.append(" - ");
-            
+
             Role roleForCommunity = player.getRoleForCommunity();
             if (roleForCommunity == null) {
                 output.append("No community role");
