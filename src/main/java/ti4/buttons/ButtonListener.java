@@ -1043,19 +1043,7 @@ public class ButtonListener extends ListenerAdapter {
             new PutAgendaBottom().putBottom((GenericInteractionCreateEvent) event, Integer.parseInt(agendaNumID), activeMap);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Put "+agendaNumID + " on the bottom of the agenda deck.");
         }
-
-        else if(buttonID.startsWith("freelancersBuild_")){
-            String planet = buttonID.replace("freelancersBuild_", "");        
-            List<Button> buttons = new ArrayList<Button>();
-            buttons = Helper.getPlaceUnitButtons(event, player, activeMap,  activeMap.getTile(AliasHandler.resolveTile(planet)), false);
-            String message = Helper.getPlayerRepresentation(event, player, false)+" Use the buttons to produce 1 unit.";
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-            event.getMessage().delete().queue();
-        }
-
-        else if(buttonID.startsWith("agendaResolution_")){
-
-
+        else if (buttonID.startsWith("agendaResolution_")) {
             String winner = buttonID.substring(buttonID.indexOf("_")+1,buttonID.length());
             String agendaid = activeMap.getCurrentAgendaInfo().substring(activeMap.getCurrentAgendaInfo().lastIndexOf("_")+1,activeMap.getCurrentAgendaInfo().length());
             int aID = Integer.parseInt(agendaid);
@@ -1169,7 +1157,6 @@ public class ButtonListener extends ListenerAdapter {
                     addReaction(event, false, false, reply, "");
                 }
                 case "warfareBuild" -> {
-                    player.addFollowedSC(6);
                     List<Button> buttons = new ArrayList<Button>();
                     buttons = Helper.getPlaceUnitButtons(event, player, activeMap,  activeMap.getTile(AliasHandler.resolveTile(player.getFaction())), true);
                     String message = Helper.getPlayerRepresentation(player, activeMap)+" Use the buttons to produce. Reminder that when following warfare, you can only use 1 dock in your home system.";
@@ -1648,7 +1635,6 @@ public class ButtonListener extends ListenerAdapter {
                         player.setCommodities(player.getCommodities()+1);
                         addReaction(event, false, false,"Gained 1 Commodity", "");
                     }
-                    
                 }
                 case "comm_for_AC" -> {
                     boolean hasSchemingAbility = player.hasAbility("scheming");

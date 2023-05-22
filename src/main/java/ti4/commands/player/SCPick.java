@@ -66,17 +66,14 @@ public class SCPick extends PlayerSubcommandData {
             if (activeMap.isFoWMode()) {
                 String[] scs = {Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6};
                 int c = 0;
-                while(playerSCs.isEmpty() && c < 5 && !pickSuccessful){
-                    if (event.getOption(scs[c]) != null)
-                    {
-                        pickSuccessful = stats.pickSC(event, activeMap, player, event.getOption(scs[c]));
+                while (playerSCs.isEmpty() && c < 5) {
+                    if (event.getOption(scs[c]) != null) {
+                        stats.pickSC(event, activeMap, player, event.getOption(scs[c]));
                     }
                     playerSCs = player.getSCs();
                     c++;
                 }
             }
-        }
-        if (!pickSuccessful) {
             return;
         }
 
@@ -98,10 +95,8 @@ public class SCPick extends PlayerSubcommandData {
         sb.append(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true));
         if (!activeMap.isHomeBrewSCMode()) {
             sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(event, scPicked));
-        }
-        else{
-            sb.append(" Picked: ").append("SC #"+scPicked);
-
+        } else {
+            sb.append(" Picked: ").append(Helper.getSCBackRepresentation(event, scPicked));
         }
 
         boolean nextCorrectPing = false;
