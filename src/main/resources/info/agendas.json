@@ -355,7 +355,7 @@
     "name": "Checks and Balances",
     "type": "Law",
     "target": "For/Against",
-    "text1": "For: When a player chooses a strategy card during the strategy phase, they give that strategy card to another player who does not have 1 (or a player who does not have 2 is a three- or four-player game), if able.",
+    "text1": "For: When a player chooses a strategy card during the strategy phase, they give that strategy card to another player who does not have 1 (or a player who does not have 2 in a three- or four-player game), if able.",
     "text2": "Against: Each player readies only 3 of their planets at the end of this agenda phase.",
     "source": "PoK"
   },
@@ -364,7 +364,7 @@
     "name": "Clandestine Operations",
     "type": "Directive",
     "target": "For/Against",
-    "text1": "For: Each player removes 2 command tokens from their command sheet and return those tokens to their reinforcements.",
+    "text1": "For: Each player removes 2 command tokens from their command sheet and returns those tokens to their reinforcements.",
     "text2": "Against: Each player removes 1 command token from their fleet pool and returns that token to their reinforcements.",
     "source": "PoK"
   },
@@ -372,7 +372,7 @@
     "alias": "covert",
     "name": "Covert Legislation",
     "type": "Directive",
-    "target": "When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect Elect Player, etc.) the other Players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects.",
+    "target": "When this agenda is revealed, the speaker draws the next card in the agenda deck but does not reveal it to the other players. Instead, the speaker reads the eligible outcomes aloud (for, against, elect Elect Player, etc.). The other Players vote for these outcomes as if they were outcomes of this agenda, without knowing their effects.",
     "text1": "",
     "text2": "",
     "source": "PoK"
