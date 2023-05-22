@@ -483,6 +483,36 @@ public class Helper {
         }
         return planetButtons;
     }
+    public static List<Button> getRemainingSCButtons(GenericInteractionCreateEvent event, Map activeMap) {
+        List<Button> scButtons = new ArrayList<>();
+        
+        for (int x=1; x < 9; x++) {
+
+            boolean held = false;
+            for(Player player :activeMap.getPlayers().values())
+            {
+                if(player == null || player.getFaction() == null)
+                {
+                    continue;
+                }
+                else
+                {
+                    if(player.getSCs() != null && player.getSCs().contains(Integer.valueOf(x)) &&!activeMap.isFoWMode())
+                    {
+                        held = true;
+                    }
+                }
+            }
+
+            if(!held)
+            {
+                Button button = Button.secondary("scPick_"+x, x+"");
+                scButtons.add(button);
+            }
+            
+        }
+        return scButtons;
+    }
 
     public static List<Button> getPlanetExhaustButtons(GenericInteractionCreateEvent event, Player player, Map activeMap) {
         List<Button> planetButtons = new ArrayList<>();

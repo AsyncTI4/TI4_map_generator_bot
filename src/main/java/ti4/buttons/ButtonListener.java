@@ -42,6 +42,8 @@ import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.commands.player.PlanetExhaust;
 import ti4.commands.player.PlanetRefresh;
+import ti4.commands.player.Stats;
+import ti4.commands.player.SCPick;
 import ti4.commands.player.Turn;
 import ti4.helpers.Constants;
 import ti4.helpers.AgendaHelper;
@@ -1022,6 +1024,19 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             event.getMessage().delete().queue();
         }
+        else if(buttonID.startsWith("scPick_")){
+            Stats stats = new Stats();
+            String num = buttonID.replace("scPick_", "");
+            int scpick = Integer.parseInt(num);
+            boolean pickSuccessful = stats.secondHalfOfPickSC((GenericInteractionCreateEvent)event, activeMap, player, scpick);
+            if(pickSuccessful)
+            {
+                new SCPick().secondHalfOfSCPick((GenericInteractionCreateEvent)event, player, activeMap, scpick);
+                event.getMessage().delete().queue();
+            }
+            
+            
+        }
 
        
         else if (buttonID.startsWith("reinforcements_cc_placement_")) {
@@ -1474,8 +1489,17 @@ public class ButtonListener extends ListenerAdapter {
                     String message =  Helper.getPlayerRepresentation(speaker, activeMap, event.getGuild(), true) + " UP TO PICK SC";
                     if (activeMap.isFoWMode()) {
                         MessageHelper.sendPrivateMessageToPlayer(speaker, activeMap, message);
+                        if(!activeMap.isHomeBrewSCMode())
+                        {
+                            MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                        }
                     } else {
                         MessageHelper.sendMessageToChannel(event.getChannel(), message);
+                        if(!activeMap.isHomeBrewSCMode())
+                        {
+                            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                        }
+
                     }
                     event.getMessage().delete().queue();
 
