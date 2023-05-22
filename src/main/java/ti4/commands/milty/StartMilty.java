@@ -204,8 +204,8 @@ public class StartMilty extends MiltySubcommandData {
         } catch (IOException e) {
             BotLogger.log("Could not save generated slice image", e);
         }
-        Map map = getActiveMap();
-        String absolutePath = file.getParent() + "/" + map.getName() + "_slices.jpg";
+        Map activeMap = getActiveMap();
+        String absolutePath = file.getParent() + "/" + activeMap.getName() + "_slices.jpg";
         try (FileInputStream fileInputStream = new FileInputStream(file);
              FileOutputStream fileOutputStream = new FileOutputStream(absolutePath)) {
 

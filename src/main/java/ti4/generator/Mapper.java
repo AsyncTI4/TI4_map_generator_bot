@@ -56,14 +56,14 @@ public class Mapper {
     private static final Properties hyperlaneAdjacencies = new Properties();
     private static final Properties wormholes = new Properties();
     private static final Properties ds_handcards = new Properties();
-    
+
     //TODO: (Jazz) Finish moving all files over from properties to json
     private static final HashMap<String, ActionCardModel> actionCards = new HashMap<>();
     private static final HashMap<String, AgendaModel> agendas = new HashMap<>();
     private static final HashMap<String, FactionModel> factionSetup = new HashMap<>();
     private static final HashMap<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
     private static final HashMap<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
-    
+
     private static final HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = new HashMap<>();
 
     public static void init() {
@@ -123,7 +123,7 @@ public class Mapper {
             try (InputStream input = new FileInputStream(jsonSource)) {
                 String jsonContents = new String(input.readAllBytes());
                 JsonNode jsonList = objectMapper.readTree(jsonContents);
-                 
+
                 if (jsonList.getNodeType() == JsonNodeType.ARRAY) {
                     jsonList.elements().forEachRemaining(node -> {
                         T obj = constructor.construct(node);
@@ -141,7 +141,7 @@ public class Mapper {
             }
         }
     }
-    
+
     public static List<String> getPromissoryNotes(String color, String faction) {
         List<String> pnList = new ArrayList<>();
         color = AliasHandler.resolveColor(color);
@@ -561,7 +561,7 @@ public class Mapper {
         HashMap<String, ActionCardModel> acList = new HashMap<>(actionCards);
         return acList;
     }
-    
+
     public static HashMap<String, ActionCardModel> getActionCards(String extra) {
         HashMap<String, ActionCardModel> acList = new HashMap<>();
         for (Map.Entry<String, ActionCardModel> entry : actionCards.entrySet()) {
@@ -644,7 +644,7 @@ public class Mapper {
         return AliasHandler.getPlanetKeyList().contains(id);
     }
 
-    
+
     public static HashMap<String, PublicObjectiveModel> getPublicObjectives() {
         HashMap<String, PublicObjectiveModel> poList = new HashMap<>(publicObjectives);
         return poList;
@@ -700,7 +700,7 @@ public class Mapper {
         }
         return factionAbilities;
     }
-    
+
     public static List<String> getFactions() {
         return factions.keySet().stream()
                 .filter(token -> token instanceof String)

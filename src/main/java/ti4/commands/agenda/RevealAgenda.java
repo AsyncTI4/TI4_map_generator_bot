@@ -42,17 +42,14 @@ public class RevealAgenda extends AgendaSubcommandData {
         String id = activeMap.revealAgenda(revealFromBottom);
         LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(id);
-        
+
         AgendaModel agendaDetails = Mapper.getAgenda(id);
         String agendaTarget = agendaDetails.target;
         String agendaType = agendaDetails.type;
         String agendaName = agendaDetails.name;
-        if (agendaName!= null && !agendaName.equalsIgnoreCase("Covert Legislation"))
-        {
+        if (agendaName!= null && !agendaName.equalsIgnoreCase("Covert Legislation")) {
             activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget + "_"+uniqueID);
-        }
-        else
-        {
+        } else {
             String id2 = activeMap.getNextAgenda(revealFromBottom);
             AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
             agendaTarget = agendaDetails2.target;
@@ -75,21 +72,21 @@ public class RevealAgenda extends AgendaSubcommandData {
         Button noWhenPersistent = Button.primary("no_when_persistent", "No Whens No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
 
         List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
-        
+
         Button playAfter = Button.danger("play_after", "Play A Non-AC Rider");
         Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromFormatted(Emojis.noafters));
         Button noAfterPersistent = Button.primary("no_after_persistent", "No Afters No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.noafters));
         List<Button> afterButtons = new ArrayList<>(List.of(playAfter, noAfter, noAfterPersistent));
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
-        
+
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, Emojis.nowhens, activeMap, whenButtons, "when");
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, Emojis.noafters,activeMap, afterButtons,"after");
-        
+
         ListVoteCount.turnOrder(event, activeMap, channel);
         Button proceed = Button.danger( "proceedToVoting", "Proceed to voting without waiting for everyone to react");
         List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
         MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters", proceedButtons);
-       
+
     }
 }

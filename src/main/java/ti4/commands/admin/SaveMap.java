@@ -27,9 +27,9 @@ public class SaveMap extends AdminSubcommandData {
                 sendMessage("Game with such name does not exists, use /list_games");
                 return;
             }
-            Map map = MapManager.getInstance().getMap(mapName);
-            MapSaveLoadManager.saveMap(map, event);
-            sendMessage("Save map: " + map.getName());
+            Map activeMap = MapManager.getInstance().getMap(mapName);
+            MapSaveLoadManager.saveMap(activeMap, event);
+            sendMessage("Save map: " + activeMap.getName());
 
         } else {
             sendMessage("No Game specified.");

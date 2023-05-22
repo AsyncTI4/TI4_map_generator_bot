@@ -56,47 +56,39 @@ public class ExpPlanet extends ExploreSubcommandData {
         if (traitOption != null){
             drawColor = traitOption.getAsString();
         }
-        
+
         Player player = activeMap.getPlayer(event.getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
 
-        
+
         explorePlanet(event, tile, planetName, drawColor, player, false, activeMap, 1);
     }
 
-    public void explorePlanet(GenericInteractionCreateEvent event, Tile tile, String planetName, String drawColor, Player player, boolean NRACheck, Map activeMap, int numExplores)
-    {
-        if (!player.getPlanets().contains(planetName) && !activeMap.isAllianceMode())
-        {
+    public void explorePlanet(GenericInteractionCreateEvent event, Tile tile, String planetName, String drawColor, Player player, boolean NRACheck, Map activeMap, int numExplores) {
+        if (!player.getPlanets().contains(planetName) && !activeMap.isAllianceMode()) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not own this planet, thus cannot explore it.");
             return;
         }
-        
-        if (player.getFaction().equalsIgnoreCase("naaz"))
-        {
-            if (Helper.mechCheck(planetName, activeMap, player))
-            {
-                if (!NRACheck)
-                {
+
+        if (player.getFaction().equalsIgnoreCase("naaz")) {
+            if (Helper.mechCheck(planetName, activeMap, player)) {
+                if (!NRACheck) {
                     String message = "Please decide whether or not to use your distant suns (explore twice) ability.";
                     Button resolveExplore1  = Button.success("distant_suns_accept_"+planetName+"_"+drawColor, "Choose to Explore Twice");
                     Button resolveExplore2 = Button.success("distant_suns_decline_"+planetName+"_"+drawColor, "Decline Distant Suns");
                     List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                     return;
-                }
-                else
-                {
-                    if (numExplores == 2)
-                    {
+                } else {
+                    if (numExplores == 2) {
                         String cardID = activeMap.drawExplore(drawColor);
                         if (cardID == null) {
                             sendMessage("Planet cannot be explored");
                             return;
                         }
                         String cardID2 = activeMap.drawExplore(drawColor);
-                        
+
                         String card = Mapper.getExplore(cardID);
                         String[] cardInfo1 = card.split(";");
                         String name1 = cardInfo1[0];
@@ -128,8 +120,7 @@ public class ExpPlanet extends ExploreSubcommandData {
         messageText.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(planetName) +" *(tile "+ tile.getPosition() + ")*:\n");
         messageText.append("> ").append(displayExplore(cardID));
         resolveExplore(event, cardID, tile, planetName, messageText.toString(), false, player, activeMap);
-        if (player.getTechs().contains(AliasHandler.resolveTech("Pre-Fab Arcologies")))
-        {
+        if (player.getTechs().contains(AliasHandler.resolveTech("Pre-Fab Arcologies"))) {
             new PlanetRefresh().doAction(player, planetName, activeMap);
             MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
         }

@@ -31,7 +31,7 @@ public abstract class PNCardsSubcommandData extends SubcommandData {
     public User getUser() {
         return user;
     }
-    
+
     /**
      * Send a message to the event's channel, handles large text
      * @param messageText new message

@@ -86,7 +86,7 @@ public class PNInfo extends PNCardsSubcommandData {
                     }
                 }
                 sb.append("\n");
-                
+
                 //PLAY AREA PROMISSORY NOTES
                 sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
                 if (promissoryNotesInPlayArea.isEmpty()) {
@@ -104,7 +104,7 @@ public class PNInfo extends PNCardsSubcommandData {
             }
         }
         return sb.toString();
-    } 
+    }
 
     private static String getPromissoryNoteRepresentationShort(String pnID) {
         return getPromissoryNoteRepresentation(pnID, null, false);

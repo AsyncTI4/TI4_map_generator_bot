@@ -49,14 +49,14 @@ public class Stats extends PlayerSubcommandData {
 			sendMessage("Player could not be found");
 			return;
 		}
-		
+
 		List<OptionMapping> optionMappings = event.getOptions();
 		//NO OPTIONS SELECTED, JUST DISPLAY STATS
 		if (optionMappings.isEmpty() && !activeMap.isFoWMode()) {
 			sendMessage(getPlayersCurrentStatsText(player, activeMap));
 			return;
 		}
-		
+
 		//DO CCs FIRST
 		OptionMapping optionCC = event.getOption(Constants.CC);
 		OptionMapping optionT = event.getOption(Constants.TACTICAL);
@@ -107,7 +107,7 @@ public class Stats extends PlayerSubcommandData {
 		if (optionMappings.isEmpty()) return;
 
 		sendMessage(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " player stats changed:");
-		
+
 		OptionMapping optionTG = event.getOption(Constants.TG);
 		if (optionTG != null) {
 			setValue(event, activeMap, player, optionTG, player::setTg, player::getTg);
@@ -224,7 +224,7 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Speaker: ").append(getActiveMap().getSpeaker().equals(player.getUserID())).append("\n");
 		sb.append("> Passed: ").append(player.isPassed()).append("\n");
 		sb.append("> Dummy: ").append(player.isDummy()).append("\n");
-		
+
 		sb.append("> Abilities: ").append(player.getFactionAbilities()).append("\n");
 		sb.append("> Planets: ").append(player.getPlanets()).append("\n");
 		sb.append("> Techs: ").append(player.getTechs()).append("\n");
@@ -270,7 +270,7 @@ public class Stats extends PlayerSubcommandData {
 					return false;
 				}
 			}
-	
+
 			player.addSC(scNumber);
 			String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) + " picked SC #"+scNumber;
 			if (activeMap.isFoWMode()) {
@@ -285,23 +285,23 @@ public class Stats extends PlayerSubcommandData {
 				if (activeMap.isFoWMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
 				}
-				
+
 				player.setTg(tg);
 			}
 			return true;
 	}
 
-	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, OptionMapping option,
+	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping option,
 			Consumer<Integer> consumer, Supplier<Integer> supplier) {
-		setValue(event, map, player, option.getName(), consumer, supplier, option.getAsString(), false);
+		setValue(event, activeMap, player, option.getName(), consumer, supplier, option.getAsString(), false);
 	}
 
-	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, OptionMapping option,
+	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping option,
 			Consumer<Integer> consumer, Supplier<Integer> supplier, boolean suppressMessage) {
-		setValue(event, map, player, option.getName(), consumer, supplier, option.getAsString(), suppressMessage);
+		setValue(event, activeMap, player, option.getName(), consumer, supplier, option.getAsString(), suppressMessage);
 	}
 
-	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, String optionName,
+	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, String optionName,
 			Consumer<Integer> consumer, Supplier<Integer> supplier, String value, boolean suppressMessage) {
 		try {
 			boolean setValue = !value.startsWith("+") && !value.startsWith("-");
@@ -311,8 +311,8 @@ public class Stats extends PlayerSubcommandData {
 				consumer.accept(number);
 				String messageToSend = getSetValueMessage(event, player, optionName, number, existingNumber);
 				if (!suppressMessage) sendMessage(messageToSend);
-				if (map.isFoWMode()) {
-					FoWHelper.pingAllPlayersWithFullStats(map, event, player, messageToSend);
+				if (activeMap.isFoWMode()) {
+					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
 				}
 			} else {
 				int newNumber = existingNumber + number;
@@ -320,8 +320,8 @@ public class Stats extends PlayerSubcommandData {
 				consumer.accept(newNumber);
 				String messageToSend = getChangeValueMessage(event, player, optionName, number, existingNumber, newNumber);
 				if (!suppressMessage) sendMessage(messageToSend);
-				if (map.isFoWMode()) {
-					FoWHelper.pingAllPlayersWithFullStats(map, event, player, messageToSend);
+				if (activeMap.isFoWMode()) {
+					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
 				}
 			}
 		} catch (Exception e) {

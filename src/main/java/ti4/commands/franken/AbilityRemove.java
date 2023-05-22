@@ -10,7 +10,7 @@ public class AbilityRemove extends AbilityAddRemove {
     public AbilityRemove() {
         super(Constants.ABILITY_REMOVE, "Remove an ability from your faction");
     }
-    
+
     @Override
     public void doAction(Player player, List<String> abilityIDs) {
         StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveMap())).append(" removed abilities:\n");

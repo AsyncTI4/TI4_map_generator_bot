@@ -84,7 +84,7 @@ public class GameEnd extends GameSubcommandData {
         File file = GenerateMap.getInstance().saveImage(userActiveMap, DisplayType.map, event);
         FileUpload fileUpload = FileUpload.fromData(file);
         MessageHelper.replyToMessage(event, file);
-        
+
         //CREATE POST IN #THE-PBD-CHRONICLES
         TextChannel pbdChroniclesChannel = MapGenerator.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).get(0);
         String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles" : pbdChroniclesChannel.getAsMention();
@@ -98,7 +98,7 @@ public class GameEnd extends GameSubcommandData {
             if (member != null) message.append(member.getAsMention());
         }
         message.append("\nPlease provide a summary of the game below:");
-        
+
         pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
             m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
             m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
@@ -107,13 +107,13 @@ public class GameEnd extends GameSubcommandData {
         //INFORM PLAYERS
         String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
         MessageHelper.sendMessageToChannel(event.getChannel(), msg);
-                
+
         //INFORM BOTHELPER IF IN-LIMBO IS FULL
         String bothelperMention = Helper.getEventGuildRole(event, "bothelper").getAsMention();
         // MessageHelper.sendMessageToChannel(event.getChannel(), bothelperMention + " - this game has concluded");
         TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
-        if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");      
-    
+        if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
+
         //MOVE CHANNELS TO IN-LIMBO
         Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
         TextChannel tableTalkChannel = (TextChannel) userActiveMap.getTableTalkChannel();
@@ -147,37 +147,37 @@ public class GameEnd extends GameSubcommandData {
         }
 
         //DOWNLOAD CHANNEL BACKUP VIA CLI
-        
+
         //POST FILE TO BACKUP CHANNEL
 
         //DELETE CHANNELS
     }
 
-    public static String getGameEndText(Map map, SlashCommandInteractionEvent event) {
+    public static String getGameEndText(Map activeMap, SlashCommandInteractionEvent event) {
         StringBuilder sb = new StringBuilder();
-        sb.append("__**").append(map.getName()).append("**__ - ").append(map.getCustomName()).append("\n");
-        sb.append(map.getCreationDate()).append(" - ").append(Helper.getDateRepresentation(map.getLastModifiedDate()));
+        sb.append("__**").append(activeMap.getName()).append("**__ - ").append(activeMap.getCustomName()).append("\n");
+        sb.append(activeMap.getCreationDate()).append(" - ").append(Helper.getDateRepresentation(activeMap.getLastModifiedDate()));
         sb.append("\n");
         sb.append("\n");
         sb.append("**Players:**").append("\n");
-        HashMap<String, Player> players = map.getPlayers();
+        HashMap<String, Player> players = activeMap.getPlayers();
         int index = 1;
         for (Player player : players.values()) {
             if (player.getFaction() != null && !player.isDummy()) {
-                int playerVP = player.getTotalVictoryPoints(map);
+                int playerVP = player.getTotalVictoryPoints(activeMap);
                 sb.append("> `").append(index).append(".` ");
                 sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
                 sb.append(Helper.getColourAsMention(event.getGuild(), player.getColor()));
                 sb.append(event.getJDA().getUserById(player.getUserID()).getAsMention());
                 sb.append(" - *").append(playerVP).append("VP* ");
-                if (playerVP >= map.getVp()) sb.append(" - **WINNER**");
+                if (playerVP >= activeMap.getVp()) sb.append(" - **WINNER**");
                 sb.append("\n");
                 index++;
             }
         }
-        
+
         sb.append("\n");
-        String gameModesText = map.getGameModesText();
+        String gameModesText = activeMap.getGameModesText();
         if (gameModesText.isEmpty()) gameModesText = "None";
         sb.append("Game Modes: " + gameModesText).append("\n");
 

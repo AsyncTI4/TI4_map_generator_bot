@@ -79,7 +79,7 @@ public class MapGenerator {
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .build();
-	    
+
         jda.addEventListener(new MessageListener(), new ButtonListener());
         try {
             jda.awaitReady();

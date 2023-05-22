@@ -22,7 +22,7 @@ import ti4.message.MessageHelper;
 public class LeaderInfo extends LeaderSubcommandData {
     public static final String CARDS_INFO = Constants.CARDS_INFO_THREAD_PREFIX;
     private static HashMap<Map, TextChannel> threadTextChannels = new HashMap<>();
-    
+
     public LeaderInfo() {
         super(Constants.INFO, "Send Leader info to your Cards-Info thread");
     }
@@ -41,7 +41,7 @@ public class LeaderInfo extends LeaderSubcommandData {
 
         if (event != null) {
             OptionMapping option = event.getOption(Constants.DM_CARD_INFO);
-            if (option != null && option.getAsBoolean()) { 
+            if (option != null && option.getAsBoolean()) {
                 MessageHelper.sendMessageToUser(leaderInfo, user);
             }
         }
@@ -53,7 +53,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendLeadersInfo(activeMap, player);
     }
-    
+
     public static void sendLeadersInfo(Map activeMap, Player player) {
         //LEADERS INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getLeaderInfo(activeMap, player));
@@ -68,7 +68,7 @@ public class LeaderInfo extends LeaderSubcommandData {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
         }
-    } 
+    }
 
     private static List<Button> getLeaderButtons(Map activeMap, Player player) {
         return null;
@@ -90,7 +90,7 @@ public class LeaderInfo extends LeaderSubcommandData {
                 leaderSB.append(Helper.getLeaderFullRepresentation(player, leader)).append("\n");
             }
         }
-        
+
         //PROMISSORY NOTES
         LinkedHashMap<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
@@ -152,7 +152,7 @@ public class LeaderInfo extends LeaderSubcommandData {
                 }
             }
         }
-    
+
         return leaderSB.toString();
     }
 }

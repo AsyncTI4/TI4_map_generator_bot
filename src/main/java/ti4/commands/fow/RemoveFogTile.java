@@ -28,13 +28,13 @@ public class RemoveFogTile extends FOWSubcommandData {
             MessageHelper.sendMessageToChannel(channel, "You're not a player of this game");
             return;
         }
-        
+
         OptionMapping positionMapping = event.getOption(Constants.POSITION);
         if (positionMapping == null) {
             MessageHelper.replyToMessage(event, "Specify position");
             return;
         }
-        
+
         String position = positionMapping.getAsString().toLowerCase();
         if (!PositionMapper.isTilePositionValid(position)) {
             MessageHelper.replyToMessage(event, "Tile position is not allowed");

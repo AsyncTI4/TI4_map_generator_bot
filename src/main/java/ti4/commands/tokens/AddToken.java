@@ -28,8 +28,7 @@ public class AddToken extends AddRemoveToken {
             tokenName = AliasHandler.resolveAttachment(tokenName);
             addToken(event, tile, tokenName, activeMap);
             activeMap.clearPlanetsCache();
-        }
-        else {
+        } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Token not specified.");
         }
     }

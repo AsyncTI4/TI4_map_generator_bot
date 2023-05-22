@@ -32,7 +32,7 @@ public abstract class SOCardsSubcommandData extends SubcommandData {
     public User getUser() {
         return user;
     }
-    
+
     /**
      * Send a message to the event's channel, handles large text
      * @param messageText new message
@@ -40,7 +40,7 @@ public abstract class SOCardsSubcommandData extends SubcommandData {
     public void sendMessage(String messageText) {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);
     }
-    
+
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void preExecute(SlashCommandInteractionEvent event) {

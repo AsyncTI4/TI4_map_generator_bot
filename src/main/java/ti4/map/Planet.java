@@ -104,14 +104,14 @@ public class Planet extends UnitHolder {
                 influenceOriginal = 0;
             }
         }
-        
+
         List<String> attachmentInfoAll = Mapper.getAttachmentInfoAll();
         for (String id : attachmentInfoAll) {
             String attachmentID = Mapper.getAttachmentID(id);
             if (tokenFileName.equals(attachmentID)) {
                 String attachmentInfo = Mapper.getAttachmentInfo(id);
                 String[] split = attachmentInfo.split(";");
-                
+
                 try {
                     if (removeTokenData) {
                         resourcesModifier -= Integer.parseInt(split[0]);
@@ -126,7 +126,7 @@ public class Planet extends UnitHolder {
                 }
 
                 //ADD TYPES
-                if (split.length > 2) { 
+                if (split.length > 2) {
                     String additional = split[2];
                     if (additional.contains(",")) {
                         String[] subSplit = additional.split(",");

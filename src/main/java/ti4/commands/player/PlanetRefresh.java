@@ -10,7 +10,7 @@ public class PlanetRefresh extends PlanetAddRemove {
     }
 
     @Override
-    public void doAction(Player player, String planet, Map map) {
+    public void doAction(Player player, String planet, Map activeMap) {
         player.refreshPlanet(planet);
     }
 }

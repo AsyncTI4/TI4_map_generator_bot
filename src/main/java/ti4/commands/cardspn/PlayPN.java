@@ -106,7 +106,7 @@ public class PlayPN extends PNCardsSubcommandData {
             pnText = Mapper.getPromissoryNote(id, longPNDisplay);
         }
         sb.append(pnText).append("\n");
-        
+
         //TERRAFORM TIP
         if (id.equalsIgnoreCase("terraform")) {
             sb.append("`/add_token token:titanspn`\n");

@@ -40,7 +40,7 @@ public class Turn extends PlayerSubcommandData {
         Player mainPlayer = activeMap.getPlayer(getUser().getId());
         mainPlayer = Helper.getGamePlayer(activeMap, mainPlayer, event, null);
         mainPlayer = Helper.getPlayer(activeMap, mainPlayer, event);
-        
+
         if (mainPlayer == null) {
             sendMessage("Player/Faction/Color could not be found in map:" + activeMap.getName());
             return;
@@ -59,7 +59,7 @@ public class Turn extends PlayerSubcommandData {
            MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
         } else {
             MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(),Helper.getPlayerRepresentation(mainPlayer, activeMap));
-            
+
         }
         String nextMessage = pingNextPlayer(event, activeMap, mainPlayer);
         if (!nextMessage.isEmpty()) sendMessage(nextMessage);
@@ -157,21 +157,18 @@ public class Turn extends PlayerSubcommandData {
                     String fail = "User for next faction not found. Report to ADMIN";
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, activeMap, event, text, fail, success);
-                    if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase(""))
-                    {
+                    if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
                         MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeMap, player));
                     }
-                  
+
                     activeMap.setPingSystemCounter(0);
-                    for (int x = 0; x < 10; x++)
-                    {
+                    for (int x = 0; x < 10; x++) {
                         activeMap.setTileAsPinged(x, null);
                     }
                     return "";
                 } else {
                     MessageHelper.sendMessageToChannel(gameChannel, text);
-                    if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase(""))
-                    {
+                    if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
                         MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeMap, player));
                     }
                     return "";
@@ -181,14 +178,14 @@ public class Turn extends PlayerSubcommandData {
         return "Next Player not found";
     }
 
-    private String getMissedSCFollowsText(Map map, Player player) {
-        if (!map.isStratPings()) return null;
+    private String getMissedSCFollowsText(Map activeMap, Player player) {
+        if (!activeMap.isStratPings()) return null;
         boolean sendReminder = false;
-        
+
         StringBuilder sb = new StringBuilder("> Please react to ");
 
-        for (int sc : map.getPlayedSCs()) {
-            if (!player.hasFollowedSC(sc)) {   
+        for (int sc : activeMap.getPlayedSCs()) {
+            if (!player.hasFollowedSC(sc)) {
                 sb.append(Helper.getSCBackEmojiFromInteger(sc));
                 sendReminder = true;
             }
@@ -199,42 +196,32 @@ public class Turn extends PlayerSubcommandData {
 
     private void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Map activeMap, MessageChannel gameChannel) {
         String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeMap);
-        
+
         LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
         Player arborec = Helper.getPlayerFromColorOrFaction(activeMap, "arborec");
-        if (arborec != null)
-        {
+        if (arborec != null) {
             String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeMap, event.getGuild(), true) + " reminder to do mitosis!";
-            if (activeMap.isFoWMode())
-            {
+            if (activeMap.isFoWMode()) {
                 MessageHelper.sendMessageToChannel(arborec.getPrivateChannel(), mitosisMessage);
-            }
-            else
-            {
+            } else {
                 MessageHelper.sendMessageToChannel(gameChannel, mitosisMessage);
             }
         }
         Player solPlayer =  Helper.getPlayerFromColorOrFaction(activeMap, "sol");
-    
-        if (solPlayer != null)
-        {
+
+        if (solPlayer != null) {
             String colorID = Mapper.getColorID(solPlayer.getColor());
             String fsKey = colorID + "_fs.png";
             String infKey = colorID + "_gf.png";
             for (Tile tile : activeMap.getTileMap().values()) {
                 for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    if (unitHolder.getUnits() != null)
-                    {
-                        if (unitHolder.getUnits().get(fsKey) != null && unitHolder.getUnits().get(fsKey) > 0)
-                        {
+                    if (unitHolder.getUnits() != null) {
+                        if (unitHolder.getUnits().get(fsKey) != null && unitHolder.getUnits().get(fsKey) > 0) {
                             unitHolder.addUnit(infKey, 1);
                             String genesisMessage = Helper.getPlayerRepresentation(solPlayer, activeMap, event.getGuild(), true) + " an infantry was added to the space area of your flagship automatically.";
-                            if (activeMap.isFoWMode())
-                            {
+                            if (activeMap.isFoWMode()) {
                                 MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
-                            }
-                            else
-                            {
+                            } else {
                                 MessageHelper.sendMessageToChannel(gameChannel, genesisMessage);
                             }
                         }
@@ -245,27 +232,22 @@ public class Turn extends PlayerSubcommandData {
 
         Player l1z1xPlayer =  Helper.getPlayerFromColorOrFaction(activeMap, "l1z1x");
 
-        if (l1z1xPlayer != null)
-        {
-            for (Player player : activeMap.getPlayers().values())
-            {
- 
+        if (l1z1xPlayer != null) {
+            for (Player player : activeMap.getPlayers().values()) {
+
                 if (!player.getPromissoryNotes().isEmpty()) {
                     for (String pn : player.getPromissoryNotes().keySet()) {
-                        
+
                         if (!player.getFaction().equalsIgnoreCase("l1z1x") && pn.equalsIgnoreCase("ce")) {
                             String cyberMessage = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " reminder to use cybernetic enhancements!";
-                            if (activeMap.isFoWMode())
-                            {
+                            if (activeMap.isFoWMode()) {
                                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(), cyberMessage);
-                            }
-                            else
-                            {
+                            } else {
                                 MessageHelper.sendMessageToChannel(gameChannel, cyberMessage);
                             }
                         }
-                            
-                        
+
+
                     }
                 }
             }
@@ -332,7 +314,7 @@ public class Turn extends PlayerSubcommandData {
         MessageCreateData messageObject = new MessageCreateBuilder()
                 .addContent(message)
                 .addComponents(actionRows).build();
-        
+
         gameChannel.sendMessage(messageObject).queue();
     }
 }

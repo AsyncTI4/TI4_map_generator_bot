@@ -19,7 +19,7 @@ public class SetHeroActiveLeader extends LeaderAction {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
-        
+
         if (player == null) {
             sendMessage("Player could not be found");
             return;
@@ -46,7 +46,7 @@ public class SetHeroActiveLeader extends LeaderAction {
             sendMessage("Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
             return;
         }
-        
+
         sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
         StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
         .append(" played ")

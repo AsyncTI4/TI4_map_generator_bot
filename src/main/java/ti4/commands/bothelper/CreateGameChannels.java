@@ -86,7 +86,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         } else {
             gameName = getNextGameName();
         }
-        
+
         //CHECK CATEGORY IS VALID
         String categoryChannelName = event.getOption(Constants.CATEGORY).getAsString();
         Category categoryChannel = null;
@@ -117,7 +117,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             sendMessage("Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
-        
+
         //CHECK IF CATEGORY HAS ROOM
         Category category = categoryChannel;
         if (category.getChannels().size() > 48) {
@@ -133,7 +133,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
 
-        
+
         //PLAYERS
         ArrayList<Member> members = new ArrayList<>();
         Member gameOwner = null;
@@ -161,14 +161,14 @@ public class CreateGameChannels extends BothelperSubcommandData {
             sendMessage("https://discord.gg/zkMP2VbEsA"); //invite link to secondary server, #landing-pad channel, unlimited uses, no expiration date
             return;
         }
-        
+
         //CREATE ROLE
         Role role = guild.createRole()
         .setName(gameName)
         .setMentionable(true)
         .complete();
 
-        
+
         //ADD PLAYERS TO ROLE
         for (Member member : members) {
             guild.addRoleToMember(member, role).complete();
@@ -176,13 +176,13 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //CREATE GAME
         CreateGame createGame = new CreateGame();
-        Map map = createGame.createNewGame(event, gameName, gameOwner);
+        Map newMap = createGame.createNewGame(event, gameName, gameOwner);
 
         //ADD PLAYERS
         for (Member member : members) {
-            map.addPlayer(member.getId(), member.getEffectiveName());
+            newMap.addPlayer(member.getId(), member.getEffectiveName());
         }
-        
+
         //CREATE CHANNELS
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
         String newChatChannelName = gameName + "-" + gameFunName;
@@ -190,29 +190,29 @@ public class CreateGameChannels extends BothelperSubcommandData {
         String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
         long gameRoleID = role.getIdLong();
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-        
+
         // CREATE TABLETALK CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, category)
         .syncPermissionOverrides()
         .addRolePermissionOverride(gameRoleID, permission, 0)
         .complete();
         MessageHelper.sendMessageToChannel((MessageChannel) chatChannel, role.getAsMention()+ " - table talk channel");
-        map.setTableTalkChannelID(chatChannel.getId());
-        
+        newMap.setTableTalkChannelID(chatChannel.getId());
+
         // CREATE ACTIONS CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
         .syncPermissionOverrides()
         .addRolePermissionOverride(gameRoleID, permission, 0)
         .complete();
         MessageHelper.sendMessageToChannel((MessageChannel) actionsChannel, role.getAsMention() + " - actions channel");
-        map.setMainGameChannelID(actionsChannel.getId());
-        
+        newMap.setMainGameChannelID(actionsChannel.getId());
+
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
         .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
         .complete();
-        map.setBotMapUpdatesThreadID(botThread.getId());
-        
+        newMap.setBotMapUpdatesThreadID(botThread.getId());
+
         StringBuilder botGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - bot/map channel\n");
         botGetStartedMessage.append("__Use the following commands to get started:__\n");
         botGetStartedMessage.append("> `/game setup` to set player count and additional options\n");
@@ -237,8 +237,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
         message.append("> " + actionsChannel.getAsMention()).append("\n");
         message.append("> " + botThread.getAsMention()).append("\n");
         sendMessage(message.toString());
-        
-        MapSaveLoadManager.saveMap(map, event);
+
+        MapSaveLoadManager.saveMap(newMap, event);
     }
 
     private static String getNextGameName() {
@@ -256,8 +256,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
             for (Role role : guild.getRoles()) {
                 gameAndRoleNames.add(role.getName());
             }
-        }           
-        
+        }
+
         // GET ALL EXISTING PBD MAP NAMES
         HashSet<String> mapNames = new HashSet<>(MapManager.getInstance().getMapList().keySet());
         gameAndRoleNames.addAll(mapNames);
@@ -288,8 +288,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
                     pbdNumbers.add(Integer.parseInt(pbdNum));
                 }
             }
-        }           
-        
+        }
+
         // GET ALL EXISTING PBD MAP NAMES
         List<String> mapNames = MapManager.getInstance().getMapList().keySet().stream()
             .filter(mapName -> mapName.startsWith("pbd"))
@@ -310,15 +310,14 @@ public class CreateGameChannels extends BothelperSubcommandData {
             return MapGenerator.guildSecondary;
         } else {
             return null;
-        }        
+        }
     }
 
     private static boolean serverCanHostNewGame(Guild guild) {
         if (guild != null   && serverHasRoomForNewRole(guild)
-                            && serverHasRoomForNewChannels(guild))
-                            {
+                            && serverHasRoomForNewChannels(guild)) {
             return true;
-        }         
+        }
         return false;
     }
 

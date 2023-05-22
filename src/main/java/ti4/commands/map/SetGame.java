@@ -32,8 +32,8 @@ public class SetGame implements Command {
             return false;
         }
         String userID = event.getUser().getId();
-        Map map = MapManager.getInstance().getMap(mapName);
-        if (map.isMapOpen()){
+        Map activeMap = MapManager.getInstance().getMap(mapName);
+        if (activeMap.isMapOpen()){
             return true;
         }
         Member member = event.getMember();
@@ -45,7 +45,7 @@ public class SetGame implements Command {
                 }
             }
         }
-        if (!map.getPlayerIDs().contains(userID) && !userID.equals(map.getOwnerID())){
+        if (!activeMap.getPlayerIDs().contains(userID) && !userID.equals(activeMap.getOwnerID())){
             MessageHelper.replyToMessage(event, "Your are not a player of selected map.");
             return false;
         }

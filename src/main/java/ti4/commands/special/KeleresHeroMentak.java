@@ -83,4 +83,4 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
         }
         BotLogger.log(event, "DEBUG: **Keleres Hero Mentak used**");
     }
-} 
+}

@@ -36,10 +36,10 @@ public class SCPick extends PlayerSubcommandData {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
-        
+
         Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
         boolean isFowPrivateGame = (privateGame != null && privateGame);
-        
+
         if (player == null) {
             sendMessage("You're not a player of this game");
             return;
@@ -51,14 +51,14 @@ public class SCPick extends PlayerSubcommandData {
         int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
 
         int playerSCCount = player.getSCs().size();
-        if (playerSCCount >= maxSCsPerPlayer) { 
+        if (playerSCCount >= maxSCsPerPlayer) {
             sendMessage("Player can not pick another SC. Max SC per player for this game is " + maxSCsPerPlayer);
             return;
         }
-        
+
         OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
         int scPicked = option.getAsInt();
-        
+
         Stats stats = new Stats();
         boolean pickSuccessful = stats.pickSC(event, activeMap, player, option);
         LinkedHashSet<Integer> playerSCs = player.getSCs();
@@ -66,10 +66,8 @@ public class SCPick extends PlayerSubcommandData {
             if (activeMap.isFoWMode()) {
                 String[] scs = {Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6};
                 int c = 0;
-                while (playerSCs.isEmpty() && c < 5)
-                {
-                    if (event.getOption(scs[c]) != null)
-                    {
+                while (playerSCs.isEmpty() && c < 5) {
+                    if (event.getOption(scs[c]) != null) {
                         stats.pickSC(event, activeMap, player, event.getOption(scs[c]));
                     }
                     playerSCs = player.getSCs();
@@ -78,29 +76,26 @@ public class SCPick extends PlayerSubcommandData {
             }
             return;
         }
-        
+
 
         //ONLY DEAL WITH EXTRA PICKS IF IN FoW
-        
+
 
         if (playerSCs.isEmpty()) {
             sendMessage("No SC picked.");
             return;
         }
-        
+
         String msg = "";
         String msgExtra = "";
         boolean allPicked = true;
         Player privatePlayer = null;
-        
+
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true));
-        if (!activeMap.isHomeBrewSCMode())
-        {
+        if (!activeMap.isHomeBrewSCMode()) {
             sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(event, scPicked));
-        }
-        else
-        {
+        } else {
             sb.append(" Picked: ").append(Helper.getSCBackRepresentation(event, scPicked));
         }
 
@@ -125,7 +120,7 @@ public class SCPick extends PlayerSubcommandData {
                 players.add(player_);
             }
         }
-        
+
         //INFORM ALL PLAYER HAVE PICKED
         if (allPicked) {
             msgExtra += Helper.getGamePing(event, activeMap) + "\nAll players picked SC";
@@ -135,7 +130,7 @@ public class SCPick extends PlayerSubcommandData {
             for (Player player_ : activePlayers) {
                 scPickedList.addAll(player_.getSCs());
             }
-            
+
             //ADD A TG TO UNPICKED SC
             for (Integer scNumber : scTradeGoods.keySet()) {
                 if (!scPickedList.contains(scNumber) && scNumber != 0) {

@@ -38,7 +38,7 @@ public abstract class AgendaSubcommandData extends SubcommandData {
     public void sendMessage(String messageText) {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);
     }
-    
+
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void preExecute(SlashCommandInteractionEvent event) {

@@ -50,8 +50,8 @@ public class RelicInfo extends ExploreSubcommandData {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
         }
-    } 
-    
+    }
+
     private static String getRelicInfoText(Player player) {
         List<String> playerRelics = player.getRelics();
         StringBuilder sb = new StringBuilder("__**Relic Info**__\n");

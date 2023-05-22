@@ -34,7 +34,7 @@ public class SendCommodities extends PlayerSubcommandData {
             sendMessage("Player to send TG/Commodities could not be found");
             return;
         }
-        
+
         OptionMapping optionComms = event.getOption(Constants.COMMODITIES);
         if (optionComms != null) {
             int sendCommodities = optionComms.getAsInt();
@@ -47,7 +47,7 @@ public class SendCommodities extends PlayerSubcommandData {
             targetTG += sendCommodities;
             player_.setTg(targetTG);
 
-            
+
 			String p1 = Helper.getPlayerRepresentation(player, activeMap);
 			String p2 = Helper.getPlayerRepresentation(player_, activeMap);
 			String commString = sendCommodities + " " + Emojis.comm + " commodities";
@@ -58,7 +58,7 @@ public class SendCommodities extends PlayerSubcommandData {
                 String fail = "Could not notify receiving player.";
                 String success = "The other player has been notified";
                 MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
-                
+
 				// Add extra message for transaction visibility
 				FoWHelper.pingPlayersTransaction(activeMap, event, player, player_, commString, null);
             }

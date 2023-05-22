@@ -17,7 +17,7 @@ public class RemoveUnits extends AddRemoveUnits {
 
     @Override
     protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color) {
-        
+
     }
 
 
@@ -104,8 +104,8 @@ public class RemoveUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map) {
-        super.actionAfterAll(event, tile, color, map);
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map activeMap) {
+        super.actionAfterAll(event, tile, color, activeMap);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
             addPlanetToPlayArea(event, tile, unitHolder_.getName());
         }

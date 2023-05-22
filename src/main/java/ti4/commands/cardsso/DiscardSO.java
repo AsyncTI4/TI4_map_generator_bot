@@ -35,7 +35,7 @@ public class DiscardSO extends SOCardsSubcommandData {
         discardSO(event, player, option.getAsInt(), activeMap);
     }
     public void discardSO(GenericInteractionCreateEvent event, Player player, int SOID, Map activeMap) {
-       
+
         boolean removed = activeMap.discardSecretObjective(player.getUserID(), SOID);
         if (!removed) {
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap,"No such Secret Objective ID found, please retry");

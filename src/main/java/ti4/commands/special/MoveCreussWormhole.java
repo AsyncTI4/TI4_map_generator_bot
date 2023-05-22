@@ -72,5 +72,5 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
         List<String> validNames = List.of("creussalpha", "creussbeta", "creussgamma");
         return validNames.contains(tokenName);
     }
-    
+
 }

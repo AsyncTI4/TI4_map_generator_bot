@@ -21,17 +21,17 @@ public class PlanetAdd extends PlanetAddRemove {
     }
 
     @Override
-    public void doAction(Player player, String planet, Map map) {
-      doAction(player, planet, map, null);
+    public void doAction(Player player, String planet, Map activeMap) {
+      doAction(player, planet, activeMap, null);
     }
 
-    public void doAction(Player player, String planet, Map map, GenericInteractionCreateEvent event) {
+    public void doAction(Player player, String planet, Map activeMap, GenericInteractionCreateEvent event) {
         player.addPlanet(planet);
         player.exhaustPlanet(planet);
         if (planet.equals("mirage")){
-            map.clearPlanetsCache();
+            activeMap.clearPlanetsCache();
         }
-        UnitHolder unitHolder = map.getPlanetsInfo().get(planet);
+        UnitHolder unitHolder = activeMap.getPlanetsInfo().get(planet);
         String color = player.getColor();
         boolean moveTitanPN = false;
         if (unitHolder != null && color != null && !"null".equals(color)) {
@@ -44,14 +44,14 @@ public class PlanetAdd extends PlanetAddRemove {
                 moveTitanPN = true;
             } else if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
                 unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
-                map.scorePublicObjective(player.getUserID(), 0);
+                activeMap.scorePublicObjective(player.getUserID(), 0);
                 if (event != null && event instanceof SlashCommandInteractionEvent) {
-                    ScorePublic.informAboutScoring(event, ((SlashCommandInteractionEvent) event).getChannel(), map, player, 0);
+                    ScorePublic.informAboutScoring(event, ((SlashCommandInteractionEvent) event).getChannel(), activeMap, player, 0);
                 }
             }
         }
         boolean alreadyOwned = false;
-        for (Player player_ : map.getPlayers().values()) {
+        for (Player player_ : activeMap.getPlayers().values()) {
             if (player_ != player) {
                 List<String> planets = player_.getPlanets();
                 if (planets.contains(planet)) {
@@ -70,25 +70,22 @@ public class PlanetAdd extends PlanetAddRemove {
                 }
             }
         }
-        
-        if (!alreadyOwned && !map.isAllianceMode())
-        {
+
+        if (!alreadyOwned && !activeMap.isAllianceMode()) {
             Planet planetReal = (Planet) unitHolder;
             boolean oneOfThree = false;
-            if (planetReal != null && planetReal.getOriginalPlanetType() != null && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous")))
-            {
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous"))) {
                 oneOfThree = true;
             }
-            if ( oneOfThree)
-            {
+            if ( oneOfThree) {
                 String message = "Click Button To Explore";
                 String drawColor = planetReal.getOriginalPlanetType();
-                Button resolveExplore2 = Button.success("movedNExplored_filler_"+planet+"_"+drawColor, "Explore "+Helper.getPlanetRepresentation(planet, map));
+                Button resolveExplore2 = Button.success("movedNExplored_filler_"+planet+"_"+drawColor, "Explore "+Helper.getPlanetRepresentation(planet, activeMap));
                 List<Button> buttons = List.of(resolveExplore2);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
 
             }
-           
+
         }
     }
 }

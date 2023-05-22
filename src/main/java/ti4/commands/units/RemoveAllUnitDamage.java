@@ -12,7 +12,7 @@ import ti4.map.Tile;
 public class RemoveAllUnitDamage extends RemoveAllUnits {
 
     @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map map) {
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
         tile.removeAllUnitDamage(color);
     }
 

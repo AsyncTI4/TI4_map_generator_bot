@@ -16,7 +16,7 @@ public class SetupGameChannels extends GameSubcommandData {
     public SetupGameChannels() {
         super(Constants.GAME_CHANNEL_SETUP, "Setup channels and roles for non standard games");
         addOptions(new OptionData(OptionType.CHANNEL, Constants.MAIN_GAME_CHANNEL, "Specify main game channel").setRequired(true));
-    
+
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Specify main player for Community/Fog mode").setRequired(false));
         addOptions(new OptionData(OptionType.ROLE, Constants.ROLE1, "Specify role for Community Mode").setRequired(false));
         addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL1, "Specify private channel for player/role").setRequired(false));
@@ -94,7 +94,7 @@ public class SetupGameChannels extends GameSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify game player: " + playerConstant + " is invalid.");
                 return;
             }
-            
+
             //set community mode data
             if (activeMap.isCommunityMode()) {
                 if (role == null) {
@@ -104,7 +104,7 @@ public class SetupGameChannels extends GameSubcommandData {
                     player_.setRoleIDForCommunity(role.getAsRole().getId());
                 }
             }
-            
+
             //set private channel data
             if (channel.getChannelType() != ChannelType.TEXT) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify text channel for " + channelConstant);
