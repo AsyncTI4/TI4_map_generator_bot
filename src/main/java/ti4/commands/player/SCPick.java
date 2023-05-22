@@ -1,6 +1,7 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -90,11 +91,24 @@ public class SCPick extends PlayerSubcommandData {
             sendMessage("No SC picked.");
             return;
         }
+        secondHalfOfSCPick(event, player, activeMap, scPicked);
+    }
 
+        
+
+
+    public void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Map activeMap, int scPicked)
+    {
+        Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
+        boolean isFowPrivateGame = (privateGame != null && privateGame);
         String msg = "";
         String msgExtra = "";
         boolean allPicked = true;
         Player privatePlayer = null;
+        Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
+                .filter(player_ -> player_.isRealPlayer())
+                .collect(Collectors.toList());
+        int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
 
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true));
@@ -168,7 +182,7 @@ public class SCPick extends PlayerSubcommandData {
             }
         }
         msg = sb.toString();
-        sendMessage(msg);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame ) {
@@ -178,12 +192,22 @@ public class SCPick extends PlayerSubcommandData {
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(privatePlayer, activeMap, event, msgExtra, fail, success);
+            if(!allPicked&& !activeMap.isHomeBrewSCMode())
+            {
+                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+            }
+
         } else {
             if (allPicked) {
                 ListTurnOrder.turnOrder(event, activeMap);
             }
             if (!msgExtra.isEmpty()) {
-                sendMessage(msgExtra);
+                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
+                if(!allPicked && !activeMap.isHomeBrewSCMode())
+                {
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                }
+
             }
         }
     }
