@@ -307,6 +307,14 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 List<Button> buttons = List.of(ReadyPlanet,Decline);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
+            case "frln1", "frln2", "frln3" -> {
+                message = "Resolve explore using the buttons.";   
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
+                Button gainTG= Button.success("freelancersBuild_"+planetName, "Build 1 Unit");
+                Button Decline2 = Button.danger("decline_explore", "Decline Explore");
+                List<Button> buttons = List.of(gainTG,Decline2);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
+            }
             case "cm1", "cm2", "cm3" -> {
                 message = "Resolve explore using the buttons.";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);

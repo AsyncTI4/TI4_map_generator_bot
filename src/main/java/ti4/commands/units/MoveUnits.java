@@ -204,7 +204,12 @@ public class MoveUnits extends AddRemoveUnits {
             if (!priorityDmg) {
                 Integer unitCountInSystem = unitHolder.getUnits().get(unitID);
                 if (unitCountInSystem != null) {
-                    Integer unitDamageCountInSystem = unitHolder.getUnitDamage().get(unitID);
+                    Integer unitDamageCountInSystem =null;
+                    if(unitHolder != null && unitHolder.getUnitDamage()!= null)
+                    {
+                        unitDamageCountInSystem=unitHolder.getUnitDamage().get(unitID);
+                    }
+                   
                     if (unitDamageCountInSystem != null) {
                         countToRemove = unitDamageCountInSystem - (unitCountInSystem - count);
                         unitsDamage.put(unitID, countToRemove);

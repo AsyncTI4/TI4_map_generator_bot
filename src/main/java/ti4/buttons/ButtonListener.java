@@ -1014,6 +1014,16 @@ public class ButtonListener extends ListenerAdapter {
 
 
         }
+        else if(buttonID.startsWith("freelancersBuild_")){
+            String planet = buttonID.replace("freelancersBuild_", "");        
+            List<Button> buttons = new ArrayList<Button>();
+            buttons = Helper.getPlaceUnitButtons(event, player, activeMap,  activeMap.getTile(AliasHandler.resolveTile(planet)), false);
+            String message = Helper.getPlayerRepresentation(player, activeMap)+" Use the buttons to produce 1 unit.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+            event.getMessage().delete().queue();
+        }
+
+       
         else if (buttonID.startsWith("reinforcements_cc_placement_")) {
             String playerRep = Helper.getPlayerRepresentation(player, activeMap);
             String planet = buttonID.replace("reinforcements_cc_placement_", "");
