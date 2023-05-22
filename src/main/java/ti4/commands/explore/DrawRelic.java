@@ -35,8 +35,8 @@ public class DrawRelic extends GenericRelicAction {
         player.addRelic(relicID);
         String[] relicData = Mapper.getRelic(relicID).split(";");
         StringBuilder message = new StringBuilder();
-        message.append(Helper.getPlayerRepresentation(event, player)).append(" drew a Relic:\n").append(Emojis.Relic).append(" __**").append(relicData[0]).append("**__\n> ").append(relicData[1]).append("\n");
-       
+        message.append(Helper.getPlayerRepresentation(player, activeMap)).append(" drew a Relic:\n").append(Emojis.Relic).append(" __**").append(relicData[0]).append("**__\n> ").append(relicData[1]).append("\n");
+
         //Append helpful commands after relic draws and resolve effects:
         switch (relicID) {
             case "nanoforge" -> {
@@ -48,7 +48,7 @@ public class DrawRelic extends GenericRelicAction {
                 Integer poIndex = activeMap.addCustomPO("Shard of the Throne", 1);
                 activeMap.scorePublicObjective(player.getUserID(), poIndex);
                 message.append("Custom PO 'Shard of the Throne' has been added.\n")
-                       .append(Helper.getPlayerRepresentation(event, player)).append(" scored 'Shard of the Throne'");
+                       .append(Helper.getPlayerRepresentation(player, activeMap)).append(" scored 'Shard of the Throne'");
             }
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
@@ -56,11 +56,10 @@ public class DrawRelic extends GenericRelicAction {
                 Integer poIndex = activeMap.addCustomPO(customPOName, 1);
                 activeMap.scorePublicObjective(player.getUserID(), poIndex);
                 message.append("Custom PO '" + customPOName + "' has been added.\n")
-                       .append(Helper.getPlayerRepresentation(event, player)).append(" scored '" + customPOName + "'");
+                       .append(Helper.getPlayerRepresentation(player, activeMap)).append(" scored '" + customPOName + "'");
             }
         }
-        if(activeMap.isFoWMode())
-        {
+        if (activeMap.isFoWMode()) {
             FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, message.toString());
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());

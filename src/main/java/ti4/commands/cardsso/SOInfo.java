@@ -39,22 +39,22 @@ public class SOInfo extends SOCardsSubcommandData {
     }
 
     public static void sendSecretObjectiveInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendSecretObjectiveInfo(activeMap, player);
     }
     public static void sendSecretObjectiveInfo(Map activeMap, Player player, GenericInteractionCreateEvent event) {
-        String headerText = Helper.getPlayerRepresentation(event, player) + " used something";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used something";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendSecretObjectiveInfo(activeMap, player);
     }
 
     public static void sendSecretObjectiveInfo(Map activeMap, Player player, ButtonInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(event, player) + " pressed button: " + event.getButton().getLabel();
+        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " pressed button: " + event.getButton().getLabel();
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendSecretObjectiveInfo(activeMap, player);
     }
-    
+
     public static void sendSecretObjectiveInfo(Map activeMap, Player player) {
         //SO INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getSecretObjectiveCardInfo(activeMap, player));
@@ -70,10 +70,10 @@ public class SOInfo extends SOCardsSubcommandData {
             buttons.add(scoreB);
             buttons.add(discardB);
             MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);
-           
-            
+
+
         }
-    }   
+    }
 
     public static String getSecretObjectiveRepresentationShort(String soID) {
         return getSecretObjectiveRepresentationShort(soID, null);

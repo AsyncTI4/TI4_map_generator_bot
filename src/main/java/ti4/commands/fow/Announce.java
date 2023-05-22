@@ -15,8 +15,8 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class Announce extends FOWSubcommandData {
-    
-    
+
+
     public Announce() {
         super(Constants.ANNOUNCE, "Send a message to the main channel");
         addOptions(new OptionData(OptionType.STRING, Constants.MSG, "Message to send").setRequired(true));
@@ -38,22 +38,16 @@ public class Announce extends FOWSubcommandData {
         if (ms != null) {
             String msg = ms.getAsString();
             String message = "";
-            if (anon != null)
-            {
+            if (anon != null) {
                 String anonY = anon.getAsString();
-                
-                if (anonY.compareToIgnoreCase("y") == 0)
-                {
+
+                if (anonY.compareToIgnoreCase("y") == 0) {
                      message =  "[REDACTED] announces: " + msg;
+                } else {
+                     message = Helper.getPlayerRepresentation(player, activeMap) + " announces: " + msg;
                 }
-                else
-                {
-                     message = Helper.getPlayerRepresentation(event, player) + " announces: " + msg;
-                }
-            }
-            else
-            {
-                message = Helper.getPlayerRepresentation(event, player) + " announces: " + msg;
+            } else {
+                message = Helper.getPlayerRepresentation(player, activeMap) + " announces: " + msg;
             }
 
             MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? event.getChannel() : activeMap.getMainGameChannel();

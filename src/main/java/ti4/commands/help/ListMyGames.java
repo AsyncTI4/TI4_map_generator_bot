@@ -45,21 +45,21 @@ public class ListMyGames extends HelpSubcommandData {
 
         int index = 1;
         StringBuilder sb = new StringBuilder("**__").append(user.getName()).append("'s Games__**\n");
-        for (Map map : maps) {
-            sb.append(Helper.rightpad("`" + index + ".`", 6)).append(getPlayerMapListRepresentation(map, userID, event)).append("\n");
+        for (Map playerMap : maps) {
+            sb.append(Helper.rightpad("`" + index + ".`", 6)).append(getPlayerMapListRepresentation(playerMap, userID, event)).append("\n");
             index++;
         }
         MessageHelper.sendMessageToThread(event.getChannel(), user.getName() + "'s Game List", sb.toString());
     }
 
-    private String getPlayerMapListRepresentation(Map map, String userID, GenericInteractionCreateEvent event) {
-        Player player = map.getPlayer(userID);
+    private String getPlayerMapListRepresentation(Map playerMap, String userID, GenericInteractionCreateEvent event) {
+        Player player = playerMap.getPlayer(userID);
         if (player == null) return "";
         StringBuilder sb = new StringBuilder();
-        sb.append("**").append(map.getName()).append("**:  ");
-        sb.append(Helper.getFactionIconFromDiscord(player.getFaction())).append(Helper.getColourAsMention(event.getGuild(), player.getColor())).append(" ").append(map.getActionsChannel() == null ? "" : map.getActionsChannel().getAsMention());
-        if (map.getActivePlayer() == null ? false : map.getActivePlayer().equals(userID)) sb.append(" - **__IT IS YOUR TURN__**");
-        if (map.isHasEnded()) sb.append(" - GAME HAS ENDED");
+        sb.append("**").append(playerMap.getName()).append("**:  ");
+        sb.append(Helper.getFactionIconFromDiscord(player.getFaction())).append(Helper.getColourAsMention(event.getGuild(), player.getColor())).append(" ").append(playerMap.getActionsChannel() == null ? "" : playerMap.getActionsChannel().getAsMention());
+        if (playerMap.getActivePlayer() == null ? false : playerMap.getActivePlayer().equals(userID)) sb.append(" - **__IT IS YOUR TURN__**");
+        if (playerMap.isHasEnded()) sb.append(" - GAME HAS ENDED");
         return sb.toString();
     }
 

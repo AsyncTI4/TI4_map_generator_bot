@@ -1,8 +1,6 @@
 package ti4.commands.special;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -76,7 +74,7 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
             activeMap.shuffleActionCardBackIntoDeck(cardID);
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), Emojis.KeleresHeroHarka);
-        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(event, player) + " uses **Keleres (Mentak) Hero** to Reveal "+ Emojis.ActionCard + "Action Cards until Drawing 3 component action cards.\n");
+        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(player, activeMap) + " uses **Keleres (Mentak) Hero** to Reveal "+ Emojis.ActionCard + "Action Cards until Drawing 3 component action cards.\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), acRevealMessage.toString());
         MessageHelper.sendMessageToChannel(event.getChannel(), acDrawMessage.toString());
         MessageHelper.sendMessageToChannel(event.getChannel(), "All non-component action cards have been reshuffled back into the deck.");
@@ -85,4 +83,4 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
         }
         BotLogger.log(event, "DEBUG: **Keleres Hero Mentak used**");
     }
-} 
+}

@@ -38,7 +38,7 @@ public class PingSystem extends FOWSubcommandData {
             MessageHelper.replyToMessage(event, "Specify position");
             return;
         }
-        
+
         OptionMapping messageMapping = event.getOption(Constants.MESSAGE);
         String message = messageMapping == null ? "" : messageMapping.getAsString();
 
@@ -52,14 +52,14 @@ public class PingSystem extends FOWSubcommandData {
         List<Player> players = FoWHelper.getAdjacentPlayers(activeMap, position, true);
         int successfulCount = 0;
         for (Player player_ : players) {
-            String playerMessage = Helper.getPlayerRepresentation(event, player_, true) + " - System " + position + " has been pinged:\n> " + message;
+            String playerMessage = Helper.getPlayerRepresentation(player_, activeMap, event.getGuild(), true) + " - System " + position + " has been pinged:\n> " + message;
             boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
             if (success) {
                 successfulCount++;
             }
         }
 
-        if(successfulCount < players.size()) {
+        if (successfulCount < players.size()) {
             MessageHelper.replyToMessage(event, "One or more pings failed to send. Please follow up with game's GM.");
         } else {
             MessageHelper.replyToMessage(event, "Successfully sent all pings.");

@@ -12,7 +12,7 @@ public class ListCategoryChannelCounts extends BothelperSubcommandData {
     public ListCategoryChannelCounts(){
         super(Constants.CATEGORY_CHANNEL_COUNT, "List all categories and their channel counts.");
     }
-    
+
     public void execute(SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
 
@@ -26,7 +26,7 @@ public class ListCategoryChannelCounts extends BothelperSubcommandData {
         }
         sendMessage(sb.toString());
     }
-    
+
     private String getPercentage(double numerator, double denominator) {
         NumberFormat formatPercent = NumberFormat.getPercentInstance();
         // formatPercent.setMinimumFractionDigits(1);

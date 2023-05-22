@@ -41,7 +41,7 @@ public class GenericButtonCommand implements Command {
         }
         return false;
     }
-    
+
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String buttonText = event.getOption(Constants.BUTTON_TEXT, "Button", OptionMapping::getAsString);
@@ -54,7 +54,7 @@ public class GenericButtonCommand implements Command {
         }
 
         Button button = Button.secondary(Constants.GENERIC_BUTTON_ID_PREFIX + event.getId(), buttonText);
-        
+
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, Collections.singletonList(button));
     }
 

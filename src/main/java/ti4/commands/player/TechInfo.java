@@ -35,7 +35,7 @@ public class TechInfo extends PlayerSubcommandData {
     }
 
     public static void sendTechInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendTechInfo(activeMap, player);
     }
@@ -54,7 +54,7 @@ public class TechInfo extends PlayerSubcommandData {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
         }
-    } 
+    }
 
     private static List<Button> getTechButtons(Map activeMap, Player player) {
         return null;
@@ -103,7 +103,7 @@ public class TechInfo extends PlayerSubcommandData {
                 sb.append(Helper.getTechRepresentationLong(techID));
             }
         }
-        
+
         return sb.toString();
     }
 }

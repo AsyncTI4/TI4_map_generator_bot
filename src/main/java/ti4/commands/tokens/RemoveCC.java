@@ -24,7 +24,7 @@ public class RemoveCC extends AddRemoveToken {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
                 FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has removed a token in the system");
             }
-    
+
             tile.removeCC(ccID);
             Helper.isCCCountCorrect(event, activeMap, color);
         }

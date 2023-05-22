@@ -41,7 +41,7 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exist, use `/help list_games`");
                 return;
             }
-        }else {
+        } else {
             Map userActiveMap = MapManager.getInstance().getUserActiveMap(callerUser.getId());
             if (userActiveMap == null){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Specify game or set active Game");
@@ -50,30 +50,18 @@ abstract public class AddRemovePlayer extends GameSubcommandData {
             mapName = userActiveMap.getName();
         }
         MapManager mapManager = MapManager.getInstance();
-        Map map = mapManager.getMap(mapName);
-        // Member member = event.getMember();
-        // boolean isAdmin = false;
-        // if (member != null) {
-        //     java.util.List<Role> roles = member.getRoles();
-        //     if (roles.contains(MapGenerator.adminRole)) {
-        //         isAdmin = true;
-        //     }
-        // }
-//        if (!map.getOwnerID().equals(callerUser.getId()) && !isAdmin){
-//            MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game owner can add/remove players.");
-//            return;
-//        }
-        if (!map.isMapOpen()) {
+        Map activeMap = mapManager.getMap(mapName);
+        if (!activeMap.isMapOpen()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not open. Can only add/remove players when game status is 'open'.");
             return;
         }
 
         User user = event.getUser();
-        action(event, map, user);
-        MapSaveLoadManager.saveMap(map, event);
-        MessageHelper.replyToMessage(event, getResponseMessage(map, user));
+        action(event, activeMap, user);
+        MapSaveLoadManager.saveMap(activeMap, event);
+        MessageHelper.replyToMessage(event, getResponseMessage(activeMap, user));
     }
-    abstract protected String getResponseMessage(Map map, User user);
+    abstract protected String getResponseMessage(Map activeMap, User user);
 
-    abstract protected void action(SlashCommandInteractionEvent event, Map map, User user);
+    abstract protected void action(SlashCommandInteractionEvent event, Map activeMap, User user);
 }

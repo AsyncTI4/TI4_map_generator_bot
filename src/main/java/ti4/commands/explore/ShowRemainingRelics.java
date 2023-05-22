@@ -33,8 +33,7 @@ public class ShowRemainingRelics extends GenericRelicAction {
         formatPercent.setMaximumFractionDigits(1);
         OptionMapping override = event.getOption(Constants.OVERRIDE_FOW);
         boolean over = false;
-        if (override != null)
-        {
+        if (override != null) {
            over = override.getAsString().equalsIgnoreCase("TRUE");
         }
         StringBuilder text;
@@ -51,14 +50,11 @@ public class ShowRemainingRelics extends GenericRelicAction {
         Player player2 = activeMap.getPlayer(getUser().getId());
         player2 = Helper.getGamePlayer(activeMap, player2, event, null);
 
-        if(player != null && !player.getSCs().isEmpty() && !over && activeMap.isFoWMode())
-        {
+        if (player != null && !player.getSCs().isEmpty() && !over && activeMap.isFoWMode()) {
                 sendMessage("It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
-        }
-        else
-        {
+        } else {
                 sendMessage(text.toString());
         }
-        
+
     }
 }

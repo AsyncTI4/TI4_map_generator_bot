@@ -19,7 +19,7 @@ public class PutAgendaTop extends AgendaSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.AGENDA_ID, "Agenda ID that is sent between ()").setRequired(true));
     }
 
-    
+
     public void putTop(GenericInteractionCreateEvent event, int agendaID, Map activeMap) {
         boolean success = activeMap.putAgendaTop(agendaID);
         if (success && !activeMap.isFoWMode()) {
@@ -35,14 +35,13 @@ public class PutAgendaTop extends AgendaSubcommandData {
                     MessageHelper.sendMessageToChannel((MessageChannel)threadChannel_, "Agenda put on top");
                 }
             }
-            
+
 
         } else {
-            if(!activeMap.isFoWMode())
-            {
+            if (!activeMap.isFoWMode()) {
                 MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "No Agenda ID found");
             }
-            
+
         }
     }
     @Override

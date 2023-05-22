@@ -89,7 +89,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         FactionModel setupInfo = player.getFactionSetupInfo();
-       
+
         //HOME SYSTEM
         String hsTile = AliasHandler.resolveTile(setupInfo.homeSystemTile);
 
@@ -106,8 +106,7 @@ public class Setup extends PlayerSubcommandData {
         } else {
             setup = Constants.setup8p;
             is6playerMap = false;
-            if (activeMap.getRingCount() == 8)
-            {
+            if (activeMap.getRingCount() == 8) {
                 useSpecified = true;
             } else if (PositionMapper.isTilePositionValid(positionHS)){
                 useSpecified = true;
@@ -149,7 +148,7 @@ public class Setup extends PlayerSubcommandData {
                        activeMap.removeTile("tl");
                        activeMap.setTile(mallice);
                    }
-                }else{
+                } else {
                     if (positionNumber == 1 || positionNumber == 2 || positionNumber == 3 ){
                         position = "tr";
                     } else if (positionNumber == 4 || positionNumber == 5) {
@@ -192,8 +191,8 @@ public class Setup extends PlayerSubcommandData {
 
         //STARTING UNITS
         addUnits(setupInfo, tile, color, event);
-        if(!activeMap.isFoWMode()) {
-            sendMessage("Player: " + Helper.getPlayerRepresentation(event, player) + " has been set up");
+        if (!activeMap.isFoWMode()) {
+            sendMessage("Player: " + Helper.getPlayerRepresentation(player, activeMap) + " has been set up");
         } else {
             sendMessage("Player was set up.");
         }

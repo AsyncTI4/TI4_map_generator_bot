@@ -98,7 +98,7 @@ public class Map {
     private String mainChannelID = null;
     @Nullable
     private String botMapUpdatesThreadID = null;
-    
+
     //UserID, UserName
     private LinkedHashMap<String, Player> players = new LinkedHashMap<>();
     @ExportableField
@@ -120,12 +120,12 @@ public class Map {
 
     @ExportableField
     private int pingSystemCounter = 0;
-    
+
     @ExportableField
     private String playersWhoHitPersistentNoAfter = "";
     private String playersWhoHitPersistentNoWhen = "";
     @ExportableField
-    private String[] listOfTilePinged =new String[10]; 
+    private String[] listOfTilePinged =new String[10];
 
     @ExportableField
     private String activePlayer = null;
@@ -181,7 +181,7 @@ public class Map {
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
         lastModifiedDate = new Date().getTime();
-        
+
         miltyDraftManager = new MiltyDraftManager();
 
         HashMap<String, SecretObjectiveModel> secretObjectives = Mapper.getSecretObjectives();
@@ -282,8 +282,7 @@ public class Map {
         this.purgedPN.remove(purgedPN);
     }
 
-    public void addActionCardDuplicates(List<String> ACs)
-    {
+    public void addActionCardDuplicates(List<String> ACs) {
         actionCards.addAll(ACs);
         Collections.shuffle(this.actionCards);
     }
@@ -316,13 +315,11 @@ public class Map {
         }
     }
 
-    public boolean isACInDiscard(String name)
-    {
+    public boolean isACInDiscard(String name) {
         boolean isInDiscard = false;
         for (java.util.Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
-            
-            if(Mapper.getActionCard(ac.getKey()).name.contains(name))
-            {
+
+            if (Mapper.getActionCard(ac.getKey()).name.contains(name)) {
                 return true;
             }
         }
@@ -341,20 +338,16 @@ public class Map {
         this.customName = customName;
     }
 
-    public int getPingSystemCounter()
-    {
+    public int getPingSystemCounter() {
         return pingSystemCounter;
     }
-    public void setPingSystemCounter(int count)
-    {
+    public void setPingSystemCounter(int count) {
         pingSystemCounter = count;
     }
-    public String[] getListOfTilesPinged()
-    {
+    public String[] getListOfTilesPinged() {
         return listOfTilePinged;
     }
-    public void setTileAsPinged(int count, String tileName)
-    {
+    public void setTileAsPinged(int count, String tileName) {
         listOfTilePinged[count] = tileName;
     }
 
@@ -655,42 +648,36 @@ public class Map {
         return hasHackElectionBeenPlayed;
     }
 
-   
+
     public void addPlayersWhoHitPersistentNoAfter(String faction) {
-        if(playersWhoHitPersistentNoAfter != null && playersWhoHitPersistentNoAfter.length() > 0)
-        {
+        if (playersWhoHitPersistentNoAfter != null && playersWhoHitPersistentNoAfter.length() > 0) {
             playersWhoHitPersistentNoAfter = playersWhoHitPersistentNoAfter + "_"+faction;
-        }
-        else
-        {
+        } else {
             playersWhoHitPersistentNoAfter = faction;
-        } 
+        }
     }
     public void addPlayersWhoHitPersistentNoWhen(String faction) {
-        if(playersWhoHitPersistentNoWhen != null && playersWhoHitPersistentNoWhen.length() > 0)
-        {
+        if (playersWhoHitPersistentNoWhen != null && playersWhoHitPersistentNoWhen.length() > 0) {
             playersWhoHitPersistentNoWhen = playersWhoHitPersistentNoWhen + "_"+faction;
-        }
-        else
-        {
+        } else {
             playersWhoHitPersistentNoWhen = faction;
-        } 
+        }
     }
 
     public void setPlayersWhoHitPersistentNoAfter(String persistent) {
-        
+
         playersWhoHitPersistentNoAfter = persistent;
-        
+
     }
     public void setPlayersWhoHitPersistentNoWhen(String persistent) {
-        
+
         playersWhoHitPersistentNoWhen = persistent;
-        
+
     }
     public void setHackElectionStatus(boolean hack) {
-        
+
         hasHackElectionBeenPlayed = hack;
-        
+
     }
 
     public String getActivePlayer() {
@@ -739,13 +726,11 @@ public class Map {
         this.lastTimeGamesChecked = time;
     }
 
-    public void setAutoPing(boolean status)
-    {
+    public void setAutoPing(boolean status) {
         this.auto_ping_enabled = status;
     }
 
-    public boolean getAutoPingStatus()
-    {
+    public boolean getAutoPingStatus() {
         return auto_ping_enabled;
     }
 
@@ -832,7 +817,7 @@ public class Map {
      * @param sc the integer value of the new strategy card
      */
     public void addSC(int sc) {
-        if(!getSCList().contains(sc)) {
+        if (!getSCList().contains(sc)) {
             setScTradeGood(sc, null);
         }
     }
@@ -856,7 +841,7 @@ public class Map {
     public ArrayList<String> getPublicObjectives2() {
         return publicObjectives2;
     }
-    
+
     public java.util.Map.Entry<String, Integer> revealState1() {
         return revealObjective(publicObjectives1);
     }
@@ -864,7 +849,7 @@ public class Map {
     public java.util.Map.Entry<String, Integer> revealState2() {
         return revealObjective(publicObjectives2);
     }
-    
+
     public java.util.Map.Entry<String, Integer> revealObjective(ArrayList<String> objectiveList) {
         if (!objectiveList.isEmpty()) {
             String id = objectiveList.get(0);
@@ -878,7 +863,7 @@ public class Map {
         }
         return null;
     }
-    
+
     public java.util.Map.Entry<String, Integer> addSpecificStage1(String objective) {
         return addSpecificObjective(publicObjectives1, objective);
     }
@@ -924,8 +909,7 @@ public class Map {
         return false;
     }
 
-    public boolean isCustodiansScored()
-    {
+    public boolean isCustodiansScored() {
 
         boolean custodiansTaken = false;
         String idC = "";
@@ -935,13 +919,10 @@ public class Map {
                 break;
             }
         }
-        if (!idC.isEmpty())
-        {
+        if (!idC.isEmpty()) {
             List<String> scoredPlayerList = scoredPublicObjectives.computeIfAbsent(idC, key -> new ArrayList<>());
-            for(String playerID : players.keySet())
-            {
-                if(scoredPlayerList.contains(playerID))
-                {
+            for (String playerID : players.keySet()) {
+                if (scoredPlayerList.contains(playerID)) {
                     custodiansTaken = true;
                 }
             }
@@ -1106,7 +1087,7 @@ public class Map {
     }
 
     @JsonGetter
-    @JsonSerialize(keyUsing = MapPairKeySerializer.class) 
+    @JsonSerialize(keyUsing = MapPairKeySerializer.class)
     public LinkedHashMap<Pair<String, Integer>, String> getAdjacentTileOverrides() {
         return adjacencyOverrides;
     }
@@ -1518,10 +1499,8 @@ public class Map {
     public LinkedHashMap<String, Integer> drawSpecificActionCard(String acID, String userID) {
         if (!actionCards.isEmpty()) {
             int tries = 0;
-            while(tries < 3)
-            {
-                if(actionCards.indexOf(acID) > -1)
-                {
+            while (tries < 3) {
+                if (actionCards.indexOf(acID) > -1) {
                     String id = acID;
                     Player player = getPlayer(userID);
                     if (player != null) {
@@ -1532,16 +1511,13 @@ public class Map {
                     tries = 12;
                 }
                 tries++;
-                if(acID.contains("extra1"))
-                {
+                if (acID.contains("extra1")) {
                     acID = acID.replace("extra1","extra2");
-                }
-                else
-                {
+                } else {
                     acID = acID+"extra1";
                 }
             }
-            
+
         }
         return null;
     }
@@ -1621,7 +1597,7 @@ public class Map {
         return false;
     }
 
-    public boolean scoreSecretObjective(String userID, Integer soIDNumber, ti4.map.Map map) {
+    public boolean scoreSecretObjective(String userID, Integer soIDNumber, ti4.map.Map activeMap) {
         Player player = getPlayer(userID);
         if (player != null) {
             LinkedHashMap<String, Integer> secrets = player.getSecrets();
@@ -1634,7 +1610,7 @@ public class Map {
             }
             if (!soID.isEmpty()) {
                 player.removeSecret(soIDNumber);
-                player.setSecretScored(soID, map);
+                player.setSecretScored(soID, activeMap);
                 return true;
             }
         }
@@ -1899,8 +1875,7 @@ public class Map {
     }
 
     public void setOwnerID(String ownerID) {
-        if (ownerID.length() > 18)
-        {
+        if (ownerID.length() > 18) {
             ownerID = ownerID.substring(0, 18);
         }
         this.ownerID = ownerID;
@@ -1961,11 +1936,9 @@ public class Map {
 
     public boolean isEmpyInTheGame(){
         boolean empyPresent = false;
-        
-        for (Player player : getRealPlayers())
-        {
-            if(player.getFaction() != null && player.getFaction().equalsIgnoreCase("Empyrean"))
-            {
+
+        for (Player player : getRealPlayers()) {
+            if (player.getFaction() != null && player.getFaction().equalsIgnoreCase("Empyrean")) {
                 return true;
             }
         }
@@ -1973,12 +1946,10 @@ public class Map {
     }
     public boolean doesAnyoneHaveInstinctTraining(){
         boolean empyPresent = false;
-        
-        for (Player player : getRealPlayers())
-        {
-            
-            if(player.getTechs().contains(AliasHandler.resolveTech("Instinct Training")))
-            {
+
+        for (Player player : getRealPlayers()) {
+
+            if (player.getTechs().contains(AliasHandler.resolveTech("Instinct Training"))) {
                 return true;
             }
         }
@@ -2016,7 +1987,7 @@ public class Map {
 
     public void endGameIfOld() {
         if (isHasEnded()) return;
-        
+
         LocalDate currentDate = LocalDate.now();
         LocalDate lastModifiedDate = (new Date(this.lastModifiedDate)).toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         Period period = Period.ofMonths(2); //TODO: CANDIDATE FOR GLOBAL VARIABLE

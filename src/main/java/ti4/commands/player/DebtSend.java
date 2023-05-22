@@ -48,7 +48,7 @@ public class DebtSend extends PlayerSubcommandData {
             targetTG += sendTG;
             player_.setTg(targetTG);
 
-            sendMessage(Helper.getPlayerRepresentation(event, player) + " sent " + sendTG + Emojis.tg + " trade goods to " + Helper.getPlayerRepresentation(event, player_));
+            sendMessage(Helper.getPlayerRepresentation(player, activeMap) + " sent " + sendTG + Emojis.tg + " trade goods to " + Helper.getPlayerRepresentation(player_, activeMap));
         }
     }
 

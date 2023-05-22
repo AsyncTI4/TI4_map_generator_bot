@@ -71,9 +71,9 @@ public class AgendaCommand implements Command {
             }
         }
 
-        Map map = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
-        if (map != null) {
-            MapSaveLoadManager.saveMap(map, event);
+        Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
+        if (activeMap != null) {
+            MapSaveLoadManager.saveMap(activeMap, event);
         }
         if (executedCommand != null) {
             // MessageHelper.replyToMessage(event, "Executed action: " + executedCommand.getActionID());

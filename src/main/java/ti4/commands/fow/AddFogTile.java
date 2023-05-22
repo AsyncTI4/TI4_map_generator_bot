@@ -33,7 +33,7 @@ public class AddFogTile extends FOWSubcommandData {
             MessageHelper.sendMessageToChannel(channel, "You're not a player of this game");
             return;
         }
-        
+
         OptionMapping planetTileMapping = event.getOption(Constants.TILE_NAME);
         if (planetTileMapping == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify tile");
@@ -45,7 +45,7 @@ public class AddFogTile extends FOWSubcommandData {
             MessageHelper.replyToMessage(event, "Specify position");
             return;
         }
-        
+
         OptionMapping labelMapping = event.getOption(Constants.LABEL);
         String label = labelMapping == null ? "" : labelMapping.getAsString();
 

@@ -23,7 +23,7 @@ public class AddUnits extends AddRemoveUnits {
         tile.addUnit(planetName, unitID, count);
     }
 
-    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map) {
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map activeMap) {
         OptionMapping option = event.getOption(Constants.CC_USE);
         if (option != null){
             String value = option.getAsString().toLowerCase();
@@ -31,11 +31,11 @@ public class AddUnits extends AddRemoveUnits {
                 case "t/tactics", "t", "tactics", "tac", "tact" -> {
                     MoveUnits.removeTacticsCC(event, color, tile, MapManager.getInstance().getUserActiveMap(event.getUser().getId()));
                     AddCC.addCC(event, color, tile);
-                    Helper.isCCCountCorrect(event, map, color);
+                    Helper.isCCCountCorrect(event, activeMap, color);
                 }
                 case "r/retreat/reinforcements", "r", "retreat", "reinforcements" -> {
                     AddCC.addCC(event, color, tile);
-                    Helper.isCCCountCorrect(event, map, color);
+                    Helper.isCCCountCorrect(event, activeMap, color);
                 }
             }
         }
@@ -44,8 +44,6 @@ public class AddUnits extends AddRemoveUnits {
             boolean useSlingRelay = optionSlingRelay.getAsBoolean();
             if (useSlingRelay) {
                 String userID = event.getUser().getId();
-                MapManager mapManager = MapManager.getInstance();
-                Map activeMap = mapManager.getUserActiveMap(userID);
                 Player player = activeMap.getPlayer(userID);
                 player = Helper.getGamePlayer(activeMap, player, event, null);
                 player = Helper.getPlayer(activeMap, player, event);
@@ -57,17 +55,13 @@ public class AddUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map map) {
-        String userID = event.getUser().getId();
-        MapManager mapManager = MapManager.getInstance();
-        Map activeMap = mapManager.getUserActiveMap(userID);
-
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
         tile = MoveUnits.flipMallice(event, tile, activeMap);
         if (tile == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice");
             return;
         }
-        super.unitParsingForTile(event, color, tile, map);
+        super.unitParsingForTile(event, color, tile, activeMap);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
             addPlanetToPlayArea(event, tile, unitHolder_.getName());
         }

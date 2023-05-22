@@ -20,7 +20,7 @@ public class ListOldThreads extends BothelperSubcommandData {
         super(Constants.LIST_OLD_THREADS, "List the oldest 'active' threads. Use to help find threads that can be archived.");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of threads to list (1 to 1000)").setRequired(true));
     }
-    
+
     public void execute(SlashCommandInteractionEvent event) {
         Integer channelCount = event.getOption(Constants.COUNT).getAsInt();
         if (channelCount < 1 || channelCount > 1000) {
@@ -39,7 +39,7 @@ public class ListOldThreads extends BothelperSubcommandData {
                             .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
                             .limit(channelCount)
                             .toList();
-        
+
         sb = new StringBuilder("Least Active Threads:\n");
         for (ThreadChannel threadChannel : threadChannels) {
             OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());
@@ -56,7 +56,7 @@ public class ListOldThreads extends BothelperSubcommandData {
                             .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
                             .limit(1)
                             .toList();
-        
+
         String durationText = "";
         for (ThreadChannel threadChannel : threadChannels) {
             OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(threadChannel.getLatestMessageIdLong());

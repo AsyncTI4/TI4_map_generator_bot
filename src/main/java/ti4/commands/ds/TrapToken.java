@@ -69,8 +69,7 @@ public class TrapToken extends DiscordantStarsSubcommandData {
             tile.removeToken(Constants.LIZHO_TRAP_PNG, unitHolder.getName());
             LinkedHashMap<String, String> trapCardsPlanets = new LinkedHashMap<>(player.getTrapCardsPlanets());
             for (java.util.Map.Entry<String, String> entry : trapCardsPlanets.entrySet()) {
-                if (planetName.equals(entry.getValue()))
-                {
+                if (planetName.equals(entry.getValue())) {
                     player.setTrapCardPlanet(entry.getKey(), null);
                 }
             }

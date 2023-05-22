@@ -17,7 +17,7 @@ public class ListOldChannels extends BothelperSubcommandData {
         super(Constants.LIST_OLD_CHANNELS, "List the oldest 'active' channels. Use to help find dead games to free up channels.");
         addOptions(new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of channels to list (1 to 500)").setRequired(true));
     }
-    
+
     public void execute(SlashCommandInteractionEvent event) {
         Integer channelCount = event.getOption(Constants.COUNT).getAsInt();
         if (channelCount < 1 || channelCount > 500) {
@@ -35,7 +35,7 @@ public class ListOldChannels extends BothelperSubcommandData {
                             .sorted((object1, object2) -> object1.getLatestMessageId().compareTo(object2.getLatestMessageId()))
                             .limit(channelCount)
                             .toList();
-        
+
         StringBuilder sb = new StringBuilder("Least Active Channels:\n");
         for (TextChannel channel : channels) {
             OffsetDateTime latestActivityTime = TimeUtil.getTimeCreated(channel.getLatestMessageIdLong());

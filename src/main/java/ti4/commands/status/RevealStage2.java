@@ -22,15 +22,14 @@ public class RevealStage2 extends StatusSubcommandData {
         revealS2(event, event.getChannel());
     }
 
-    public void revealS2(GenericInteractionCreateEvent event, MessageChannel channel)
-    {
+    public void revealS2(GenericInteractionCreateEvent event, MessageChannel channel) {
         Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
         java.util.Map.Entry<String, Integer> objective = activeMap.revealState2();
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
         String objectiveName = po.name;
         String objectiveDescription = po.text;
-        
+
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getGamePing(event, activeMap));
         sb.append(" **Stage 2 Public Objective Revealed**").append("\n");

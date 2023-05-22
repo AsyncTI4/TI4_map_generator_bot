@@ -21,5 +21,5 @@ public class ListFragments extends ExploreSubcommandData {
 
 		sendMessage(player.getFragments().toString());
 	}
-	
+
 }

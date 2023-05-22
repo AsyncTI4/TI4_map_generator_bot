@@ -57,7 +57,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
     public User getUser() {
         return user;
     }
-    
+
     /**
      * Send a message to the event's channel, handles large text
      * @param messageText new message
@@ -104,11 +104,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         return tile;
     }
 
-    public void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetName, String messageText, boolean enigmatic, Player player, Map map) {
+    public void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetName, String messageText, boolean enigmatic, Player player, Map activeMap) {
         String message = "Card has been discarded. Resolve effects manually.";
-        if(map != null)
-        {
-            activeMap = map;
+        if (activeMap != null) {
+            activeMap = activeMap;
         }
         if (enigmatic){
             message = "Card has been added to play area.";
@@ -116,22 +115,18 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
         String card = Mapper.getExplore(cardID);
         String[] cardInfo = card.split(";");
-        
+
         if (player == null) {
             MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Player could not be found");
             return;
         }
 
-        if(map != null && !map.isFoWMode() &&(event.getChannel() !=  map.getActionsChannel()))
-        {
+        if (activeMap != null && !activeMap.isFoWMode() &&(event.getChannel() !=  activeMap.getActionsChannel())) {
             String pF = StringUtils.capitalize(player.getFaction());
-            if(planetName != null)
-            {
-                MessageHelper.sendMessageToChannel(map.getActionsChannel(), pF + " found a "+cardInfo[0]+ " on "+Helper.getPlanetRepresentation(planetName, map));
-            }
-            else
-            {
-                MessageHelper.sendMessageToChannel(map.getActionsChannel(), pF + " found a "+cardInfo[0]);
+            if (planetName != null) {
+                MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), pF + " found a "+cardInfo[0]+ " on "+Helper.getPlanetRepresentation(planetName, activeMap));
+            } else {
+                MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), pF + " found a "+cardInfo[0]);
             }
         }
 
@@ -189,7 +184,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 message = "Invalid token or tile";
             }
         }
-        
+
         switch (cardID) {
             case "lc1", "lc2" -> {
                 boolean hasSchemingAbility = player.hasAbility("scheming");
@@ -198,8 +193,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 for (int i = 0; i < count; i++) {
                     activeMap.drawActionCard(player.getUserID());
                 }
-                if(activeMap.isFoWMode())
-                {
+                if (activeMap.isFoWMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew 2 AC");
                 }
                 ACInfo.sendActionCardInfo(activeMap, player, event);
@@ -208,8 +202,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "dv1", "dv2" -> {
                 message = "Drew Secret Objective";
                 activeMap.drawSecretObjective(player.getUserID());
-                if(activeMap.isFoWMode())
-                {
+                if (activeMap.isFoWMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew SO");
                 }
                 SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
@@ -240,7 +233,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     sendMessage("Planet cannot be explored: " + mirageID + "\n> The Cultural deck may be empty");
                     return;
                 }
-                StringBuilder exploredMessage = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" explored ");
+                StringBuilder exploredMessage = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap)).append(" explored ");
                 exploredMessage.append(Helper.getEmojiFromDiscord(planetTrait));
                 exploredMessage.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(mirageID) +" *(tile "+ tile.getPosition() + ")*").append(":\n");
                 exploredMessage.append(displayExplore(exploreID));
@@ -264,8 +257,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
             case "mo1", "mo2", "mo3" -> {
-                if(tile != null && planetName != null)
-                {
+                if (tile != null && planetName != null) {
                     new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetName, activeMap, planetName);
                 }
                 message = Helper.getColourAsMention(event.getGuild(), player.getColor()) + Emojis.infantry + " added to " + Helper.getPlanetRepresentationPlusEmoji(planetName);
@@ -302,13 +294,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
                 Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
-                String trueIdentity = Helper.getPlayerRepresentation(event, player, true);
+                String trueIdentity = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true);
                 String message2 = trueIdentity + "! Your current CCs are "+Helper.getPlayerCCs(player)+". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), message);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message2, buttons);
             }
             case "exp1", "exp2", "exp3" -> {
-                message = "Resolve explore using the buttons.";   
+                message = "Resolve explore using the buttons.";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
                 Button ReadyPlanet= Button.success("planet_ready", "Remove Inf Or Have Mech To Ready "+planetName);
                 Button Decline = Button.danger("decline_explore", "Decline Explore");
@@ -316,7 +308,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
             case "cm1", "cm2", "cm3" -> {
-                message = "Resolve explore using the buttons.";   
+                message = "Resolve explore using the buttons.";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
                 Button gainTG= Button.success("gain_1_tg", "Gain 1tg By Removing 1 Inf Or Having Mech On "+planetName).withEmoji(Emoji.fromFormatted(Emojis.tg));
                 Button Decline2 = Button.danger("decline_explore", "Decline Explore");
@@ -332,7 +324,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
             case "vfs1", "vfs2", "vfs3" -> {
-                message = "Resolve explore using the buttons.";   
+                message = "Resolve explore using the buttons.";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
                 Button gainCC= Button.success("gain_CC", "Gain 1CC By Removing 1 Inf Or Having Mech On "+planetName);
                 Button Decline3 = Button.danger("decline_explore", "Decline Explore");

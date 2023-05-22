@@ -215,7 +215,7 @@ public class Constants {
     public static final String FOW_FILTER_WHITE = "White";
     public static final String FOW_FILTER_PINK = "Pink";
     public static final String FOW_FILTER_PURPLE = "Purple";
-    
+
     public static final String MILTY = "milty";
     public static final String START = "start";
     public static final String SLICE_COUNT = "slice_count";
@@ -291,7 +291,7 @@ public class Constants {
     public static final String ACTIVE_PLAYER = "active_player";
     public static final String LAST_ACTIVE_PLAYER_PING = "last_active_player_ping";
     public static final String LAST_ACTIVE_PLAYER_CHANGE = "last_active_player_change";
-    
+
     public static final String TABLE_TALK_CHANNEL = "table_talk_channel";
     public static final String MAIN_GAME_CHANNEL = "main_game_channel";
     public static final String BOT_MAP_CHANNEL = "bot_map_channel";
@@ -374,7 +374,7 @@ public class Constants {
     public static final String SC6 = "6th_choice";
     public static final String STRAT_PINGS = "strat_pings";
     public static final String DUMMY = "dummy";
-    
+
     public static final String NUMBER_OF_TURNS = "number_of_turns";
     public static final String TOTAL_TURN_TIME = "total_turn_time";
 

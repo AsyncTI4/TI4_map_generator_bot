@@ -28,8 +28,8 @@ public class MapManager {
         this.mapList = mapList;
     }
 
-    public void addMap(Map map) {
-        mapList.put(map.getName(), map);
+    public void addMap(Map activeMap) {
+        mapList.put(activeMap.getName(), activeMap);
     }
 
     public Map getMap(String mapName) {

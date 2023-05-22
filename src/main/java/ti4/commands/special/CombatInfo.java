@@ -22,7 +22,7 @@ public class CombatInfo extends SpecialSubcommandData {
         super(Constants.COMBAT_INFO, "Combat info for system");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
     }
-    
+
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();

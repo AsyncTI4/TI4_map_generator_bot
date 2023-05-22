@@ -24,7 +24,7 @@ public class RelicLookAtTop extends GenericRelicAction {
         }
         String relicID = relicDeck.get(0);
         StringBuilder sb = new StringBuilder();
-        sb.append("**Relic - Look at Top**\n").append(Helper.getPlayerRepresentation(event, player)).append("\n");
+        sb.append("**Relic - Look at Top**\n").append(Helper.getPlayerRepresentation(player, activeMap)).append("\n");
         sb.append(Helper.getRelicRepresentation(relicID));
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
     }

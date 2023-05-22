@@ -30,10 +30,10 @@ public class ReloadMap extends AdminSubcommandData {
 
                 return;
             }
-            Map map = MapManager.getInstance().getMap(mapName);
-            MapSaveLoadManager.reload(map);
-            map = MapManager.getInstance().getMap(mapName);
-            File file = GenerateMap.getInstance().saveImage(map, event);
+            Map activeMap = MapManager.getInstance().getMap(mapName);
+            MapSaveLoadManager.reload(activeMap);
+            activeMap = MapManager.getInstance().getMap(mapName);
+            File file = GenerateMap.getInstance().saveImage(activeMap, event);
             MessageHelper.replyToMessage(event, file);
 
         } else {

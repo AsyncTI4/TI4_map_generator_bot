@@ -79,6 +79,6 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
         sb.append(displayExplore(topCard));
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
-        
+
     }
 }

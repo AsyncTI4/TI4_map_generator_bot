@@ -33,34 +33,34 @@ public class Info extends GameSubcommandData{
         MessageHelper.replyToMessage(event, sb.toString());
     }
 
-    public static StringBuilder getGameInfo(OptionMapping gameOption, MapManager mapManager, Map map, SlashCommandInteractionEvent event) {
+    public static StringBuilder getGameInfo(OptionMapping gameOption, MapManager mapManager, Map activeMap, SlashCommandInteractionEvent event) {
         StringBuilder sb = new StringBuilder();
-        Boolean privateGame = FoWHelper.isPrivateGame(map, event);
-        if (map == null && gameOption == null){
+        Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
+        if (activeMap == null && gameOption == null){
             sb.append("Game not specified");
             return sb;
-        } else if (map == null ){
-            map = mapManager.getMap(gameOption.getAsString());
+        } else if (activeMap == null ){
+            activeMap = mapManager.getMap(gameOption.getAsString());
         }
         sb.append("Game Info:").append(NEW_LINE);
-        sb.append("Game name: " + map.getName()).append(NEW_LINE);
-        sb.append("Game owner: " + map.getOwnerName()).append(NEW_LINE);
-        sb.append("Game status: " + map.getMapStatus());
-        if (map.isHasEnded()) sb.append(" - GAME HAS ENDED");
+        sb.append("Game name: " + activeMap.getName()).append(NEW_LINE);
+        sb.append("Game owner: " + activeMap.getOwnerName()).append(NEW_LINE);
+        sb.append("Game status: " + activeMap.getMapStatus());
+        if (activeMap.isHasEnded()) sb.append(" - GAME HAS ENDED");
         sb.append(NEW_LINE);
-        sb.append("Game Modes: " + map.getGameModesText()).append(NEW_LINE);
-        sb.append("Auto-Ping Time Interval (hrs): " + map.getAutoPingSpacer()).append(NEW_LINE);
-        sb.append("Created: " + map.getCreationDate()).append(NEW_LINE);
-        sb.append("Last Modified: " + Helper.getDateRepresentation(map.getLastModifiedDate())).append(NEW_LINE);
+        sb.append("Game Modes: " + activeMap.getGameModesText()).append(NEW_LINE);
+        sb.append("Auto-Ping Time Interval (hrs): " + activeMap.getAutoPingSpacer()).append(NEW_LINE);
+        sb.append("Created: " + activeMap.getCreationDate()).append(NEW_LINE);
+        sb.append("Last Modified: " + Helper.getDateRepresentation(activeMap.getLastModifiedDate())).append(NEW_LINE);
         if (privateGame == null || privateGame == false) {
-            sb.append("Map String: `" + Helper.getMapString(map)).append("`").append(NEW_LINE);
+            sb.append("Map String: `" + Helper.getMapString(activeMap)).append("`").append(NEW_LINE);
         } else {
             sb.append("Map String: Cannot show map string for private games").append(NEW_LINE);
         }
-        sb.append("Game player count: " + map.getPlayerCountForMap()).append(NEW_LINE);
+        sb.append("Game player count: " + activeMap.getPlayerCountForMap()).append(NEW_LINE);
         if (privateGame == null || privateGame == false) {
             sb.append("Players: ").append(NEW_LINE);
-            HashMap<String, Player> mapPlayers = map.getPlayers();
+            HashMap<String, Player> mapPlayers = activeMap.getPlayers();
             int index = 1;
             ArrayList<Player> players = new ArrayList<>(mapPlayers.values());
             for (Player player : players) {

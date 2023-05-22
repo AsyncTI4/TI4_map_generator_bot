@@ -12,6 +12,6 @@ public class TechAdd extends TechAddRemove {
     @Override
     public void doAction(Player player, String techID) {
         player.addTech(techID);
-        sendMessage(Helper.getPlayerRepresentation(getEvent(), player) + " added tech: " + Helper.getTechRepresentation(techID));
+        sendMessage(Helper.getPlayerRepresentation(player, getActiveMap()) + " added tech: " + Helper.getTechRepresentation(techID));
     }
 }
