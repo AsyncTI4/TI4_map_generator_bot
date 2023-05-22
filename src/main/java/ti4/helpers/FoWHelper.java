@@ -182,7 +182,7 @@ public class FoWHelper {
 		Channel eventChannel = event == null ? null : event.getChannel();
 		Channel channel = channel_ != null ? channel_ : eventChannel;
 		if (channel == null) {
-			return null;
+			return activeMap.isFoWMode();
 		}
 		if (activeMap == null) {
 			String gameName = channel.getName();

@@ -71,7 +71,7 @@ public class PlanetAdd extends PlanetAddRemove {
             }
         }
 
-        if (!alreadyOwned && !activeMap.isAllianceMode()) {
+        if (!alreadyOwned && !activeMap.isAllianceMode() && (!planet.equals("mirage"))) {
             Planet planetReal = (Planet) unitHolder;
             boolean oneOfThree = false;
             if (planetReal != null && planetReal.getOriginalPlanetType() != null && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous"))) {
