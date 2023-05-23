@@ -660,6 +660,12 @@ public class Player {
         return new ArrayList<String>(factionSetupInfo.abilities);
     }
 
+    private List<String> getFactionStartingLeaders() {
+        FactionModel factionSetupInfo = getFactionSetupInfo();
+        if(factionSetupInfo == null) return new ArrayList<String>();
+        return new ArrayList<String>(factionSetupInfo.leaders);
+    }
+
     public void initLeaders() {
         if (faction != null && Mapper.isFaction(faction)) {
             leaders.clear();
