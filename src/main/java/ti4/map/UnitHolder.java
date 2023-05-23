@@ -44,7 +44,7 @@ abstract public class UnitHolder {
     }
 
     public void addUnit(String unit, Integer count) {
-        if (count > 0 && count < 100) {
+        if (count != null && count > 0 && count < 100) {
             Integer unitCount = units.get(unit);
             if (unitCount != null) {
                 unitCount += count;
@@ -93,7 +93,7 @@ abstract public class UnitHolder {
     }
 
     public void removeUnit(String unit, Integer count) {
-        if (count > 0) {
+        if (count != null && count > 0) {
             Integer unitCount = units.get(unit);
             if (unitCount != null) {
                 unitCount -= count;
@@ -107,7 +107,7 @@ abstract public class UnitHolder {
     }
 
     public void addUnitDamage(String unit, Integer count) {
-        if (count > 0 && count < 100) {
+        if (count != null && count > 0 && count < 100) {
             Integer unitCount = unitsDamage.get(unit);
             if (unitCount != null) {
                 unitCount += count;
@@ -119,7 +119,7 @@ abstract public class UnitHolder {
     }
 
     public void removeUnitDamage(String unit, Integer count) {
-        if (count > 0) {
+        if (count != null && count > 0) {
             Integer unitCount = unitsDamage.get(unit);
             if (unitCount != null) {
                 unitCount -= count;
@@ -133,6 +133,7 @@ abstract public class UnitHolder {
     }
 
     public void removeAllUnitDamage(String color) {
+        if (color == null) return;
         String colorID = Mapper.getColorID(color);
         unitsDamage.keySet().removeIf(key -> key.startsWith(colorID));
     }
@@ -143,6 +144,7 @@ abstract public class UnitHolder {
 
 
     public void removeAllUnits(String color) {
+        if (color == null) return;
         String colorID = Mapper.getColorID(color);
         units.keySet().removeIf(key -> key.startsWith(colorID));
     }
