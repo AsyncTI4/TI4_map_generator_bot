@@ -1,6 +1,5 @@
 package ti4.commands.player;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -12,8 +11,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -37,10 +34,6 @@ public class SCPick extends PlayerSubcommandData {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
-
-        Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
-        boolean isFowPrivateGame = (privateGame != null && privateGame);
-
         if (player == null) {
             sendMessage("You're not a player of this game");
             return;

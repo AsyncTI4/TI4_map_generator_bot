@@ -1,10 +1,5 @@
 package ti4.commands.help;
 
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -22,10 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 public class ListGames extends HelpSubcommandData {
 

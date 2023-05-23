@@ -18,7 +18,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapManager;
 import ti4.map.Player;
 
 import java.io.File;
@@ -117,7 +116,6 @@ public class MessageHelper {
 			String gameName = event.getChannel().getName();
 			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
-			Map activeMap = MapManager.getInstance().getMap(gameName);
 			if (event.getChannel() instanceof MessageChannel) {
 				sendMessageWithFile((MessageChannel)event.getChannel(), file, messageText, pinMessage);
 			}
@@ -227,6 +225,20 @@ public class MessageHelper {
 		}
 	}
 
+	public static boolean privatelyPingPlayerList(List<Player> players, Map activeMap, String message) {
+		return privatelyPingPlayerList(players, activeMap, (MessageChannel) null, message, null, null);
+	}
+
+	public static boolean privatelyPingPlayerList(List<Player> players, Map activeMap, MessageChannel feedbackChannel, String message, String failText, String successText) {
+		int count = 0;
+		for (Player player : players) {
+			String playerRepresentation = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
+			boolean success = sendPrivateMessageToPlayer(player, activeMap, feedbackChannel, playerRepresentation + message, failText, successText);
+			if (success) count++;
+		}
+		return count == players.size();
+	}
+
     public static void sendMessageToUser(String messageText, GenericInteractionCreateEvent event) {
         sendMessageToUser(messageText, event.getUser());
     }
@@ -265,7 +277,7 @@ public class MessageHelper {
 	 * @param maxLength   maximum length, any positive integer
 	 * @return
 	 */
-	private static List<String> splitLargeText(@NotNull String messageText, int maxLength) {
+	private static List<String> splitLargeText(String messageText, int maxLength) {
 		List<String> texts = new ArrayList<>();
 		if (messageText == null || messageText.isEmpty()) return Collections.emptyList();
 		Integer messageLength = messageText.length();

@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.DiscordantStarsHelper;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;

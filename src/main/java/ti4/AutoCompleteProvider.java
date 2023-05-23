@@ -54,7 +54,7 @@ public class AutoCompleteProvider {
             case Constants.FACTION -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 HashMap<String, String> factions = Mapper.getFactionRepresentations();
-                if (activeMap.isDiscordantStarsMode()) {
+                if (activeMap != null && activeMap.isDiscordantStarsMode()) {
                     List<Command.Choice> options = factions.entrySet().stream()
                             .filter(token -> token.getValue().toLowerCase().contains(enteredValue))
                             .limit(25)
@@ -72,7 +72,10 @@ public class AutoCompleteProvider {
                 }
             }
             case Constants.FACTION_COLOR, Constants.FACTION_COLOR_1, Constants.FACTION_COLOR_2 -> {
-                if (activeMap == null) event.replyChoiceStrings("No game found in this channel").queue();
+                if (activeMap == null) {
+                    event.replyChoiceStrings("No game found in this channel").queue();
+                    break;
+                }
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 if (activeMap.isFoWMode()) {
                     List<String> factionColors = new ArrayList<>(Mapper.getFactions());
@@ -142,7 +145,7 @@ public class AutoCompleteProvider {
             case Constants.RELIC -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 HashMap<String, String> relics = Mapper.getRelics();
-                if (activeMap.isAbsolMode()){
+                if (activeMap != null && activeMap.isAbsolMode()){
                     List<Command.Choice> options = relics.entrySet().stream()
                             .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                             .filter(value -> value.getKey().startsWith("absol_") || value.getKey().equals("enigmaticdevice"))
@@ -237,7 +240,7 @@ public class AutoCompleteProvider {
             case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 HashMap<String, String> techs = Mapper.getTechs();
-                if (activeMap.isDiscordantStarsMode()) {
+                if (activeMap != null && activeMap.isDiscordantStarsMode()) {
                     List<Command.Choice> options = techs.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)

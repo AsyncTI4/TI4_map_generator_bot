@@ -9,8 +9,6 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.commons.collections4.CollectionUtils;
-
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;

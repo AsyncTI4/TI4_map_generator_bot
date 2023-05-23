@@ -14,7 +14,6 @@ import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;

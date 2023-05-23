@@ -17,7 +17,6 @@ import java.util.*;
 import java.util.Map.Entry;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ObjectUtils.Null;
 
 public class ListVoteCount extends AgendaSubcommandData {
     public ListVoteCount() {

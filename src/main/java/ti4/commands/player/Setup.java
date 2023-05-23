@@ -12,7 +12,6 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapStringMapper;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.model.FactionModel;
@@ -229,7 +228,7 @@ public class Setup extends PlayerSubcommandData {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
             String unitID = Mapper.getUnitID(unit, color);
-            String unitPath = tile.getUnitPath(unitID);
+            String unitPath = Tile.getUnitPath(unitID);
             if (unitPath == null) {
                 sendMessage("Unit: " + unit + " is not valid and not supported.");
                 continue;
