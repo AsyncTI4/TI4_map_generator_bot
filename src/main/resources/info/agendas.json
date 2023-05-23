@@ -147,7 +147,7 @@
     "alias": "abolishment",
     "name": "Judicial Abolishment",
     "type": "Directive",
-    "target": "Elect law (When this agenda is revealed, if there are no Elect laws in play, discard this card and reveal another agenda from the top of the deck.)",
+    "target": "Elect law (When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.)",
     "text1": "Discard the elected law from play.",
     "text2": "",
     "source": "PoK"
