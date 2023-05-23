@@ -2,9 +2,7 @@ package ti4.map;
 
 import ti4.helpers.AliasHandler;
 
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.StringTokenizer;
 
 public class MapStringMapper {

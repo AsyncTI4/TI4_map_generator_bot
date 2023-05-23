@@ -1,6 +1,5 @@
 package ti4.commands.admin;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.Guild;

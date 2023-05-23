@@ -1,32 +1,29 @@
 package ti4.commands.explore;
 
+import java.util.List;
+
+import org.jetbrains.annotations.NotNull;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import software.amazon.awssdk.utils.StringUtils;
+
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
-
-import org.jetbrains.annotations.NotNull;
+import ti4.commands.player.PlanetAdd;
+import ti4.commands.player.PlanetRefresh;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
-import ti4.commands.player.PlanetAdd;
-import ti4.commands.player.PlanetRefresh;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import software.amazon.awssdk.utils.StringUtils;
-
-import java.nio.channels.Channel;
-import java.util.List;
-
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -104,10 +101,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         return tile;
     }
 
-    public void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetName, String messageText, boolean enigmatic, Player player, Map activeMap) {
+    public void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetName, String messageText, boolean enigmatic, Player player, Map activeMap_) {
         String message = "Card has been discarded. Resolve effects manually.";
-        if (activeMap != null) {
-            activeMap = activeMap;
+        if (activeMap_ != null) {
+            activeMap = activeMap_;
         }
         if (enigmatic){
             message = "Card has been added to play area.";

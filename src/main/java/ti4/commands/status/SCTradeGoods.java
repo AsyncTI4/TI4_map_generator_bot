@@ -11,7 +11,6 @@ import ti4.message.MessageHelper;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class SCTradeGoods extends StatusSubcommandData {
     public SCTradeGoods() {

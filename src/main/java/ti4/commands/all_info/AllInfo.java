@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.MapGenerator;
 import ti4.commands.Command;
 import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.explore.RelicInfo;

@@ -1,17 +1,12 @@
 package ti4.commands.cardsac;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.commands.OptionMapping;
-import net.dv8tion.jda.api.interactions.commands.OptionType;
-import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.util.LinkedHashMap;
 
 public class RevealAndPutACIntoDiscard extends ACCardsSubcommandData {
     public RevealAndPutACIntoDiscard() {

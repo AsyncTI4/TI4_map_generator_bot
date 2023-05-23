@@ -11,8 +11,6 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.LinkedHashMap;
-
 public class ShowACToAll extends ACCardsSubcommandData {
     public ShowACToAll() {
         super(Constants.SHOW_AC_TO_ALL, "Show an Action Card to all players");

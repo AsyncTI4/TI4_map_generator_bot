@@ -1,8 +1,5 @@
 package ti4.commands.custom;
 
-import java.util.List;
-import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;

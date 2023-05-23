@@ -11,7 +11,6 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.MessageHelper;
 
 public class UseExplore extends ExploreSubcommandData {
 

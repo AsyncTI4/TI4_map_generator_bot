@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
-import ti4.message.MessageHelper;
 
 public class ExploreAndDiscard extends ExploreSubcommandData {
     public ExploreAndDiscard() {
