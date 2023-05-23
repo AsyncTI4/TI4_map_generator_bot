@@ -3,12 +3,10 @@ package ti4.helpers;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ObjectUtils.Null;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -60,7 +58,7 @@ public class FoWHelper {
 			return true;
 		}
 
-		return viewingPlayer != null && player != null &&
+		return viewingPlayer != null && player != null && activeMap != null &&
 			( hasHomeSystemInView(activeMap, player, viewingPlayer)
 				|| hasPlayersPromInPlayArea(player, viewingPlayer)
 				|| hasMahactCCInFleet(player, viewingPlayer)
@@ -116,7 +114,7 @@ public class FoWHelper {
 	}
 
 	public static void updateFog(Map activeMap, Player player) {
-		initializeFog(activeMap, player, true);
+		if (player != null) initializeFog(activeMap, player, true);
 	}
 
     private static void updatePlayerFogTiles(Map activeMap, Player player) {
@@ -443,8 +441,6 @@ public class FoWHelper {
 		List<Player> players = getAdjacentPlayers(activeMap, position, true);
 		int successfulCount = 0;
 		for (Player player_ : players) {
-			if (!player_.isRealPlayer()) continue;
-
 			String playerMessage = Helper.getPlayerRepresentation(player_, activeMap) + " - System " + position + " has been pinged:\n>>> " + message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			successfulCount += success ? 1 : 0;
@@ -495,7 +491,6 @@ public class FoWHelper {
 		int totalPings = playersWithVisiblity.size() + playersWithoutVisiblity.size();
 
 		for (Player player_ : playersWithVisiblity) {
-			if (!player_.isRealPlayer()) continue;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, messageForFullInfo);
 			succesfulCount += success ? 1 : 0;
 		}
@@ -520,7 +515,7 @@ public class FoWHelper {
 		// iterate through the player list. this may result in some extra pings, we'll
 		// sort that out later
 		for (Player player_ : activeMap.getPlayers().values()) {
-			if (!player_.isRealPlayer()) continue;
+			if (player_.getColor().equals("null")) continue;
 			if (player_ == sendingPlayer || player_ == receivingPlayer) continue;
 			attemptCount++;
 
@@ -561,11 +556,9 @@ public class FoWHelper {
 		}
 	}
 
-
-
 	private static boolean initializeAndCheckStatVisibility(Map activeMap, Player player, Player viewer) {
 		if (viewer == player) return false;
-		if (!viewer.isRealPlayer()) return false;
+		if (viewer.getColor().equals("null")) return false;
 		initializeFog(activeMap, viewer, false);
 		return FoWHelper.canSeeStatsOfPlayer(activeMap, player, viewer);
 	}
