@@ -48,7 +48,7 @@ public class Turn extends PlayerSubcommandData {
         if (activeMap.isFoWMode()) {
             MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
         } else {
-            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(),Helper.getPlayerRepresentation(mainPlayer, activeMap));
+            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(),Helper.getPlayerRepresentation(mainPlayer, activeMap)+ " ended turn");
         }
         String nextMessage = pingNextPlayer(event, activeMap, mainPlayer);
         if (!nextMessage.isEmpty()) sendMessage(nextMessage);

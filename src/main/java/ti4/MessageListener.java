@@ -183,7 +183,7 @@ public class MessageListener extends ListenerAdapter {
                         if (player != null) {
                             long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
                             if (milliSinceLastPing > (1000 *60*60* activeMap.getAutoPingSpacer())) {
-                                String realIdentity = Helper.getPlayerRepresentation(player, activeMap);
+                                String realIdentity = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
                                 String ping = realIdentity + " this is a gentle reminder that it is your turn.";
                                 if (activeMap.isFoWMode()) {
                                     MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);
