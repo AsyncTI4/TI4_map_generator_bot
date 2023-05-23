@@ -145,6 +145,10 @@ public class ListVoteCount extends AgendaSubcommandData {
                     if (bloodPactPn) {
                         text += " (+4 votes for Blood Pact)";
                     }
+                    //Predictive Intelligence
+                    if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
+                        text += " (+3 votes for Predictive Intelligence)";
+                    }
                 }
 
                 text += "**";
