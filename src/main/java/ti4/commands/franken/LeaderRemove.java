@@ -20,7 +20,7 @@ public class LeaderRemove extends LeaderAddRemove {
                 sb.append("> ").append(leaderID).append(" (player did not have this leader)");
             } else {
                 Leader leader = new Leader(leaderID);
-                sb.append("> ").append(Helper.getLeaderFullRepresentation(null, leader));
+                sb.append("> ").append(Helper.getLeaderFullRepresentation(leader));
             }
             sb.append("\n");
             player.removeLeader(leaderID);
