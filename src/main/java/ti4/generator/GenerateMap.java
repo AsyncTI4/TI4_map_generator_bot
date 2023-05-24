@@ -709,12 +709,7 @@ public class GenerateMap {
                 }
             }
 
-            String extraInfo = "";
-            if (leader.getId().contains("nomadagent")) {
-                extraInfo = "_" + leader.getId().replace("nomadagent", "");
-            }
-
-            String leaderInfoFileName = "pa_leaders_" + leader.getType() + "_" + player.getFaction() + extraInfo + status + ".png";
+            String leaderInfoFileName = "pa_leaders_" + leader.getId() + status + ".png";
             drawPAImage(x + deltaX, y, leaderInfoFileName);
             deltaX += 48;
             if (Constants.COMMANDER.equals(leader.getType()) && player.hasAbility("imperia")) {
