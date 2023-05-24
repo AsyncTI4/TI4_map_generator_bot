@@ -694,6 +694,15 @@ public class Player {
     }
 
     @Nullable
+    public Leader getLeader(String leaderIdOrType) {
+        Leader leader = getLeaderByID(leaderIdOrType);
+        if (leader == null) {
+            return getLeaderByType(leaderIdOrType);
+        }
+        return leader;
+    }
+
+    @Nullable
     public Leader getLeaderByType(String leaderType) {
         for (Leader leader : leaders) {
             if (leader.getType().equals(leaderType)) {

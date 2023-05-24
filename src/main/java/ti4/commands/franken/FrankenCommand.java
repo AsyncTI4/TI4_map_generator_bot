@@ -110,7 +110,7 @@ public class FrankenCommand implements Command {
         subcommands.add(new AbilityAdd());
         subcommands.add(new AbilityRemove());
         subcommands.add(new LeaderAdd());
-        // subcommands.add(new LeaderRemove());
+        subcommands.add(new LeaderRemove());
 
 
         return subcommands;
