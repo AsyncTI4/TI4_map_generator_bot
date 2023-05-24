@@ -65,7 +65,9 @@ public class Info extends GameSubcommandData{
             ArrayList<Player> players = new ArrayList<>(mapPlayers.values());
             for (Player player : players) {
                 if (player.getFaction() != null) {
-                    sb.append("> `").append(index).append(".` ").append(player.getUserName()).append(Helper.getFactionIconFromDiscord(player.getFaction())).append(Helper.getColourAsMention(event.getGuild(), player.getColor())).append(NEW_LINE);
+                    sb.append("> `").append(index).append(".` ").append(player.getUserName()).append(Helper.getFactionIconFromDiscord(player.getFaction())).append(Helper.getColourAsMention(event.getGuild(), player.getColor()));
+                    sb.append(" - *").append(player.getTotalVictoryPoints(activeMap)).append("VP* ");
+                    sb.append(NEW_LINE);
                     index++;
                 }
             }

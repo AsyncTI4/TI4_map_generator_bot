@@ -810,8 +810,12 @@ public class Player {
     }
 
     @JsonIgnore
-    public int getSecretVictoryPoints() {
-        return getSecretsScored().size();
+    public int getSecretVictoryPoints(ti4.map.Map activeMap) {
+        Map<String, Integer> scoredSecrets = getSecretsScored();
+        for (String id : activeMap.getSoToPoList()) {
+            scoredSecrets.remove(id);
+        }
+        return scoredSecrets.size();
     }
 
     @JsonIgnore
@@ -828,7 +832,7 @@ public class Player {
 
     @JsonIgnore
     public int getTotalVictoryPoints(ti4.map.Map activeMap) {
-        return getPublicVictoryPoints(activeMap) + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
+        return getPublicVictoryPoints(activeMap) + getSecretVictoryPoints(activeMap) + getSupportForTheThroneVictoryPoints();
     }
 
     public void setTg(int tg) {
