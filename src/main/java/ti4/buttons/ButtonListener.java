@@ -253,18 +253,47 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 new RevealStage1().revealS1(event, event.getChannel());
             }
+
+            int playersWithSCs = 0;
+
+            for(Player player2 : activeMap.getPlayers().values())
+            {
+                if(playersWithSCs > 1)
+                {
+                    new Cleanup().runStatusCleanup(activeMap);
+                    addReaction(event, false, true, "Running Status Cleanup. ", "Status Cleanup Run!");
+                    break;
+                }
+                if(player2.isRealPlayer())
+                {
+                    if(player2.getSCs()!= null && player2.getSCs().size() > 0 && !player2.getSCs().contains(Integer.valueOf(0)))
+                    {
+                        playersWithSCs = playersWithSCs+1;
+                    }
+                }
+            }
+
+
+
+
+
+
+            String message2 = null;
+            message2 = "Resolve status homework using the buttons. Only the Ready for [X] button is essential to hit, all others are optional. ";
             Button draw1AC = Button.success("draw_1_AC", "Draw 1 AC");
             Button confirmCCs = Button.primary("confirm_cc", "Confirm Your CC Update is Complete & Final");
             Button getCCs= Button.success("redistributeCCButtons", "Redistribute & Gain CCs");
             boolean custodiansTaken = activeMap.isCustodiansScored();
             Button passOnAbilities;
             if (custodiansTaken) {
-                passOnAbilities = Button.danger("pass_on_abilities", "Pass on Pol. Stability/A. Burial Sites/Maw Of W./Crown of E.");
+                passOnAbilities = Button.danger("pass_on_abilities", "Ready For Agenda");
+                message2 = message2 +" Ready for Agenda means you are done playing/passing on playing political stability, ancient burial sites, and crown of emphidia.";
             } else {
-                passOnAbilities = Button.danger("pass_on_abilities", "Pass on Pol. Stability/Summit/Man. Investments");
+                passOnAbilities = Button.danger("pass_on_abilities", "Ready For Strategy Phase");
+                message2 = message2 +" Ready for Strategy Phase means you are done playing/passing on playing political stability, summit, and manupulate investments. ";
             }
             List<Button> buttons = null;
-            String message2 = null;
+           
 
             if (activeMap.isFoWMode()) {
                 buttons = List.of(draw1AC, getCCs);
@@ -282,7 +311,6 @@ public class ButtonListener extends ListenerAdapter {
 
                 buttons = List.of(draw1AC, getCCs, confirmCCs, passOnAbilities);
             }
-            message2 = "Resolve status homework using the buttons. Only the Pass on [abilities] button is essential to hit, all others are optional. ";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             event.getMessage().delete().queue();
 
@@ -306,7 +334,6 @@ public class ButtonListener extends ListenerAdapter {
         }
         else if (buttonID.startsWith("sc_no_follow_")) {
             int scnum2 = 1;
-            activeMap.getDiscardActionCards();
             boolean setstatus = true;
             try {
                 scnum2 = Integer.parseInt(lastcharMod);
@@ -995,7 +1022,7 @@ public class ButtonListener extends ListenerAdapter {
 
 
 
-            if (unit.equalsIgnoreCase("sd") || unit.equalsIgnoreCase("pds")) {
+            if (unit.equalsIgnoreCase("sd") || unitLong.equalsIgnoreCase("pds")) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), playerRep+ " "+successMessage);
                 String message = playerRep+" Would you like to put a cc from reinforcements in the same system?";
                 Button placeCCInSystem= Button.success( finsFactionCheckerPrefix+"reinforcements_cc_placement_"+planetName, "Place A CC From Reinforcements In The System.");
@@ -1832,7 +1859,7 @@ public class ButtonListener extends ListenerAdapter {
                     addReaction(event, true, false, "Drew 2 AC", "");
                 }
                 case "pass_on_abilities" -> {
-                    addReaction(event, false, false,"Passed"+event.getButton().getLabel().replace("Pass", ""), "");
+                    addReaction(event, false, false," Is "+event.getButton().getLabel(), "");
                 }
                 case "vote" -> {
                     String pfaction2 = null;
@@ -1913,9 +1940,9 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                 }
                 case "eraseMyVote" -> {
-                    String pfaction = StringUtils.capitalize(player.getFaction());
+                    String pfaction = player.getFaction();
                     AgendaHelper.eraseVotesOfFaction(activeMap, pfaction);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Erased previous votes made by "+pfaction + "\n \n"+ AgendaHelper.getSummaryOfVotes(activeMap, true));
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Erased previous votes made by "+StringUtils.capitalize(pfaction) + "\n \n"+ AgendaHelper.getSummaryOfVotes(activeMap, true));
 
                 }
                 case "gain_CC"-> {
@@ -1956,7 +1983,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String message3 = event.getMessage().getContentRaw();
                     event.getMessage().editMessage(message3).setComponents(actionRow2).queue();
-
+                    
                     addReaction(event, false, true, "Running Status Cleanup. ", "Status Cleanup Run!");
 
                 }
@@ -2204,11 +2231,11 @@ public class ButtonListener extends ListenerAdapter {
                 event.getInteraction().getMessage().reply("All players have indicated 'No Sabotage'").queueAfter(1, TimeUnit.SECONDS);
             }
             case Constants.PO_SCORING, Constants.PO_NO_SCORING -> {
-                String message2 = "All players have indicated scoring. Run Status Cleanup and then Draw PO using the buttons.";
+                String message2 = "All players have indicated scoring. Flip the relevant PO using the buttons. This will automatically run status clean-up if it has not been run already.";
                 Button drawStage2= Button.success("reveal_stage_2", "Reveal Stage 2");
                 Button drawStage1 = Button.success("reveal_stage_1", "Reveal Stage 1");
-                Button runStatusCleanup = Button.primary("run_status_cleanup", "Run Status Cleanup");
-                List<Button> buttons = List.of(runStatusCleanup,drawStage1, drawStage2);
+               // Button runStatusCleanup = Button.primary("run_status_cleanup", "Run Status Cleanup");
+                List<Button> buttons = List.of(drawStage1, drawStage2);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             }
             case "pass_on_abilities"-> {
@@ -2219,6 +2246,27 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Please flip agenda now", buttons);
                 } else {
                     event.getInteraction().getMessage().reply(Helper.getGamePing(event.getGuild(), activeMap) + " All players have indicated completion of status phase. Proceed to Strategy Phase.").queueAfter(1, TimeUnit.SECONDS);
+                    Player speaker = null;
+                    if (activeMap.getPlayer(activeMap.getSpeaker()) != null) {
+                        speaker = activeMap.getPlayers().get(activeMap.getSpeaker());
+                    } else {
+                        speaker = null;
+                    }
+                    String message =  Helper.getPlayerRepresentation(speaker, activeMap, event.getGuild(), true) + " UP TO PICK SC";
+                    if (activeMap.isFoWMode()) {
+                        MessageHelper.sendPrivateMessageToPlayer(speaker, activeMap, message);
+                        if(!activeMap.isHomeBrewSCMode())
+                        {
+                            MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                        }
+                    } else {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+                        if(!activeMap.isHomeBrewSCMode())
+                        {
+                            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                        }
+
+                    }
                 }
 
             }
