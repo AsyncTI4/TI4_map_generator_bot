@@ -138,6 +138,11 @@ public class AliasHandler {
     }
 
     public static String resolveTile(String name) {
+        
+        if(name.equalsIgnoreCase("mirage"))
+        {
+            return name;
+        }
         String aliasID = tileAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;

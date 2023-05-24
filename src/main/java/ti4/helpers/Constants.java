@@ -54,6 +54,7 @@ public class Constants {
     public static String ETA = "wheta";
 
     public static final String DRAW_SPECIFIC_SO_FOR_PLAYER = "draw_specific_so_for_player";
+    public static final String DRAW_SPECIFIC_SO = "draw_specific_so";
 
     public static final String SAVE_GAMES = "save_games";
     public static final String SAVE_GAME = "save_game";
@@ -250,6 +251,7 @@ public class Constants {
     public static final String EXHAUST_LEADER = "exhaust";
     public static final String REFRESH_LEADER = "ready";
     public static final String PURGE_LEADER = "purge";
+    public static final String PURGE_SO = "purge_so";
     public static final String ADD_LEADER = "add";
     public static final String LEADERS = "leaders";
     public static final String SC = "sc";
