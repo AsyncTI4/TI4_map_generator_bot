@@ -36,7 +36,7 @@ public class SetHeroActiveLeader extends LeaderAction {
 
     @Override
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeaderByType(leader);
+        Leader playerLeader = player.getLeader(leader);
         String playerFaction = player.getFaction();
 
         if (playerLeader != null && playerLeader.isLocked()) {

@@ -559,6 +559,8 @@ public class MapSaveLoadManager {
             for (Leader leader : player.getLeaders()) {
                 leaderInfo.append(leader.getId());
                 leaderInfo.append(",");
+                leaderInfo.append(leader.getType());
+                leaderInfo.append(",");
                 leaderInfo.append(leader.getTgCount());
                 leaderInfo.append(",");
                 leaderInfo.append(leader.isExhausted());
@@ -1447,11 +1449,11 @@ public class MapSaveLoadManager {
                         while (leaderInfos.hasMoreTokens()) {
                             String[] split = leaderInfos.nextToken().split(",");
                             Leader leader = new Leader(split[0]);
-                            leader.setTgCount(Integer.parseInt(split[1]));
-                            leader.setExhausted(Boolean.parseBoolean(split[2]));
-                            leader.setLocked(Boolean.parseBoolean(split[3]));
+                            leader.setTgCount(Integer.parseInt(split[2]));
+                            leader.setExhausted(Boolean.parseBoolean(split[3]));
+                            leader.setLocked(Boolean.parseBoolean(split[4]));
                             if (split.length == 6) {
-                                leader.setActive(Boolean.parseBoolean(split[4]));
+                                leader.setActive(Boolean.parseBoolean(split[5]));
                             }
                             leaderList.add(leader);
                         }

@@ -350,7 +350,7 @@ public class AgendaHelper {
             {
                 if(player.getMahactCC().contains(xxcha.getColor()))
                 {
-                    Leader leader = xxcha.getLeaderByType(Constants.COMMANDER);
+                    Leader leader = xxcha.getLeader(Constants.COMMANDER);
                     if (leader != null && !leader.isLocked()) {
                         influenceCount += planets.size(); 
                         hasXxchaAlliance = 1;
@@ -363,12 +363,12 @@ public class AgendaHelper {
 
 
         if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeaderByType(Constants.COMMANDER);
+            Leader leader = player.getLeader(Constants.COMMANDER);
             if (leader != null && !leader.isLocked()) {
                 influenceCount += planets.size(); 
                 hasXxchaAlliance = 1;
             }
-            leader = player.getLeaderByType(Constants.HERO);
+            leader = player.getLeader(Constants.HERO);
             if (leader != null && !leader.isLocked()) {
                 int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                         .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
@@ -386,7 +386,7 @@ public class AgendaHelper {
                                 playerFaction.equals(promissoryNoteOwner);
                         if ("xxcha".equals(playerFaction) && pn.endsWith("_an")) {
                             if (isCorrectPlayer) {
-                                Leader leader = player_.getLeaderByType(Constants.COMMANDER);
+                                Leader leader = player_.getLeader(Constants.COMMANDER);
                                 if (leader != null && !leader.isLocked()) {
                                     influenceCount += planets.size();
                                     hasXxchaAlliance = 1;

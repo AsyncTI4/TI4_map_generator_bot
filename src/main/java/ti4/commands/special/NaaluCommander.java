@@ -37,7 +37,7 @@ public class NaaluCommander extends SpecialSubcommandData {
             return;
         }
 
-        if (player.getLeaderByType("commander").isLocked()) {
+        if (player.getLeader("commander").isLocked()) {
             sendMessage("Your commander is locked.");
             return;
         }

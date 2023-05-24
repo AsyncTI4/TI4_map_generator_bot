@@ -593,7 +593,7 @@ public class GenerateMap {
 
                         String pnFactionIcon = "pa_tech_factionicon_" + playerFaction + "_rdy.png";
                         drawPAImage(x + deltaX, y, pnFactionIcon);
-                        Leader leader = player_.getLeaderByType(Constants.COMMANDER);
+                        Leader leader = player_.getLeader(Constants.COMMANDER);
                         if (leader != null) {
                             commanderUnlocked = !leader.isLocked();
                         }
@@ -726,7 +726,7 @@ public class GenerateMap {
                         String playerColor = player_.getColor();
                         String playerFaction = player_.getFaction();
                         if (playerColor != null && mahactCCs.contains(playerColor)) {
-                            Leader leader_ = player_.getLeaderByType(Constants.COMMANDER);
+                            Leader leader_ = player_.getLeader(Constants.COMMANDER);
                             if (leader_ != null) {
                                 boolean locked = leader_.isLocked();
                                 String imperiaColorFile = "pa_leaders_imperia";
@@ -1070,7 +1070,7 @@ public class GenerateMap {
         drawPAImage(x + deltaX - 2, y - 2, "pa_resinf_info.png");
         graphics.setColor(Color.WHITE);
         graphics.drawRect(x + deltaX - 2, y - 2, 152, 152);
-        if (player.getFaction().equals("xxcha") && !player.getLeaderByType("hero").isLocked()) { //XXCHA WITH UNLOCKED HERO
+        if (player.getFaction().equals("xxcha") && !player.getLeader("hero").isLocked()) { //XXCHA WITH UNLOCKED HERO
             int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, map);
             int totalPlayerResources = Helper.getPlayerResourcesTotal(player, map);
             if (player.getUserID().equals("586504147746947090")) {

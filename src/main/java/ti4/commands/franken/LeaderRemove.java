@@ -9,7 +9,7 @@ import ti4.map.Player;
 
 public class LeaderRemove extends LeaderAddRemove {
     public LeaderRemove() {
-        super(Constants.LEADER_ADD, "Remove a leader from your faction");
+        super(Constants.LEADER_REMOVE, "Remove a leader from your faction");
     }
     
     @Override

@@ -900,7 +900,7 @@ public class Helper {
     }
     
     public static String getLeaderRepresentation(Player player, String leader, boolean includeTitle, boolean includeAbility) {
-        return getLeaderRepresentation(player.getFaction(), player.getLeaderByType(leader), includeTitle, includeAbility, false);
+        return getLeaderRepresentation(player.getFaction(), player.getLeader(leader), includeTitle, includeAbility, false);
     }
 
     public static String getLeaderRepresentation(Player player, Leader leader, boolean includeTitle, boolean includeAbility) {
@@ -917,6 +917,10 @@ public class Helper {
 
     public static String getLeaderFullRepresentation(Player player, Leader leader) {
         return getLeaderRepresentation(player.getFaction(), leader, true, true, false);
+    }
+
+    public static String getLeaderFullRepresentation(Leader leader) {
+        return getLeaderRepresentation(null, leader, true, true, false);
     }
 
     public static String getLeaderLockedRepresentation(Player player, Leader leader) {
@@ -1044,7 +1048,7 @@ public class Helper {
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
         int resourcesCount = 0;
         if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeaderByType(Constants.HERO);
+            Leader leader = player.getLeader(Constants.HERO);
             if (leader != null && !leader.isLocked()) {
                 int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                         .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
@@ -1068,7 +1072,7 @@ public class Helper {
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
         int resourcesCount = 0;
         if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeaderByType(Constants.HERO);
+            Leader leader = player.getLeader(Constants.HERO);
             if (leader != null && !leader.isLocked()) {
                 int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                         .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
@@ -1092,7 +1096,7 @@ public class Helper {
 
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
         if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeaderByType(Constants.HERO);
+            Leader leader = player.getLeader(Constants.HERO);
             if (leader != null && !leader.isLocked()) {
                 return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                         .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -1113,7 +1117,7 @@ public class Helper {
 
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
         if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeaderByType(Constants.HERO);
+            Leader leader = player.getLeader(Constants.HERO);
             if (leader != null && !leader.isLocked()) {
                 return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                         .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -1136,7 +1140,7 @@ public class Helper {
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
         int influenceCount = 0;
         if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeaderByType(Constants.HERO);
+            Leader leader = player.getLeader(Constants.HERO);
             if (leader != null && !leader.isLocked()) {
                 int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                         .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
@@ -1160,7 +1164,7 @@ public class Helper {
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
         int influenceCount = 0;
         if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeaderByType(Constants.HERO);
+            Leader leader = player.getLeader(Constants.HERO);
             if (leader != null && !leader.isLocked()) {
                 int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                         .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
@@ -1184,7 +1188,7 @@ public class Helper {
 
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
         if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeaderByType(Constants.HERO);
+            Leader leader = player.getLeader(Constants.HERO);
             if (leader != null && !leader.isLocked()) {
                 return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
             }
@@ -1204,7 +1208,7 @@ public class Helper {
 
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
         if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeaderByType(Constants.HERO);
+            Leader leader = player.getLeader(Constants.HERO);
             if (leader != null && !leader.isLocked()) {
                 return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                         .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
@@ -1226,7 +1230,7 @@ public class Helper {
 
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
         if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeaderByType(Constants.HERO);
+            Leader leader = player.getLeader(Constants.HERO);
             if (leader != null && !leader.isLocked()) {
                 return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
             }
@@ -1246,7 +1250,7 @@ public class Helper {
 
         HashMap<String, UnitHolder> planetsInfo = map.getPlanetsInfo();
         if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeaderByType(Constants.HERO);
+            Leader leader = player.getLeader(Constants.HERO);
             if (leader != null && !leader.isLocked()) {
                 return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
             }
@@ -1597,7 +1601,7 @@ public class Helper {
     }
 
     public static void checkIfHeroUnlocked(GenericInteractionCreateEvent event, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeaderByType(Constants.HERO);
+        Leader playerLeader = player.getLeader(Constants.HERO);
         if (playerLeader != null && playerLeader.isLocked()) {
             int scoredSOCount = player.getSecretsScored().size();
             int scoredPOCount = 0;
@@ -1850,14 +1854,14 @@ public class Helper {
     }
 
     public static boolean playerHasXxchaCommanderUnlocked(@NotNull Map map, @NotNull Player player) {  //TODO: contains(xxcha) -> contains(playerWithXxchaCommander)
-        if (player.getFaction().equals("xxcha") && player.getLeaderByType(Constants.COMMANDER) != null) {
-            return !player.getLeaderByType(Constants.COMMANDER).isLocked();
+        if (player.getFaction().equals("xxcha") && player.getLeader(Constants.COMMANDER) != null) {
+            return !player.getLeader(Constants.COMMANDER).isLocked();
         }
         List<String> playersPNs = player.getPromissoryNotesInPlayArea();
         ArrayList<Player> xxchaPlayers = new ArrayList<>(map.getRealPlayers().stream().filter(p -> p.getFaction().equals("xxcha")).toList());
         if (!xxchaPlayers.remove(player) && !xxchaPlayers.isEmpty() && xxchaPlayers.size() == 1) {
             Player xxchaPlayer = xxchaPlayers.get(0);
-            Leader xxchaCommander = xxchaPlayer.getLeaderByType(Constants.COMMANDER);
+            Leader xxchaCommander = xxchaPlayer.getLeader(Constants.COMMANDER);
             if (xxchaCommander != null && !xxchaCommander.isLocked()) {
                 for (String pn : playersPNs) {
                     if (pn.contains(xxchaPlayer.getColor()) && pn.contains("_an")) {
@@ -1872,7 +1876,7 @@ public class Helper {
             {
                 if(player.getMahactCC().contains(xxcha.getColor()))
                 {
-                    Leader leader = xxcha.getLeaderByType(Constants.COMMANDER);
+                    Leader leader = xxcha.getLeader(Constants.COMMANDER);
                     if (leader != null && !leader.isLocked()) {
                         return true;
                     }
@@ -1884,7 +1888,7 @@ public class Helper {
 
     public static boolean playerHasXxchaHeroUnlocked(Player player) {
         if (player.getFaction().equals("xxcha")) {
-            Leader xxchaHero = player.getLeaderByType("hero");
+            Leader xxchaHero = player.getLeader("hero");
             return (xxchaHero != null && !xxchaHero.isLocked());
         }
         return false;

@@ -21,7 +21,7 @@ public class UnlockLeader extends LeaderAction {
     }
 
     public void unlockLeader(GenericInteractionCreateEvent event, String leader, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeaderByType(leader);
+        Leader playerLeader = player.getLeader(leader);
         MessageChannel channel = activeMap.getMainGameChannel();
         if (activeMap.isFoWMode()) channel = player.getPrivateChannel();
 

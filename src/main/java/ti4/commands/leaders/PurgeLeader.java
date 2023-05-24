@@ -15,7 +15,7 @@ public class PurgeLeader extends LeaderAction {
 
     @Override
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeaderByType(leader);
+        Leader playerLeader = player.getLeader(leader);
         boolean purged = player.removeLeader(leader);
         if (purged) {
             sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));

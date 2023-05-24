@@ -63,7 +63,7 @@ public class ListVoteCount extends AgendaSubcommandData {
                     {
                         if(player.getMahactCC().contains(xxcha.getColor()))
                         {
-                            Leader leader = xxcha.getLeaderByType(Constants.COMMANDER);
+                            Leader leader = xxcha.getLeader(Constants.COMMANDER);
                             if (leader != null && !leader.isLocked()) {
                                 influenceCount += planets.size(); 
                                 
@@ -74,13 +74,13 @@ public class ListVoteCount extends AgendaSubcommandData {
                 //XXCHA SPECIAL CASE
                 if ("xxcha".equals(player.getFaction())) {
                     // add planet count if xxcha commander unlocked
-                    Leader leader = player.getLeaderByType(Constants.COMMANDER);
+                    Leader leader = player.getLeader(Constants.COMMANDER);
                     if (leader != null && !leader.isLocked()) {
                         influenceCount += planets.size();
                     }
 
                     // add resources if xxcha hero unlocked
-                    leader = player.getLeaderByType(Constants.HERO);
+                    leader = player.getLeader(Constants.HERO);
                     if (leader != null && !leader.isLocked()) {
                         int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                                 .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
@@ -103,7 +103,7 @@ public class ListVoteCount extends AgendaSubcommandData {
                                 // add planet count if xxcha commander unlocked
                                 if ("xxcha".equals(playerFaction) && pn.endsWith("_an")) {
                                     if (isCorrectPlayer) {
-                                        Leader leader = player_.getLeaderByType(Constants.COMMANDER);
+                                        Leader leader = player_.getLeader(Constants.COMMANDER);
                                         if (leader != null && !leader.isLocked()) {
                                             influenceCount += planets.size();
                                             hasXxchaAlliance = true;
@@ -220,7 +220,7 @@ public class ListVoteCount extends AgendaSubcommandData {
 
         //XXCHA
         if (player.getFaction().equals("xxcha")) {
-            Leader xxchaHero = player.getLeaderByType("hero");
+            Leader xxchaHero = player.getLeader("hero");
             if (xxchaHero != null && !xxchaHero.isLocked()) {
                 voteCount = baseResourceCount + baseInfluenceCount;
                 return voteCount;

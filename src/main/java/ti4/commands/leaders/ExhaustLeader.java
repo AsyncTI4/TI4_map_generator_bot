@@ -21,7 +21,7 @@ public class ExhaustLeader extends LeaderAction {
 
 	@Override
 	void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-		Leader playerLeader = player.getLeaderByType(leader);
+		Leader playerLeader = player.getLeader(leader);
 		if (playerLeader != null) {
 			if (playerLeader.isLocked()) {
 				sendMessage("Leader '" + leader + "' is locked");
