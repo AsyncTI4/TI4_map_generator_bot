@@ -1494,6 +1494,10 @@ public class Map {
         return null;
     }
 
+    public boolean purgeSpecificSecretObjective(String soID) {
+        return secretObjectives.remove(soID);
+    }
+
     @Nullable
     public LinkedHashMap<String, Integer> drawSpecificActionCard(String acID, String userID) {
         if (!actionCards.isEmpty()) {
@@ -1783,6 +1787,21 @@ public class Map {
     }
 
     public Tile getTile(String tileID) {
+        if(tileID != null && tileID.equalsIgnoreCase("mirage"))
+        {
+            for(Tile tile : tileMap.values())
+            {
+                for(UnitHolder uh : tile.getUnitHolders().values())
+                {
+                    if(uh.getTokenList() != null && (uh.getTokenList().contains("mirage") || uh.getTokenList().contains("token_mirage.png")))
+                    {
+                        return tile;
+                    }
+                }
+            }
+        }
+
+
         return tileMap.values().stream()
                 .filter(tile -> tile.getTileID().equals(tileID))
                 .findFirst()

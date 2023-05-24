@@ -211,7 +211,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 DrawRelic.drawRelicAndNotify(player,  event,  activeMap);
             }
             case "ms1", "ms2" -> {
-                message = "Replenished Commodities (" +player.getCommodities() +"->"+player.getCommoditiesTotal()+")";
+                message = "Replenished Commodities (" +player.getCommodities() +"->"+player.getCommoditiesTotal()+"). Reminder that this is optional, and that you can instead convert your existing comms.";
                 player.setCommodities(player.getCommoditiesTotal());
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + "\n" + message);
             }
@@ -257,7 +257,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 if (tile != null && planetName != null) {
                     new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetName, activeMap, planetName);
                 }
-                message = Helper.getColourAsMention(event.getGuild(), player.getColor()) + Emojis.infantry + " added to " + Helper.getPlanetRepresentationPlusEmoji(planetName);
+                message = Helper.getColourAsMention(event.getGuild(), player.getColor()) + Emojis.infantry + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetName)+". This placement is optional though.";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + "\n" + message);
                 break;
             }
