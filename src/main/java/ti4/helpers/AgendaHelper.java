@@ -376,6 +376,11 @@ public class AgendaHelper {
                 influenceCount += 3;
             }
         }
+        if (activeMap.getLaws() != null && (activeMap.getLaws().keySet().contains("rep_govt") || activeMap.getLaws().keySet().contains("absol_government"))) {
+            influenceCount = 1;
+        }
+
+
         if (player.getFaction().equals("nekro") && hasXxchaAlliance == 0) {
             influenceCount = 0;
         }
