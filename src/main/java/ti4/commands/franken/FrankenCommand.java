@@ -109,6 +109,9 @@ public class FrankenCommand implements Command {
         Collection<FrankenSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new AbilityAdd());
         subcommands.add(new AbilityRemove());
+        subcommands.add(new LeaderAdd());
+        // subcommands.add(new LeaderRemove());
+
 
         return subcommands;
     }

@@ -667,32 +667,46 @@ public class Player {
     }
 
     public void initLeaders() {
-        if (faction != null && Mapper.isFaction(faction)) {
-            leaders.clear();
-            HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = Mapper.getLeadersInfo();
-            HashMap<String, ArrayList<String>> factionLeaders = leadersInfo.get(faction);
-            if (factionLeaders != null) {
-                for (Map.Entry<String, ArrayList<String>> factionLeaderEntry : factionLeaders.entrySet()) {
-                    String leaderType = factionLeaderEntry.getKey();
-                    ArrayList<String> uniqueLeaders = factionLeaderEntry.getValue();
-                    if (uniqueLeaders.isEmpty()){
-                        Leader leader = new Leader(leaderType, "");
-                        leaders.add(leader);
-                    } else {
-                        for (String uniqueLeader : uniqueLeaders) {
-                            Leader leader = new Leader(leaderType, uniqueLeader);
-                            leaders.add(leader);
-                        }
-                    }
-                }
-            }
+        // if (faction != null && Mapper.isFaction(faction)) {
+        //     leaders.clear();
+        //     HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = Mapper.getLeadersInfo();
+        //     HashMap<String, ArrayList<String>> factionLeaders = leadersInfo.get(faction);
+        //     if (factionLeaders != null) {
+        //         for (Map.Entry<String, ArrayList<String>> factionLeaderEntry : factionLeaders.entrySet()) {
+        //             String leaderType = factionLeaderEntry.getKey();
+        //             ArrayList<String> uniqueLeaders = factionLeaderEntry.getValue();
+        //             if (uniqueLeaders.isEmpty()){
+        //                 Leader leader = new Leader(leaderType, "");
+        //                 leaders.add(leader);
+        //             } else {
+        //                 for (String uniqueLeader : uniqueLeaders) {
+        //                     Leader leader = new Leader(leaderType, uniqueLeader);
+        //                     leaders.add(leader);
+        //                 }
+        //             }
+        //         }
+        //     }
+        // }
+        for (String leaderID : getFactionStartingLeaders()) {
+            Leader leader = new Leader(leaderID);
+            leaders.add(leader);
         }
     }
 
     @Nullable
-    public Leader getLeader(String leaderID) {
+    public Leader getLeaderByType(String leaderType) {
         for (Leader leader : leaders) {
-            if (leader.getId().equals(leaderID) || leader.getName().equals(leaderID)){
+            if (leader.getType().equals(leaderType)) {
+                return leader;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public Leader getLeaderByID(String leaderID) {
+        for (Leader leader : leaders) {
+            if (leader.getId().equals(leaderID)) {
                 return leader;
             }
         }
@@ -703,6 +717,14 @@ public class Player {
         return leaders;
     }
 
+    public List<String> getLeaderIDs() {
+        return getLeaders().stream().map(l -> l.getId()).toList();
+    }
+
+    public boolean hasLeader(String leaderID) {
+        return getLeaderIDs().contains(leaderID);
+    }
+
     public void setLeaders(List<Leader> leaders) {
         this.leaders = leaders;
     }
@@ -710,7 +732,7 @@ public class Player {
     public boolean removeLeader(String leaderID) {
         Leader leaderToPurge = null;
         for (Leader leader : leaders) {
-            if (leader.getId().equals(leaderID) || leader.getName().equals(leaderID)){
+            if (leader.getId().equals(leaderID)) {
                 leaderToPurge = leader;
                 break;
             }
@@ -721,17 +743,17 @@ public class Player {
         return leaders.remove(leaderToPurge);
     }
 
-    public boolean addLeader(String leaderID) {
-        Leader leaderToPurge = null;
-        for (Leader leader : leaders) {
-            if (leader.getId().equals(leaderID) || leader.getName().equals(leaderID)){
-                return false;
-            }
+    public void addLeader(String leaderID) {
+        if (!getLeaderIDs().contains(leaderID)) {
+            Leader leader = new Leader(leaderID);
+            leaders.add(leader);
         }
-        if (leaderToPurge == null){
-            return false;
+    }
+
+    public void addLeader(Leader leader) {
+        if (!getLeaderIDs().contains(leader.getId())) {
+            leaders.add(leader);
         }
-        return leaders.remove(leaderToPurge);
     }
 
     public String getColor() {

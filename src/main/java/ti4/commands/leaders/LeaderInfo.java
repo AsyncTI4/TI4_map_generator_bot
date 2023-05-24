@@ -105,7 +105,7 @@ public class LeaderInfo extends LeaderSubcommandData {
                         String colour = split[1];
                         for (Player player_ : activeMap.getPlayers().values()) {
                             if (player_.getColor().equalsIgnoreCase(colour)) {
-                                Leader playerLeader = player_.getLeader(Constants.COMMANDER);
+                                Leader playerLeader = player_.getLeaderByType(Constants.COMMANDER);
                                 if (playerLeader == null) continue;
                                 leaderSB.append("ALLIANCE: ");
                                 if (playerLeader.isLocked()) {
@@ -126,8 +126,8 @@ public class LeaderInfo extends LeaderSubcommandData {
             leaderSB.append("**Other Faction's Agents:**").append("\n");
             for (Player player_ : activeMap.getPlayers().values()) {
                 if (player_ != player) {
-                    Leader playerLeader = player.getLeader(Constants.AGENT);
-                    Leader otherPlayerAgent = player_.getLeader(Constants.AGENT);
+                    Leader playerLeader = player.getLeaderByType(Constants.AGENT);
+                    Leader otherPlayerAgent = player_.getLeaderByType(Constants.AGENT);
                     if (otherPlayerAgent == null) continue;
                     if (playerLeader.isExhausted()) {
                         leaderSB.append("EXHAUSTED: ").append(Helper.getLeaderFullRepresentation(player_, otherPlayerAgent)).append("\n");
@@ -145,7 +145,7 @@ public class LeaderInfo extends LeaderSubcommandData {
             for (Player player_ : activeMap.getPlayers().values()) {
                 if (player_ != player) {
                     if (player.getMahactCC().contains(player_.getColor())) {
-                        Leader leader = player_.getLeader(Constants.COMMANDER);
+                        Leader leader = player_.getLeaderByType(Constants.COMMANDER);
                         if (leader == null) continue;
                         leaderSB.append(Helper.getLeaderFullRepresentation(player_, leader)).append("\n");
                     }

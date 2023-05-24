@@ -230,7 +230,7 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Techs: ").append(player.getTechs()).append("\n");
 		sb.append("> Relics: ").append(player.getRelics()).append("\n");
 		sb.append("> Leaders: [");
-		player.getLeaders().forEach(l -> sb.append(" [" + l.getId() + l.getName() + "] "));
+		player.getLeaders().forEach(l -> sb.append(" [" + l.getId() + "] "));
 		sb.append("]\n");
 
 		return sb.toString();

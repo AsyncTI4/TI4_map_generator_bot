@@ -16,7 +16,7 @@ public class RefreshLeader extends LeaderAction {
 
     @Override
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeader(leader);    
+        Leader playerLeader = player.getLeaderByType(leader);    
         if (playerLeader != null){
             if (playerLeader.isLocked()){
                 sendMessage("Leader is locked");
