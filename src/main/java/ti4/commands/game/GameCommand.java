@@ -99,6 +99,7 @@ public class GameCommand implements Command {
         subcommands.add(new Ping());
         subcommands.add(new SetUnitCap());
         subcommands.add(new ChangeToBaseGame());
+        subcommands.add(new SetDeck());
         return subcommands;
     }
 
