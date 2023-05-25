@@ -120,11 +120,11 @@ public class SCPlay extends PlayerSubcommandData {
         }
 
 
-        if (!activeMap.isHomeBrewSCMode()) {
+        
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
             //GET BUTTONS
             ActionRow actionRow = null;
-            List<Button> scButtons = getSCButtons(scToDisplay);
+            List<Button> scButtons = getSCButtons(scToDisplay, activeMap);
             if (scButtons != null && !scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
             if (actionRow != null) baseMessageObject.addComponents(actionRow);
 
@@ -159,9 +159,7 @@ public class SCPlay extends PlayerSubcommandData {
 
                 }
             });
-        } else {
-            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message + "\n No buttons will be displayed due to the homebrew SC");
-        }
+        
 
 
         //POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
@@ -218,7 +216,11 @@ public class SCPlay extends PlayerSubcommandData {
         }
     }
 
-    private List<Button> getSCButtons(int sc) {
+    private List<Button> getSCButtons(int sc, Map activeMap) {
+
+        if (!activeMap.isHomeBrewSCMode()) {
+            return getGenericButtons(sc);
+        }
         return switch (sc) {
             case 1 -> getLeadershipButtons();
             case 2 -> getDiplomacyButtons();

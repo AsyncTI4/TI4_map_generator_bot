@@ -125,7 +125,7 @@ public class ButtonListener extends ListenerAdapter {
             buttonID = buttonID.replace(factionWhoGeneratedButton+"_", "");
             String factionWhoIsUp = player.getFaction();
             if (!player.getFaction().equalsIgnoreCase(factionWhoGeneratedButton) && !buttonLabel.toLowerCase().contains(factionWhoIsUp)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "To "+ StringUtils.capitalize(player.getFaction()) +": you are not the faction who these buttons are meant for.");
+                MessageHelper.sendMessageToChannel(event.getChannel(), "To "+ Helper.getFactionIconFromDiscord(player.getFaction()) +": you are not the faction who these buttons are meant for.");
                 return;
             }
         }
@@ -360,7 +360,7 @@ public class ButtonListener extends ListenerAdapter {
             String message = "";
 
 
-            new ExpPlanet().explorePlanet(event, Helper.getTileFromPlanet(info[1], activeMap), info[1], info[2], player, false, activeMap, 1);
+            new ExpPlanet().explorePlanet(event, Helper.getTileFromPlanet(info[1], activeMap), info[1], info[2], player, false, activeMap, 1, false);
 
             event.getMessage().delete().queue();
         }
@@ -370,10 +370,10 @@ public class ButtonListener extends ListenerAdapter {
             String message = "";
             if (info[0].equalsIgnoreCase("decline")) {
                 message = "Rejected Distant Suns Ability";
-                new ExpPlanet().explorePlanet(event, Helper.getTileFromPlanet(info[1], activeMap), info[1], info[2], player, true, activeMap, 1);
+                new ExpPlanet().explorePlanet(event, Helper.getTileFromPlanet(info[1], activeMap), info[1], info[2], player, true, activeMap, 1, false);
             } else {
                 message = "Exploring twice";
-                new ExpPlanet().explorePlanet(event, Helper.getTileFromPlanet(info[1], activeMap), info[1], info[2], player, true, activeMap, 2);
+                new ExpPlanet().explorePlanet(event, Helper.getTileFromPlanet(info[1], activeMap), info[1], info[2], player, true, activeMap, 2, false);
             }
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
             event.getMessage().delete().queue();
@@ -410,7 +410,7 @@ public class ButtonListener extends ListenerAdapter {
             if (actionRow2.size() > 0) {
                 event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue();
             }
-            String ident = StringUtils.capitalize(player.getFaction());
+            String ident = Helper.getFactionIconFromDiscord(player.getFaction());
             MessageHelper.sendMessageToChannel(event.getChannel(), ident+" Readied "+ Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, activeMap));
 
 
@@ -439,7 +439,7 @@ public class ButtonListener extends ListenerAdapter {
 
             String tech = buttonID.replace("getTech_", "");
             String techFancy = buttonLabel;
-            String ident = StringUtils.capitalize(player.getFaction());
+            String ident = Helper.getFactionIconFromDiscord(player.getFaction());
             String message = ident+ " Acquired The Tech " +  Helper.getTechRepresentation(AliasHandler.resolveTech(tech));
 
             String trueIdentity = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true);
@@ -482,7 +482,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
             String totalVotesSoFar = event.getMessage().getContentRaw();
-            String ident = StringUtils.capitalize(player.getFaction());
+            String ident = Helper.getFactionIconFromDiscord(player.getFaction());
             if (totalVotesSoFar.contains("exhausted")) {
                 totalVotesSoFar = totalVotesSoFar + ", "+Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, activeMap);
             } else {
@@ -543,7 +543,7 @@ public class ButtonListener extends ListenerAdapter {
         else if (buttonID.startsWith("reduceTG_")) {
 
             int tgLoss = Integer.parseInt(buttonID.replace("reduceTG_", ""));
-            String ident = StringUtils.capitalize(player.getFaction()) + "";
+            String ident = Helper.getFactionIconFromDiscord(player.getFaction()) + "";
             String message = ident + " reduced tgs by "+tgLoss+" ("+player.getTg()+"->"+(player.getTg()-tgLoss)+").";
             if (tgLoss > player.getTg()) {
                 message = "You dont have "+tgLoss+" tgs. No change made.";
@@ -1098,7 +1098,19 @@ public class ButtonListener extends ListenerAdapter {
         else if (buttonID.startsWith("agendaResolution_")) {
             String winner = buttonID.substring(buttonID.indexOf("_")+1,buttonID.length());
             String agendaid = activeMap.getCurrentAgendaInfo().substring(activeMap.getCurrentAgendaInfo().lastIndexOf("_")+1,activeMap.getCurrentAgendaInfo().length());
-            int aID = Integer.parseInt(agendaid);
+            int aID = 0;
+            if(agendaid.equalsIgnoreCase("CL"))
+            {
+                String id2 = activeMap.revealAgenda(false);
+                LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
+                Integer uniqueID = discardAgendas.get(id2);
+                aID = uniqueID;
+            }
+            else
+            {
+                aID = Integer.parseInt(agendaid);
+            }
+           
             if (activeMap.getCurrentAgendaInfo().startsWith("Law")) {
                 if (activeMap.getCurrentAgendaInfo().contains("Player")) {
                     Player player2 = Helper.getPlayerFromColorOrFaction(activeMap, winner);
@@ -1835,6 +1847,51 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     addReaction(event, false, false, message, "");
                 }
+                case "mallice_2_tg" -> {
+                    
+                    String playerRep = Helper.getFactionIconFromDiscord(player.getFaction());
+                    
+                    String message = playerRep + " exhausted Mallice ability and gained 2 tg ("+player.getTg()+"->"+(player.getTg()+2)+").";
+                    player.setTg(player.getTg()+2);
+                    if(activeMap.isFoWMode() && event.getMessageChannel() != activeMap.getMainGameChannel())
+                    {
+
+                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
+                    }
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                    event.getMessage().delete().queue();
+                    //player.exhaustPlanetAbility("mallice");
+                }
+                case "mallice_convert_comm" -> {
+                    
+                    String playerRep = Helper.getFactionIconFromDiscord(player.getFaction());
+                    
+                    String message = playerRep + " exhausted Mallice ability and converted comms to tg (TGs: "+player.getTg()+"->"+(player.getTg()+player.getCommodities())+").";
+                    player.setTg(player.getTg()+player.getCommodities());
+                    player.setCommodities(0);
+                    if(activeMap.isFoWMode() && event.getMessageChannel() != activeMap.getMainGameChannel())
+                    {
+                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
+                    }
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+                    event.getMessage().delete().queue();
+                    //player.exhaustPlanetAbility("mallice");
+                }
+                case "mallice_use_ability" -> {
+                    
+                    String playerRep = Helper.getEmojiFromDiscord(StringUtils.capitalize(player.getFaction()));
+                    
+                    String message = playerRep + " Use buttons to decide how to resolve Mallice ability.";
+                    List<Button> buttons = new ArrayList<Button>();
+                    Button twoTG = Button.success(finsFactionCheckerPrefix+"mallice_2_tg", "Use Ability to get 2tg");
+                    buttons.add(twoTG);
+                    Button convertC = Button.success(finsFactionCheckerPrefix+"mallice_convert_comm", "Use Ability to Convert Your Commodities to TG");
+                    buttons.add(convertC);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons); 
+                    event.getMessage().delete().queue();
+                    player.exhaustPlanetAbility("mallice");
+
+                }
                 case "decline_explore" -> {
                     addReaction(event, false, false, "Declined Explore", "");
                     event.getMessage().delete().queue();
@@ -1942,7 +1999,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "eraseMyVote" -> {
                     String pfaction = player.getFaction();
                     AgendaHelper.eraseVotesOfFaction(activeMap, pfaction);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Erased previous votes made by "+StringUtils.capitalize(pfaction) + "\n \n"+ AgendaHelper.getSummaryOfVotes(activeMap, true));
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Erased previous votes made by "+Helper.getFactionIconFromDiscord(player.getFaction()) + "\n \n"+ AgendaHelper.getSummaryOfVotes(activeMap, true));
 
                 }
                 case "gain_CC"-> {
