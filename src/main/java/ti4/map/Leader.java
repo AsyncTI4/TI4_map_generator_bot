@@ -37,6 +37,8 @@ public class Leader {
             type = Constants.COMMANDER;
         } else if (id.contains(Constants.HERO)) {
             type = Constants.HERO;
+        } else if (id.contains(Constants.ENVOY)) {
+            type = Constants.ENVOY;
         }
     }
 

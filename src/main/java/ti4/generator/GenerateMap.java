@@ -710,6 +710,7 @@ public class GenerateMap {
                     case Constants.AGENT -> pipID = "i";
                     case Constants.COMMANDER -> pipID = "ii";
                     case Constants.HERO -> pipID = "iii";
+                    case Constants.ENVOY -> pipID = "agenda";
                     default -> pipID = "";
                 }
 
@@ -725,6 +726,7 @@ public class GenerateMap {
             }
 
             String leaderInfoFileName = "pa_leaders_" + leader.getId() + status + ".png";
+            if (Constants.ENVOY.equals(leader.getType())) leaderInfoFileName = "pa_leaders_envoy" + status + ".png";
             drawPAImage(x + deltaX, y, leaderInfoFileName);
             deltaX += 48;
             if (Constants.COMMANDER.equals(leader.getType()) && player.hasAbility("imperia")) {
