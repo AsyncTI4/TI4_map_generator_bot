@@ -1,0 +1,97 @@
+[
+    {
+        "alias": "template",
+        "name": "Deck Template",
+        "type": "template",
+        "description": "A template json deck",
+        "cardIDs": [
+           "card1","card2","card3"
+        ]
+    },
+
+    
+    {
+        "alias": "agendas_pok",
+        "name": "PoK Agendas",
+        "type": "agenda",
+        "description": "All agendas in a 'vanilla' PoK game",
+        "cardIDs": [
+            "abolishment","arbiter","arms_reduction","articles_war","artifact","censure","checks","cladenstine","classified","committee","conscription","constitution","conventions","covert","crisis","defense_act","disarmamament","economic_equality","execution","grant_reallocation","incentive","minister_antiquities","minister_commrece","minister_exploration","minister_industry","minister_peace","minister_policy","minister_sciences","minister_war","miscount","mutiny","nexus","plowshares","prophecy","rearmament","redistribution","regulations","rep_govt","revolution","sanctions","schematics","secret","seed_empire","shared_research","standardization","travel_ban","unconventional","warrant","wormhole_recon","wormhole_research"
+        ]
+    },
+    {
+        "alias": "action_cards_pok",
+        "name": "PoK Action Cards",
+        "type": "action_card",
+        "description": "All action cards in a 'vanilla' PoK game",
+        "cardIDs": [
+            "abs","arch_expedition","assassin","blitz","bribery","bunker","confounding","confusing","const_rider","counterstroke","coup","courageous","cripple","deadly_plot","decoy","dh1","dh2","dh3","dh4","diplo_rider","disable","disgrace","distinguished","divert_funding","dp1","dp2","dp3","dp4","economic_initiative","emergency","experimental","f_conscription","f_deployment","f_prototype","f_researched","fire_team","fs1","fs2","fs3","fs4","fsb","ghost_ship","ghost_squad","hack","harness","imp_rider","impersonation","industrial_initiative","infiltrate","insider","insub","intercept","investments","jamming","lead_rider","lost_star","lucky","master_plan","mb1","mb2","mb3","mb4","meltdown","messiah","mining_initiative","mjets1","mjets2","mjets3","mjets4","nav_suite","parley","plagiarize","plague","politic_rider","probe","rally","refit","reflective","reparations","repeal","reveal_prototype","reverse_engineer","rout","s_retreat1","s_retreat2","s_retreat3","s_retreat4","sabo1","sabo2","sabo3","sabo4","salvage","sanction","scramble","scuttle","seize","sh1","sh2","sh3","sh4","silence_space","solar_flare","spy","stability","summit","tactical","tech_rider","trade_rider","unexpected","unstable","upgrade","uprising","veto","war_effort","war_machine1","war_machine2","war_machine3","war_machine4","war_rider","waylay"
+        ]
+    },
+    {
+        "alias": "secret_objectives_pok",
+        "name": "PoK Secret Objectives",
+        "type": "secret_objective",
+        "description": "All secret objectives in a 'vanilla' PoK game",
+        "cardIDs": [
+            "ans","baf","bam","btgk","btv","csl","ctr","dfat","dhw","dp","dtd","dtgs","dts","dyp","eap","eh","faa","fc","fsn","fwm","fwp","gamf","hrm","lsc","mew","mlp","mp","mrm","mtm","ose","otf","pe","pem","sai","sar","sb","syc","te","ttfd","uf"
+        ]
+    },
+    {
+        "alias": "public_stage_1_objectives_pok",
+        "name": "PoK Public Stage I Objectives",
+        "type": "public_stage_1_objective",
+        "description": "All Stage I public objectives in a 'vanilla' PoK game",
+        "cardIDs": [
+            "amass_wealth","build_defenses","corner","deep_space","develop","diversify","engineer_marvel","expand_borders","infrastructure","intimidate","lead","lost_outposts","make_history","monument","outer_rim","push_boundaries","raise_fleet","research_outposts","sway_council","trade_routes"
+        ]
+    },
+    {
+        "alias": "public_stage_2_objectives_pok",
+        "name": "PoK Public Stage II Objectives",
+        "type": "public_stage_2_objective",
+        "description": "All Stage II public objectives in a 'vanilla' PoK game",
+        "cardIDs": [
+            "ancient_monuments","become_legend","brain_trust","centralize_trade","command_armada","conquer","control_borderlands","distant_lands","galvanize","golden_age","manipulate_law","massive_cities","master_science","protect_border","revolutionize","subdue","supremacy","unify_colonies","vast_reserves","vast_territories"
+        ]
+    },
+    {
+        "alias": "relics_pok",
+        "name": "PoK Relics",
+        "type": "relic",
+        "description": "All Relics in a 'vanilla' PoK game",
+        "cardIDs": [
+            "codex","dominusorb","dynamiscore","emelpar","emphidia","enigmaticdevice","mawofworlds","nanoforge","obsidian","prophetstears","shard","stellarconverter","thalnos","titanprototype"
+        ]
+    },
+    {
+        "alias": "explores_pok",
+        "name": "PoK Explore Cards",
+        "type": "explore",
+        "description": "All explore cards in a 'vanilla' PoK game",
+        "cardIDs": [
+            "aw1","aw2","aw3","aw4","biotic","cm1","cm2","cm3","crf1","crf2","crf3","crf4","crf5","crf6","crf7","crf8","crf9","cybernetic","dmz","ds","dv1","dv2","dw","ed1","ed2","ent","exp1","exp2","exp3","fb1","fb2","fb3","fb4","frln1","frln2","frln3","gamma","gw","hrf1","hrf2","hrf3","hrf4","hrf5","hrf6","hrf7","ion","irf1","irf2","irf3","irf4","irf5","kel1","kel2","lc1","lc2","lf1","lf2","lf3","lf4","ls","majent","minent","mirage","mo1","mo2","mo3","ms1","ms2","mw","propulsion","pw","rw","toe","urf1","urf2","urf3","vfs1","vfs2","vfs3","warfare"
+        ]
+    },
+
+
+
+    {
+        "alias": "agendas_absol",
+        "name": "Absol's Agendas",
+        "type": "agenda",
+        "description": "All Agendas for Absol Mode",
+        "cardIDs": [
+            "absol_abolishment","absol_affirmation","absol_agreement","absol_arbiter","absol_articleswar","absol_artifact","absol_censure","absol_checks","absol_conscription","absol_constitution","absol_conventionswar","absol_covert","absol_crisis","absol_defenseact","absol_disarmamament","absol_emergency1","absol_emergency2","absol_emergency3","absol_emergency4","absol_equality","absol_execution","absol_formation","absol_government","absol_grant","absol_hyperlane","absol_incentive","absol_leak","absol_limits","absol_measures","absol_minsantique","absol_minscomm","absol_minsexp","absol_minsindus","absol_minspeace","absol_minspolicy","absol_minssci","absol_minswar","absol_miscount","absol_mutiny","absol_nexus","absol_operations","absol_pax","absol_prophecy","absol_recon","absol_redistribution","absol_reduction","absol_regulations","absol_revolution","absol_sanctions","absol_schematics","absol_secret","absol_seeds","absol_shared","absol_sites","absol_spending","absol_standardization","absol_swords","absol_travelban","absol_warrant","absol_whresearch"
+        ]
+    },
+    {
+        "alias": "relics_absol",
+        "name": "Absol's Relics",
+        "type": "relic",
+        "description": "All Relics for Absol Mode",
+        "cardIDs": [
+            "absol_codex","absol_dominusorb","absol_dynamiscore","absol_emelpar","absol_emphidia","absol_jr","absol_luxarchtreatise","absol_mawofworlds","absol_nanoforge","absol_obsidian","absol_plenaryorbital","absol_prophetstears","absol_quantumcore","absol_shardofthethrone1","absol_shardofthethrone2","absol_shardofthethrone3","absol_stellarconverter","absol_syncretone","absol_thalnos","absol_tyrantslament","enigmaticdevice"
+        ]
+    }
+]
