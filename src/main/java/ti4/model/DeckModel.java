@@ -1,6 +1,7 @@
 package ti4.model;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -33,5 +34,11 @@ public class DeckModel extends Model {
             && type != null
             && description != null
             && cardIDs != null;
+    }
+
+    public List<String> getShuffledCardList() {
+        List<String> cardList = cardIDs;
+        Collections.shuffle(cardIDs);
+        return cardList;    
     }
 }
