@@ -30,7 +30,7 @@ public abstract class LeaderAddRemove extends FrankenSubcommandData {
         }
 
         leaderIDs.removeIf(StringUtils::isEmpty);
-        leaderIDs.removeIf(a -> !Mapper.getLeaderRepresentations().keySet().contains(a));
+        leaderIDs.removeIf(leaderID -> !Mapper.getLeaderRepresentations().keySet().contains(leaderID));
         
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
