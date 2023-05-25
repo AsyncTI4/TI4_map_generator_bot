@@ -36,6 +36,7 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.MapGenerator;
+import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
@@ -1449,6 +1450,22 @@ public class MapSaveLoadManager {
                         while (leaderInfos.hasMoreTokens()) {
                             String[] split = leaderInfos.nextToken().split(",");
                             Leader leader = new Leader(split[0]);
+
+                            // Migration Code
+                            String leaderType = split[0];
+                            String leaderName = split[1];
+                            if (".".equals(leaderName)) leaderName = "";
+                            if (Constants.AGENT.equals(leaderType) || Constants.AGENT.equals(leaderType) || Constants.AGENT.equals(leaderType)) {
+                                String newLeaderId = player.getFaction() + leaderType + leaderName;
+                                if (Mapper.getLeaderRepresentations().keySet().contains(newLeaderId)) {
+                                    BotLogger.log("Migrating Leader: [" + leaderType + "," + leaderName +"] -> " + newLeaderId);
+                                    leader = new Leader(newLeaderId);
+                                } else {
+                                    BotLogger.log("Could not find Leader Representation to Migrate: [" + leaderType + "," + leaderName +"] -> " + newLeaderId);
+                                }
+                            }
+                            // End Migration Code
+
                             leader.setTgCount(Integer.parseInt(split[2]));
                             leader.setExhausted(Boolean.parseBoolean(split[3]));
                             leader.setLocked(Boolean.parseBoolean(split[4]));
