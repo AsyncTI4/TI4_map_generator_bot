@@ -56,7 +56,7 @@ public class GenerateMap {
     private static HashMap<Player, Integer> userVPs = new HashMap<>();
 
     private final int width8 = 2500;
-    private final int heght8 = 3350;
+    private final int height8 = 3350;
     private final int playerHeight = 340;
 
     private int minX = -1;
@@ -86,12 +86,25 @@ public class GenerateMap {
     }
 
     private void init(Map activeMap) {
+        HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
+        HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
+
         mapHeight = width8;
-        mapWidth = heght8;
-        heightStats = heght8 / 2;
+        mapWidth = height8;
+        heightStats = height8 / 2;
         if (activeMap != null) {
+            int stage1 = activeMap.getRevealedPublicObjectives().keySet().stream().filter(obj -> publicObjectivesState1.containsKey(obj)).toList().size();
+            int stage2 = activeMap.getRevealedPublicObjectives().keySet().stream().filter(obj -> publicObjectivesState2.containsKey(obj)).toList().size();
+            int other = activeMap.getRevealedPublicObjectives().size() - stage1 - stage2;
+            int mostObjs = Math.max(Math.max(stage1, stage2), other);
+            int objectivesY = Math.max((mostObjs - 5) * 43, 0);
+            
             int playerCountForMap = activeMap.getPlayerCountForMap();
-            heightStats = playerCountForMap * playerHeight + ((activeMap.getLaws().keySet().size() / 2 + 1) * 115) + 600;
+            int playerY = playerCountForMap * playerHeight;
+
+            int lawsY = (activeMap.getLaws().keySet().size() / 2 + 1) * 115;
+            heightStats = playerY + lawsY + objectivesY + 600;
+            
             mapHeight = (activeMap.getRingCount() + 1) * 600 + extraY * 2;
             mapWidth = (activeMap.getRingCount() + 1) * 520 + extraX * 2;
             extraRow = false;
