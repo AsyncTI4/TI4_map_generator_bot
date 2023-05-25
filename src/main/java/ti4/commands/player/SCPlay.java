@@ -218,7 +218,7 @@ public class SCPlay extends PlayerSubcommandData {
 
     private List<Button> getSCButtons(int sc, Map activeMap) {
 
-        if (!activeMap.isHomeBrewSCMode()) {
+        if (activeMap.isHomeBrewSCMode()) {
             return getGenericButtons(sc);
         }
         return switch (sc) {
