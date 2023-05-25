@@ -79,13 +79,15 @@ public class GameEnd extends GameSubcommandData {
         MapSaveLoadManager.saveMap(userActiveMap, event);
         String gameEndText = getGameEndText(userActiveMap, event);
         MessageHelper.sendMessageToChannel(event.getChannel(), gameEndText);
-
+        userActiveMap.setAutoPing(false);
+        userActiveMap.setAutoPingSpacer(0);
         //SEND THE MAP IMAGE
         File file = GenerateMap.getInstance().saveImage(userActiveMap, DisplayType.map, event);
         FileUpload fileUpload = FileUpload.fromData(file);
         MessageHelper.replyToMessage(event, file);
 
         //CREATE POST IN #THE-PBD-CHRONICLES
+        
         TextChannel pbdChroniclesChannel = MapGenerator.guildPrimary.getTextChannelsByName("the-pbd-chronicles", true).get(0);
         String channelMention = pbdChroniclesChannel == null ? "#the-pbd-chronicles" : pbdChroniclesChannel.getAsMention();
         if (pbdChroniclesChannel == null) {
@@ -98,22 +100,30 @@ public class GameEnd extends GameSubcommandData {
             if (member != null) message.append(member.getAsMention());
         }
         message.append("\nPlease provide a summary of the game below:");
+        String bothelperMention = Helper.getEventGuildRole(event, "bothelper").getAsMention();
 
-        pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
-            m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
-            m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
-        });
+        if(!userActiveMap.isFoWMode())
+        {
+            pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
+                m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
+                m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
+                String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
+                MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+                
+            });
+            TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
+            if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
+    
+        }
+        
 
         //INFORM PLAYERS
-        String msg = "Game summary has been posted in the " + channelMention + " channel. Please post a summary of the game there!";
-        MessageHelper.sendMessageToChannel(event.getChannel(), msg);
+       
 
         //INFORM BOTHELPER IF IN-LIMBO IS FULL
-        String bothelperMention = Helper.getEventGuildRole(event, "bothelper").getAsMention();
+        
         // MessageHelper.sendMessageToChannel(event.getChannel(), bothelperMention + " - this game has concluded");
-        TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
-        if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
-
+      
         //MOVE CHANNELS TO IN-LIMBO
         Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
         TextChannel tableTalkChannel = (TextChannel) userActiveMap.getTableTalkChannel();

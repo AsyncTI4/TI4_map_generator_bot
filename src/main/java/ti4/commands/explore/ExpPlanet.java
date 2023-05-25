@@ -27,6 +27,7 @@ public class ExpPlanet extends ExploreSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet to explore").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TRAIT, "Planet trait to explore").setRequired(false).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ, "Override ownership requirement. Enter YES if so").setRequired(false));
     }
 
     @Override
@@ -56,17 +57,22 @@ public class ExpPlanet extends ExploreSubcommandData {
         if (traitOption != null){
             drawColor = traitOption.getAsString();
         }
-
+        boolean over = false;
+        OptionMapping overRider = event.getOption(Constants.OVERRIDE_EXPLORE_OWNERSHIP_REQ);
+        if(overRider != null && overRider.getAsString().equalsIgnoreCase("YES"))
+        {
+            over = true;
+        }
         Player player = activeMap.getPlayer(event.getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
 
 
-        explorePlanet(event, tile, planetName, drawColor, player, false, activeMap, 1);
+        explorePlanet(event, tile, planetName, drawColor, player, false, activeMap, 1, over);
     }
 
-    public void explorePlanet(GenericInteractionCreateEvent event, Tile tile, String planetName, String drawColor, Player player, boolean NRACheck, Map activeMap, int numExplores) {
-        if (!player.getPlanets().contains(planetName) && !activeMap.isAllianceMode()) {
+    public void explorePlanet(GenericInteractionCreateEvent event, Tile tile, String planetName, String drawColor, Player player, boolean NRACheck, Map activeMap, int numExplores, boolean ownerShipOverride) {
+        if (!player.getPlanets().contains(planetName) && !activeMap.isAllianceMode() && !ownerShipOverride) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "You do not own this planet, thus cannot explore it.");
             return;
         }

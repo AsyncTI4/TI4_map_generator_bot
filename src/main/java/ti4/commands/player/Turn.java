@@ -186,7 +186,15 @@ public class Turn extends PlayerSubcommandData {
 
         for (int sc : activeMap.getPlayedSCs()) {
             if (!player.hasFollowedSC(sc)) {
-                sb.append(Helper.getSCBackEmojiFromInteger(sc));
+                if(!activeMap.isHomeBrewSCMode())
+                {
+                    sb.append(Helper.getSCBackEmojiFromInteger(sc));
+                }
+                else
+                {
+                    sb.append("SC #"+sc);
+                }
+                
                 sendReminder = true;
             }
         }
@@ -198,7 +206,7 @@ public class Turn extends PlayerSubcommandData {
         String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeMap);
 
         LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
-        Player arborec = Helper.getPlayerFromColorOrFaction(activeMap, "arborec");
+        Player arborec = Helper.getPlayerFromAbility(activeMap, "mitosis");
         if (arborec != null) {
             String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeMap, event.getGuild(), true) + " reminder to do mitosis!";
             if (activeMap.isFoWMode()) {
