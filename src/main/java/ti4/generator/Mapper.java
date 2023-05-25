@@ -55,6 +55,7 @@ public class Mapper {
     private static final Properties ds_handcards = new Properties();
 
     //TODO: (Jazz) Finish moving all files over from properties to json
+    private static final HashMap<String, DeckModel> decks = new HashMap<>();
     private static final HashMap<String, ActionCardModel> actionCards = new HashMap<>();
     private static final HashMap<String, AgendaModel> agendas = new HashMap<>();
     private static final HashMap<String, FactionModel> factionSetup = new HashMap<>();
@@ -94,6 +95,7 @@ public class Mapper {
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
         readData("wormholes.properties", wormholes, "Could not read wormholes file");
         readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
+        readJsonData("decks.json", decks, DeckModel::new, "couild not read decks file");
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -655,6 +657,11 @@ public class Mapper {
     public static HashMap<String, AgendaModel> getAgendas() {
         HashMap<String, AgendaModel> agendaList = new HashMap<>(agendas);
         return agendaList;
+    }
+
+    public static HashMap<String, DeckModel> getDecks() {
+        HashMap<String, DeckModel> deckList = new HashMap<>(decks);
+        return deckList;
     }
 
     public static HashMap<String, String> getFactionAbilities() {

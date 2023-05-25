@@ -13,7 +13,7 @@ import ti4.message.MessageHelper;
 public class Undo extends GameSubcommandData{
     public Undo() {
         super(Constants.UNDO, "Undo the last action");
-        addOptions(new OptionData(OptionType.STRING, Constants.LATEST_COMMAND, "For Reference Only - Autocomplete should show the last command.").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LATEST_COMMAND, "For Reference Only - Autocomplete shows the last command.").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm undo command with YES").setRequired(true));
     }
 

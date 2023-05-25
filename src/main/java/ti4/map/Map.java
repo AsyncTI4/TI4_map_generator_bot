@@ -25,9 +25,6 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
-import ti4.model.ActionCardModel;
-import ti4.model.AgendaModel;
-import ti4.model.SecretObjectiveModel;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -161,16 +158,16 @@ public class Map {
     // @JsonDeserialize(keyUsing = MapPairKeyDeserializer.class)
     private LinkedHashMap<Pair<String, Integer>, String> adjacencyOverrides = new LinkedHashMap<>();
 
-    private ArrayList<String> publicObjectives1 = new ArrayList<>();
-    private ArrayList<String> publicObjectives2 = new ArrayList<>();
+    private List<String> publicObjectives1 = new ArrayList<>();
+    private List<String> publicObjectives2 = new ArrayList<>();
     private ArrayList<String> soToPoList = new ArrayList<>();
 
     @JsonIgnore
     private ArrayList<String> purgedPN = new ArrayList<>();
 
-    private ArrayList<String> explore = new ArrayList<>();
+    private List<String> explore = new ArrayList<>();
     private ArrayList<String> discardExplore = new ArrayList<>();
-    private ArrayList<String> relics = new ArrayList<>();
+    private List<String> relics = new ArrayList<>();
 
     @JsonIgnore
     private static HashMap<Player, Integer> playerVPs = new HashMap<>();
@@ -187,28 +184,16 @@ public class Map {
 
         miltyDraftManager = new MiltyDraftManager();
 
-        HashMap<String, SecretObjectiveModel> secretObjectives = Mapper.getSecretObjectives();
-        this.secretObjectives = new ArrayList<>(secretObjectives.keySet());
-        Collections.shuffle(this.secretObjectives);
-
-        HashMap<String, ActionCardModel> actionCards = Mapper.getActionCards();
-        this.actionCards = new ArrayList<>(actionCards.keySet());
-        Collections.shuffle(this.actionCards);
-
+        //Card Decks
+        this.secretObjectives = Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList();
+        this.actionCards = Mapper.getDecks().get("action_cards_pok").getShuffledCardList();
+        this.explore = Mapper.getDecks().get("explores_pok").getShuffledCardList();
+        this.publicObjectives1 = Mapper.getDecks().get("public_stage_1_objectives_pok").getShuffledCardList();
+        this.publicObjectives2 = Mapper.getDecks().get("public_stage_2_objectives_pok").getShuffledCardList();
         resetAgendas();
-
-        Set<String> po1 = Mapper.getPublicObjectivesStage1().keySet();
-        Set<String> po2 = Mapper.getPublicObjectivesStage2().keySet();
-        publicObjectives1.addAll(po1);
-        publicObjectives2.addAll(po2);
-        Collections.shuffle(publicObjectives1);
-        Collections.shuffle(publicObjectives2);
-        addCustomPO(Constants.CUSTODIAN, 1);
-
-        Set<String> exp = Mapper.getExplores().keySet();
-        explore.addAll(exp);
-        Collections.shuffle(explore);
         resetRelics();
+        
+        addCustomPO(Constants.CUSTODIAN, 1);
 
         //Default SC initialization
         for (int i = 0; i < 8; i++) {
@@ -220,7 +205,6 @@ public class Map {
         Map m = this;
         return m;
     }
-
 
     public HashMap<String, Object> getExportableFieldMap() {
         Class<? extends Map> aClass = this.getClass();
@@ -851,11 +835,11 @@ public class Map {
         return revealedPublicObjectives;
     }
 
-    public ArrayList<String> getPublicObjectives1() {
+    public List<String> getPublicObjectives1() {
         return publicObjectives1;
     }
 
-    public ArrayList<String> getPublicObjectives2() {
+    public List<String> getPublicObjectives2() {
         return publicObjectives2;
     }
 
@@ -867,7 +851,7 @@ public class Map {
         return revealObjective(publicObjectives2);
     }
 
-    public java.util.Map.Entry<String, Integer> revealObjective(ArrayList<String> objectiveList) {
+    public java.util.Map.Entry<String, Integer> revealObjective(List<String> objectiveList) {
         if (!objectiveList.isEmpty()) {
             String id = objectiveList.get(0);
             objectiveList.remove(id);
@@ -889,7 +873,7 @@ public class Map {
         return addSpecificObjective(publicObjectives2, objective);
     }
 
-    public java.util.Map.Entry<String, Integer> addSpecificObjective(ArrayList<String> objectiveList, String objective) {
+    public java.util.Map.Entry<String, Integer> addSpecificObjective(List<String> objectiveList, String objective) {
         if (!objectiveList.isEmpty()) {
             objectiveList.remove(objective);
             addRevealedPublicObjective(objective);
@@ -1171,13 +1155,11 @@ public class Map {
     }
 
     public void resetAgendas() {
-        HashMap<String, AgendaModel> agendas = Mapper.getAgendas(); //ALL agendas, including absol
         if (this.absolMode) {
-            this.agendas = new ArrayList<>(agendas.entrySet().stream().filter(a -> a.getValue().source.equals("absol")).map(a -> a.getKey()).toList());
-        } else { //ALL agendas, except absol - if more decks get added, this will need to be rebuilt
-            this.agendas = new ArrayList<>(agendas.entrySet().stream().filter(a -> a.getValue().source.equals("PoK")).map(a -> a.getKey()).toList());
+            this.agendas = Mapper.getDecks().get("agendas_absol").getShuffledCardList();
+        } else {
+            this.agendas = Mapper.getDecks().get("agendas_pok").getShuffledCardList();
         }
-        Collections.shuffle(this.agendas);
         discardAgendas = new LinkedHashMap<>();
     }
 
@@ -1750,14 +1732,11 @@ public class Map {
     }
 
     public void resetRelics() {
-        HashMap<String, String> relics = Mapper.getRelics(); //ALL agendas including absol
         if (this.absolMode) {
-            this.relics = new ArrayList<>(relics.keySet().stream().filter(r -> r.startsWith("absol_")).toList());
-            this.relics.add(Constants.ENIGMATIC_DEVICE);
-        } else { //ALL relics, except absol - if more decks get added, this will need to be rebuilt
-            this.relics = new ArrayList<>(relics.keySet().stream().filter(Predicate.not(r -> r.startsWith("absol_"))).toList());
+            this.relics = Mapper.getDecks().get("relics_absol").getShuffledCardList();
+        } else {
+            this.relics = Mapper.getDecks().get("relics_pok").getShuffledCardList();
         }
-        Collections.shuffle(this.relics);
     }
 
     public void setSecretObjectives(List<String> secretObjectives) {

@@ -13,6 +13,7 @@ import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
+import ti4.model.DeckModel;
 import ti4.model.PublicObjectiveModel;
 
 import java.io.File;
@@ -460,6 +461,16 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
                 }
+            }
+            case Constants.DECK_NAME -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, DeckModel> decks = Mapper.getDecks();
+                List<Command.Choice> options = decks.values().stream()
+                    .filter(value -> value.alias.contains(enteredValue))
+                    .map((deck) -> new Command.Choice(deck.getName(), deck.alias))
+                    .limit(25)
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
             }
             case Constants.VERBOSITY -> {
                 event.replyChoiceStrings(Constants.VERBOSITY_OPTIONS).queue();
