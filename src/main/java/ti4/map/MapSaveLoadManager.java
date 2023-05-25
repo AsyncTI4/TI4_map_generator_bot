@@ -1484,7 +1484,8 @@ public class MapSaveLoadManager {
                                 }
                             }
                             // End Migration Code
-
+                            
+                            // leader.setType(Integer.parseInt(split[1])); // type is set in constructor based on ID
                             leader.setTgCount(Integer.parseInt(split[2]));
                             leader.setExhausted(Boolean.parseBoolean(split[3]));
                             leader.setLocked(Boolean.parseBoolean(split[4]));
