@@ -93,5 +93,17 @@
         "cardIDs": [
             "absol_codex","absol_dominusorb","absol_dynamiscore","absol_emelpar","absol_emphidia","absol_jr","absol_luxarchtreatise","absol_mawofworlds","absol_nanoforge","absol_obsidian","absol_plenaryorbital","absol_prophetstears","absol_quantumcore","absol_shardofthethrone1","absol_shardofthethrone2","absol_shardofthethrone3","absol_stellarconverter","absol_syncretone","absol_thalnos","absol_tyrantslament","enigmaticdevice"
         ]
+    },
+
+    
+    {
+        "alias": "action_deck_2",
+        "name": "Action Deck 2",
+        "type": "action_card",
+        "description": "Homebrew collection of action cards that replaces many in the standard deck. See: https://www.reddit.com/r/twilightimperium/comments/z4en6e/homebrew_alternate_action_card_deck/",
+        "cardIDs": [
+            "adrenaline_shots","ancient_data_archive","ancient_trade_routes","annexation","anti-gravity_drive","arms_deal","artifact_hunters","artifact_research","assassination_attempt","black_market_raid","brilliant_tactician","brutal_occupation","bureaucracy_rider","chain_reaction","close_quarters","collaborative_planning","concise_legal_text","contradictory_legal_text","corporate_lobbying","counter-intelligence","custodian_support","cyberwarfare","deep_cover_operatives","deep_space_station","defectors","defense_installation","defense_rider","deflection_tactics","disrupt_logistics","early_voting","emergency_conscription","exploration_rider","fire_for_effect","firing_solution_","flawless_strategy","freedom_fighters","frontier_rider","fulfillment_protocols","garner_tribute","grand_heist","graviton_shielding","hostile_world","illusory_duplication","impeachment","intrigue","ixthian_gift","kickbacks","last_minute_deliberation","magen_engineers","micrometeoroid_storm","overtime","political_upheaval","production_rider","propaganda","prophecy","proxy_war","psychological_operations","public_outcry","rapid_mobilization","reconstruction","recurrence_protocols","rehash_debates","relay_connection","relic_rider","rigged_explosives","risky_jump_piloting","safety_overrides","shock_and_awe","shock_troops","short-lived_clone","shrapnel_turrets","side_project","singularity_charge","smuggler_routes","space_mines","special_considerations","stasis_haul","steal_prototype","stranded_ship","technological_breakthrough","terraforming_initiative","timely_reinforcements","transference_protocol","virulent_gas_canisters",
+            "dh1","dh2","dh3","dh4","dp1","dp2","dp3","dp4","fs1","fs2","fs3","fs4","mb1","mb2","mb3","mb4","mjets1","mjets2","mjets3","mjets4","s_retreat1","s_retreat2","s_retreat3","s_retreat4","sabo1","sabo2","sabo3","sabo4","sh1","sh2","sh3","sh4","war_machine1","war_machine2","war_machine3","war_machine4"
+        ]
     }
 ]
