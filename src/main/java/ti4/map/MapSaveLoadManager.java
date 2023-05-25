@@ -1473,7 +1473,9 @@ public class MapSaveLoadManager {
                             String leaderName = split[1];
                             if (".".equals(leaderName)) leaderName = "";
                             if (Constants.AGENT.equals(leaderType) || Constants.COMMANDER.equals(leaderType) || Constants.HERO.equals(leaderType)) {
-                                String newLeaderId = player.getFaction() + leaderType + leaderName;
+                                String faction = player.getFaction();
+                                if ("keleresm".equals(faction) || "keleresx".equals(faction) || "keleresa".equals(faction)) faction = "keleres";
+                                String newLeaderId = faction + leaderType + leaderName;
                                 if (Mapper.getLeaderRepresentations().keySet().contains(newLeaderId)) {
                                     // BotLogger.log("Migrating Leader: [" + leaderType + "," + leaderName +"] -> " + newLeaderId);
                                     leader = new Leader(newLeaderId);
