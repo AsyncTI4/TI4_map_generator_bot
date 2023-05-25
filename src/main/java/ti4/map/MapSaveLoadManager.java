@@ -1455,10 +1455,10 @@ public class MapSaveLoadManager {
                             String leaderType = split[0];
                             String leaderName = split[1];
                             if (".".equals(leaderName)) leaderName = "";
-                            if (Constants.AGENT.equals(leaderType) || Constants.AGENT.equals(leaderType) || Constants.AGENT.equals(leaderType)) {
+                            if (Constants.AGENT.equals(leaderType) || Constants.COMMANDER.equals(leaderType) || Constants.HERO.equals(leaderType)) {
                                 String newLeaderId = player.getFaction() + leaderType + leaderName;
                                 if (Mapper.getLeaderRepresentations().keySet().contains(newLeaderId)) {
-                                    BotLogger.log("Migrating Leader: [" + leaderType + "," + leaderName +"] -> " + newLeaderId);
+                                    // BotLogger.log("Migrating Leader: [" + leaderType + "," + leaderName +"] -> " + newLeaderId);
                                     leader = new Leader(newLeaderId);
                                 } else {
                                     BotLogger.log("Could not find Leader Representation to Migrate: [" + leaderType + "," + leaderName +"] -> " + newLeaderId);
