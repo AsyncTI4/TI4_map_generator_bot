@@ -1,13 +1,11 @@
 package ti4.commands.cardsso;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 import java.util.*;
 
@@ -38,7 +36,7 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
             scoredSecretObjective.remove(id);
         }
 
-        sb.append(Helper.getPlayerRepresentation(event, player));
+        sb.append(Helper.getPlayerRepresentation(player, activeMap));
         sb.append("\n");
         sb.append("**Secret Objectives:**").append("\n");
         int index = 1;

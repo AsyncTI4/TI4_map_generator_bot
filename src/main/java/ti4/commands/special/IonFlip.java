@@ -23,7 +23,7 @@ public class IonFlip extends SpecialSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-        
+
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         if (tileOption == null){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");

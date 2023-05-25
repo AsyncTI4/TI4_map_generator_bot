@@ -3,12 +3,10 @@ package ti4.helpers;
 import net.dv8tion.jda.api.entities.channel.Channel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.ButtonInteraction;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.ObjectUtils.Null;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,8 +24,7 @@ import ti4.model.FactionModel;
 public class FoWHelper {
 
 	public static Boolean isPrivateGame(GenericInteractionCreateEvent event) {
-		if (event == null)
-		{
+		if (event == null) {
 			return null;
 		}
 		return isPrivateGame(null, null, event.getChannel());
@@ -37,40 +34,44 @@ public class FoWHelper {
 		return isPrivateGame(null, event);
 	}
 
-	public static Boolean isPrivateGame(@Nullable Map map, GenericCommandInteractionEvent event) {
-		return isPrivateGame(map, event, null);
+	public static Boolean isPrivateGame(@Nullable Map activeMap, GenericInteractionCreateEvent event) {
+		return isPrivateGame(activeMap, event, null);
 	}
-	
+
+	public static Boolean isPrivateGame(Map activeMap) {
+		return isPrivateGame(activeMap, null, null);
+	}
+
 	/** Method to determine of a viewing player should be able to see the stats of a particular faction */
-	public static boolean canSeeStatsOfFaction(Map map, String faction, Player viewingPlayer) {
-		for (Player player : map.getPlayers().values()) {
+	public static boolean canSeeStatsOfFaction(Map activeMap, String faction, Player viewingPlayer) {
+		for (Player player : activeMap.getPlayers().values()) {
 			if (faction.equals(player.getFaction())) {
-				return canSeeStatsOfPlayer(map, player, viewingPlayer);
+				return canSeeStatsOfPlayer(activeMap, player, viewingPlayer);
 			}
 		}
 		return false;
 	}
 
 	/** Method to determine of a viewing player should be able to see the stats of a particular player */
-	public static boolean canSeeStatsOfPlayer(Map map, Player player, Player viewingPlayer) {
+	public static boolean canSeeStatsOfPlayer(Map activeMap, Player player, Player viewingPlayer) {
 		if (player == viewingPlayer) {
 			return true;
 		}
-		
-		return viewingPlayer != null && player != null && 
-			( hasHomeSystemInView(map, player, viewingPlayer)
-				|| hasPlayersPromInPlayArea(player, viewingPlayer) 
+
+		return viewingPlayer != null && player != null && activeMap != null &&
+			( hasHomeSystemInView(activeMap, player, viewingPlayer)
+				|| hasPlayersPromInPlayArea(player, viewingPlayer)
 				|| hasMahactCCInFleet(player, viewingPlayer)
 			);
 	}
 
 	/** Check if the fog filter needs to be updated, then return the list of tiles that the player can see */
-	public static Set<String> fowFilter(Map map, Player player) {
+	public static Set<String> fowFilter(Map activeMap, Player player) {
 		if (player != null) {
-			updateFog(map, player);
+			updateFog(activeMap, player);
 
 			Set<String> systems = new HashSet<>();
-			for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(map.getTileMap()).entrySet()) {
+			for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(activeMap.getTileMap()).entrySet()) {
 				if (!tileEntry.getValue().hasFog(player)) {
 					systems.add(tileEntry.getKey());
 				}
@@ -80,54 +81,56 @@ public class FoWHelper {
 		return Collections.emptySet();
 	}
 
-	private static void initializeFog(Map map, @NotNull Player player, boolean forceRecalculate) {
+	private static void initializeFog(Map activeMap, @NotNull Player player, boolean forceRecalculate) {
 		if (player.hasFogInitialized() && !forceRecalculate) {
 			return;
 		}
 
 		// Get all tiles with the player in it
 		Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
-		for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(map.getTileMap()).entrySet()) {
-			if (FoWHelper.playerIsInSystem(map, tileEntry.getValue(), player)) {
+		for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(activeMap.getTileMap()).entrySet()) {
+			if (FoWHelper.playerIsInSystem(activeMap, tileEntry.getValue(), player)) {
 				tilesWithPlayerUnitsPlanets.add(tileEntry.getKey());
 			}
 		}
 
 		Set<String> tilePositionsToShow = new HashSet<>(tilesWithPlayerUnitsPlanets);
 		for (String tilePos : tilesWithPlayerUnitsPlanets) {
-			Set<String> adjacentTiles = FoWHelper.getAdjacentTiles(map, tilePos, player);
+			Set<String> adjacentTiles = FoWHelper.getAdjacentTiles(activeMap, tilePos, player);
 			tilePositionsToShow.addAll(adjacentTiles);
 		}
 
-		for (Tile tile : map.getTileMap().values()) {
+		String playerSweep = Mapper.getSweepID(player.getColor());
+		for (Tile tile : activeMap.getTileMap().values()) {
+			if (tile.hasCC(playerSweep)) {
+				tilePositionsToShow.add(tile.getPosition());
+			}
 			boolean tileHasFog = !tilePositionsToShow.contains(tile.getPosition());
 			tile.setTileFog(player, tileHasFog);
 		}
 
-		updatePlayerFogTiles(map, player, tilePositionsToShow);
+		updatePlayerFogTiles(activeMap, player);
 		player.setFogInitialized(true);
 	}
 
-	public static void updateFog(Map map, Player player) {
-		initializeFog(map, player, true);
+	public static void updateFog(Map activeMap, Player player) {
+		if (player != null) initializeFog(activeMap, player, true);
 	}
 
-    private static void updatePlayerFogTiles(Map map, Player player, Set<String> tileKeys) {
-        for (String key_ : tileKeys) {
-            Tile tileToUpdate = map.getTileByPosition(key_);
-
-            if (tileToUpdate != null) {
-                player.updateFogTile(tileToUpdate, "Round " + map.getRound());
+    private static void updatePlayerFogTiles(Map activeMap, Player player) {
+        for (Tile tileToUpdate : activeMap.getTileMap().values()) {
+            if (!tileToUpdate.hasFog(player)) {
+                player.updateFogTile(tileToUpdate, "Round " + activeMap.getRound());
             }
         }
     }
 
-	private static boolean hasHomeSystemInView(@NotNull Map map, @NotNull Player player, @NotNull Player viewingPlayer) {
+	private static boolean hasHomeSystemInView(@NotNull Map activeMap, @NotNull Player player, @NotNull Player viewingPlayer) {
 		String faction = player.getFaction();
 		if (faction == null) {
 			return false;
 		}
-		
+
 		List<String> hsIDs = new ArrayList<>();
 		if ("keleres".equals(faction)) {
 			hsIDs.add("92");
@@ -142,7 +145,7 @@ public class FoWHelper {
 			}
 		}
 
-		for (Tile tile : map.getTileMap().values()) {
+		for (Tile tile : activeMap.getTileMap().values()) {
 			if (hsIDs.contains(tile.getTileID()) && !tile.hasFog(viewingPlayer)) {
 				return true;
 			}
@@ -172,23 +175,23 @@ public class FoWHelper {
 		return mahactCCs.contains(player.getColor());
 	}
 
-	public static Boolean isPrivateGame(Map map, @Nullable GenericCommandInteractionEvent event, @Nullable Channel channel_) {
+	public static Boolean isPrivateGame(Map activeMap, @Nullable GenericInteractionCreateEvent event, @Nullable Channel channel_) {
 		Boolean isFoWPrivate = null;
 		Channel eventChannel = event == null ? null : event.getChannel();
 		Channel channel = channel_ != null ? channel_ : eventChannel;
 		if (channel == null) {
-			return null;
+			return activeMap.isFoWMode();
 		}
-		if (map == null) {
+		if (activeMap == null) {
 			String gameName = channel.getName();
 			gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
-			map = MapManager.getInstance().getMap(gameName);
-			if (map == null) {
+			activeMap = MapManager.getInstance().getMap(gameName);
+			if (activeMap == null) {
 				return isFoWPrivate;
 			}
 		}
-		if (map.isFoWMode() && channel_ != null || event != null) {
+		if (activeMap.isFoWMode() && channel_ != null || event != null) {
 			isFoWPrivate = channel.getName().endsWith(Constants.PRIVATE_CHANNEL);
 		}
 		return isFoWPrivate;
@@ -198,15 +201,15 @@ public class FoWHelper {
 	 *  Includes custom adjacent tiles defined on the map level, hyperlanes, and
 	 *  wormholes
 	 */
-	public static Set<String> getAdjacentTiles(Map map, String position, Player player) {
-		Set<String> adjacentPositions = traverseHyperlaneAdjacencies(map, position, -1, new HashSet<>(), null);
+	public static Set<String> getAdjacentTiles(Map activeMap, String position, Player player) {
+		Set<String> adjacentPositions = traverseHyperlaneAdjacencies(activeMap, position, -1, new HashSet<>(), null);
 
-		List<String> adjacentCustomTiles = map.getCustomAdjacentTiles().get(position);
+		List<String> adjacentCustomTiles = activeMap.getCustomAdjacentTiles().get(position);
 		if (adjacentCustomTiles != null) {
 			adjacentPositions.addAll(adjacentCustomTiles);
 		}
 
-		Set<String> wormholeAdjacencies = getWormholeAdjacencies(map, position, player);
+		Set<String> wormholeAdjacencies = getWormholeAdjacencies(activeMap, position, player);
 		if (wormholeAdjacencies != null) {
 			adjacentPositions.addAll(wormholeAdjacencies);
 		}
@@ -218,7 +221,7 @@ public class FoWHelper {
 	 * <p>
 	 * Does not traverse wormholes
 	 */
-	private static Set<String> traverseHyperlaneAdjacencies(Map map, String position, Integer sourceDirection,
+	private static Set<String> traverseHyperlaneAdjacencies(Map activeMap, String position, Integer sourceDirection,
 			Set<String> exploredSet, String prevTile) {
 		Set<String> tiles = new HashSet<>();
 		if (exploredSet.contains(position + sourceDirection)) {
@@ -228,7 +231,7 @@ public class FoWHelper {
 		// mark the tile as explored
 		exploredSet.add(position + sourceDirection);
 
-		Tile currentTile = map.getTileByPosition(position);
+		Tile currentTile = activeMap.getTileByPosition(position);
 		if (currentTile == null) {
 			// could not load the requested tile
 			return tiles;
@@ -248,7 +251,7 @@ public class FoWHelper {
 			return tiles;
 		}
 
-		List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(map, position);
+		List<String> directlyAdjacentTiles = PositionMapper.getAdjacentTilePositions(activeMap, position);
 		if (directlyAdjacentTiles == null || directlyAdjacentTiles.size() != 6) {
 			// adjacency file for this tile is not filled in
 			return tiles;
@@ -257,19 +260,19 @@ public class FoWHelper {
 		// for each adjacent tile...
 		for (int i = 0; i < 6; i++) {
 			String position_ = directlyAdjacentTiles.get(i);
-			
-			String override = map.getAdjacentTileOverride(position, i);
+
+			String override = activeMap.getAdjacentTileOverride(position, i);
 			if (override != null) {
 				position_ = override;
 			}
-			
+
 			if (position_.equals("x") || (hyperlaneData != null && !hyperlaneData.get(i))) {
 				// the hyperlane doesn't exist & doesn't go that direction, skip.
 				continue;
 			}
 
 			// explore that tile now!
-			Set<String> newTiles = traverseHyperlaneAdjacencies(map, position_, (i + 3) % 6, exploredSet,
+			Set<String> newTiles = traverseHyperlaneAdjacencies(activeMap, position_, (i + 3) % 6, exploredSet,
 					position + sourceDirection);
 			tiles.addAll(newTiles);
 		}
@@ -280,21 +283,21 @@ public class FoWHelper {
 	 *  <p>
 	 *  Also takes into account player abilities and agendas
 	 */
-	private static Set<String> getWormholeAdjacencies(Map map, String position, Player player) {
+	private static Set<String> getWormholeAdjacencies(Map activeMap, String position, Player player) {
 		Set<String> adjacentPositions = new HashSet<>();
-		Set<Tile> allTiles = new HashSet<Tile>(map.getTileMap().values());
-		Tile tile = map.getTileByPosition(position);
+		Set<Tile> allTiles = new HashSet<Tile>(activeMap.getTileMap().values());
+		Tile tile = activeMap.getTileByPosition(position);
 
 		String ghostFlagship = null;
-		for (Player p : map.getPlayers().values()) {
+		for (Player p : activeMap.getPlayers().values()) {
 			if ("ghost".equals(p.getFaction())) {
 				ghostFlagship = Mapper.getUnitID("fs", p.getColor());
 				break;
 			}
 		}
 
-		boolean wh_recon = map.getLaws().keySet().contains("wormhole_recon");
-		boolean absol_recon = map.getLaws().keySet().contains("absol_recon");
+		boolean wh_recon = activeMap.getLaws().keySet().contains("wormhole_recon");
+		boolean absol_recon = activeMap.getLaws().keySet().contains("absol_recon");
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -303,7 +306,7 @@ public class FoWHelper {
 				if (token.contains(Constants.ALPHA)) {
 					wormholeIDs.add(Constants.ALPHA);
 				} else if (token.contains(Constants.BETA)) {
-					wormholeIDs.add(Constants.BETA);	
+					wormholeIDs.add(Constants.BETA);
 				} else if (token.contains(Constants.GAMMA)) {
 					wormholeIDs.add(Constants.GAMMA);
 				} else if (token.contains(Constants.DELTA)) {
@@ -366,19 +369,25 @@ public class FoWHelper {
 	 *  <p>
 	 *  WARNING: This function returns information that certain players may not be privy to
 	 */
-	public static List<Player> getAdjacentPlayers(Map map, String position) {
+	public static List<Player> getAdjacentPlayers(Map activeMap, String position, boolean includeSweep) {
 		List<Player> players = new ArrayList<>();
-		Set<String> tilesToCheck = getAdjacentTiles(map, position, null);
+		Set<String> tilesToCheck = getAdjacentTiles(activeMap, position, null);
+		Tile startingTile = activeMap.getTileByPosition(position);
 
-		for (Player player_ : map.getPlayers().values()) {
+		for (Player player_ : activeMap.getPlayers().values()) {
 			Set<String> tiles = new HashSet<>(tilesToCheck);
 			if ("ghost".equals(player_.getFaction())) {
-				tiles.addAll(getWormholeAdjacencies(map, position, player_));
+				tiles.addAll(getWormholeAdjacencies(activeMap, position, player_));
+			}
+
+			if (includeSweep && startingTile.hasCC(Mapper.getSweepID(player_.getColor()))) {
+				players.add(player_);
+				continue;
 			}
 
 			for (String position_ : tiles) {
-				Tile tile = map.getTileByPosition(position_);
-				if (playerIsInSystem(map, tile, player_)) {
+				Tile tile = activeMap.getTileByPosition(position_);
+				if (playerIsInSystem(activeMap, tile, player_)) {
 					players.add(player_);
 					break;
 				}
@@ -389,18 +398,18 @@ public class FoWHelper {
 	}
 
 	/** Check if the specified player should have vision on the system */
-	public static boolean playerIsInSystem(Map map, Tile tile, Player player) {
+	public static boolean playerIsInSystem(Map activeMap, Tile tile, Player player) {
 		Set<String> unitHolderNames = tile.getUnitHolders().keySet();
 		List<String> playerPlanets = player.getPlanets();
 		if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
 			return true;
 		} else if ("18".equals(tile.getTileID()) && player.getTechs().contains("iihq")) {
 			return true;
-		} else if ("s11".equals(tile.getTileID()) && canSeeStatsOfFaction(map, "cabal", player)) {
+		} else if ("s11".equals(tile.getTileID()) && canSeeStatsOfFaction(activeMap, "cabal", player)) {
 			return true;
-		} else if ("s12".equals(tile.getTileID()) && canSeeStatsOfFaction(map, "nekro", player)) {
+		} else if ("s12".equals(tile.getTileID()) && canSeeStatsOfFaction(activeMap, "nekro", player)) {
 			return true;
-		} else if ("s13".equals(tile.getTileID()) && canSeeStatsOfFaction(map, "yssaril", player)) {
+		} else if ("s13".equals(tile.getTileID()) && canSeeStatsOfFaction(activeMap, "yssaril", player)) {
 			return true;
 		}
 
@@ -417,8 +426,7 @@ public class FoWHelper {
 			units.putAll(unitHolder.getUnits());
 		}
 		for (String key : units.keySet()) {
-			if(key != null)
-			{
+			if (key != null) {
 				if (key.startsWith(colorID)) {
 					return true;
 				}
@@ -430,12 +438,10 @@ public class FoWHelper {
 	/** Ping the players adjacent to a given system */
 	public static void pingSystem(Map activeMap, GenericInteractionCreateEvent event, String position, String message) {
 		// get players adjacent
-		List<Player> players = getAdjacentPlayers(activeMap, position);
+		List<Player> players = getAdjacentPlayers(activeMap, position, true);
 		int successfulCount = 0;
 		for (Player player_ : players) {
-			if (!player_.isRealPlayer()) continue;
-			
-			String playerMessage = Helper.getPlayerRepresentation(event, player_, false) + " - System " + position + " has been pinged:\n>>> " + message;
+			String playerMessage = Helper.getPlayerRepresentation(player_, activeMap) + " - System " + position + " has been pinged:\n>>> " + message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			successfulCount += success ? 1 : 0;
 		}
@@ -447,7 +453,7 @@ public class FoWHelper {
 		int succesfulCount = 0;
 
 		for (Player player_ : activeMap.getPlayers().values()) {
-			String playerMessage = Helper.getPlayerRepresentation(event, player_, false) + " all player ping\n>>> " + message;
+			String playerMessage = Helper.getPlayerRepresentation(player_, activeMap) + " all player ping\n>>> " + message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			succesfulCount += success ? 1 : 0;
 		}
@@ -460,7 +466,7 @@ public class FoWHelper {
 				.collect(Collectors.toSet());
 		int succesfulCount = 0;
 
-		String playerMessage = Helper.getPlayerRepresentation(event, playerWithChange, false) + " stats changed:\n" + message;
+		String playerMessage = Helper.getPlayerRepresentation(playerWithChange, activeMap) + " stats changed:\n" + message;
 		for (Player player_ : playersToPing) {
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
 			succesfulCount += success ? 1 : 0;
@@ -469,10 +475,10 @@ public class FoWHelper {
 	}
 
 	public static void pingPlayersDifferentMessages(
-		Map activeMap, 
+		Map activeMap,
 		GenericInteractionCreateEvent event,
-		Player playerWithChange, 
-		String messageForFullInfo, 
+		Player playerWithChange,
+		String messageForFullInfo,
 		String messageForAll
 	) {
 		Set<Player> playersWithVisiblity = activeMap.getPlayers().values().stream()
@@ -485,7 +491,6 @@ public class FoWHelper {
 		int totalPings = playersWithVisiblity.size() + playersWithoutVisiblity.size();
 
 		for (Player player_ : playersWithVisiblity) {
-			if (!player_.isRealPlayer()) continue;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, messageForFullInfo);
 			succesfulCount += success ? 1 : 0;
 		}
@@ -510,7 +515,7 @@ public class FoWHelper {
 		// iterate through the player list. this may result in some extra pings, we'll
 		// sort that out later
 		for (Player player_ : activeMap.getPlayers().values()) {
-			if (!player_.isRealPlayer()) continue;
+			if (player_.getColor().equals("null")) continue;
 			if (player_ == sendingPlayer || player_ == receivingPlayer) continue;
 			attemptCount++;
 
@@ -522,17 +527,17 @@ public class FoWHelper {
 			StringBuilder sb = new StringBuilder();
 			// first off let's give full info for someone that can see both sides
 			if (senderVisible) {
-				sb.append(Helper.getPlayerRepresentation(event, sendingPlayer, false));
+				sb.append(Helper.getPlayerRepresentation(sendingPlayer, activeMap));
 			} else {
 				sb.append("???");
 			}
 			sb.append(" sent " + transactedObject + " to ");
 			if (receiverVisible) {
-				sb.append(Helper.getPlayerRepresentation(event, receivingPlayer, false));
+				sb.append(Helper.getPlayerRepresentation(receivingPlayer, activeMap));
 			} else {
 				sb.append("???");
 			}
-			
+
 			String message = sb.toString();
 			if (!senderVisible && !receiverVisible) {
 				message = noVisibilityMessage;
@@ -551,12 +556,10 @@ public class FoWHelper {
 		}
 	}
 
-	
-
-	private static boolean initializeAndCheckStatVisibility(Map map, Player player, Player viewer) {
+	private static boolean initializeAndCheckStatVisibility(Map activeMap, Player player, Player viewer) {
 		if (viewer == player) return false;
-		if (!viewer.isRealPlayer()) return false;
-		initializeFog(map, viewer, false);
-		return FoWHelper.canSeeStatsOfPlayer(map, player, viewer);
+		if (viewer.getColor().equals("null")) return false;
+		initializeFog(activeMap, viewer, false);
+		return FoWHelper.canSeeStatsOfPlayer(activeMap, player, viewer);
 	}
 }

@@ -7,7 +7,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
@@ -32,8 +31,7 @@ public class ExpInfo extends ExploreSubcommandData {
         OptionMapping override = event.getOption(Constants.OVERRIDE_FOW);
 
         boolean over = false;
-        if (override != null)
-        {
+        if (override != null) {
            over = override.getAsString().equalsIgnoreCase("TRUE");
         }
         if (reqType != null) {
@@ -62,15 +60,13 @@ public class ExpInfo extends ExploreSubcommandData {
             info.append(listNames(deck)).append("\n");
             info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (").append(String.valueOf(discardCount)).append(")\n");
             info.append(listNames(discard)).append("\n_ _\n");
-            
-            
-            if(player == null || player.getSCs().isEmpty() || over || !activeMap.isFoWMode())
-            {
+
+
+            if (player == null || player.getSCs().isEmpty() || over || !activeMap.isFoWMode()) {
                 sendMessage(info.toString());
             }
         }
-        if(player != null && !player.getSCs().isEmpty() && !over && activeMap.isFoWMode())
-            {
+        if (player != null && !player.getSCs().isEmpty() && !over && activeMap.isFoWMode()) {
                 sendMessage("It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
             }
     }

@@ -1,5 +1,7 @@
 package ti4.commands.status;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -20,29 +22,29 @@ public class ListTurnOrder extends StatusSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map map = getActiveMap();
-        turnOrder(event, map);
+        Map activeMap = getActiveMap();
+        turnOrder(event, activeMap);
     }
 
-    public static void turnOrder(SlashCommandInteractionEvent event, Map map) {
+    public static void turnOrder(GenericInteractionCreateEvent event, Map activeMap) {
 
-        if (map.isFoWMode()) {
+        if (activeMap.isFoWMode()) {
             MessageHelper.replyToMessage(event, "Turn order does not display when `/game setup fow_mode:YES`");
             return;
         }
 
         HashMap<Integer, String> order = new HashMap<>();
         int naaluSC = 0;
-        for (Player player : map.getRealPlayers()) {
+        for (Player player : activeMap.getRealPlayers()) {
             int sc = player.getLowestSC();
-            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, map, Integer.toString(sc));
+            String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, activeMap, Integer.toString(sc));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 naaluSC = sc;
             }
             boolean passed = player.isPassed();
 
             Set<Integer> SCs = player.getSCs();
-            HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
+            HashMap<Integer, Boolean> scPlayed = activeMap.getScPlayed();
             String text = "";
             for (int sc_ : SCs) {
                 Boolean found = scPlayed.get(sc_);
@@ -59,12 +61,12 @@ public class ListTurnOrder extends StatusSubcommandData {
             if (passed) {
                 text += "~~";
             }
-            text += Helper.getPlayerRepresentation(event, player);
+            text += Helper.getPlayerRepresentation(player, activeMap);
             if (passed) {
                 text += "~~ - PASSED";
             }
 
-            if (player.getUserID().equals(map.getSpeaker())) {
+            if (player.getUserID().equals(activeMap.getSpeaker())) {
                 text += " " + Emojis.SpeakerToken;
             }
 
@@ -77,7 +79,7 @@ public class ListTurnOrder extends StatusSubcommandData {
             String text = order.get(naaluSC);
             msg.append("`").append(0).append(".`").append(text).append("\n");
         }
-        Integer max = Collections.max(map.getScTradeGoods().keySet());
+        Integer max = Collections.max(activeMap.getScTradeGoods().keySet());
         for (int i = 1; i <= max; i++) {
             if (naaluSC != 0 && i == naaluSC) {
                 continue;
@@ -88,12 +90,9 @@ public class ListTurnOrder extends StatusSubcommandData {
             }
         }
         msg.append("_ _"); // forced extra line
-        if (event.getName().equals(Constants.PLAYER)) { // catch if called from /player sc_pick
-            MessageHelper.sendMessageToChannel(event.getChannel(), msg.toString());
-        } else {
-           MessageHelper.replyToMessage(event, msg.toString());
-
-        }
+        
+        MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), msg.toString());
+        
     }
 
     @Override

@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.MapGenerator;
 import ti4.commands.Command;
-import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -73,13 +72,11 @@ public class AdminCommand implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        AdminSubcommandData subCommandExecuted = null;
         String subcommandName = event.getInteraction().getSubcommandName();
         for (AdminSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
-                subCommandExecuted = subcommand;
                 break;
             }
         }

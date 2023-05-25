@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import ti4.buttons.ButtonListener;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
@@ -22,6 +21,7 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 
 public class PlayAC extends ACCardsSubcommandData {
     public PlayAC() {
@@ -44,7 +44,7 @@ public class PlayAC extends ACCardsSubcommandData {
             sendMessage("Please select what Action Card to discard");
             return;
         }
-        
+
         String reply = playAC(event, activeMap, player, option.getAsString().toLowerCase(), event.getChannel(), event.getGuild());
         if (reply != null) {
             sendMessage(reply);
@@ -53,7 +53,7 @@ public class PlayAC extends ACCardsSubcommandData {
 
     public static String playAC(GenericInteractionCreateEvent event, Map activeMap, Player player, String value, MessageChannel channel, Guild guild) {
         MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? channel : activeMap.getMainGameChannel();
-        
+
         String acID = null;
         int acIndex = -1;
         try {
@@ -86,11 +86,11 @@ public class PlayAC extends ACCardsSubcommandData {
             //sendMessage();
             return "No such Action Card ID found, please retry";
         }
-        String[] actionCard = Mapper.getActionCard(acID).split(";");
-        String actionCardTitle = actionCard[0];
-        String actionCardPhase = actionCard[1];
-        String actionCardWindow = actionCard[2];
-        String actionCardText = actionCard[3];
+        ActionCardModel actionCard = Mapper.getActionCard(acID);
+        String actionCardTitle = actionCard.name;
+        String actionCardPhase = actionCard.phase;
+        String actionCardWindow = actionCard.window;
+        String actionCardText = actionCard.text;
 
         String activePlayerID = activeMap.getActivePlayer();
         if (player.isPassed() && activePlayerID != null) {
@@ -107,21 +107,17 @@ public class PlayAC extends ACCardsSubcommandData {
         if (activeMap.isFoWMode()) {
             sb.append("Someone played an Action Card:\n");
         } else {
-            sb.append(Helper.getPlayerRepresentation(event, player)).append(" played an Action Card:\n");
+            sb.append(Helper.getPlayerRepresentation(player, activeMap)).append(" played an Action Card:\n");
         }
-        sb.append(Emojis.ActionCard).append("__**").append(actionCardTitle).append("**__ (").append(actionCardPhase).append(" Phase)\n");
-        sb.append(">  _").append(actionCardWindow).append(":_\n");
-        sb.append(">  ").append(actionCardText).append("\n");
+        sb.append(actionCard.getRepresentation());
         List<Button> buttons = new ArrayList<Button>();
         Button sabotageButton = Button.danger("sabotage_ac", "Cancel AC With Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
         buttons.add(sabotageButton);
-        if(activeMap.isEmpyInTheGame() || activeMap.isFoWMode())
-        {
+        if (activeMap.isEmpyInTheGame() || activeMap.isFoWMode()) {
             Button empyButton = Button.secondary("sabotage_empy", "Cancel AC With Empyrean Mech ").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
             buttons.add(empyButton);
         }
-        if(activeMap.doesAnyoneHaveInstinctTraining() || activeMap.isFoWMode())
-        {
+        if (activeMap.doesAnyoneHaveInstinctTraining() || activeMap.isFoWMode()) {
             Button instinctButton = Button.secondary("sabotage_xxcha", "Cancel AC With Instinct Training").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("Xxcha")));
             buttons.add(instinctButton);
         }
@@ -132,46 +128,42 @@ public class PlayAC extends ACCardsSubcommandData {
         } else {
             MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, sb.toString(), activeMap, player, buttons);
 
-            if(actionCardWindow.contains("After an agenda is revealed"))
-            {
+            if (actionCardWindow.contains("After an agenda is revealed")) {
                 Button playAfter = Button.danger("play_after", "Play A Non-AC Rider");
                 Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromFormatted(Emojis.noafters));
                 Button noAfterPersistent = Button.primary("no_after_persistent", "No Afters No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.noafters));
                 List<Button> afterButtons = new ArrayList<>(List.of(playAfter, noAfter, noAfterPersistent));
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", activeMap, afterButtons, "after");
-                
 
-                if(actionCardTitle.contains("Rider") || actionCardTitle.contains("Sanction") )
-                {
+
+                if (actionCardTitle.contains("Rider") || actionCardTitle.contains("Sanction") ) {
                     List<Button> riderButtons = AgendaHelper.getRiderButtons(actionCardTitle, activeMap);
                     MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target", activeMap, player, riderButtons);
                 }
-                if(actionCardTitle.contains("Hack Election") )
-                {
+                if (actionCardTitle.contains("Hack Election") ) {
                     Button setHack = Button.danger("hack_election", "Set the voting order as reversed");
                     List<Button> hackButtons =  List.of(setHack);
                     MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please hit this button after confirming no sabo on the hack election", activeMap, player, hackButtons);
                 }
 
             }
-            if(actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto"))
-            {
+            if (actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto")) {
                 Button playWhen = Button.danger("play_when", "Play When");
                 Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
                 Button noWhenPersistent = Button.primary("no_when_persistent", "No Whens No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-        
+
                 List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", activeMap, whenButtons, "when");
-                
 
-            
+
+
 
             }
         }
-        
+
         //Fog of war ping
 		if (activeMap.isFoWMode()) {
-            String fowMessage = Helper.getPlayerRepresentation(event, player, false) + " played an Action Card: " + actionCardTitle;
+            String fowMessage = Helper.getPlayerRepresentation(player, activeMap) + " played an Action Card: " + actionCardTitle;
 			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, fowMessage);
             MessageHelper.sendPrivateMessageToPlayer(player, activeMap, "Played action card: " + actionCardTitle);
 		}

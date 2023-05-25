@@ -40,7 +40,7 @@ public class BothelperCommand implements Command {
                     }
                 }
                 MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have the @Bothelper role.");
-                return false;                
+                return false;
             }
         }
         return false;

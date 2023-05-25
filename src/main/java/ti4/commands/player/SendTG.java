@@ -48,8 +48,8 @@ public class SendTG extends PlayerSubcommandData {
 			targetTG += sendTG;
 			player_.setTg(targetTG);
 
-			String p1 = Helper.getPlayerRepresentation(event, player);
-			String p2 = Helper.getPlayerRepresentation(event, player_);
+			String p1 = Helper.getPlayerRepresentation(player, activeMap);
+			String p2 = Helper.getPlayerRepresentation(player_, activeMap);
 			String tgString = sendTG + " " + Emojis.tg + " trade goods";
 			String message =  p1 + " sent " + tgString + " to " + p2;
 			sendMessage(message);

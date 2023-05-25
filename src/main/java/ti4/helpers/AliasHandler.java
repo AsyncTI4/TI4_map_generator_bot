@@ -34,8 +34,7 @@ public class AliasHandler {
     private static HashMap<String, String> ttpgTokenAliasList = new HashMap<>();
     private static HashMap<String, String> ttpgUnitAliasList = new HashMap<>();
 
-    public static void init()
-    {
+    public static void init() {
         readAliasFile("tile_alias.properties", tileAliasList, "Could not read tiles alias file");
         readAliasFile("tile_alias.properties", tileAliasEntryList);
         readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
@@ -125,10 +124,9 @@ public class AliasHandler {
                 aliasProperties.load(input);
                 for (String id: aliasProperties.stringPropertyNames()) {
                     StringTokenizer tokenizer = new StringTokenizer(aliasProperties.getProperty(id), ",");
-                    while (tokenizer.hasMoreTokens())
-                    {
+                    while (tokenizer.hasMoreTokens()) {
                         String aliasToken = tokenizer.nextToken();
-                        if(!aliasToken.isEmpty()) {
+                        if (!aliasToken.isEmpty()) {
                             aliasList.put(aliasToken.toLowerCase(), id);
                         }
                     }
@@ -139,13 +137,17 @@ public class AliasHandler {
         }
     }
 
-    public static String resolveTile(String name)
-    {
+    public static String resolveTile(String name) {
+        
+        if(name.equalsIgnoreCase("mirage"))
+        {
+            return name;
+        }
         String aliasID = tileAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
-            //System.out.println("Could not find an alias for Tile: " + name);
+            System.out.println("Could not find an alias for Tile: " + name);
             return name;
         }
     }
@@ -154,8 +156,7 @@ public class AliasHandler {
      * @param name - Async specific Tile ID
      * @return Standard TI4 Tile ID number
      */
-    public static String resolveStandardTile(String name)
-    {
+    public static String resolveStandardTile(String name) {
         String aliasID = tilemapAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -165,8 +166,7 @@ public class AliasHandler {
         }
     }
 
-    public static String resolveFaction(String name)
-    {
+    public static String resolveFaction(String name) {
         String aliasID = factionAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -176,8 +176,7 @@ public class AliasHandler {
         }
     }
 
-    public static String resolveColor(String name)
-    {
+    public static String resolveColor(String name) {
         String aliasID = colorAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -187,8 +186,7 @@ public class AliasHandler {
         }
     }
 
-    public static String resolveUnit(String name)
-    {
+    public static String resolveUnit(String name) {
         String aliasID = unitAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -206,8 +204,7 @@ public class AliasHandler {
         return planetKeyList;
     }
 
-    public static String resolvePlanet(String name)
-    {
+    public static String resolvePlanet(String name) {
         if (name.contains(" ")) name = name.substring(0, name.lastIndexOf(" ")); //if there is a space " " then cut off remainder
         String aliasID = planetAliasList.get(name.toLowerCase());
         if (aliasID != null) {
@@ -218,8 +215,7 @@ public class AliasHandler {
         }
     }
 
-    public static String resolveAttachment(String name)
-    {
+    public static String resolveAttachment(String name) {
         String aliasID = planetAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -229,8 +225,7 @@ public class AliasHandler {
         }
     }
 
-    public static String resolveToken(String name)
-    {
+    public static String resolveToken(String name) {
         String aliasID = cctokenAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -240,8 +235,7 @@ public class AliasHandler {
         }
     }
 
-    public static String resolveTech(String name)
-    {
+    public static String resolveTech(String name) {
         String aliasID = techAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -251,8 +245,7 @@ public class AliasHandler {
         }
     }
 
-    public static String resolveActionCard(String name)
-    {
+    public static String resolveActionCard(String name) {
         String aliasID = actionCardAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -262,8 +255,7 @@ public class AliasHandler {
         }
     }
 
-    public static String resolveAgenda(String name)
-    {
+    public static String resolveAgenda(String name) {
         String aliasID = agendaAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -273,8 +265,7 @@ public class AliasHandler {
         }
     }
 
-    public static String resolveExploration(String name)
-    {
+    public static String resolveExploration(String name) {
         String aliasID = explorationAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -283,9 +274,8 @@ public class AliasHandler {
             return name;
         }
     }
-    
-    public static String resolvePromissory(String name)
-    {
+
+    public static String resolvePromissory(String name) {
         String aliasID = promissoryAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -294,9 +284,8 @@ public class AliasHandler {
             return name;
         }
     }
-    
-    public static String resolveRelic(String name)
-    {
+
+    public static String resolveRelic(String name) {
         String aliasID = relicAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -305,9 +294,8 @@ public class AliasHandler {
             return name;
         }
     }
-    
-    public static String resolveObjective(String name)
-    {
+
+    public static String resolveObjective(String name) {
         String aliasID = objectiveAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -316,9 +304,8 @@ public class AliasHandler {
             return name;
         }
     }
-        
-    public static String resolveTTPGAttachment(String name)
-    {
+
+    public static String resolveTTPGAttachment(String name) {
         String aliasID = ttpgAttachmentAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -327,9 +314,8 @@ public class AliasHandler {
             return name;
         }
     }
-    
-    public static String resolveTTPGToken(String name)
-    {
+
+    public static String resolveTTPGToken(String name) {
         String aliasID = ttpgTokenAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
@@ -338,9 +324,8 @@ public class AliasHandler {
             return name;
         }
     }
-    
-    public static String resolveTTPGUnit(String name)
-    {
+
+    public static String resolveTTPGUnit(String name) {
         String aliasID = ttpgUnitAliasList.get(name.toLowerCase());
         if (aliasID != null) {
             return resolveUnit(aliasID);
@@ -354,8 +339,7 @@ public class AliasHandler {
      * @param position TTPG like [+-][0-9][+-][0-9] Eg. +0+0, +2-2, +0+8
      * @return Async position like [0-9][a-z] Eg. 0a, 2e, 4a
      */
-    public static String resolveTTPGPosition(String position)
-    {
+    public static String resolveTTPGPosition(String position) {
         String aliasID = ttpgPositionAliasList.get(position);
         // System.out.println("resolving TTPG position: " + position + " to async position: " + aliasID);
         return aliasID != null ? aliasID : null;

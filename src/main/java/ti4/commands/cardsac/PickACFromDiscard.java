@@ -1,6 +1,5 @@
 package ti4.commands.cardsac;
 
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -54,7 +53,7 @@ public class PickACFromDiscard extends ACCardsSubcommandData {
         sb.append("Game: ").append(activeMap.getName()).append(" ");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Picked card from Discards: ");
-        sb.append(Mapper.getActionCard(acID)).append("\n");
+        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
 
         ACInfo.sendActionCardInfo(activeMap, player);

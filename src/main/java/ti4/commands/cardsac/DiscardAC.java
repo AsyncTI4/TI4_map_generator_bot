@@ -52,7 +52,7 @@ public class DiscardAC extends ACCardsSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("Player: ").append(player.getUserName()).append(" - ");
         sb.append("Discarded Action Card:").append("\n");
-        sb.append(Mapper.getActionCard(acID)).append("\n");
+        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
         ACInfo.sendActionCardInfo(activeMap, player);
     }

@@ -56,7 +56,7 @@ public class DiscardACRandom extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Cards found, please retry");
                 return;
             }
-            sb.append(Mapper.getActionCard(acID)).append("\n");
+            sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
             count--;
         }
 

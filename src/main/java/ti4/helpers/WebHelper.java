@@ -45,11 +45,11 @@ public class WebHelper {
 
     }
 
-    public static void putData(String gameId, Map map) {
+    public static void putData(String gameId, Map activeMap) {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            HashMap<String, Object> exportableFieldMap = map.getExportableFieldMap();
+            HashMap<String, Object> exportableFieldMap = activeMap.getExportableFieldMap();
             String json = mapper.writeValueAsString( exportableFieldMap );
 
             HttpClient client = HttpClient.newHttpClient();
@@ -112,7 +112,7 @@ public class WebHelper {
             }
 
             s3.putObject(request, RequestBody.fromBytes(out.toByteArray()));
-        } catch(SdkClientException e) {
+        } catch (SdkClientException e) {
             // BotLogger.log("Could not add image to web server. Likely invalid credentials.", e);
         } catch (Exception e) {
             BotLogger.log("Could not add image to web server", e);

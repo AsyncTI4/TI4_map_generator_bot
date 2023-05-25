@@ -27,6 +27,7 @@ import ti4.commands.fow.FOWCommand;
 import ti4.commands.franken.FrankenCommand;
 import ti4.commands.game.GameCommand;
 import ti4.commands.help.*;
+import ti4.commands.installation.InstallationCommand;
 import ti4.commands.leaders.LeaderCommand;
 import ti4.commands.map.*;
 import ti4.commands.milty.MiltyCommand;
@@ -39,7 +40,6 @@ import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.GlobalSettings;
-import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.BotLogger;
@@ -79,7 +79,7 @@ public class MapGenerator {
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .build();
-	    
+
         jda.addEventListener(new MessageListener(), new ButtonListener());
         try {
             jda.awaitReady();
@@ -100,6 +100,7 @@ public class MapGenerator {
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
         adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
+        adminRoles.add(jda.getRoleById("1109657180170371182")); // Jazz's Server
         adminRoles.removeIf(r -> r == null);
 
         //DEVELOPER ROLES
@@ -160,6 +161,7 @@ public class MapGenerator {
         commandManager.addCommand(new LeaderCommand());
         commandManager.addCommand(new CustomCommand());
         commandManager.addCommand(new FOWCommand());
+        commandManager.addCommand(new InstallationCommand());
         commandManager.addCommand(new MiltyCommand());
         commandManager.addCommand(new FrankenCommand());
         commandManager.addCommand(new CaptureCommand());

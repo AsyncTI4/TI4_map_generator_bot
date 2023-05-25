@@ -133,6 +133,7 @@ public class SOCardsCommand implements Command {
         subcommands.add(new ShowAllSO());
         subcommands.add(new ShowAllSOToAll());
         subcommands.add(new DealSOToAll());
+        subcommands.add(new DrawSpecificSO());
         return subcommands;
     }
 

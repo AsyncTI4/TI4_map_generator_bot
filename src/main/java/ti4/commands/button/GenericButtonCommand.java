@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Map;
@@ -41,7 +40,7 @@ public class GenericButtonCommand implements Command {
         }
         return false;
     }
-    
+
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String buttonText = event.getOption(Constants.BUTTON_TEXT, "Button", OptionMapping::getAsString);
@@ -54,7 +53,7 @@ public class GenericButtonCommand implements Command {
         }
 
         Button button = Button.secondary(Constants.GENERIC_BUTTON_ID_PREFIX + event.getId(), buttonText);
-        
+
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, Collections.singletonList(button));
     }
 

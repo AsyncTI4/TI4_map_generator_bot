@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -95,7 +94,7 @@ public class PlayPN extends PNCardsSubcommandData {
         }
 
         String emojiToUse = activeMap.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(event, player) + " played promissory note:\n");
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " played promissory note:\n");
         sb.append(emojiToUse + Emojis.PN);
         String pnText = "";
 
@@ -106,7 +105,7 @@ public class PlayPN extends PNCardsSubcommandData {
             pnText = Mapper.getPromissoryNote(id, longPNDisplay);
         }
         sb.append(pnText).append("\n");
-        
+
         //TERRAFORM TIP
         if (id.equalsIgnoreCase("terraform")) {
             sb.append("`/add_token token:titanspn`\n");
