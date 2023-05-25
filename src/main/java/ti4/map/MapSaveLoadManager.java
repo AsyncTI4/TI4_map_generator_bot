@@ -31,6 +31,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
+import ti4.MapGenerator;
+import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
@@ -562,8 +564,7 @@ public class MapSaveLoadManager {
             for (Leader leader : player.getLeaders()) {
                 leaderInfo.append(leader.getId());
                 leaderInfo.append(",");
-                String name = leader.getName();
-                leaderInfo.append(name.isEmpty() ? "." : name);
+                leaderInfo.append(leader.getType());
                 leaderInfo.append(",");
                 leaderInfo.append(leader.getTgCount());
                 leaderInfo.append(",");
@@ -1465,7 +1466,26 @@ public class MapSaveLoadManager {
                         List<Leader> leaderList = new ArrayList<>();
                         while (leaderInfos.hasMoreTokens()) {
                             String[] split = leaderInfos.nextToken().split(",");
-                            Leader leader = new Leader(split[0], split[1]);
+                            Leader leader = new Leader(split[0]);
+
+                            // Migration Code
+                            String leaderType = split[0];
+                            String leaderName = split[1];
+                            if (".".equals(leaderName)) leaderName = "";
+                            if (Constants.AGENT.equals(leaderType) || Constants.COMMANDER.equals(leaderType) || Constants.HERO.equals(leaderType)) {
+                                String faction = player.getFaction();
+                                if ("keleresm".equals(faction) || "keleresx".equals(faction) || "keleresa".equals(faction)) faction = "keleres";
+                                String newLeaderId = faction + leaderType + leaderName;
+                                if (Mapper.getLeaderRepresentations().keySet().contains(newLeaderId)) {
+                                    // BotLogger.log("Migrating Leader: [" + leaderType + "," + leaderName +"] -> " + newLeaderId);
+                                    leader = new Leader(newLeaderId);
+                                } else {
+                                    BotLogger.log("Could not find Leader Representation to Migrate: [" + leaderType + "," + leaderName +"] -> " + newLeaderId);
+                                }
+                            }
+                            // End Migration Code
+                            
+                            // leader.setType(Integer.parseInt(split[1])); // type is set in constructor based on ID
                             leader.setTgCount(Integer.parseInt(split[2]));
                             leader.setExhausted(Boolean.parseBoolean(split[3]));
                             leader.setLocked(Boolean.parseBoolean(split[4]));

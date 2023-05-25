@@ -930,7 +930,7 @@ public class Helper {
     }
 
     public static String getFactionLeaderEmoji(String faction, Leader leader) {
-        return getEmojiFromDiscord(faction + leader.getId() + leader.getName());
+        return getEmojiFromDiscord(leader.getId());
     }
 
     public static String getFactionLeaderEmoji(Player player, Leader leader) {
@@ -938,7 +938,7 @@ public class Helper {
     }
 
     public static String getLeaderRepresentation(String faction, Leader leader, boolean includeTitle, boolean includeAbility, boolean includeUnlockCondition) {
-        String leaderID = faction + leader.getId() + leader.getName();
+        String leaderID = leader.getId();
 
         String leaderRep =  Mapper.getLeaderRepresentations().get(leaderID.toString());
         if (leaderRep == null) {
@@ -958,7 +958,7 @@ public class Helper {
         StringBuilder representation = new StringBuilder();
         representation.append(getFactionLeaderEmoji(faction, leader)).append(" **").append(leaderName).append("**");
         if (includeTitle) representation.append(": ").append(leaderTitle); //add title
-        if (includeAbility && leader.getId().equals(Constants.HERO)) representation.append(" - ").append("__**").append(heroAbilityName).append("**__"); //add hero ability name
+        if (includeAbility && Constants.HERO.equals(leader.getType())) representation.append(" - ").append("__**").append(heroAbilityName).append("**__"); //add hero ability name
         if (includeAbility) representation.append(" - *").append(leaderAbilityWindow).append("* ").append(leaderAbilityText); //add ability
         if (includeUnlockCondition) representation.append(" *Unlock:* ").append(leaderUnlockCondition);
 
@@ -983,6 +983,10 @@ public class Helper {
 
     public static String getLeaderFullRepresentation(Player player, Leader leader) {
         return getLeaderRepresentation(player.getFaction(), leader, true, true, false);
+    }
+
+    public static String getLeaderFullRepresentation(Leader leader) {
+        return getLeaderRepresentation(null, leader, true, true, false);
     }
 
     public static String getLeaderLockedRepresentation(Player player, Leader leader) {
