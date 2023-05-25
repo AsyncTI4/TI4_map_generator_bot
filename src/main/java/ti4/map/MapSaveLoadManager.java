@@ -400,6 +400,10 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.FOW_MODE + " " + activeMap.isFoWMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.BASE_GAME_MODE + " " + activeMap.isBaseGameMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.LIGHT_FOG_MODE + " " + activeMap.isLightFogMode());
+        writer.write(System.lineSeparator());
         writer.write(Constants.STRAT_PINGS + " " + activeMap.isStratPings());
         writer.write(System.lineSeparator());
         writer.write(Constants.ABSOL_MODE + " " + activeMap.isAbsolMode());
@@ -1203,6 +1207,22 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeMap.setFoWMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.BASE_GAME_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeMap.setBaseGameMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.LIGHT_FOG_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeMap.setLightFogMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

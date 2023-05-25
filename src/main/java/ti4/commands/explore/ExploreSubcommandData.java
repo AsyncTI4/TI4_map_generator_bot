@@ -119,7 +119,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
 
         if (activeMap != null && !activeMap.isFoWMode() &&(event.getChannel() !=  activeMap.getActionsChannel())) {
-            String pF = StringUtils.capitalize(player.getFaction());
+            String pF = Helper.getFactionIconFromDiscord(player.getFaction());
             if (planetName != null) {
                 MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), pF + " found a "+cardInfo[0]+ " on "+Helper.getPlanetRepresentation(planetName, activeMap));
             } else {

@@ -12,6 +12,8 @@ public class Constants {
     public static final String COMMUNITY_MODE = "community_mode";
     public static final String ALLIANCE_MODE = "alliance_mode";
     public static final String FOW_MODE = "fow_mode";
+    public static final String BASE_GAME_MODE = "base_game_mode";
+    public static final String LIGHT_FOG_MODE = "light_fog_mode";
     public static final String HOMEBREW_SC_MODE = "homebrew_sc_mode";
     public static final String ABSOL_MODE = "absol_mode";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
@@ -624,6 +626,7 @@ public class Constants {
     public static final String WHISPER = "whisper";
     public static final String MSG = "msg";
     public static final String OVERRIDE_FOW = "override_fow";
+    public static final String OVERRIDE_EXPLORE_OWNERSHIP_REQ = "override_explore_ownership_req";
     public static final String ANON = "anon";
     public static final String ANNOUNCE = "announce";
     public static final String ENDED_GAMES = "ended_games";
