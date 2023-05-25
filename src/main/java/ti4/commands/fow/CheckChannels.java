@@ -1,14 +1,11 @@
 package ti4.commands.fow;
 
-import java.util.Date;
-
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;

@@ -5,7 +5,6 @@ import ti4.helpers.Constants;
 import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class SetHeroInactiveLeader extends LeaderAction {
     public SetHeroInactiveLeader() {

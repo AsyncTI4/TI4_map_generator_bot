@@ -12,15 +12,12 @@ import net.dv8tion.jda.api.requests.RestAction;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
-import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import ti4.MapGenerator;
 import ti4.MessageListener;
 import ti4.commands.agenda.DrawAgenda;
-import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.agenda.PutAgendaBottom;
 import ti4.commands.agenda.PutAgendaTop;
 import ti4.commands.agenda.RevealAgenda;
@@ -32,13 +29,11 @@ import ti4.commands.cardsso.DiscardSO;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.explore.ExpPlanet;
-import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
-import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.commands.player.PlanetExhaust;
 import ti4.commands.player.PlanetRefresh;
@@ -67,7 +62,7 @@ public class ButtonListener extends ListenerAdapter {
     private static HashMap<String, Set<Player>> playerUsedSC = new HashMap<>();
 
     @Override
-    public void onButtonInteraction(@NotNull ButtonInteractionEvent event) {
+    public void onButtonInteraction(ButtonInteractionEvent event) {
         event.deferEdit().queue();
         String id = event.getUser().getId();
         MessageListener.setActiveGame(event.getMessageChannel(), id, "button");
@@ -357,6 +352,7 @@ public class ButtonListener extends ListenerAdapter {
         else if (buttonID.startsWith("movedNExplored_")) {
             String bID = buttonID.replace("movedNExplored_", "");
             String[] info = bID.split("_");
+
             String message = "";
 
 
@@ -440,6 +436,7 @@ public class ButtonListener extends ListenerAdapter {
             String tech = buttonID.replace("getTech_", "");
             String techFancy = buttonLabel;
             String ident = Helper.getFactionIconFromDiscord(player.getFaction());
+
             String message = ident+ " Acquired The Tech " +  Helper.getTechRepresentation(AliasHandler.resolveTech(tech));
 
             String trueIdentity = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true);
@@ -744,12 +741,14 @@ public class ButtonListener extends ListenerAdapter {
                         if (!tiedWinners.isEmpty()) {
                             MessageChannel channel = null;
                             if (activeMap.isFoWMode()) {
-                                channel = speaker.getPrivateChannel();
+                                channel = speaker == null ? null : speaker.getPrivateChannel();
+                                if (channel == null) {
+                                    MessageHelper.sendMessageToChannel(event.getChannel(), "Speaker is not assigned for some reason. Please decide the winner.");
+                                }
                             } else {
                                 channel = event.getChannel();
                             }
                             MessageHelper.sendMessageToChannelWithButtons(channel, Helper.getPlayerRepresentation(speaker, activeMap, event.getGuild(), true)+ " please decide the winner.", tiedWinners);
-
                         }
                     }
                 }
@@ -770,22 +769,16 @@ public class ButtonListener extends ListenerAdapter {
 
 
                     MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), resMessage,deadlyActionRow);
-
-                    String loseMessage = "";
-                    for (Player los : losers) {
-                        String playerRepresentation = Helper.getPlayerRepresentation(los, activeMap, event.getGuild(), true);
-                        if (los != null) {
-                            if (activeMap.isFoWMode()) {
-                                los.getPrivateChannel().sendMessage(playerRepresentation + "Please respond to bribery/deadly plot window").queue();;
-                            } else {
-                                loseMessage = loseMessage + playerRepresentation;
+                    if (!activeMap.isFoWMode()) {
+                        String loseMessage = "";
+                        for (Player los : losers) {
+                            if (los != null) {
+                                loseMessage = loseMessage + Helper.getPlayerRepresentation(los, activeMap, event.getGuild(), true);
                             }
                         }
-                    }
-
-                    if (!activeMap.isFoWMode()) {
-
-                        event.getChannel().sendMessage(loseMessage + "Please respond to bribery/deadly plot window").queue();
+                        event.getChannel().sendMessage(loseMessage + " Please respond to bribery/deadly plot window").queue();
+                    } else {
+                        MessageHelper.privatelyPingPlayerList(losers, activeMap, "Please respond to bribery/deadly plot window");
                     }
                 } else {
                     activeMap.getMainGameChannel().sendMessage("Either both bribery and deadly plot were in the discard or noone could legally play them.").queue();

@@ -13,13 +13,11 @@ import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
-import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
@@ -30,7 +28,6 @@ import ti4.MapGenerator;
 import ti4.ResourceHelper;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.bothelper.ArchiveOldThreads;
-import ti4.commands.bothelper.ListOldChannels;
 import ti4.commands.bothelper.ListOldThreads;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
@@ -315,7 +312,6 @@ public class Helper {
 
     //private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
 
-    @NotNull
     public static Emoji getPlayerEmoji(Map activeMap, Player player, Message message) {
         Emoji emojiToUse = null;
         String playerFaction = player.getFaction();
@@ -610,7 +606,6 @@ public class Helper {
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
             if (!Helper.getPlanetRepresentation(planet,activeMap).toLowerCase().contains("mecatol")) {
-                HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
                 Button button = Button.danger("diplo_"+planet, Helper.getPlanetRepresentation(planet,activeMap) + " System");
                 planetButtons.add(button);
             }
@@ -1834,9 +1829,10 @@ public class Helper {
         return new HashSet<>(getListFromCSV(commaSeparatedString));
     }
 
-    public static boolean playerHasXxchaCommanderUnlocked(@NotNull Map activeMap, @NotNull Player player) {  //TODO: contains(xxcha) -> contains(playerWithXxchaCommander)
-        if (player.getFaction().equals("xxcha") && player.getLeader(Constants.COMMANDER) != null) {
-            return !player.getLeader(Constants.COMMANDER).isLocked();
+    public static boolean playerHasXxchaCommanderUnlocked(Map activeMap, Player player) {  //TODO: contains(xxcha) -> contains(playerWithXxchaCommander)
+        Leader commander = player.getLeader(Constants.COMMANDER);
+        if (player.getFaction().equals("xxcha") && commander != null) {
+            return !commander.isLocked();
         }
         List<String> playersPNs = player.getPromissoryNotesInPlayArea();
         ArrayList<Player> xxchaPlayers = new ArrayList<>(activeMap.getRealPlayers().stream().filter(p -> p.getFaction().equals("xxcha")).toList());
