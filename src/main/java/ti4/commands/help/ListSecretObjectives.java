@@ -27,6 +27,7 @@ public class ListSecretObjectives extends HelpSubcommandData {
         String message = "**__Secret Objective List__**\n" + soList.entrySet().stream()
             .map(e -> e.getKey() + " = " + SOInfo.getSecretObjectiveRepresentation(e.getKey()))
             .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
+            .filter(s -> !s.contains("_pbd100"))
             .sorted()
             .collect(Collectors.joining("\n"));
         MessageHelper.sendMessageToThread(event.getChannel(), "Secret Objective List", message);
