@@ -194,7 +194,7 @@ public class Map {
         resetRelics();
         
         addCustomPO(Constants.CUSTODIAN, 1);
-        
+
         //Default SC initialization
         for (int i = 0; i < 8; i++) {
             scTradeGoods.put(i + 1, 0);

@@ -9,10 +9,10 @@ import com.fasterxml.jackson.databind.JsonNode;
 import ti4.message.BotLogger;
 
 public class DeckModel extends Model {
-    public String name;
-    public String type;
-    public String description;
-    public List<String> cardIDs;
+    private String name;
+    private String type;
+    private String description;
+    private List<String> cardIDs;
 
     public DeckModel(JsonNode json) {
         try {
@@ -34,6 +34,22 @@ public class DeckModel extends Model {
             && type != null
             && description != null
             && cardIDs != null;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getType() {
+        return type;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public List<String> getCardIDs() {
+        return cardIDs;
     }
 
     public List<String> getShuffledCardList() {
