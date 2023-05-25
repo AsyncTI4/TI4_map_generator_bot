@@ -210,19 +210,25 @@ public class AutoCompleteProvider {
                 event.replyChoices(options).queue();
             }
             case Constants.LEADER -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                if (leaders.isEmpty()) {
-                    leaders = new ArrayList<>(Constants.leaderList);
-                    HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = Mapper.getLeadersInfo();
-                    for (HashMap<String, ArrayList<String>> value : leadersInfo.values()) {
-                        for (ArrayList<String> leaderNames : value.values()) {
-                            if (!leaderNames.isEmpty()) {
-                                leaders.addAll(leaderNames);
-                            }
-                        }
-                    }
+                Set<String> leaderIDs = new HashSet<>();
+                for (Player player_ : activeMap.getPlayers().values()) {
+                    leaderIDs.addAll(player_.getLeaderIDs());
                 }
-                List<Command.Choice> options = leaders.stream()
+                
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                // if (leaders.isEmpty()) {
+                //     leaders = new ArrayList<>(Constants.leaderList);
+                //     HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = Mapper.getLeadersInfo();
+                //     for (HashMap<String, ArrayList<String>> value : leadersInfo.values()) {
+                //         for (ArrayList<String> leaderNames : value.values()) {
+                //             if (!leaderNames.isEmpty()) {
+                //                 leaders.addAll(leaderNames);
+                //             }
+                //         }
+                //     }
+                // }
+                List<Command.Choice> options = leaderIDs.stream()
+                        // .map(s -> s + "!")
                         .filter(value -> value.toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))
