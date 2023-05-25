@@ -1468,27 +1468,27 @@ public class MapSaveLoadManager {
                             String[] split = leaderInfos.nextToken().split(",");
                             Leader leader = new Leader(split[0]);
 
-                            // Migration Code
-                            String leaderType = split[0];
-                            String leaderName = split[1];
-                            if (".".equals(leaderName) || leaderType.equalsIgnoreCase(leaderName)) leaderName = "";
-                            if (Constants.AGENT.equals(leaderType) || Constants.COMMANDER.equals(leaderType) || Constants.HERO.equals(leaderType)) {
-                                String faction = player.getFaction();
-                                switch (faction) {
-                                    case "keleresm" -> leaderName = "harka";
-                                    case "keleresx" -> leaderName = "odlynn";
-                                    case "keleresa" -> leaderName = "kuuasi";
-                                }
-                                if ("keleresm".equals(faction) || "keleresx".equals(faction) || "keleresa".equals(faction)) faction = "keleres";
-                                String newLeaderId = faction + leaderType + leaderName;
-                                if (Mapper.getLeaderRepresentations().keySet().contains(newLeaderId)) {
-                                    // BotLogger.log("Migrating Leader: [" + leaderType + "," + leaderName +"] -> " + newLeaderId);
-                                    leader = new Leader(newLeaderId);
-                                } else {
-                                    BotLogger.log("Could not find Leader Representation to Migrate: [" + leaderType + "," + leaderName +"] -> " + newLeaderId);
-                                }
-                            }
-                            // End Migration Code
+                            // // Migration Code
+                            // String leaderType = split[0];
+                            // String leaderName = split[1];
+                            // if (".".equals(leaderName) || leaderType.equalsIgnoreCase(leaderName)) leaderName = "";
+                            // if (Constants.AGENT.equals(leaderType) || Constants.COMMANDER.equals(leaderType) || Constants.HERO.equals(leaderType)) {
+                            //     String faction = player.getFaction();
+                            //     switch (faction) {
+                            //         case "keleresm" -> leaderName = "harka";
+                            //         case "keleresx" -> leaderName = "odlynn";
+                            //         case "keleresa" -> leaderName = "kuuasi";
+                            //     }
+                            //     if ("keleresm".equals(faction) || "keleresx".equals(faction) || "keleresa".equals(faction)) faction = "keleres";
+                            //     String newLeaderId = faction + leaderType + leaderName;
+                            //     if (Mapper.getLeaderRepresentations().keySet().contains(newLeaderId)) {
+                            //         // BotLogger.log("Migrating Leader: [" + leaderType + "," + leaderName +"] -> " + newLeaderId);
+                            //         leader = new Leader(newLeaderId);
+                            //     } else {
+                            //         BotLogger.log("Could not find Leader Representation to Migrate: [" + leaderType + "," + leaderName +"] -> " + newLeaderId);
+                            //     }
+                            // }
+                            // // End Migration Code
 
                             // leader.setType(Integer.parseInt(split[1])); // type is set in constructor based on ID
                             leader.setTgCount(Integer.parseInt(split[2]));
