@@ -24,8 +24,6 @@ import org.apache.commons.lang3.StringUtils;
 
 public class AutoCompleteProvider {
 
-    private static ArrayList<String> leaders = new ArrayList<>();
-
     public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
         String optionName = event.getFocusedOption().getName();
         String userID = event.getUser().getId();
