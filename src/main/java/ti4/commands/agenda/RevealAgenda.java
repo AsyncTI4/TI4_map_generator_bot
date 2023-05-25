@@ -55,7 +55,8 @@ public class RevealAgenda extends AgendaSubcommandData {
             agendaTarget = agendaDetails2.target;
             agendaType = agendaDetails2.type;
             agendaName = agendaDetails.name;
-            activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget);
+            
+            activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget+"_CL");
         }
         activeMap.resetCurrentAgendaVotes();
         activeMap.setHackElectionStatus(false);

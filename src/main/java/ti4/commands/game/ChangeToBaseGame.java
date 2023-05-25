@@ -29,6 +29,7 @@ public class ChangeToBaseGame extends GameSubcommandData {
             }
 
         }
+        activeMap.setBaseGameMode(true);
         Helper.removePoKComponents(activeMap, codex);
         MessageHelper.sendMessageToChannel(event.getChannel(), "Removed PoK components.");
         MapSaveLoadManager.saveMap(activeMap, event);

@@ -132,6 +132,18 @@ public class Helper {
         }
         return player;
     }
+    public static Player getPlayerFromAbility(Map activeMap, String ability) {
+        Player player = null;
+        if (ability != null) {
+            for (Player player_ : activeMap.getPlayers().values()) {
+                if (player_.isRealPlayer() && player_.hasAbility(ability)) {
+                    player = player_;
+                    break;
+                }
+            }
+        }
+        return player;
+    }
 
 
 

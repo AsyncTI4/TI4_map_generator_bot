@@ -79,6 +79,10 @@ public class Map {
     @ExportableField
     private boolean fowMode = false;
     @ExportableField
+    private boolean baseGameMode = false;
+    @ExportableField
+    private boolean lightFogMode = false;
+    @ExportableField
     private boolean homebrewSCMode = false;
     @ExportableField
     private boolean stratPings = true;
@@ -380,8 +384,22 @@ public class Map {
         return fowMode;
     }
 
+    public boolean isLightFogMode() {
+        return lightFogMode;
+    }
+
+    public boolean isBaseGameMode() {
+        return baseGameMode;
+    }
+
     public void setFoWMode(boolean fowMode) {
         this.fowMode = fowMode;
+    }
+    public void setLightFogMode(boolean lightFogMode) {
+        this.lightFogMode = lightFogMode;
+    }
+    public void setBaseGameMode(boolean baseGameMode) {
+        this.baseGameMode = baseGameMode;
     }
     public boolean isHomeBrewSCMode() {
         return homebrewSCMode;
@@ -1339,6 +1357,8 @@ public class Map {
         addDiscardAgenda(id);
         return id;
     }
+
+    
     public String getNextAgenda(boolean revealFromBottom) {
         int index = revealFromBottom ? agendas.size() - 1 : 0;
         String id = agendas.get(index);
