@@ -8,7 +8,6 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
-import ti4.message.MessageHelper;
 
 public class SaveMap extends AdminSubcommandData {
 

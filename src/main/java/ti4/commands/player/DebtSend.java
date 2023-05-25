@@ -11,7 +11,6 @@ import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class DebtSend extends PlayerSubcommandData {
     public DebtSend() {

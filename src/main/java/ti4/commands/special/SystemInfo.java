@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -14,7 +13,6 @@ import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Objects;
 

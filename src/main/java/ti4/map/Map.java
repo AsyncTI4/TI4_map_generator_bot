@@ -23,7 +23,6 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
-import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.model.ActionCardModel;

@@ -10,7 +10,6 @@ import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 

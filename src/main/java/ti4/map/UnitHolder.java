@@ -133,8 +133,8 @@ abstract public class UnitHolder {
     }
 
     public void removeAllUnitDamage(String color) {
-        if (color == null) return;
         String colorID = Mapper.getColorID(color);
+        if (colorID == null) return;
         unitsDamage.keySet().removeIf(key -> key.startsWith(colorID));
     }
 
@@ -144,8 +144,8 @@ abstract public class UnitHolder {
 
 
     public void removeAllUnits(String color) {
-        if (color == null) return;
         String colorID = Mapper.getColorID(color);
+        if (colorID == null) return;
         units.keySet().removeIf(key -> key.startsWith(colorID));
     }
 

@@ -968,7 +968,7 @@
     "type": "Directive",
     "target": "For/Against",
     "text1": "For: Each player who voted \"For\" draws 2 action cards. Each player who voted \"Against\" places a command token from their reinforcements into their strategy pool.",
-    "text2": "Against: Each player who voted \"For\" or abstained discards their action cards. The player that cast the most votes \"Agaisnt\" chooses one strategy card to become exhausted and removed all trade goods from it.",
+    "text2": "Against: Each player who voted \"For\" or abstained discards their action cards. The player that cast the most votes \"Against\" chooses one strategy card to become exhausted and removed all trade goods from it.",
     "source": "absol"
   },
   {
