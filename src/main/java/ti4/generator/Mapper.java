@@ -48,7 +48,6 @@ public class Mapper {
     private static final Properties tech_representation = new Properties();
     private static final Properties unit_representation = new Properties();
     private static final Properties attachmentInfo = new Properties();
-    private static final Properties leaders = new Properties();
     private static final Properties miltyDraft = new Properties();
     private static final Properties agendaRepresentation = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
@@ -61,8 +60,6 @@ public class Mapper {
     private static final HashMap<String, FactionModel> factionSetup = new HashMap<>();
     private static final HashMap<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
     private static final HashMap<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
-
-    private static final HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = new HashMap<>();
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
@@ -81,7 +78,6 @@ public class Mapper {
         readJsonData("public_objectives.json", publicObjectives, PublicObjectiveModel::new, "Could not read public objective file");
         readData("promissory_notes.properties", promissoryNotes, "Could not read promissory notes file");
         readData("exploration.properties", explore, "Could not read explore file");
-        readData("leaders.properties", leaders, "Could not read leaders file");
         readData("relics.properties", relics, "Could not read relic file");
         readData("tech.properties", techs, "Could not read tech file");
         readData("tech_representation.properties", tech_representation, "Could not read tech representation file");
@@ -601,36 +597,6 @@ public class Mapper {
             }
         }
         return techListInfo;
-    }
-
-    public static HashMap<String, HashMap<String, ArrayList<String>>> getLeadersInfo() {
-        if (leadersInfo.isEmpty()) {
-            for (Map.Entry<Object, Object> entry : leaders.entrySet()) {
-                String value = (String) entry.getValue();
-                String[] leaders = value.split(";");
-                HashMap<String, ArrayList<String>> leaderMap = new HashMap<>();
-                for (String leader : leaders) {
-                    ArrayList<String> filteredNames = new ArrayList<>();
-                    if (leader.contains(",")) {
-                        String[] names = leader.split(",");
-                        if (names.length > 1) {
-                            for (String name : names) {
-                                if (!name.equals(Constants.AGENT) &&
-                                        !name.equals(Constants.COMMANDER) &&
-                                        !name.equals(Constants.HERO)) {
-                                    filteredNames.add(name);
-                                }
-                            }
-                        }
-                        leaderMap.put(names[0], filteredNames);
-                    } else {
-                        leaderMap.put(leader, filteredNames);
-                    }
-                }
-                leadersInfo.put((String) entry.getKey(), leaderMap);
-            }
-        }
-        return leadersInfo;
     }
 
     public static boolean isValidTech(String id) {

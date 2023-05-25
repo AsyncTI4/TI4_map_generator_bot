@@ -52,14 +52,14 @@ public class SetHeroActiveLeader extends LeaderAction {
         .append(" played ")
         .append(Helper.getLeaderFullRepresentation(player, playerLeader));
         if ("letnev".equals(playerFaction) || "nomad".equals(playerFaction)) {
-            if (playerLeader != null && Constants.HERO.equals(playerLeader.getId())) {
+            if (playerLeader != null && Constants.HERO.equals(playerLeader.getType())) {
                 playerLeader.setLocked(false);
                 playerLeader.setActive(true);
                 sendMessage(message.toString() + " - Leader will be PURGED after status cleanup");
             } else {
                 sendMessage("Leader not found");
             }
-        } else if (playerLeader != null && Constants.HERO.equals(playerLeader.getId())) {
+        } else if (playerLeader != null && Constants.HERO.equals(playerLeader.getType())) {
             boolean purged = player.removeLeader(leader);
             if (purged) {
                 sendMessage(message.toString() + " - Leader " + leader + " has been purged");

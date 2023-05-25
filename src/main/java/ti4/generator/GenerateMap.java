@@ -706,7 +706,7 @@ public class GenerateMap {
                 graphics.drawString(Integer.toString(leader.getTgCount()), x + deltaX + 3, y + 32);
             } else {
                 String pipID;
-                switch (leader.getId()) {
+                switch (leader.getType()) {
                     case Constants.AGENT -> pipID = "i";
                     case Constants.COMMANDER -> pipID = "ii";
                     case Constants.HERO -> pipID = "iii";
@@ -724,11 +724,10 @@ public class GenerateMap {
                 }
             }
 
-            String extraInfo = leader.getName().isEmpty() ? "" : "_" + leader.getName();
-            String leaderInfoFileName = "pa_leaders_" + leader.getId() + "_" + player.getFaction() + extraInfo + status + ".png";
+            String leaderInfoFileName = "pa_leaders_" + leader.getId() + status + ".png";
             drawPAImage(x + deltaX, y, leaderInfoFileName);
             deltaX += 48;
-            if (leader.getId().equals(Constants.COMMANDER) && player.hasAbility("imperia")) {
+            if (Constants.COMMANDER.equals(leader.getType()) && player.hasAbility("imperia")) {
                 List<String> mahactCCs = player.getMahactCC();
 
                 Collection<Player> players = activeMap.getPlayers().values();
