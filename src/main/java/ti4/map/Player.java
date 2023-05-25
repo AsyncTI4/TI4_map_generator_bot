@@ -667,26 +667,7 @@ public class Player {
     }
 
     public void initLeaders() {
-        // if (faction != null && Mapper.isFaction(faction)) {
-        //     leaders.clear();
-        //     HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = Mapper.getLeadersInfo();
-        //     HashMap<String, ArrayList<String>> factionLeaders = leadersInfo.get(faction);
-        //     if (factionLeaders != null) {
-        //         for (Map.Entry<String, ArrayList<String>> factionLeaderEntry : factionLeaders.entrySet()) {
-        //             String leaderType = factionLeaderEntry.getKey();
-        //             ArrayList<String> uniqueLeaders = factionLeaderEntry.getValue();
-        //             if (uniqueLeaders.isEmpty()){
-        //                 Leader leader = new Leader(leaderType, "");
-        //                 leaders.add(leader);
-        //             } else {
-        //                 for (String uniqueLeader : uniqueLeaders) {
-        //                     Leader leader = new Leader(leaderType, uniqueLeader);
-        //                     leaders.add(leader);
-        //                 }
-        //             }
-        //         }
-        //     }
-        // }
+        leaders.clear();
         for (String leaderID : getFactionStartingLeaders()) {
             Leader leader = new Leader(leaderID);
             leaders.add(leader);

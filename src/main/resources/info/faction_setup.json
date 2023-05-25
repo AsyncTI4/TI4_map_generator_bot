@@ -482,7 +482,7 @@
       "startingTech": ["pa", "det"],
       "homePlanets": ["drah", "trykk"],
       "abilities": ["the_lady_and_the_lord", "rule_of_two"],
-      "leaders": ["gheminaagent", "gheminacommander", "gheminahero"]
+      "leaders": ["gheminaagent", "gheminacommander", "gheminaherolord", "gheminaherolady"]
     },
     {
       "alias": "ghoti",
