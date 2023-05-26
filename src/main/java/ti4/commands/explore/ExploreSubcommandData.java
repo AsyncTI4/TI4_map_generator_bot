@@ -248,9 +248,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "aw1", "aw2", "aw3", "aw4" -> {
                 message = "Resolve using the buttons";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
-                Button covert2CommButton = Button.success("covert_2_comms", "Covert 2 Commodities Into TG").withEmoji(Emoji.fromFormatted(Emojis.Wash));
+                Button convert2CommButton = Button.success("convert_2_comms", "Convert 2 Commodities Into TG").withEmoji(Emoji.fromFormatted(Emojis.Wash));
                 Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
-                List<Button> buttons = List.of(covert2CommButton, get2CommButton);
+                List<Button> buttons = List.of(convert2CommButton, get2CommButton);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
             case "mo1", "mo2", "mo3" -> {
