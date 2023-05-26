@@ -598,12 +598,6 @@ public class Constants {
         setup8p.add("419");
         setup8p.add("422");
     }
-    public static final HashMap<String, String> KELERES_CHOICES = new HashMap<>();
-    static {
-        KELERES_CHOICES.put("keleresm", "Mentak");
-        KELERES_CHOICES.put("keleresx", "Xxcha");
-        KELERES_CHOICES.put("keleresa", "Argent");
-    }
 
     public static final String ATTACHMENT_TITANSPN_PNG = "attachment_titanspn.png";
     public static final String TERRAFORM = "terraform";

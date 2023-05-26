@@ -1074,7 +1074,7 @@ public class GenerateMap {
         drawPAImage(x + deltaX - 2, y - 2, "pa_resinf_info.png");
         graphics.setColor(Color.WHITE);
         graphics.drawRect(x + deltaX - 2, y - 2, 152, 152);
-        if (player.getFaction().equals("xxcha") && !player.getLeader("hero").isLocked()) { //XXCHA WITH UNLOCKED HERO
+        if (player.hasLeaderUnlocked("xxchahero")) { //XXCHA WITH UNLOCKED HERO
             int availablePlayerResources = Helper.getPlayerResourcesAvailable(player, activeMap);
             int totalPlayerResources = Helper.getPlayerResourcesTotal(player, activeMap);
             if (player.getUserID().equals("586504147746947090")) {

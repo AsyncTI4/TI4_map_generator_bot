@@ -162,16 +162,6 @@ public class AutoCompleteProvider {
                     event.replyChoices(options).queue();
                 }
             }
-            case Constants.KELERES_HS -> {
-                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> keleres = Constants.KELERES_CHOICES;
-                List<Command.Choice> options = keleres.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
-                        .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
-                        .collect(Collectors.toList());
-                event.replyChoices(options).queue();
-            }
             case Constants.PO_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 java.util.Map<String, PublicObjectiveModel> publicObjectives = Mapper.getPublicObjectives();

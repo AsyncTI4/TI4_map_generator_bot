@@ -220,12 +220,9 @@ public class ListVoteCount extends AgendaSubcommandData {
         }
 
         //XXCHA
-        if (player.getFaction().equals("xxcha")) {
-            Leader xxchaHero = player.getLeader("hero");
-            if (xxchaHero != null && !xxchaHero.isLocked()) {
-                voteCount = baseResourceCount + baseInfluenceCount;
-                return voteCount;
-            }
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            voteCount = baseResourceCount + baseInfluenceCount;
+            return voteCount;
         }
 
         //KHRASK
