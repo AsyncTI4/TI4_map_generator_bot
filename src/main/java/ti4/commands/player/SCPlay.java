@@ -166,7 +166,7 @@ public class SCPlay extends PlayerSubcommandData {
         if (!activeMap.isFoWMode() && scToPlay == 3) {
             String assignSpeakerMessage = Helper.getPlayerRepresentation(player, activeMap) + ", please click a faction below to assign Speaker " + Emojis.SpeakerToken;
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons();
-            if (assignSpeakerActionRow.isEmpty()) return;
+            
 
             for (MessageCreateData messageCreateData : MessageHelper.getMessageCreateDataObjects(assignSpeakerMessage, assignSpeakerActionRow)) {
                 mainGameChannel.sendMessage(messageCreateData).queue();
@@ -177,7 +177,7 @@ public class SCPlay extends PlayerSubcommandData {
             List<Button> drawAgendaButton = new ArrayList<Button>();
             Button draw2Agenda = Button.success("FFCC_"+player.getFaction()+"_"+"drawAgenda_2", "Draw 2 agendas");
             drawAgendaButton.add(draw2Agenda);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Politics holder should click this after assigning speaker.", drawAgendaButton);
+            MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), false)+" click this after assigning speaker.", drawAgendaButton);
         }
 
         if (scToPlay == 6 && !activeMap.isHomeBrewSCMode()) {
@@ -186,7 +186,7 @@ public class SCPlay extends PlayerSubcommandData {
             Button deleButton= Button.danger("FFCC_"+player.getFaction()+"_"+"deleteButtons", "Delete These Buttons");
             redistributeButton.add(redistribute);
             redistributeButton.add(deleButton);
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Warfare holder should click this after picking up a CC.", redistributeButton);
+            MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), false) +" click this after picking up a CC.", redistributeButton);
         }
 
         List<Button> conclusionButtons = new ArrayList<Button>();
