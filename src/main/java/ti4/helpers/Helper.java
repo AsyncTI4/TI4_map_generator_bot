@@ -597,6 +597,11 @@ public class Helper {
             }
         }
         Button DoneProducingUnits = Button.danger("deleteButtons", "Done Producing Units");
+        if(warfare)
+        {
+            DoneProducingUnits = Button.danger("deleteButtons_warfare", "Done Producing Units");
+        }
+       
         unitButtons.add(DoneProducingUnits);
         return unitButtons;
     }
@@ -1562,7 +1567,7 @@ public class Helper {
 
             if (techType2.equalsIgnoreCase(techType)) {
 
-                if (!player.getTechs().contains(techName)) {
+                if (!player.getTechs().contains(AliasHandler.resolveTech(techName))) {
                     if (!techFaction.equals(" ")) {
                         if (playerfaction.equalsIgnoreCase(techFaction) || (playerfaction.toLowerCase().startsWith("keleres") && techFaction.equalsIgnoreCase("Keleres"))) {
                             factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
