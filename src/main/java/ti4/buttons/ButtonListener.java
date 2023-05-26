@@ -1595,13 +1595,9 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = List.of(getTactic, getFleet, getStrat, loseTactic, loseFleet, loseStrat, DoneGainingCC);
                     if (!activeMap.isFoWMode()) {
 
-                        for(Player p :activeMap.getPlayers().values()){
-                            if(!p.isRealPlayer())
-                            {
-                                continue;
-                            }
-                            MessageHelper.sendMessageToChannelWithButtons((MessageChannel)p.getCardsInfoThread(activeMap), message, buttons);;
-                        }
+                        
+                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeMap), message, buttons);
+
                         //MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
 
                     } else {
