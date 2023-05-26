@@ -1,11 +1,9 @@
 package ti4.commands.leaders;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -20,9 +18,6 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class LeaderInfo extends LeaderSubcommandData {
-    public static final String CARDS_INFO = Constants.CARDS_INFO_THREAD_PREFIX;
-    private static HashMap<Map, TextChannel> threadTextChannels = new HashMap<>();
-
     public LeaderInfo() {
         super(Constants.INFO, "Send Leader info to your Cards-Info thread");
     }
@@ -121,7 +116,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         }
 
         //ADD YSSARIL AGENT REFERENCE
-        if (player.getFaction().equals("yssaril")) { //TODO: If player.getLeaders().contains("yssarilagent")
+        if (player.hasLeader("yssarilagent")) {
             leaderSB.append("_ _\n");
             leaderSB.append("**Other Faction's Agents:**").append("\n");
             for (Player player_ : activeMap.getPlayers().values()) {

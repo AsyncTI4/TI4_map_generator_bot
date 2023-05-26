@@ -34,16 +34,16 @@ public class SetHeroActiveLeader extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeader(leader);
+    void action(SlashCommandInteractionEvent event, String leaderID, Map activeMap, Player player) {
+        Leader playerLeader = player.getLeader(leaderID);
         
         if (playerLeader == null) {
-            sendMessage("Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
+            sendMessage("Leader '" + leaderID + "'' could not be found. The leader might have been purged earlier.");
             return;
         }
         
         if (playerLeader.isLocked()) {
-            sendMessage("Leader is locked, use command to unlock `/leaders unlock leader:" + leader + "`");
+            sendMessage("Leader is locked, use command to unlock `/leaders unlock leader:" + leaderID + "`");
             sendMessage(Helper.getLeaderLockedRepresentation(playerLeader));
             return;
         }
@@ -58,7 +58,7 @@ public class SetHeroActiveLeader extends LeaderAction {
         } else {
             boolean purged = player.removeLeader(playerLeader);
             if (purged) {
-                sendMessage(message.toString() + " - Leader " + leader + " has been purged");
+                sendMessage(message.toString() + " - Leader " + leaderID + " has been purged");
             } else {
                 sendMessage("Leader was not purged - something went wrong");
             }

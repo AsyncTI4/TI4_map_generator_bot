@@ -12,13 +12,13 @@ public class LockLeader extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeader(leader);
-        if (playerLeader != null){
-            playerLeader.setLocked(true);
-            sendMessage("Leader '" + leader + "'' locked");
-        } else {
+    void action(SlashCommandInteractionEvent event, String leaderID, Map activeMap, Player player) {
+        Leader playerLeader = player.getLeader(leaderID);
+        if (playerLeader == null) {
             sendMessage("Leader not found");
+            return;
         }
+        playerLeader.setLocked(true);
+        sendMessage("Leader '" + playerLeader.getId() + "'' locked");
     }
 }

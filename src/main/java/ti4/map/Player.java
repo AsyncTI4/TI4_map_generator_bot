@@ -714,6 +714,10 @@ public class Player {
         return getLeaderIDs().contains(leaderID);
     }
 
+    public boolean hasLeaderUnlocked(String leaderID) {
+        return hasLeader(leaderID) && !getLeader(leaderID).isLocked();
+    }
+
     public void setLeaders(List<Leader> leaders) {
         this.leaders = leaders;
     }

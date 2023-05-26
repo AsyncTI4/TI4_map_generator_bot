@@ -16,12 +16,12 @@ public class UnlockLeader extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-        unlockLeader(event, leader, activeMap, player);
+    void action(SlashCommandInteractionEvent event, String leaderID, Map activeMap, Player player) {
+        unlockLeader(event, leaderID, activeMap, player);
     }
 
-    public void unlockLeader(GenericInteractionCreateEvent event, String leader, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeader(leader);
+    public void unlockLeader(GenericInteractionCreateEvent event, String leaderID, Map activeMap, Player player) {
+        Leader playerLeader = player.getLeader(leaderID);
         MessageChannel channel = activeMap.getMainGameChannel();
         if (activeMap.isFoWMode()) channel = player.getPrivateChannel();
 
