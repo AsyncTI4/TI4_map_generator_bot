@@ -29,7 +29,7 @@ public class SetHeroActiveLeader extends LeaderAction {
 
     @Override
     protected void options() {
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader for which to do action").setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
@@ -45,6 +45,11 @@ public class SetHeroActiveLeader extends LeaderAction {
         if (playerLeader.isLocked()) {
             sendMessage("Leader is locked, use command to unlock `/leaders unlock leader:" + leaderID + "`");
             sendMessage(Helper.getLeaderLockedRepresentation(playerLeader));
+            return;
+        }
+
+        if (!playerLeader.getType().equals(Constants.HERO)) {
+            sendMessage("Leader is not a hero");
             return;
         }
 
