@@ -111,7 +111,6 @@ public class Helper {
         return player;
     }
 
-
     @Nullable
     public static Player getPlayerFromColorOrFaction(Map activeMap, String factionOrColor) {
         Player player = null;
@@ -142,9 +141,6 @@ public class Helper {
         return player;
     }
 
-
-
-
     @Nullable
     public static String getColor(Map activeMap, SlashCommandInteractionEvent event) {
         OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
@@ -163,7 +159,6 @@ public class Helper {
         }
         return null;
     }
-
 
     public static String getColorFromString(Map activeMap, String factionColor) {
         factionColor = AliasHandler.resolveColor(factionColor);
@@ -392,6 +387,7 @@ public class Helper {
             case "axis" -> Emojis.axis;
             case "bentor" -> Emojis.bentor;
             case "blex" -> Emojis.blex;
+            case "kyro" -> Emojis.blex;
             case "celdauri" -> Emojis.celdauri;
             case "cheiran" -> Emojis.cheiran;
             case "cymiae" -> Emojis.cymiae;
@@ -491,6 +487,7 @@ public class Helper {
         }
         return planetButtons;
     }
+    
     public static List<Button> getRemainingSCButtons(GenericInteractionCreateEvent event, Map activeMap) {
         List<Button> scButtons = new ArrayList<>();
         
@@ -1735,11 +1732,6 @@ public class Helper {
 
     }
 
-
-
-
-
-
     public static boolean mechCheck(String planetName, Map activeMap, Player player) {
         String message = "";
         Tile tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
@@ -1849,44 +1841,34 @@ public class Helper {
         return new HashSet<>(getListFromCSV(commaSeparatedString));
     }
 
-    public static boolean playerHasXxchaCommanderUnlocked(Map activeMap, Player player) {  //TODO: contains(xxcha) -> contains(playerWithXxchaCommander)
-        Leader commander = player.getLeader(Constants.COMMANDER);
-        if (player.getFaction().equals("xxcha") && commander != null) {
-            return !commander.isLocked();
-        }
-        List<String> playersPNs = player.getPromissoryNotesInPlayArea();
-        ArrayList<Player> xxchaPlayers = new ArrayList<>(activeMap.getRealPlayers().stream().filter(p -> p.getFaction().equals("xxcha")).toList());
-        if (!xxchaPlayers.remove(player) && !xxchaPlayers.isEmpty() && xxchaPlayers.size() == 1) {
-            Player xxchaPlayer = xxchaPlayers.get(0);
-            Leader xxchaCommander = xxchaPlayer.getLeader(Constants.COMMANDER);
-            if (xxchaCommander != null && !xxchaCommander.isLocked()) {
-                for (String pn : playersPNs) {
-                    if (pn.contains(xxchaPlayer.getColor()) && pn.contains("_an")) {
-                        return true;
-                    }
+    public static boolean playerHasXxchaCommanderUnlockedOrAlliance(Map activeMap, Player player) {
+        String xxchaCommanderLeaderID = "xxchacommander";
+        
+        if (player.hasLeaderUnlocked(xxchaCommanderLeaderID)) return true;
+
+        ArrayList<Player> otherPlayers = new ArrayList<>(activeMap.getRealPlayers());
+        otherPlayers.remove(player);
+
+        //Check if other players have xxchaCommander, and whether player has the alliance or imperia
+        for (Player otherPlayer : otherPlayers) {
+            if (!otherPlayer.hasLeaderUnlocked(xxchaCommanderLeaderID)) continue;
+            for (String pn : player.getPromissoryNotesInPlayArea()) {
+                if (pn.contains(otherPlayer.getColor()) && pn.contains("_an")) {
+                    return true;
                 }
             }
-        }
-        if (player.hasAbility("imperia")) {
-            Player xxcha = Helper.getPlayerFromColorOrFaction(activeMap, "xxcha");
-            if (xxcha != null) {
-                if (player.getMahactCC().contains(xxcha.getColor())) {
-                    Leader leader = xxcha.getLeader(Constants.COMMANDER);
-                    if (leader != null && !leader.isLocked()) {
-                        return true;
-                    }
+            if (player.hasAbility("imperia")) {
+                if (player.getMahactCC().contains(otherPlayer.getColor())) {
+                    return true;
                 }
             }
+            
         }
         return false;
     }
 
     public static boolean playerHasXxchaHeroUnlocked(Player player) {
-        if (player.getFaction().equals("xxcha")) {
-            Leader xxchaHero = player.getLeader("hero");
-            return (xxchaHero != null && !xxchaHero.isLocked());
-        }
-        return false;
+        return player.hasLeaderUnlocked("xxchahero");
     }
 
     public static boolean isFakeAttachment(String attachmentName) {
