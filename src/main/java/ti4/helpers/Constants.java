@@ -253,6 +253,12 @@ public class Constants {
     public static final String EXHAUST_LEADER = "exhaust";
     public static final String REFRESH_LEADER = "ready";
     public static final String PURGE_LEADER = "purge";
+    public static final String LEADER_ADD = "leader_add";
+    public static final String LEADER_REMOVE = "leader_remove";
+    public static final String LEADER_1 = "leader_1";
+    public static final String LEADER_2 = "leader_2";
+    public static final String LEADER_3 = "leader_3";
+    public static final String LEADER_4 = "leader_4";
     public static final String PURGE_SO = "purge_so";
     public static final String ADD_LEADER = "add";
     public static final String LEADERS = "leaders";
@@ -560,11 +566,13 @@ public class Constants {
     public static final String AGENT = "agent";
     public static final String COMMANDER = "commander";
     public static final String HERO = "hero";
+    public static final String ENVOY = "envoy";
     public static final ArrayList<String> leaderList = new ArrayList<>();
     static {
         leaderList.add(AGENT);
         leaderList.add(COMMANDER);
         leaderList.add(HERO);
+        leaderList.add(ENVOY);
     }
 
     public static final String KELERES_HS = "keleres_hs";
@@ -738,9 +746,6 @@ public class Constants {
     public static final String LIST_TECHS = "list_techs";
     public static final String LIST_LEADERS = "list_leaders";
     public static final String IS_MY_TURN = "is_my_turn";
-    public static final String LEADER_ADD = "leader_add";
-    public static final String LEADER_REMOVE = "leader_remove";
     public static final String SET_DECK = "set_deck";
     public static final String DECK_NAME = "deck_name";
-    public static final String ENVOY = "envoy";
 }

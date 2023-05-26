@@ -15,8 +15,8 @@ public class RefreshLeader extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeader(leader);
+    void action(SlashCommandInteractionEvent event, String leaderID, Map activeMap, Player player) {
+        Leader playerLeader = player.getLeader(leaderID);
         if (playerLeader != null){
             if (playerLeader.isLocked()){
                 sendMessage("Leader is locked");
@@ -24,10 +24,10 @@ public class RefreshLeader extends LeaderAction {
             }
             int tgCount = playerLeader.getTgCount();
             refreshLeader(player, playerLeader);
-            sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
+            sendMessage(Helper.getFactionLeaderEmoji(playerLeader));
             StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
                     .append(" readied ")
-                    .append(Helper.getLeaderShortRepresentation(player, playerLeader));
+                    .append(Helper.getLeaderShortRepresentation(playerLeader));
             if (tgCount > 0) {
                 message.append(" - ").append(String.valueOf(tgCount)).append(Emojis.tg).append(" transferred from leader to player");
             }
