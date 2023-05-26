@@ -9,8 +9,8 @@ import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
 
-public class SetHeroActiveLeader extends LeaderAction {
-    public SetHeroActiveLeader() {
+public class HeroPlay extends LeaderAction {
+    public HeroPlay() {
         super(Constants.ACTIVE_LEADER, "Play Hero");
     }
 
