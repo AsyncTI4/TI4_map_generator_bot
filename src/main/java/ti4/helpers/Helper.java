@@ -1074,7 +1074,20 @@ public class Helper {
     public static String getMapString(Map activeMap) {
         List<String> tilePositions = new ArrayList<String>();
         tilePositions.add("000");
-        tilePositions.addAll(activeMap.getTileMap().keySet());
+
+        int ringCountMax = activeMap.getRingCount();
+        int ringCount = 1;
+        int tileCount = 1;
+        while (ringCount <= ringCountMax) {
+            String position = "" + ringCount + (tileCount < 10 ? "0" + tileCount : tileCount);
+            tilePositions.add(position);
+            tileCount++;
+            if (tileCount > ringCount * 6){
+                tileCount = 1;
+                ringCount++;
+            }
+        }
+
         List<String> sortedTilePositions = tilePositions.stream().sorted().collect(Collectors.toList());
 
         HashMap<String, Tile> tileMap = new HashMap<>(activeMap.getTileMap());
@@ -1084,9 +1097,9 @@ public class Helper {
             for (Tile tile : tileMap.values()){
                 if (tile.getPosition().equals(position)){
                     String tileID = AliasHandler.resolveStandardTile(tile.getTileID()).toUpperCase();
-                    if (position.equalsIgnoreCase("0a") && tileID.equalsIgnoreCase("18")) { //Mecatol Rex in Centre Position
-                        //do nothing!
-                    } else if (position.equalsIgnoreCase("0a") && !tileID.equalsIgnoreCase("18")) { //Something else is in the Centre Position
+                    if (position.equalsIgnoreCase("000") && tileID.equalsIgnoreCase("18")) { //Mecatol Rex in Centre Position
+                        sb.append("{18}");
+                    } else if (position.equalsIgnoreCase("000") && !tileID.equalsIgnoreCase("18")) { //Something else is in the Centre Position
                         sb.append("{").append(tileID).append("}");
                     } else {
                         sb.append(tileID);
@@ -1095,7 +1108,9 @@ public class Helper {
                     break;
                 }
             }
-            if (missingTile) {
+            if (missingTile && position.equalsIgnoreCase("000")) {
+                sb.append("{-1}");
+            } else if (missingTile) {
                 sb.append("-1");
             }
             sb.append(" ");
