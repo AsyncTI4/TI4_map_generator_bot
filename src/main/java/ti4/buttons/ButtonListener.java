@@ -637,7 +637,7 @@ public class ButtonListener extends ListenerAdapter {
             boolean resolveTime = false;
             String winner = "";
             String votes = buttonID.substring(buttonID.lastIndexOf("_")+1, buttonID.length());
-            if (!buttonID.contains("outcomeTie_")) {
+            if (!buttonID.contains("outcomeTie*")) {
                 if (votes.equalsIgnoreCase("0")) {
 
                     String pfaction2 = null;
@@ -715,7 +715,7 @@ public class ButtonListener extends ListenerAdapter {
                 } else {
                     String summary = AgendaHelper.getSummaryOfVotes(activeMap, false);
                     winner = AgendaHelper.getWinner(summary);
-                    if (winner != null && !winner.contains("_")) {
+                    if (winner != null && !winner.contains("*")) {
                         resolveTime = true;
                     } else {
                         Player speaker = null;
@@ -727,16 +727,15 @@ public class ButtonListener extends ListenerAdapter {
 
                         List<Button> tiedWinners = new ArrayList<Button>();
                         if (winner != null) {
-                            StringTokenizer winnerInfo = new StringTokenizer(winner, "_");
+                            StringTokenizer winnerInfo = new StringTokenizer(winner, "*");
                             while (winnerInfo.hasMoreTokens()) {
                                 String tiedWinner = winnerInfo.nextToken();
-                                Button button = Button.primary("delete_buttons_outcomeTie_"+tiedWinner, tiedWinner);
+                                Button button = Button.primary("delete_buttons_outcomeTie* "+tiedWinner, tiedWinner);
                                 tiedWinners.add(button);
                             }
                         } else {
-                            event.getChannel().sendMessage("Please try the voting process again and cast at least one vote for something. Ping Fin to tell him to fix this.").queue();;
-                            Button button = Button.primary("placeholder", "Unfortunate Dead End");
-                            tiedWinners.add(button);
+                            
+                            tiedWinners = AgendaHelper.getAgendaButtons(null, activeMap, "delete_buttons_outcomeTie*");
                         }
                         if (!tiedWinners.isEmpty()) {
                             MessageChannel channel = null;
@@ -754,7 +753,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
             } else {
                 resolveTime = true;
-                winner = buttonID.substring(buttonID.lastIndexOf("_")+1, buttonID.length());
+                winner = buttonID.substring(buttonID.lastIndexOf("*")+2, buttonID.length());
             }
             if (resolveTime) {
                 List<Player> losers = AgendaHelper.getLosers(winner, activeMap);
@@ -824,12 +823,35 @@ public class ButtonListener extends ListenerAdapter {
             Player planetOwner = Helper.getPlayerFromColorOrFaction(activeMap, factionOrColor);
             String voteMessage= "Chose to vote for one of "+factionOrColor +"'s planets. Click buttons for which outcome to vote for.";
             List<Button> outcomeActionRow = null;
-
-            outcomeActionRow = AgendaHelper.getPlanetOutcomeButtons(event, planetOwner, activeMap);
+            outcomeActionRow = AgendaHelper.getPlanetOutcomeButtons(event, planetOwner, activeMap, "outcome", null);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,outcomeActionRow);
-
             event.getMessage().delete().queue();
         }
+        else if (buttonID.startsWith("tiedPlanets_")) {
+            buttonID = buttonID.replace("tiedPlanets_", "");
+            buttonID = buttonID.replace("delete_buttons_outcomeTie*_", "");
+            String factionOrColor = buttonID.substring(0, buttonID.length());
+            Player planetOwner = Helper.getPlayerFromColorOrFaction(activeMap, factionOrColor);
+            String voteMessage= "Chose to break tie for one of "+factionOrColor +"'s planets. Use buttons to select which one.";
+            List<Button> outcomeActionRow = null;
+            outcomeActionRow = AgendaHelper.getPlanetOutcomeButtons(event, planetOwner, activeMap, "delete_buttons_outcomeTie*", null);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,outcomeActionRow);
+            event.getMessage().delete().queue();
+        }
+
+        else if (buttonID.startsWith("planetRider_")) {
+            buttonID = buttonID.replace("planetRider_", "");
+            String factionOrColor = buttonID.substring(0, buttonID.indexOf("_"));
+            Player planetOwner = Helper.getPlayerFromColorOrFaction(activeMap, factionOrColor);
+            String voteMessage= "Chose to rider for one of "+factionOrColor +"'s planets. Use buttons to select which one.";
+            List<Button> outcomeActionRow = null;
+            buttonID = buttonID.replace(factionOrColor+"_", "");
+            outcomeActionRow = AgendaHelper.getPlanetOutcomeButtons(event, planetOwner, activeMap, "rider", buttonID);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,outcomeActionRow);
+            event.getMessage().delete().queue();
+        }
+
+
         else if (buttonID.startsWith("distinguished_")) {
             String voteMessage = "You added 5 votes to your total. Please select from the available buttons to vote.";
             String vote = buttonID.substring(buttonID.indexOf("_")+1, buttonID.length());
@@ -885,7 +907,7 @@ public class ButtonListener extends ListenerAdapter {
             String result = buttonID.substring(buttonID.indexOf("_")+1, buttonID.length());
             if (result.equalsIgnoreCase("manual")) {
                 String resMessage3 = "Please select the winner.";
-                List<Button> deadlyActionRow3 = AgendaHelper.getAgendaResButtons(activeMap);
+                List<Button> deadlyActionRow3 = AgendaHelper.getAgendaButtons(null,activeMap, "agendaResolution");
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), resMessage3,deadlyActionRow3);
             }
             event.getMessage().delete().queue();
@@ -1096,6 +1118,7 @@ public class ButtonListener extends ListenerAdapter {
             {
                 String id2 = activeMap.revealAgenda(false);
                 LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
+                MessageHelper.sendMessageToChannel(actionsChannel, "The hidden agenda was "+Mapper.getAgendaTitle(id2)+"! You can find it added as a law or in the discard.");
                 Integer uniqueID = discardAgendas.get(id2);
                 aID = uniqueID;
             }
@@ -1646,7 +1669,7 @@ public class ButtonListener extends ListenerAdapter {
 
                     addReaction(event, true, true, "Playing A Non-AC Rider", "Non-AC Rider Played");
 
-                    List<Button> riderButtons = AgendaHelper.getRiderButtons("Non-AC Rider", activeMap);
+                    List<Button> riderButtons = AgendaHelper.getAgendaButtons("Non-AC Rider", activeMap, "outcome");
                     MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target", activeMap, player, riderButtons);
 
                     Button playAfter = Button.danger("play_after", "Play A Non-AC Rider");
@@ -1681,11 +1704,11 @@ public class ButtonListener extends ListenerAdapter {
                         addReaction(event, false, false, "Gained 2 Commodities", "");
                     }
                 }
-                case "covert_2_comms" -> {
+                case "convert_2_comms" -> {
                     if (player.getCommodities() > 1) {
                         player.setCommodities(player.getCommodities()-2);
                         player.setTg(player.getTg()+2);
-                        addReaction(event, false, false, "Coverted 2 Commodities to 2 tg", "");
+                        addReaction(event, false, false, "Converted 2 Commodities to 2 tg", "");
                     } else {
                         player.setTg(player.getTg()+player.getCommodities());
                         player.setCommodities(0);
@@ -1921,15 +1944,16 @@ public class ButtonListener extends ListenerAdapter {
                         String agendaDetails = activeMap.getCurrentAgendaInfo();
                         agendaDetails = agendaDetails.substring(agendaDetails.indexOf("_")+1, agendaDetails.lastIndexOf("_"));
                         List<Button> outcomeActionRow = null;
+                        outcomeActionRow = AgendaHelper.getAgendaButtons(null, activeMap, "outcome");
                         if (agendaDetails.contains("For") || agendaDetails.contains("for")) {
                             outcomeActionRow = AgendaHelper.getForAgainstOutcomeButtons(null, "outcome");
                         }
                         else if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
-                            outcomeActionRow = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, "outcome");
+                            outcomeActionRow = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, "outcome", null);
                         }
                         else if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
                             voteMessage= "Chose to Vote. Too many planets in the game to represent all as buttons. Click buttons for which player owns the planet you wish to elect.";
-                            outcomeActionRow = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, "planetOutcomes");
+                            outcomeActionRow = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, "planetOutcomes", null);
                         }
                         else if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
                             outcomeActionRow = AgendaHelper.getSecretOutcomeButtons(activeMap, null, "outcome");

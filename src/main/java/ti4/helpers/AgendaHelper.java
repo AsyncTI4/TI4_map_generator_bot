@@ -121,10 +121,12 @@ public class AgendaHelper {
         for (Player player :  activeMap.getPlayers().values()) {
             for (java.util.Map.Entry<String, Integer> so : player.getSecretsScored().entrySet()) {
                 Button button = null;
+                String soName = Mapper.getSecretObjectivesJustNames().get(so.getKey());
                 if (rider == null) {
-                    button = Button.secondary(prefix+"_"+so.getKey(), so.getKey()+"");
+                    
+                    button = Button.secondary(prefix+"_"+so.getKey(), soName);
                 } else {
-                    button = Button.secondary(prefix+"rider_"+so.getKey()+"_"+rider, so.getKey()+"");
+                    button = Button.secondary(prefix+"rider_"+so.getKey()+"_"+rider, soName);
                 }
                 secretButtons.add(button);
             }
@@ -146,18 +148,23 @@ public class AgendaHelper {
         return strategyButtons;
     }
 
-    public static List<Button> getPlanetOutcomeButtons(GenericInteractionCreateEvent event, Player player, Map activeMap) {
+    public static List<Button> getPlanetOutcomeButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, String prefix, String rider) {
         List<Button> planetOutcomeButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
-            Button button = Button.secondary("outcome_"+planet, planet);
+            Button button = null;
+            if (rider == null) {
+                button = Button.secondary(prefix+"_"+planet, Helper.getPlanetRepresentation(planet, activeMap));
+            } else {
+                button = Button.secondary("rider_"+planet+"_"+rider, Helper.getPlanetRepresentation(planet, activeMap));
+            }
             planetOutcomeButtons.add(button);
         }
         return planetOutcomeButtons;
     }
 
 
-    public static List<Button> getPlayerOutcomeButtons(Map activeMap, String rider, String prefix) {
+    public static List<Button> getPlayerOutcomeButtons(Map activeMap, String rider, String prefix, String planetRes) {
         List<Button> playerOutcomeButtons = new ArrayList<>();
 
         for (Player player : activeMap.getPlayers().values()) {
@@ -167,7 +174,15 @@ public class AgendaHelper {
                     Button button = null;
                     if (!activeMap.isFoWMode()) {
                         if (rider != null) {
-                            button = Button.secondary("rider_"+faction+"_"+rider, " ");
+                            if(planetRes != null)
+                            {
+                                button = Button.secondary(planetRes+"_"+faction+"_"+rider, " ");
+                            }
+                            else
+                            {
+                                button = Button.secondary("rider_"+faction+"_"+rider, " ");
+                            }
+                           
                         } else {
                             button = Button.secondary(prefix+"_"+faction, " ");
                         }
@@ -175,7 +190,14 @@ public class AgendaHelper {
                         button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
                     } else {
                         if (rider != null) {
-                            button = Button.secondary("rider_"+player.getColor()+"_"+rider, player.getColor());
+                            if(planetRes != null)
+                            {
+                                button = Button.secondary(planetRes+"_"+player.getColor()+"_"+rider, " ");
+                            }
+                            else
+                            {
+                                 button = Button.secondary("rider_"+player.getColor()+"_"+rider, player.getColor());
+                            }
                         } else {
                             button = Button.secondary(prefix+"_"+player.getColor(), player.getColor());
                         }
@@ -187,26 +209,35 @@ public class AgendaHelper {
         return playerOutcomeButtons;
     }
 
-    public static List<Button> getRiderButtons(String ridername, Map activeMap) {
+
+
+    public static List<Button> getAgendaButtons(String ridername, Map activeMap, String prefix) {
         String agendaDetails = activeMap.getCurrentAgendaInfo();
         agendaDetails = agendaDetails.substring(agendaDetails.indexOf("_")+1, agendaDetails.length());
         List<Button> outcomeActionRow = null;
         if (agendaDetails.contains("For")) {
-            outcomeActionRow = getForAgainstOutcomeButtons(ridername, "outcome");
+            outcomeActionRow = getForAgainstOutcomeButtons(ridername, prefix);
         }
         else if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
-            outcomeActionRow = getPlayerOutcomeButtons(activeMap, ridername, "outcome");
+            outcomeActionRow = getPlayerOutcomeButtons(activeMap, ridername, prefix, null);
         }
         else if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
-            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "Sorry, the bot will not track riders played on planet outcomes");
+            if(ridername == null)
+            {
+                outcomeActionRow = getPlayerOutcomeButtons(activeMap, ridername, "tiedPlanets_"+prefix, "planetRider");
+            }
+            else
+            {
+                outcomeActionRow = getPlayerOutcomeButtons(activeMap, ridername, prefix, "planetRider");
+            }
         }
         else if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
-            outcomeActionRow = getSecretOutcomeButtons(activeMap, ridername, "outcome");
+            outcomeActionRow = getSecretOutcomeButtons(activeMap, ridername, prefix);
         }
         else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
-            outcomeActionRow = getStrategyOutcomeButtons(ridername, "outcome");
+            outcomeActionRow = getStrategyOutcomeButtons(ridername, prefix);
         } else {
-            outcomeActionRow = getLawOutcomeButtons(activeMap, ridername, "outcome");
+            outcomeActionRow = getLawOutcomeButtons(activeMap, ridername, prefix);
         }
 
         return outcomeActionRow;
@@ -602,35 +633,10 @@ public class AgendaHelper {
         return summary;
     }
 
-    public static List<Button> getAgendaResButtons(Map activeMap) {
-
-        String agendaDetails = activeMap.getCurrentAgendaInfo();
-        agendaDetails = agendaDetails.substring(agendaDetails.indexOf("_")+1, agendaDetails.length());
-        List<Button> outcomeActionRow = null;
-        if (agendaDetails.contains("For") || agendaDetails.contains("for")) {
-            outcomeActionRow = getForAgainstOutcomeButtons(null, "agendaResolution");
-        }
-        else if (agendaDetails.contains("Player") || agendaDetails.contains("player")) {
-            outcomeActionRow = getPlayerOutcomeButtons(activeMap, null, "agendaResolution");
-        }
-        else if (agendaDetails.contains("Planet") || agendaDetails.contains("planet")) {
-            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "Sorry, the bot will resolve all possible planets rn.");
-        }
-        else if (agendaDetails.contains("Secret") || agendaDetails.contains("secret")) {
-            outcomeActionRow = getSecretOutcomeButtons(activeMap, null, "agendaResolution");
-        }
-        else if (agendaDetails.contains("Strategy") || agendaDetails.contains("strategy")) {
-            outcomeActionRow = getStrategyOutcomeButtons(null, "agendaResolution");
-        } else {
-            outcomeActionRow = getLawOutcomeButtons(activeMap, null, "agendaResolution");
-        }
-
-        return outcomeActionRow;
-    }
-
+    
 
     public static String getWinner(String summary) {
-        String winner = "";
+        String winner = null;
         StringTokenizer vote_info = new StringTokenizer(summary, ":");
         int currentHighest = 0;
         String outcome = "";
@@ -648,7 +654,7 @@ public class AgendaHelper {
                 String votes = specificVote.substring(13,specificVote.indexOf("."));
                 if (Integer.parseInt(votes) >= currentHighest) {
                     if (Integer.parseInt(votes) == currentHighest) {
-                        winner = winner + "_"+outcome;
+                        winner = winner + "*"+outcome;
                     } else {
                         currentHighest = Integer.parseInt(votes);
                         winner = outcome;
@@ -657,6 +663,10 @@ public class AgendaHelper {
                 }
                 outcome = specificVote.substring(specificVote.lastIndexOf(".")+3,specificVote.length());
             }
+        }
+        if(currentHighest == 0)
+        {
+            return null;
         }
         return winner;
     }

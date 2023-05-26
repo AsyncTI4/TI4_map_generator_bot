@@ -137,7 +137,7 @@ public class PlayAC extends ACCardsSubcommandData {
 
 
                 if (actionCardTitle.contains("Rider") || actionCardTitle.contains("Sanction") ) {
-                    List<Button> riderButtons = AgendaHelper.getRiderButtons(actionCardTitle, activeMap);
+                    List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, activeMap, "outcome");
                     MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target", activeMap, player, riderButtons);
                 }
                 if (actionCardTitle.contains("Hack Election") ) {
