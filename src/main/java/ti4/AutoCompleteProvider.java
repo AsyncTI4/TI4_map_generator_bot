@@ -212,7 +212,7 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.LEADER -> {
+            case Constants.LEADER, Constants.LEADER_1, Constants.LEADER_2, Constants.LEADER_3, Constants.LEADER_4 -> {
                 List<String> leaderIDs = new ArrayList<>();
                 if (activeMap == null || activeMap.isFoWMode() || Constants.LEADER_ADD.equals(event.getSubcommandName())) {
                     leaderIDs.addAll(Mapper.getLeaderRepresentations().keySet());

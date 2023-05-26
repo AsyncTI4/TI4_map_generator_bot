@@ -19,6 +19,10 @@ public abstract class LeaderAddRemove extends FrankenSubcommandData {
     public LeaderAddRemove(String name, String description) {
         super(name, description);
         addOptions(new OptionData(OptionType.STRING, Constants.LEADER, "Leader Name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LEADER_1, "Leader Name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LEADER_2, "Leader Name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LEADER_3, "Leader Name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.LEADER_4, "Leader Name").setRequired(true).setAutoComplete(true));
     }
 
     public void execute(SlashCommandInteractionEvent event) {
