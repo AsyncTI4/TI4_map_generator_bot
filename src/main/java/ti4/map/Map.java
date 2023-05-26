@@ -995,6 +995,10 @@ public class Map {
         return false;
     }
 
+    public boolean addSOToGame(String id) {
+        return secretObjectives.add(id);
+    }
+
     public boolean removeSOFromGame(String id) {
         return secretObjectives.remove(id);
     }

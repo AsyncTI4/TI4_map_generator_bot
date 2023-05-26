@@ -105,6 +105,7 @@ public class CustomCommand implements Command {
     private Collection<CustomSubcommandData> getSubcommands() {
         Collection<CustomSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new SoRemoveFromGame());
+        subcommands.add(new SoAddToGame());
         subcommands.add(new AgendaRemoveFromGame());
         subcommands.add(new ACRemoveFromGame());
         subcommands.add(new SCAddToGame());

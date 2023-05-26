@@ -517,7 +517,7 @@ public class Mapper {
     public static HashMap<String, String> getSecretObjectivesJustNames() {
         HashMap<String, String> soList = new HashMap<>();
         for (Map.Entry<String, SecretObjectiveModel> entry : secretObjectives.entrySet()) {
-            soList.put(entry.getKey(), entry.getValue().name);
+            soList.put(entry.getKey(), entry.getValue().name + " (" + entry.getValue().source + ")");
         }
         return soList;
     }
