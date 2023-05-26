@@ -380,7 +380,7 @@
     "factionTech": ["dsblexg", "dsblexff"],
     "startingTech": [],
     "homePlanets": ["avicenna"],
-    "abilities": ["blight", "contagion", "plague_reservoir"],
+    "abilities": ["blight", "contagion_blex", "plague_reservoir_blex"],
     "leaders": ["blexagent", "blexcommander", "blexhero"]
   },
   {
@@ -562,6 +562,18 @@
     "homePlanets": ["ogdun", "brthkul"],
     "abilities": ["fervor", "ruthless"],
     "leaders": ["kortaliagent", "kortalicommander", "kortalihero"]
+  },
+  {
+    "alias": "kyro",
+    "factionName": "Kyro Sodality",
+    "homeSystem": "d10",
+    "startingFleet": "dn,cv,dd,3 inf a,sd a",
+    "commodities": 2,
+    "factionTech": ["dskyrog", "dskyroy"],
+    "startingTech": [],
+    "homePlanets": ["avicenna"],
+    "abilities": ["contagion", "plague_reservoir"],
+    "leaders": ["kyroagent", "kyrocommander", "kyrohero"]
   },
   {
     "alias": "lanefir",
