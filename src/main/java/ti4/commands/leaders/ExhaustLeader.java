@@ -18,30 +18,32 @@ public class ExhaustLeader extends LeaderAction {
 	}
 
 	@Override
-	void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-		Leader playerLeader = player.getLeader(leader);
-		if (playerLeader != null) {
-			if (playerLeader.isLocked()) {
-				sendMessage("Leader '" + leader + "' is locked");
-				return;
-			}
-			playerLeader.setExhausted(true);
-			sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
-			StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
-					.append(" exhausted ").append(Helper.getLeaderFullRepresentation(player, playerLeader));
-			OptionMapping optionTG = event.getOption(Constants.TG);
-			if (optionTG != null) {
-				playerLeader.setTgCount(optionTG.getAsInt());
-				messageText.append("\n").append(optionTG.getAsString()).append(Emojis.tg)
-						.append(" was placed on top of the leader");
-				if (playerLeader.getTgCount() != optionTG.getAsInt()) {
-					messageText.append(" _(").append(String.valueOf(playerLeader.getTgCount())).append(Emojis.tg)
-							.append(" total)_\n");
-				}
-			}
-			sendMessage(messageText.toString());
-		} else {
-			sendMessage("Leader '" + leader + "'' not found");
+	void action(SlashCommandInteractionEvent event, String leaderID, Map activeMap, Player player) {
+		Leader playerLeader = player.getLeader(leaderID);
+		if (playerLeader == null) {
+			sendMessage("Leader '" + leaderID + "'' not found");
+			return;
 		}
+
+		if (playerLeader.isLocked()) {
+			sendMessage("Leader '" + playerLeader.getId() + "' is locked");
+			return;
+		}
+
+		playerLeader.setExhausted(true);
+		sendMessage(Helper.getFactionLeaderEmoji(playerLeader));
+		StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
+				.append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
+		OptionMapping optionTG = event.getOption(Constants.TG);
+		if (optionTG != null) {
+			playerLeader.setTgCount(optionTG.getAsInt());
+			messageText.append("\n").append(optionTG.getAsString()).append(Emojis.tg)
+					.append(" was placed on top of the leader");
+			if (playerLeader.getTgCount() != optionTG.getAsInt()) {
+				messageText.append(" _(").append(String.valueOf(playerLeader.getTgCount())).append(Emojis.tg)
+						.append(" total)_\n");
+			}
+		}
+		sendMessage(messageText.toString());
 	}
 }

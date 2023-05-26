@@ -6,14 +6,14 @@ import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
 
-public class SetHeroInactiveLeader extends LeaderAction {
-    public SetHeroInactiveLeader() {
+public class HeroUnplay extends LeaderAction {
+    public HeroUnplay() {
         super(Constants.INACTIVE_LEADER, "Set leader as inactive");
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeader(leader);
+    void action(SlashCommandInteractionEvent event, String leaderID, Map activeMap, Player player) {
+        Leader playerLeader = player.getLeader(leaderID);
         if (playerLeader != null){
             playerLeader.setActive(false);
             sendMessage("Leader deactivated/unplayed");

@@ -111,8 +111,8 @@ public class LeaderCommand implements Command {
         subcommands.add(new ExhaustLeader());
         subcommands.add(new PurgeLeader());
         subcommands.add(new ResetLeader());
-        subcommands.add(new SetHeroActiveLeader());
-        subcommands.add(new SetHeroInactiveLeader());
+        subcommands.add(new HeroPlay());
+        subcommands.add(new HeroUnplay());
 
         return subcommands;
     }

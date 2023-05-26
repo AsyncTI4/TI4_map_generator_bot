@@ -16,21 +16,21 @@ public class UnlockLeader extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-        unlockLeader(event, leader, activeMap, player);
+    void action(SlashCommandInteractionEvent event, String leaderID, Map activeMap, Player player) {
+        unlockLeader(event, leaderID, activeMap, player);
     }
 
-    public void unlockLeader(GenericInteractionCreateEvent event, String leader, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeader(leader);
+    public void unlockLeader(GenericInteractionCreateEvent event, String leaderID, Map activeMap, Player player) {
+        Leader playerLeader = player.getLeader(leaderID);
         MessageChannel channel = activeMap.getMainGameChannel();
         if (activeMap.isFoWMode()) channel = player.getPrivateChannel();
 
         if (playerLeader != null){
             playerLeader.setLocked(false);
-            MessageHelper.sendMessageToChannel(channel, Helper.getFactionLeaderEmoji(player, playerLeader));
+            MessageHelper.sendMessageToChannel(channel, Helper.getFactionLeaderEmoji(playerLeader));
             StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
                     .append(" unlocked ")
-                    .append(Helper.getLeaderFullRepresentation(player, playerLeader));
+                    .append(Helper.getLeaderFullRepresentation(playerLeader));
             MessageHelper.sendMessageToChannel(channel, message.toString());
             if (playerLeader.isExhausted()){
                 MessageHelper.sendMessageToChannel(channel, "Leader is also exhausted");
