@@ -1125,15 +1125,12 @@ public class Helper {
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int resourcesCount = 0;
-        if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeader(Constants.HERO);
-            if (leader != null && !leader.isLocked()) {
-                int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                        .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
-                resourcesCount += resourcesCountFromPlanetsRes;
-            }
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                    .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+            resourcesCount += resourcesCountFromPlanetsRes;
         }
-
+        
         int resourcesCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
 
@@ -1149,15 +1146,11 @@ public class Helper {
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int resourcesCount = 0;
-        if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeader(Constants.HERO);
-            if (leader != null && !leader.isLocked()) {
-                int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                        .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
-                resourcesCount += resourcesCountFromPlanetsRes;
-            }
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            int resourcesCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                    .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+            resourcesCount += resourcesCountFromPlanetsRes;
         }
-
         int resourcesCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
 
@@ -1173,12 +1166,9 @@ public class Helper {
         planets.removeAll(player.getExhaustedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
-        if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeader(Constants.HERO);
-            if (leader != null && !leader.isLocked()) {
-                return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                        .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
-            }
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                    .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
         }
 
         int resourcesCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -1194,12 +1184,9 @@ public class Helper {
         List<String> planets = new ArrayList<>(player.getPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
-        if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeader(Constants.HERO);
-            if (leader != null && !leader.isLocked()) {
-                return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                        .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
-            }
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                    .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
         }
 
         int resourcesCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -1217,15 +1204,12 @@ public class Helper {
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int influenceCount = 0;
-        if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeader(Constants.HERO);
-            if (leader != null && !leader.isLocked()) {
-                int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                        .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
-                influenceCount += influenceCountFromPlanetsRes;
-            }
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                    .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+            influenceCount += influenceCountFromPlanetsRes;
         }
-
+        
         int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
 
@@ -1241,15 +1225,12 @@ public class Helper {
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int influenceCount = 0;
-        if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeader(Constants.HERO);
-            if (leader != null && !leader.isLocked()) {
-                int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                        .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
-                influenceCount += influenceCountFromPlanetsRes;
-            }
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                    .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+            influenceCount += influenceCountFromPlanetsRes;
         }
-
+        
         int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
 
@@ -1265,11 +1246,8 @@ public class Helper {
         planets.removeAll(player.getExhaustedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
-        if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeader(Constants.HERO);
-            if (leader != null && !leader.isLocked()) {
-                return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
-            }
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
         }
 
         int influenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
@@ -1285,14 +1263,11 @@ public class Helper {
         List<String> planets = new ArrayList<>(player.getPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
-        if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeader(Constants.HERO);
-            if (leader != null && !leader.isLocked()) {
-                return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                        .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
-            }
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
+                    .map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
         }
-
+        
         int influenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getOptimalInfluence).sum();
 
@@ -1307,13 +1282,10 @@ public class Helper {
         planets.removeAll(player.getExhaustedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
-        if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeader(Constants.HERO);
-            if (leader != null && !leader.isLocked()) {
-                return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
-            }
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
         }
-
+        
         int influenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getFlexResourcesOrInfluence).sum();
 
@@ -1327,13 +1299,10 @@ public class Helper {
         List<String> planets = new ArrayList<>(player.getPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
-        if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeader(Constants.HERO);
-            if (leader != null && !leader.isLocked()) {
-                return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
-            }
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            return planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getSumResourcesInfluence).sum();
         }
-
+        
         int influenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                 .map(planet -> (Planet) planet).mapToInt(Planet::getFlexResourcesOrInfluence).sum();
 
