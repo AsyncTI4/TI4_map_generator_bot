@@ -732,6 +732,10 @@ public class Player {
         return leaders.remove(leaderToPurge);
     }
 
+    public boolean removeLeader(Leader leader) {
+        return leaders.remove(leader);
+    }
+    
     public void addLeader(String leaderID) {
         if (!getLeaderIDs().contains(leaderID)) {
             Leader leader = new Leader(leaderID);

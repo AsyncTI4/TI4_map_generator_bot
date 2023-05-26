@@ -40,34 +40,31 @@ public class SetHeroActiveLeader extends LeaderAction {
 
         if (playerLeader != null && playerLeader.isLocked()) {
             sendMessage("Leader is locked, use command to unlock `/leaders unlock leader:" + leader + "`");
-            sendMessage(Helper.getLeaderLockedRepresentation(player, playerLeader));
+            sendMessage(Helper.getLeaderLockedRepresentation(playerLeader));
             return;
         } else if (playerLeader == null) {
             sendMessage("Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
             return;
         }
 
-        sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
+        sendMessage(Helper.getFactionLeaderEmoji(playerLeader));
         StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
-        .append(" played ")
-        .append(Helper.getLeaderFullRepresentation(player, playerLeader));
-        if ("letnev".equals(playerFaction) || "nomad".equals(playerFaction)) {
-            if (playerLeader != null && Constants.HERO.equals(playerLeader.getType())) {
-                playerLeader.setLocked(false);
-                playerLeader.setActive(true);
-                sendMessage(message.toString() + " - Leader will be PURGED after status cleanup");
-            } else {
-                sendMessage("Leader not found");
-            }
-        } else if (playerLeader != null && Constants.HERO.equals(playerLeader.getType())) {
-            boolean purged = player.removeLeader(leader);
+            .append(" played ")
+            .append(Helper.getLeaderFullRepresentation(playerLeader));
+
+        if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId())) {
+            playerLeader.setLocked(false);
+            playerLeader.setActive(true);
+            sendMessage(message.toString() + " - Leader will be PURGED after status cleanup");
+        } else {
+            boolean purged = player.removeLeader(playerLeader);
             if (purged) {
                 sendMessage(message.toString() + " - Leader " + leader + " has been purged");
             } else {
                 sendMessage("Leader not found");
             }
             if (playerFaction.equals("titans")) {
-                sendMessage("`/add_token token:titanshero`");
+                sendMessage("`Use the following command to add the attachment: /add_token token:titanshero`");
             }
         }
     }

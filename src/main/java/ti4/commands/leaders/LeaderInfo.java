@@ -81,13 +81,13 @@ public class LeaderInfo extends LeaderSubcommandData {
         leaderSB.append("**Leaders Information:**").append("\n");
         for (Leader leader : player.getLeaders()) {
             if (leader.isLocked()) {
-                leaderSB.append("LOCKED: ").append(Helper.getLeaderLockedRepresentation(player, leader)).append("\n");
+                leaderSB.append("LOCKED: ").append(Helper.getLeaderLockedRepresentation(leader)).append("\n");
             } else if (leader.isExhausted()) {
-                leaderSB.append("EXHAUSTED: ").append("~~").append(Helper.getLeaderFullRepresentation(player, leader)).append("~~\n");
+                leaderSB.append("EXHAUSTED: ").append("~~").append(Helper.getLeaderFullRepresentation(leader)).append("~~\n");
             } else if (leader.isActive()) {
-                leaderSB.append("ACTIVE: ").append(Helper.getLeaderFullRepresentation(player, leader)).append("\nActive Hero will be purged during `/status cleanup`\n");
+                leaderSB.append("ACTIVE: ").append(Helper.getLeaderFullRepresentation(leader)).append("\nActive Hero will be purged during `/status cleanup`\n");
             } else {
-                leaderSB.append(Helper.getLeaderFullRepresentation(player, leader)).append("\n");
+                leaderSB.append(Helper.getLeaderFullRepresentation(leader)).append("\n");
             }
         }
 
@@ -109,9 +109,9 @@ public class LeaderInfo extends LeaderSubcommandData {
                                 if (playerLeader == null) continue;
                                 leaderSB.append("ALLIANCE: ");
                                 if (playerLeader.isLocked()) {
-                                    leaderSB.append("(LOCKED) ").append(Helper.getLeaderLockedRepresentation(player_, playerLeader)).append("\n");
+                                    leaderSB.append("(LOCKED) ").append(Helper.getLeaderLockedRepresentation(playerLeader)).append("\n");
                                 } else {
-                                    leaderSB.append(Helper.getLeaderFullRepresentation(player_, playerLeader)).append("\n");
+                                    leaderSB.append(Helper.getLeaderFullRepresentation(playerLeader)).append("\n");
                                 }
                             }
                         }
@@ -130,9 +130,9 @@ public class LeaderInfo extends LeaderSubcommandData {
                     Leader otherPlayerAgent = player_.getLeader(Constants.AGENT);
                     if (otherPlayerAgent == null) continue;
                     if (playerLeader.isExhausted()) {
-                        leaderSB.append("EXHAUSTED: ").append(Helper.getLeaderFullRepresentation(player_, otherPlayerAgent)).append("\n");
+                        leaderSB.append("EXHAUSTED: ").append(Helper.getLeaderFullRepresentation(otherPlayerAgent)).append("\n");
                     } else {
-                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, otherPlayerAgent)).append("\n");
+                        leaderSB.append(Helper.getLeaderFullRepresentation(otherPlayerAgent)).append("\n");
                     }
                 }
             }
@@ -147,7 +147,7 @@ public class LeaderInfo extends LeaderSubcommandData {
                     if (player.getMahactCC().contains(player_.getColor())) {
                         Leader leader = player_.getLeader(Constants.COMMANDER);
                         if (leader == null) continue;
-                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, leader)).append("\n");
+                        leaderSB.append(Helper.getLeaderFullRepresentation(leader)).append("\n");
                     }
                 }
             }
