@@ -368,7 +368,7 @@ public class PositionMapper {
         return unitTokenPosition;
     }
 
-    public static List<String> getAdjacentTilePositions(Map map, String tileID) {
+    public static List<String> getAdjacentTilePositions(Map activeMap, String tileID) {
         String property = adjacent8RingTiles.getProperty(tileID);
         if (property == null) {
             return Collections.emptyList();

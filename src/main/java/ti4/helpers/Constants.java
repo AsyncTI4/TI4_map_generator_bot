@@ -12,6 +12,8 @@ public class Constants {
     public static final String COMMUNITY_MODE = "community_mode";
     public static final String ALLIANCE_MODE = "alliance_mode";
     public static final String FOW_MODE = "fow_mode";
+    public static final String BASE_GAME_MODE = "base_game_mode";
+    public static final String LIGHT_FOG_MODE = "light_fog_mode";
     public static final String HOMEBREW_SC_MODE = "homebrew_sc_mode";
     public static final String ABSOL_MODE = "absol_mode";
     public static final String DISCORDANT_STARS_MODE = "discordant_stars_mode";
@@ -54,6 +56,7 @@ public class Constants {
     public static String ETA = "wheta";
 
     public static final String DRAW_SPECIFIC_SO_FOR_PLAYER = "draw_specific_so_for_player";
+    public static final String DRAW_SPECIFIC_SO = "draw_specific_so";
 
     public static final String SAVE_GAMES = "save_games";
     public static final String SAVE_GAME = "save_game";
@@ -129,6 +132,7 @@ public class Constants {
     public static final String REMOVE_ALL_UNIT_DAMAGE = "remove_all_sustain_damage";
     public static final String SPACE = "space";
     public static final String COMMAND = "command_";
+    public static final String SWEEP = "sweep_";
     public static final String CONTROL = "control_";
     public static final String GF = "gf";
     public static final String FF = "ff";
@@ -214,7 +218,7 @@ public class Constants {
     public static final String FOW_FILTER_WHITE = "White";
     public static final String FOW_FILTER_PINK = "Pink";
     public static final String FOW_FILTER_PURPLE = "Purple";
-    
+
     public static final String MILTY = "milty";
     public static final String START = "start";
     public static final String SLICE_COUNT = "slice_count";
@@ -249,6 +253,7 @@ public class Constants {
     public static final String EXHAUST_LEADER = "exhaust";
     public static final String REFRESH_LEADER = "ready";
     public static final String PURGE_LEADER = "purge";
+    public static final String PURGE_SO = "purge_so";
     public static final String ADD_LEADER = "add";
     public static final String LEADERS = "leaders";
     public static final String SC = "sc";
@@ -290,7 +295,7 @@ public class Constants {
     public static final String ACTIVE_PLAYER = "active_player";
     public static final String LAST_ACTIVE_PLAYER_PING = "last_active_player_ping";
     public static final String LAST_ACTIVE_PLAYER_CHANGE = "last_active_player_change";
-    
+
     public static final String TABLE_TALK_CHANNEL = "table_talk_channel";
     public static final String MAIN_GAME_CHANNEL = "main_game_channel";
     public static final String BOT_MAP_CHANNEL = "bot_map_channel";
@@ -373,7 +378,7 @@ public class Constants {
     public static final String SC6 = "6th_choice";
     public static final String STRAT_PINGS = "strat_pings";
     public static final String DUMMY = "dummy";
-    
+
     public static final String NUMBER_OF_TURNS = "number_of_turns";
     public static final String TOTAL_TURN_TIME = "total_turn_time";
 
@@ -621,6 +626,7 @@ public class Constants {
     public static final String WHISPER = "whisper";
     public static final String MSG = "msg";
     public static final String OVERRIDE_FOW = "override_fow";
+    public static final String OVERRIDE_EXPLORE_OWNERSHIP_REQ = "override_explore_ownership_req";
     public static final String ANON = "anon";
     public static final String ANNOUNCE = "announce";
     public static final String ENDED_GAMES = "ended_games";
@@ -648,6 +654,8 @@ public class Constants {
     public static final String CARDS_INFO_THREAD_CHANNEL_ID = "cards_info_thread_channel_id";
     public static final String LATEST_COMMAND = "latest_command";
     public static final String LATEST_OUTCOME_VOTED_FOR = "latest_outcome_voted_for";
+    public static final String LATEST_AFTER_MSG = "latest_after_msg";
+    public static final String LATEST_WHEN_MSG = "latest_when_msg";
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER = "players_who_hit_persistent_no_after";
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN = "players_who_hit_persistent_no_when";
     public static final String HACK_ELECTION_STATUS = "hack_election_status";
@@ -663,6 +671,11 @@ public class Constants {
     public static final String SC_FOLLOW_6 = "sc_follow_6";
     public static final String SC_FOLLOW_7 = "sc_follow_7";
     public static final String SC_FOLLOW_8 = "sc_follow_8";
+
+    //Installation constants
+    public static final String INSTALLATION = "installation";
+    public static final String ADD_SWEEP_TOKEN = "add_sweep_token";
+    public static final String REMOVE_SWEEP_TOKEN = "remove_sweep_token";
 
     public static final String STATS_USERNAME="userName";
     public static final String STATS_VP ="vp";
@@ -725,4 +738,9 @@ public class Constants {
     public static final String LIST_TECHS = "list_techs";
     public static final String LIST_LEADERS = "list_leaders";
     public static final String IS_MY_TURN = "is_my_turn";
+    public static final String LEADER_ADD = "leader_add";
+    public static final String LEADER_REMOVE = "leader_remove";
+    public static final String SET_DECK = "set_deck";
+    public static final String DECK_NAME = "deck_name";
+    public static final String ENVOY = "envoy";
 }

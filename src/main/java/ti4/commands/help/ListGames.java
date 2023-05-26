@@ -1,10 +1,5 @@
 package ti4.commands.help;
 
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildMessageChannel;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -22,10 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.Map.Entry;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
-
-import javax.swing.text.html.HTMLDocument.HTMLReader.IsindexAction;
 
 public class ListGames extends HelpSubcommandData {
 
@@ -40,7 +32,7 @@ public class ListGames extends HelpSubcommandData {
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.DISCORDANT_STARS_MODE, "True to include Discordant Stars games"));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.ENDED_GAMES, "True to also show ended games"));
     }
-    
+
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
@@ -82,17 +74,17 @@ public class ListGames extends HelpSubcommandData {
     }
 
     private String getRepresentationText(HashMap<String, Map> mapList, String mapName) {
-        Map map = mapList.get(mapName);
+        Map mapToShow = mapList.get(mapName);
         StringBuilder representationText = new StringBuilder("> **" + mapName + "**").append(" ");
-        representationText.append("   Created: ").append(map.getCreationDate());
-        representationText.append("   Last Modified: ").append(Helper.getDateRepresentation(map.getLastModifiedDate())).append("  ");
-        for (Player player : map.getPlayers().values()) {
-            if (!map.isFoWMode() && player.getFaction() != null) {
+        representationText.append("   Created: ").append(mapToShow.getCreationDate());
+        representationText.append("   Last Modified: ").append(Helper.getDateRepresentation(mapToShow.getLastModifiedDate())).append("  ");
+        for (Player player : mapToShow.getPlayers().values()) {
+            if (!mapToShow.isFoWMode() && player.getFaction() != null) {
                 representationText.append(Helper.getFactionIconFromDiscord(player.getFaction()));
             }
         }
-        representationText.append(" [" + map.getGameModesText()).append("] ");
-        if (map.isHasEnded()) representationText.append(" ENDED");
+        representationText.append(" [" + mapToShow.getGameModesText()).append("] ");
+        if (mapToShow.isHasEnded()) representationText.append(" ENDED");
         return representationText.toString();
     }
 }

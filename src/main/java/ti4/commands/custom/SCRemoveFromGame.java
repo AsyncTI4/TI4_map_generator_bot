@@ -1,8 +1,5 @@
 package ti4.commands.custom;
 
-import java.util.List;
-import java.util.Set;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -21,7 +18,7 @@ public class SCRemoveFromGame extends CustomSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
 		Map activeMap = getActiveMap();
-        
+
         Integer sc = event.getOption(Constants.STRATEGY_CARD, null, OptionMapping::getAsInt);
         if (sc == null) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "SC was null?");
@@ -34,5 +31,5 @@ public class SCRemoveFromGame extends CustomSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Strategy Card did not exist: " + sc);
         }
     }
-    
+
 }

@@ -13,23 +13,23 @@ public abstract class LeaderSubcommandData extends SubcommandData {
     private SlashCommandInteractionEvent event;
     private Map activeMap;
     private User user;
-    
+
     public String getActionID() {
         return getName();
     }
-    
+
     public LeaderSubcommandData(@NotNull String name, @NotNull String description) {
         super(name, description);
     }
-    
+
     public Map getActiveMap() {
         return activeMap;
     }
-    
+
     public User getUser() {
         return user;
     }
-    
+
     /**
      * Send a message to the event's channel, handles large text
      * @param messageText new message

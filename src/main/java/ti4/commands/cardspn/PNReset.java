@@ -40,7 +40,7 @@ public class PNReset extends PNCardsSubcommandData {
             }
         }
         checkAndAddPNs(activeMap, player);
-        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendPromissoryNoteInfo(activeMap, player, true);
         sendMessage("PN Info Sent");
@@ -87,7 +87,7 @@ public class PNReset extends PNCardsSubcommandData {
                     }
                 }
                 sb.append("\n");
-                
+
                 //PLAY AREA PROMISSORY NOTES
                 sb.append("\n").append("**PLAY AREA Promissory Notes:**").append("\n");
                 if (promissoryNotesInPlayArea.isEmpty()) {
@@ -105,7 +105,7 @@ public class PNReset extends PNCardsSubcommandData {
             }
         }
         return sb.toString();
-    } 
+    }
 
     private static String getPromissoryNoteRepresentationShort(String pnID) {
         return getPromissoryNoteRepresentation(pnID, null, false);

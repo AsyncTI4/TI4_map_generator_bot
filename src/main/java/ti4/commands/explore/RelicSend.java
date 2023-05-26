@@ -42,7 +42,7 @@ public class RelicSend extends GenericRelicAction {
                 }
             }
         }
-                
+
         //resolve player2
         Player player2 = null; //Player to send to
         if (targetFaction != null) {
@@ -58,7 +58,7 @@ public class RelicSend extends GenericRelicAction {
         if (player2 == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
-        }       
+        }
 
         if (player1.equals(player2)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "The two players provided are the same player");
@@ -101,8 +101,8 @@ public class RelicSend extends GenericRelicAction {
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(event, player1, false));
-        sb.append(" sent a relic to ").append(Helper.getPlayerRepresentation(event, player2, false));
+        sb.append(Helper.getPlayerRepresentation(player1, activeMap));
+        sb.append(" sent a relic to ").append(Helper.getPlayerRepresentation(player2, activeMap));
         sb.append("\n").append(Helper.getRelicRepresentation(relicID));
         sendMessage(sb.toString());
     }

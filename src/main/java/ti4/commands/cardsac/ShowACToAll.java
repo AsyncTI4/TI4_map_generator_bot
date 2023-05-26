@@ -11,8 +11,6 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
-import java.util.LinkedHashMap;
-
 public class ShowACToAll extends ACCardsSubcommandData {
     public ShowACToAll() {
         super(Constants.SHOW_AC_TO_ALL, "Show an Action Card to all players");
@@ -54,7 +52,7 @@ public class ShowACToAll extends ACCardsSubcommandData {
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Showed Action Card:").append("\n");
 
-        sb.append(Mapper.getActionCard(acID)).append("\n");
+        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
         if (!scored) {
             player.setActionCard(acID);
         }

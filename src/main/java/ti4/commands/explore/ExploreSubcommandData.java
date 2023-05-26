@@ -1,29 +1,29 @@
 package ti4.commands.explore;
 
+import java.util.List;
+
+import org.jetbrains.annotations.NotNull;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import software.amazon.awssdk.utils.StringUtils;
+
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
-
-import org.jetbrains.annotations.NotNull;
+import ti4.commands.player.PlanetAdd;
+import ti4.commands.player.PlanetRefresh;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
-import ti4.commands.player.PlanetAdd;
-import ti4.commands.player.PlanetRefresh;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
-
-import java.util.List;
-
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -54,7 +54,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
     public User getUser() {
         return user;
     }
-    
+
     /**
      * Send a message to the event's channel, handles large text
      * @param messageText new message
@@ -101,11 +101,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         return tile;
     }
 
-    public void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetName, String messageText, boolean enigmatic, Player player, Map map) {
+    public void resolveExplore(GenericInteractionCreateEvent event, String cardID, Tile tile, String planetName, String messageText, boolean enigmatic, Player player, Map activeMap_) {
         String message = "Card has been discarded. Resolve effects manually.";
-        if(map != null)
-        {
-            activeMap = map;
+        if (activeMap_ != null) {
+            activeMap = activeMap_;
         }
         if (enigmatic){
             message = "Card has been added to play area.";
@@ -113,10 +112,19 @@ public abstract class ExploreSubcommandData extends SubcommandData {
         }
         String card = Mapper.getExplore(cardID);
         String[] cardInfo = card.split(";");
-        
+
         if (player == null) {
             MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Player could not be found");
             return;
+        }
+
+        if (activeMap != null && !activeMap.isFoWMode() &&(event.getChannel() !=  activeMap.getActionsChannel())) {
+            String pF = Helper.getFactionIconFromDiscord(player.getFaction());
+            if (planetName != null) {
+                MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), pF + " found a "+cardInfo[0]+ " on "+Helper.getPlanetRepresentation(planetName, activeMap));
+            } else {
+                MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), pF + " found a "+cardInfo[0]);
+            }
         }
 
         String cardType = cardInfo[3];
@@ -173,17 +181,16 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 message = "Invalid token or tile";
             }
         }
-        
+
         switch (cardID) {
             case "lc1", "lc2" -> {
-                boolean hasSchemingAbility = player.getFactionAbilities().contains("scheming");
+                boolean hasSchemingAbility = player.hasAbility("scheming");
                 message = hasSchemingAbility ? "Drew 3 Actions Cards (Scheming) - please discard an Action Card from your hand" : "Drew 2 Actions cards";
                 int count = hasSchemingAbility ? 3 : 2;
                 for (int i = 0; i < count; i++) {
                     activeMap.drawActionCard(player.getUserID());
                 }
-                if(activeMap.isFoWMode())
-                {
+                if (activeMap.isFoWMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew 2 AC");
                 }
                 ACInfo.sendActionCardInfo(activeMap, player, event);
@@ -192,8 +199,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "dv1", "dv2" -> {
                 message = "Drew Secret Objective";
                 activeMap.drawSecretObjective(player.getUserID());
-                if(activeMap.isFoWMode())
-                {
+                if (activeMap.isFoWMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew SO");
                 }
                 SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
@@ -205,7 +211,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 DrawRelic.drawRelicAndNotify(player,  event,  activeMap);
             }
             case "ms1", "ms2" -> {
-                message = "Replenished Commodifites (" +player.getCommodities() +"->"+player.getCommoditiesTotal()+")";
+                message = "Replenished Commodities (" +player.getCommodities() +"->"+player.getCommoditiesTotal()+"). Reminder that this is optional, and that you can instead convert your existing comms.";
                 player.setCommodities(player.getCommoditiesTotal());
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + "\n" + message);
             }
@@ -224,7 +230,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     sendMessage("Planet cannot be explored: " + mirageID + "\n> The Cultural deck may be empty");
                     return;
                 }
-                StringBuilder exploredMessage = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" explored ");
+                StringBuilder exploredMessage = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap)).append(" explored ");
                 exploredMessage.append(Helper.getEmojiFromDiscord(planetTrait));
                 exploredMessage.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(mirageID) +" *(tile "+ tile.getPosition() + ")*").append(":\n");
                 exploredMessage.append(displayExplore(exploreID));
@@ -242,17 +248,16 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             case "aw1", "aw2", "aw3", "aw4" -> {
                 message = "Resolve using the buttons";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
-                Button covert2CommButton = Button.success("covert_2_comms", "Covert 2 Commodities Into TG").withEmoji(Emoji.fromFormatted(Emojis.Wash));
+                Button convert2CommButton = Button.success("convert_2_comms", "Convert 2 Commodities Into TG").withEmoji(Emoji.fromFormatted(Emojis.Wash));
                 Button get2CommButton = Button.primary("gain_2_comms", "Gain 2 Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
-                List<Button> buttons = List.of(covert2CommButton, get2CommButton);
+                List<Button> buttons = List.of(convert2CommButton, get2CommButton);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
             case "mo1", "mo2", "mo3" -> {
-                if(tile != null && planetName != null)
-                {
+                if (tile != null && planetName != null) {
                     new AddUnits().unitParsing(event, player.getColor(), tile, "inf " + planetName, activeMap, planetName);
                 }
-                message = Helper.getColourAsMention(event.getGuild(), player.getColor()) + Emojis.infantry + " added to " + Helper.getPlanetRepresentationPlusEmoji(planetName);
+                message = Helper.getColourAsMention(event.getGuild(), player.getColor()) + Emojis.infantry + " automatically added to " + Helper.getPlanetRepresentationPlusEmoji(planetName)+". This placement is optional though.";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + "\n" + message);
                 break;
             }
@@ -286,21 +291,29 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
                 Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
                 List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
-                String trueIdentity = Helper.getPlayerRepresentation(event, player, true);
+                String trueIdentity = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true);
                 String message2 = trueIdentity + "! Your current CCs are "+Helper.getPlayerCCs(player)+". Use buttons to gain CCs";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), message);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message2, buttons);
             }
             case "exp1", "exp2", "exp3" -> {
-                message = "Resolve explore using the buttons.";   
+                message = "Resolve explore using the buttons.";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
                 Button ReadyPlanet= Button.success("planet_ready", "Remove Inf Or Have Mech To Ready "+planetName);
                 Button Decline = Button.danger("decline_explore", "Decline Explore");
                 List<Button> buttons = List.of(ReadyPlanet,Decline);
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
-            case "cm1", "cm2", "cm3" -> {
+            case "frln1", "frln2", "frln3" -> {
                 message = "Resolve explore using the buttons.";   
+                MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
+                Button gainTG= Button.success("freelancersBuild_"+planetName, "Build 1 Unit");
+                Button Decline2 = Button.danger("decline_explore", "Decline Explore");
+                List<Button> buttons = List.of(gainTG,Decline2);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
+            }
+            case "cm1", "cm2", "cm3" -> {
+                message = "Resolve explore using the buttons.";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
                 Button gainTG= Button.success("gain_1_tg", "Gain 1tg By Removing 1 Inf Or Having Mech On "+planetName).withEmoji(Emoji.fromFormatted(Emojis.tg));
                 Button Decline2 = Button.danger("decline_explore", "Decline Explore");
@@ -308,7 +321,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
             }
             case "vfs1", "vfs2", "vfs3" -> {
-                message = "Resolve explore using the buttons.";   
+                message = "Resolve explore using the buttons.";
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText);
                 Button gainCC= Button.success("gain_CC", "Gain 1CC By Removing 1 Inf Or Having Mech On "+planetName);
                 Button Decline3 = Button.danger("decline_explore", "Decline Explore");

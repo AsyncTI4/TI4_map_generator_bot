@@ -7,11 +7,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cardsac.ACInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 
 public class ListActionCards extends HelpSubcommandData {
 
@@ -23,9 +22,9 @@ public class ListActionCards extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        HashMap<String, String> acList = Mapper.getActionCards();
+        HashMap<String, ActionCardModel> acList = Mapper.getActionCards();
         String message = "**__Action Card List__**\n" + acList.entrySet().stream()
-            .map(e -> e.getKey() + " = " + ACInfo.getActionCardRepresentation(e.getKey()))
+            .map(e -> e.getKey() + " = " + e.getValue().getRepresentation())
             .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
             .sorted()
             .collect(Collectors.joining("\n"));

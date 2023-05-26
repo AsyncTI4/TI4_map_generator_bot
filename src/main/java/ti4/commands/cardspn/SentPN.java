@@ -4,8 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cardsac.ACInfo_Legacy;
-import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -14,8 +12,6 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
-
-import java.io.File;
 
 public class SentPN extends PNCardsSubcommandData {
 	public SentPN() {
@@ -109,8 +105,7 @@ public class SentPN extends PNCardsSubcommandData {
 		PNInfo.sendPromissoryNoteInfo(activeMap, targetPlayer, false);
 		PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
 		String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-		String message = Helper.getPlayerRepresentation(event, player) + " sent " + Emojis.PN + text + "PN to "
-				+ Helper.getPlayerRepresentation(event, targetPlayer);
+		String message = Helper.getPlayerRepresentation(player, activeMap) + " sent " + Emojis.PN + text + "PN to " + Helper.getPlayerRepresentation(targetPlayer, activeMap);
 		if (activeMap.isFoWMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
 			String success = message + "\nThe other player has been notified";

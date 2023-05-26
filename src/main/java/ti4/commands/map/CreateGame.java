@@ -53,21 +53,21 @@ public class CreateGame implements Command {
     }
 
     public Map createNewGame(SlashCommandInteractionEvent event, String mapName, Member gameOwner) {
-        Map map = new Map();
+        Map newMap = new Map();
         String ownerID = gameOwner.getId();
-        map.setOwnerID(ownerID);
-        map.setOwnerName(gameOwner.getEffectiveName());
-        map.setName(mapName);
+        newMap.setOwnerID(ownerID);
+        newMap.setOwnerName(gameOwner.getEffectiveName());
+        newMap.setName(mapName);
 
         MapManager mapManager = MapManager.getInstance();
-        mapManager.addMap(map);
+        mapManager.addMap(newMap);
         boolean setMapSuccessful = mapManager.setMapForUser(ownerID, mapName);
-        map.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
+        newMap.addPlayer(gameOwner.getId(), gameOwner.getEffectiveName());
         if (!setMapSuccessful) {
             MessageHelper.replyToMessage(event, "Could not assign active Game " + mapName);
         }
-        MapSaveLoadManager.saveMap(map, event);
-        return map;
+        MapSaveLoadManager.saveMap(newMap, event);
+        return newMap;
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

@@ -1,5 +1,7 @@
 package ti4.commands.player;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -49,14 +51,14 @@ public class Stats extends PlayerSubcommandData {
 			sendMessage("Player could not be found");
 			return;
 		}
-		
+
 		List<OptionMapping> optionMappings = event.getOptions();
 		//NO OPTIONS SELECTED, JUST DISPLAY STATS
 		if (optionMappings.isEmpty() && !activeMap.isFoWMode()) {
-			sendMessage(getPlayersCurrentStatsText(player));
+			sendMessage(getPlayersCurrentStatsText(player, activeMap));
 			return;
 		}
-		
+
 		//DO CCs FIRST
 		OptionMapping optionCC = event.getOption(Constants.CC);
 		OptionMapping optionT = event.getOption(Constants.TACTICAL);
@@ -94,7 +96,7 @@ public class Stats extends PlayerSubcommandData {
 			}
 			if (optionT != null || optionF != null || optionS != null || optionCC != null) {
 				String newCCString = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
-				sendMessage(Helper.getPlayerRepresentation(event, player) + " updated CCs: " + originalCCString + " -> " + newCCString);
+				sendMessage(Helper.getPlayerRepresentation(player, activeMap) + " updated CCs: " + originalCCString + " -> " + newCCString);
 			}
 			if (optionT != null || optionF != null || optionS != null) {
 				Helper.isCCCountCorrect(event, activeMap, player.getColor());
@@ -106,8 +108,8 @@ public class Stats extends PlayerSubcommandData {
 		optionMappings.remove(optionS);
 		if (optionMappings.isEmpty()) return;
 
-		sendMessage(Helper.getPlayerRepresentation(event, player, true) + " player stats changed:");
-		
+		sendMessage(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " player stats changed:");
+
 		OptionMapping optionTG = event.getOption(Constants.TG);
 		if (optionTG != null) {
 			setValue(event, activeMap, player, optionTG, player::setTg, player::getTg);
@@ -197,8 +199,8 @@ public class Stats extends PlayerSubcommandData {
 
 	}
 
-	private String getPlayersCurrentStatsText(Player player) {
-		StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(getEvent(), player, false) + " player's current stats:\n");
+	private String getPlayersCurrentStatsText(Player player, Map activeMap) {
+		StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " player's current stats:\n");
 
 		sb.append("> VP: ").append(player.getTotalVictoryPoints(getActiveMap()));
 		sb.append("      CC: ").append(player.getTacticalCC()).append("/").append(player.getFleetCC()).append("/").append(player.getStrategicCC());
@@ -224,14 +226,13 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Speaker: ").append(getActiveMap().getSpeaker().equals(player.getUserID())).append("\n");
 		sb.append("> Passed: ").append(player.isPassed()).append("\n");
 		sb.append("> Dummy: ").append(player.isDummy()).append("\n");
-		
+
 		sb.append("> Abilities: ").append(player.getFactionAbilities()).append("\n");
 		sb.append("> Planets: ").append(player.getPlanets()).append("\n");
 		sb.append("> Techs: ").append(player.getTechs()).append("\n");
 		sb.append("> Relics: ").append(player.getRelics()).append("\n");
-		sb.append("> Leaders: [");
-		player.getLeaders().forEach(l -> sb.append(" [" + l.getId() + l.getName() + "] "));
-		sb.append("]\n");
+		sb.append("> Leaders: ").append(player.getLeaderIDs()).append("\n");
+		sb.append("\n");
 
 		return sb.toString();
 	}
@@ -245,7 +246,7 @@ public class Stats extends PlayerSubcommandData {
 		GenerateMap.getInstance().saveImage(activeMap, event);
 	}
 
-	public boolean pickSC(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping optionSC) {
+	public boolean pickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, OptionMapping optionSC) {
 			if (optionSC == null) {
 				return false;
 			}
@@ -253,24 +254,29 @@ public class Stats extends PlayerSubcommandData {
 				activeMap.setMapStatus(MapStatus.open);
 			}
 			int scNumber = optionSC.getAsInt();
+			return secondHalfOfPickSC(event, activeMap, player, scNumber);
+	}
+
+	public boolean secondHalfOfPickSC(GenericInteractionCreateEvent event, Map activeMap, Player player, int scNumber)
+	{
 			LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
 			if (player.getColor() == null || "null".equals(player.getColor()) || player.getFaction() == null) {
-				MessageHelper.sendMessageToChannel(event.getChannel(), "Can pick SC only if faction and color picked");
+				MessageHelper.sendMessageToChannel((MessageChannel) event.getChannel(), "Can pick SC only if faction and color picked");
 				return false;
 			}
 			if (!scTradeGoods.containsKey(scNumber)) {
-				MessageHelper.sendMessageToChannel(event.getChannel(),"Strategy Card must be from possible ones in Game");
+				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),"Strategy Card must be from possible ones in Game");
 				return false;
 			}
 
 			LinkedHashMap<String, Player> players = activeMap.getPlayers();
 			for (Player playerStats : players.values()) {
 				if (playerStats.getSCs().contains(scNumber)) {
-					MessageHelper.sendMessageToChannel(event.getChannel(), "SC #"+scNumber+" is already picked.");
+					MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "SC #"+scNumber+" is already picked.");
 					return false;
 				}
 			}
-	
+
 			player.addSC(scNumber);
 			String messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) + " picked SC #"+scNumber;
 			if (activeMap.isFoWMode()) {
@@ -281,27 +287,28 @@ public class Stats extends PlayerSubcommandData {
 				int tg = player.getTg();
 				tg += tgCount;
 				messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
-				MessageHelper.sendMessageToChannel(event.getChannel(),"You gained "+tgCount +" tgs from picking SC #"+scNumber);
+				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),"You gained "+tgCount +" tgs from picking SC #"+scNumber);
 				if (activeMap.isFoWMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
 				}
-				
+
 				player.setTg(tg);
 			}
 			return true;
+
 	}
 
-	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, OptionMapping option,
+	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping option,
 			Consumer<Integer> consumer, Supplier<Integer> supplier) {
-		setValue(event, map, player, option.getName(), consumer, supplier, option.getAsString(), false);
+		setValue(event, activeMap, player, option.getName(), consumer, supplier, option.getAsString(), false);
 	}
 
-	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, OptionMapping option,
+	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, OptionMapping option,
 			Consumer<Integer> consumer, Supplier<Integer> supplier, boolean suppressMessage) {
-		setValue(event, map, player, option.getName(), consumer, supplier, option.getAsString(), suppressMessage);
+		setValue(event, activeMap, player, option.getName(), consumer, supplier, option.getAsString(), suppressMessage);
 	}
 
-	public void setValue(SlashCommandInteractionEvent event, Map map, Player player, String optionName,
+	public void setValue(SlashCommandInteractionEvent event, Map activeMap, Player player, String optionName,
 			Consumer<Integer> consumer, Supplier<Integer> supplier, String value, boolean suppressMessage) {
 		try {
 			boolean setValue = !value.startsWith("+") && !value.startsWith("-");
@@ -311,8 +318,8 @@ public class Stats extends PlayerSubcommandData {
 				consumer.accept(number);
 				String messageToSend = getSetValueMessage(event, player, optionName, number, existingNumber);
 				if (!suppressMessage) sendMessage(messageToSend);
-				if (map.isFoWMode()) {
-					FoWHelper.pingAllPlayersWithFullStats(map, event, player, messageToSend);
+				if (activeMap.isFoWMode()) {
+					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
 				}
 			} else {
 				int newNumber = existingNumber + number;
@@ -320,8 +327,8 @@ public class Stats extends PlayerSubcommandData {
 				consumer.accept(newNumber);
 				String messageToSend = getChangeValueMessage(event, player, optionName, number, existingNumber, newNumber);
 				if (!suppressMessage) sendMessage(messageToSend);
-				if (map.isFoWMode()) {
-					FoWHelper.pingAllPlayersWithFullStats(map, event, player, messageToSend);
+				if (activeMap.isFoWMode()) {
+					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
 				}
 			}
 		} catch (Exception e) {

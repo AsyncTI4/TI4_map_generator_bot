@@ -12,9 +12,9 @@ public class PlanetRemove extends PlanetAddRemove {
     }
 
     @Override
-    public void doAction(Player player, String planet, Map map) {
+    public void doAction(Player player, String planet, Map activeMap) {
         player.removePlanet(planet);
-        UnitHolder unitHolder = map.getPlanetsInfo().get(planet);
+        UnitHolder unitHolder = activeMap.getPlanetsInfo().get(planet);
         removePlayerControlToken(player, unitHolder);
     }
 

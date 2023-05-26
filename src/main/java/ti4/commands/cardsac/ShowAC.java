@@ -52,10 +52,10 @@ public class ShowAC extends ACCardsSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("---------\n");
         sb.append("Game: ").append(activeMap.getName()).append("\n");
-        sb.append("Player: ").append(Helper.getPlayerRepresentation(event, player));
+        sb.append("Player: ").append(Helper.getPlayerRepresentation(player, activeMap));
         sb.append("\n");
         sb.append("Showed Action Cards:").append("\n");
-        sb.append(Mapper.getActionCard(acID)).append("\n");
+        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
         sb.append("---------\n");
         player.setActionCard(acID);
 

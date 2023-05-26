@@ -13,28 +13,28 @@ public class Add extends AddRemovePlayer {
     }
 
 
-    protected String getResponseMessage(Map map, User user) {
-        return user.getName() + " added players to game: " + map.getName() + " - successful";
+    protected String getResponseMessage(Map activeMap, User user) {
+        return user.getName() + " added players to game: " + activeMap.getName() + " - successful";
     }
 
     @Override
-    protected void action(SlashCommandInteractionEvent event, Map map, User user) {
-        addExtraUser(event, map, Constants.PLAYER1);
-        addExtraUser(event, map, Constants.PLAYER2);
-        addExtraUser(event, map, Constants.PLAYER3);
-        addExtraUser(event, map, Constants.PLAYER4);
-        addExtraUser(event, map, Constants.PLAYER5);
-        addExtraUser(event, map, Constants.PLAYER6);
-        addExtraUser(event, map, Constants.PLAYER7);
-        addExtraUser(event, map, Constants.PLAYER8);
+    protected void action(SlashCommandInteractionEvent event, Map activeMap, User user) {
+        addExtraUser(event, activeMap, Constants.PLAYER1);
+        addExtraUser(event, activeMap, Constants.PLAYER2);
+        addExtraUser(event, activeMap, Constants.PLAYER3);
+        addExtraUser(event, activeMap, Constants.PLAYER4);
+        addExtraUser(event, activeMap, Constants.PLAYER5);
+        addExtraUser(event, activeMap, Constants.PLAYER6);
+        addExtraUser(event, activeMap, Constants.PLAYER7);
+        addExtraUser(event, activeMap, Constants.PLAYER8);
     }
 
-    private void addExtraUser(SlashCommandInteractionEvent event, Map map, String playerID) {
+    private void addExtraUser(SlashCommandInteractionEvent event, Map activeMap, String playerID) {
         OptionMapping option;
         option = event.getOption(playerID);
         if (option != null){
             User extraUser = option.getAsUser();
-            map.addPlayer(extraUser.getId(), extraUser.getName());
+            activeMap.addPlayer(extraUser.getId(), extraUser.getName());
         }
     }
 }

@@ -12,9 +12,9 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapStringMapper;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.model.FactionModel;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -87,10 +87,10 @@ public class Setup extends PlayerSubcommandData {
             }
         }
 
-        String[] setupInfo = player.getFactionSetupInfo();
-       
+        FactionModel setupInfo = player.getFactionSetupInfo();
+
         //HOME SYSTEM
-        String hsTile = setupInfo[1];
+        String hsTile = AliasHandler.resolveTile(setupInfo.homeSystemTile);
 
         ArrayList<String> setup;
         boolean useSpecified = false;
@@ -105,8 +105,7 @@ public class Setup extends PlayerSubcommandData {
         } else {
             setup = Constants.setup8p;
             is6playerMap = false;
-            if (activeMap.getRingCount() == 8)
-            {
+            if (activeMap.getRingCount() == 8) {
                 useSpecified = true;
             } else if (PositionMapper.isTilePositionValid(positionHS)){
                 useSpecified = true;
@@ -148,7 +147,7 @@ public class Setup extends PlayerSubcommandData {
                        activeMap.removeTile("tl");
                        activeMap.setTile(mallice);
                    }
-                }else{
+                } else {
                     if (positionNumber == 1 || positionNumber == 2 || positionNumber == 3 ){
                         position = "tr";
                     } else if (positionNumber == 4 || positionNumber == 5) {
@@ -169,8 +168,8 @@ public class Setup extends PlayerSubcommandData {
         }
 
         //STARTING COMMODITIES
-        player.setCommoditiesTotal(Integer.parseInt(setupInfo[3]));
-        for (String tech : setupInfo[5].split(",")) {
+        player.setCommoditiesTotal(setupInfo.commodities);
+        for (String tech : setupInfo.startingTech) {
             if (tech.trim().isEmpty()){
                 continue;
             }
@@ -178,7 +177,7 @@ public class Setup extends PlayerSubcommandData {
         }
 
         //STARTING PLANETS
-        for (String planet : setupInfo[6].split(",")) {
+        for (String planet : setupInfo.homePlanets) {
             if (planet.isEmpty()){
                 continue;
             }
@@ -191,8 +190,8 @@ public class Setup extends PlayerSubcommandData {
 
         //STARTING UNITS
         addUnits(setupInfo, tile, color, event);
-        if(!activeMap.isFoWMode()) {
-            sendMessage("Player: " + Helper.getPlayerRepresentation(event, player) + " has been set up");
+        if (!activeMap.isFoWMode()) {
+            sendMessage("Player: " + Helper.getPlayerRepresentation(player, activeMap) + " has been set up");
         } else {
             sendMessage("Player was set up.");
         }
@@ -205,8 +204,8 @@ public class Setup extends PlayerSubcommandData {
         LeaderInfo.sendLeadersInfo(activeMap, player, event);
     }
 
-    private void addUnits(String[] setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {
-        String units = setupInfo[2];
+    private void addUnits(FactionModel setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {
+        String units = setupInfo.startingFleet;
         units = units.replace(", ", ",");
         StringTokenizer tokenizer = new StringTokenizer(units, ",");
         while (tokenizer.hasMoreTokens()) {
@@ -229,7 +228,7 @@ public class Setup extends PlayerSubcommandData {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
             String unitID = Mapper.getUnitID(unit, color);
-            String unitPath = tile.getUnitPath(unitID);
+            String unitPath = Tile.getUnitPath(unitID);
             if (unitPath == null) {
                 sendMessage("Unit: " + unit + " is not valid and not supported.");
                 continue;

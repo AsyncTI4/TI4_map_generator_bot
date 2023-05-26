@@ -45,8 +45,7 @@ public class RemoveToken extends AddRemoveToken {
                 removeToken(event, tile, tokenID, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName));
                 activeMap.clearPlanetsCache();
             }
-        }
-        else {
+        } else {
             MessageHelper.replyToMessage(event, "Token not specified.");
         }
     }
@@ -72,7 +71,7 @@ public class RemoveToken extends AddRemoveToken {
                 }
             }
         }
-        
+
         unitHolder = unitHolder.replace(" ", "");
         StringTokenizer planetTokenizer = new StringTokenizer(unitHolder, ",");
         while (planetTokenizer.hasMoreTokens()) {

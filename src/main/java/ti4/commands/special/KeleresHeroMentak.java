@@ -1,8 +1,6 @@
 package ti4.commands.special;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -14,6 +12,7 @@ import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.ActionCardModel;
 
 public class KeleresHeroMentak extends SpecialSubcommandData {
 
@@ -51,13 +50,11 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
                 acID = ac.getValue();
                 acKey = ac.getKey();
             }
-            String[] actionCardData = Mapper.getActionCard(acKey).split(";");
-            String acName = actionCardData[0];
-            String acPhase = actionCardData[1];
-            String acWindow = actionCardData[2];
-            String acDescription = actionCardData[3];
+            ActionCardModel actionCard = Mapper.getActionCard(acKey);
+            String acName = actionCard.name;
+            String acWindow = actionCard.window;
             if (acWindow.equalsIgnoreCase("Action")) {
-                acDrawMessage.append("> `").append(String.format("%02d", index)).append(".` ").append(Emojis.ActionCard).append("Action Card: __**").append(acName).append("**__: *").append(acWindow).append(":* ").append(acDescription).append("\n");
+                acDrawMessage.append("> `").append(String.format("%02d", index)).append(".` ").append(actionCard.getRepresentation());
                 componentActionACCount++;
             } else {
                 acRevealMessage.append("> `").append(String.format("%02d", index)).append(".` ").append(Emojis.ActionCard).append(" ").append(acName).append("\n");
@@ -77,7 +74,7 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
             activeMap.shuffleActionCardBackIntoDeck(cardID);
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), Emojis.KeleresHeroHarka);
-        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(event, player) + " uses **Keleres (Mentak) Hero** to Reveal "+ Emojis.ActionCard + "Action Cards until Drawing 3 component action cards.\n");
+        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getPlayerRepresentation(player, activeMap) + " uses **Keleres (Mentak) Hero** to Reveal "+ Emojis.ActionCard + "Action Cards until Drawing 3 component action cards.\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), acRevealMessage.toString());
         MessageHelper.sendMessageToChannel(event.getChannel(), acDrawMessage.toString());
         MessageHelper.sendMessageToChannel(event.getChannel(), "All non-component action cards have been reshuffled back into the deck.");
@@ -86,4 +83,4 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
         }
         BotLogger.log(event, "DEBUG: **Keleres Hero Mentak used**");
     }
-} 
+}

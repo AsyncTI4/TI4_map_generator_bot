@@ -21,21 +21,18 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.Channel;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.MapGenerator;
+import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
@@ -79,34 +76,34 @@ public class MapSaveLoadManager {
         }
     }
 
-    public static void saveMap(Map map) {
-        saveMap(map, false, null);
+    public static void saveMap(Map activeMap) {
+        saveMap(activeMap, false, null);
     }
 
-    public static void saveMap(Map map, GenericInteractionCreateEvent event) {
-        saveMap(map, false, event);
+    public static void saveMap(Map activeMap, GenericInteractionCreateEvent event) {
+        saveMap(activeMap, false, event);
     }
 
-    public static void saveMap(Map map, boolean keepModifiedDate, @Nullable GenericInteractionCreateEvent event) {
+    public static void saveMap(Map activeMap, boolean keepModifiedDate, @Nullable GenericInteractionCreateEvent event) {
         //ADD COMMAND/BUTTON FOR UNDO INFORMATION
         if (event != null) {
             String username = event.getUser().getName();
             if (event instanceof SlashCommandInteractionEvent) {
-                map.setLatestCommand(username + " used: " + ((SlashCommandInteractionEvent) event).getCommandString());
+                activeMap.setLatestCommand(username + " used: " + ((SlashCommandInteractionEvent) event).getCommandString());
             } else if (event instanceof ButtonInteractionEvent) {
-                map.setLatestCommand(username + " pressed button: " + ((ButtonInteractionEvent) event).getButton().getId());   
+                activeMap.setLatestCommand(username + " pressed button: " + ((ButtonInteractionEvent) event).getButton().getId());
             } else {
-                map.setLatestCommand("Last Command Unknown - Not a Slash Command or Button Press");
+                activeMap.setLatestCommand("Last Command Unknown - Not a Slash Command or Button Press");
             }
         } else {
-            map.setLatestCommand("Last Command Unknown - No Event Provided");
+            activeMap.setLatestCommand("Last Command Unknown - No Event Provided");
         }
 
-        DiscordantStarsHelper.checkGardenWorlds(map);
-        
+        DiscordantStarsHelper.checkGardenWorlds(activeMap);
+
         ObjectMapper mapper = new ObjectMapper();
         try {
-            Map map2 = map.copy();
+            Map map2 = activeMap.copy();
             mapper.writerWithDefaultPrettyPrinter().writeValue(Storage.getMapsJSONStorage(map2.getName() + JSON), map2);
         } catch (IOException e) {
             // BotLogger.log(map.getName() + ": IOException with JSON SAVER - likely a Role/Channel object - JSON SAVED INCORRECTLY");
@@ -115,34 +112,34 @@ public class MapSaveLoadManager {
         }
 
         if (loadFromJSON) return; //DON'T SAVE OVER OLD TXT SAVES IF LOADING AND SAVING FROM JSON
-        
-        File mapFile = Storage.getMapImageStorage(map.getName() + TXT);
+
+        File mapFile = Storage.getMapImageStorage(activeMap.getName() + TXT);
         if (mapFile != null) {
-            saveUndo(map, mapFile);
+            saveUndo(activeMap, mapFile);
             try (FileWriter writer = new FileWriter(mapFile.getAbsoluteFile())) {
-                HashMap<String, Tile> tileMap = map.getTileMap();
-                writer.write(map.getOwnerID());
+                HashMap<String, Tile> tileMap = activeMap.getTileMap();
+                writer.write(activeMap.getOwnerID());
                 writer.write(System.lineSeparator());
-                writer.write(map.getOwnerName());
+                writer.write(activeMap.getOwnerName());
                 writer.write(System.lineSeparator());
-                writer.write(map.getName());
+                writer.write(activeMap.getName());
                 writer.write(System.lineSeparator());
-                saveMapInfo(writer, map, keepModifiedDate);
+                saveMapInfo(writer, activeMap, keepModifiedDate);
 
                 for (java.util.Map.Entry<String, Tile> tileEntry : tileMap.entrySet()) {
                     Tile tile = tileEntry.getValue();
                     saveTile(writer, tile);
                 }
             } catch (IOException e) {
-                BotLogger.log("Could not save map: " + map.getName(), e);
+                BotLogger.log("Could not save map: " + activeMap.getName(), e);
             }
         } else {
             BotLogger.log("Could not save map, error creating save file");
         }
     }
 
-    public static void undo(Map map) {
-        File originalMapFile = Storage.getMapImageStorage(map.getName() + Constants.TXT);
+    public static void undo(Map activeMap) {
+        File originalMapFile = Storage.getMapImageStorage(activeMap.getName() + Constants.TXT);
         if (originalMapFile != null) {
             File mapUndoDirectory = Storage.getMapUndoDirectory();
             if (mapUndoDirectory == null) {
@@ -152,7 +149,7 @@ public class MapSaveLoadManager {
                 return;
             }
 
-            String mapName = map.getName();
+            String mapName = activeMap.getName();
             String mapNameForUndoStart = mapName + "_";
             String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
             if (mapUndoFiles != null && mapUndoFiles.length > 0) {
@@ -169,7 +166,7 @@ public class MapSaveLoadManager {
                     mapUndoStorage.delete();
 //                    reload(map);
                     Map loadedMap = loadMap(originalMapFile);
-                    MapManager.getInstance().deleteMap(map.getName());
+                    MapManager.getInstance().deleteMap(activeMap.getName());
                     MapManager.getInstance().addMap(loadedMap);
                 } catch (Exception e) {
                     BotLogger.log("Error trying to make undo copy for map: " + mapName, e);
@@ -178,16 +175,16 @@ public class MapSaveLoadManager {
         }
     }
 
-    public static void reload(Map map) {
-        File originalMapFile = Storage.getMapImageStorage(map.getName() + Constants.TXT);
+    public static void reload(Map activeMap) {
+        File originalMapFile = Storage.getMapImageStorage(activeMap.getName() + Constants.TXT);
         if (originalMapFile != null) {
             Map loadedMap = loadMap(originalMapFile);
-            MapManager.getInstance().deleteMap(map.getName());
+            MapManager.getInstance().deleteMap(activeMap.getName());
             MapManager.getInstance().addMap(loadedMap);
         }
     }
 
-    private static void saveUndo(Map map, File originalMapFile) {
+    private static void saveUndo(Map activeMap, File originalMapFile) {
         File mapUndoDirectory = Storage.getMapUndoDirectory();
         if (mapUndoDirectory == null) {
             return;
@@ -196,7 +193,7 @@ public class MapSaveLoadManager {
             mapUndoDirectory.mkdir();
         }
 
-        String mapName = map.getName();
+        String mapName = activeMap.getName();
         String mapNameForUndoStart = mapName + "_";
         String[] mapUndoFiles = mapUndoDirectory.list((dir, name) -> name.startsWith(mapNameForUndoStart));
         if (mapUndoFiles != null) {
@@ -223,69 +220,73 @@ public class MapSaveLoadManager {
         }
     }
 
-    private static void saveMapInfo(FileWriter writer, Map map, boolean keepModifiedDate) throws IOException {
+    private static void saveMapInfo(FileWriter writer, Map activeMap, boolean keepModifiedDate) throws IOException {
         writer.write(MAPINFO);
         writer.write(System.lineSeparator());
 
-        writer.write(map.getMapStatus());
+        writer.write(activeMap.getMapStatus());
         writer.write(System.lineSeparator());
-        
+
 
         writer.write(GAMEINFO);
         writer.write(System.lineSeparator());
         //game information
-        writer.write(Constants.LATEST_COMMAND + " " + map.getLatestCommand());
+        writer.write(Constants.LATEST_COMMAND + " " + activeMap.getLatestCommand());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.LATEST_OUTCOME_VOTED_FOR + " " + map.getLatestOutcomeVotedFor());
+        writer.write(Constants.LATEST_OUTCOME_VOTED_FOR + " " + activeMap.getLatestOutcomeVotedFor());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.LATEST_AFTER_MSG + " " + activeMap.getLatestWhenMsg());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.LATEST_WHEN_MSG + " " + activeMap.getLatestWhenMsg());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.SO + " " + String.join(",", map.getSecretObjectives()));
+        writer.write(Constants.SO + " " + String.join(",", activeMap.getSecretObjectives()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.AC + " " + String.join(",", map.getActionCards()));
+        writer.write(Constants.AC + " " + String.join(",", activeMap.getActionCards()));
         writer.write(System.lineSeparator());
 
-        writeCards(map.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
+        writeCards(activeMap.getDiscardActionCards(), writer, Constants.AC_DISCARDED);
 
-        writer.write(Constants.EXPLORE + " " + String.join(",", map.getAllExplores()));
+        writer.write(Constants.EXPLORE + " " + String.join(",", activeMap.getAllExplores()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.RELICS + " " + String.join(",", map.getAllRelics()));
+        writer.write(Constants.RELICS + " " + String.join(",", activeMap.getAllRelics()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.DISCARDED_EXPLORES + " " + String.join(",", map.getAllExploreDiscard()));
+        writer.write(Constants.DISCARDED_EXPLORES + " " + String.join(",", activeMap.getAllExploreDiscard()));
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.SPEAKER + " " + map.getSpeaker());
+        writer.write(Constants.SPEAKER + " " + activeMap.getSpeaker());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.ACTIVE_PLAYER + " " + map.getActivePlayer());
+        writer.write(Constants.ACTIVE_PLAYER + " " + activeMap.getActivePlayer());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.LAST_ACTIVE_PLAYER_PING + " " + map.getLastActivePlayerPing().getTime());
+        writer.write(Constants.LAST_ACTIVE_PLAYER_PING + " " + activeMap.getLastActivePlayerPing().getTime());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.LAST_TIME_GAMES_CHECKED + " " + map.getLastTimeGamesChecked().getTime());
+        writer.write(Constants.LAST_TIME_GAMES_CHECKED + " " + activeMap.getLastTimeGamesChecked().getTime());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.AUTO_PING + " " + map.getAutoPingSpacer());
+        writer.write(Constants.AUTO_PING + " " + activeMap.getAutoPingSpacer());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER + " " + map.getPlayersWhoHitPersistentNoAfter());
+        writer.write(Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER + " " + activeMap.getPlayersWhoHitPersistentNoAfter());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN + " " + map.getPlayersWhoHitPersistentNoWhen());
+        writer.write(Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN + " " + activeMap.getPlayersWhoHitPersistentNoWhen());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.CURRENT_AGENDA_INFO + " " + map.getCurrentAgendaInfo());
+        writer.write(Constants.CURRENT_AGENDA_INFO + " " + activeMap.getCurrentAgendaInfo());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " " + map.getLastActivePlayerChange().getTime());
+        writer.write(Constants.LAST_ACTIVE_PLAYER_CHANGE + " " + activeMap.getLastActivePlayerChange().getTime());
         writer.write(System.lineSeparator());
 
-        HashMap<Integer, Boolean> scPlayed = map.getScPlayed();
-        
+        HashMap<Integer, Boolean> scPlayed = activeMap.getScPlayed();
+
         StringBuilder sb = new StringBuilder();
         for (java.util.Map.Entry<Integer, Boolean> entry : scPlayed.entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
@@ -294,7 +295,7 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
 
 
-        HashMap<String, String> agendaVoteInfo = map.getCurrentAgendaVotes();
+        HashMap<String, String> agendaVoteInfo = activeMap.getCurrentAgendaVotes();
         StringBuilder sb2 = new StringBuilder();
         for (java.util.Map.Entry<String, String> entry : agendaVoteInfo.entrySet()) {
             sb2.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
@@ -302,56 +303,56 @@ public class MapSaveLoadManager {
         writer.write(Constants.AGENDA_VOTE_INFO + " " + sb2);
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.AGENDAS + " " + String.join(",", map.getAgendas()));
+        writer.write(Constants.AGENDAS + " " + String.join(",", activeMap.getAgendas()));
         writer.write(System.lineSeparator());
 
-        writeCards(map.getDiscardAgendas(), writer, Constants.DISCARDED_AGENDAS);
-        writeCards(map.getSentAgendas(), writer, Constants.SENT_AGENDAS);
-        writeCards(map.getLaws(), writer, Constants.LAW);
+        writeCards(activeMap.getDiscardAgendas(), writer, Constants.DISCARDED_AGENDAS);
+        writeCards(activeMap.getSentAgendas(), writer, Constants.SENT_AGENDAS);
+        writeCards(activeMap.getLaws(), writer, Constants.LAW);
 
         sb = new StringBuilder();
-        for (java.util.Map.Entry<String, String> entry : map.getLawsInfo().entrySet()) {
+        for (java.util.Map.Entry<String, String> entry : activeMap.getLawsInfo().entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(Constants.LAW_INFO + " " + sb);
         writer.write(System.lineSeparator());
 
         sb = new StringBuilder();
-        for (java.util.Map.Entry<Integer, Integer> entry : map.getScTradeGoods().entrySet()) {
+        for (java.util.Map.Entry<Integer, Integer> entry : activeMap.getScTradeGoods().entrySet()) {
             sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         writer.write(Constants.SC_TRADE_GOODS + " " + sb);
         writer.write(System.lineSeparator());
 
-        writeCards(map.getRevealedPublicObjectives(), writer, Constants.REVEALED_PO);
-        writeCards(map.getCustomPublicVP(), writer, Constants.CUSTOM_PO_VP);
-        writer.write(Constants.PO1 + " " + String.join(",", map.getPublicObjectives1()));
+        writeCards(activeMap.getRevealedPublicObjectives(), writer, Constants.REVEALED_PO);
+        writeCards(activeMap.getCustomPublicVP(), writer, Constants.CUSTOM_PO_VP);
+        writer.write(Constants.PO1 + " " + String.join(",", activeMap.getPublicObjectives1()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.PO2 + " " + String.join(",", map.getPublicObjectives2()));
+        writer.write(Constants.PO2 + " " + String.join(",", activeMap.getPublicObjectives2()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.SO_TO_PO + " " + String.join(",", map.getSoToPoList()));
+        writer.write(Constants.SO_TO_PO + " " + String.join(",", activeMap.getSoToPoList()));
         writer.write(System.lineSeparator());
-        writer.write(Constants.PURGED_PN + " " + String.join(",", map.getPurgedPN()));
+        writer.write(Constants.PURGED_PN + " " + String.join(",", activeMap.getPurgedPN()));
         writer.write(System.lineSeparator());
-        
 
-        DisplayType displayTypeForced = map.getDisplayTypeForced();
+
+        DisplayType displayTypeForced = activeMap.getDisplayTypeForced();
         if (displayTypeForced != null) {
             writer.write(Constants.DISPLAY_TYPE + " " + displayTypeForced.getValue());
             writer.write(System.lineSeparator());
         }
 
-        writer.write(Constants.PLAYER_COUNT_FOR_MAP + " " + map.getPlayerCountForMap());
+        writer.write(Constants.PLAYER_COUNT_FOR_MAP + " " + activeMap.getPlayerCountForMap());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.RING_COUNT_FOR_MAP + " " + map.getRingCount());
+        writer.write(Constants.RING_COUNT_FOR_MAP + " " + activeMap.getRingCount());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.VP_COUNT + " " + map.getVp());
+        writer.write(Constants.VP_COUNT + " " + activeMap.getVp());
         writer.write(System.lineSeparator());
 
         StringBuilder sb1 = new StringBuilder();
-        for (java.util.Map.Entry<String, List<String>> entry : map.getScoredPublicObjectives().entrySet()) {
+        for (java.util.Map.Entry<String, List<String>> entry : activeMap.getScoredPublicObjectives().entrySet()) {
             String userIds = String.join("-", entry.getValue());
             sb1.append(entry.getKey()).append(",").append(userIds).append(";");
         }
@@ -359,7 +360,7 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
 
         StringBuilder adjacentTiles = new StringBuilder();
-        for (java.util.Map.Entry<String, List<String>> entry : map.getCustomAdjacentTiles().entrySet()) {
+        for (java.util.Map.Entry<String, List<String>> entry : activeMap.getCustomAdjacentTiles().entrySet()) {
             String userIds = String.join("-", entry.getValue());
             adjacentTiles.append(entry.getKey()).append(",").append(userIds).append(";");
         }
@@ -367,7 +368,7 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
 
         StringBuilder adjacencyOverrides = new StringBuilder();
-        for (java.util.Map.Entry<Pair<String, Integer>, String> entry : map.getAdjacentTileOverrides().entrySet()) {
+        for (java.util.Map.Entry<Pair<String, Integer>, String> entry : activeMap.getAdjacentTileOverrides().entrySet()) {
             adjacencyOverrides.append(entry.getKey().getLeft() + "-");
             adjacencyOverrides.append(entry.getKey().getRight() + "-");
             adjacencyOverrides.append(entry.getValue() + ";");
@@ -375,61 +376,65 @@ public class MapSaveLoadManager {
         writer.write(Constants.ADJACENCY_OVERRIDES + " " + adjacencyOverrides);
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.CREATION_DATE + " " + map.getCreationDate());
+        writer.write(Constants.CREATION_DATE + " " + activeMap.getCreationDate());
         writer.write(System.lineSeparator());
-        long time = keepModifiedDate ? map.getLastModifiedDate() : new Date().getTime();
+        long time = keepModifiedDate ? activeMap.getLastModifiedDate() : new Date().getTime();
         writer.write(Constants.LAST_MODIFIED_DATE + " " + time);
         writer.write(System.lineSeparator());
-        writer.write(Constants.ROUND + " " + map.getRound());
+        writer.write(Constants.ROUND + " " + activeMap.getRound());
         writer.write(System.lineSeparator());
-        writer.write(Constants.GAME_CUSTOM_NAME + " " + map.getCustomName());
+        writer.write(Constants.GAME_CUSTOM_NAME + " " + activeMap.getCustomName());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.TABLE_TALK_CHANNEL + " " + map.getTableTalkChannelID());
+        writer.write(Constants.TABLE_TALK_CHANNEL + " " + activeMap.getTableTalkChannelID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.MAIN_GAME_CHANNEL + " " + map.getMainGameChannelID());
+        writer.write(Constants.MAIN_GAME_CHANNEL + " " + activeMap.getMainGameChannelID());
         writer.write(System.lineSeparator());
-        writer.write(Constants.BOT_MAP_CHANNEL + " " + map.getBotMapUpdatesThreadID());
+        writer.write(Constants.BOT_MAP_CHANNEL + " " + activeMap.getBotMapUpdatesThreadID());
         writer.write(System.lineSeparator());
 
         //GAME MODES
-        writer.write(Constants.TIGL_GAME + " " + map.isCompetitiveTIGLGame());
+        writer.write(Constants.TIGL_GAME + " " + activeMap.isCompetitiveTIGLGame());
         writer.write(System.lineSeparator());
-        writer.write(Constants.COMMUNITY_MODE + " " + map.isCommunityMode());
+        writer.write(Constants.COMMUNITY_MODE + " " + activeMap.isCommunityMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.ALLIANCE_MODE + " " + map.isAllianceMode());
+        writer.write(Constants.ALLIANCE_MODE + " " + activeMap.isAllianceMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.FOW_MODE + " " + map.isFoWMode());
+        writer.write(Constants.FOW_MODE + " " + activeMap.isFoWMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.STRAT_PINGS + " " + map.isStratPings());
+        writer.write(Constants.BASE_GAME_MODE + " " + activeMap.isBaseGameMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.ABSOL_MODE + " " + map.isAbsolMode());
+        writer.write(Constants.LIGHT_FOG_MODE + " " + activeMap.isLightFogMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.LARGE_TEXT + " " + map.getLargeText());
+        writer.write(Constants.STRAT_PINGS + " " + activeMap.isStratPings());
         writer.write(System.lineSeparator());
-        writer.write(Constants.DISCORDANT_STARS_MODE + " " + map.isDiscordantStarsMode());
+        writer.write(Constants.ABSOL_MODE + " " + activeMap.isAbsolMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.VERBOSITY + " " + map.getOutputVerbosity());
+        writer.write(Constants.LARGE_TEXT + " " + activeMap.getLargeText());
         writer.write(System.lineSeparator());
-        writer.write(Constants.BETA_TEST_MODE + " " + map.isTestBetaFeaturesMode());
+        writer.write(Constants.DISCORDANT_STARS_MODE + " " + activeMap.isDiscordantStarsMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.HACK_ELECTION_STATUS + " " + map.getHackElectionStatus());
+        writer.write(Constants.VERBOSITY + " " + activeMap.getOutputVerbosity());
         writer.write(System.lineSeparator());
-        writer.write(Constants.CC_N_PLASTIC_LIMIT + " " + map.getCCNPlasticLimit());
+        writer.write(Constants.BETA_TEST_MODE + " " + activeMap.isTestBetaFeaturesMode());
         writer.write(System.lineSeparator());
-        writer.write(Constants.HOMEBREW_SC_MODE + " " + map.isHomeBrewSCMode());
+        writer.write(Constants.HACK_ELECTION_STATUS + " " + activeMap.getHackElectionStatus());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.CC_N_PLASTIC_LIMIT + " " + activeMap.getCCNPlasticLimit());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.HOMEBREW_SC_MODE + " " + activeMap.isHomeBrewSCMode());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.GAME_HAS_ENDED + " " + map.isHasEnded());
+        writer.write(Constants.GAME_HAS_ENDED + " " + activeMap.isHasEnded());
         writer.write(System.lineSeparator());
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
-        
+
         //Player information
         writer.write(PLAYERINFO);
         writer.write(System.lineSeparator());
-        HashMap<String, Player> players = map.getPlayers();
+        HashMap<String, Player> players = activeMap.getPlayers();
         for (java.util.Map.Entry<String, Player> playerEntry : players.entrySet()) {
             writer.write(PLAYER);
             writer.write(System.lineSeparator());
@@ -455,7 +460,7 @@ public class MapSaveLoadManager {
 
             writer.write(Constants.PLAYER_PRIVATE_CHANNEL + " " + player.getPrivateChannelID());
             writer.write(System.lineSeparator());
-            
+
             String fogColor = player.getFogFilter() == null ? "" : player.getFogFilter();
             writer.write(Constants.FOG_FILTER + " " + fogColor);
             writer.write(System.lineSeparator());
@@ -509,7 +514,7 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.PLANETS_ABILITY_EXHAUSTED + " " + String.join(",", player.getExhaustedPlanetsAbilities()));
             writer.write(System.lineSeparator());
-            
+
             writer.write(Constants.TACTICAL + " " + player.getTacticalCC());
             writer.write(System.lineSeparator());
             writer.write(Constants.FLEET + " " + player.getFleetCC());
@@ -538,7 +543,7 @@ public class MapSaveLoadManager {
             }
             writer.write(Constants.CAPTURE + " " + units);
             writer.write(System.lineSeparator());
-         
+
             writer.write(Constants.UNIT_CAP + " " + getUnitCapList(player.getUnitCaps()));
             writer.write(System.lineSeparator());
 
@@ -546,7 +551,7 @@ public class MapSaveLoadManager {
             writer.write(System.lineSeparator());
             writer.write(Constants.SO_SCORED + " " + getSecretList(player.getSecretsScored()));
             writer.write(System.lineSeparator());
-            
+
             writer.write(Constants.NUMBER_OF_TURNS + " " + player.getNumberTurns());
             writer.write(System.lineSeparator());
             writer.write(Constants.TOTAL_TURN_TIME + " " + player.getTotalTurnTime());
@@ -559,8 +564,7 @@ public class MapSaveLoadManager {
             for (Leader leader : player.getLeaders()) {
                 leaderInfo.append(leader.getId());
                 leaderInfo.append(",");
-                String name = leader.getName();
-                leaderInfo.append(name.isEmpty() ? "." : name);
+                leaderInfo.append(leader.getType());
                 leaderInfo.append(",");
                 leaderInfo.append(leader.getTgCount());
                 leaderInfo.append(",");
@@ -759,9 +763,9 @@ public class MapSaveLoadManager {
                 for (File file : jsonfiles) {
                     if (isJSONExtention(file)) {
                         try {
-                            Map map = loadMapJSON(file);
-                            if (map != null) {
-                                mapList.put(map.getName(), map);
+                            Map activeMap = loadMapJSON(file);
+                            if (activeMap != null) {
+                                mapList.put(activeMap.getName(), activeMap);
                             }
                         } catch (Exception e) {
                             BotLogger.log("Could not load JSON game:" + file, e);
@@ -775,9 +779,9 @@ public class MapSaveLoadManager {
                 for (File file : txtFiles) {
                     if (isTxtExtention(file)) {
                         try {
-                            Map map = loadMap(file);
-                            if (map != null) {
-                                mapList.put(map.getName(), map);
+                            Map activeMap = loadMap(file);
+                            if (activeMap != null) {
+                                mapList.put(activeMap.getName(), activeMap);
                             }
                         } catch (Exception e) {
                             BotLogger.log("Could not load TXT game:" + file, e);
@@ -795,8 +799,8 @@ public class MapSaveLoadManager {
         ObjectMapper mapper = new ObjectMapper();
         mapper.registerModule(new SimpleModule().addKeyDeserializer(Pair.class, new MapPairKeyDeserializer()));
         try {
-            Map map = mapper.readValue(mapFile, Map.class);
-            return map;
+            Map activeMap = mapper.readValue(mapFile, Map.class);
+            return activeMap;
         } catch (Exception e) {
             BotLogger.log(mapFile.getName() + "JSON FAILED TO LOAD", e);
             // System.out.println(mapFile.getAbsolutePath());
@@ -809,11 +813,11 @@ public class MapSaveLoadManager {
     @Nullable
     private static Map loadMap(File mapFile) {
         if (mapFile != null) {
-            Map map = new Map();
+            Map activeMap = new Map();
             try (Scanner myReader = new Scanner(mapFile)) {
-                map.setOwnerID(myReader.nextLine());
-                map.setOwnerName(myReader.nextLine());
-                map.setName(myReader.nextLine());
+                activeMap.setOwnerID(myReader.nextLine());
+                activeMap.setOwnerName(myReader.nextLine());
+                activeMap.setName(myReader.nextLine());
                 while (myReader.hasNextLine()) {
                     String data = myReader.nextLine();
                     if (MAPINFO.equals(data)) {
@@ -822,8 +826,8 @@ public class MapSaveLoadManager {
                     if (ENDMAPINFO.equals(data)) {
                         break;
                     }
-                   // map.setMapStatus(MapStatus.valueOf(data));
-                    map.setMapStatus(MapStatus.open);
+                   // activeMap.setMapStatus(MapStatus.valueOf(data));
+                    activeMap.setMapStatus(MapStatus.open);
 
                     while (myReader.hasNextLine()) {
                         data = myReader.nextLine();
@@ -834,9 +838,9 @@ public class MapSaveLoadManager {
                             break;
                         }
                         try {
-                            readGameInfo(map, data);
+                            readGameInfo(activeMap, data);
                         } catch (Exception e) {
-                            BotLogger.log("Data is bad: " + map.getName(), e);
+                            BotLogger.log("Data is bad: " + activeMap.getName(), e);
                         }
                     }
 
@@ -854,13 +858,13 @@ public class MapSaveLoadManager {
                             tmpData = null;
                             if (PLAYER.equals(data)) {
 
-                                player = map.addPlayerLoad(myReader.nextLine(), myReader.nextLine());
+                                player = activeMap.addPlayerLoad(myReader.nextLine(), myReader.nextLine());
                                 continue;
                             }
                             if (ENDPLAYER.equals(data)) {
                                 break;
                             }
-                            readPlayerInfo(player, data, map);
+                            readPlayerInfo(player, data, activeMap);
                         }
                     }
                 }
@@ -877,7 +881,7 @@ public class MapSaveLoadManager {
                         if (tileData.isEmpty()) {
                             continue;
                         }
-                        Tile tile = readTile(tileData, map);
+                        Tile tile = readTile(tileData, activeMap);
                         if (tile != null) {
                             tileMap.put(tile.getPosition(), tile);
                         }
@@ -899,7 +903,7 @@ public class MapSaveLoadManager {
                                     if (Constants.MIRAGE.equals(spaceHolder)) {
                                         Helper.addMirageToTile(tile);
                                     } else if (!tile.isSpaceHolderValid(spaceHolder)) {
-                                        BotLogger.log(map.getName() + ": Not valid space holder detected: " + spaceHolder);
+                                        BotLogger.log(activeMap.getName() + ": Not valid space holder detected: " + spaceHolder);
                                     }
                                     continue;
                                 }
@@ -946,71 +950,73 @@ public class MapSaveLoadManager {
                 } catch (Exception e) {
                     BotLogger.log("Data read error: " + mapFile.getName(), e);
                 }
-                map.setTileMap(tileMap);
+                activeMap.setTileMap(tileMap);
             } catch (FileNotFoundException e) {
                 BotLogger.log("File not found to read map data: " + mapFile.getName(), e);
             } catch (Exception e) {
                 BotLogger.log("Data read error: " + mapFile.getName(), e);
             }
 
-            map.endGameIfOld();
-            return map;
+            activeMap.endGameIfOld();
+            return activeMap;
         } else {
             BotLogger.log("Could not save map, error creating save file");
         }
         return null;
     }
 
-    private static void readGameInfo(Map map, String data) {
+    private static void readGameInfo(Map activeMap, String data) {
         String[] tokenizer = data.split(" ", 2);
         if (tokenizer.length == 2) {
             String identification = tokenizer[0];
             String info = tokenizer[1];
             switch (identification) {
-                case Constants.LATEST_COMMAND -> map.setLatestCommand(info);
-                case Constants.LATEST_OUTCOME_VOTED_FOR -> map.setLatestOutcomeVotedFor(info);
-                case Constants.SO -> map.setSecretObjectives(getCardList(info));
-                case Constants.AC -> map.setActionCards(getCardList(info));
-                case Constants.PO1 -> map.setPublicObjectives1(getCardList(info));
-                case Constants.PO2 -> map.setPublicObjectives2(getCardList(info));
-                case Constants.SO_TO_PO -> map.setSoToPoList(getCardList(info));
-                case Constants.PURGED_PN -> map.setPurgedPNs(getCardList(info));
-                case Constants.REVEALED_PO -> map.setRevealedPublicObjectives(getParsedCards(info));
-                case Constants.CUSTOM_PO_VP -> map.setCustomPublicVP(getParsedCards(info));
-                case Constants.SCORED_PO -> map.setScoredPublicObjectives(getParsedCardsForScoredPO(info));
+                case Constants.LATEST_COMMAND -> activeMap.setLatestCommand(info);
+                case Constants.LATEST_OUTCOME_VOTED_FOR -> activeMap.setLatestOutcomeVotedFor(info);
+                case Constants.LATEST_AFTER_MSG -> activeMap.setLatestAfterMsg(info);
+                case Constants.LATEST_WHEN_MSG -> activeMap.setLatestWhenMsg(info);
+                case Constants.SO -> activeMap.setSecretObjectives(getCardList(info));
+                case Constants.AC -> activeMap.setActionCards(getCardList(info));
+                case Constants.PO1 -> activeMap.setPublicObjectives1(getCardList(info));
+                case Constants.PO2 -> activeMap.setPublicObjectives2(getCardList(info));
+                case Constants.SO_TO_PO -> activeMap.setSoToPoList(getCardList(info));
+                case Constants.PURGED_PN -> activeMap.setPurgedPNs(getCardList(info));
+                case Constants.REVEALED_PO -> activeMap.setRevealedPublicObjectives(getParsedCards(info));
+                case Constants.CUSTOM_PO_VP -> activeMap.setCustomPublicVP(getParsedCards(info));
+                case Constants.SCORED_PO -> activeMap.setScoredPublicObjectives(getParsedCardsForScoredPO(info));
                 case Constants.CUSTOM_ADJACENT_TILES -> {
 
                     LinkedHashMap<String, List<String>> adjacentTiles = getParsedCardsForScoredPO(info);
                     LinkedHashMap<String, List<String>> adjacentTilesMigrated = new LinkedHashMap<>();
                     for (java.util.Map.Entry<String, List<String>> entry : adjacentTiles.entrySet()) {
                         String key = entry.getKey();
-                        key = migratePosition(map, key);
+                        key = migratePosition(activeMap, key);
 
                         List<String> migrated = new ArrayList<>();
                         for (String value : entry.getValue()) {
-                            value = migratePosition(map, value);
+                            value = migratePosition(activeMap, value);
                             migrated.add(value);
                         }
                         adjacentTilesMigrated.put(key, migrated);
                     }
 
-                    map.setCustomAdjacentTiles(adjacentTilesMigrated);
+                    activeMap.setCustomAdjacentTiles(adjacentTilesMigrated);
                 }
                 case Constants.ADJACENCY_OVERRIDES -> {
                     try {
-                        map.setAdjacentTileOverride(getParsedAdjacencyOverrides(info, map));
+                        activeMap.setAdjacentTileOverride(getParsedAdjacencyOverrides(info, activeMap));
                     } catch (Exception e) {
                         BotLogger.log("Failed to load adjacency overrides", e);
                     }
                 }
-                case Constants.AGENDAS -> map.setAgendas(getCardList(info));
-                case Constants.AC_DISCARDED -> map.setDiscardActionCards(getParsedCards(info));
-                case Constants.DISCARDED_AGENDAS -> map.setDiscardAgendas(getParsedCards(info));
-                case Constants.SENT_AGENDAS -> map.setSentAgendas(getParsedCards(info));
-                case Constants.LAW -> map.setLaws(getParsedCards(info));
-                case Constants.EXPLORE -> map.setExploreDeck(getCardList(info));
-                case Constants.RELICS -> map.setRelics(getCardList(info));
-                case Constants.DISCARDED_EXPLORES -> map.setExploreDiscard(getCardList(info));
+                case Constants.AGENDAS -> activeMap.setAgendas(getCardList(info));
+                case Constants.AC_DISCARDED -> activeMap.setDiscardActionCards(getParsedCards(info));
+                case Constants.DISCARDED_AGENDAS -> activeMap.setDiscardAgendas(getParsedCards(info));
+                case Constants.SENT_AGENDAS -> activeMap.setSentAgendas(getParsedCards(info));
+                case Constants.LAW -> activeMap.setLaws(getParsedCards(info));
+                case Constants.EXPLORE -> activeMap.setExploreDeck(getCardList(info));
+                case Constants.RELICS -> activeMap.setRelics(getCardList(info));
+                case Constants.DISCARDED_EXPLORES -> activeMap.setExploreDiscard(getCardList(info));
                 case Constants.LAW_INFO -> {
                     StringTokenizer actionCardToken = new StringTokenizer(info, ";");
                     LinkedHashMap<String, String> cards = new LinkedHashMap<>();
@@ -1020,7 +1026,7 @@ public class MapSaveLoadManager {
                         String value = cardInfo.nextToken();
                         cards.put(id, value);
                     }
-                    map.setLawsInfo(cards);
+                    activeMap.setLawsInfo(cards);
                 }
                 case Constants.SC_TRADE_GOODS -> {
                     StringTokenizer scTokenizer = new StringTokenizer(info, ";");
@@ -1031,15 +1037,15 @@ public class MapSaveLoadManager {
                         Integer value = Integer.parseInt(cardInfo.nextToken());
                         scTradeGoods.put(id, value);
                     }
-                    map.setScTradeGoods(scTradeGoods);
+                    activeMap.setScTradeGoods(scTradeGoods);
                 }
-                case Constants.SPEAKER -> map.setSpeaker(info);
-                case Constants.ACTIVE_PLAYER -> map.setActivePlayer(info);
+                case Constants.SPEAKER -> activeMap.setSpeaker(info);
+                case Constants.ACTIVE_PLAYER -> activeMap.setActivePlayer(info);
                 case Constants.LAST_ACTIVE_PLAYER_PING -> {
                     try {
                         long millis = Long.parseLong(info);
                         Date lastPing = new Date(millis);
-                        map.setLastActivePlayerPing(lastPing);
+                        activeMap.setLastActivePlayerPing(lastPing);
                     } catch (Exception e) {
                         // do nothing
                     }
@@ -1048,7 +1054,7 @@ public class MapSaveLoadManager {
                     try {
                         long millis = Long.parseLong(info);
                         Date lastGameCheck = new Date(millis);
-                        map.setLastTimeGamesChecked(lastGameCheck);
+                        activeMap.setLastTimeGamesChecked(lastGameCheck);
                     } catch (Exception e) {
                         // do nothing
                     }
@@ -1056,22 +1062,19 @@ public class MapSaveLoadManager {
                 case Constants.AUTO_PING-> {
                     try {
                         int pnghrs = Integer.parseInt(info);
-                        if (pnghrs != 0)
-                        {
-                            map.setAutoPing(true);  
+                        if (pnghrs != 0) {
+                            activeMap.setAutoPing(true);
+                        } else {
+                            activeMap.setAutoPing(false);
                         }
-                        else
-                        {
-                            map.setAutoPing(false);
-                        }
-                        map.setAutoPingSpacer(pnghrs);
+                        activeMap.setAutoPingSpacer(pnghrs);
                     } catch (Exception e) {
                         // do nothing
                     }
                 }
                 case Constants.CURRENT_AGENDA_INFO-> {
                     try {
-                        map.setCurrentAgendaInfo(info);
+                        activeMap.setCurrentAgendaInfo(info);
                     } catch (Exception e) {
                         // do nothing
                     }
@@ -1081,7 +1084,7 @@ public class MapSaveLoadManager {
                     try {
                         Long millis = Long.parseLong(info);
                         Date lastChange = new Date(millis);
-                        map.setLastActivePlayerChange(lastChange);
+                        activeMap.setLastActivePlayerChange(lastChange);
                     } catch (Exception e) {
                         // do nothing
                     }
@@ -1090,41 +1093,41 @@ public class MapSaveLoadManager {
                     try {
                         int playerCount = Integer.parseInt(info);
                         if (playerCount >= 2 && playerCount <= 30) {
-                            map.setPlayerCountForMap(playerCount);
+                            activeMap.setPlayerCountForMap(playerCount);
                         } else {
-                            map.setPlayerCountForMap(6);
+                            activeMap.setPlayerCountForMap(6);
                         }
                     } catch (Exception e) {
-                        map.setPlayerCountForMap(6);
+                        activeMap.setPlayerCountForMap(6);
                     }
                 }
                 case Constants.RING_COUNT_FOR_MAP -> {
                     try {
                         int ringCount = Integer.parseInt(info);
                         if (ringCount >= 3 && ringCount <= 8) {
-                            map.setRingCount(ringCount);
+                            activeMap.setRingCount(ringCount);
                         } else {
-                            map.setRingCount(3);
+                            activeMap.setRingCount(3);
                         }
                     } catch (Exception e) {
-                        map.setRingCount(3);
+                        activeMap.setRingCount(3);
                     }
                 }
                 case Constants.VP_COUNT -> {
                     try {
                         int vpCount = Integer.parseInt(info);
-                        map.setVp(vpCount);
+                        activeMap.setVp(vpCount);
                     } catch (Exception e) {
-                        map.setVp(10);
+                        activeMap.setVp(10);
                     }
                 }
                 case Constants.DISPLAY_TYPE -> {
                     if (info.equals(DisplayType.stats.getValue())) {
-                        map.setDisplayTypeForced(DisplayType.stats);
+                        activeMap.setDisplayTypeForced(DisplayType.stats);
                     } else if (info.equals(DisplayType.map.getValue())) {
-                        map.setDisplayTypeForced(DisplayType.map);
+                        activeMap.setDisplayTypeForced(DisplayType.map);
                     } else if (info.equals(DisplayType.all.getValue())) {
-                        map.setDisplayTypeForced(DisplayType.all);
+                        activeMap.setDisplayTypeForced(DisplayType.all);
                     }
                 }
                 case Constants.SC_PLAYED -> {
@@ -1133,8 +1136,8 @@ public class MapSaveLoadManager {
                         StringTokenizer dataInfo = new StringTokenizer(scPlayed.nextToken(), ",");
                         Integer scID = Integer.parseInt(dataInfo.nextToken());
                         Boolean status = Boolean.parseBoolean(dataInfo.nextToken());
-                        map.setSCPlayed(scID, status);
-                    }                    
+                        activeMap.setSCPlayed(scID, status);
+                    }
                 }
                 case Constants.AGENDA_VOTE_INFO -> {
                     StringTokenizer vote_info = new StringTokenizer(info, ":");
@@ -1142,31 +1145,29 @@ public class MapSaveLoadManager {
                         StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
                         String outcome = null;
                         String voteInfo = null;
-                        if(dataInfo.hasMoreTokens())
-                        {
+                        if (dataInfo.hasMoreTokens()) {
                             outcome = dataInfo.nextToken();
                         }
-                        if(dataInfo.hasMoreTokens())
-                        {
+                        if (dataInfo.hasMoreTokens()) {
                             voteInfo = dataInfo.nextToken();
-                            map.setCurrentAgendaVote(outcome, voteInfo);
+                            activeMap.setCurrentAgendaVote(outcome, voteInfo);
                         }
-                    }                    
+                    }
                 }
-                case Constants.GAME_CUSTOM_NAME -> map.setCustomName(info);
+                case Constants.GAME_CUSTOM_NAME -> activeMap.setCustomName(info);
                 case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER -> {
-                    map.setPlayersWhoHitPersistentNoAfter(info);
+                    activeMap.setPlayersWhoHitPersistentNoAfter(info);
                 }
-                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN -> map.setPlayersWhoHitPersistentNoWhen(info);
-                case Constants.TABLE_TALK_CHANNEL ->  map.setTableTalkChannelID(info);
-                case Constants.MAIN_GAME_CHANNEL -> map.setMainGameChannelID(info);
-                case Constants.BOT_MAP_CHANNEL -> map.setBotMapUpdatesThreadID(info);
+                case Constants.PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN -> activeMap.setPlayersWhoHitPersistentNoWhen(info);
+                case Constants.TABLE_TALK_CHANNEL ->  activeMap.setTableTalkChannelID(info);
+                case Constants.MAIN_GAME_CHANNEL -> activeMap.setMainGameChannelID(info);
+                case Constants.BOT_MAP_CHANNEL -> activeMap.setBotMapUpdatesThreadID(info);
 
                 //GAME MODES
                 case Constants.TIGL_GAME -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        map.setCompetitiveTIGLGame(value);
+                        activeMap.setCompetitiveTIGLGame(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1174,7 +1175,7 @@ public class MapSaveLoadManager {
                 case Constants.HACK_ELECTION_STATUS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        map.setHackElectionStatus(value);
+                        activeMap.setHackElectionStatus(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1182,7 +1183,7 @@ public class MapSaveLoadManager {
                 case Constants.CC_N_PLASTIC_LIMIT -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        map.setCCNPlasticLimit(value);
+                        activeMap.setCCNPlasticLimit(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1190,7 +1191,7 @@ public class MapSaveLoadManager {
                 case Constants.COMMUNITY_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        map.setCommunityMode(value);
+                        activeMap.setCommunityMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1198,7 +1199,7 @@ public class MapSaveLoadManager {
                 case Constants.ALLIANCE_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        map.setAllianceMode(value);
+                        activeMap.setAllianceMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1206,7 +1207,23 @@ public class MapSaveLoadManager {
                 case Constants.FOW_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        map.setFoWMode(value);
+                        activeMap.setFoWMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.BASE_GAME_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeMap.setBaseGameMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.LIGHT_FOG_MODE -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeMap.setLightFogMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1214,7 +1231,7 @@ public class MapSaveLoadManager {
                 case Constants.HOMEBREW_SC_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        map.setHomeBrewSCMode(value);
+                        activeMap.setHomeBrewSCMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1222,7 +1239,7 @@ public class MapSaveLoadManager {
                 case Constants.STRAT_PINGS -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        map.setStratPings(value);
+                        activeMap.setStratPings(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1230,7 +1247,7 @@ public class MapSaveLoadManager {
                 case Constants.LARGE_TEXT -> {
                     try {
                         String value = info;
-                        map.setLargeText(value);
+                        activeMap.setLargeText(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1238,7 +1255,7 @@ public class MapSaveLoadManager {
                 case Constants.ABSOL_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        map.setAbsolMode(value);
+                        activeMap.setAbsolMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1246,7 +1263,7 @@ public class MapSaveLoadManager {
                 case Constants.DISCORDANT_STARS_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        map.setDiscordantStarsMode(value);
+                        activeMap.setDiscordantStarsMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1254,7 +1271,7 @@ public class MapSaveLoadManager {
                 case Constants.VERBOSITY -> {
                     try {
                         String value = info;
-                        map.setOutputVerbosity(value);
+                        activeMap.setOutputVerbosity(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1262,7 +1279,7 @@ public class MapSaveLoadManager {
                 case Constants.BETA_TEST_MODE -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        map.setTestBetaFeaturesMode(value);
+                        activeMap.setTestBetaFeaturesMode(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
@@ -1270,16 +1287,16 @@ public class MapSaveLoadManager {
                 case Constants.GAME_HAS_ENDED -> {
                     try {
                         boolean value = Boolean.parseBoolean(info);
-                        map.setHasEnded(value);
+                        activeMap.setHasEnded(value);
                     } catch (Exception e) {
                         //Do nothing
                     }
                 }
-                case Constants.CREATION_DATE -> map.setCreationDate(info);
+                case Constants.CREATION_DATE -> activeMap.setCreationDate(info);
                 case Constants.ROUND -> {
                     String roundNumber = info;
                     try {
-                        map.setRound(Integer.parseInt(roundNumber));
+                        activeMap.setRound(Integer.parseInt(roundNumber));
                     } catch (Exception exception) {
                         BotLogger.log("Could not parse round number", exception);
                     }
@@ -1287,7 +1304,7 @@ public class MapSaveLoadManager {
                 case Constants.LAST_MODIFIED_DATE -> {
                     String lastModificationDate = info;
                     try {
-                        map.setLastModifiedDate(Long.parseLong(lastModificationDate));
+                        activeMap.setLastModifiedDate(Long.parseLong(lastModificationDate));
                     } catch (Exception exception) {
                         BotLogger.log("Could not parse last modified date", exception);
                     }
@@ -1336,7 +1353,7 @@ public class MapSaveLoadManager {
         return scoredPOs;
     }
 
-    private static LinkedHashMap<Pair<String, Integer>, String> getParsedAdjacencyOverrides(String tokenizer, Map map) {
+    private static LinkedHashMap<Pair<String, Integer>, String> getParsedAdjacencyOverrides(String tokenizer, Map activeMap) {
 
         StringTokenizer override = new StringTokenizer(tokenizer, ";");
         LinkedHashMap<Pair<String, Integer>, String> overrides = new LinkedHashMap<>();
@@ -1346,8 +1363,8 @@ public class MapSaveLoadManager {
             String direction = overrideInfo[1];
             String secondaryTile = overrideInfo[2];
 
-            primaryTile = migratePosition(map, primaryTile);
-            secondaryTile = migratePosition(map, secondaryTile);
+            primaryTile = migratePosition(activeMap, primaryTile);
+            secondaryTile = migratePosition(activeMap, secondaryTile);
 
             Pair<String, Integer> primary = new ImmutablePair<String, Integer>(primaryTile, Integer.parseInt(direction));
             overrides.put(primary, secondaryTile);
@@ -1355,9 +1372,9 @@ public class MapSaveLoadManager {
         return overrides;
     }
 
-    private static String migratePosition(Map map, String primaryTile) {
+    private static String migratePosition(Map activeMap, String primaryTile) {
         if (!PositionMapper.isTilePositionValid(primaryTile)) {
-            if (map.getRingCount() == 8) {
+            if (activeMap.getRingCount() == 8) {
                 primaryTile = PositionMapper.getMigrate8RingsPosition(primaryTile);
             } else {
                 primaryTile = PositionMapper.getMigratePosition(primaryTile);
@@ -1366,7 +1383,7 @@ public class MapSaveLoadManager {
         return primaryTile;
     }
 
-    private static void readPlayerInfo(Player player, String data, Map map) {
+    private static void readPlayerInfo(Player player, String data, Map activeMap) {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.countTokens() == 2) {
             data = tokenizer.nextToken();
@@ -1449,7 +1466,8 @@ public class MapSaveLoadManager {
                         List<Leader> leaderList = new ArrayList<>();
                         while (leaderInfos.hasMoreTokens()) {
                             String[] split = leaderInfos.nextToken().split(",");
-                            Leader leader = new Leader(split[0], split[1]);
+                            Leader leader = new Leader(split[0]);
+                            // leader.setType(Integer.parseInt(split[1])); // type is set in constructor based on ID
                             leader.setTgCount(Integer.parseInt(split[2]));
                             leader.setExhausted(Boolean.parseBoolean(split[3]));
                             leader.setLocked(Boolean.parseBoolean(split[4]));
@@ -1468,7 +1486,7 @@ public class MapSaveLoadManager {
                         StringTokenizer fow_systems = new StringTokenizer(tokenizer.nextToken(), ";");
                         while (fow_systems.hasMoreTokens()) {
                             String[] system = fow_systems.nextToken().split(",");
-                            String position = migratePosition(map, system[0]);
+                            String position = migratePosition(activeMap, system[0]);
                             String tileID = system[1];
                             String label = system[2];
                             if (label != null) label = label.replaceAll("—", " "); //replace em dash with spaces
@@ -1512,7 +1530,7 @@ public class MapSaveLoadManager {
                         player.addFragment(fragments.nextToken());
                     }
                 }
-                
+
                 case Constants.NUMBER_OF_TURNS -> player.setNumberTurns(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TOTAL_TURN_TIME -> player.setTotalTurnTime(Long.parseLong(tokenizer.nextToken()));
                 case Constants.FOG_FILTER -> {
@@ -1530,8 +1548,8 @@ public class MapSaveLoadManager {
             }
         }
     }
-    
-    private static Tile readTile(String tileData, Map map) {
+
+    private static Tile readTile(String tileData, Map activeMap) {
         StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
         String tileID = tokenizer.nextToken();
         String position = tokenizer.nextToken();
@@ -1540,17 +1558,16 @@ public class MapSaveLoadManager {
         }
         String tempPosition = position;
         if (!PositionMapper.isTilePositionValid(position)) {
-            if (map.getRingCount() == 8) {
+            if (activeMap.getRingCount() == 8) {
                 position = PositionMapper.getMigrate8RingsPosition(position);
             } else {
                 position = PositionMapper.getMigratePosition(position);
             }
             if (position == null) {
-                System.out.println(tempPosition + " " + map.getName());
+                System.out.println(tempPosition + " " + activeMap.getName());
             }
         }
-        if (tileID.equalsIgnoreCase("setup6") || tileID.equalsIgnoreCase("setup8"))
-        {
+        if (tileID.equalsIgnoreCase("setup6") || tileID.equalsIgnoreCase("setup8")) {
             tileID = "setup";
         }
         return new Tile(tileID, position);
@@ -1570,7 +1587,7 @@ public class MapSaveLoadManager {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
-            if (token.startsWith(Constants.COMMAND)) {
+            if (token.startsWith(Constants.COMMAND) || token.startsWith(Constants.SWEEP)) {
                 tile.addCC(token);
             } else if (token.startsWith(Constants.CONTROL)) {
                 tile.addControl(token, unitHolderName);

@@ -11,12 +11,12 @@ public class AbilityAdd extends AbilityAddRemove {
     public AbilityAdd() {
         super(Constants.ABILITY_ADD, "Add an ability to your faction");
     }
-    
+
     @Override
     public void doAction(Player player, List<String> abilityIDs) {
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(getEvent(), player)).append(" added abilities:\n");
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveMap())).append(" added abilities:\n");
         for (String abilityID : abilityIDs ){
-            if (player.getFactionAbilities().contains(abilityID)) {
+            if (player.hasAbility(abilityID)) {
                 sb.append("> ").append(abilityID).append(" (player had this ability)");
             } else {
                 sb.append("> ").append(AbilityInfo.getAbilityRepresentation(abilityID));

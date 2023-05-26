@@ -1,12 +1,10 @@
 package ti4.commands.game;
 
-import java.util.ArrayList;
-
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.Mapper;
+
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.map.Map;
@@ -30,8 +28,8 @@ public class Setup extends GameSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.AUTO_PING, "Hours between auto pings. Min 1. Enter 0 to turn off."));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.BETA_TEST_MODE, "True to test new features that may not be released to all games yet."));
         addOptions(new OptionData(OptionType.STRING, Constants.VERBOSITY, "Verbosity of bot output. Verbose/Average/Minimal  (Default = Verbose)").setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.HOMEBREW_SC_MODE, "Disable SC buttons. ON to turn on, or OFF to turn off."));
-
+       // addOptions(new OptionData(OptionType.STRING, Constants.HOMEBREW_SC_MODE, "Disable SC buttons. ON to turn on, or OFF to turn off."));
+       addOptions(new OptionData(OptionType.STRING, Constants.CC_N_PLASTIC_LIMIT, "Pings for exceeding limits. ON to turn on. OFF to turn off"));
 
     }
 
@@ -157,17 +155,14 @@ public class Setup extends GameSubcommandData {
         OptionMapping pingHours = event.getOption(Constants.AUTO_PING);
         if (pingHours != null) {
             int pinghrs = pingHours.getAsInt();
-            if(pinghrs == 0)
-            {
+            if (pinghrs == 0) {
                 activeMap.setAutoPing(false);
                 activeMap.setAutoPingSpacer(pinghrs);
-            }
-            else
-            {
+            } else {
                 activeMap.setAutoPing(true);
                 if (pinghrs < 1){
                     pinghrs = 1;
-                } 
+                }
                 activeMap.setAutoPingSpacer(pinghrs);
             }
         }

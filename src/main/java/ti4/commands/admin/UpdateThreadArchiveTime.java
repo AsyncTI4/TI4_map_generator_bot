@@ -1,6 +1,5 @@
 package ti4.commands.admin;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -42,7 +41,7 @@ public class UpdateThreadArchiveTime extends AdminSubcommandData {
             sendMessage("Must pick autoArchive duration from the list");
             return;
         }
-        
+
         Guild guild = event.getGuild();
         if (guild == null) {
             sendMessage("What did you do wrong this time?");
@@ -59,5 +58,5 @@ public class UpdateThreadArchiveTime extends AdminSubcommandData {
         }
         sendMessage(sb.toString());
     }
-    
+
 }

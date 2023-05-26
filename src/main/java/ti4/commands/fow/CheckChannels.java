@@ -1,21 +1,18 @@
 package ti4.commands.fow;
 
-import java.util.Date;
-
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
-import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class CheckChannels extends FOWSubcommandData {
-    
-    
+
+
     public CheckChannels() {
         super(Constants.CHECK_CHANNELS, "Ping each channel that is set up");
     }
@@ -42,7 +39,7 @@ public class CheckChannels extends FOWSubcommandData {
                 output.append(channel.getAsMention());
             }
             output.append(" - ");
-            
+
             Role roleForCommunity = player.getRoleForCommunity();
             if (roleForCommunity == null) {
                 output.append("No community role");

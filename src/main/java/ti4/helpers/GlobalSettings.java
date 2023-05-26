@@ -23,7 +23,7 @@ public class GlobalSettings {
     }
 
     public static <T> T getSetting(String attr, Class<T> clazz, T def) {
-        if(!settings.containsKey(attr))
+        if (!settings.containsKey(attr))
             return def;
         return clazz.cast(settings.get(attr));
     }

@@ -60,8 +60,8 @@ public class ZelianHero extends DiscordantStarsSubcommandData {
             }
         }
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
-        activeMap.removeTile(tile.getPosition());      
-        
+        activeMap.removeTile(tile.getPosition());
+
         //Add the zelian asteroid field to the map and copy over the space unitholder
         Tile asteroidTile = new Tile(AliasHandler.resolveTile("D36"), tile.getPosition(), space);
         activeMap.setTile(asteroidTile);

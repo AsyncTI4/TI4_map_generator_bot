@@ -1,6 +1,6 @@
 package ti4.commands.player;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -11,8 +11,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -36,10 +34,6 @@ public class SCPick extends PlayerSubcommandData {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
-        
-        Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
-        boolean isFowPrivateGame = (privateGame != null && privateGame);
-        
         if (player == null) {
             sendMessage("You're not a player of this game");
             return;
@@ -51,14 +45,14 @@ public class SCPick extends PlayerSubcommandData {
         int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
 
         int playerSCCount = player.getSCs().size();
-        if (playerSCCount >= maxSCsPerPlayer) { 
+        if (playerSCCount >= maxSCsPerPlayer) {
             sendMessage("Player can not pick another SC. Max SC per player for this game is " + maxSCsPerPlayer);
             return;
         }
-        
+
         OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
         int scPicked = option.getAsInt();
-        
+
         Stats stats = new Stats();
         boolean pickSuccessful = stats.pickSC(event, activeMap, player, option);
         LinkedHashSet<Integer> playerSCs = player.getSCs();
@@ -66,36 +60,56 @@ public class SCPick extends PlayerSubcommandData {
             if (activeMap.isFoWMode()) {
                 String[] scs = {Constants.SC2, Constants.SC3, Constants.SC4, Constants.SC5, Constants.SC6};
                 int c = 0;
-                while(playerSCs.isEmpty() && c < 5)
-                {
+                while(playerSCs.isEmpty() && c < 5 && !pickSuccessful){
                     if (event.getOption(scs[c]) != null)
                     {
-                        stats.pickSC(event, activeMap, player, event.getOption(scs[c]));
+                        pickSuccessful = stats.pickSC(event, activeMap, player, event.getOption(scs[c]));
                     }
                     playerSCs = player.getSCs();
                     c++;
                 }
             }
-            return;
+            if(!pickSuccessful)
+            {
+                return;
+            }
+            
         }
-        
+
 
         //ONLY DEAL WITH EXTRA PICKS IF IN FoW
-        
+
 
         if (playerSCs.isEmpty()) {
             sendMessage("No SC picked.");
             return;
         }
+        secondHalfOfSCPick(event, player, activeMap, scPicked);
+    }
+
         
+
+
+    public void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Map activeMap, int scPicked)
+    {
+        Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
+        boolean isFowPrivateGame = (privateGame != null && privateGame);
         String msg = "";
         String msgExtra = "";
         boolean allPicked = true;
         Player privatePlayer = null;
-        
+        Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
+                .filter(player_ -> player_.isRealPlayer())
+                .collect(Collectors.toList());
+        int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
+
         StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(event, player, true));
-        sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(event, scPicked));
+        sb.append(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true));
+        if (!activeMap.isHomeBrewSCMode()) {
+            sb.append(" Picked: ").append(Helper.getSCFrontRepresentation(event, scPicked));
+        } else {
+            sb.append(" Picked: ").append(("SC #"+scPicked));
+        }
 
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
@@ -106,7 +120,7 @@ public class SCPick extends PlayerSubcommandData {
             }
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += Helper.getPlayerRepresentation(event, player_, true) + " To Pick SC";
+                msgExtra += Helper.getPlayerRepresentation(player_, activeMap, event.getGuild(), true) + " To Pick SC";
                 privatePlayer = player_;
                 allPicked = false;
                 break;
@@ -118,7 +132,7 @@ public class SCPick extends PlayerSubcommandData {
                 players.add(player_);
             }
         }
-        
+
         //INFORM ALL PLAYER HAVE PICKED
         if (allPicked) {
             msgExtra += Helper.getGamePing(event, activeMap) + "\nAll players picked SC";
@@ -128,7 +142,7 @@ public class SCPick extends PlayerSubcommandData {
             for (Player player_ : activePlayers) {
                 scPickedList.addAll(player_.getSCs());
             }
-            
+
             //ADD A TG TO UNPICKED SC
             for (Integer scNumber : scTradeGoods.keySet()) {
                 if (!scPickedList.contains(scNumber) && scNumber != 0) {
@@ -155,28 +169,38 @@ public class SCPick extends PlayerSubcommandData {
 
             //INFORM FIRST PLAYER IS UP FOR ACTION
             if (nextPlayer != null) {
-                msgExtra += " " + Helper.getPlayerRepresentation(event, nextPlayer) + " is up for an action";
+                msgExtra += " " + Helper.getPlayerRepresentation(nextPlayer, activeMap) + " is up for an action";
                 privatePlayer = nextPlayer;
                 activeMap.updateActivePlayer(nextPlayer);
             }
         }
         msg = sb.toString();
-        sendMessage(msg);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame ) {
             if (allPicked) {
-                msgExtra = Helper.getPlayerRepresentation(event, privatePlayer, true) + " UP NEXT";
+                msgExtra = Helper.getPlayerRepresentation(privatePlayer, activeMap, event.getGuild(), true) + " UP NEXT";
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(privatePlayer, activeMap, event, msgExtra, fail, success);
+            if(!allPicked&& !activeMap.isHomeBrewSCMode())
+            {
+                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+            }
+
         } else {
             if (allPicked) {
                 ListTurnOrder.turnOrder(event, activeMap);
             }
             if (!msgExtra.isEmpty()) {
-                sendMessage(msgExtra);
+                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
+                if(!allPicked && !activeMap.isHomeBrewSCMode())
+                {
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                }
+
             }
         }
     }
