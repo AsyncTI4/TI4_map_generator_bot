@@ -182,7 +182,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         if (activeMap.isFoWMode()) {
             sb.append(" vote count: **???**");
             return sb.toString();
-        } else if (player.hasAbility("galactic_threat") && !Helper.playerHasXxchaCommanderUnlocked(activeMap, player)) {
+        } else if (player.hasAbility("galactic_threat") && !Helper.playerHasXxchaCommanderUnlockedOrAlliance(activeMap, player)) {
             sb.append(" NOT VOTING (Galactic Threat)");
             return sb.toString();
         } else if (Helper.playerHasXxchaHeroUnlocked(player)) {
@@ -215,7 +215,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         planets.removeAll(player.getExhaustedPlanets());
 
         //NEKRO unless XXCHA ALLIANCE
-        if (player.hasAbility("galactic_threat") && !Helper.playerHasXxchaCommanderUnlocked(activeMap, player)) {
+        if (player.hasAbility("galactic_threat") && !Helper.playerHasXxchaCommanderUnlockedOrAlliance(activeMap, player)) {
             return 0;
         }
 
@@ -258,7 +258,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         }
 
         //Xxcha Alliance
-        if (Helper.playerHasXxchaCommanderUnlocked(activeMap, player)) {
+        if (Helper.playerHasXxchaCommanderUnlockedOrAlliance(activeMap, player)) {
             Set<String> planets = new HashSet<>(player.getPlanets());
             planets.removeAll(player.getExhaustedPlanets());
             int readyPlanetCount = planets.size();
