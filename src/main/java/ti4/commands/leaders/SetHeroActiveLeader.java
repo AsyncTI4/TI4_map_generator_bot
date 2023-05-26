@@ -36,21 +36,20 @@ public class SetHeroActiveLeader extends LeaderAction {
     @Override
     void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
         Leader playerLeader = player.getLeader(leader);
-        String playerFaction = player.getFaction();
-
-        if (playerLeader != null && playerLeader.isLocked()) {
+        
+        if (playerLeader == null) {
+            sendMessage("Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
+            return;
+        }
+        
+        if (playerLeader.isLocked()) {
             sendMessage("Leader is locked, use command to unlock `/leaders unlock leader:" + leader + "`");
             sendMessage(Helper.getLeaderLockedRepresentation(playerLeader));
-            return;
-        } else if (playerLeader == null) {
-            sendMessage("Leader '" + leader + "'' could not be found. The leader might have been purged earlier.");
             return;
         }
 
         sendMessage(Helper.getFactionLeaderEmoji(playerLeader));
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
-            .append(" played ")
-            .append(Helper.getLeaderFullRepresentation(playerLeader));
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
 
         if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId())) {
             playerLeader.setLocked(false);
@@ -61,9 +60,9 @@ public class SetHeroActiveLeader extends LeaderAction {
             if (purged) {
                 sendMessage(message.toString() + " - Leader " + leader + " has been purged");
             } else {
-                sendMessage("Leader not found");
+                sendMessage("Leader was not purged - something went wrong");
             }
-            if (playerFaction.equals("titans")) {
+            if ("titanshero".equals(playerLeader.getId())) {
                 sendMessage("`Use the following command to add the attachment: /add_token token:titanshero`");
             }
         }
