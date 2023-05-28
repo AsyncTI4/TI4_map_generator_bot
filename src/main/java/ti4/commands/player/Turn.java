@@ -152,15 +152,18 @@ public class Turn extends PlayerSubcommandData {
         for (Player player : activeMap.getPlayers().values()) {
             int sc = player.getLowestSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
-                try {
-                    if (!activeMap.isFoWMode() && activeMap.getLatestTransactionMsg() != null && activeMap.getLatestTransactionMsg() != "") {
-                        activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestTransactionMsg()).queue();
+                if(activeMap.isTestBetaFeaturesMode())
+                {
+                    try {
+                        if (!activeMap.isFoWMode() && activeMap.getLatestTransactionMsg() != null && activeMap.getLatestTransactionMsg() != "") {
+                            activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestTransactionMsg()).queue();
+                            activeMap.setLatestTransactionMsg("");
+                        }
                     }
-                  }
-                  catch(Exception e) {
-                    //  Block of code to handle errors
-                  }
-               
+                    catch(Exception e) {
+                        //  Block of code to handle errors
+                    }
+                }
                 String text = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " UP NEXT";
                 String buttonText = "Use buttons to do your turn. ";
                 List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeMap, false);
