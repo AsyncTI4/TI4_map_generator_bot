@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -63,6 +64,11 @@ public class SCPlay extends PlayerSubcommandData {
         }
 
         Integer scToPlay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
+        playSC(event, scToPlay, activeMap, mainGameChannel, player);
+
+    }
+
+    public void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Map activeMap, MessageChannel mainGameChannel, Player player) {
         Integer scToDisplay = scToPlay;
         String pbd100group = null;
         boolean pbd100or500 = activeMap.getName().equals("pbd100") || activeMap.getName().equals("pbd500");
@@ -194,7 +200,7 @@ public class SCPlay extends PlayerSubcommandData {
         Button deleteButton = Button.danger("deleteButtons", "Do Another Action");
         conclusionButtons.add(endTurn);
         conclusionButtons.add(deleteButton);
-        MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to end turn or take another action.", conclusionButtons);
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to end turn or take another action.", conclusionButtons);
 
 
 
@@ -207,7 +213,7 @@ public class SCPlay extends PlayerSubcommandData {
                             if (activeMap.isFoWMode()) {
                                 MessageHelper.sendMessageToChannel(player2.getPrivateChannel(), acqMessage);
                             } else {
-                                MessageHelper.sendMessageToChannel(event.getChannel(), acqMessage);
+                                MessageHelper.sendMessageToChannel(event.getMessageChannel(), acqMessage);
                             }
                         }
                     }
