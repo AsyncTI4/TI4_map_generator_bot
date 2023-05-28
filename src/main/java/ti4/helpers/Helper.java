@@ -487,6 +487,20 @@ public class Helper {
         }
         return planetButtons;
     }
+    public static String getPlayerDependingOnFog(Map activeMap, Player player)
+    {
+        String ident = "";
+
+        if(activeMap.isFoWMode())
+        {
+            ident = player.getColor();
+        }
+        else
+        {
+            ident = Helper.getFactionIconFromDiscord(player.getFaction());
+        }
+        return ident;
+    }
     
     public static List<Button> getRemainingSCButtons(GenericInteractionCreateEvent event, Map activeMap) {
         List<Button> scButtons = new ArrayList<>();

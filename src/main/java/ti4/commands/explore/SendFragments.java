@@ -3,6 +3,7 @@ package ti4.commands.explore;
 import java.util.ArrayList;
 
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -45,6 +46,10 @@ public class SendFragments extends ExploreSubcommandData {
         if (countOption != null) {
         	count = countOption.getAsInt();
         }
+		sendFrags(event, sender, receiver, trait, count, activeMap);
+
+	}
+	public void sendFrags(GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Map activeMap) {
 
         ArrayList<String> fragments = new ArrayList<>();
         for (String cardID : sender.getFragments()) {
@@ -77,7 +82,7 @@ public class SendFragments extends ExploreSubcommandData {
 		String p2 = Helper.getPlayerRepresentation(receiver, activeMap);
 		String fragString = count + " " + trait + " " + Helper.getEmojiFromDiscord(emojiName) + " relic fragments";
 		String message =  p1 + " sent " + fragString + " to " + p2;
-		sendMessage(message);
+		MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
 
 		if (activeMap.isFoWMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
