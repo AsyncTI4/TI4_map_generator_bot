@@ -1368,7 +1368,10 @@ public class Map {
     public boolean discardSpecificAgenda(String agendaID) {
         
         boolean succeeded = agendas.remove(agendaID);
-        addDiscardAgenda(agendaID);
+        if(succeeded)
+        {
+            addDiscardAgenda(agendaID);
+        }
         return succeeded;
     }
 
