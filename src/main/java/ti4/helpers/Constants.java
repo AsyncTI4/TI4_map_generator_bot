@@ -417,7 +417,7 @@ public class Constants {
     public static final String SHUFFLE_AGENDAS = "shuffle_deck";
     public static final String RESET_AGENDAS = "reset_deck";
     public static final String RESET_DRAW_STATE_FOR_AGENDAS = "reset_draw_state_for_deck";
-    public static final String SHUFFLE_DISCARD_BACK_INTO_DECK = "shuffle_discard_back_into_deck";
+    public static final String PUT_DISCARD_BACK_INTO_DECK = "put_discard_back_into_deck";
     public static final String LOOK_AT_TOP = "look_at_top";
     public static final String LOOK_AT_BOTTOM = "look_at_bottom";
     public static final String REVEAL = "reveal";
@@ -436,6 +436,7 @@ public class Constants {
     public static final String MAKE_SO_INTO_PO = "so_into_po";
     public static final String SO_TO_PO = "so_to_po";
     public static final String REMOVE_CUSTOM = "po_remove_custom";
+    public static final String DISCARD_SPECIFIC_AGENDA = "discard_specific_agenda";
     public static final String REVEAL_STATGE2 = "po_reveal_stage2";
     public static final String SCORE_OBJECTIVE = "po_score";
     public static final String UNSCORE_OBJECTIVE = "po_unscore";
@@ -658,6 +659,7 @@ public class Constants {
     public static final String LATEST_OUTCOME_VOTED_FOR = "latest_outcome_voted_for";
     public static final String LATEST_AFTER_MSG = "latest_after_msg";
     public static final String LATEST_WHEN_MSG = "latest_when_msg";
+    public static final String LATEST_TRANSACTION_MSG = "latest_transaction_msg";
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER = "players_who_hit_persistent_no_after";
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN = "players_who_hit_persistent_no_when";
     public static final String HACK_ELECTION_STATUS = "hack_election_status";

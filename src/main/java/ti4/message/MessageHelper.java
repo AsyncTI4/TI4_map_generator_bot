@@ -14,10 +14,12 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import ti4.MapGenerator;
+import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
 import ti4.map.Map;
+import ti4.map.MapManager;
 import ti4.map.Player;
 
 import java.io.File;
@@ -161,6 +163,17 @@ public class MessageHelper {
 				channel.sendMessage(messageCreateData).queue();
 			} else { //last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
+
+					if(messageText.contains("Use buttons to do your turn"))
+					{
+						String gameName = channel.getName();
+						gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+						gameName = gameName.substring(0, gameName.indexOf("-"));
+						Map activeMap = MapManager.getInstance().getMap(gameName);
+						activeMap.setLatestTransactionMsg(complete.getId());
+
+					}
+					
 					if (restAction != null) restAction.run(complete);
 				});
 			}

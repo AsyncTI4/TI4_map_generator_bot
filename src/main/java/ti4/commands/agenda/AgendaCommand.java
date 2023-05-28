@@ -100,7 +100,7 @@ public class AgendaCommand implements Command {
         subcommands.add(new ResetAgendas());
         subcommands.add(new Cleanup());
         subcommands.add(new ResetDrawStateAgendas());
-        subcommands.add(new ShuffleDiscardBackIntoDeckAgendas());
+        subcommands.add(new PutDiscardBackIntoDeckAgendas());
         return subcommands;
     }
 

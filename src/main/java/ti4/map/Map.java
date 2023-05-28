@@ -50,6 +50,7 @@ public class Map {
 
     private String latestAfterMsg = "";
     private String latestWhenMsg = "";
+    private String latestTransactionMsg = "";
 
     private MiltyDraftManager miltyDraftManager;
     private boolean ccNPlasticLimit = true;
@@ -244,6 +245,9 @@ public class Map {
     public String getLatestWhenMsg() {
         return latestWhenMsg;
     }
+    public String getLatestTransactionMsg() {
+        return latestTransactionMsg;
+    }
 
     public void setLatestOutcomeVotedFor(String outcomeVotedFor) {
         latestOutcomeVotedFor = outcomeVotedFor;
@@ -253,6 +257,9 @@ public class Map {
     }
     public void setLatestWhenMsg(String latestWhen) {
         latestWhenMsg = latestWhen;
+    }
+    public void setLatestTransactionMsg(String latestTransaction) {
+        latestTransactionMsg = latestTransaction;
     }
 
 
@@ -1254,6 +1261,21 @@ public class Map {
         }
         return false;
     }
+    public boolean putBackIntoDeckOnTop(Integer idNumber) {
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
+            if (agendas.getValue().equals(idNumber)) {
+                id = agendas.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            discardAgendas.remove(id);
+            agendas.add(0, id);
+            return true;
+        }
+        return false;
+    }
 
     public boolean removeLaw(Integer idNumber) {
         String id = "";
@@ -1341,6 +1363,20 @@ public class Map {
         String id = agendas.remove(index);
         addDiscardAgenda(id);
         return id;
+    }
+
+    public boolean discardSpecificAgenda(String agendaID) {
+        
+        boolean succeeded = agendas.remove(agendaID);
+        addDiscardAgenda(agendaID);
+        return succeeded;
+    }
+
+    public boolean putSpecificAgendaOnTop(String agendaID) {
+        
+        boolean succeeded = agendas.remove(agendaID);
+        addDiscardAgenda(agendaID);
+        return succeeded;
     }
 
     
