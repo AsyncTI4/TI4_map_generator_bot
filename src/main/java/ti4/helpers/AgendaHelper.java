@@ -126,7 +126,7 @@ public class AgendaHelper {
                     
                     button = Button.secondary(prefix+"_"+so.getKey(), soName);
                 } else {
-                    button = Button.secondary(prefix+"rider_"+so.getKey()+"_"+rider, soName);
+                    button = Button.secondary("rider_"+so.getKey()+"_"+rider, soName);
                 }
                 secretButtons.add(button);
             }

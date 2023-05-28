@@ -213,7 +213,7 @@ public class Stats extends PlayerSubcommandData {
 		if (!player.getSCs().isEmpty()) {
 			sb.append("      ");
 			for (int sc: player.getSCs()) {
-				if (getActiveMap().getScPlayed().get(sc)) {
+				if (getActiveMap().getScPlayed() != null && getActiveMap().getScPlayed().get(sc)) {
 					sb.append(Helper.getSCBackEmojiFromInteger(sc));
 				} else {
 					sb.append(Helper.getSCEmojiFromInteger(sc));

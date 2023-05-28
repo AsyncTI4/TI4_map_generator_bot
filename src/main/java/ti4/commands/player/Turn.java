@@ -15,6 +15,7 @@ import org.apache.commons.collections4.ListUtils;
 
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -151,15 +152,32 @@ public class Turn extends PlayerSubcommandData {
         for (Player player : activeMap.getPlayers().values()) {
             int sc = player.getLowestSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
+                try {
+                    if (!activeMap.isFoWMode() && activeMap.getLatestTransactionMsg() != null && activeMap.getLatestTransactionMsg() != "") {
+                        activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestTransactionMsg()).queue();
+                    }
+                  }
+                  catch(Exception e) {
+                    //  Block of code to handle errors
+                  }
+               
                 String text = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " UP NEXT";
+                String buttonText = "Use buttons to do your turn. ";
+                List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeMap, false);
                 activeMap.updateActivePlayer(player);
                 if (isFowPrivateGame) {
                     String fail = "User for next faction not found. Report to ADMIN";
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, activeMap, event, text, fail, success);
+                    
                     if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
                         MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeMap, player));
                     }
+                    if(activeMap.isTestBetaFeaturesMode())
+                    {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(),buttonText, buttons);
+                    }
+                  
 
                     activeMap.setPingSystemCounter(0);
                     for (int x = 0; x < 10; x++) {
@@ -168,9 +186,15 @@ public class Turn extends PlayerSubcommandData {
                     return "";
                 } else {
                     MessageHelper.sendMessageToChannel(gameChannel, text);
+                   
                     if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
                         MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeMap, player));
                     }
+                    if(activeMap.isTestBetaFeaturesMode())
+                    {
+                        MessageHelper.sendMessageToChannelWithButtons(gameChannel,buttonText, buttons);
+                    }
+                    
                     return "";
                 }
             }

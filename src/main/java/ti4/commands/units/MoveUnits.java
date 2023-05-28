@@ -217,7 +217,11 @@ public class MoveUnits extends AddRemoveUnits {
                 }
             } else {
                 countToRemove = count;
-                Integer unitDamageCountInSystem = unitHolder.getUnitDamage().get(unitID);
+                Integer unitDamageCountInSystem =null;
+                if(unitHolder != null && unitHolder.getUnitDamage()!= null)
+                {
+                    unitDamageCountInSystem=unitHolder.getUnitDamage().get(unitID);
+                }
                 if (unitDamageCountInSystem != null) {
                     unitsDamage.put(unitID, Math.min(unitDamageCountInSystem, countToRemove));
                 }

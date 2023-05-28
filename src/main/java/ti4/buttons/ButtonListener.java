@@ -39,10 +39,12 @@ import ti4.commands.player.PlanetExhaust;
 import ti4.commands.player.PlanetRefresh;
 import ti4.commands.player.Stats;
 import ti4.commands.player.SCPick;
+import ti4.commands.player.SCPlay;
 import ti4.commands.player.Turn;
 import ti4.helpers.Constants;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -374,6 +376,11 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(event.getChannel(), message);
             event.getMessage().delete().queue();
         }
+        else if (buttonID.startsWith("strategicAction_")) {
+            int scNum= Integer.parseInt(buttonID.replace("strategicAction_", ""));
+            new SCPlay().playSC(event, scNum, activeMap, mainGameChannel, player);
+            event.getMessage().delete().queue();
+        }
         else if (buttonID.startsWith("resolve_explore_")) {
             String bID = buttonID.replace("resolve_explore_", "");
             String[] info = bID.split("_");
@@ -665,7 +672,8 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Diplod the system containing " + Helper.getPlanetRepresentation(planet, activeMap));
+            String ident = Helper.getFactionIconFromDiscord(player.getFaction()) + "";
+            MessageHelper.sendMessageToChannel(event.getChannel(), ident+ " chose to diplo the system containing " + Helper.getPlanetRepresentation(planet, activeMap));
             event.getMessage().delete().queue();
         }
         else if (buttonID.startsWith("delete_buttons_")) {
@@ -1322,6 +1330,23 @@ public class ButtonListener extends ListenerAdapter {
             }
             event.getMessage().delete().queue();
         }
+        else if (buttonID.startsWith("transactWith_")) {
+            String faction = buttonID.replace("transactWith_", "");
+            Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, faction);
+            List<Button> buttons = new ArrayList<Button>();
+            buttons = ButtonHelper.getStuffToTransButtons(activeMap, player, p2);
+            String message = Helper.getPlayerRepresentation(player, activeMap)+" Use the buttons to select what you want to transact";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+            event.getMessage().delete().queue();
+        }
+        else if (buttonID.startsWith("transact_")) {
+           ButtonHelper.resolveSpecificTransButtons(activeMap, player, buttonID, event);
+           event.getMessage().delete().queue();
+        }
+        else if (buttonID.startsWith("send_")) {
+            ButtonHelper.resolveSpecificTransButtonPress(activeMap, player, buttonID, event);
+            event.getMessage().delete().queue();
+         }
         else if (buttonID.startsWith("topAgenda_")) {
             String agendaNumID = buttonID.substring(buttonID.indexOf("_")+1, buttonID.length());
             new PutAgendaTop().putTop((GenericInteractionCreateEvent)event, Integer.parseInt(agendaNumID), activeMap);
@@ -1468,6 +1493,13 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
                     }
                 }
+                case "transaction" -> {
+                    List<Button> buttons = new ArrayList<Button>();
+                    buttons = ButtonHelper.getPlayersToTransact(activeMap, player);
+                    String message = Helper.getPlayerRepresentation(player, activeMap)+" Use the buttons to select which player you wish to transact with";
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                    
+                }
                 case "acquireATech" -> {
 
                     List<Button> buttons = new ArrayList<Button>();
@@ -1516,6 +1548,13 @@ public class ButtonListener extends ListenerAdapter {
                 case "no_sabotage" -> {
                     String message = activeMap.isFoWMode() ? "No sabotage" : null;
                     addReaction(event, false, false, message, "");
+                }
+                case "passForRound" -> {
+                    player.setPassed(true);
+                    String text = Helper.getPlayerRepresentation(player, activeMap) + " PASSED";
+                    MessageHelper.sendMessageToChannel(event.getChannel(), text);
+                    new Turn().execute(event, player, activeMap);
+                    event.getMessage().delete().queue();
                 }
                 case "proceedToVoting" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Decided to skip waiting for afters and proceed to voting.");
