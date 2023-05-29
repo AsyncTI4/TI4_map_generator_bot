@@ -622,7 +622,12 @@ public class AgendaHelper {
                     if (outcomeSummary != null && outcomeSummary.length() > 2) {
                         outcomeSummary = outcomeSummary.substring(0, outcomeSummary.length()-2);
                     }
+                    
                     summary = summary + outcome+": "+totalVotes +". (" +outcomeSummary + ")\n";
+                    if(!activeMap.isFoWMode() &&activeMap.getCurrentAgendaInfo().contains("Elect Player"))
+                    {
+                        summary = Helper.getFactionIconFromDiscord(outcome.toLowerCase()) + " "+summary;
+                    }
                 } else {
                     summary = summary + outcome+": Total votes "+totalVotes +". " +outcomeSummary + "\n";
                 }

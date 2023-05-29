@@ -2238,7 +2238,7 @@ public class ButtonListener extends ListenerAdapter {
                     Button Abstain = Button.danger("delete_buttons_0", StringUtils.capitalize(player.getFaction())+" Choose To Abstain");
                    
                     List<Button> buttons = List.of(Vote, Abstain);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to vote again.", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to vote again. Reminder that this erasing of old votes did not refresh any planets.", buttons);
                     event.getMessage().delete().queue();
 
                 }
