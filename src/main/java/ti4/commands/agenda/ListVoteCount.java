@@ -81,12 +81,11 @@ public class ListVoteCount extends AgendaSubcommandData {
 
     public static int getVoteCountFromPlanets(Map activeMap, Player player) {
         List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int baseResourceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
         int baseInfluenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
         int voteCount = baseInfluenceCount; //default
-
-        planets.removeAll(player.getExhaustedPlanets());
 
         //NEKRO unless XXCHA ALLIANCE
         if (player.hasAbility("galactic_threat") && !Helper.playerHasXxchaCommanderUnlockedOrAlliance(activeMap, player)) {
