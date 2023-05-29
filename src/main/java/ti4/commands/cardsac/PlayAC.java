@@ -141,9 +141,10 @@ public class PlayAC extends ACCardsSubcommandData {
                     MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target", activeMap, player, riderButtons);
                 }
                 if (actionCardTitle.contains("Hack Election") ) {
-                    Button setHack = Button.danger("hack_election", "Set the voting order as reversed");
+                    activeMap.setHackElectionStatus(true);
+                    Button setHack = Button.danger("hack_election", "Set the voting order as normal");
                     List<Button> hackButtons =  List.of(setHack);
-                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please hit this button after confirming no sabo on the hack election", activeMap, player, hackButtons);
+                    MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Voting order reversed. Please hit this button if hack election is sabod", activeMap, player, hackButtons);
                 }
 
             }
