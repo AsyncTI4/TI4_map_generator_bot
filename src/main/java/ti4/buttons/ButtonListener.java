@@ -713,7 +713,12 @@ public class ButtonListener extends ListenerAdapter {
                     activeMap.setCurrentAgendaVote(outcome, existingData);
                     addReaction(event, true, true,"Voted "+votes + " votes for "+StringUtils.capitalize(outcome)+"!", "");
                 }
-
+                event.getMessage().delete().queue();
+                String pFaction1 = StringUtils.capitalize(player.getFaction());
+                Button EraseVote = Button.danger("FFCC_"+pFaction1+"_eraseMyVote", pFaction1+" Erase Any Of Your Previous Votes");
+                List<Button> EraseButton = List.of(EraseVote);
+                String mErase = "Use this button if you want to erase your previous votes and vote again";
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), mErase, EraseButton);
                 String message = " up to vote! Resolve using buttons.";
 
                 Player nextInLine = AgendaHelper.getNextInLine(player, AgendaHelper.getVotingOrder(activeMap),activeMap);
@@ -744,9 +749,9 @@ public class ButtonListener extends ListenerAdapter {
                     message = AgendaHelper.getSummaryOfVotes(activeMap, true) + "\n \n "+ realIdentity + message;
                     Button Vote= Button.success("vote", pFaction+" Choose To Vote");
                     Button Abstain = Button.danger("delete_buttons_0", pFaction+" Choose To Abstain");
-                    Button EraseVote = Button.danger("FFCC_"+pFaction+"_eraseMyVote", pFaction+" Erase Any Of Your Previous Votes");
+                   
 
-                    List<Button> buttons = List.of(Vote, Abstain, EraseVote);
+                    List<Button> buttons = List.of(Vote, Abstain);
                     if (activeMap.isFoWMode()) {
                         if (nextInLine.getPrivateChannel() != null) {
                             MessageHelper.sendMessageToChannelWithButtons(nextInLine.getPrivateChannel(), message, buttons);
@@ -2171,6 +2176,7 @@ public class ButtonListener extends ListenerAdapter {
                         } else {
                             outcomeActionRow = AgendaHelper.getLawOutcomeButtons(activeMap, null, "outcome");
                         }
+                        event.getMessage().editMessageComponents();
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,outcomeActionRow);
                     } else {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "You are not the faction who is supposed to press this button.");
@@ -2223,8 +2229,17 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "eraseMyVote" -> {
                     String pfaction = player.getFaction();
+                    if(activeMap.isFoWMode()){
+                        pfaction=player.getColor();
+                    }
                     AgendaHelper.eraseVotesOfFaction(activeMap, pfaction);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Erased previous votes made by "+Helper.getFactionIconFromDiscord(player.getFaction()) + "\n \n"+ AgendaHelper.getSummaryOfVotes(activeMap, true));
+                    Button Vote= Button.success("vote", StringUtils.capitalize(player.getFaction())+" Choose To Vote");
+                    Button Abstain = Button.danger("delete_buttons_0", StringUtils.capitalize(player.getFaction())+" Choose To Abstain");
+                   
+                    List<Button> buttons = List.of(Vote, Abstain);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to vote again.", buttons);
+                    event.getMessage().delete().queue();
 
                 }
                 case "gain_CC"-> {
