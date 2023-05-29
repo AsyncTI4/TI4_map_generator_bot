@@ -428,10 +428,14 @@ public class FoWHelper {
 
 			for (String position_ : tiles) {
 				Tile tile = activeMap.getTileByPosition(position_);
-				if (playerIsInSystem(activeMap, tile, player_)) {
-					players.add(player_);
-					break;
+				if(tile != null)
+				{
+					if (playerIsInSystem(activeMap, tile, player_)) {
+						players.add(player_);
+						break;
+					}
 				}
+				
 			}
 		}
 
