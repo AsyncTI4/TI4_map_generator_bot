@@ -86,9 +86,8 @@ public class AgendaHelper {
             message = realIdentity + message;
             Button Vote= Button.success("vote", pFaction+" Choose To Vote");
             Button Abstain = Button.danger("delete_buttons_0", pFaction+" Choose To Abstain");
-            Button EraseVote = Button.danger("FFCC_"+pFaction+"_eraseMyVote", pFaction+" Erase Any Of Your Previous Votes");
-
-            List<Button> buttons = List.of(Vote, Abstain, EraseVote);
+           
+            List<Button> buttons = List.of(Vote, Abstain);
             if (activeMap.isFoWMode()) {
                 if (nextInLine.getPrivateChannel() != null) {
                     MessageHelper.sendMessageToChannelWithButtons(nextInLine.getPrivateChannel(), message, buttons);

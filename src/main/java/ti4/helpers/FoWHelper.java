@@ -96,7 +96,7 @@ public class FoWHelper {
 
 		Set<String> tilePositionsToShow = new HashSet<>(tilesWithPlayerUnitsPlanets);
 		for (String tilePos : tilesWithPlayerUnitsPlanets) {
-			Set<String> adjacentTiles = FoWHelper.getAdjacentTiles(activeMap, tilePos, player);
+			Set<String> adjacentTiles = FoWHelper.getAdjacentTiles(activeMap, tilePos, player, true);
 			tilePositionsToShow.addAll(adjacentTiles);
 		}
 
@@ -201,13 +201,54 @@ public class FoWHelper {
 	 *  Includes custom adjacent tiles defined on the map level, hyperlanes, and
 	 *  wormholes
 	 */
-	public static Set<String> getAdjacentTiles(Map activeMap, String position, Player player) {
+	public static Set<String> getAdjacentTiles(Map activeMap, String position, Player player, boolean toShow) {
 		Set<String> adjacentPositions = traverseHyperlaneAdjacencies(activeMap, position, -1, new HashSet<>(), null);
-
+		
 		List<String> adjacentCustomTiles = activeMap.getCustomAdjacentTiles().get(position);
+		
+		List<String> adjacentCustomTiles2 = new ArrayList<String>();
 		if (adjacentCustomTiles != null) {
-			adjacentPositions.addAll(adjacentCustomTiles);
+
+			
+			if(!toShow)
+			{
+				for(String t : adjacentCustomTiles)
+				{
+					if(activeMap.getCustomAdjacentTiles().get(t) != null && activeMap.getCustomAdjacentTiles().get(t).contains(position))
+					{
+						adjacentCustomTiles2.add(t);
+					}
+				}
+				adjacentPositions.addAll(adjacentCustomTiles2);
+			}
+			else
+			{
+				
+				adjacentPositions.addAll(adjacentCustomTiles);
+			}
+			
+			
+			
 		}
+		if(!toShow)
+			{
+				System.out.println("Hello 1");
+				for(String primaryTile : activeMap.getCustomAdjacentTiles().keySet())
+				{
+					System.out.println("Primary tile" + primaryTile);
+					System.out.println("Position" + position);
+					if(activeMap.getCustomAdjacentTiles().get(primaryTile).contains(position))
+					{
+						if(!adjacentPositions.contains(primaryTile))
+						{
+							adjacentPositions.add(primaryTile);
+						}
+					}
+				}
+
+			}
+		
+
 
 		Set<String> wormholeAdjacencies = getWormholeAdjacencies(activeMap, position, player);
 		if (wormholeAdjacencies != null) {
@@ -371,7 +412,7 @@ public class FoWHelper {
 	 */
 	public static List<Player> getAdjacentPlayers(Map activeMap, String position, boolean includeSweep) {
 		List<Player> players = new ArrayList<>();
-		Set<String> tilesToCheck = getAdjacentTiles(activeMap, position, null);
+		Set<String> tilesToCheck = getAdjacentTiles(activeMap, position, null, false);
 		Tile startingTile = activeMap.getTileByPosition(position);
 
 		for (Player player_ : activeMap.getPlayers().values()) {
