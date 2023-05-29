@@ -91,7 +91,7 @@ public class AgendaHelper {
             if (activeMap.isFoWMode()) {
                 if (nextInLine.getPrivateChannel() != null) {
                     MessageHelper.sendMessageToChannelWithButtons(nextInLine.getPrivateChannel(), message, buttons);
-                    event.getMessageChannel().sendMessage("Voting started. Notified first in next in line").queue();
+                    event.getMessageChannel().sendMessage("Voting started. Notified first in line").queue();
                 }
             } else {
                 MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
@@ -623,10 +623,20 @@ public class AgendaHelper {
                         outcomeSummary = outcomeSummary.substring(0, outcomeSummary.length()-2);
                     }
                     
-                    summary = summary + outcome+": "+totalVotes +". (" +outcomeSummary + ")\n";
+                    
                     if(!activeMap.isFoWMode() &&activeMap.getCurrentAgendaInfo().contains("Elect Player"))
                     {
-                        summary = Helper.getFactionIconFromDiscord(outcome.toLowerCase()) + " "+summary;
+                        summary = summary + Helper.getFactionIconFromDiscord(outcome.toLowerCase())+" "+ outcome+": "+totalVotes +". (" +outcomeSummary + ")\n";
+                       
+                    }
+                    else if(!activeMap.isHomeBrewSCMode() &&activeMap.getCurrentAgendaInfo().contains("Elect Strategy Card"))
+                    {
+                        summary = summary + Helper.getSCEmojiFromInteger(Integer.parseInt(outcome))+ " "+ outcome+": "+totalVotes +". (" +outcomeSummary + ")\n";
+                    }
+                    else
+                    {
+                        summary = summary + outcome+": "+totalVotes +". (" +outcomeSummary + ")\n";
+
                     }
                 } else {
                     summary = summary + outcome+": Total votes "+totalVotes +". " +outcomeSummary + "\n";
