@@ -1738,8 +1738,8 @@ public class ButtonListener extends ListenerAdapter {
 
                 }
                 case "hack_election" -> {
-                    activeMap.setHackElectionStatus(true);
-                    MessageHelper.sendMessageToChannel(event.getChannel(),"Reversed voting order.");
+                    activeMap.setHackElectionStatus(false);
+                    MessageHelper.sendMessageToChannel(event.getChannel(),"Set Order Back To Normal.");
                     event.getMessage().delete().queue();
                 }
                 case "proceed_to_strategy" -> {
