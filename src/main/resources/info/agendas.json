@@ -147,7 +147,7 @@
     "alias": "abolishment",
     "name": "Judicial Abolishment",
     "type": "Directive",
-    "target": "Elect law (When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.)",
+    "target": "Elect Law (When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.)",
     "text1": "Discard the elected law from play.",
     "text2": "",
     "source": "PoK"
@@ -219,7 +219,7 @@
     "alias": "miscount",
     "name": "Miscount Disclosed",
     "type": "Directive",
-    "target": "Elect law (When this agenda is revealed, if there are no Elect laws in play, discard this card and reveal another agenda from the top of the deck.)",
+    "target": "Elect Law (When this agenda is revealed, if there are no Elect laws in play, discard this card and reveal another agenda from the top of the deck.)",
     "text1": "Vote on the elected law as if it were just revealed from the top of the deck.",
     "text2": "",
     "source": "PoK"
@@ -534,7 +534,7 @@
     "alias": "absol_redistribution",
     "name": "Colonial Redistribution",
     "type": "Directive",
-    "target": "Elect non-home planet other than Mecatol Rex",
+    "target": "Elect non-home Planet other than Mecatol Rex",
     "text1": "Remove each unit on the elected planet. The player who controls that planet places the removed units on a planet in their home system, if able, then chooses one other player with the fewest victory points| that player may place 3 infantry from their reinforcements on the elected planet.",
     "text2": "",
     "source": "absol"
@@ -552,7 +552,7 @@
     "alias": "absol_disarmamament",
     "name": "Compensated Disarmamanet",
     "type": "Directive",
-    "target": "Elect non-home planet",
+    "target": "Elect non-home Planet",
     "text1": "Remove each ground force on the elected planet| the player that controls that planet gains 1 trade good for each infantry removed and 2 trade goods for each mech removed. The other player that controls the elected planet gives the other player that cast the most votes for that planet 1 promissory note from their hand.",
     "text2": "",
     "source": "absol"
@@ -660,7 +660,7 @@
     "alias": "absol_crisis",
     "name": "Glactic Crisis Pact",
     "type": "Directive",
-    "target": "Elect strategy card",
+    "target": "Elect Strategy Card",
     "text1": "Each player may perform the secondary ability of the elected strategy card without spending a command token| command tokens placed by the ability are placed from a player\"s reinforcements, instead. The player that cast the most votes for the elected strategy card may choose to perform the primary ability, instead.",
     "text2": "",
     "source": "absol"
@@ -687,7 +687,7 @@
     "alias": "absol_arbiter",
     "name": "Imperial Arbiter",
     "type": "Law",
-    "target": "Elect player",
+    "target": "Elect Player",
     "text1": "The elected player gains this card and gives each other player that voted for them 1 promissory note from their hand (from most votes to least), if able. At the start of the action phase, the owner of this card may spend 1 command token from their strategy pool and up to 8 influence to swap 1 of their strategy cards with a strategy card with an initiative value equal to the influence spent.",
     "text2": "",
     "source": "absol"
@@ -714,7 +714,7 @@
     "alias": "absol_abolishment",
     "name": "Judicial Abolishment",
     "type": "Directive",
-    "target": "Elect law",
+    "target": "Elect Law",
     "text1": "When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck. Discard the elected law. The player that cast the most votes for the elected law places a command token from their reinforcements in their strategy pool, then gives a promissory note from their hand to any player who owned or had a control token on the law.",
     "text2": "",
     "source": "absol"
@@ -723,7 +723,7 @@
     "alias": "absol_minsantique",
     "name": "Minister of Antiquities",
     "type": "Law",
-    "target": "Elect player",
+    "target": "Elect Player",
     "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Imperial strategy card without spending a command token. Whenever the owner of this card would draw a secret objective, they may spend a command token from their strategy pool to instead draw a relic.",
     "text2": "",
     "source": "absol"
@@ -732,7 +732,7 @@
     "alias": "absol_minscomm",
     "name": "Minister of Commerce",
     "type": "Law",
-    "target": "Elect player",
+    "target": "Elect Player",
     "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Trade strategy card without spending a command token. Whenever the owner of this card refreshes their commodities, they gain 1 trade good per player that is their neighbor.",
     "text2": "",
     "source": "absol"
@@ -741,7 +741,7 @@
     "alias": "absol_minsexp",
     "name": "Minister of Exploration",
     "type": "Law",
-    "target": "Elect player",
+    "target": "Elect Player",
     "text1": "The elected player gains this card. When gaining command tokens as part of the secondary ability of the leadsership strategy card, the owner of this card gains 1 addition command token. After performing a tactical action, the owner of this card may explore one planet in the active system that contains their units.",
     "text2": "",
     "source": "absol"
@@ -750,7 +750,7 @@
     "alias": "absol_minsindus",
     "name": "Minister of Industry",
     "type": "Law",
-    "target": "Elect player",
+    "target": "Elect Player",
     "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Construction strategy card without spending or placing a command token. The owner of this card doubles the production value of their space docks.",
     "text2": "",
     "source": "absol"
@@ -759,7 +759,7 @@
     "alias": "absol_minspeace",
     "name": "Minister of Peace",
     "type": "Law",
-    "target": "Elect player",
+    "target": "Elect Player",
     "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Diplomacy strategy card without spending a command token. After a player activates a system that contains 1 or more of another player\"s units, the owner of this card may spend a command token from their strategy pool and give the active player a promissory note from their hand to immediately end the active player\"s turn.",
     "text2": "",
     "source": "absol"
@@ -768,7 +768,7 @@
     "alias": "absol_minspolicy",
     "name": "Minister of Policy",
     "type": "Law",
-    "target": "Elect player",
+    "target": "Elect Player",
     "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Politics strategy card without spending a command token. Players no longer draw action cards in the status phase. Instead, the owner of this card looks at a number of action cards from the deck equal to the number of players plus 1, adds 2 to their hand, then gives one to each other player. Players with technologies or abilities that increase the number of action cards drawn may then use those abilities to draw additional action cards, as normal.",
     "text2": "",
     "source": "absol"
@@ -777,7 +777,7 @@
     "alias": "absol_minssci",
     "name": "Minister of Sciences",
     "type": "Law",
-    "target": "Elect player",
+    "target": "Elect Player",
     "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Technology strategy card without spending a command token. The owner of this card does not need to spend resources to research technology as part of the Technology strategy card.",
     "text2": "",
     "source": "absol"
@@ -786,7 +786,7 @@
     "alias": "absol_minswar",
     "name": "Minister of War",
     "type": "Law",
-    "target": "Elect player",
+    "target": "Elect Player",
     "text1": "The elected player gains this card. The owner of this card may use the secondary ability of the Warfare strategy card without spending a command token. The owner of this card may perform the following component action: Action:Exhaust this card and spend 1 command token from their strategy pool to perform the primary ability of the Warfare strategy card.",
     "text2": "",
     "source": "absol"
@@ -795,7 +795,7 @@
     "alias": "absol_miscount",
     "name": "Miscount Disclosed",
     "type": "Directive",
-    "target": "Elect law",
+    "target": "Elect Law",
     "text1": "When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck. Vote on the elected law, as if it were just revealed from the top of the deck. The player that cast the most votes for the elected law casts 2 additional votes per player when voting on the elected law.",
     "text2": "",
     "source": "absol"
@@ -840,7 +840,7 @@
     "alias": "absol_censure",
     "name": "Political Censure",
     "type": "Law",
-    "target": "Elect player",
+    "target": "Elect Player",
     "text1": "The elected player gains this card and 1 victory point. If they are the speaker, the other player that cast the most votes for them takes the speaker token. The electd player cannot play action cards or take or be given the speaker token. If the elected player loses this card, they lose 1 victory point.",
     "text2": "",
     "source": "absol"
@@ -867,7 +867,7 @@
     "alias": "absol_execution",
     "name": "Public Execution",
     "type": "Directive",
-    "target": "Elect player",
+    "target": "Elect Player",
     "text1": "The player who cast the most votes for the elected player looks at the elected player\"s action cards and adds up to 2 to their hand. The elected player discards all of their action cards and exhausts all of their planets. If they have the speaker token, they give it to the player who cast the most votes for them.",
     "text2": "",
     "source": "absol"
@@ -912,7 +912,7 @@
     "alias": "absol_grant",
     "name": "Research Grant Allocation",
     "type": "Directive",
-    "target": "Elect player",
+    "target": "Elect Player",
     "text1": "The elected player researches any 1 non-faction technology. The player that cast the most votes for the elected player may gain that technology by paying 2 trade goods for each prerequisite on that technology.",
     "text2": "",
     "source": "absol"
@@ -921,7 +921,7 @@
     "alias": "absol_warrant",
     "name": "Search Warrant",
     "type": "Law",
-    "target": "Elect player",
+    "target": "Elect Player",
     "text1": "Place a control token for the non-elected player that cast the most votes for the elected player on this card. The elected player gains this card and draws 4 secret objectives. The owner of this card plays with their secret objectives revealed. When the owner of this card would discard a secret objective, a player whose control token is on this card may take that secret objective instead.",
     "text2": "",
     "source": "absol"
