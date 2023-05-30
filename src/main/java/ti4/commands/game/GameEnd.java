@@ -82,7 +82,7 @@ public class GameEnd extends GameSubcommandData {
         userActiveMap.setAutoPing(false);
         userActiveMap.setAutoPingSpacer(0);
         //SEND THE MAP IMAGE
-        File file = GenerateMap.getInstance().saveImage(userActiveMap, DisplayType.map, event);
+        File file = GenerateMap.getInstance().saveImage(userActiveMap, DisplayType.all, event);
         FileUpload fileUpload = FileUpload.fromData(file);
         MessageHelper.replyToMessage(event, file);
 
@@ -104,6 +104,7 @@ public class GameEnd extends GameSubcommandData {
 
         if(!userActiveMap.isFoWMode())
         {
+            //INFORM PLAYERS
             pbdChroniclesChannel.sendMessage(gameEndText).queue(m -> { //POST INITIAL MESSAGE
                 m.editMessageAttachments(fileUpload).queue(); //ADD MAP FILE TO MESSAGE
                 m.createThreadChannel(gameName).queue(t -> t.sendMessage(message.toString()).queue()); //CREATE THREAD AND POST FOLLOW UP
@@ -113,17 +114,9 @@ public class GameEnd extends GameSubcommandData {
             });
             TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
             if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
-    
+            
         }
         
-
-        //INFORM PLAYERS
-       
-
-        //INFORM BOTHELPER IF IN-LIMBO IS FULL
-        
-        // MessageHelper.sendMessageToChannel(event.getChannel(), bothelperMention + " - this game has concluded");
-      
         //MOVE CHANNELS TO IN-LIMBO
         Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
         TextChannel tableTalkChannel = (TextChannel) userActiveMap.getTableTalkChannel();
@@ -177,7 +170,7 @@ public class GameEnd extends GameSubcommandData {
                 int playerVP = player.getTotalVictoryPoints(activeMap);
                 sb.append("> `").append(index).append(".` ");
                 sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
-                sb.append(Helper.getColourAsMention(event.getGuild(), player.getColor()));
+                sb.append(Helper.getColourAsMention(MapGenerator.guildPrimary, player.getColor()));
                 sb.append(event.getJDA().getUserById(player.getUserID()).getAsMention());
                 sb.append(" - *").append(playerVP).append("VP* ");
                 if (playerVP >= activeMap.getVp()) sb.append(" - **WINNER**");
