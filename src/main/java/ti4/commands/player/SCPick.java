@@ -43,6 +43,7 @@ public class SCPick extends PlayerSubcommandData {
                 .filter(player_ -> player_.isRealPlayer())
                 .collect(Collectors.toList());
         int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
+        if (maxSCsPerPlayer <= 0) maxSCsPerPlayer = 1;
 
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
@@ -76,10 +77,7 @@ public class SCPick extends PlayerSubcommandData {
             
         }
 
-
         //ONLY DEAL WITH EXTRA PICKS IF IN FoW
-
-
         if (playerSCs.isEmpty()) {
             sendMessage("No SC picked.");
             return;

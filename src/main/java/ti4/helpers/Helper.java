@@ -504,31 +504,26 @@ public class Helper {
     
     public static List<Button> getRemainingSCButtons(GenericInteractionCreateEvent event, Map activeMap) {
         List<Button> scButtons = new ArrayList<>();
-        
-        for (int x=1; x < 9; x++) {
 
-            boolean held = false;
-            for(Player player :activeMap.getPlayers().values())
-            {
-                if(player == null || player.getFaction() == null)
-                {
+        for (Integer sc : activeMap.getSCList()) {
+            if (sc <= 0) continue; // some older games have a 0 in the list of SCs
+            for (Player player : activeMap.getPlayers().values()) {
+                if (player == null || player.getFaction() == null) {
                     continue;
                 }
-                else
-                {
-                    if(player.getSCs() != null && player.getSCs().contains(Integer.valueOf(x)) &&!activeMap.isFoWMode())
-                    {
-                        held = true;
-                    }
+                if (player.getSCs() != null && player.getSCs().contains(Integer.valueOf(sc)) && !activeMap.isFoWMode()) {
+                    continue;
                 }
             }
 
-            if(!held)
-            {
-                Button button = Button.secondary("scPick_"+x, x+"");
-                scButtons.add(button);
+            Emoji scEmoji = Emoji.fromFormatted(getSCBackEmojiFromInteger(sc));
+            Button button;
+            if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
+                button = Button.secondary("scPick_" + sc, " ").withEmoji(scEmoji);
+            } else {
+                button = Button.secondary("scPick_" + sc, "" + sc);
             }
-            
+            scButtons.add(button);
         }
         return scButtons;
     }
