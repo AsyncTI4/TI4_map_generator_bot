@@ -305,10 +305,299 @@ public class ButtonHelper {
         }
         MapSaveLoadManager.saveMap(activeMap, event);
 
-        
-        
+    
     }
 
+    public static void getAllPossibleCompButtons(Map activeMap, Player p1, ButtonInteractionEvent event) {
+        String finChecker = "FFCC_"+p1.getFaction() + "_";
+        String prefix = "componentActionRes_";
+        List<Button> compButtons = new ArrayList<>();
+        //techs
+        for(String tech : p1.getTechs())
+        {
+            String techRep = Mapper.getTechRepresentations().get(tech);
+
+            //Columns: key = Proper Name | type | prerequisites | faction | text
+            StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
+            String techName = techRepTokenizer.nextToken();
+            String techType = techRepTokenizer.nextToken();
+            String techPrerequisites = techRepTokenizer.nextToken();
+            String techFaction = techRepTokenizer.nextToken();
+            String factionEmoji = "";
+            if (!techFaction.equals(" ")) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
+            String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
+            String techText = techRepTokenizer.nextToken();
+            if(techText.contains("ACTION"))
+            {
+                Button tButton = Button.danger(finChecker+prefix+"tech_"+tech, "Exhaust "+techName).withEmoji(Emoji.fromFormatted(techEmoji));
+                compButtons.add(tButton);
+            }
+        }
+        //leaders
+        for(Leader leader:p1.getLeaders())
+        {
+            if(!leader.isExhausted() && !leader.isLocked())
+            {
+                String leaderID = leader.getId();
+
+                String leaderRep =  Mapper.getLeaderRepresentations().get(leaderID.toString());
+                //leaderID = 0:LeaderName ; 1:LeaderTitle ; 2:BacksideTitle/HeroAbility ; 3:AbilityWindow ; 4:AbilityText
+                String[] leaderRepSplit = leaderRep.split(";");
+                String leaderName = leaderRepSplit[0];
+                String leaderTitle = leaderRepSplit[1];
+                String heroAbilityName = leaderRepSplit[2];
+                String leaderAbilityWindow = leaderRepSplit[3];
+                String leaderAbilityText = leaderRepSplit[4];
+                String leaderUnlockCondition = leaderRepSplit[5];
+                
+                String factionEmoji =Helper.getFactionLeaderEmoji(leader);
+                if(leaderAbilityWindow.equalsIgnoreCase("ACTION:") || leaderName.contains("Ssruu"))
+                {
+                    Button lButton = Button.secondary(finChecker+prefix+"leader_"+leaderID, "Use "+leaderName).withEmoji(Emoji.fromFormatted(factionEmoji));
+                    compButtons.add(lButton);
+                }
+            }
+        }
+        //Relics
+        for(String relic : p1.getRelics())
+        {
+            String relicText = Mapper.getRelic(relic);
+            String[] relicData = relicText.split(";");
+            if(relicData[1].contains("Action:"))
+            {
+                Button rButton = Button.danger(finChecker+prefix+"relic_"+relic, "Purge "+relicData[1]);
+                compButtons.add(rButton);
+            }
+        }
+        //PNs
+        for(String pn : p1.getPromissoryNotes().keySet()){
+            if(!Mapper.getPromissoryNoteOwner(pn).equalsIgnoreCase(p1.getFaction()) && !p1.getPromissoryNotesInPlayArea().contains(pn))
+            {
+                String pnText = Mapper.getPromissoryNote(pn, true);
+                if(pnText.contains("Action:"))
+                {
+                    Button pnButton = Button.danger(finChecker+prefix+"pn_"+p1.getPromissoryNotes().get(pn), "Use "+pnText.substring(0, pnText.indexOf(";")));
+                    compButtons.add(pnButton);
+                }
+            }
+        }
+        //Abilities
+        if(p1.hasAbility("star_forge") && p1.getStrategicCC() > 0)
+        {
+            Button abilityButton = Button.success(finChecker+prefix+"ability_starForge", "Starforge");
+            compButtons.add(abilityButton);
+        }
+        if(p1.hasAbility("orbital_drop") && p1.getStrategicCC() > 0)
+        {
+            Button abilityButton = Button.success(finChecker+prefix+"ability_orbitalDrop", "Orbital Drop");
+            compButtons.add(abilityButton);
+        }
+        if(p1.hasAbility("stall_tactics") && p1.getActionCards().size() > 0)
+        {
+            Button abilityButton = Button.success(finChecker+prefix+"ability_stallTactics", "Stall Tactics");
+            compButtons.add(abilityButton);
+        }
+        if(p1.hasAbility("fabrication") && p1.getFragments().size() > 0)
+        {
+            Button abilityButton = Button.success(finChecker+prefix+"ability_fabrication", "Purge 1 Frag for a CC");
+            compButtons.add(abilityButton);
+        }
+        //Get Relic
+        if(p1.enoughFragsForRelic())
+        {
+            Button getRelicButton = Button.success(finChecker+prefix+"getRelic_", "Get Relic");
+            compButtons.add(getRelicButton);
+        }
+       //ACs
+        Button acButton = Button.secondary(finChecker+prefix+"actionCards_", "Play \"ACTION:\" AC");
+        compButtons.add(acButton);
+        //Generic
+        Button genButton = Button.secondary(finChecker+prefix+"generic_", "Generic Component Action");
+        compButtons.add(genButton);
+    }
+
+    public static void resolvePressedCompButton(Map activeMap, Player p1, ButtonInteractionEvent event, String buttonID) {
+        String prefix = "componentActionRes_";
+        String finChecker = "FFCC_"+p1.getFaction() + "_";
+        buttonID = buttonID.replace(prefix, "");
+
+        String firstPart = buttonID.substring(0, buttonID.indexOf("_"));
+        buttonID = buttonID.replace(firstPart+"_", "");
+
+        switch(firstPart) {
+            case "tech" -> {
+                p1.exhaustTech(buttonID);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), (Helper.getPlayerRepresentation(p1, activeMap) + " exhausted tech: " + Helper.getTechRepresentation(buttonID)));
+            }
+            case "leader" -> {
+                Leader playerLeader = p1.getLeader(buttonID);
+		
+                if(buttonID.contains("agent")){
+                    playerLeader.setExhausted(true);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),Helper.getFactionLeaderEmoji(playerLeader));
+                    StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(p1, activeMap))
+                            .append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),messageText.toString());
+                    
+                }
+                else {
+                    StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(p1, activeMap)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
+                    if ("letnevhero".equals(playerLeader.getId()) || "nomadhero".equals(playerLeader.getId())) {
+                        playerLeader.setLocked(false);
+                        playerLeader.setActive(true);
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),message.toString() + " - Leader will be PURGED after status cleanup");
+                    } else {
+                        boolean purged = p1.removeLeader(playerLeader);
+                        if (purged) {
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(),message.toString() + " - Leader " + buttonID + " has been purged");
+                        } else {
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Leader was not purged - something went wrong");
+                        }
+                        if ("titanshero".equals(playerLeader.getId())) {
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"`Use the following command to add the attachment: /add_token token:titanshero`");
+                        }
+                    }
+
+                }
+            }
+            case "relic" -> {
+                String relicId = buttonID;
+                Player player = p1;
+                if (player.getRelics().contains(relicId)) {
+                    player.removeRelic(relicId);
+                    player.removeExhaustedRelic(relicId);
+                    String relicName = Mapper.getRelic(relicId).split(";")[0];
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Purged " + Emojis.Relic + " relic: " + relicName);
+                } else {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Invalid relic or player does not have specified relic");
+                }
+            }
+            case "pn" -> {
+                boolean longPNDisplay = false;
+                String id = buttonID;
+                Player player = p1;
+                String promissoryNote = Mapper.getPromissoryNote(id, true);
+                String[] pn = promissoryNote.split(";");
+                String pnOwner = Mapper.getPromissoryNoteOwner(id);
+                if (pn.length > 3 && pn[3].equals("playarea")) {
+                    player.setPromissoryNotesInPlayArea(id);
+                } else {
+                    player.removePromissoryNote(id);
+                    for (Player player_ : activeMap.getPlayers().values()) {
+                        String playerColor = player_.getColor();
+                        String playerFaction = player_.getFaction();
+                        if (playerColor != null && playerColor.equals(pnOwner) || playerFaction != null && playerFaction.equals(pnOwner)) {
+                            player_.setPromissoryNote(id);
+                            PNInfo.sendPromissoryNoteInfo(activeMap, player_, false);
+                            pnOwner = player_.getFaction();
+                            break;
+                        }
+                    }
+                }
+
+                String emojiToUse = activeMap.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
+                StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " played promissory note:\n");
+                sb.append(emojiToUse + Emojis.PN);
+                String pnText = "";
+
+                //Handle AbsolMode Political Secret
+                if (activeMap.isAbsolMode() && id.endsWith("_ps")) {
+                    pnText = "Political Secret" + Emojis.Absol + ":  *When you cast votes:* You may exhaust up to 3 of the {colour} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {colour} player.";
+                } else {
+                    pnText = Mapper.getPromissoryNote(id, longPNDisplay);
+                }
+                sb.append(pnText).append("\n");
+
+                //TERRAFORM TIP
+                if (id.equalsIgnoreCase("terraform")) {
+                    sb.append("`/add_token token:titanspn`\n");
+                }
+
+                //Fog of war ping
+                if (activeMap.isFoWMode()) {
+                    // Add extra message for visibility
+                    FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, sb.toString());
+                }
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),sb.toString());
+                PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
+            }
+            case "ability" -> {
+                if(buttonID.equalsIgnoreCase("starForge")){
+
+                } else if(buttonID.equalsIgnoreCase("orbitalDrop")){
+
+                }else if(buttonID.equalsIgnoreCase("fabrication")){
+
+                }else if(buttonID.equalsIgnoreCase("stallTactics")){
+
+                }
+            }
+            case "getRelic" -> {
+
+                List<Button> purgeFragButtons = new ArrayList<>();
+                String message = "Click the fragments you'd like to purge. ";
+                int numToBeat = 2 - p1.getVrf();
+                if((p1.hasAbility("fabrication") || p1.getPromissoryNotes().containsKey("bmf")))
+                {
+                    numToBeat = numToBeat -1;
+                    if( p1.getPromissoryNotes().containsKey("bmf"))
+                    {
+                        Button transact = Button.primary(finChecker+"playBMF", "Play BMF");
+                        purgeFragButtons.add(transact);
+                    }
+                    
+                }
+                if(p1.getCrf() > numToBeat)
+                {
+                    for(int x = numToBeat+1; x < p1.getCrf()+1; x++)
+                    {
+                        Button transact = Button.primary(finChecker+"purge_Frags_CRF"+x, "Cultural Fragments ("+x+")");
+                        purgeFragButtons.add(transact);
+                    }
+                }
+                if(p1.getIrf()> numToBeat)
+                {
+                    for(int x = numToBeat+1; x < p1.getIrf()+1; x++)
+                    {
+                        Button transact = Button.success(finChecker+"purge_Frags_IRF"+x, "Industrial Fragments ("+x+")");
+                        purgeFragButtons.add(transact);
+                    }
+                }
+                if(p1.getHrf() > numToBeat)
+                {
+                    for(int x = numToBeat+1; x < p1.getHrf()+1; x++)
+                    {
+                        Button transact = Button.danger(finChecker+"purge_Frags_HRF"+x, "Hazardous Fragments ("+x+")");
+                        purgeFragButtons.add(transact);
+                    }
+                }
+                
+                if(p1.getVrf() > 0)
+                {
+                    for(int x = 1; x < p1.getVrf()+1; x++)
+                    {
+                        Button transact = Button.secondary(finChecker+"purge_Frags_URF"+x, "Frontier Fragments ("+x+")");
+                        purgeFragButtons.add(transact);
+                    }
+                }
+                Button transact2 = Button.danger(finChecker+"drawRelicFromFrag", "Finish Purging and Draw Relic");
+                purgeFragButtons.add(transact2);
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),message, purgeFragButtons);
+            }
+            case "generic" -> {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Doing unspecified component action. Maybe ping Fin to add this. ");
+            }
+            case "actionCards" -> {
+
+                
+            }
+
+
+        }
+
+        
+
+    }
     
 
 }
