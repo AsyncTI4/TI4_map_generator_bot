@@ -524,6 +524,38 @@ public class Player {
         return fragments;
     }
 
+    public boolean enoughFragsForRelic(){
+        boolean enough = false;
+        int haz = 0;
+        int ind = 0;
+        int cult = 0;
+        int frontier = 0;
+		for (String id : fragments) {
+			String[] cardInfo = Mapper.getExplore(id).split(";");
+			if (cardInfo[1].equalsIgnoreCase("hazardous")) {
+				haz = haz + 1;
+			} else if (cardInfo[1].equalsIgnoreCase(Constants.FRONTIER)) {
+				frontier = frontier+1;
+			}else if (cardInfo[1].equalsIgnoreCase("industrial")) {
+				ind = ind+1;
+			}else if (cardInfo[1].equalsIgnoreCase("cultural")) {
+				cult = cult+1;
+			}
+		}
+        int targetToHit = 3 - frontier;
+        if(hasAbility("fabrication") || getPromissoryNotes().containsKey("bmf"))
+        {
+            targetToHit = targetToHit-1;
+        }
+        if(haz >= targetToHit || cult >= targetToHit || ind >= targetToHit)
+        {
+            enough = true;
+        }
+
+        return enough;
+    }
+
+
     public void setFragments(ArrayList<String> fragmentList) {
         fragments = fragmentList;
         updateFragments();
