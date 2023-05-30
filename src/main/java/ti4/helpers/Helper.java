@@ -507,15 +507,17 @@ public class Helper {
 
         for (Integer sc : activeMap.getSCList()) {
             if (sc <= 0) continue; // some older games have a 0 in the list of SCs
+            boolean held = false;
             for (Player player : activeMap.getPlayers().values()) {
                 if (player == null || player.getFaction() == null) {
                     continue;
                 }
                 if (player.getSCs() != null && player.getSCs().contains(Integer.valueOf(sc)) && !activeMap.isFoWMode()) {
-                    continue;
+                    held = true;
+                    break;
                 }
             }
-
+            if (held) continue;
             Emoji scEmoji = Emoji.fromFormatted(getSCBackEmojiFromInteger(sc));
             Button button;
             if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
