@@ -427,7 +427,7 @@ public class AgendaHelper {
 
     public static List<Player> getVotingOrder(Map activeMap) {
         List<Player> orderList = new ArrayList<>();
-        orderList.addAll(activeMap.getPlayers().values().stream().toList());
+        orderList.addAll(activeMap.getPlayers().values().stream().filter(p -> p.isRealPlayer()).toList());
         String speakerName = activeMap.getSpeaker();
         Optional<Player> optSpeaker = orderList.stream().filter(player -> player.getUserID().equals(speakerName))
                 .findFirst();
