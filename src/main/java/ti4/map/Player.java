@@ -388,13 +388,7 @@ public class Player {
 
     @JsonSetter
     public void setPromissoryNotesInPlayArea(List<String> promissoryNotesInPlayArea) {
-        List<String> replaced = new ArrayList<>();
-        for (String id : promissoryNotesInPlayArea) {
-            id = id.replace("torquoise", "turquoise");
-            replaced.add(id);
-        }
-
-        this.promissoryNotesInPlayArea = replaced;
+        this.promissoryNotesInPlayArea = promissoryNotesInPlayArea;
     }
 
     public void setPromissoryNotes(LinkedHashMap<String, Integer> promissoryNotes) {
@@ -414,7 +408,6 @@ public class Player {
     }
 
     public void setPromissoryNote(String id, Integer identifier) {
-        id = id.replace("torquoise", "turquoise");
         promissoryNotes.put(id, identifier);
     }
 
