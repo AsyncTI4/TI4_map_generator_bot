@@ -29,7 +29,7 @@ public class PNReset extends PNCardsSubcommandData {
         String playerColor = AliasHandler.resolveColor(player.getColor());
         String playerFaction = player.getFaction();
         if (Mapper.isColorValid(playerColor) && Mapper.isFaction(playerFaction)) {
-            List<String> promissoryNotes = new ArrayList<>(Mapper.getPromissoryNotes(activeMap, playerColor, playerFaction));
+            List<String> promissoryNotes = new ArrayList<>(Mapper.getColourFactionPromissoryNoteIDs(activeMap, playerColor, playerFaction));
             for (String promissoryNote : promissoryNotes) {
                 activeMap.removePurgedPN(promissoryNote);
             }

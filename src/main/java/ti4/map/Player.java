@@ -641,7 +641,6 @@ public class Player {
 
     public void setFaction(String faction) {
         this.faction = faction;
-        initPNs();
         initLeaders();
         initAbilities();
     }
@@ -786,7 +785,6 @@ public class Player {
         if (!color.equals("null")) {
             this.color = AliasHandler.resolveColor(color);
         }
-        initPNs();
     }
 
     public void changeColor(String color) {
@@ -795,12 +793,15 @@ public class Player {
         }
     }
 
-    public void initPNs() {
-        if (color != null && faction != null && Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
+    public void initPNs(ti4.map.Map activeMap) {
+        if (activeMap != null && color != null && faction != null && Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
             promissoryNotes.clear();
-            List<String> promissoryNotes = Mapper.getPromissoryNotes(color, faction);
+            List<String> promissoryNotes = Mapper.getColourFactionPromissoryNoteIDs(activeMap, color, faction);
             for (String promissoryNote : promissoryNotes) {
-                if (hasAbility("hubris") && promissoryNote.endsWith("_an")){
+                if (hasAbility("hubris") && promissoryNote.endsWith("_an")) {
+                    continue;
+                }
+                if (promissoryNote.equalsIgnoreCase("blood_pact") && !hasAbility("dark_whispers")) {
                     continue;
                 }
                 setPromissoryNote(promissoryNote);

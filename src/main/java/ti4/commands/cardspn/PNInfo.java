@@ -17,6 +17,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.PromissoryNoteModel;
 
 public class PNInfo extends PNCardsSubcommandData {
     public PNInfo() {
@@ -119,41 +120,40 @@ public class PNInfo extends PNCardsSubcommandData {
     }
 
     private static String getPromissoryNoteRepresentation(String pnID, Integer pnUniqueID, boolean longFormat) {
-        StringBuilder sb = new StringBuilder();
-        String pnRawText = Mapper.getPromissoryNote(pnID, true);
-        if (pnRawText == null || pnRawText.isEmpty()) {
+        PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pnID);
+        if (pnModel == null) {
             String error = "Could not find representation for PN ID: " + pnID;
             BotLogger.log(error);
             return error;
         }
-        String[] pnSplit = pnRawText.split(";");
-        //#Columns:  Name ; colour/faction ; Text
-        String pnName = pnSplit[0];
-        String pnFactionOrColour = pnSplit[1];
-        String pnText = pnSplit[2];
+        String pnName = pnModel.name;
+        String pnFactionOrColour = pnModel.getOwner();
+        String pnText = pnModel.text;
+        StringBuilder sb = new StringBuilder();
         sb.append(Emojis.PN).append("__**" + pnName + "**__");
         sb.append(" *(").append(pnFactionOrColour).append(")*");
-        if (longFormat || Mapper.isFaction(pnFactionOrColour.toLowerCase())) sb.append("   ").append(pnText);
+        if (longFormat || Mapper.isFaction(pnFactionOrColour.toLowerCase()) || pnModel.source.equalsIgnoreCase("Absol")) sb.append("   ").append(pnText);
         sb.append("\n");
         return sb.toString();
     }
 
-    private static void checkAndAddPNs(Map activeMap, Player player) {
+    public static void checkAndAddPNs(Map activeMap, Player player) {
         String playerColor = AliasHandler.resolveColor(player.getColor());
         String playerFaction = player.getFaction();
-        if (Mapper.isColorValid(playerColor) && Mapper.isFaction(playerFaction)) {
-            List<String> promissoryNotes = new ArrayList<>(Mapper.getPromissoryNotes(playerColor, playerFaction));
-            for (Player player_ : activeMap.getPlayers().values()) {
-                promissoryNotes.removeAll(player_.getPromissoryNotes().keySet());
-                promissoryNotes.removeAll(player_.getPromissoryNotesInPlayArea());
-            }
-            promissoryNotes.removeAll(player.getPromissoryNotes().keySet());
-            promissoryNotes.removeAll(player.getPromissoryNotesInPlayArea());
-            promissoryNotes.removeAll(activeMap.getPurgedPN());
-            if (!promissoryNotes.isEmpty()) {
-                for (String promissoryNote : promissoryNotes) {
-                    player.setPromissoryNote(promissoryNote);
-                }
+        if (!Mapper.isColorValid(playerColor) || !Mapper.isFaction(playerFaction)) {
+            return;
+        }
+        List<String> promissoryNotes = new ArrayList<>(Mapper.getColourFactionPromissoryNoteIDs(activeMap, playerColor, playerFaction));
+        for (Player player_ : activeMap.getPlayers().values()) {
+            promissoryNotes.removeAll(player_.getPromissoryNotes().keySet());
+            promissoryNotes.removeAll(player_.getPromissoryNotesInPlayArea());
+        }
+        promissoryNotes.removeAll(player.getPromissoryNotes().keySet());
+        promissoryNotes.removeAll(player.getPromissoryNotesInPlayArea());
+        promissoryNotes.removeAll(activeMap.getPurgedPN());
+        if (!promissoryNotes.isEmpty()) {
+            for (String promissoryNote : promissoryNotes) {
+                player.setPromissoryNote(promissoryNote);
             }
         }
     }

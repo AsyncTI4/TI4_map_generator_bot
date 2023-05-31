@@ -170,13 +170,7 @@ public class Setup extends PlayerSubcommandData {
 
         //STARTING COMMODITIES
         player.setCommoditiesTotal(setupInfo.commodities);
-        for (String tech : setupInfo.startingTech) {
-            if (tech.trim().isEmpty()){
-                continue;
-            }
-            player.addTech(tech);
-        }
-
+        
         //STARTING PLANETS
         for (String planet : setupInfo.homePlanets) {
             if (planet.isEmpty()){
@@ -196,16 +190,23 @@ public class Setup extends PlayerSubcommandData {
         } else {
             sendMessage("Player was set up.");
         }
-
+        
         //STARTING TECH
+        for (String tech : setupInfo.startingTech) {
+            if (tech.trim().isEmpty()){
+                continue;
+            }
+            player.addTech(tech);
+        }
 
         //STARTING PNs
+        player.initPNs(activeMap);
 
         //SEND STUFF
         AbilityInfo.sendAbilityInfo(activeMap, player, event);
         TechInfo.sendTechInfo(activeMap, player, event);
         LeaderInfo.sendLeadersInfo(activeMap, player, event);
-        PNInfo.sendPromissoryNoteInfo(activeMap, player, true, event);
+        PNInfo.sendPromissoryNoteInfo(activeMap, player, false, event);
     }
 
     private void addUnits(FactionModel setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {
