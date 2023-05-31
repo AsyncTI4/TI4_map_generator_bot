@@ -32,7 +32,7 @@ public class Stats extends PlayerSubcommandData {
 				.addOptions(new OptionData(OptionType.STRING, Constants.COMMODITIES, "Commodity count"))
 				.addOptions(new OptionData(OptionType.INTEGER, Constants.COMMODITIES_TOTAL, "Commodity total count"))
 				.addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card Number count"))
-				.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Flip a Strategy Card from played to unplayed or unplayer to played"))
+				.addOptions(new OptionData(OptionType.INTEGER, Constants.SC_PLAYED, "Toggle a Strategy Card played status. Enter the SC #"))
 				.addOptions(new OptionData(OptionType.STRING, Constants.PASSED, "Player passed y/n"))
 				.addOptions(new OptionData(OptionType.STRING, Constants.SPEAKER, "Player is speaker y/n"))
 				.addOptions(new OptionData(OptionType.BOOLEAN, Constants.DUMMY, "Player is a placeholder"))
