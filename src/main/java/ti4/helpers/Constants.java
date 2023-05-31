@@ -745,4 +745,6 @@ public class Constants {
     public static final String IS_MY_TURN = "is_my_turn";
     public static final String SET_DECK = "set_deck";
     public static final String DECK_NAME = "deck_name";
+    public static final String PN_REMOVE = "pn_remove";
+    public static final String PN_ADD = "pn_add";
 }

@@ -350,6 +350,14 @@ public class Player {
         return promissoryNotesOwned.contains(promissoryNoteID);
     }
 
+    public boolean removeOwnedPromissoryNoteByID(String promissoryNoteID) {
+        return promissoryNotesOwned.remove(promissoryNoteID);
+    }
+
+    public boolean addOwnedPromissoryNoteByID(String promissoryNoteID) {
+        return promissoryNotesOwned.add(promissoryNoteID);
+    }
+
     public LinkedHashMap<String, Integer> getPromissoryNotes() {
         return promissoryNotes;
     }
