@@ -151,8 +151,15 @@ public class PNInfo extends PNCardsSubcommandData {
         promissoryNotes.removeAll(player.getPromissoryNotes().keySet());
         promissoryNotes.removeAll(player.getPromissoryNotesInPlayArea());
         promissoryNotes.removeAll(activeMap.getPurgedPN());
+        
         if (!promissoryNotes.isEmpty()) {
             for (String promissoryNote : promissoryNotes) {
+                if (promissoryNote.endsWith("_an") && player.hasAbility("hubris")) {
+                    continue;
+                }
+                if (promissoryNote.equalsIgnoreCase("blood_pact") && !player.hasAbility("dark_whispers")) {
+                    continue;
+                }
                 player.setPromissoryNote(promissoryNote);
             }
         }
