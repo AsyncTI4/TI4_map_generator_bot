@@ -174,7 +174,7 @@ public class AutoCompleteProvider {
             }
             case Constants.SO_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> secretObjectives = Mapper.getSecretObjectivesJustNames();
+                HashMap<String, String> secretObjectives = Mapper.getSecretObjectivesJustNamesAndSource();
                 List<Command.Choice> options = secretObjectives.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
