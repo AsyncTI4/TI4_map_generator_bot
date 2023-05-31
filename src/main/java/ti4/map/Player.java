@@ -62,6 +62,7 @@ public class Player {
     private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> promissoryNotes = new LinkedHashMap<>();
     private HashSet<String> factionAbilities = new HashSet<>();
+    private HashSet<String> promissoryNotesOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
     private List<String> exhaustedTechs = new ArrayList<>();
@@ -335,6 +336,14 @@ public class Player {
 
     public LinkedHashMap<String, String> getTrapCardsPlanets() {
         return trapCardsPlanets;
+    }
+
+    public HashSet<String> getPromissoryNotesOwned() {
+        return promissoryNotesOwned;
+    }
+
+    public void setPromissoryNotesOwned(HashSet<String> promissoryNotesOwned) {
+        this.promissoryNotesOwned = promissoryNotesOwned;
     }
 
     public LinkedHashMap<String, Integer> getPromissoryNotes() {

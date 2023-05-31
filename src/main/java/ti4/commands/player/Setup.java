@@ -18,6 +18,7 @@ import ti4.map.Tile;
 import ti4.model.FactionModel;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.StringTokenizer;
 
@@ -201,6 +202,8 @@ public class Setup extends PlayerSubcommandData {
 
         //STARTING PNs
         player.initPNs(activeMap);
+        HashSet<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
+        player.setPromissoryNotesOwned(playerPNs);
 
         //SEND STUFF
         AbilityInfo.sendAbilityInfo(activeMap, player, event);
