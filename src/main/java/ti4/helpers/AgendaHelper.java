@@ -257,7 +257,11 @@ public class AgendaHelper {
 
                     if (winningR != null && (specificVote.contains("Rider") || winningR.getFaction().equalsIgnoreCase("nomad"))) {
 
-                        winningRs.add(winningR);
+                        if(!winningRs.contains(winningR))
+                        {
+                            winningRs.add(winningR);
+                        }
+                        
 
                     }
 
