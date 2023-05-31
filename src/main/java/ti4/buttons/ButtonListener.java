@@ -689,6 +689,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     if (pfaction2 != null && buttonLabel.toLowerCase().contains(pfaction2)) {
                         addReaction(event, true, true,"Abstained.", "");
+                        event.getMessage().delete().queue();
                     } else {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "You are not the faction who is supposed to press this button.");
                         return;
@@ -713,7 +714,7 @@ public class ButtonListener extends ListenerAdapter {
                     activeMap.setCurrentAgendaVote(outcome, existingData);
                     addReaction(event, true, true,"Voted "+votes + " votes for "+StringUtils.capitalize(outcome)+"!", "");
                 }
-                event.getMessage().delete().queue();
+                
                 String pFaction1 = StringUtils.capitalize(player.getFaction());
                 Button EraseVote = Button.danger("FFCC_"+pFaction1+"_eraseMyVote", pFaction1+" Erase Any Of Your Previous Votes");
                 List<Button> EraseButton = List.of(EraseVote);
@@ -1007,7 +1008,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 
             }
-            if (buttonLabel.equalsIgnoreCase("Done Exhausting Planets") || buttonLabel.equalsIgnoreCase("Done Producing Units")) {
+            if ((buttonLabel.equalsIgnoreCase("Done Exhausting Planets") || buttonLabel.equalsIgnoreCase("Done Producing Units")) && !event.getMessage().getContentRaw().contains("Click the names of the planets you wish")) {
                 String editedMessage = event.getMessage().getContentRaw();
                 if(activeMap.isFoWMode())
                 {
@@ -2176,7 +2177,7 @@ public class ButtonListener extends ListenerAdapter {
                         } else {
                             outcomeActionRow = AgendaHelper.getLawOutcomeButtons(activeMap, null, "outcome");
                         }
-                        event.getMessage().editMessageComponents();
+                        event.getMessage().delete().queue();
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,outcomeActionRow);
                     } else {
                         MessageHelper.sendMessageToChannel(event.getChannel(), "You are not the faction who is supposed to press this button.");
