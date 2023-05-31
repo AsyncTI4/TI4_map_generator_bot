@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.model.*;
 
@@ -136,6 +137,22 @@ public class Mapper {
                 BotLogger.log(error);
             }
         }
+    }
+
+    public static List<String> getFactionStartingPromissoryNotes(Player player) {       
+        List<String> pnList = new ArrayList<>();
+        if (player == null || !player.isRealPlayer()) return pnList;
+        String faction = player.getFaction();
+        return getFactionStartingPromissoryNotes(faction);
+    }
+
+    public static List<String> getFactionStartingPromissoryNotes(String faction) {       
+        List<String> pnList = new ArrayList<>();
+        FactionModel factionModel = getFactionSetup(faction);
+        if (factionModel != null) {
+            pnList.addAll(factionModel.promissoryNotes);
+        }
+        return pnList;
     }
 
     public static List<String> getPromissoryNotes(String color, String faction) {
