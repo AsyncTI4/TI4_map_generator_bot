@@ -346,6 +346,10 @@ public class Player {
         this.promissoryNotesOwned = promissoryNotesOwned;
     }
 
+    public boolean ownsPromissoryNote(String promissoryNoteID) {
+        return promissoryNotesOwned.contains(promissoryNoteID);
+    }
+
     public LinkedHashMap<String, Integer> getPromissoryNotes() {
         return promissoryNotes;
     }
