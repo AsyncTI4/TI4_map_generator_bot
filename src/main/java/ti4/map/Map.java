@@ -2094,28 +2094,13 @@ public class Map {
         List<String> unOwnedPromissoryNotes = new ArrayList<>(allPromissoryNotes);
         unOwnedPromissoryNotes.removeAll(allOwnedPromissoryNotes);
         if (unOwnedPromissoryNotes.size() > 0) {
-            BotLogger.log("`" + getName() + "`: there are promissory notes in the game that no player owns: " + unOwnedPromissoryNotes);
+            BotLogger.log("`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `" + unOwnedPromissoryNotes + "`");
         }
 
         List<String> missingPromissoryNotes = new ArrayList<>(allOwnedPromissoryNotes);
         missingPromissoryNotes.removeAll(allPromissoryNotes);
         if (missingPromissoryNotes.size() > 0) {
-            BotLogger.log("`" + getName() + "`: there are promissory notes should be in the game but are not: " + missingPromissoryNotes);
-        }
-    }
-
-    public void migrateOwnedPNs() {
-        for (Player player : getPlayers().values()) {
-            if (!player.getPromissoryNotesOwned().isEmpty()) continue;
-            HashSet<String> originalOwnedPNs = new HashSet<>();
-            List<String> promissoryNotes = Mapper.getColourFactionPromissoryNoteIDs(this, player.getColor(), player.getFaction());
-            for (String promissoryNote : promissoryNotes) {
-                if (promissoryNote.endsWith("_an") && player.hasAbility("hubris")) {
-                    continue;
-                }
-                originalOwnedPNs.add(promissoryNote);
-            }
-            player.setPromissoryNotesOwned(originalOwnedPNs);
+            BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `" + missingPromissoryNotes + "`");
         }
     }
 }
