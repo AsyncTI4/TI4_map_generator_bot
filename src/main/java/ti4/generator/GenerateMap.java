@@ -2122,12 +2122,12 @@ public class GenerateMap {
                     }
                     String[] pnSplit = Mapper.getPromissoryNote(id).split(";");
                     Player promissoryNoteOwner = activeMap.getPNOwner(id);
+                    if (promissoryNoteOwner == null) { //nobody owns this note - possibly eliminated player
+                        BotLogger.log(activeMap.getName() + " " + player.getUserName() + "  `GenerateMap.displaySftT` is trying to display a **Support for the Throne** without an owner - possibly an eliminated player: " + id);
+                        continue; 
+                    }
                     StringBuilder name = new StringBuilder(pnSplit[0] + " - ");
                     for (Player player_ : players.values()) {
-                        if (promissoryNoteOwner == null) { //nobody owns this note - possibly eliminated player
-                            BotLogger.log(activeMap.getName() + " " + player.getUserName() + "  `GenerateMap.displaySftT` is trying to display a **Support for the Throne** without an owner - possibly an eliminated player: " + id);
-                            continue; 
-                        }
                         if (player_ != player) {
                             String playerColor = player_.getColor();
                             String playerFaction = player_.getFaction();
