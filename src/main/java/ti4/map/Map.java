@@ -2074,7 +2074,7 @@ public class Map {
         }
 
         if (Helper.findDuplicateInList(allPlayerHandPromissoryNotes).size() > 0) {
-            BotLogger.log("`" + getName() + "`: there are duplicate promissory notes in the game:\n> `" + Helper.findDuplicateInList(allPromissoryNotes) + "`");
+            BotLogger.log("`" + getName() + "`: there are duplicate promissory notes in the game:\n> `" + Helper.findDuplicateInList(allPlayerHandPromissoryNotes) + "`");
         }
 
         allPromissoryNotes.addAll(getPurgedPN());
