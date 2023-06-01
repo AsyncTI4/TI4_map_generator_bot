@@ -114,8 +114,10 @@ public class ExpPlanet extends ExploreSubcommandData {
                         String message = "Please decide which card to resolve.";
 
                         if (activeMap != null && !activeMap.isFoWMode() &&(event.getChannel() !=  activeMap.getActionsChannel())) {
-                            String pF = StringUtils.capitalize(player.getFaction());
-                            MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "Using Distant Suns " + pF + " found a "+name1+" and a " +name2+ " on "+Helper.getPlanetRepresentation(planetName, activeMap));
+                            
+                            String pF = Helper.getFactionIconFromDiscord(player.getFaction());
+                            
+                            MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "Using Distant Suns,  " + pF + " found a "+name1+" and a " +name2+ " on "+Helper.getPlanetRepresentation(planetName, activeMap));
                             
                         }
                         else

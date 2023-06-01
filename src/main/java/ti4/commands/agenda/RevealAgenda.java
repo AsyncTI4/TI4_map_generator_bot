@@ -43,20 +43,46 @@ public class RevealAgenda extends AgendaSubcommandData {
         LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(id);
 
+        
         AgendaModel agendaDetails = Mapper.getAgenda(id);
         String agendaTarget = agendaDetails.target;
         String agendaType = agendaDetails.type;
         String agendaName = agendaDetails.name;
+
+        if(agendaName.equalsIgnoreCase("Emergency Session"))
+        {
+            MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeMap.getGuild(), activeMap)+" Emergency Session revealed, flipping next agenda");
+            revealAgenda(event, revealFromBottom, activeMap, channel);
+            return;
+        }
         if (agendaName!= null && !agendaName.equalsIgnoreCase("Covert Legislation")) {
             activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget + "_"+uniqueID);
         } else {
-            String id2 = activeMap.getNextAgenda(revealFromBottom);
-            AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
-            agendaTarget = agendaDetails2.target;
-            agendaType = agendaDetails2.type;
-            agendaName = agendaDetails.name;
+            boolean notEmergency = false;
+            while(!notEmergency)
+            {
+                if(agendaName.equalsIgnoreCase("Emergency Session"))
+                {
+                    String id3 = activeMap.revealAgenda(revealFromBottom);
+                    MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeMap.getGuild(), activeMap)+" Emergency Session revealed underneath Covert Legislation, discarding it.");
+                }
+                String id2 = activeMap.getNextAgenda(revealFromBottom);
+                AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
+                agendaTarget = agendaDetails2.target;
+                agendaType = agendaDetails2.type;
+                agendaName = agendaDetails.name;
+                activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget+"_CL");
+                if(agendaName.equalsIgnoreCase("Emergency Session"))
+                {
+                    notEmergency = false;
+                }
+                else
+                {
+                    notEmergency = true;
+                }
+
+            }
             
-            activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget+"_CL");
         }
         activeMap.resetCurrentAgendaVotes();
         activeMap.setHackElectionStatus(false);
