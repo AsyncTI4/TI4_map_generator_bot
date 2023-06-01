@@ -2070,6 +2070,11 @@ public class Map {
             allPromissoryNotes.addAll(player.getPromissoryNotesInPlayArea());
             allOwnedPromissoryNotes.addAll(player.getPromissoryNotesOwned());
         }
+
+        if (Helper.findDuplicateInList(allPromissoryNotes).size() > 0) {
+            BotLogger.log("`" + getName() + "`: there are duplicate promissory notes in the game:\n> `" + Helper.findDuplicateInList(allPromissoryNotes) + "`");
+        }
+
         allPromissoryNotes.addAll(getPurgedPN());
 
         List<String> unOwnedPromissoryNotes = new ArrayList<>(allPromissoryNotes);
