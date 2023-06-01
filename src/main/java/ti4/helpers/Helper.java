@@ -2,6 +2,7 @@ package ti4.helpers;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
+import net.dv8tion.jda.api.entities.Invite;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
@@ -1870,5 +1871,17 @@ public class Helper {
   
             // Collect duplicate elements in the set
             .collect(Collectors.toSet());
+    }
+
+    public static String getGuildInviteURL(Guild guild) {
+        List<Invite> invites = guild.retrieveInvites().complete();
+        String inviteUrl = null;
+        if (invites != null && !invites.isEmpty()) {
+            inviteUrl = invites.get(0).getUrl();
+        }
+        if (inviteUrl == null) {
+            inviteUrl = guild.getDefaultChannel().createInvite().complete().getUrl();
+        }
+        return null;
     }
 }

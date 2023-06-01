@@ -33,7 +33,7 @@ public class PNInfo extends PNCardsSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
-        checkAndAddPNs(activeMap, player); // may not need this anymore - see botlogger
+        checkAndAddPNs(activeMap, player);
         activeMap.checkPromissoryNotes();
         sendPromissoryNoteInfo(activeMap, player, true, event);
         sendMessage("PN Info Sent");
