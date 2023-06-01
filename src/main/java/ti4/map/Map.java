@@ -2079,4 +2079,43 @@ public class Map {
     public void setTileNameAutocompleteOptionsCache(List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache) {
         this.tileNameAutocompleteOptionsCache = tileNameAutocompleteOptionsCache;
     }
+
+    public void checkPromissoryNotes() {
+        List<String> allPromissoryNotes = new ArrayList<>();
+        Set<String> allOwnedPromissoryNotes = new HashSet<>();
+
+        for (Player player : getPlayers().values()) {
+            allPromissoryNotes.addAll(player.getPromissoryNotes().keySet());
+            allPromissoryNotes.addAll(player.getPromissoryNotesInPlayArea());
+            allOwnedPromissoryNotes.addAll(player.getPromissoryNotesOwned());
+        }
+        allPromissoryNotes.addAll(getPurgedPN());
+
+        List<String> unOwnedPromissoryNotes = new ArrayList<>(allPromissoryNotes);
+        unOwnedPromissoryNotes.removeAll(allOwnedPromissoryNotes);
+        if (unOwnedPromissoryNotes.size() > 0) {
+            BotLogger.log("`" + getName() + "`: there are promissory notes in the game that no player owns: " + unOwnedPromissoryNotes);
+        }
+
+        List<String> missingPromissoryNotes = new ArrayList<>(allOwnedPromissoryNotes);
+        missingPromissoryNotes.removeAll(allPromissoryNotes);
+        if (missingPromissoryNotes.size() > 0) {
+            BotLogger.log("`" + getName() + "`: there are promissory notes should be in the game but are not: " + missingPromissoryNotes);
+        }
+    }
+
+    public void migrateOwnedPNs() {
+        for (Player player : getPlayers().values()) {
+            if (!player.getPromissoryNotesOwned().isEmpty()) continue;
+            HashSet<String> originalOwnedPNs = new HashSet<>();
+            List<String> promissoryNotes = Mapper.getColourFactionPromissoryNoteIDs(this, player.getColor(), player.getFaction());
+            for (String promissoryNote : promissoryNotes) {
+                if (promissoryNote.endsWith("_an") && player.hasAbility("hubris")) {
+                    continue;
+                }
+                originalOwnedPNs.add(promissoryNote);
+            }
+            player.setPromissoryNotesOwned(originalOwnedPNs);
+        }
+    }
 }

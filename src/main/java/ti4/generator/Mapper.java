@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.model.*;
 
@@ -34,7 +35,6 @@ public class Mapper {
     private static final Properties faction_abilities = new Properties();
     private static final Properties factions = new Properties();
     private static final Properties general = new Properties();
-    private static final Properties promissoryNotes = new Properties();
     private static final Properties techs = new Properties();
     private static final Properties explore = new Properties();
     private static final Properties relics = new Properties();
@@ -61,6 +61,7 @@ public class Mapper {
     private static final HashMap<String, FactionModel> factionSetup = new HashMap<>();
     private static final HashMap<String, PublicObjectiveModel> publicObjectives = new HashMap<>();
     private static final HashMap<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
+    private static final HashMap<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
 
     public static void init() {
         readData("tiles.properties", tiles, "Could not read tiles name file");
@@ -77,7 +78,7 @@ public class Mapper {
         readJsonData("action_cards.json", actionCards, ActionCardModel::new, "Could not read action cards file");
         readJsonData("agendas.json", agendas, AgendaModel::new, "Could not read agendas file");
         readJsonData("public_objectives.json", publicObjectives, PublicObjectiveModel::new, "Could not read public objective file");
-        readData("promissory_notes.properties", promissoryNotes, "Could not read promissory notes file");
+        readJsonData("promissory_notes.json", promissoryNotes, PromissoryNoteModel::new, "Could not read promissory notes file");
         readData("exploration.properties", explore, "Could not read explore file");
         readData("relics.properties", relics, "Could not read relic file");
         readData("tech.properties", techs, "Could not read tech file");
@@ -138,26 +139,37 @@ public class Mapper {
         }
     }
 
-    public static List<String> getPromissoryNotes(String color, String faction) {
+    public static List<String> getColourFactionPromissoryNoteIDs(ti4.map.Map activeMap, String color, String faction) {
         List<String> pnList = new ArrayList<>();
         color = AliasHandler.resolveColor(color);
         if (Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
-            for (Map.Entry<Object, Object> entry : promissoryNotes.entrySet()) {
-                String value = (String) entry.getValue();
-                String[] pns = value.split(";");
-                String id = pns[1].toLowerCase();
-                if (id.equals(color) || (isFaction(id) && AliasHandler.resolveFaction(id).equals(faction))) {
-                    pnList.add((String) entry.getKey());
+            for (PromissoryNoteModel pn : promissoryNotes.values()) {
+                if (pn.colour.equals(color) || pn.faction.equalsIgnoreCase(faction)) {
+                    if (activeMap.isAbsolMode() && pn.alias.endsWith("_ps") && !pn.source.equalsIgnoreCase("Absol")) {
+                        continue;
+                    }
+                    if (!activeMap.isAbsolMode() && pn.alias.endsWith("_ps") && pn.source.equalsIgnoreCase("Absol")) {
+                        continue;
+                    }
+                    pnList.add(pn.alias);
                 }
             }
         }
         return pnList;
     }
 
-    public static List<String> getPromissoryNotes() {
+    public static HashMap<String, PromissoryNoteModel> getPromissoryNotes() {
+        return promissoryNotes;
+    }
+
+    public static PromissoryNoteModel getPromissoryNoteByID(String id) {
+        return promissoryNotes.get(id);
+    }
+
+    public static List<String> getAllPromissoryNoteIDs() {
         List<String> pnList = new ArrayList<>();
-        for (Map.Entry<Object, Object> entry : promissoryNotes.entrySet()) {
-            pnList.add((String) entry.getKey());
+        for (String pnID : promissoryNotes.keySet()) {
+            pnList.add(pnID);
         }
         return pnList;
     }
@@ -356,23 +368,21 @@ public class Mapper {
     }
 
     public static String getPromissoryNote(String id) {
-        return (String) promissoryNotes.get(id);
+        return promissoryNotes.get(id).text;
     }
 
     public static String getShortPromissoryNote(String id) {
-        String promStr = promissoryNotes.getProperty(id);
+        String promStr = promissoryNotes.get(id).text;
         // if we would break trying to split the note, just return whatever is there
         if ((promStr == null) || !promStr.contains(";")) {
             return promStr;
         }
-        String[] pns = ((String) promissoryNotes.get(id)).split(";");
-        return pns[0] + ";" + pns[1];
+        String pns = promissoryNotes.get(id).name + ";" + promissoryNotes.get(id).faction + promissoryNotes.get(id).colour;
+        return pns;
     }
 
     public static String getPromissoryNoteOwner(String id) {
-        String pnInfo = (String) promissoryNotes.get(id);
-        String[] pns = pnInfo.split(";");
-        return pns[1].toLowerCase();
+        return promissoryNotes.get(id).getOwner();
     }
 
     public static PublicObjectiveModel getPublicObjective(String id) {

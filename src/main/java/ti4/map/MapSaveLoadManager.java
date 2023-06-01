@@ -488,6 +488,10 @@ public class MapSaveLoadManager {
 
             writeCards(player.getActionCards(), writer, Constants.AC);
             writeCards(player.getPromissoryNotes(), writer, Constants.PROMISSORY_NOTES);
+
+            writer.write(Constants.PROMISSORY_NOTES_OWNED + " " + String.join(",", player.getPromissoryNotesOwned()));
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
             writer.write(System.lineSeparator());
             writeCards(player.getTrapCards(), writer, Constants.LIZHO_TRAP_CARDS);
@@ -784,6 +788,8 @@ public class MapSaveLoadManager {
                             Map activeMap = loadMap(file);
                             if (activeMap != null) {
                                 mapList.put(activeMap.getName(), activeMap);
+                                activeMap.migrateOwnedPNs();
+                                // activeMap.checkPromissoryNotes(); 
                             }
                         } catch (Exception e) {
                             BotLogger.log("Could not load TXT game:" + file, e);
@@ -1451,6 +1457,7 @@ public class MapSaveLoadManager {
                         player.setPromissoryNote(id, index);
                     }
                 }
+                case Constants.PROMISSORY_NOTES_OWNED -> player.setPromissoryNotesOwned(new HashSet<String>(Helper.getSetFromCSV(tokenizer.nextToken())));
                 case Constants.PROMISSORY_NOTES_PLAY_AREA ->
                         player.setPromissoryNotesInPlayArea(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS -> player.setPlanets(getCardList(tokenizer.nextToken()));

@@ -111,6 +111,8 @@ public class FrankenCommand implements Command {
         subcommands.add(new AbilityRemove());
         subcommands.add(new LeaderAdd());
         subcommands.add(new LeaderRemove());
+        subcommands.add(new PNAdd());
+        subcommands.add(new PNRemove());
 
 
         return subcommands;

@@ -62,6 +62,7 @@ public class Player {
     private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> promissoryNotes = new LinkedHashMap<>();
     private HashSet<String> factionAbilities = new HashSet<>();
+    private HashSet<String> promissoryNotesOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
     private List<String> exhaustedTechs = new ArrayList<>();
@@ -337,6 +338,26 @@ public class Player {
         return trapCardsPlanets;
     }
 
+    public HashSet<String> getPromissoryNotesOwned() {
+        return promissoryNotesOwned;
+    }
+
+    public void setPromissoryNotesOwned(HashSet<String> promissoryNotesOwned) {
+        this.promissoryNotesOwned = promissoryNotesOwned;
+    }
+
+    public boolean ownsPromissoryNote(String promissoryNoteID) {
+        return promissoryNotesOwned.contains(promissoryNoteID);
+    }
+
+    public boolean removeOwnedPromissoryNoteByID(String promissoryNoteID) {
+        return promissoryNotesOwned.remove(promissoryNoteID);
+    }
+
+    public boolean addOwnedPromissoryNoteByID(String promissoryNoteID) {
+        return promissoryNotesOwned.add(promissoryNoteID);
+    }
+
     public LinkedHashMap<String, Integer> getPromissoryNotes() {
         return promissoryNotes;
     }
@@ -388,13 +409,7 @@ public class Player {
 
     @JsonSetter
     public void setPromissoryNotesInPlayArea(List<String> promissoryNotesInPlayArea) {
-        List<String> replaced = new ArrayList<>();
-        for (String id : promissoryNotesInPlayArea) {
-            id = id.replace("torquoise", "turquoise");
-            replaced.add(id);
-        }
-
-        this.promissoryNotesInPlayArea = replaced;
+        this.promissoryNotesInPlayArea = promissoryNotesInPlayArea;
     }
 
     public void setPromissoryNotes(LinkedHashMap<String, Integer> promissoryNotes) {
@@ -414,7 +429,6 @@ public class Player {
     }
 
     public void setPromissoryNote(String id, Integer identifier) {
-        id = id.replace("torquoise", "turquoise");
         promissoryNotes.put(id, identifier);
     }
 
@@ -648,7 +662,6 @@ public class Player {
 
     public void setFaction(String faction) {
         this.faction = faction;
-        initPNs();
         initLeaders();
         initAbilities();
     }
@@ -793,7 +806,6 @@ public class Player {
         if (!color.equals("null")) {
             this.color = AliasHandler.resolveColor(color);
         }
-        initPNs();
     }
 
     public void changeColor(String color) {
@@ -802,12 +814,15 @@ public class Player {
         }
     }
 
-    public void initPNs() {
-        if (color != null && faction != null && Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
+    public void initPNs(ti4.map.Map activeMap) {
+        if (activeMap != null && color != null && faction != null && Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
             promissoryNotes.clear();
-            List<String> promissoryNotes = Mapper.getPromissoryNotes(color, faction);
+            List<String> promissoryNotes = Mapper.getColourFactionPromissoryNoteIDs(activeMap, color, faction);
             for (String promissoryNote : promissoryNotes) {
-                if (hasAbility("hubris") && promissoryNote.endsWith("_an")){
+                if (promissoryNote.endsWith("_an") && hasAbility("hubris")) {
+                    continue;
+                }
+                if (promissoryNote.equalsIgnoreCase("blood_pact") && !hasAbility("dark_whispers")) {
                     continue;
                 }
                 setPromissoryNote(promissoryNote);
@@ -1182,6 +1197,9 @@ public class Player {
         this.isDummy = isDummy;
     }
 
+    /**
+     * @return true if the player is: not a "dummy", faction != null, color != null, & color != "null"
+     */
     @JsonIgnore
     public boolean isRealPlayer() {
         return !(isDummy || faction == null || color == null || color.equals("null"));

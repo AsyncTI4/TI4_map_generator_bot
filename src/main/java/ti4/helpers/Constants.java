@@ -505,6 +505,7 @@ public class Constants {
 
     public static final String PROMISSORY_NOTE_ID = "promissory_note_id";
     public static final String PROMISSORY_NOTES = "promissory_notes";
+    public static final String PROMISSORY_NOTES_OWNED = "promissory_notes_owned";
     public static final String PROMISSORY_NOTES_PLAY_AREA = "promissory_notes_play_area";
     public static final String SHOW_PN = "show";
     public static final String SHOW_ALL_PN = "show_all";
@@ -744,4 +745,6 @@ public class Constants {
     public static final String IS_MY_TURN = "is_my_turn";
     public static final String SET_DECK = "set_deck";
     public static final String DECK_NAME = "deck_name";
+    public static final String PN_REMOVE = "pn_remove";
+    public static final String PN_ADD = "pn_add";
 }
