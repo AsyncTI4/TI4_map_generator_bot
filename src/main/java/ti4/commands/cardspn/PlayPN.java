@@ -11,6 +11,7 @@ import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
+import ti4.model.PromissoryNoteModel;
 
 public class PlayPN extends PNCardsSubcommandData {
     public PlayPN() {
@@ -40,13 +41,13 @@ public class PlayPN extends PNCardsSubcommandData {
         }
 
         String value = option.getAsString().toLowerCase();
-        String id = null;
+        String pnID = null;
         int pnIndex;
         try {
             pnIndex = Integer.parseInt(value);
-            for (java.util.Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
-                if (so.getValue().equals(pnIndex)) {
-                    id = so.getKey();
+            for (java.util.Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
+                if (pn.getValue().equals(pnIndex)) {
+                    pnID = pn.getKey();
                 }
             }
         } catch (Exception e) {
@@ -61,7 +62,7 @@ public class PlayPN extends PNCardsSubcommandData {
                             sendMessage("Multiple cards with similar name founds, please use ID");
                             return;
                         }
-                        id = pn.getKey();
+                        pnID = pn.getKey();
                         foundSimilarName = true;
                         cardName = pnName;
                     }
@@ -69,23 +70,20 @@ public class PlayPN extends PNCardsSubcommandData {
             }
         }
 
-        if (id == null) {
+        if (pnID == null) {
             sendMessage("No such Promissory Note ID found, please retry");
             return;
         }
 
-        String promissoryNote = Mapper.getPromissoryNote(id, true);
-        String[] pn = promissoryNote.split(";");
-        String pnOwner = Mapper.getPromissoryNoteOwner(id);
-        if (pn.length > 3 && pn[3].equals("playarea")) {
-            player.setPromissoryNotesInPlayArea(id);
+        PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnID);
+        String pnOwner = Mapper.getPromissoryNoteOwner(pnID);
+        if (promissoryNote.playArea) {
+            player.setPromissoryNotesInPlayArea(pnID);
         } else {
-            player.removePromissoryNote(id);
+            player.removePromissoryNote(pnID);
             for (Player player_ : activeMap.getPlayers().values()) {
-                String playerColor = player_.getColor();
-                String playerFaction = player_.getFaction();
-                if (playerColor != null && playerColor.equals(pnOwner) || playerFaction != null && playerFaction.equals(pnOwner)) {
-                    player_.setPromissoryNote(id);
+                if (player_.getPromissoryNotesOwned().contains(pnID)) {
+                    player_.setPromissoryNote(pnID);
                     PNInfo.sendPromissoryNoteInfo(activeMap, player_, false, event);
                     pnOwner = player_.getFaction();
                     break;
@@ -98,16 +96,11 @@ public class PlayPN extends PNCardsSubcommandData {
         sb.append(emojiToUse + Emojis.PN);
         String pnText = "";
 
-        //Handle AbsolMode Political Secret
-        if (activeMap.isAbsolMode() && id.endsWith("_ps")) {
-            pnText = "Political Secret" + Emojis.Absol + ":  *When you cast votes:* You may exhaust up to 3 of the {colour} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {colour} player.";
-        } else {
-            pnText = Mapper.getPromissoryNote(id, longPNDisplay);
-        }
+        pnText = Mapper.getPromissoryNote(pnID, longPNDisplay);
         sb.append(pnText).append("\n");
 
         //TERRAFORM TIP
-        if (id.equalsIgnoreCase("terraform")) {
+        if (pnID.equalsIgnoreCase("terraform")) {
             sb.append("`/add_token token:titanspn`\n");
         }
 
