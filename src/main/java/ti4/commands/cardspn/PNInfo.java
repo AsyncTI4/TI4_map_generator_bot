@@ -34,6 +34,7 @@ public class PNInfo extends PNCardsSubcommandData {
             return;
         }
         checkAndAddPNs(activeMap, player); // may not need this anymore - see botlogger
+        activeMap.checkPromissoryNotes();
         sendPromissoryNoteInfo(activeMap, player, true, event);
         sendMessage("PN Info Sent");
     }

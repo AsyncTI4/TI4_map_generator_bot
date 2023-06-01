@@ -819,7 +819,7 @@ public class Player {
             promissoryNotes.clear();
             List<String> promissoryNotes = Mapper.getColourFactionPromissoryNoteIDs(activeMap, color, faction);
             for (String promissoryNote : promissoryNotes) {
-                if (hasAbility("hubris") && promissoryNote.endsWith("_an")) {
+                if (promissoryNote.endsWith("_an") && hasAbility("hubris")) {
                     continue;
                 }
                 if (promissoryNote.equalsIgnoreCase("blood_pact") && !hasAbility("dark_whispers")) {
