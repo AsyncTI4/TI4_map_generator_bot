@@ -788,7 +788,6 @@ public class MapSaveLoadManager {
                             Map activeMap = loadMap(file);
                             if (activeMap != null) {
                                 mapList.put(activeMap.getName(), activeMap);
-                                activeMap.migrateOwnedPNs();
                                 // activeMap.checkPromissoryNotes(); 
                             }
                         } catch (Exception e) {
