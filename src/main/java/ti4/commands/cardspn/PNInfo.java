@@ -42,7 +42,7 @@ public class PNInfo extends PNCardsSubcommandData {
     }
 
     public static void sendPromissoryNoteInfo(Map activeMap, Player player, boolean longFormat, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " Heads up, someone used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendPromissoryNoteInfo(activeMap, player, longFormat);
     }
