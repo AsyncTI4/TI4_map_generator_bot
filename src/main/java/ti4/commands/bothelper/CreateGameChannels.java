@@ -176,8 +176,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
         if (sendInviteLink) {
-            //guild.retrieveInvites().complete().get(0).getUrl();
-            sendMessage("https://discord.gg/zkMP2VbEsA"); //invite link to secondary server, #landing-pad channel, unlimited uses, no expiration date
+            sendMessage(Helper.getGuildInviteURL(guild));
             return;
         }
 
