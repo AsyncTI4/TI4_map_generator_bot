@@ -2121,6 +2121,10 @@ public class GenerateMap {
                     Player promissoryNoteOwner = activeMap.getPNOwner(id);
                     StringBuilder name = new StringBuilder(pnSplit[0] + " - ");
                     for (Player player_ : players.values()) {
+                        if (promissoryNoteOwner == null) { //nobody owns this note - possibly eliminated player
+                            BotLogger.log("`GenerateMap.displaySftT` is trying to display a **Support for the Throne** without an owner - possibly an eliminated player");
+                            continue; 
+                        }
                         if (player_ != player) {
                             String playerColor = player_.getColor();
                             String playerFaction = player_.getFaction();
