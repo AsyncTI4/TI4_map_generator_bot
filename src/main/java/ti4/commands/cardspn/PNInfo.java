@@ -154,7 +154,6 @@ public class PNInfo extends PNCardsSubcommandData {
         promissoryNotes.removeAll(activeMap.getPurgedPN());
         
         if (!promissoryNotes.isEmpty()) {
-            BotLogger.log(activeMap.getName() + " " + player.getUserName() + " `PNInfo.checkAndAddPNs` found missing PNs: " + promissoryNotes);
             for (String promissoryNote : promissoryNotes) {
                 player.setPromissoryNote(promissoryNote);
             }
