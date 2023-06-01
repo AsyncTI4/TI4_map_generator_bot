@@ -136,7 +136,7 @@ public class PNInfo extends PNCardsSubcommandData {
 
         String pnText = pnModel.text;
         Player pnOwner = activeMap.getPNOwner(pnID);
-        if (pnOwner != null && pnOwner.isRealPlayer() && !activeMap.isFoWMode()) {
+        if (pnOwner != null && pnOwner.isRealPlayer()) {
             sb.append(Helper.getFactionIconFromDiscord(pnOwner.getFaction()));
             sb.append(Helper.getRoleMentionByName(activeMap.getGuild(), pnOwner.getColor()));
             if (!activeMap.isFoWMode()) sb.append("(").append(pnOwner.getUserName()).append(")");
