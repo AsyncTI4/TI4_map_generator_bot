@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -34,7 +36,6 @@ public class CreateGameChannels extends BothelperSubcommandData {
     public CreateGameChannels(){
         super(Constants.CREATE_GAME_CHANNELS, "Create Role and Game Channels for a New Game");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CATEGORY, "Category #category-name - only select a category").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName - this will be the game owner, who will complete /game setup").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3 @playerName"));
@@ -44,6 +45,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next pbd###)"));
+        addOptions(new OptionData(OptionType.STRING, Constants.CATEGORY, "Override default Category #category-name (PBD #XYZ-ZYX)").setAutoComplete(true));
         // addOptions(new OptionData(OptionType.STRING, Constants.SERVER, "Server to create the channels on (Primary or Secondary) - default is smart selection").setAutoComplete(true));
     }
 
@@ -87,19 +89,36 @@ public class CreateGameChannels extends BothelperSubcommandData {
             gameName = getNextGameName();
         }
 
-        //CHECK CATEGORY IS VALID
-        String categoryChannelName = event.getOption(Constants.CATEGORY).getAsString();
+        //CHECK IF GIVEN CATEGORY IS VALID
+        String categoryChannelName = event.getOption(Constants.CATEGORY, null, OptionMapping::getAsString);
         Category categoryChannel = null;
         if (categoryChannelName != null && !categoryChannelName.isEmpty()) {
-            List<Category> categories = MapGenerator.jda.getCategoriesByName(categoryChannelName, false);
-            if (categories.size() > 1) {
+            List<Category> categoriesWithName = MapGenerator.jda.getCategoriesByName(categoryChannelName, false);
+            if (categoriesWithName.size() > 1) {
                 sendMessage("Too many categories with this name!!");
                 return;
-            } else if (categories.isEmpty()) {
+            } else if (categoriesWithName.isEmpty()) {
                 sendMessage("Category not found");
                 return;
             } else {
                 categoryChannel = MapGenerator.jda.getCategoriesByName(categoryChannelName, false).get(0);
+            }
+        } else { //CATEGORY WAS NOT PROVIDED, FIND ONE
+            categoryChannelName = getCategoryNameForGame(gameName);
+            if (categoryChannelName == null) {
+                sendMessage("Please provide a category name for this game");
+                return;
+            }
+            List<Category> categories = getAllAvailablePBDCategories();
+            for (Category category : categories) {
+                if (category.getName().toUpperCase().startsWith(categoryChannelName)) {
+                    categoryChannel = category;
+                    break;
+                }
+            }
+            if (categoryChannel == null) {
+                sendMessage("Could not automatically find a category that begins with **" + categoryChannelName + "** - Please create this category.");
+                return;
             }
         }
 
@@ -157,8 +176,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
         if (sendInviteLink) {
-            //guild.retrieveInvites().complete().get(0).getUrl();
-            sendMessage("https://discord.gg/zkMP2VbEsA"); //invite link to secondary server, #landing-pad channel, unlimited uses, no expiration date
+            sendMessage(Helper.getGuildInviteURL(guild));
             return;
         }
 
@@ -341,7 +359,21 @@ public class CreateGameChannels extends BothelperSubcommandData {
         return true;
     }
 
-    private static Category getNextAvailableCategory(Guild guild) {
-        return null;
+    private static String getCategoryNameForGame(String gameName) {
+        if (!gameName.startsWith("pbd")) return null;
+        String gameNumber = StringUtils.substringAfter(gameName, "pbd");
+        if (!Helper.isInteger(gameNumber)) return null;
+        int gameNum = Integer.parseInt(gameNumber);
+        int lowerBound = gameNum - gameNum % 25 + 1;
+        int upperBound = lowerBound + 24;
+        return "PBD #" + lowerBound + "-" + upperBound;
+    }
+    
+    public static List<Category> getAllAvailablePBDCategories() {
+        List<Category> categories = MapGenerator.jda.getCategories().stream()
+            .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
+            .toList();
+
+        return categories;
     }
 }
