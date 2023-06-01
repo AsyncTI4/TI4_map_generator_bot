@@ -2063,15 +2063,17 @@ public class Map {
 
     public void checkPromissoryNotes() {
         List<String> allPromissoryNotes = new ArrayList<>();
+        List<String> allPlayerHandPromissoryNotes = new ArrayList<>();
         Set<String> allOwnedPromissoryNotes = new HashSet<>();
 
         for (Player player : getPlayers().values()) {
             allPromissoryNotes.addAll(player.getPromissoryNotes().keySet());
+            allPlayerHandPromissoryNotes.addAll(allPromissoryNotes);
             allPromissoryNotes.addAll(player.getPromissoryNotesInPlayArea());
             allOwnedPromissoryNotes.addAll(player.getPromissoryNotesOwned());
         }
 
-        if (Helper.findDuplicateInList(allPromissoryNotes).size() > 0) {
+        if (Helper.findDuplicateInList(allPlayerHandPromissoryNotes).size() > 0) {
             BotLogger.log("`" + getName() + "`: there are duplicate promissory notes in the game:\n> `" + Helper.findDuplicateInList(allPromissoryNotes) + "`");
         }
 
