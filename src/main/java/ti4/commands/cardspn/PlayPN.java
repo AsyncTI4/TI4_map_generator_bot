@@ -79,7 +79,7 @@ public class PlayPN extends PNCardsSubcommandData {
         String pnOwner = Mapper.getPromissoryNoteOwner(pnID);
         if (promissoryNote.playArea) {
             player.setPromissoryNotesInPlayArea(pnID);
-        } else {
+        } else { //return to owner
             player.removePromissoryNote(pnID);
             for (Player player_ : activeMap.getPlayers().values()) {
                 if (player_.getPromissoryNotesOwned().contains(pnID)) {

@@ -788,7 +788,8 @@ public class MapSaveLoadManager {
                             Map activeMap = loadMap(file);
                             if (activeMap != null) {
                                 mapList.put(activeMap.getName(), activeMap);
-                                // activeMap.checkPromissoryNotes(); 
+                                // activeMap.checkPromissoryNotes();
+                                activeMap.migrateAbsolPS();
                             }
                         } catch (Exception e) {
                             BotLogger.log("Could not load TXT game:" + file, e);

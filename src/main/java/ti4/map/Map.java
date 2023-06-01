@@ -1,5 +1,6 @@
 package ti4.map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
@@ -2095,12 +2096,32 @@ public class Map {
         unOwnedPromissoryNotes.removeAll(allOwnedPromissoryNotes);
         if (unOwnedPromissoryNotes.size() > 0) {
             BotLogger.log("`" + getName() + "`: there are promissory notes in the game that no player owns:\n> `" + unOwnedPromissoryNotes + "`");
+            getPurgedPN().removeAll(unOwnedPromissoryNotes);
         }
 
         List<String> missingPromissoryNotes = new ArrayList<>(allOwnedPromissoryNotes);
         missingPromissoryNotes.removeAll(allPromissoryNotes);
         if (missingPromissoryNotes.size() > 0) {
             BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `" + missingPromissoryNotes + "`");
+        }
+    }
+
+    public void migrateAbsolPS() {
+        if (!isAbsolMode()) return;
+
+        for (Player player : getPlayers().values()) {
+            for (String pnID : player.getPromissoryNotes().keySet()) {
+                if (pnID.endsWith("_ps") && pnID.startsWith("absol_")) {
+                    player.removePromissoryNote(pnID);
+                    continue;
+                }
+                if (pnID.endsWith("_ps") && !pnID.startsWith("absol_")) {
+                    String colour = StringUtils.substringBefore(pnID, "_ps");
+                    System.out.println(colour);
+                    player.removePromissoryNote(pnID);
+                    player.setPromissoryNote("absol_" + pnID);
+                }
+            }
         }
     }
 }
