@@ -1882,6 +1882,6 @@ public class Helper {
         if (inviteUrl == null) {
             inviteUrl = guild.getDefaultChannel().createInvite().complete().getUrl();
         }
-        return null;
+        return inviteUrl;
     }
 }
