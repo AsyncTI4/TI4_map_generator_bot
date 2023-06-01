@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -155,7 +157,7 @@ public class PNInfo extends PNCardsSubcommandData {
         
         if (!promissoryNotes.isEmpty()) {
             for (String promissoryNote : promissoryNotes) {
-                // player.setPromissoryNote(promissoryNote);
+                player.setPromissoryNote(promissoryNote);
             }
         }
     }

@@ -788,8 +788,6 @@ public class MapSaveLoadManager {
                             Map activeMap = loadMap(file);
                             if (activeMap != null) {
                                 mapList.put(activeMap.getName(), activeMap);
-                                // activeMap.checkPromissoryNotes();
-                                // activeMap.migrateAbsolPS();
                             }
                         } catch (Exception e) {
                             BotLogger.log("Could not load TXT game:" + file, e);
@@ -1453,6 +1451,9 @@ public class MapSaveLoadManager {
                     while (pnToken.hasMoreTokens()) {
                         StringTokenizer pnInfo = new StringTokenizer(pnToken.nextToken(), ",");
                         String id = pnInfo.nextToken();
+                        //MIGRATE ABSOL'S PS
+                        if (activeMap.isAbsolMode() && id.endsWith("_ps") && !id.startsWith("absol_")) id = "absol_" + id;
+                        //END MIGRATE
                         Integer index = Integer.parseInt(pnInfo.nextToken());
                         player.setPromissoryNote(id, index);
                     }

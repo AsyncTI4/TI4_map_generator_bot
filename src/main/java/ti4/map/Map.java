@@ -2105,23 +2105,4 @@ public class Map {
             BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `" + missingPromissoryNotes + "`");
         }
     }
-
-    public void migrateAbsolPS() {
-        if (!isAbsolMode()) return;
-
-        for (Player player : getPlayers().values()) {
-            for (String pnID : player.getPromissoryNotes().keySet()) {
-                if (pnID.endsWith("_ps") && pnID.startsWith("absol_")) {
-                    player.removePromissoryNote(pnID);
-                    continue;
-                }
-                if (pnID.endsWith("_ps") && !pnID.startsWith("absol_")) {
-                    String colour = StringUtils.substringBefore(pnID, "_ps");
-                    System.out.println(colour);
-                    player.removePromissoryNote(pnID);
-                    player.setPromissoryNote("absol_" + pnID);
-                }
-            }
-        }
-    }
 }
