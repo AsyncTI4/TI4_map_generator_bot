@@ -2061,6 +2061,15 @@ public class Map {
         this.tileNameAutocompleteOptionsCache = tileNameAutocompleteOptionsCache;
     }
 
+    public Player getPNOwner(String pnID) {
+        for (Player player : getPlayers().values()) {
+            if (player.ownsPromissoryNote(pnID)) {
+                return player;
+            }
+        }
+        return null;
+    }
+
     public void checkPromissoryNotes() {
         List<String> allPromissoryNotes = new ArrayList<>();
         List<String> allPlayerHandPromissoryNotes = new ArrayList<>();
