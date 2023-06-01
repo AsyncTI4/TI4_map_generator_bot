@@ -789,7 +789,7 @@ public class MapSaveLoadManager {
                             if (activeMap != null) {
                                 mapList.put(activeMap.getName(), activeMap);
                                 activeMap.migrateOwnedPNs();
-                                // activeMap.checkPromissoryNotes();
+                                // activeMap.checkPromissoryNotes(); 
                             }
                         } catch (Exception e) {
                             BotLogger.log("Could not load TXT game:" + file, e);
