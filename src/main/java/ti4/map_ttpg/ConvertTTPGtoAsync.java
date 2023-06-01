@@ -511,7 +511,7 @@ public class ConvertTTPGtoAsync {
     }
 
     private static String determineCardType(String card) {
-        if (Mapper.getPromissoryNotes().contains(AliasHandler.resolvePromissory(card))) {
+        if (Mapper.getAllPromissoryNoteIDs().contains(AliasHandler.resolvePromissory(card))) {
             return "promissory";
         } else if (Mapper.getActionCards().containsKey(AliasHandler.resolveActionCard(card))) {
             return "action";

@@ -14,6 +14,7 @@ import ti4.map.MapManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.model.DeckModel;
+import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 
 import java.io.File;
@@ -174,8 +175,8 @@ public class AutoCompleteProvider {
             }
             case Constants.SO_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> secretObjectives = Mapper.getSecretObjectivesJustNamesAndSource();
-                List<Command.Choice> options = secretObjectives.entrySet().stream()
+                HashMap<String, String> actionCards = Mapper.getSecretObjectivesJustNamesAndSource();
+                List<Command.Choice> options = actionCards.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getValue(), value.getKey()))
@@ -184,8 +185,8 @@ public class AutoCompleteProvider {
             }
             case Constants.AGENDA_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> secretObjectives = Mapper.getAgendaJustNames();
-                List<Command.Choice> options = secretObjectives.entrySet().stream()
+                HashMap<String, String> agendas = Mapper.getAgendaJustNames();
+                List<Command.Choice> options = agendas.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getValue(), value.getKey()))
@@ -194,11 +195,21 @@ public class AutoCompleteProvider {
             }
             case Constants.AC_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> secretObjectives = Mapper.getACJustNames();
-                List<Command.Choice> options = secretObjectives.entrySet().stream()
+                HashMap<String, String> actionCards = Mapper.getACJustNames();
+                List<Command.Choice> options = actionCards.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.PROMISSORY_NOTE_ID -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, PromissoryNoteModel> PNs = Mapper.getPromissoryNotes();
+                List<Command.Choice> options = PNs.values().stream()
+                        .filter(pn -> (pn.alias + " " + pn.name + " " + pn.getOwner()).toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(pn -> new Command.Choice(pn.alias + " " + pn.name + " " + pn.getOwner(), pn.alias))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }

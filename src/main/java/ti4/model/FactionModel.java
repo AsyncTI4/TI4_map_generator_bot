@@ -18,6 +18,7 @@ public class FactionModel extends Model {
     public List<String> homePlanets;
     public List<String> abilities;
     public List<String> leaders;
+    public List<String> promissoryNotes;
 
     public FactionModel(JsonNode json) {
         try {
@@ -41,6 +42,9 @@ public class FactionModel extends Model {
 
             leaders = new ArrayList<String>();
             json.get("leaders").elements().forEachRemaining(val -> leaders.add(val.asText()));
+
+            promissoryNotes = new ArrayList<String>();
+            json.get("promissoryNotes").elements().forEachRemaining(val -> promissoryNotes.add(val.asText()));
         } catch (Exception e) {
             BotLogger.log("Could not load faction setup.");
         }
@@ -55,6 +59,7 @@ public class FactionModel extends Model {
             && startingTech != null
             && homePlanets != null
             && abilities != null
-            && leaders != null;
+            && leaders != null
+            && promissoryNotes != null;
     }
 }

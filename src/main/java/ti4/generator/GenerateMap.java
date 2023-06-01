@@ -15,6 +15,7 @@ import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.PromissoryNoteModel;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -628,21 +629,18 @@ public class GenerateMap {
 
             String pnName = "pa_pn_name_" + pn + ".png";
             drawPAImage(x + deltaX, y, pnName);
-            String promissoryNote = Mapper.getPromissoryNote(pn, true);
-            if (promissoryNote != null) {
-                String[] pnSplit = promissoryNote.split(";");
-                if (pnSplit.length > 4 && !pnSplit[4].isEmpty()) {
-                    String tokenID = pnSplit[4];
-                    found:
-                    for (Tile tile : activeMap.getTileMap().values()) {
-                        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                            if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(tokenID))) {
-                                drawPlanetImage(x + deltaX + 17, y, "pc_planetname_" + unitHolder.getName() + "_rdy.png");
-                                break found;
-                            }
+            PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pn);
+            if (promissoryNote != null && promissoryNote.attachment != null && !promissoryNote.attachment.isBlank()) {
+                String tokenID = promissoryNote.attachment;
+                found:
+                for (Tile tile : activeMap.getTileMap().values()) {
+                    for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                        if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(tokenID))) {
+                            drawPlanetImage(x + deltaX + 17, y, "pc_planetname_" + unitHolder.getName() + "_rdy.png");
+                            break found;
                         }
                     }
-                }
+                }    
             }
             deltaX += 48;
         }

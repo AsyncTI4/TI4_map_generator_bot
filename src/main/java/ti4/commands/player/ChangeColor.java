@@ -57,7 +57,7 @@ public class ChangeColor extends PlayerSubcommandData {
 
         for (Player playerInfo : players.values()) {
             LinkedHashMap<String, Integer> promissoryNotes = playerInfo.getPromissoryNotes();
-
+            
             LinkedHashMap<String, Integer> promissoryNotesChanged = new LinkedHashMap<>();
             for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                 String key = pn.getKey();
@@ -82,6 +82,15 @@ public class ChangeColor extends PlayerSubcommandData {
                 playerInfo.addMahactCC(replacedCC);
             }
         }
+
+        Set<String> ownedPromissoryNotes = player.getPromissoryNotesOwned();
+        HashSet<String> ownedPromissoryNotesChanged = new HashSet<>();
+        for (String pn : ownedPromissoryNotes) {
+            String key = pn;
+            String replacedKey = key.replace(oldColor, color);
+            ownedPromissoryNotesChanged.add(replacedKey);
+        }
+        player.setPromissoryNotesOwned(ownedPromissoryNotesChanged);
 
 
         for (Tile tile : activeMap.getTileMap().values()) {
