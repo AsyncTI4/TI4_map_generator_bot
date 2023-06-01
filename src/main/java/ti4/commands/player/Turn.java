@@ -236,11 +236,8 @@ public class Turn extends PlayerSubcommandData {
         Player arborec = Helper.getPlayerFromAbility(activeMap, "mitosis");
         if (arborec != null) {
             String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeMap, event.getGuild(), true) + " reminder to do mitosis!";
-            if (activeMap.isFoWMode()) {
-                MessageHelper.sendMessageToChannel(arborec.getPrivateChannel(), mitosisMessage);
-            } else {
-                MessageHelper.sendMessageToChannel(gameChannel, mitosisMessage);
-            }
+            MessageHelper.sendMessageToChannel((MessageChannel) arborec.getCardsInfoThread(activeMap), mitosisMessage);
+            
         }
         Player solPlayer =  Helper.getPlayerFromColorOrFaction(activeMap, "sol");
 
@@ -265,28 +262,9 @@ public class Turn extends PlayerSubcommandData {
             }
         }
 
-        Player l1z1xPlayer =  Helper.getPlayerFromColorOrFaction(activeMap, "l1z1x");
+        
 
-        if (l1z1xPlayer != null) {
-            for (Player player : activeMap.getPlayers().values()) {
-
-                if (!player.getPromissoryNotes().isEmpty()) {
-                    for (String pn : player.getPromissoryNotes().keySet()) {
-
-                        if (!player.getFaction().equalsIgnoreCase("l1z1x") && pn.equalsIgnoreCase("ce")) {
-                            String cyberMessage = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " reminder to use cybernetic enhancements!";
-                            if (activeMap.isFoWMode()) {
-                                MessageHelper.sendMessageToChannel(player.getPrivateChannel(), cyberMessage);
-                            } else {
-                                MessageHelper.sendMessageToChannel(gameChannel, cyberMessage);
-                            }
-                        }
-
-
-                    }
-                }
-            }
-        }
+        
 
         HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
         HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();

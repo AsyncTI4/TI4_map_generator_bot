@@ -18,6 +18,7 @@ import ti4.map.Map;
 import ti4.map.MapSaveLoadManager;
 import ti4.map.Planet;
 import ti4.map.Player;
+import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 
@@ -416,6 +417,65 @@ public class ButtonHelper {
         compButtons.add(genButton);
     }
 
+    public static boolean isNextToEmpyMechs(Map activeMap, Player ACPlayer, Player EmpyPlayer)
+    {
+        if(ACPlayer == null || EmpyPlayer == null)
+        {
+            return false;
+        }
+        boolean isNextTo = false;
+        if(ACPlayer.getFaction().equalsIgnoreCase(EmpyPlayer.getFaction()))
+        {
+            return false;
+        }
+        List<Tile> tiles = getTilesOfPlayersSpecificUnit(activeMap, EmpyPlayer, "mech");
+        for(Tile tile : tiles)
+        {
+            
+            Set<String> adjTiles = FoWHelper.getAdjacentTiles(activeMap, tile.getPosition(), EmpyPlayer, true);
+            for(String adjTile : adjTiles)
+            {
+                
+                Tile adjT = activeMap.getTileMap().get(adjTile);
+                if(FoWHelper.playerHasUnitsInSystem(ACPlayer, adjT))
+                {
+                    isNextTo = true;
+                    return isNextTo;
+                }
+            }
+        }
+
+
+        return isNextTo;
+    }
+
+    public static List<Tile> getTilesOfPlayersSpecificUnit(Map activeMap, Player p1, String unit)
+    {
+
+        List<Tile> tiles = new ArrayList<Tile>();
+
+        for(Tile tile : activeMap.getTileMap().values())
+        {
+            boolean tileHasIt = false;
+            String unitKey = Mapper.getUnitID(AliasHandler.resolveUnit(unit), p1.getColor());
+            for(UnitHolder unitH : tile.getUnitHolders().values())
+            {
+                if(unitH.getUnits().containsKey(unitKey))
+                {
+                    tileHasIt = true;
+                }
+            }
+            if(tileHasIt && !tiles.contains(tile))
+            {
+                tiles.add(tile);
+            }
+        }
+
+
+        return tiles;
+        
+    }
+
     public static void resolvePressedCompButton(Map activeMap, Player p1, ButtonInteractionEvent event, String buttonID) {
         String prefix = "componentActionRes_";
         String finChecker = "FFCC_"+p1.getFaction() + "_";
@@ -589,7 +649,7 @@ public class ButtonHelper {
             }
             case "actionCards" -> {
 
-                
+
             }
 
 

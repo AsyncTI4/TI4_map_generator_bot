@@ -14,6 +14,8 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
+import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -111,16 +113,37 @@ public class PlayAC extends ACCardsSubcommandData {
         }
         sb.append(actionCard.getRepresentation());
         List<Button> buttons = new ArrayList<Button>();
-        Button sabotageButton = Button.danger("sabotage_ac", "Cancel AC With Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
+        Button sabotageButton = Button.danger("sabotage_ac_"+actionCardTitle, "Cancel AC With Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
         buttons.add(sabotageButton);
-        if (activeMap.isEmpyInTheGame() || activeMap.isFoWMode()) {
-            Button empyButton = Button.secondary("sabotage_empy", "Cancel AC With Empyrean Mech ").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
-            buttons.add(empyButton);
+        Player empy = Helper.getPlayerFromColorOrFaction(activeMap, "empyrean");
+        if (empy != null && ButtonHelper.isNextToEmpyMechs(activeMap, player, empy)) {
+            Player player2 = empy;
+            Button empyButton = Button.secondary("sabotage_empy_"+actionCardTitle, "Cancel "+actionCardTitle+" With Empyrean Mech ").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
+            List<Button> empyButtons = new ArrayList<Button>();
+            empyButtons.add(empyButton);
+            Button refuse = Button.danger("deleteButtons", "Delete These Buttons");
+            empyButtons.add(refuse);
+            MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+"You have mechs adjacent to the player who played the AC. Use Buttons to decide whether to cancel.", empyButtons);
+
         }
-        if (activeMap.doesAnyoneHaveInstinctTraining() || activeMap.isFoWMode()) {
-            Button instinctButton = Button.secondary("sabotage_xxcha", "Cancel AC With Instinct Training").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("Xxcha")));
-            buttons.add(instinctButton);
+        String al = AliasHandler.resolveTech("Instinct Training");
+        for(Player player2 : activeMap.getPlayers().values())
+        {
+            if(player2.getTechs().contains(AliasHandler.resolveTech(al)) && !player2.getExhaustedTechs().contains(al) && player2.getStrategicCC() > 0)
+            {
+                Button instinctButton = Button.secondary("sabotage_xxcha_"+actionCardTitle, "Cancel "+actionCardTitle+" With Instinct Training").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("Xxcha")));
+                List<Button> xxchaButtons = new ArrayList<Button>();
+                xxchaButtons.add(instinctButton);
+                Button refuse = Button.danger("deleteButtons", "Delete These Buttons");
+                xxchaButtons.add(refuse);
+                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+"You have Instinct Training unexhausted and a cc available. Use Buttons to decide whether to cancel", xxchaButtons);
+            }
+
         }
+            
+            
+
+        
         Button noSabotageButton = Button.primary("no_sabotage", "No Sabotage").withEmoji(Emoji.fromFormatted(Emojis.NoSabotage));
         buttons.add(noSabotageButton);
         if (acID.contains("sabo")) {
@@ -136,8 +159,9 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", activeMap, afterButtons, "after");
 
 
+                String finChecker = "FFCC_"+player.getFaction() + "_";
                 if (actionCardTitle.contains("Rider") || actionCardTitle.contains("Sanction") ) {
-                    List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, activeMap, "outcome");
+                    List<Button> riderButtons = AgendaHelper.getAgendaButtons(actionCardTitle, activeMap, finChecker);
                     MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, "Please select your rider target", activeMap, player, riderButtons);
                 }
                 if (actionCardTitle.contains("Hack Election") ) {
