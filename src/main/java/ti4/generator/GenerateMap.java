@@ -594,16 +594,19 @@ public class GenerateMap {
         Collection<Player> players = activeMap.getPlayers().values();
         for (String pn : player.getPromissoryNotesInPlayArea()) {
             graphics.setColor(Color.WHITE);
-            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);  
 
             boolean commanderUnlocked = false;
             Player promissoryNoteOwner = activeMap.getPNOwner(pn);
+            if (promissoryNoteOwner == null) { //nobody owns this note - possibly eliminated player
+                BotLogger.log(activeMap.getName() + " " + player.getUserName() + "  `GenerateMap.pnInfo` is trying to display a Promissory Note without an owner - possibly an eliminated player: " + pn);
+                continue; 
+            }
             for (Player player_ : players) {
                 if (player_ != player) {
                     String playerColor = player_.getColor();
                     String playerFaction = player_.getFaction();
-                    if (playerColor != null && playerColor.equals(promissoryNoteOwner.getColor()) ||
-                            playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
+                    if (playerColor != null && playerColor.equals(promissoryNoteOwner.getColor()) || playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
                         String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
                         drawPAImage(x + deltaX, y, pnColorFile);
 
@@ -2122,7 +2125,7 @@ public class GenerateMap {
                     StringBuilder name = new StringBuilder(pnSplit[0] + " - ");
                     for (Player player_ : players.values()) {
                         if (promissoryNoteOwner == null) { //nobody owns this note - possibly eliminated player
-                            BotLogger.log("`GenerateMap.displaySftT` is trying to display a **Support for the Throne** without an owner - possibly an eliminated player");
+                            BotLogger.log(activeMap.getName() + " " + player.getUserName() + "  `GenerateMap.displaySftT` is trying to display a **Support for the Throne** without an owner - possibly an eliminated player: " + id);
                             continue; 
                         }
                         if (player_ != player) {
