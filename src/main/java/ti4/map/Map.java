@@ -1995,27 +1995,7 @@ public class Map {
         planets.clear();
     }
 
-    public boolean isEmpyInTheGame(){
-        boolean empyPresent = false;
-
-        for (Player player : getRealPlayers()) {
-            if (player.getFaction() != null && player.getFaction().equalsIgnoreCase("Empyrean")) {
-                return true;
-            }
-        }
-        return empyPresent;
-    }
-    public boolean doesAnyoneHaveInstinctTraining(){
-        boolean empyPresent = false;
-
-        for (Player player : getRealPlayers()) {
-
-            if (player.getTechs().contains(AliasHandler.resolveTech("Instinct Training"))) {
-                return true;
-            }
-        }
-        return empyPresent;
-    }
+   
 
     @JsonIgnore
     public Set<String> getPlanets() {
