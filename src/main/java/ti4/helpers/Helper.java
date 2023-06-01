@@ -1855,4 +1855,20 @@ public class Helper {
         attachmentName = AliasHandler.resolveAttachment(attachmentName);
         return Mapper.getSpecialCaseValues("fake_attachments").contains(attachmentName);
     }
+
+    // Function to find the
+    // duplicates in a Stream
+    public static <T> Set<T> findDuplicateInList(List<T> list) {
+        // Set to store the duplicate elements
+        Set<T> items = new HashSet<>();
+  
+        // Return the set of duplicate elements
+        return list.stream()
+            // Set.add() returns false if the element was already present in the set.
+            // Hence filter such elements
+            .filter(n -> !items.add(n))
+  
+            // Collect duplicate elements in the set
+            .collect(Collectors.toSet());
+    }
 }
