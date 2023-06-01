@@ -144,7 +144,7 @@ public class PNInfo extends PNCardsSubcommandData {
         if (!Mapper.isColorValid(playerColor) || !Mapper.isFaction(playerFaction)) {
             return;
         }
-        List<String> promissoryNotes = new ArrayList<>(Mapper.getColourFactionPromissoryNoteIDs(activeMap, playerColor, playerFaction));
+        List<String> promissoryNotes = new ArrayList<>(player.getPromissoryNotesOwned());
         for (Player player_ : activeMap.getPlayers().values()) {
             promissoryNotes.removeAll(player_.getPromissoryNotes().keySet());
             promissoryNotes.removeAll(player_.getPromissoryNotesInPlayArea());
@@ -155,15 +155,9 @@ public class PNInfo extends PNCardsSubcommandData {
         
         if (!promissoryNotes.isEmpty()) {
             BotLogger.log(activeMap.getName() + " " + player.getUserName() + " `PNInfo.checkAndAddPNs` found missing PNs: " + promissoryNotes);
-            // for (String promissoryNote : promissoryNotes) {
-            //     if (promissoryNote.endsWith("_an") && player.hasAbility("hubris")) {
-            //         continue;
-            //     }
-            //     if (promissoryNote.equalsIgnoreCase("blood_pact") && !player.hasAbility("dark_whispers")) {
-            //         continue;
-            //     }
-            //     // player.setPromissoryNote(promissoryNote);
-            // }
+            for (String promissoryNote : promissoryNotes) {
+                player.setPromissoryNote(promissoryNote);
+            }
         }
     }
 }

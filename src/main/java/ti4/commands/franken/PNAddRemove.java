@@ -9,6 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.cardspn.PNInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -30,7 +31,7 @@ public abstract class PNAddRemove extends FrankenSubcommandData {
         }
 
         pnIDs.removeIf(StringUtils::isEmpty);
-        pnIDs.removeIf(a -> !Mapper.getAllPromissoryNoteIDs().contains(a));
+        pnIDs.removeIf(pn -> !Mapper.getAllPromissoryNoteIDs().contains(pn));
 
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
@@ -41,6 +42,8 @@ public abstract class PNAddRemove extends FrankenSubcommandData {
         }
 
         doAction(player, pnIDs);
+        PNInfo.checkAndAddPNs(getActiveMap(), player);
+        PNInfo.sendPromissoryNoteInfo(activeMap, player, false, event);
     }
 
     public abstract void doAction(Player player, List<String> pnIDs);
