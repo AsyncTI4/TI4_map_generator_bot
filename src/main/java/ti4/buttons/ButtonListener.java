@@ -973,7 +973,7 @@ public class ButtonListener extends ListenerAdapter {
                     + "'s planets. Use buttons to select which one.";
             List<Button> outcomeActionRow = null;
             buttonID = buttonID.replace(factionOrColor + "_", "");
-            outcomeActionRow = AgendaHelper.getPlanetOutcomeButtons(event, planetOwner, activeMap, "rider", buttonID);
+            outcomeActionRow = AgendaHelper.getPlanetOutcomeButtons(event, planetOwner, activeMap, finsFactionCheckerPrefix, buttonID);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, outcomeActionRow);
             event.getMessage().delete().queue();
         }
