@@ -597,13 +597,13 @@ public class GenerateMap {
             graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
 
             boolean commanderUnlocked = false;
-            String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(pn);
+            Player promissoryNoteOwner = activeMap.getPNOwner(pn);
             for (Player player_ : players) {
                 if (player_ != player) {
                     String playerColor = player_.getColor();
                     String playerFaction = player_.getFaction();
-                    if (playerColor != null && playerColor.equals(promissoryNoteOwner) ||
-                            playerFaction != null && playerFaction.equals(promissoryNoteOwner)) {
+                    if (playerColor != null && playerColor.equals(promissoryNoteOwner.getColor()) ||
+                            playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
                         String pnColorFile = "pa_pn_color_" + Mapper.getColorID(playerColor) + ".png";
                         drawPAImage(x + deltaX, y, pnColorFile);
 
@@ -2118,14 +2118,14 @@ public class GenerateMap {
                         case 2 -> x = 1598;
                     }
                     String[] pnSplit = Mapper.getPromissoryNote(id).split(";");
-                    String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);
+                    Player promissoryNoteOwner = activeMap.getPNOwner(id);
                     StringBuilder name = new StringBuilder(pnSplit[0] + " - ");
                     for (Player player_ : players.values()) {
                         if (player_ != player) {
                             String playerColor = player_.getColor();
                             String playerFaction = player_.getFaction();
-                            if (playerColor != null && playerColor.equals(promissoryNoteOwner) ||
-                                    playerFaction != null && playerFaction.equals(promissoryNoteOwner)) {
+                            if (playerColor != null && playerColor.equals(promissoryNoteOwner.getColor()) ||
+                                    playerFaction != null && playerFaction.equals(promissoryNoteOwner.getFaction())) {
                                 name.append(playerFaction).append(" (").append(playerColor).append(")");
                             }
                         }
