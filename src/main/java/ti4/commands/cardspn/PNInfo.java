@@ -155,7 +155,7 @@ public class PNInfo extends PNCardsSubcommandData {
         
         if (!promissoryNotes.isEmpty()) {
             for (String promissoryNote : promissoryNotes) {
-                player.setPromissoryNote(promissoryNote);
+                // player.setPromissoryNote(promissoryNote);
             }
         }
     }
