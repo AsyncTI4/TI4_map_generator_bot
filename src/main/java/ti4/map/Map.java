@@ -2068,7 +2068,7 @@ public class Map {
 
         for (Player player : getPlayers().values()) {
             allPromissoryNotes.addAll(player.getPromissoryNotes().keySet());
-            allPlayerHandPromissoryNotes.addAll(allPromissoryNotes);
+            allPlayerHandPromissoryNotes.addAll(player.getPromissoryNotes().keySet());
             allPromissoryNotes.addAll(player.getPromissoryNotesInPlayArea());
             allOwnedPromissoryNotes.addAll(player.getPromissoryNotesOwned());
         }
