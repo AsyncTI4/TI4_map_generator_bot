@@ -29,6 +29,6 @@ public class SoAddToGame extends CustomSubcommandData {
         }
 
         activeMap.addSOToGame(soID);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "SO removed from game deck");
+        MessageHelper.sendMessageToChannel(event.getChannel(), "SO added to game deck");
     }
 }
