@@ -550,18 +550,30 @@ public class Helper {
         }
         return planetButtons;
     }
+    public static List<Button> getSpaceShipsPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, String unit) {
+        List<Button> planetButtons = new ArrayList<>();
+        List<String> planets = new ArrayList<>(player.getPlanets());
+      
+        for (String planet : planets) {
+            Button button = Button.danger("FFCC_"+player.getFaction()+"_"+"place_"+unit+"_"+planet, Helper.getPlanetRepresentation(planet, activeMap));
+            planetButtons.add(button);
+        }
+        return planetButtons;
+    }
     
-    public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, Tile tile, boolean warfare) {
+    public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, Tile tile, String warfareNOtherstuff) {
         List<Button> unitButtons = new ArrayList<>();
         HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
-        tile.getUnitHolders();
         String tp = tile.getPosition();
-        Button wsButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_warsun_"+tp, "Produce Warsun" );
-        wsButton = wsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("warsun")));
-        unitButtons.add(wsButton);
-        Button fsButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_flagship_"+tp, "Produce Flagship" );
-        fsButton = fsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("flagship")));
-        unitButtons.add(fsButton);
+        if(!warfareNOtherstuff.equalsIgnoreCase("muaatagent"))
+        {
+            Button wsButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_warsun_"+tp, "Produce Warsun" );
+            wsButton = wsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("warsun")));
+            unitButtons.add(wsButton);
+            Button fsButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_flagship_"+tp, "Produce Flagship" );
+            fsButton = fsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("flagship")));
+            unitButtons.add(fsButton);
+        }
         Button dnButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_dreadnought_"+tp, "Produce Dreadnought" );
         dnButton = dnButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("dreadnought")));
         unitButtons.add(dnButton);
@@ -577,16 +589,19 @@ public class Helper {
         Button ff1Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_fighter_"+tp, "Produce 1 Fighter" );
         ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
         unitButtons.add(ff1Button);
-        Button ff2Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_2ff_"+tp, "Produce 2 Fighters" );
-        ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
-        unitButtons.add(ff2Button);
+        if(!warfareNOtherstuff.equalsIgnoreCase("freelancers")){
+            Button ff2Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_2ff_"+tp, "Produce 2 Fighters" );
+            ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
+            unitButtons.add(ff2Button);
+        }
+        
 
         for (UnitHolder unitHolder : unitHolders.values()) {
             if (unitHolder instanceof Planet planet) {
                 String colorID = Mapper.getColorID(player.getColor());
                 String sdKey =  colorID+ "_sd.png";
 
-                if (warfare) {
+                if (warfareNOtherstuff.equalsIgnoreCase("warfare")) {
 
                     if ((planet.getUnits().get(sdKey) == null || planet.getUnits().get(sdKey) == 0) && !player.getFaction().equalsIgnoreCase("saar")) {
                         continue;
@@ -596,16 +611,18 @@ public class Helper {
                 Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_infantry_"+pp, "Produce 1 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap));
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
                 unitButtons.add(inf1Button);
-                Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_2gf_"+pp, "Produce 2 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap) );
-                inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
-                unitButtons.add(inf2Button);
+                if(!warfareNOtherstuff.equalsIgnoreCase("freelancers")){
+                    Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_2gf_"+pp, "Produce 2 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap) );
+                    inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                    unitButtons.add(inf2Button);
+                }
                 Button mfButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_mech_"+pp, "Produce Mech on "+Helper.getPlanetRepresentation(pp, activeMap) );
                 mfButton = mfButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
                 unitButtons.add(mfButton);
             }
         }
         Button DoneProducingUnits = Button.danger("deleteButtons", "Done Producing Units");
-        if(warfare)
+        if(warfareNOtherstuff.equalsIgnoreCase("warfare"))
         {
             DoneProducingUnits = Button.danger("deleteButtons_warfare", "Done Producing Units");
         }
@@ -1497,7 +1514,6 @@ public class Helper {
 
         for (String tech : techs) {
             String techName = tech.substring(tech.lastIndexOf("_")+1, tech.length());
-            String techLabel = tech.replace("_", "");
             String buttonID = "FFCC_"+player.getFaction()+"_getTech_"+techName;
             Button techB = null;
             switch (techType) {
