@@ -273,38 +273,39 @@ public class ButtonListener extends ListenerAdapter {
                         playersWithSCs = playersWithSCs + 1;
                     }
                 }
-                else{
+                else {
                     continue;
                 }
                 if(player2.hasLeader("naaluhero") &&!player2.getLeaderByID("naaluhero").isLocked())
                 {
                     MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+"Reminder this is the window to do Naalu Hero");
                 }
-                if(player2.getRelics().contains("mawofworlds") && activeMap.isCustodiansScored())
+                if(player2.getRelics() != null && player2.getRelics().contains("mawofworlds") && activeMap.isCustodiansScored())
                 {
                     MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+"Reminder this is the window to do Maw of Worlds");
                 }
-                if(player2.getRelics().contains("emphidia"))
+                if(player2.getRelics() != null &&player2.getRelics().contains("emphidia"))
                 {
                     for(String pl : player2.getPlanets())
                     {
                         Tile tile = activeMap.getTile(AliasHandler.resolveTile(pl));
+                        
                         UnitHolder unitHolder = tile.getUnitHolders().get(pl);
-                        if(unitHolder.getTokenList().contains("attachment_tombofemphidia.png"))
+                        if(unitHolder.getTokenList()!= null && unitHolder.getTokenList().contains("attachment_tombofemphidia.png"))
                         {
                             MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+"Reminder this is the window to purge Crown of Emphidia if you want to. Command to make a new custom public for crown is /status po_add_custom public_name:");
                         }
                     }
                 }
-                if(player2.getActionCards().keySet().contains("summit") && !activeMap.isCustodiansScored())
+                if(player2.getActionCards() != null && player2.getActionCards().keySet().contains("summit") && !activeMap.isCustodiansScored())
                 {
                     MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+"Reminder this is the window to do summit");
                 }
-                if(player2.getActionCards().keySet().contains("investments") && !activeMap.isCustodiansScored())
+                if(player2.getActionCards() != null && (player2.getActionCards().keySet().contains("investments") && !activeMap.isCustodiansScored()))
                 {
                     MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+"Reminder this is the window to do manipulate investments.");
                 }
-                if(player2.getActionCards().keySet().contains("stability"))
+                if(player2.getActionCards() != null && player2.getActionCards().keySet().contains("stability"))
                 {
                     MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+"Reminder this is the window to play political stability.");
                 }
@@ -315,10 +316,6 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap), cyberMessage); 
                     }
                 }
-
-
-
-
             }
 
             String message2 = null;
@@ -331,14 +328,12 @@ public class ButtonListener extends ListenerAdapter {
             
             if (custodiansTaken) {
                 passOnAbilities = Button.danger("pass_on_abilities", "Ready For Agenda");
-
-                
                 message2 = message2
                         + " Ready for Agenda means you are done playing/passing on playing political stability, ancient burial sites, maw of worlds, Naalu hero, and crown of emphidia.";
             } else {
                 passOnAbilities = Button.danger("pass_on_abilities", "Ready For Strategy Phase");
                 message2 = message2
-                        + " Ready for Strategy Phase means you are done playing/passing on playing political stability, summit, and manupulate investments. ";
+                        + " Ready for Strategy Phase means you are done playing/passing on playing political stability, summit, and manipulate investments. ";
             }
             List<Button> buttons = null;
 
@@ -1349,7 +1344,7 @@ public class ButtonListener extends ListenerAdapter {
             String planet = buttonID.replace("freelancersBuild_", "");
             List<Button> buttons = new ArrayList<Button>();
             buttons = Helper.getPlaceUnitButtons(event, player, activeMap,
-                    activeMap.getTile(AliasHandler.resolveTile(planet)), false);
+                    activeMap.getTile(AliasHandler.resolveTile(planet)), "freelancers");
             String message = Helper.getPlayerRepresentation(player, activeMap) + " Use the buttons to produce 1 unit.";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             event.getMessage().delete().queue();
@@ -1566,7 +1561,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "warfareBuild" -> {
                     List<Button> buttons = new ArrayList<Button>();
                     buttons = Helper.getPlaceUnitButtons(event, player, activeMap,
-                            activeMap.getTile(AliasHandler.resolveTile(player.getFaction())), true);
+                            activeMap.getTile(AliasHandler.resolveTile(player.getFaction())), "warfare");
                     String message = Helper.getPlayerRepresentation(player, activeMap)
                             + " Use the buttons to produce. Reminder that when following warfare, you can only use 1 dock in your home system.";
                     if (!activeMap.isFoWMode()) {
