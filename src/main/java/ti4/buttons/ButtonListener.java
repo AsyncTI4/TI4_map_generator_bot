@@ -786,7 +786,7 @@ public class ButtonListener extends ListenerAdapter {
                     + Helper.getPlanetRepresentation(planet, activeMap));
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("doneWithOneSystem_")) {
-           String pos = buttonID.replace("doneWithOneSys_","");
+           String pos = buttonID.replace("doneWithOneSystem_","");
            Tile tile = activeMap.getTileByPosition(pos);
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "From system "+tile.getRepresentationForButtons(activeMap, player)+"\n"+event.getMessage().getContentRaw());
             String message = "Choose a different system to move from, or finalize movement.";
