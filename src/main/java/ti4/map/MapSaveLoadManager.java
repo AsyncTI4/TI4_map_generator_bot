@@ -86,7 +86,7 @@ public class MapSaveLoadManager {
 
     public static void saveMap(Map activeMap, boolean keepModifiedDate, @Nullable GenericInteractionCreateEvent event) {
         //ADD COMMAND/BUTTON FOR UNDO INFORMATION
-        if (event != null) {
+        if (event != null && !keepModifiedDate) {
             String username = event.getUser().getName();
             if (event instanceof SlashCommandInteractionEvent) {
                 activeMap.setLatestCommand(username + " used: " + ((SlashCommandInteractionEvent) event).getCommandString());

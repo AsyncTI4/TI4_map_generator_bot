@@ -1402,7 +1402,7 @@
     {
         "alias": "ambuscade",
         "name": "Strike Wing Ambuscade",
-        "faction": "Argent",
+        "faction": "argent",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1412,7 +1412,7 @@
     {
         "alias": "war_funding",
         "name": "War Funding",
-        "faction": "Letnev",
+        "faction": "letnev",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1422,7 +1422,7 @@
     {
         "alias": "ragh",
         "name": "Raghs Call",
-        "faction": "Saar",
+        "faction": "saar",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1432,7 +1432,7 @@
     {
         "alias": "fires",
         "name": "Fires of the Gashlai",
-        "faction": "Muaat",
+        "faction": "muaat",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1442,7 +1442,7 @@
     {
         "alias": "convoys",
         "name": "Trade Convoys",
-        "faction": "Hacan",
+        "faction": "hacan",
         "colour": "",
         "playArea": "true",
         "attachment": "",
@@ -1452,7 +1452,7 @@
     {
         "alias": "blood_pact",
         "name": "Blood Pact",
-        "faction": "Empyrean",
+        "faction": "empyrean",
         "colour": "",
         "playArea": "true",
         "attachment": "",
@@ -1462,7 +1462,7 @@
     {
         "alias": "ms",
         "name": "Military Support",
-        "faction": "Sol",
+        "faction": "sol",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1472,7 +1472,7 @@
     {
         "alias": "iff",
         "name": "Creuss Iff",
-        "faction": "Ghost",
+        "faction": "ghost",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1482,7 +1482,7 @@
     {
         "alias": "ce",
         "name": "Cybernetic Enhancements",
-        "faction": "L1Z1X",
+        "faction": "l1z1x",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1492,7 +1492,7 @@
     {
         "alias": "scepter",
         "name": "Scepter of Dominion",
-        "faction": "Mahact",
+        "faction": "mahact",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1502,7 +1502,7 @@
     {
         "alias": "pop",
         "name": "Promise of Protection",
-        "faction": "Mentak",
+        "faction": "mentak",
         "colour": "",
         "playArea": "true",
         "attachment": "",
@@ -1512,7 +1512,7 @@
     {
         "alias": "gift",
         "name": "Gift of Prescience",
-        "faction": "Naalu",
+        "faction": "naalu",
         "colour": "",
         "playArea": "true",
         "attachment": "",
@@ -1532,7 +1532,7 @@
     {
         "alias": "antivirus",
         "name": "Antivirus",
-        "faction": "Nekro",
+        "faction": "nekro",
         "colour": "",
         "playArea": "true",
         "attachment": "",
@@ -1542,7 +1542,7 @@
     {
         "alias": "cavalry",
         "name": "The Cavalry",
-        "faction": "Nomad",
+        "faction": "nomad",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1552,7 +1552,7 @@
     {
         "alias": "tekklar",
         "name": "Tekklar Legion",
-        "faction": "Sardakk",
+        "faction": "sardakk",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1562,7 +1562,7 @@
     {
         "alias": "terraform",
         "name": "Terraform",
-        "faction": "Titans",
+        "faction": "titans",
         "colour": "",
         "playArea": "true",
         "attachment": "titanspn",
@@ -1572,7 +1572,7 @@
     {
         "alias": "ra",
         "name": "Research Agreement",
-        "faction": "JolNar",
+        "faction": "jolnar",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1582,7 +1582,7 @@
     {
         "alias": "crucible",
         "name": "Crucible",
-        "faction": "Cabal",
+        "faction": "cabal",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1592,7 +1592,7 @@
     {
         "alias": "acq",
         "name": "Acquiescence",
-        "faction": "Winnu",
+        "faction": "winnu",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1602,7 +1602,7 @@
     {
         "alias": "favor",
         "name": "Political Favor",
-        "faction": "Xxcha",
+        "faction": "xxcha",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1612,7 +1612,7 @@
     {
         "alias": "greyfire",
         "name": "Greyfire Mutagen",
-        "faction": "Yin",
+        "faction": "yin",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1622,7 +1622,7 @@
     {
         "alias": "spynet",
         "name": "Spy Net",
-        "faction": "Yssaril",
+        "faction": "yssaril",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1632,7 +1632,7 @@
     {
         "alias": "stymie",
         "name": "Stymie",
-        "faction": "Arborec",
+        "faction": "arborec",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1642,7 +1642,7 @@
     {
         "alias": "dark_pact",
         "name": "Dark Pact",
-        "faction": "Empyrean",
+        "faction": "empyrean",
         "colour": "",
         "playArea": "true",
         "attachment": "",
@@ -1652,7 +1652,7 @@
     {
         "alias": "rider",
         "name": "Keleres Rider",
-        "faction": "Keleres",
+        "faction": "keleres",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1662,7 +1662,7 @@
     {
         "alias": "ridera",
         "name": "Keleres Rider",
-        "faction": "Keleresa",
+        "faction": "keleresa",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1672,7 +1672,7 @@
     {
         "alias": "riderm",
         "name": "Keleres Rider",
-        "faction": "Keleresm",
+        "faction": "keleresm",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1682,7 +1682,7 @@
     {
         "alias": "riderx",
         "name": "Keleres Rider",
-        "faction": "Keleresx",
+        "faction": "keleresx",
         "colour": "",
         "playArea": "",
         "attachment": "",
@@ -1692,7 +1692,7 @@
     {
         "alias": "adminspn",
         "name": "Mass Transference",
-        "faction": "Admins",
+        "faction": "admins",
         "colour": "",
         "playArea": "",
         "attachment": "",

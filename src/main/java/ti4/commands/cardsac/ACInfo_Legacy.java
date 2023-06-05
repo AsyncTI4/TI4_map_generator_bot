@@ -12,6 +12,9 @@ public class ACInfo_Legacy extends ACCardsSubcommandData {
 
     public static final String CARDS_INFO = Constants.CARDS_INFO_THREAD_PREFIX;
 
+    /**
+     * This only still exists because some folks don't want to stop using [/ac info] instead of [/cards_info]
+     */
     public ACInfo_Legacy() {
         super(Constants.INFO, "Send all your cards to your Cards Info thread");
     }
