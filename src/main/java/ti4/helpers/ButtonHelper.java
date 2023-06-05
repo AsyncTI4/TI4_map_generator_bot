@@ -437,7 +437,7 @@ public class ButtonHelper {
            
             
         }
-        Button concludeMove = Button.primary(finChecker+"doneWithOneSystem", "Done moving units from this system");
+        Button concludeMove = Button.primary(finChecker+"doneWithOneSystem_"+tile.getPosition(), "Done moving units from this system");
         buttons.add(concludeMove);
         HashMap<String, Integer> displacedUnits = activeMap.getCurrentMovedUnitsFrom1System();
         for(String unit :displacedUnits.keySet())
