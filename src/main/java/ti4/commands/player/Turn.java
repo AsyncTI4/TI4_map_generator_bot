@@ -166,7 +166,7 @@ public class Turn extends PlayerSubcommandData {
                         //  Block of code to handle errors
                     }
                 }
-                String text = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " UP NEXT";
+                String text = "# " + Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " UP NEXT";
                 String buttonText = "Use buttons to do your turn. ";
                 List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeMap, false);
                 activeMap.updateActivePlayer(player);
