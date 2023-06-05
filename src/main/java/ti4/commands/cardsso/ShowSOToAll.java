@@ -63,7 +63,7 @@ public class ShowSOToAll extends SOCardsSubcommandData {
         } else {
             sb.append("Showed Secret Objectives:").append("\n");
         }
-        sb.append(Mapper.getSecretObjective(soID)).append("\n");
+        sb.append(SOInfo.getSecretObjectiveRepresentation(soID)).append("\n");
         if (!scored) {
             player.setSecret(soID);
         }

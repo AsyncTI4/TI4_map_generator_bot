@@ -42,14 +42,14 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
         int index = 1;
         if (secretObjectives != null) {
             for (String so : secretObjectives) {
-                sb.append(index).append(" - ").append(Mapper.getSecretObjective(so)).append("\n");
+                sb.append(index).append(" - ").append(SOInfo.getSecretObjectiveRepresentation(so)).append("\n");
                 player.setSecret(so);
                 index++;
             }
         }
         sb.append("\n").append("**Scored Secret Objectives:**").append("\n");
         for (java.util.Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
-            sb.append(index).append(". (").append(so.getValue()).append(") - ").append(Mapper.getSecretObjective(so.getKey())).append("\n");
+            sb.append(index).append(". (").append(so.getValue()).append(") - ").append(SOInfo.getSecretObjectiveRepresentation(so.getKey())).append("\n");
             index++;
         }
         sendMessage(sb.toString());

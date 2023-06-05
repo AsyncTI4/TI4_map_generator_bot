@@ -36,7 +36,7 @@ public class ShowAllSO extends SOCardsSubcommandData {
         LinkedHashMap<String, Integer> secretsScored = player.getSecretsScored();
         Collections.shuffle(secrets);
         for (String id : secrets) {
-            sb.append(Mapper.getSecretObjective(id)).append("\n");
+            sb.append(SOInfo.getSecretObjectiveRepresentation(id)).append("\n");
             if (!secretsScored.containsKey(id)) {
                 player.setSecret(id);
             }

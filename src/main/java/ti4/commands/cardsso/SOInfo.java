@@ -77,6 +77,7 @@ public class SOInfo extends SOCardsSubcommandData {
     public static String getSecretObjectiveRepresentationShort(String soID) {
         return getSecretObjectiveRepresentationShort(soID, null);
     }
+
     public static String getSecretObjectiveRepresentationShort(String soID, Integer soUniqueID) {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
@@ -88,6 +89,7 @@ public class SOInfo extends SOCardsSubcommandData {
     public static String getSecretObjectiveRepresentation(String soID) {
         return getSecretObjectiveRepresentation(soID, null);
     }
+
     private static String getSecretObjectiveRepresentation(String soID, Integer soUniqueID) {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
@@ -129,7 +131,6 @@ public class SOInfo extends SOCardsSubcommandData {
                 sb.append("> None");
             } else {
                 for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
-                    SecretObjectiveModel so_ = Mapper.getSecretObjective(so.getKey());
                     Integer idValue = so.getValue();
                     sb.append("`").append(index).append(".").append(Helper.leftpad("(" + idValue, 4)).append(")`");
                     sb.append(getSecretObjectiveRepresentation(so.getKey()));
