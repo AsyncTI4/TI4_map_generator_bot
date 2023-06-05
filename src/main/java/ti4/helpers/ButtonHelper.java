@@ -285,11 +285,16 @@ public class ButtonHelper {
         HashMap<String, Integer> displacedUnits =  activeMap.getCurrentMovedUnitsFrom1System();
         HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         Tile tile = activeMap.getTileByPosition(activeMap.getActiveSystem());
+        
         for(String unit :displacedUnits.keySet()){
             int amount = displacedUnits.get(unit);
             String[] combo = unit.split("_");
+            combo[1] = combo[1].toLowerCase().replace(" ", "");
+            combo[1] = combo[1].replace("'", "");
             new AddUnits().unitParsing(event, player.getColor(),
             tile, amount +" " +combo[0]+" "+combo[1], activeMap);
+            String key = Mapper.getUnitID(AliasHandler.resolveUnit(combo[0]), player.getColor());
+            tile.removeUnit("space",key, amount);
         }
         activeMap.resetCurrentMovedUnitsFrom1System();
         Button buildButton = Button.danger(finChecker+"tacticalActionBuild_"+activeMap.getActiveSystem(), "Build in this system.");
