@@ -1744,7 +1744,7 @@ public class GenerateMap {
             Integer vpCount = userVPs.get(player);
             vpCount = vpCount == null ? 0 : vpCount;
             point = PositionMapper.getPlayerStats(Constants.STATS_VP);
-            graphics.drawString("VP - " + vpCount, point.x + deltaX, point.y + deltaY);
+            graphics.drawString(StringUtils.capitalize(player.getFaction()) + ", VP - " + vpCount, point.x + deltaX, point.y + deltaY);
 
             int totalSecrets = player.getSecrets().keySet().size();
             Set<String> soSet = player.getSecretsScored().keySet();
