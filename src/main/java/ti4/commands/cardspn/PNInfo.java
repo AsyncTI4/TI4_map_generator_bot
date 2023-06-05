@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 
-import org.apache.commons.lang3.StringUtils;
-
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -35,7 +33,7 @@ public class PNInfo extends PNCardsSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
-        checkAndAddPNs(activeMap, player); // may not need this anymore - see botlogger
+        checkAndAddPNs(activeMap, player);
         activeMap.checkPromissoryNotes();
         sendPromissoryNoteInfo(activeMap, player, true, event);
         sendMessage("PN Info Sent");
@@ -85,7 +83,7 @@ public class PNInfo extends PNCardsSubcommandData {
                 for (java.util.Map.Entry<String, Integer> pn : promissoryNotes.entrySet()) {
                     if (!promissoryNotesInPlayArea.contains(pn.getKey())) {
                         sb.append("`").append(index).append(".").append(Helper.leftpad("(" + pn.getValue(), 3)).append(")`");
-                        sb.append(getPromissoryNoteRepresentation(pn.getKey(), longFormat));
+                        sb.append(getPromissoryNoteRepresentation(activeMap, pn.getKey(), longFormat));
                         index++;
                     }
                 }
@@ -100,7 +98,7 @@ public class PNInfo extends PNCardsSubcommandData {
                         if (promissoryNotesInPlayArea.contains(pn.getKey())) {
                             sb.append("`").append(index).append(".");
                             sb.append("(" + pn.getValue()).append(")`");
-                            sb.append(getPromissoryNoteRepresentation(pn.getKey(), longFormat));
+                            sb.append(getPromissoryNoteRepresentation(activeMap, pn.getKey(), longFormat));
                             index++;
                         }
                     }
@@ -110,19 +108,19 @@ public class PNInfo extends PNCardsSubcommandData {
         return sb.toString();
     }
 
-    private static String getPromissoryNoteRepresentationShort(String pnID) {
-        return getPromissoryNoteRepresentation(pnID, null, false);
+    private static String getPromissoryNoteRepresentationShort(Map activeMap, String pnID) {
+        return getPromissoryNoteRepresentation(activeMap, pnID, null, false);
     }
 
-    public static String getPromissoryNoteRepresentation(String pnID) {
-        return getPromissoryNoteRepresentation(pnID, null, true);
+    public static String getPromissoryNoteRepresentation(Map activeMap, String pnID) {
+        return getPromissoryNoteRepresentation(activeMap, pnID, null, true);
     }
 
-    public static String getPromissoryNoteRepresentation(String pnID, boolean longFormat) {
-        return getPromissoryNoteRepresentation(pnID, null, longFormat);
+    private static String getPromissoryNoteRepresentation(Map activeMap, String pnID, boolean longFormat) {
+        return getPromissoryNoteRepresentation(activeMap, pnID, null, longFormat);
     }
 
-    private static String getPromissoryNoteRepresentation(String pnID, Integer pnUniqueID, boolean longFormat) {
+    private static String getPromissoryNoteRepresentation(Map activeMap, String pnID, Integer pnUniqueID, boolean longFormat) {
         PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pnID);
         if (pnModel == null) {
             String error = "Could not find representation for PN ID: " + pnID;
@@ -130,12 +128,22 @@ public class PNInfo extends PNCardsSubcommandData {
             return error;
         }
         String pnName = pnModel.name;
-        String pnFactionOrColour = pnModel.getOwner();
-        String pnText = pnModel.text;
         StringBuilder sb = new StringBuilder();
-        sb.append(Emojis.PN).append("__**" + pnName + "**__");
-        sb.append(" *(").append(pnFactionOrColour).append(")*");
-        if (longFormat || Mapper.isFaction(pnFactionOrColour.toLowerCase()) || pnModel.source.equalsIgnoreCase("Absol")) sb.append("   ").append(pnText);
+
+        sb.append(Emojis.PN);
+        if (pnModel.faction != null && !pnModel.faction.isEmpty()) sb.append(Helper.getFactionIconFromDiscord(pnModel.faction));
+        sb.append("__**" + pnName + "**__   ");
+
+        String pnText = pnModel.text;
+        Player pnOwner = activeMap.getPNOwner(pnID);
+        if (pnOwner != null && pnOwner.isRealPlayer()) {
+            if (!activeMap.isFoWMode()) sb.append(Helper.getFactionIconFromDiscord(pnOwner.getFaction()));
+            sb.append(Helper.getRoleMentionByName(activeMap.getGuild(), pnOwner.getColor()));
+            // if (!activeMap.isFoWMode()) sb.append("(").append(pnOwner.getUserName()).append(")");
+            pnText = pnText.replaceAll(pnOwner.getColor(), Helper.getRoleMentionByName(activeMap.getGuild(), pnOwner.getColor()));
+        }
+        
+        if (longFormat || Mapper.isFaction(pnModel.faction.toLowerCase()) || pnModel.source.equalsIgnoreCase("Absol")) sb.append("      ").append(pnText);
         sb.append("\n");
         return sb.toString();
     }

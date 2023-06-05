@@ -16,11 +16,20 @@ public class PNAdd extends PNAddRemove {
     public void doAction(Player player, List<String> pnIDs) {
         StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, getActiveMap())).append(" added PNs:\n");
         for (String pnID : pnIDs ){
-            if (player.ownsPromissoryNote(pnID)) {
-                sb.append("> ").append(pnID).append(" (player already owns this PN)");
-            } else {
-                sb.append("> ").append(PNInfo.getPromissoryNoteRepresentation(pnID));
+            Player pnOwner = getActiveMap().getPNOwner(pnID);
+            sb.append("> ");
+            if (pnOwner != null) {
+                sb.append(pnID).append(" is already owned by ").append(pnOwner.getUserName());
+                sb.append("\n");
+                continue;
             }
+
+            if (player.ownsPromissoryNote(pnID)) {
+                sb.append(pnID).append(" (player already owned this PN)");
+                sb.append("\n");
+                continue;
+            }
+            sb.append(PNInfo.getPromissoryNoteRepresentation(getActiveMap(), pnID));
             sb.append("\n");
             player.addOwnedPromissoryNoteByID(pnID);
         }

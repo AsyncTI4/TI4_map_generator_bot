@@ -29,6 +29,10 @@ public class SoAddToGame extends CustomSubcommandData {
         }
 
         activeMap.addSOToGame(soID);
-        MessageHelper.sendMessageToChannel(event.getChannel(), "SO removed from game deck");
+        if (activeMap.getSecretObjectives().contains(soID)) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "SO added to game deck");
+        } else {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "SO was not added for an unknown reason");
+        }
     }
 }
