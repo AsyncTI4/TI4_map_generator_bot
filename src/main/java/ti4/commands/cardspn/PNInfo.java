@@ -116,10 +116,6 @@ public class PNInfo extends PNCardsSubcommandData {
         return getPromissoryNoteRepresentation(activeMap, pnID, null, true);
     }
 
-
-    public static String getPromissoryNoteRepresentation(String pnID, boolean longFormat) {
-        return getPromissoryNoteRepresentation(pnID, null, longFormat);
-    }
     public static String getPromissoryNoteRepresentation(Map activeMap, String pnID, boolean longFormat) {
         return getPromissoryNoteRepresentation(activeMap, pnID, null, longFormat);
     }
