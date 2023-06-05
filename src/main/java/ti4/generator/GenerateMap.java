@@ -1,6 +1,7 @@
 package ti4.generator;
 
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
 
@@ -142,7 +143,7 @@ public class GenerateMap {
         return saveImage(activeMap, DisplayType.all, event);
     }
 
-    public File saveImage(Map activeMap, @Nullable DisplayType displayType, @Nullable SlashCommandInteractionEvent event) {
+    public File saveImage(Map activeMap, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
         long startup = System.currentTimeMillis();
         init(activeMap);
         if (activeMap.getDisplayTypeForced() != null) {
@@ -170,7 +171,7 @@ public class GenerateMap {
         tilesToDisplay = new HashMap<>(activeMap.getTileMap());
         if (activeMap.isFoWMode() && event != null) {
             isFoWPrivate = false;
-            if (event.getChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
+            if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
                 isFoWPrivate = true;
                 Player player = getFowPlayer(activeMap, event);
 
@@ -284,7 +285,7 @@ public class GenerateMap {
         return jpgFile;
     }
 
-    private Player getFowPlayer(Map activeMap, @Nullable SlashCommandInteractionEvent event) {
+    private Player getFowPlayer(Map activeMap, @Nullable GenericInteractionCreateEvent event) {
         String user = event.getUser().getId();
         return activeMap.getPlayer(user);
     }
