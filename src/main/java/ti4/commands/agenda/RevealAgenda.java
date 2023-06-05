@@ -55,6 +55,12 @@ public class RevealAgenda extends AgendaSubcommandData {
             revealAgenda(event, revealFromBottom, activeMap, channel);
             return;
         }
+        if(agendaTarget.contains("Law") && (activeMap.getLaws().isEmpty() || activeMap.getLaws().size() == 0))
+        {
+            MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeMap.getGuild(), activeMap)+"An \"Elect Law\" Agenda ("+agendaName+") was revealed when no laws in play, flipping next agenda");
+            revealAgenda(event, revealFromBottom, activeMap, channel);
+            return;
+        }
         if (agendaName!= null && !agendaName.equalsIgnoreCase("Covert Legislation")) {
             activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget + "_"+uniqueID);
         } else {

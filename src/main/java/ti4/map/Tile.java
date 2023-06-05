@@ -10,12 +10,14 @@ import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.message.BotLogger;
 
 import java.awt.*;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.StringTokenizer;
 
 public class Tile {
@@ -310,6 +312,28 @@ public class Tile {
             // TODO: handle exception
         }
         return null;
+    }
+    public String getRepresentationForButtons(Map activeMap, Player player) {
+        try {
+            if(activeMap.isFoWMode())
+            {
+                Set<String> tilesToShow = FoWHelper.getTilePositionsToShow(activeMap, player);
+                if(tilesToShow.contains(getPosition()))
+                {
+                    return getPosition() + " (" + getRepresentation() + ")";
+                }
+                else
+                {
+                    return getPosition();
+                }
+            }
+            else {
+                return getPosition() + " (" + getRepresentation() + ")";
+            }
+            
+        } catch (Exception e) {
+            return getTileID();
+        }
     }
 
     @JsonIgnore

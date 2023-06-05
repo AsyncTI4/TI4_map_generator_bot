@@ -2,6 +2,7 @@ package ti4.commands.explore;
 
 import org.jetbrains.annotations.NotNull;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -10,6 +11,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.*;
+import ti4.message.MessageHelper;
 
 public class ExpFrontier extends ExploreSubcommandData {
     public ExpFrontier() {
@@ -29,7 +31,11 @@ public class ExpFrontier extends ExploreSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
+        expFront(event, tile, activeMap, player);
+        
+    }
 
+    public void expFront(GenericInteractionCreateEvent event, Tile tile, Map activeMap, Player player) {
         UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
         String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
         if (space.getTokenList().contains(frontierFilename)) {
@@ -40,8 +46,9 @@ public class ExpFrontier extends ExploreSubcommandData {
             messageText.append(displayExplore(cardID));
             resolveExplore(event, cardID, tile, null, messageText.toString(), checkIfEngimaticDevice(player, cardID), player, activeMap);
         } else {
-            sendMessage("No frontier token in given system.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No frontier token in given system.");
         }
+
     }
 
     public static boolean checkIfEngimaticDevice(@NotNull Player player, String cardID) {
