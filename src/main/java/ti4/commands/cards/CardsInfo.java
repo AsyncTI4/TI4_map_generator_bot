@@ -92,6 +92,7 @@ public class CardsInfo implements Command {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
+        PNInfo.checkAndAddPNs(activeMap, player);
         sendCardsInfo(activeMap, player, event);
     }
 
