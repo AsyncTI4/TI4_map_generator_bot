@@ -1207,6 +1207,7 @@ public class ButtonHelper {
             List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(p1, activeMap, true);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         }
+        File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.all, event);
         event.getMessage().delete().queue();
         
 

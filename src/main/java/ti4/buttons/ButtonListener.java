@@ -45,6 +45,7 @@ import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.Turn;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -57,8 +58,12 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.map.Tile;
+
+import java.io.File;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
+
+import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 
 public class ButtonListener extends ListenerAdapter {
@@ -2708,10 +2713,33 @@ public class ButtonListener extends ListenerAdapter {
                
                 case "doneWithTacticalAction" -> {
                     ButtonHelper.exploreDET(player, activeMap, event);
+                    
+                    String threadName = activeMap.getName() + "-bot-map-updates";
+                    List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
                     String message = "Use buttons to end turn or do another action.";
                     List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeMap, true);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
+                    boolean foundsomething = false;
+                    File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.all, event);
+                    if(!activeMap.isFoWMode())
+                    {
+                        for (ThreadChannel threadChannel_ : threadChannels) {
+                            if (threadChannel_.getName().equals(threadName)) {
+                                foundsomething = true;
+                                MessageHelper.sendFileToChannel((MessageChannel) threadChannel_, file);
+                            }
+                        }
+                    }
+                    else{
+                        MessageHelper.sendFileToChannel(event.getChannel(), file);
+                        foundsomething = true;
+                    }
+                    if(!foundsomething)
+                    {
+                        MessageHelper.sendFileToChannel(event.getChannel(), file);
+                    }
+                    
                 }
                 case "doAnotherAction" -> {
                     String message = "Use buttons to end turn or do another action.";
@@ -2721,9 +2749,32 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "concludeMove" -> {
                     String message = "Moved all units to the space area. Make sure to resolve any space combat, and then use the buttons to land troops.";
+                    
                     List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
+                    String threadName = activeMap.getName() + "-bot-map-updates";
+                    boolean foundsomething = false;
+                    List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+                    File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.all, event);
+                    if(!activeMap.isFoWMode())
+                    {
+                        for (ThreadChannel threadChannel_ : threadChannels) {
+                            if (threadChannel_.getName().equals(threadName)) {
+                                MessageHelper.sendFileToChannel((MessageChannel) threadChannel_, file);
+                                foundsomething = true;
+                            }
+                        }
+                    }
+                    else{
+                        MessageHelper.sendFileToChannel(event.getChannel(), file);
+                        foundsomething = true;
+                    }
+                    if(!foundsomething)
+                    {
+                        MessageHelper.sendFileToChannel(event.getChannel(), file);
+                    }
+                    
                 }
                 case "doneLanding" -> {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
