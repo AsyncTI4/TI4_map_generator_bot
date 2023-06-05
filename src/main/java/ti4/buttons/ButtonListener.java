@@ -785,7 +785,16 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(event.getChannel(), ident + " chose to diplo the system containing "
                     + Helper.getPlanetRepresentation(planet, activeMap));
             event.getMessage().delete().queue();
-        } else if (buttonID.startsWith("delete_buttons_")) {
+        } else if (buttonID.startsWith("doneWithOneSystem_")) {
+           String pos = buttonID.replace("doneWithOneSys_","");
+           Tile tile = activeMap.getTileByPosition(pos);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "From system "+tile.getRepresentationForButtons(activeMap, player)+"\n"+event.getMessage().getContentRaw());
+            String message = "Choose a different system to move from, or finalize movement.";
+            activeMap.resetCurrentMovedUnitsFrom1System();
+            List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, activeMap);
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
+            event.getMessage().delete().queue();
+        }else if (buttonID.startsWith("delete_buttons_")) {
             boolean resolveTime = false;
             String winner = "";
             String votes = buttonID.substring(buttonID.lastIndexOf("_") + 1, buttonID.length());
@@ -2674,14 +2683,6 @@ public class ButtonListener extends ListenerAdapter {
                     String message = "Choosing a different system to activate. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex.";
                     List<Button> ringButtons = ButtonHelper.getPossibleRings(player, activeMap);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
-                    event.getMessage().delete().queue();
-                }
-                case "doneWithOneSystem" -> {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
-                    String message = "Choose a different system to move from, or finalize movement.";
-                    activeMap.resetCurrentMovedUnitsFrom1System();
-                    List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, activeMap);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
                 }
                 case "componentAction" -> {
