@@ -23,6 +23,9 @@ public class Constants {
     public static final String DISPLAY_TYPE = "display_type";
     public static final String GAME_STATUS = "game_status";
     public static final String CONFIRM = "confirm";
+    public static final String NAALU_AGENT = "naalu_agent";
+    public static final String COMPONENT_ACTION = "component_action";
+    public static final String ACTIVATION_COUNT = "activation_count";
     public static final String SHUTDOWN = "shutdown";
     public static final String RESET_EMOJI_CACHE = "reset_emoji_cache";
     public static final String STATISTICS = "statistics";
@@ -244,6 +247,8 @@ public class Constants {
     public static final String AGENDA_ID = "agenda_id";
     public static final String CURRENT_AGENDA_INFO = "current_agenda_info";
     public static final String AGENDA_VOTE_INFO = "agenda_vote_info";
+    public static final String DISPLACED_UNITS_SYSTEM = "displaced_units_system";
+    public static final String DISPLACED_UNITS_ACTIVATION = "displaced_units_activation";
     public static final String AC_ID = "ac_id";
 
     public static final String INACTIVE_LEADER = "hero_unplay";
@@ -299,6 +304,7 @@ public class Constants {
     public static final String TURN = "turn_end";
     public static final String SPEAKER = "speaker";
     public static final String ACTIVE_PLAYER = "active_player";
+    public static final String ACTIVE_SYSTEM= "active_system";
     public static final String LAST_ACTIVE_PLAYER_PING = "last_active_player_ping";
     public static final String LAST_ACTIVE_PLAYER_CHANGE = "last_active_player_change";
 

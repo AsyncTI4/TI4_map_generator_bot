@@ -265,6 +265,8 @@ public class MapSaveLoadManager {
 
         writer.write(Constants.ACTIVE_PLAYER + " " + activeMap.getActivePlayer());
         writer.write(System.lineSeparator());
+        writer.write(Constants.ACTIVE_SYSTEM + " " + activeMap.getActiveSystem());
+        writer.write(System.lineSeparator());
 
         writer.write(Constants.LAST_ACTIVE_PLAYER_PING + " " + activeMap.getLastActivePlayerPing().getTime());
         writer.write(System.lineSeparator());
@@ -303,6 +305,22 @@ public class MapSaveLoadManager {
             sb2.append(entry.getKey()).append(",").append(entry.getValue()).append(":");
         }
         writer.write(Constants.AGENDA_VOTE_INFO + " " + sb2);
+        writer.write(System.lineSeparator());
+
+        HashMap<String, Integer> displaced1System = activeMap.getCurrentMovedUnitsFrom1System();
+        StringBuilder sb3 = new StringBuilder();
+        for (java.util.Map.Entry<String, Integer> entry : displaced1System.entrySet()) {
+            sb2.append(entry.getKey()).append(",").append(entry.getValue()+"").append(":");
+        }
+        writer.write(Constants.DISPLACED_UNITS_SYSTEM + " " + sb3);
+        writer.write(System.lineSeparator());
+
+        HashMap<String, Integer> displacedActivation = activeMap.getMovedUnitsFromCurrentActivation();
+        StringBuilder sb4 = new StringBuilder();
+        for (java.util.Map.Entry<String, Integer> entry : displacedActivation.entrySet()) {
+            sb2.append(entry.getKey()).append(",").append(entry.getValue()+"").append(":");
+        }
+        writer.write(Constants.DISPLACED_UNITS_ACTIVATION + " " + sb4);
         writer.write(System.lineSeparator());
 
         writer.write(Constants.AGENDAS + " " + String.join(",", activeMap.getAgendas()));
@@ -403,6 +421,12 @@ public class MapSaveLoadManager {
         writer.write(Constants.ALLIANCE_MODE + " " + activeMap.isAllianceMode());
         writer.write(System.lineSeparator());
         writer.write(Constants.FOW_MODE + " " + activeMap.isFoWMode());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.NAALU_AGENT + " " + activeMap.getNaaluAgent());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.COMPONENT_ACTION + " " + activeMap.getComponentAction());
+        writer.write(System.lineSeparator());
+        writer.write(Constants.ACTIVATION_COUNT + " " + activeMap.getActivationCount());
         writer.write(System.lineSeparator());
         writer.write(Constants.BASE_GAME_MODE + " " + activeMap.isBaseGameMode());
         writer.write(System.lineSeparator());
@@ -1048,6 +1072,7 @@ public class MapSaveLoadManager {
                 }
                 case Constants.SPEAKER -> activeMap.setSpeaker(info);
                 case Constants.ACTIVE_PLAYER -> activeMap.setActivePlayer(info);
+                case Constants.ACTIVE_SYSTEM -> activeMap.setActiveSystem(info);
                 case Constants.LAST_ACTIVE_PLAYER_PING -> {
                     try {
                         long millis = Long.parseLong(info);
@@ -1120,6 +1145,14 @@ public class MapSaveLoadManager {
                         activeMap.setRingCount(3);
                     }
                 }
+                case Constants.ACTIVATION_COUNT -> {
+                    try {
+                        int ringCount = Integer.parseInt(info);
+                        activeMap.setActivationCount(ringCount);
+                    } catch (Exception e) {
+                        activeMap.setActivationCount(0);;
+                    }
+                }
                 case Constants.VP_COUNT -> {
                     try {
                         int vpCount = Integer.parseInt(info);
@@ -1158,6 +1191,36 @@ public class MapSaveLoadManager {
                         if (dataInfo.hasMoreTokens()) {
                             voteInfo = dataInfo.nextToken();
                             activeMap.setCurrentAgendaVote(outcome, voteInfo);
+                        }
+                    }
+                }
+                case Constants.DISPLACED_UNITS_SYSTEM -> {
+                    StringTokenizer vote_info = new StringTokenizer(info, ":");
+                    while (vote_info.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
+                        String outcome = null;
+                        String voteInfo = null;
+                        if (dataInfo.hasMoreTokens()) {
+                            outcome = dataInfo.nextToken();
+                        }
+                        if (dataInfo.hasMoreTokens()) {
+                            voteInfo = dataInfo.nextToken();
+                            activeMap.setSpecificCurrentMovedUnitsFrom1System(outcome, Integer.parseInt(voteInfo));
+                        }
+                    }
+                }
+                case Constants.DISPLACED_UNITS_ACTIVATION -> {
+                    StringTokenizer vote_info = new StringTokenizer(info, ":");
+                    while (vote_info.hasMoreTokens()) {
+                        StringTokenizer dataInfo = new StringTokenizer(vote_info.nextToken(), ",");
+                        String outcome = null;
+                        String voteInfo = null;
+                        if (dataInfo.hasMoreTokens()) {
+                            outcome = dataInfo.nextToken();
+                        }
+                        if (dataInfo.hasMoreTokens()) {
+                            voteInfo = dataInfo.nextToken();
+                            activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(outcome, Integer.parseInt(voteInfo));
                         }
                     }
                 }
@@ -1215,6 +1278,22 @@ public class MapSaveLoadManager {
                     try {
                         boolean value = Boolean.parseBoolean(info);
                         activeMap.setFoWMode(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.NAALU_AGENT -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeMap.setNaaluAgent(value);
+                    } catch (Exception e) {
+                        //Do nothing
+                    }
+                }
+                case Constants.COMPONENT_ACTION -> {
+                    try {
+                        boolean value = Boolean.parseBoolean(info);
+                        activeMap.setComponentAction(value);
                     } catch (Exception e) {
                         //Do nothing
                     }

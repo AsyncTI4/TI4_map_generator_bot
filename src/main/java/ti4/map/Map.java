@@ -67,6 +67,8 @@ public class Map {
     @ExportableField
     private int ringCount = 4;
     @ExportableField
+    private int activationCount = 0;
+    @ExportableField
     private int vp = 10;
     @ExportableField
     private boolean competitiveTIGLGame = false;
@@ -76,6 +78,10 @@ public class Map {
     private boolean allianceMode = false;
     @ExportableField
     private boolean fowMode = false;
+    @ExportableField
+    private boolean naaluAgent = false;
+    @ExportableField
+    private boolean componentAction = false;
     @ExportableField
     private boolean baseGameMode = false;
     @ExportableField
@@ -131,6 +137,8 @@ public class Map {
 
     @ExportableField
     private String activePlayer = null;
+    @ExportableField
+    private String activeSystem = null;
     private Date lastActivePlayerPing = new Date(0);
     private Date lastActivePlayerChange = new Date(0);
     private Date lastTimeGamesChecked = new Date(0);
@@ -140,6 +148,8 @@ public class Map {
     private List<String> secretObjectives;
     private List<String> actionCards;
     private LinkedHashMap<String, Integer> discardActionCards = new LinkedHashMap<>();
+    private HashMap<String, Integer> displacedUnitsFrom1System = new HashMap<String, Integer>();
+    private HashMap<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<String, Integer>();
 
     private String currentAgendaInfo = null;
     private boolean hasHackElectionBeenPlayed = false;
@@ -621,8 +631,34 @@ public class Map {
         return ringCount;
     }
 
+    public int getActivationCount() {
+        return activationCount;
+    }
+
+    public boolean getNaaluAgent() {
+        return naaluAgent;
+    }
+
+    
+
+    public boolean getComponentAction() {
+        return componentAction;
+    }
+
     public void setRingCount(int ringCount) {
         this.ringCount = ringCount;
+    }
+
+    public void setNaaluAgent(boolean onStatus) {
+        naaluAgent = onStatus;
+    }
+
+    public void setComponentAction(boolean onStatus) {
+        componentAction= onStatus;
+    }
+
+    public void setActivationCount(int count) {
+        activationCount = count;
     }
 
     public void setSCPlayed(Integer scNumber, Boolean playedStatus) {
@@ -691,6 +727,36 @@ public class Map {
 
     public String getActivePlayer() {
         return activePlayer;
+    }
+    public String getActiveSystem() {
+        return activeSystem;
+    }
+    public void setActiveSystem(String system) {
+        activeSystem = system;
+    }
+    public HashMap<String, Integer> getCurrentMovedUnitsFrom1System() {
+        return displacedUnitsFrom1System;
+    }
+    public HashMap<String, Integer> getMovedUnitsFromCurrentActivation() {
+        return displacedUnitsFromEntireTacticalAction;
+    }
+    public void setSpecificCurrentMovedUnitsFrom1System(String unit, int count) {
+        displacedUnitsFrom1System.put(unit, count);
+    }
+    public void setCurrentMovedUnitsFrom1System(HashMap<String, Integer> displacedUnits) {
+        displacedUnitsFrom1System = displacedUnits;
+    }
+    public void setSpecificCurrentMovedUnitsFrom1TacticalAction(String unit, int count) {
+        displacedUnitsFromEntireTacticalAction.put(unit, count);
+    }
+    public void setCurrentMovedUnitsFrom1TacticalAction(HashMap<String, Integer> displacedUnits) {
+        displacedUnitsFromEntireTacticalAction = displacedUnits;
+    }
+    public void resetCurrentMovedUnitsFrom1System() {
+        displacedUnitsFrom1System = new HashMap<String, Integer>();
+    }
+    public void resetCurrentMovedUnitsFrom1TacticalAction() {
+        displacedUnitsFromEntireTacticalAction= new HashMap<String, Integer>();
     }
 
     public void updateActivePlayer(Player player) {

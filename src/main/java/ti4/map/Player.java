@@ -180,6 +180,14 @@ public class Player {
         return cardsInfoThreadID;
     }
 
+    public boolean hasPDS2Tech() {
+        if(getTechs().contains("ht2") ||getTechs().contains("pds2") ||getTechs().contains("dsgledpds") || getTechs().contains("dsmirvpds"))
+        {
+            return true; 
+        }
+        return false;
+    }
+
     public void setCardsInfoThreadID(String cardsInfoThreadID) {
         this.cardsInfoThreadID = cardsInfoThreadID;
     }
