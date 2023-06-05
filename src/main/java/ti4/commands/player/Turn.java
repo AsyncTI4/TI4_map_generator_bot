@@ -56,6 +56,7 @@ public class Turn extends PlayerSubcommandData {
     }
 
     public void execute(GenericInteractionCreateEvent event, Player mainPlayer, Map activeMap) {
+        activeMap.setComponentAction(false);
         if (activeMap.isFoWMode()) {
            MessageHelper.sendMessageToChannel(mainPlayer.getPrivateChannel(), "_ _");
         } else {
@@ -67,6 +68,7 @@ public class Turn extends PlayerSubcommandData {
     }
 
     public String pingNextPlayer(GenericInteractionCreateEvent event, Map activeMap, Player mainPlayer) {
+        activeMap.setComponentAction(false);
         int scNext = -1;
         boolean naaluPresent = false;
         int naaluSC = 0;
@@ -152,7 +154,7 @@ public class Turn extends PlayerSubcommandData {
         for (Player player : activeMap.getPlayers().values()) {
             int sc = player.getLowestSC();
             if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
-                if(activeMap.isTestBetaFeaturesMode())
+                if(!activeMap.isFoWMode())
                 {
                     try {
                         if (!activeMap.isFoWMode() && activeMap.getLatestTransactionMsg() != null && activeMap.getLatestTransactionMsg() != "") {
@@ -176,7 +178,7 @@ public class Turn extends PlayerSubcommandData {
                     if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
                         MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeMap, player));
                     }
-                    if(activeMap.isTestBetaFeaturesMode())
+                    if(!activeMap.isFoWMode())
                     {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(),buttonText, buttons);
                     }
@@ -193,7 +195,7 @@ public class Turn extends PlayerSubcommandData {
                     if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
                         MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeMap, player));
                     }
-                    if(activeMap.isTestBetaFeaturesMode())
+                    if(!activeMap.isFoWMode())
                     {
                         MessageHelper.sendMessageToChannelWithButtons(gameChannel,buttonText, buttons);
                     }
