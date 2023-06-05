@@ -118,7 +118,7 @@ public class PNInfo extends PNCardsSubcommandData {
         return getPromissoryNoteRepresentation(pnID, null, true);
     }
 
-    private static String getPromissoryNoteRepresentation(String pnID, boolean longFormat) {
+    public static String getPromissoryNoteRepresentation(String pnID, boolean longFormat) {
         return getPromissoryNoteRepresentation(pnID, null, longFormat);
     }
 

@@ -164,7 +164,7 @@ public class MessageHelper {
 			} else { //last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
 
-					if(messageText.contains("Use buttons to do your turn"))
+					if(messageText.contains("Use buttons to do your turn") || messageText.contains("Use buttons to end turn"))
 					{
 						String gameName = channel.getName();
 						gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");

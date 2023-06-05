@@ -1,6 +1,7 @@
 package ti4.commands.player;
 
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
@@ -40,6 +41,9 @@ public abstract class PlayerSubcommandData extends SubcommandData {
      */
     public void sendMessage(String messageText) {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);
+    }
+    public void sendMessage(String messageText, GenericInteractionCreateEvent event2) {
+        MessageHelper.sendMessageToChannel(event2.getMessageChannel(), messageText);
     }
 
     abstract public void execute(SlashCommandInteractionEvent event);

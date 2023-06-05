@@ -441,6 +441,7 @@ public class Helper {
         return Helper.getPlanetEmoji(planet) + " " + (Objects.isNull(planetProper) ? planet : planetProper);
     }
     public static String getPlanetRepresentation(String planet, Map activeMap) {
+        planet = planet.toLowerCase().replace(" ", "");
         UnitHolder unitHolder = activeMap.getPlanetsInfo().get(AliasHandler.resolvePlanet(planet));
         Planet planet2 = (Planet) unitHolder;
         String planetProper = Mapper.getPlanetRepresentations().get(planet) + " (" +planet2.getResources() + "/"+planet2.getInfluence()+")";
@@ -621,12 +622,7 @@ public class Helper {
                 unitButtons.add(mfButton);
             }
         }
-        Button DoneProducingUnits = Button.danger("deleteButtons", "Done Producing Units");
-        if(warfareNOtherstuff.equalsIgnoreCase("warfare"))
-        {
-            DoneProducingUnits = Button.danger("deleteButtons_warfare", "Done Producing Units");
-        }
-       
+        Button DoneProducingUnits = Button.danger("deleteButtons_"+warfareNOtherstuff, "Done Producing Units");
         unitButtons.add(DoneProducingUnits);
         return unitButtons;
     }

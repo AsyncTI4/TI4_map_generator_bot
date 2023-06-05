@@ -113,6 +113,30 @@ public class FoWHelper {
 		player.setFogInitialized(true);
 	}
 
+	public static Set<String> getTilePositionsToShow(Map activeMap, @NotNull Player player) {
+		// Get all tiles with the player in it
+		Set<String> tilesWithPlayerUnitsPlanets = new HashSet<>();
+		for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(activeMap.getTileMap()).entrySet()) {
+			if (FoWHelper.playerIsInSystem(activeMap, tileEntry.getValue(), player)) {
+				tilesWithPlayerUnitsPlanets.add(tileEntry.getKey());
+			}
+		}
+
+		Set<String> tilePositionsToShow = new HashSet<>(tilesWithPlayerUnitsPlanets);
+		for (String tilePos : tilesWithPlayerUnitsPlanets) {
+			Set<String> adjacentTiles = FoWHelper.getAdjacentTiles(activeMap, tilePos, player, true);
+			tilePositionsToShow.addAll(adjacentTiles);
+		}
+
+		String playerSweep = Mapper.getSweepID(player.getColor());
+		for (Tile tile : activeMap.getTileMap().values()) {
+			if (tile.hasCC(playerSweep)) {
+				tilePositionsToShow.add(tile.getPosition());
+			}
+		}
+		return tilePositionsToShow;
+	}
+
 	public static void updateFog(Map activeMap, Player player) {
 		if (player != null) initializeFog(activeMap, player, true);
 	}
@@ -232,7 +256,6 @@ public class FoWHelper {
 		}
 		if(!toShow)
 			{
-				System.out.println("Hello 1");
 				for(String primaryTile : activeMap.getCustomAdjacentTiles().keySet())
 				{
 					System.out.println("Primary tile" + primaryTile);
