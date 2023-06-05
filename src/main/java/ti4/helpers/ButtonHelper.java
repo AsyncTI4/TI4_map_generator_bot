@@ -11,6 +11,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.awt.SystemColor;
+import java.io.File;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +22,7 @@ import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.SendFragments;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
+import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.map.Leader;
 import ti4.map.Map;
