@@ -57,11 +57,7 @@ public class ScoreSO extends SOCardsSubcommandData {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }
-            SecretObjectiveModel so = Mapper.getSecretObjective(entry.getKey());
-            String soName = so.name;
-            String soPhase = so.phase;
-            String soDescription = so.text;
-            message.append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
+            message.append(SOInfo.getSecretObjectiveRepresentation(entry.getKey())).append("\n");
         }
         if (event != null && channel.getName().equalsIgnoreCase(event.getChannel().getName())) {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());

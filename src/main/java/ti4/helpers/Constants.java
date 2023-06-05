@@ -2,7 +2,6 @@ package ti4.helpers;
 
 import java.awt.*;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Constants {
     public static final String SHOW_GAME = "show_game";

@@ -9,8 +9,6 @@ import com.fasterxml.jackson.databind.node.JsonNodeType;
 
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.Constants;
-import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.model.*;
 

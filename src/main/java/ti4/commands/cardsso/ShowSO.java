@@ -52,7 +52,7 @@ public class ShowSO extends SOCardsSubcommandData {
         sb.append("Game: ").append(activeMap.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Showed Secret Objectives:").append("\n");
-        sb.append(Mapper.getSecretObjective(soID)).append("\n");
+        sb.append(SOInfo.getSecretObjectiveRepresentation(soID)).append("\n");
         player.setSecret(soID);
 
         Player player_ = Helper.getPlayer(activeMap, null, event);

@@ -31,8 +31,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
-import ti4.MapGenerator;
-import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DiscordantStarsHelper;
@@ -164,7 +162,6 @@ public class MapSaveLoadManager {
                     CopyOption[] options = {StandardCopyOption.REPLACE_EXISTING};
                     Files.copy(mapUndoStorage.toPath(), originalMapFile.toPath(), options);
                     mapUndoStorage.delete();
-//                    reload(map);
                     Map loadedMap = loadMap(originalMapFile);
                     MapManager.getInstance().deleteMap(activeMap.getName());
                     MapManager.getInstance().addMap(loadedMap);
