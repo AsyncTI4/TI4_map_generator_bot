@@ -56,10 +56,10 @@ public class ListVoteCount extends AgendaSubcommandData {
         if (activeMap.isFoWMode()) {
             sb.append(" vote count: **???**");
             return sb.toString();
-        } else if (player.hasAbility("galactic_threat") && !Helper.playerHasXxchaCommanderUnlockedOrAlliance(activeMap, player)) {
+        } else if (player.hasAbility("galactic_threat") && !activeMap.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
             sb.append(" NOT VOTING (Galactic Threat)");
             return sb.toString();
-        } else if (Helper.playerHasXxchaHeroUnlocked(player)) {
+        } else if (player.hasLeaderUnlocked("xxchahero")) {
             sb.append(" vote count: **" + Emojis.ResInf + " " + voteCount);
         } else if (player.hasAbility("lithoids")) { // Vote with planet resources, no influence
             sb.append(" vote count: **" + Emojis.resources + " " + voteCount);
@@ -88,7 +88,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         int voteCount = baseInfluenceCount; //default
 
         //NEKRO unless XXCHA ALLIANCE
-        if (player.hasAbility("galactic_threat") && !Helper.playerHasXxchaCommanderUnlockedOrAlliance(activeMap, player)) {
+        if (player.hasAbility("galactic_threat") && !activeMap.playerHasLeaderUnlockedOrAlliance(player,"xxchacommander")) {
             return 0;
         }
 
@@ -128,7 +128,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         }
 
         //Xxcha Alliance
-        if (Helper.playerHasXxchaCommanderUnlockedOrAlliance(activeMap, player)) {
+        if (activeMap.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
             Set<String> planets = new HashSet<>(player.getPlanets());
             planets.removeAll(player.getExhaustedPlanets());
             int readyPlanetCount = planets.size();
