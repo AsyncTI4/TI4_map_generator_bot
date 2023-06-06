@@ -87,13 +87,13 @@ public class SCPlay extends PlayerSubcommandData {
         String emojiName = "SC" + String.valueOf(scToPlay);
 
         if (activeMap.getPlayedSCs().contains(scToPlay)) {
-            sendMessage("SC already played");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"SC already played");
             return;
         }
 
         activeMap.setSCPlayed(scToPlay, true);
         String categoryForPlayers = Helper.getGamePing(event, activeMap);
-        String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToDisplay) + (pbd100or500 ? " Group " + pbd100group : "") + " played by " + Helper.getPlayerRepresentation(player, activeMap) + "\n\n";
+        String message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(activeMap.getGuild(), scToDisplay) + (pbd100or500 ? " Group " + pbd100group : "") + " played by " + Helper.getPlayerRepresentation(player, activeMap) + "\n\n";
         if (activeMap.isFoWMode()) {
             if(activeMap.isHomeBrewSCMode())
             {
@@ -101,7 +101,7 @@ public class SCPlay extends PlayerSubcommandData {
             }
             else
             {
-                message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(event.getGuild(), scToDisplay) + " played.\n\n";
+                message = "Strategy card " + Helper.getEmojiFromDiscord(emojiName) + Helper.getSCAsMention(activeMap.getGuild(), scToDisplay) + " played.\n\n";
             }
         }
         if (!categoryForPlayers.isEmpty()) {
@@ -165,18 +165,12 @@ public class SCPlay extends PlayerSubcommandData {
 
                 }
             });
-        
-
 
         //POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
         if (!activeMap.isFoWMode() && scToPlay == 3) {
             String assignSpeakerMessage = Helper.getPlayerRepresentation(player, activeMap) + ", please click a faction below to assign Speaker " + Emojis.SpeakerToken;
-            List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons();
-            
-
-            for (MessageCreateData messageCreateData : MessageHelper.getMessageCreateDataObjects(assignSpeakerMessage, assignSpeakerActionRow)) {
-                mainGameChannel.sendMessage(messageCreateData).queue();
-            }
+            List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(activeMap);
+            MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), assignSpeakerMessage, assignSpeakerActionRow);
         }
 
         if (scToPlay == 3 && !activeMap.isHomeBrewSCMode()) {
@@ -264,10 +258,10 @@ public class SCPlay extends PlayerSubcommandData {
         return List.of(followButton, noFollowButton, draw_2_ac);
     }
 
-    private List<Button> getPoliticsAssignSpeakerButtons() {
+    private List<Button> getPoliticsAssignSpeakerButtons(Map activeMap) {
         List<Button> assignSpeakerButtons = new ArrayList<>();
-        for (Player player : getActiveMap().getPlayers().values()) {
-            if (player.isRealPlayer() && !player.getUserID().equals(getActiveMap().getSpeaker())) {
+        for (Player player : activeMap.getPlayers().values()) {
+            if (player.isRealPlayer() && !player.getUserID().equals(activeMap.getSpeaker())) {
                 String faction = player.getFaction();
                 if (faction != null && Mapper.isFaction(faction)) {
                     Button button = Button.secondary(Constants.SC3_ASSIGN_SPEAKER_BUTTON_ID_PREFIX + faction, " ");
