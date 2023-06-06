@@ -446,7 +446,7 @@ public class Helper {
         planet = planet.replace("'", "");
         UnitHolder unitHolder = activeMap.getPlanetsInfo().get(AliasHandler.resolvePlanet(planet));
         Planet planet2 = (Planet) unitHolder;
-        String planetProper = Mapper.getPlanetRepresentations().get(planet) + " (" +planet2.getResources() + "/"+planet2.getInfluence()+")";
+        String planetProper = Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planet)) + " (" +planet2.getResources() + "/"+planet2.getInfluence()+")";
 
         return (Objects.isNull(planetProper) ? planet : planetProper);
     }
@@ -603,6 +603,10 @@ public class Helper {
             if (unitHolder instanceof Planet planet) {
                 String colorID = Mapper.getColorID(player.getColor());
                 String sdKey =  colorID+ "_sd.png";
+                String csdKey =  colorID+ "_csd.png";
+                if(player.getFaction().equalsIgnoreCase("cabal")){
+                    sdKey = csdKey;
+                }
 
                 if (warfareNOtherstuff.equalsIgnoreCase("warfare")) {
 

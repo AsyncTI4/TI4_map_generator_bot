@@ -184,6 +184,7 @@ public class Tile {
     }
 
     public void removeUnit(String spaceHolder, String unitID, Integer count) {
+        
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
             unitHolder.removeUnit(unitID, count);
