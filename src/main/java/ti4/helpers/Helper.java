@@ -890,7 +890,7 @@ public class Helper {
     }
 
     public static String getGamePing(GenericInteractionCreateEvent event, Map activeMap) {
-        return getGamePing(event.getGuild(), activeMap);
+        return getGamePing(activeMap.getGuild(), activeMap);
     }
 
     public static String getGamePing(@NotNull Guild guild, @NotNull Map activeMap) {
