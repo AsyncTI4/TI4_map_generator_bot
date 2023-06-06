@@ -1839,36 +1839,6 @@ public class Helper {
         return new HashSet<>(getListFromCSV(commaSeparatedString));
     }
 
-    public static boolean playerHasXxchaCommanderUnlockedOrAlliance(Map activeMap, Player player) {
-        String xxchaCommanderLeaderID = "xxchacommander";
-        
-        if (player.hasLeaderUnlocked(xxchaCommanderLeaderID)) return true;
-
-        ArrayList<Player> otherPlayers = new ArrayList<>(activeMap.getRealPlayers());
-        otherPlayers.remove(player);
-
-        //Check if other players have xxchaCommander, and whether player has the alliance or imperia
-        for (Player otherPlayer : otherPlayers) {
-            if (!otherPlayer.hasLeaderUnlocked(xxchaCommanderLeaderID)) continue;
-            for (String pn : player.getPromissoryNotesInPlayArea()) {
-                if (pn.contains(otherPlayer.getColor()) && pn.contains("_an")) {
-                    return true;
-                }
-            }
-            if (player.hasAbility("imperia")) {
-                if (player.getMahactCC().contains(otherPlayer.getColor())) {
-                    return true;
-                }
-            }
-            
-        }
-        return false;
-    }
-
-    public static boolean playerHasXxchaHeroUnlocked(Player player) {
-        return player.hasLeaderUnlocked("xxchahero");
-    }
-
     public static boolean isFakeAttachment(String attachmentName) {
         attachmentName = AliasHandler.resolveAttachment(attachmentName);
         return Mapper.getSpecialCaseValues("fake_attachments").contains(attachmentName);
