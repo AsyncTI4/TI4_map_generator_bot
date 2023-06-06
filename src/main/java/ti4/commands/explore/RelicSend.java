@@ -75,25 +75,23 @@ public class RelicSend extends GenericRelicAction {
         player2.addRelic(relicID);
 
         //HANDLE SHARD OF THE THRONE
+        String shardCustomPOName = null;
+        Integer shardPublicObjectiveID = null;
         switch (relicID) {
             case "shard" -> {
-                Integer shardPublicObjectiveID = activeMap.getCustomPublicVP().get("Shard of the Throne");
-                if (shardPublicObjectiveID != null) {
-                    activeMap.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
-                    activeMap.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
-                }
+                shardCustomPOName = "Shard of the Throne";
+                shardPublicObjectiveID = activeMap.getCustomPublicVP().get(shardCustomPOName);
             }
             case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
                 int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
-                String customPOName = "Shard of the Throne (" + absolShardNum + ")";
-                Integer shardPublicObjectiveID = activeMap.getCustomPublicVP().get(customPOName);
-                if (shardPublicObjectiveID != null) {
-                    activeMap.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
-                    activeMap.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
-                }
+                shardCustomPOName = "Shard of the Throne (" + absolShardNum + ")";
+                shardPublicObjectiveID = activeMap.getCustomPublicVP().get(shardCustomPOName);
             }
         }
-
+        if (shardCustomPOName != null && shardPublicObjectiveID != null && activeMap.getCustomPublicVP().containsKey(shardCustomPOName) && activeMap.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {
+            activeMap.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
+            activeMap.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
+        }
 
         if (player1.getRelics().contains(relicID) || !player2.getRelics().contains(relicID)) {
             sendMessage("Something may have gone wrong - please check your relics and ping Bothelper if there is a problem.");
