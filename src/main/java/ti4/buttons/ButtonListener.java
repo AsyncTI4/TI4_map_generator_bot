@@ -1578,6 +1578,7 @@ public class ButtonListener extends ListenerAdapter {
             rest = rest.substring(1, rest.length());
             String unitkey = "";
             String planet = "";
+           
             if(rest.contains("_"))
             {
                 unitkey =rest.split("_")[0];
@@ -1598,7 +1599,10 @@ public class ButtonListener extends ListenerAdapter {
                     planetName = "space";
                 }
                 else {
+                    
                     planetName = planet.toLowerCase().replace(" ", "");
+                    planetName = AliasHandler.resolvePlanet(planetName);
+                   
                 }
                 
                 String key = Mapper.getUnitID(AliasHandler.resolveUnit(unitkey), player.getColor());
