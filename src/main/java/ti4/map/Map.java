@@ -20,7 +20,6 @@ import ti4.MapGenerator;
 import ti4.commands.milty.MiltyDraftManager;
 import ti4.commands.player.PlanetRemove;
 import ti4.generator.Mapper;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
@@ -2166,5 +2165,32 @@ public class Map {
         if (missingPromissoryNotes.size() > 0) {
             BotLogger.log("`" + getName() + "`: there are promissory notes that should be in the game but are not:\n> `" + missingPromissoryNotes + "`");
         }
+    }
+
+    public boolean playerHasLeaderUnlockedOrAlliance(Player player, String leaderID) {
+        if (player.hasLeaderUnlocked(leaderID)) return true;
+        if (!leaderID.contains("commander")) return false;
+        
+        // check if player has any allainces with players that have the commander unlocked
+        for (String pnID : player.getPromissoryNotesInPlayArea()) {
+            if (pnID.contains("_an")) {
+                Player pnOwner = getPNOwner(pnID);
+                if (pnOwner != null && !pnOwner.equals(player) && pnOwner.hasLeaderUnlocked(leaderID)) {
+                    return true;
+                }
+            }
+        }
+
+        // check if player has Imperia and if any of the stolen CCs are owned by players that have the leader unlocked
+        if (player.hasAbility("imperia")) {
+            for (Player player_ : getRealPlayers()) {
+                if (player_.equals(player)) continue;
+                if (player.getMahactCC().contains(player_.getColor()) && player_.hasLeaderUnlocked(leaderID)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 }
