@@ -1,5 +1,6 @@
 package ti4.commands.tokens;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -28,6 +29,21 @@ public class RemoveCC extends AddRemoveToken {
             tile.removeCC(ccID);
             Helper.isCCCountCorrect(event, activeMap, color);
         }
+    }
+
+    public static void removeCC(GenericInteractionCreateEvent event, String color, Tile tile, Map activeMap) {
+       
+        String ccID = Mapper.getCCID(color);
+        String ccPath = tile.getCCPath(ccID);
+        if (ccPath == null) {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
+        }
+        if (activeMap.isFoWMode()) {
+            String colorMention = Helper.getColourAsMention(event.getGuild(), color);
+            FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has removed a token in the system");
+        }
+        tile.removeCC(ccID);
+        
     }
 
     @Override
