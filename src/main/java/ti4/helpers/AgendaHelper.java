@@ -25,21 +25,21 @@ public class AgendaHelper {
 
         if(Helper.getPlayerFromColorOrFaction(activeMap,"keleres") != null && !activeMap.isFoWMode())
         {
-            Button playKeleresAfter = Button.danger("play_after_Keleres Rider", "Play Keleres Rider").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Keleres")));;
+            Button playKeleresAfter = Button.secondary("play_after_Keleres Rider", "Play Keleres Rider").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("keleres")));;
             afterButtons.add(playKeleresAfter);
         }
         if(Helper.getPlayerFromAbility(activeMap, "galactic_threat") != null && !activeMap.isFoWMode())
         {
             Player nekroProbably = Helper.getPlayerFromAbility(activeMap, "galactic_threat");
             String finChecker = "FFCC_"+nekroProbably.getFaction() + "_";
-            Button playNekroAfter = Button.danger(finChecker+"play_after_Galactic Threat", "Do Galactic Threat Rider").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Nekro")));
+            Button playNekroAfter = Button.secondary(finChecker+"play_after_Galactic Threat Rider", "Do Galactic Threat Rider").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro")));
             afterButtons.add(playNekroAfter);
         }
         if(Helper.getPlayerFromUnlockedLeader(activeMap, "keleresheroodlynn") != null)
         {
             Player keleresX = Helper.getPlayerFromUnlockedLeader(activeMap, "keleresheroodlynn");
             String finChecker = "FFCC_"+keleresX.getFaction() + "_";
-            Button playKeleresHero = Button.danger(finChecker+"play_after_Keleres Xxcha Hero", "Play Keleres Hero").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Keleres")));
+            Button playKeleresHero = Button.secondary(finChecker+"play_after_Keleres Xxcha Hero", "Play Keleres Hero").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("keleres")));
             afterButtons.add(playKeleresHero);
         }
 
@@ -639,7 +639,7 @@ public class AgendaHelper {
                             faction = "Someone";
                         }
                         String vote = specificVote.substring(specificVote.indexOf("_")+1,specificVote.length());
-                        if (!vote.contains("Rider") && !vote.contains("Sanction")) {
+                        if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")) {
                             totalVotes += Integer.parseInt(vote);
                             outcomeSummary = outcomeSummary + faction +"-"+ vote + ", ";
                         } else {
