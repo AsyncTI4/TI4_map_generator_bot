@@ -156,12 +156,33 @@ public class ListVoteCount extends AgendaSubcommandData {
             additionalVotes += shardVotes;
         }
 
+        //Absol's Syncretone - +1 bote for each neighbour
+        if (player.getRelics().contains("absol_syncretone")) {
+            int count = Helper.getNeighbourCount(activeMap, player);
+            sb.append(" (+" + count + " for " + Emojis.Relic + "Syncretone)");
+            additionalVotes += count;
+        }
+
         //Ghoti Wayfarer Tech
         if (player.getTechs().contains("dsghotg") && !player.getExhaustedTechs().contains("dsghotg")) {
             int fleetCC = player.getFleetCC();
             sb.append(" (+" + fleetCC + " if Exhaust " + Emojis.BioticTech + "Networked Command)");
             additionalVotes += fleetCC;
         }
+
+        // //Edyn Mandate Sigil - Planets in Sigil systems gain +1 vote //INCOMPLETE, POSSIBLY CHANGING ON DS END
+        // Player edynMechPlayer = Helper.getPlayerFromColorOrFaction(activeMap, "edyn");
+        // if (edynMechPlayer != null) {
+        //     int count = 0;
+        //     List<Tile> edynMechTiles = activeMap.getTileMap().values().stream().filter(t -> Helper.playerHasMechInSystem(t, activeMap, player)).toList();
+        //     for (Tile tile : edynMechTiles) {
+        //         if (tile.getUnitHolders().values().stream().anyMatch(u -> player.getPlanets().contains(u.getName()))) {
+
+        //         }
+        //     }
+        //     sb.append(" (+" + count + " for (" + count + "x) Planets in " + Emojis.edyn + "Sigil Systems)");
+        //     additionalVotes += count;
+        // }
 
         return java.util.Map.entry(additionalVotes, sb.toString());
     }
