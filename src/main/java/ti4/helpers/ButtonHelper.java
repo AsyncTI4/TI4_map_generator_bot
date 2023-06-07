@@ -304,7 +304,7 @@ public class ButtonHelper {
                             planetName = " "+unitHolder.getName();
                         }
                         new AddUnits().unitParsing(event, player.getColor(),
-                            tile, numMechs + "infantry"+planetName, activeMap);
+                            tile, numMechs + " infantry"+planetName, activeMap);
                         
                         successMessage = successMessage + "\n Put "+numMechs +" "+Helper.getEmojiFromDiscord("infantry")+" with the mechs in "+tile.getRepresentationForButtons(activeMap,player);
                     }
