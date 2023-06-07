@@ -527,7 +527,7 @@
   "commodities": 4,
     "factionTech": ["dsghoth", "dsghoty"],
     "startingTech": [],
-    "homePlanets": ["varies"],
+    "homePlanets": ["ghoti"],
     "abilities": ["mobile_command", "spawning_grounds"],
     "leaders": ["ghotiagent", "ghoticommander", "ghotihero"],
     "promissoryNotes": ["dspnghot"]
