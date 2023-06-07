@@ -63,7 +63,7 @@ public class ButtonHelper {
 
         Button transaction = Button.primary("transaction", "Transaction");
         startButtons.add(transaction);
-        if(!activeMap.isFoWMode() && activeMap.getLatestTransactionMsg() != null && !activeMap.getLatestTransactionMsg().equalsIgnoreCase(""))
+        if(activeMap.getLatestTransactionMsg() != null && !activeMap.getLatestTransactionMsg().equalsIgnoreCase(""))
         {
             activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestTransactionMsg()).queue();
         }
@@ -609,6 +609,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(activeMap),message, stuffToTransButtons);
             }
             case "PNs" -> {
+                PNInfo.sendPromissoryNoteInfo(activeMap, p1, false);
                 String message =  Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" Click the PN you would like to send";
                 for(String pnShortHand : p1.getPromissoryNotes().keySet())
                 {
@@ -1026,53 +1027,7 @@ public class ButtonHelper {
                 
             }
             case "pn" -> {
-                boolean longPNDisplay = false;
-                String id = buttonID;
-                Player player = p1;
-                String promissoryNote = Mapper.getPromissoryNote(id, true);
-                String[] pn = promissoryNote.split(";");
-                String pnOwner = Mapper.getPromissoryNoteOwner(id);
-                if (pn.length > 3 && pn[3].equals("playarea")) {
-                    player.setPromissoryNotesInPlayArea(id);
-                } else {
-                    player.removePromissoryNote(id);
-                    for (Player player_ : activeMap.getPlayers().values()) {
-                        String playerColor = player_.getColor();
-                        String playerFaction = player_.getFaction();
-                        if (playerColor != null && playerColor.equals(pnOwner) || playerFaction != null && playerFaction.equals(pnOwner)) {
-                            player_.setPromissoryNote(id);
-                            PNInfo.sendPromissoryNoteInfo(activeMap, player_, false);
-                            pnOwner = player_.getFaction();
-                            break;
-                        }
-                    }
-                }
-
-                String emojiToUse = activeMap.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
-                StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " played promissory note:\n");
-                sb.append(emojiToUse + Emojis.PN);
-                String pnText = "";
-
-                //Handle AbsolMode Political Secret
-                if (activeMap.isAbsolMode() && id.endsWith("_ps")) {
-                    pnText = "Political Secret" + Emojis.Absol + ":  *When you cast votes:* You may exhaust up to 3 of the {colour} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {colour} player.";
-                } else {
-                    pnText = Mapper.getPromissoryNote(id, longPNDisplay);
-                }
-                sb.append(pnText).append("\n");
-
-                //TERRAFORM TIP
-                if (id.equalsIgnoreCase("terraform")) {
-                    sb.append("`/add_token token:titanspn`\n");
-                }
-
-                //Fog of war ping
-                if (activeMap.isFoWMode()) {
-                    // Add extra message for visibility
-                    FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, sb.toString());
-                }
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),sb.toString());
-                PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
+                ButtonHelper.resolvePNPlay(buttonID, p1, activeMap, event);
             }
             case "ability" -> {
                 if(buttonID.equalsIgnoreCase("starForge")){
@@ -1092,6 +1047,7 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
                     String message = "Select the planet you would like to place 2 infantry on.";
                     List<Button> buttons = Helper.getPlanetPlaceUnitButtons(event, p1, activeMap, "2gf");
+                    buttons.add(Button.danger("orbitolDropFollowUp", "Done Dropping Infantry"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
 
                 }else if(buttonID.equalsIgnoreCase("fabrication")){
@@ -1140,7 +1096,7 @@ public class ButtonHelper {
                     numToBeat = numToBeat -1;
                     if(p1.getPromissoryNotes().containsKey("bmf") && !p1.hasAbility("fabrication"))
                     {
-                        Button transact = Button.primary(finChecker+"playBMF", "Play BMF");
+                        Button transact = Button.primary(finChecker+"resolvePNPlay_bmf", "Play BMF");
                         purgeFragButtons.add(transact);
                     }
                     
@@ -1210,6 +1166,72 @@ public class ButtonHelper {
         
 
     }
-    
+    public static void resolveMuaatCommanderCheck(Player player, Map activeMap, GenericInteractionCreateEvent event)
+    {
+
+        if(activeMap.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander"))
+        {
+            int old = player.getTg();
+            int newTg = player.getTg()+1;
+            player.setTg(player.getTg()+1);
+            String mMessage = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Since you have muaat commander unlocked, 1tg has been added automatically ("+old+"->"+newTg+")";
+            if(activeMap.isFoWMode())
+            {
+                MessageHelper.sendMessageToChannel(player.getPrivateChannel(),mMessage);
+            }
+            else{
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
+            }
+        }
+    }
+    public static void resolvePNPlay(String id, Player player, Map activeMap, GenericInteractionCreateEvent event)
+    {
+        boolean longPNDisplay = false;
+        
+        
+        String promissoryNote = Mapper.getPromissoryNote(id, true);
+        String[] pn = promissoryNote.split(";");
+        String pnOwner = Mapper.getPromissoryNoteOwner(id);
+        if (pn.length > 3 && pn[3].equals("playarea")) {
+            player.setPromissoryNotesInPlayArea(id);
+        } else {
+            player.removePromissoryNote(id);
+            for (Player player_ : activeMap.getPlayers().values()) {
+                String playerColor = player_.getColor();
+                String playerFaction = player_.getFaction();
+                if (playerColor != null && playerColor.equals(pnOwner) || playerFaction != null && playerFaction.equals(pnOwner)) {
+                    player_.setPromissoryNote(id);
+                    PNInfo.sendPromissoryNoteInfo(activeMap, player_, false);
+                    pnOwner = player_.getFaction();
+                    break;
+                }
+            }
+        }
+        String emojiToUse = activeMap.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " played promissory note:\n");
+        sb.append(emojiToUse + Emojis.PN);
+        String pnText = "";
+
+        //Handle AbsolMode Political Secret
+        if (activeMap.isAbsolMode() && id.endsWith("_ps")) {
+            pnText = "Political Secret" + Emojis.Absol + ":  *When you cast votes:* You may exhaust up to 3 of the {colour} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {colour} player.";
+        } else {
+            pnText = Mapper.getPromissoryNote(id, longPNDisplay);
+        }
+        sb.append(pnText).append("\n");
+
+        //TERRAFORM TIP
+        if (id.equalsIgnoreCase("terraform")) {
+            sb.append("`/add_token token:titanspn`\n");
+        }
+
+        //Fog of war ping
+        if (activeMap.isFoWMode()) {
+            // Add extra message for visibility
+            FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, sb.toString());
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(),sb.toString());
+        PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
+    }
 
 }

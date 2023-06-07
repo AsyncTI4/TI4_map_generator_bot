@@ -157,7 +157,7 @@ public class Turn extends PlayerSubcommandData {
                 if(!activeMap.isFoWMode())
                 {
                     try {
-                        if (!activeMap.isFoWMode() && activeMap.getLatestTransactionMsg() != null && activeMap.getLatestTransactionMsg() != "") {
+                        if (activeMap.getLatestTransactionMsg() != null && activeMap.getLatestTransactionMsg() != "") {
                             activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestTransactionMsg()).queue();
                             activeMap.setLatestTransactionMsg("");
                         }
@@ -178,10 +178,10 @@ public class Turn extends PlayerSubcommandData {
                     if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
                         MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeMap, player));
                     }
-                    if(!activeMap.isFoWMode())
-                    {
+                   // if(!activeMap.isFoWMode())
+                  //  {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(),buttonText, buttons);
-                    }
+                 //   }
                   
 
                     activeMap.setPingSystemCounter(0);
@@ -190,15 +190,15 @@ public class Turn extends PlayerSubcommandData {
                     }
                     return "";
                 } else {
-                    MessageHelper.sendMessageToChannel(gameChannel, text);
+                   // MessageHelper.sendMessageToChannel(gameChannel, text);
                    
                     if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
                         MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeMap, player));
                     }
-                    if(!activeMap.isFoWMode())
-                    {
-                        MessageHelper.sendMessageToChannelWithButtons(gameChannel,buttonText, buttons);
-                    }
+                    
+                    MessageHelper.sendMessageToChannelWithButtons(gameChannel,text + "\n"+buttonText, buttons);
+                    
+                    
                     
                     return "";
                 }
