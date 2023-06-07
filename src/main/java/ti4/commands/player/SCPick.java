@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.status.ListTurnOrder;
 import ti4.generator.GenerateMap;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -198,7 +199,15 @@ public class SCPick extends PlayerSubcommandData {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra+"\nUse Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
                 }
                 else{
-                    MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
+                    if(allPicked)
+                    {
+                        MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), msgExtra + "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false));
+
+                    }
+                    else
+                    {
+                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
+                    }
                 }
 
 

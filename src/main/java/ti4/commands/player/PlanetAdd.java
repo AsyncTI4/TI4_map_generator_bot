@@ -71,6 +71,10 @@ public class PlanetAdd extends PlanetAddRemove {
             }
         }
 
+        if(activeMap.playerHasLeaderUnlockedOrAlliance(player, "naazcommander"))
+        {
+            alreadyOwned = false;
+        }
         if(activeMap.getActivePlayer() != null && !(activeMap.getActivePlayer().equalsIgnoreCase("")) && player.hasAbility("scavenge") && event != null)
         {
             String fac = Helper.getFactionIconFromDiscord(player.getFaction());

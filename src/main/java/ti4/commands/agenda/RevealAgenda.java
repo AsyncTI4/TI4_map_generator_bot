@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -105,11 +106,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         Button noWhenPersistent = Button.primary("no_when_persistent", "No Whens No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
 
         List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
-
-        Button playAfter = Button.danger("play_after", "Play A Non-AC Rider");
-        Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromFormatted(Emojis.noafters));
-        Button noAfterPersistent = Button.primary("no_after_persistent", "No Afters No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.noafters));
-        List<Button> afterButtons = new ArrayList<>(List.of(playAfter, noAfter, noAfterPersistent));
+        List<Button> afterButtons = AgendaHelper.getAfterButtons(activeMap);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
 

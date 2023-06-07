@@ -18,6 +18,41 @@ import ti4.message.MessageHelper;
 
 
 public class AgendaHelper {
+    public static List<Button> getAfterButtons(Map activeMap) {
+        List<Button> afterButtons = new ArrayList<Button>();
+        Button playAfter = Button.danger("play_after_Non-AC Rider", "Play A Non-AC Rider");
+        afterButtons.add(playAfter);
+
+        if(Helper.getPlayerFromColorOrFaction(activeMap,"keleres") != null && !activeMap.isFoWMode())
+        {
+            Button playKeleresAfter = Button.danger("play_after_Keleres Rider", "Play Keleres Rider").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Keleres")));;
+            afterButtons.add(playKeleresAfter);
+        }
+        if(Helper.getPlayerFromAbility(activeMap, "galactic_threat") != null && !activeMap.isFoWMode())
+        {
+            Player nekroProbably = Helper.getPlayerFromAbility(activeMap, "galactic_threat");
+            String finChecker = "FFCC_"+nekroProbably.getFaction() + "_";
+            Button playNekroAfter = Button.danger(finChecker+"play_after_Galactic Threat", "Do Galactic Threat Rider").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Nekro")));
+            afterButtons.add(playNekroAfter);
+        }
+        if(Helper.getPlayerFromUnlockedLeader(activeMap, "keleresheroodlynn") != null)
+        {
+            Player keleresX = Helper.getPlayerFromUnlockedLeader(activeMap, "keleresheroodlynn");
+            String finChecker = "FFCC_"+keleresX.getFaction() + "_";
+            Button playKeleresHero = Button.danger(finChecker+"play_after_Keleres Xxcha Hero", "Play Keleres Hero").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Keleres")));
+            afterButtons.add(playKeleresHero);
+        }
+
+        Button noAfter = Button.primary("no_after", "No Afters")
+                .withEmoji(Emoji.fromFormatted(Emojis.noafters));
+        afterButtons.add(noAfter);
+        Button noAfterPersistent = Button
+                .primary("no_after_persistent", "No Afters No Matter What (for this agenda)")
+                .withEmoji(Emoji.fromFormatted(Emojis.noafters));
+        afterButtons.add(noAfterPersistent);
+        
+        return afterButtons;
+    }
     public static List<Button> getVoteButtons(int minVote, int voteTotal) {
         List<Button> voteButtons = new ArrayList<>();
 
@@ -557,7 +592,7 @@ public class AgendaHelper {
                     String specificVote = vote_info.nextToken();
                     String faction2 = specificVote.substring(0, specificVote.indexOf("_"));
                     String vote = specificVote.substring(specificVote.indexOf("_")+1,specificVote.length());
-                    if (vote.contains("Rider") || vote.contains("Sanction")) {
+                    if (vote.contains("Rider") || vote.contains("Sanction")||vote.contains("Hero")) {
                         voteSumm = voteSumm +";"+ specificVote;
                         continue;
                     }
@@ -612,7 +647,7 @@ public class AgendaHelper {
                         }
                     } else {
                         String vote = specificVote.substring(specificVote.indexOf("_")+1,specificVote.length());
-                        if (!vote.contains("Rider") && !vote.contains("Sanction")) {
+                        if (!vote.contains("Rider") && !vote.contains("Sanction") && !vote.contains("Hero")) {
                             totalVotes += Integer.parseInt(vote);
                             outcomeSummary = outcomeSummary + faction +" voted "+ vote + " votes. ";
                         } else {
