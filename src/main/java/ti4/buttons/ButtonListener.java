@@ -1296,8 +1296,8 @@ public class ButtonListener extends ListenerAdapter {
                 existingData = existingData + ";" + identifier + "_" + rider;
             }
             activeMap.setCurrentAgendaVote(choice, existingData);
-
-            if (!rider.equalsIgnoreCase("Non-AC Rider") && !rider.equalsIgnoreCase("Keleres Rider") &&!rider.equalsIgnoreCase("Keleres Xxcha Hero") && !rider.equalsIgnoreCase("Galactic Threat")  ) {
+            
+            if (!rider.equalsIgnoreCase("Non-AC Rider") && !rider.equalsIgnoreCase("Keleres Rider") &&!rider.equalsIgnoreCase("Keleres Xxcha Hero") && !rider.equalsIgnoreCase("Galactic Threat Rider")  ) {
                 List<Button> voteActionRow = new ArrayList<Button>();
                 Button concludeExhausting = Button.danger("reverse_" + choice, "Click this if the rider is sabod");
                 voteActionRow.add(concludeExhausting);
