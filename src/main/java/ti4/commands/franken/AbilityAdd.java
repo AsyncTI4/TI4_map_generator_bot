@@ -22,7 +22,7 @@ public class AbilityAdd extends AbilityAddRemove {
                 sb.append("> ").append(AbilityInfo.getAbilityRepresentation(abilityID));
             }
             sb.append("\n");
-            player.addFactionAbility(abilityID);
+            player.addAbility(abilityID);
         }
         sendMessage(sb.toString());
     }

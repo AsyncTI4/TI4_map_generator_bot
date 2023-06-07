@@ -227,7 +227,7 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Passed: ").append(player.isPassed()).append("\n");
 		sb.append("> Dummy: ").append(player.isDummy()).append("\n");
 
-		sb.append("> Abilities: ").append(player.getFactionAbilities()).append("\n");
+		sb.append("> Abilities: ").append(player.getAbilities()).append("\n");
 		sb.append("> Planets: ").append(player.getPlanets()).append("\n");
 		sb.append("> Techs: ").append(player.getTechs()).append("\n");
 		sb.append("> Relics: ").append(player.getRelics()).append("\n");

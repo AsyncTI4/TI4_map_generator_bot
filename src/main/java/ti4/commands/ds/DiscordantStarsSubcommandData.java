@@ -18,7 +18,7 @@ public abstract class DiscordantStarsSubcommandData extends SubcommandData {
         return getName();
     }
 
-   public DiscordantStarsSubcommandData(@NotNull String name, @NotNull String description) {
+    public DiscordantStarsSubcommandData(@NotNull String name, @NotNull String description) {
         super(name, description);
     }
 

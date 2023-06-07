@@ -21,7 +21,7 @@ public class AbilityRemove extends AbilityAddRemove {
                 sb.append("> ").append(abilityID);
             }
             sb.append("\n");
-            player.removeFactionAbility(abilityID);
+            player.removeAbility(abilityID);
         }
         sendMessage(sb.toString());
     }
