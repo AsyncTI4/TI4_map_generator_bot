@@ -395,12 +395,12 @@ public class AutoCompleteProvider {
                 HashMap<String, String> abilities = new HashMap<>();
                 try {
                     if (player != null && event.getSubcommandName().equals(Constants.ABILITY_REMOVE)) {
-                        for (String abilityID : player.getFactionAbilities()) {
+                        for (String abilityID : player.getAbilities()) {
                             abilities.put(abilityID, Mapper.getFactionAbilities().get(abilityID));
                         }
                     } else if (player != null && event.getSubcommandName().equals(Constants.ABILITY_ADD)) {
                         abilities = Mapper.getFactionAbilities();
-                        for (String abilityID : player.getFactionAbilities()) {
+                        for (String abilityID : player.getAbilities()) {
                             abilities.remove(abilityID);
                         }
                     } else {

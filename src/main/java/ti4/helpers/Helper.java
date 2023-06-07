@@ -1782,6 +1782,22 @@ public class Helper {
 
     }
 
+    public static boolean playerHasMechInSystem(Tile tile, Map activeMap, Player player) {
+        HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+
+        String colorID = Mapper.getColorID(player.getColor());
+        String mechKey = colorID + "_mf.png";
+
+        for (UnitHolder unitHolder : unitHolders.values()) {
+            if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty()) continue;
+
+            if (unitHolder.getUnits().get(mechKey) != null) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public static Set<Player> getNeighbouringPlayers(Map activeMap, Player player) {
         Set<Player> adjacentPlayers = new HashSet<>();
         Set<Player> realPlayers = new HashSet<>(activeMap.getPlayers().values().stream().filter(Player::isRealPlayer).toList());

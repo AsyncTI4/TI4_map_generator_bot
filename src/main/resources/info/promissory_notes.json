@@ -1781,13 +1781,13 @@
     },
     {
         "alias": "dspnedyn",
-        "name": "Edyn Diplomatic Support",
+        "name": "Edyn Rider",
         "faction": "edyn",
         "colour": "",
-        "playArea": "true",
+        "playArea": "",
         "attachment": "",
         "source": "Discordant Stars",
-        "text": "When you receive this card, if you are not the Edyn player, place this card face-up in your play area. While this card is in your play area and you have your Support for the Throne, you have 1 additional victory point.If you activate a system that contains 1 or more of the Edyn player's units, return this card to the Edyn player."
+        "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 command token from another player's reinforcements in a system that contains your units. Then, return this card to the Edyn player."
     },
     {
         "alias": "dspnflor",

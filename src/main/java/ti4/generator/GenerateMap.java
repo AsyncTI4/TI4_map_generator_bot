@@ -529,6 +529,10 @@ public class GenerateMap {
                     xDelta = leaderInfo(player, xDelta, yPlayArea, activeMap);
                 }
 
+                if (!player.getAbilities().isEmpty()) {
+                    xDelta = abilityInfo(player, xDelta, yPlayArea, activeMap);
+                }
+
                 if (!player.getRelics().isEmpty()) {
                     xDelta = relicInfo(player, xDelta, yPlayArea);
                 }
@@ -764,6 +768,37 @@ public class GenerateMap {
                     }
                 }
             }
+        }
+        return x + deltaX + 20;
+    }
+
+    private int abilityInfo(Player player, int x, int y, Map activeMap) {
+        int deltaX = 0;
+
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+        for (String abilityID : player.getAbilities()) {
+            
+            String abilityFileName = null;
+            switch (abilityID) {
+                case "grace" -> abilityFileName = "pa_ds_edyn_grace";
+                // add additional displayed abilities here
+            }
+            if (abilityFileName == null) continue;
+
+            boolean isExhaustedLocked = player.getExhaustedAbilities().contains(abilityID);
+            if (isExhaustedLocked) {
+                graphics.setColor(Color.GRAY);
+            } else {
+                graphics.setColor(Color.WHITE);
+            }
+
+            String status = isExhaustedLocked ? "_exh" : "_rdy";
+            abilityFileName = abilityFileName + status + ".png";
+            graphics.drawRect(x + deltaX - 2, y - 2, 44, 152);
+            drawPAImage(x + deltaX, y, abilityFileName);
+
+            deltaX += 48;
         }
         return x + deltaX + 20;
     }
