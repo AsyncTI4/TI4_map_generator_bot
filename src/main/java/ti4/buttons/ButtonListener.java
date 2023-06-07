@@ -1455,6 +1455,7 @@ public class ButtonListener extends ListenerAdapter {
                 event.getMessage().delete().queue();
         }else if (buttonID.startsWith("starforgeTile_")) {
             String pos= buttonID.replace("starforgeTile_", "");
+
             List<Button> buttons = new ArrayList<Button>();
             Button starforgerStroter = Button.danger("starforge_destroyer_"+pos, "Starforge Destroyer").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("destroyer")));
             buttons.add(starforgerStroter);
@@ -1483,6 +1484,8 @@ public class ButtonListener extends ListenerAdapter {
                 new AddUnits().unitParsing(event, player.getColor(), tile, "2 ff", activeMap);
                 successMessage = "Produced 2 " + Helper.getEmojiFromDiscord("fighter") + " in tile "+tile.getRepresentationForButtons(activeMap, player)  + ".";
             }
+            successMessage = ButtonHelper.putInfWithMechsForStarforge(pos, successMessage, activeMap, player, event);
+
             MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
             String message = "Use buttons to end turn or do another action";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -2767,6 +2770,7 @@ public class ButtonListener extends ListenerAdapter {
                     if(activeMap.getMovedUnitsFromCurrentActivation().isEmpty())
                     {
                         message =  "Nothing moved. Use buttons to decide if you want to build (if you can) or finish the activation";
+                        systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
                         systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeMap, event);
                     }
                     else
