@@ -2073,6 +2073,7 @@ public class Map {
                 }
             }
             planets.put("custodiavigilia", new Planet("custodiavigilia", new Point(0, 0)));
+            planets.put("ghoti", new Planet("ghoti", new Point(0, 0)));
         }
         return planets.keySet();
     }
