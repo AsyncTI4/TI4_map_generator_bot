@@ -449,10 +449,17 @@ public class AgendaHelper {
         }
 
         //Check if Argent Flight is in the game - if it is, put it at the front of the vote list.
-        Optional<Player> argentPlayer = orderList.stream().filter(player -> player.getFaction()!= null && player.getFaction().equals("argent")).findFirst();
+        Optional<Player> argentPlayer = orderList.stream().filter(player -> player.getFaction() != null && player.hasAbility("zeal")).findFirst();
         if (argentPlayer.isPresent()) {
             orderList.remove(argentPlayer.orElse(null));
             orderList.add(0, argentPlayer.get());
+        }
+
+        //Check if Player has Edyn Mandate faction tech - if it is, put it at the end of the vote list.
+        Optional<Player> edynPlayer = orderList.stream().filter(player -> player.getFaction() != null && player.getTechs().contains("dsedyny")).findFirst();
+        if (edynPlayer.isPresent()) {
+            orderList.remove(edynPlayer.orElse(null));
+            orderList.add(edynPlayer.get());
         }
         return orderList;
     }
