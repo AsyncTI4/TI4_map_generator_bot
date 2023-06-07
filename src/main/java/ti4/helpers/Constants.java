@@ -752,4 +752,5 @@ public class Constants {
     public static final String DECK_NAME = "deck_name";
     public static final String PN_REMOVE = "pn_remove";
     public static final String PN_ADD = "pn_add";
+    public static final String FLIP_GRACE = "flip_grace";
 }

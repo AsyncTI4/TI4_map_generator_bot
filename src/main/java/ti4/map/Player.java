@@ -62,6 +62,7 @@ public class Player {
     private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> promissoryNotes = new LinkedHashMap<>();
     private HashSet<String> abilities = new HashSet<>();
+    private HashSet<String> exhaustedAbilities = new HashSet<>();
     private HashSet<String> promissoryNotesOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
@@ -304,8 +305,39 @@ public class Player {
         this.abilities = abilities;
     }
 
+    /**
+     * @param abilityID The ID of the ability - does not check if valid
+     */
+    public void addAbility(String abilityID) {
+        abilities.add(abilityID);
+    }
+
+    public void removeAbility(String abilityID) {
+        abilities.remove(abilityID);
+    }
+
     public boolean hasAbility(String ability) {
         return getAbilities().contains(ability);
+    }
+
+    public HashSet<String> getExhaustedAbilities() {
+        return exhaustedAbilities;
+    }
+
+    public void setExhaustedAbilities(HashSet<String> exhaustedAbilities) {
+        this.exhaustedAbilities = exhaustedAbilities;
+    }
+
+    public boolean addExhaustedAbility(String ability) {
+        return exhaustedAbilities.add(ability);
+    }
+
+    public boolean removeExhaustedAbility(String ability) {
+        return exhaustedAbilities.remove(ability);
+    }
+
+    public void clearExhaustedAbilities() {
+        exhaustedAbilities.clear();
     }
 
     public int getUnitCap(String unit) {
@@ -321,17 +353,6 @@ public class Player {
 
     public void setUnitCap(String unit, int cap) {
         unitCaps.put(unit, cap);
-    }
-
-    /**
-     * @param abilityID The ID of the ability - does not check if valid
-     */
-    public void addAbility(String abilityID) {
-        abilities.add(abilityID);
-    }
-
-    public void removeAbility(String abilityID) {
-        abilities.remove(abilityID);
     }
 
     public LinkedHashMap<String, Integer> getActionCards() {
