@@ -152,10 +152,8 @@ public class PlayAC extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, sb.toString(), activeMap, player, buttons);
 
             if (actionCardWindow.contains("After an agenda is revealed")) {
-                Button playAfter = Button.danger("play_after", "Play A Non-AC Rider");
-                Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromFormatted(Emojis.noafters));
-                Button noAfterPersistent = Button.primary("no_after_persistent", "No Afters No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.noafters));
-                List<Button> afterButtons = new ArrayList<>(List.of(playAfter, noAfter, noAfterPersistent));
+                
+                List<Button> afterButtons = AgendaHelper.getAfterButtons(activeMap);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", activeMap, afterButtons, "after");
 
 
