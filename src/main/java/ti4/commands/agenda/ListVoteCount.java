@@ -156,6 +156,13 @@ public class ListVoteCount extends AgendaSubcommandData {
             additionalVotes += shardVotes;
         }
 
+        //Ghoti Wayfarer Tech
+        if (player.getTechs().contains("dsghotg") && !player.getExhaustedTechs().contains("dsghotg")) {
+            int fleetCC = player.getFleetCC();
+            sb.append(" (+" + fleetCC + " if Exhaust " + Emojis.BioticTech + "Networked Command)");
+            additionalVotes += fleetCC;
+        }
+
         return java.util.Map.entry(additionalVotes, sb.toString());
     }
 }
