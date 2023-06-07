@@ -170,19 +170,23 @@ public class ListVoteCount extends AgendaSubcommandData {
             additionalVotes += fleetCC;
         }
 
-        // //Edyn Mandate Sigil - Planets in Sigil systems gain +1 vote //INCOMPLETE, POSSIBLY CHANGING ON DS END
-        // Player edynMechPlayer = Helper.getPlayerFromColorOrFaction(activeMap, "edyn");
-        // if (edynMechPlayer != null) {
-        //     int count = 0;
-        //     List<Tile> edynMechTiles = activeMap.getTileMap().values().stream().filter(t -> Helper.playerHasMechInSystem(t, activeMap, player)).toList();
-        //     for (Tile tile : edynMechTiles) {
-        //         if (tile.getUnitHolders().values().stream().anyMatch(u -> player.getPlanets().contains(u.getName()))) {
-
-        //         }
-        //     }
-        //     sb.append(" (+" + count + " for (" + count + "x) Planets in " + Emojis.edyn + "Sigil Systems)");
-        //     additionalVotes += count;
-        // }
+        //Edyn Mandate Sigil - Planets in Sigil systems gain +1 vote //INCOMPLETE, POSSIBLY CHANGING ON DS END
+        Player edynMechPlayer = Helper.getPlayerFromColorOrFaction(activeMap, "edyn");
+        if (edynMechPlayer != null) {
+            int count = 0;
+            List<Tile> edynMechTiles = activeMap.getTileMap().values().stream().filter(t -> Helper.playerHasMechInSystem(t, activeMap, edynMechPlayer)).toList();
+            for (Tile tile : edynMechTiles) {
+                for (String planet : tile.getUnitHolders().keySet()) {
+                    if (player.getPlanets().contains(planet) && !player.getExhaustedPlanets().contains(planet)) {
+                        count++;
+                    }
+                }
+            }
+            if (count != 0) {
+                sb.append(" (+" + count + " for (" + count + "x) Planets in " + Emojis.edyn + "Sigil Systems)");
+                additionalVotes += count;
+            }
+        }
 
         return java.util.Map.entry(additionalVotes, sb.toString());
     }
