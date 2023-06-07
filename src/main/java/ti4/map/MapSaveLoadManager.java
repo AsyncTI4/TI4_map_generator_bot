@@ -96,8 +96,11 @@ public class MapSaveLoadManager {
         } else {
             activeMap.setLatestCommand("Last Command Unknown - No Event Provided");
         }
-
-        DiscordantStarsHelper.checkGardenWorlds(activeMap);
+        
+        if (activeMap.isDiscordantStarsMode()) {
+            DiscordantStarsHelper.checkGardenWorlds(activeMap);
+            DiscordantStarsHelper.checkSigil(activeMap);
+        }
 
         ObjectMapper mapper = new ObjectMapper();
         try {

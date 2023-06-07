@@ -27,4 +27,17 @@ public class DiscordantStarsHelper {
             }
         }
     }
+    public static void checkSigil(Map activeMap) { //Edyn Mech adds Sigil tokens under them
+        for (Player player : activeMap.getPlayers().values()) {
+            if ("edyn".equals(player.getFaction())) {
+                for (Tile tile : activeMap.getTileMap().values()) {
+                    if (Helper.playerHasMechInSystem(tile, activeMap, player)) {
+                        tile.addToken(Constants.SIGIL, Constants.SPACE);
+                    } else {
+                        tile.removeToken(Constants.SIGIL, Constants.SPACE);
+                    }
+                }
+            }
+        }
+    }
 }
