@@ -2763,11 +2763,15 @@ public class ButtonListener extends ListenerAdapter {
                     
                     String message = "Moved all units to the space area. Make sure to resolve any space combat, and then use the buttons to land troops.";
                    
-                    List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
+                    List<Button> systemButtons = null;
                     if(activeMap.getMovedUnitsFromCurrentActivation().isEmpty())
                     {
                         message =  "Nothing moved. Use buttons to decide if you want to build (if you can) or finish the activation";
                         systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeMap, event);
+                    }
+                    else
+                    {
+                       systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
                     }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
