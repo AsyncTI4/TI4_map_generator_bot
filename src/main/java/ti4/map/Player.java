@@ -187,6 +187,13 @@ public class Player {
         }
         return false;
     }
+    public boolean hasWarsunTech() {
+        if(getTechs().contains("pws2") ||getTechs().contains("dsrohdws") ||getTechs().contains("ws"))
+        {
+            return true; 
+        }
+        return false;
+    }
 
     public void setCardsInfoThreadID(String cardsInfoThreadID) {
         this.cardsInfoThreadID = cardsInfoThreadID;

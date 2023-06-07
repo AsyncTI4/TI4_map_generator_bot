@@ -598,9 +598,11 @@ public class Helper {
         String tp = tile.getPosition();
         if(!warfareNOtherstuff.equalsIgnoreCase("muaatagent"))
         {
-            Button wsButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_warsun_"+tp, "Produce Warsun" );
-            wsButton = wsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("warsun")));
-            unitButtons.add(wsButton);
+            if(player.hasWarsunTech()) {
+                Button wsButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_warsun_"+tp, "Produce Warsun" );
+                wsButton = wsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("warsun")));
+                unitButtons.add(wsButton);
+            }
             Button fsButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_flagship_"+tp, "Produce Flagship" );
             fsButton = fsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("flagship")));
             unitButtons.add(fsButton);

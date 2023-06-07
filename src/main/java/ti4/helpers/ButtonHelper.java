@@ -16,8 +16,12 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.SendFragments;
+import ti4.commands.player.PlanetRefresh;
+import ti4.commands.special.KeleresHeroMentak;
 import ti4.commands.tokens.AddCC;
+import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
+import ti4.commands.units.MoveUnits;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.map.Leader;
@@ -188,11 +192,11 @@ public class ButtonHelper {
             new ExpFrontier().expFront(event, tile, activeMap, player);
         }
     }
-    public static List<Button> getTilesToMoveFrom(Player player, Map activeMap) {
+    public static List<Button> getTilesToMoveFrom(Player player, Map activeMap, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(activeMap.getTileMap()).entrySet()) {
-			if (FoWHelper.playerHasUnitsInSystem(player, tileEntry.getValue())) {
+			if (FoWHelper.playerHasUnitsInSystem(player, tileEntry.getValue()) && !AddCC.hasCC(event, player.getColor(), tileEntry.getValue())) {
                 Tile tile = tileEntry.getValue();
                 Button validTile = Button.success(finChecker+"tacticalMoveFrom_"+tileEntry.getKey(), tile.getRepresentationForButtons(activeMap, player));
                 buttons.add(validTile);
@@ -206,12 +210,16 @@ public class ButtonHelper {
     }
     public static List<Button> moveAndGetLandingTroopsButtons(Player player, Map activeMap, ButtonInteractionEvent event) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
+        
         List<Button> buttons = new ArrayList<>();
         HashMap<String, Integer> displacedUnits =  activeMap.getMovedUnitsFromCurrentActivation();
         HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         Tile tile = activeMap.getTileByPosition(activeMap.getActiveSystem());
-        
-
+        tile = MoveUnits.flipMallice(event, tile, activeMap);
+        if (tile == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not flip Mallice");
+            return buttons;
+        }
         int cc = player.getTacticalCC();
         
         if (!AddCC.hasCC(event, player.getColor(), tile)) {
@@ -1038,7 +1046,28 @@ public class ButtonHelper {
                             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Leader was not purged - something went wrong");
                         }
                         if ("titanshero".equals(playerLeader.getId())) {
-                            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"`Use the following command to add the attachment: /add_token token:titanshero`");
+                            String titanshero = Mapper.getTokenID("titanshero");
+                            Tile t= activeMap.getTile(AliasHandler.resolveTile(p1.getFaction()));
+                            if(Helper.getTileFromPlanet("elysium", activeMap) != null && Helper.getTileFromPlanet("elysium", activeMap).getPosition().equalsIgnoreCase(t.getPosition())){
+                                t.addToken(titanshero, "elysium");
+                                MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Attachment added to Elysium and it has been readied");
+                                new PlanetRefresh().doAction(p1, "elysium", activeMap);
+                            }
+                            else{
+                                MessageHelper.sendMessageToChannel(event.getMessageChannel(),"`Use the following command to add the attachment: /add_token token:titanshero`");
+                            }
+                        }
+                        if ("solhero".equals(playerLeader.getId())) {
+                            
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Removed every one of your ccs from the board");
+                            for(Tile t : activeMap.getTileMap().values()){
+                                if (AddCC.hasCC(event, p1.getColor(), t)) {
+                                    RemoveCC.removeCC(event, p1.getColor(), t, activeMap);
+                                }
+                            }   
+                        }
+                        if ("keleresheroharka".equals(playerLeader.getId())) {
+                            new KeleresHeroMentak().secondHalf(activeMap, p1, event);  
                         }
                     }
 
@@ -1226,8 +1255,9 @@ public class ButtonHelper {
     {
         boolean longPNDisplay = false;
         
-        
+        PromissoryNoteModel promissoryNote2 = Mapper.getPromissoryNoteByID(id);
         String promissoryNote = Mapper.getPromissoryNote(id, true);
+        String pnName = promissoryNote2.name;
         String[] pn = promissoryNote.split(";");
         String pnOwner = Mapper.getPromissoryNoteOwner(id);
         if (pn.length > 3 && pn[3].equals("playarea")) {
@@ -1246,7 +1276,7 @@ public class ButtonHelper {
             }
         }
         String emojiToUse = activeMap.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " played promissory note:\n");
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " played promissory note: "+pnName+"\n");
         sb.append(emojiToUse + Emojis.PN);
         String pnText = "";
 
