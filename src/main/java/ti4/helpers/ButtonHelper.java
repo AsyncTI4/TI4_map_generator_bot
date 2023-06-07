@@ -277,6 +277,44 @@ public class ButtonHelper {
         buttons.add(concludeMove);
         return buttons;
     }
+    public static String putInfWithMechsForStarforge(String pos, String successMessage, Map activeMap, Player player, ButtonInteractionEvent event) {
+        
+        Set<String> tiles = FoWHelper.getAdjacentTiles(activeMap,pos,player, true);
+        if(!tiles.contains(pos))
+        {
+            tiles.add(pos);
+        }
+        for(String tilePos : tiles){
+            Tile tile = activeMap.getTileByPosition(tilePos);
+            for(UnitHolder unitHolder :tile.getUnitHolders().values())
+            {
+
+                String colorID = Mapper.getColorID(player.getColor());
+                String mechKey = colorID + "_mf.png";
+                int numMechs = 0;
+                if (unitHolder.getUnits() != null) {
+
+                    if (unitHolder.getUnits().get(mechKey) != null) {
+                        numMechs = unitHolder.getUnits().get(mechKey);
+                    }
+                    if(numMechs > 0)
+                    {
+                        String planetName = "";
+                        if(unitHolder.getName().equalsIgnoreCase("space")) {
+                            planetName = " "+unitHolder.getName();
+                        }
+                        new AddUnits().unitParsing(event, player.getColor(),
+                            tile, numMechs + "infantry"+planetName, activeMap);
+                        
+                        successMessage = successMessage + "\n Put "+numMechs +" "+Helper.getEmojiFromDiscord("infantry")+" with the mechs in "+tile.getRepresentationForButtons(activeMap,player);
+                    }
+                }
+            }
+        }
+
+        return successMessage;
+
+    }
     public static List<Button> landAndGetBuildButtons(Player player, Map activeMap, ButtonInteractionEvent event) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
