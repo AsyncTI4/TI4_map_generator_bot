@@ -76,6 +76,7 @@ public class PlayPN extends PNCardsSubcommandData {
         }
 
         PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnID);
+        String pnName = promissoryNote.name;
         String pnOwner = Mapper.getPromissoryNoteOwner(pnID);
         if (promissoryNote.playArea) {
             player.setPromissoryNotesInPlayArea(pnID);
@@ -90,9 +91,11 @@ public class PlayPN extends PNCardsSubcommandData {
                 }
             }
         }
+        
+       
 
         String emojiToUse = activeMap.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " played promissory note:\n");
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " played promissory note: "+pnName+"\n");
         sb.append(emojiToUse + Emojis.PN);
         String pnText = "";
 

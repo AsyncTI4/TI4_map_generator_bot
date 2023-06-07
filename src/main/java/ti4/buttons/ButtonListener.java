@@ -568,6 +568,10 @@ public class ButtonListener extends ListenerAdapter {
                 Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
                 buttons.add(lost3TG);
             }
+            if (player.getTechs().contains("aida") && !player.getExhaustedTechs().contains("aida")) {
+                Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
+                buttons.add(aiDEVButton);
+            }
             Button DoneExhausting = Button.danger("deleteButtons_technology", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
 
@@ -797,7 +801,7 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "From system "+tile.getRepresentationForButtons(activeMap, player)+"\n"+event.getMessage().getContentRaw());
             String message = "Choose a different system to move from, or finalize movement.";
             activeMap.resetCurrentMovedUnitsFrom1System();
-            List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, activeMap);
+            List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, activeMap, event);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
             event.getMessage().delete().queue();
         }else if (buttonID.startsWith("delete_buttons_")) {
@@ -1008,6 +1012,10 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> voteActionRow = AgendaHelper.getVoteButtons(votes - 9, votes);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("exhaustTech_")) {
+            String tech = buttonID.replace("exhaustTech_","");
+            player.exhaustTech(tech);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), (Helper.getPlayerRepresentation(player, activeMap) + " exhausted tech: " + Helper.getTechRepresentation(tech)));
         } else if (buttonID.startsWith("planetOutcomes_")) {
             String factionOrColor = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
             Player planetOwner = Helper.getPlayerFromColorOrFaction(activeMap, factionOrColor);
@@ -1216,6 +1224,10 @@ public class ButtonListener extends ListenerAdapter {
                     if (player.getTg() > 2) {
                         Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
                         buttons.add(lost3TG);
+                    }
+                    if (player.getTechs().contains("aida") && !player.getExhaustedTechs().contains("aida")) {
+                        Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
+                        buttons.add(aiDEVButton);
                     }
                     Button DoneExhausting = null;
                     if (!buttonID.contains("deleteButtons")) {
@@ -1529,7 +1541,7 @@ public class ButtonListener extends ListenerAdapter {
         }
         else if (buttonID.startsWith("ringTile_")) {
             String pos = buttonID.replace("ringTile_", "");
-            List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, activeMap);
+            List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, activeMap, event);
             activeMap.setActiveSystem(pos);
             String trueIdentity = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true);
             MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity + " decided to activate "+activeMap.getTileByPosition(pos).getRepresentationForButtons(activeMap, player));
