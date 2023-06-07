@@ -833,6 +833,9 @@ public class Player {
                 if (promissoryNote.equalsIgnoreCase("blood_pact") && !hasAbility("dark_whispers")) {
                     continue;
                 }
+                if (promissoryNote.endsWith("_sftt") && hasAbility("enlightenment")) {
+                    continue;
+                }
                 setPromissoryNote(promissoryNote);
             }
         }
