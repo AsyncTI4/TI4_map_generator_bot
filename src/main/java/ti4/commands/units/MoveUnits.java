@@ -1,6 +1,7 @@
 package ti4.commands.units;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
@@ -128,6 +129,27 @@ public class MoveUnits extends AddRemoveUnits {
             activeMap.removeTile(position);
 
 
+            String planetTileName = AliasHandler.resolveTile("82b");
+            if (!PositionMapper.isTilePositionValid(position)) {
+                MessageHelper.replyToMessage(event, "Position tile not allowed");
+                return null;
+            }
+
+            String tileName = Mapper.getTileID(planetTileName);
+            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+            if (tilePath == null) {
+                MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
+                return null;
+            }
+            tile = new Tile(planetTileName, position);
+            activeMap.setTile(tile);
+        }
+        return tile;
+    }
+    public static Tile flipMallice(ButtonInteractionEvent event, Tile tile, Map activeMap) {
+        if ("82a".equals(tile.getTileID())){
+            String position = tile.getPosition();
+            activeMap.removeTile(position);
             String planetTileName = AliasHandler.resolveTile("82b");
             if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
