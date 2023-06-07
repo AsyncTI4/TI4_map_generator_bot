@@ -120,6 +120,22 @@ public class Helper {
             factionColor = StringUtils.substringBefore(factionColor, " "); //TO HANDLE UNRESOLVED AUTOCOMPLETE
             factionColor = AliasHandler.resolveFaction(factionColor);
             for (Player player_ : activeMap.getPlayers().values()) {
+                if(factionColor.equalsIgnoreCase("keleres"))
+                {
+                    if (Objects.equals(factionColor+"a", player_.getFaction())) {
+                    player = player_;
+                    break;
+                    }
+                    if (Objects.equals(factionColor+"x", player_.getFaction())) {
+                    player = player_;
+                    break;
+                    }
+                    if (Objects.equals(factionColor+"m", player_.getFaction())) {
+                        player = player_;
+                        break;
+                    }
+
+                }
                 if (Objects.equals(factionColor, player_.getFaction()) ||
                         Objects.equals(factionColor, player_.getColor())) {
                     player = player_;
@@ -134,6 +150,18 @@ public class Helper {
         if (ability != null) {
             for (Player player_ : activeMap.getPlayers().values()) {
                 if (player_.isRealPlayer() && player_.hasAbility(ability)) {
+                    player = player_;
+                    break;
+                }
+            }
+        }
+        return player;
+    }
+    public static Player getPlayerFromUnlockedLeader(Map activeMap, String leader) {
+        Player player = null;
+        if (leader != null) {
+            for (Player player_ : activeMap.getPlayers().values()) {
+                if (player_.isRealPlayer() && player_.hasLeaderUnlocked(leader)) {
                     player = player_;
                     break;
                 }
