@@ -61,7 +61,7 @@ public class Player {
     private LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> promissoryNotes = new LinkedHashMap<>();
-    private HashSet<String> factionAbilities = new HashSet<>();
+    private HashSet<String> abilities = new HashSet<>();
     private HashSet<String> promissoryNotesOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
@@ -296,16 +296,16 @@ public class Player {
         this.passed = passed;
     }
 
-    public HashSet<String> getFactionAbilities() {
-        return factionAbilities;
+    public HashSet<String> getAbilities() {
+        return abilities;
     }
 
-    public void setFactionAbilities(HashSet<String> factionAbilities) {
-        this.factionAbilities = factionAbilities;
+    public void setAbilities(HashSet<String> abilities) {
+        this.abilities = abilities;
     }
 
     public boolean hasAbility(String ability) {
-        return getFactionAbilities().contains(ability);
+        return getAbilities().contains(ability);
     }
 
     public int getUnitCap(String unit) {
@@ -326,12 +326,12 @@ public class Player {
     /**
      * @param abilityID The ID of the ability - does not check if valid
      */
-    public void addFactionAbility(String abilityID) {
-        factionAbilities.add(abilityID);
+    public void addAbility(String abilityID) {
+        abilities.add(abilityID);
     }
 
-    public void removeFactionAbility(String abilityID) {
-        factionAbilities.remove(abilityID);
+    public void removeAbility(String abilityID) {
+        abilities.remove(abilityID);
     }
 
     public LinkedHashMap<String, Integer> getActionCards() {
@@ -683,7 +683,7 @@ public class Player {
                 abilities.add(ability);
             }
         }
-        setFactionAbilities(abilities);
+        setAbilities(abilities);
         if (faction.equals(Constants.LIZHO)){
             Map<String, String> dsHandcards = Mapper.getDSHandcards();
             for (Entry<String, String> entry : dsHandcards.entrySet()) {

@@ -549,7 +549,7 @@ public class MapSaveLoadManager {
             writer.write(Constants.STRATEGY + " " + player.getStrategicCC());
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.ABILITIES + " " + String.join(",", player.getFactionAbilities()));
+            writer.write(Constants.ABILITIES + " " + String.join(",", player.getAbilities()));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.TG + " " + player.getTg());
@@ -1542,7 +1542,7 @@ public class MapSaveLoadManager {
                 case Constants.PLANETS_ABILITY_EXHAUSTED ->
                         player.setExhaustedPlanetsAbilities(getCardList(tokenizer.nextToken()));
                 case Constants.TECH -> player.setTechs(getCardList(tokenizer.nextToken()));
-                case Constants.ABILITIES -> player.setFactionAbilities(new HashSet<String>(getCardList(tokenizer.nextToken())));
+                case Constants.ABILITIES -> player.setAbilities(new HashSet<String>(getCardList(tokenizer.nextToken())));
                 case Constants.TECH_EXHAUSTED -> player.setExhaustedTechs(getCardList(tokenizer.nextToken()));
                 case Constants.RELICS -> player.setRelics(getCardList(tokenizer.nextToken()));
                 case Constants.EXHAUSTED_RELICS -> player.setExhaustedRelics(getCardList(tokenizer.nextToken()));
