@@ -180,7 +180,7 @@ public class Emojis {
     public static final String MuaatCommander = "<:MuaatCommander:1060184846799999046>";
     public static final String NaaluCommander = "<:NaaluCommander:1060184852340686988>";
     public static final String NaazCommander = "<:NaazCommander:1060184858116227092>";
-    public static final String NekroCommander = "<:NekroCommander:1060184863526883449>";
+    public static final String NekroCommander = "<:NekroCommander:1064307994055155812>";
     public static final String NomadCommander = "<:NomadCommander:1060184810267627521>";
     public static final String SardakkCommander = "<:SardakkCommander:1060184874478227506>";
     public static final String SaarCommander = "<:SaarCommander:1060184868815908936>";
