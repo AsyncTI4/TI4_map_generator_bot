@@ -93,8 +93,8 @@ public class SentPN extends PNCardsSubcommandData {
 		player.removePromissoryNote(id);
 		targetPlayer.setPromissoryNote(id);
 
-		boolean placeDirectlyInPlayArea = pnModel.playArea;
-		if (placeDirectlyInPlayArea && !targetPlayer.equals(pnOwner) && !pnModel.text.toLowerCase().contains("action:")) {
+		boolean placeDirectlyInPlayArea = pnModel.isPlayedDirectlyToPlayArea();
+		if (placeDirectlyInPlayArea && !targetPlayer.equals(pnOwner)) {
 			targetPlayer.setPromissoryNotesInPlayArea(id);
 		}
 
