@@ -1707,7 +1707,7 @@
         "playArea": "true",
         "attachment": "",
         "source": "Discordant Stars",
-        "text": "ACTION: Place this face up in your play area.While this card is in your play area, you may look at the public objective card on the Ilyxum player's faction sheet.If you activate a system that contains 1 or more of the Ilyxum player's units, return this card to the Ilyxum player."
+        "text": "Action: Place this face up in your play area.While this card is in your play area, you may look at the public objective card on the Ilyxum player's faction sheet.If you activate a system that contains 1 or more of the Ilyxum player's units, return this card to the Ilyxum player."
     },
     {
         "alias": "dspnaxis",
@@ -1727,7 +1727,7 @@
         "playArea": "true",
         "attachment": "encryptionkey",
         "source": "Discordant Stars",
-        "text": "ACTION: Attach this card to a non-home planet you control.This planet has 1 technology specialty of any color."
+        "text": "Action: Attach this card to a non-home planet you control.This planet has 1 technology specialty of any color."
     },
     {
         "alias": "dspnblex",
@@ -1767,7 +1767,7 @@
         "playArea": "",
         "attachment": "",
         "source": "Discordant Stars",
-        "text": "ACTION: Choose 1 action card from the action card discard pile and add it to your hand.Then, purge this card."
+        "text": "Action: Choose 1 action card from the action card discard pile and add it to your hand.Then, purge this card."
     },
     {
         "alias": "dspndihm",
@@ -1837,7 +1837,7 @@
         "playArea": "true",
         "attachment": "gledgebase",
         "source": "Discordant Stars",
-        "text": "ACTION: Attach this card to a non-home planet you control.This planet's resource value is increased by 2."
+        "text": "Action: Attach this card to a non-home planet you control.This planet's resource value is increased by 2."
     },
     {
         "alias": "dspnkhra",
@@ -1887,7 +1887,7 @@
         "playArea": "true",
         "attachment": "",
         "source": "Discordant Stars",
-        "text": "ACTION: Place this card face up in your play area and remove 1 of your command tokens from the game board.At the start of the status phase, return this card to the Kortali player."
+        "text": "Action: Place this card face up in your play area and remove 1 of your command tokens from the game board.At the start of the status phase, return this card to the Kortali player."
     },
     {
         "alias": "dspnkyro",
@@ -1947,7 +1947,7 @@
         "playArea": "true",
         "attachment": "",
         "source": "Discordant Stars",
-        "text": "ACTION: Place this card face up in your play area.While this card is in your play area, once per turn, after you roll a die, you may reroll that die.If you activate a system that contains 1 or more of the Myko-Mentori player's units, return this card to the Myko-Mentori player."
+        "text": "Action: Place this card face up in your play area.While this card is in your play area, once per turn, after you roll a die, you may reroll that die.If you activate a system that contains 1 or more of the Myko-Mentori player's units, return this card to the Myko-Mentori player."
     },
     {
         "alias": "dspnnivy",
@@ -1977,7 +1977,7 @@
         "playArea": "true",
         "attachment": "",
         "source": "Discordant Stars",
-        "text": "ACTION: Place this card face up in your play area to choose and exhaust 1 planet you control. Then, ready 1 non-home planet you control other than Mecatol Rex.At the start of the status phase, return this card to the Olradin player."
+        "text": "Action: Place this card face up in your play area to choose and exhaust 1 planet you control. Then, ready 1 non-home planet you control other than Mecatol Rex.At the start of the status phase, return this card to the Olradin player."
     },
     {
         "alias": "dspnrohd",
