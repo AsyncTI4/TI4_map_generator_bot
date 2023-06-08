@@ -1036,6 +1036,14 @@ public class Player {
         return techs;
     }
 
+    public boolean hasTech(String techID) {
+        return techs.contains(techID);
+    }
+
+    public boolean hasTechReady(String techID) {
+        return hasTech(techID) && !exhaustedTechs.contains(techID);
+    }
+
     public List<String> getPlanets() {
         return planets;
     }
@@ -1070,6 +1078,14 @@ public class Player {
 
     public void setExhaustedRelics(List<String> exhaustedRelics) {
         this.exhaustedRelics = exhaustedRelics;
+    }
+
+    public boolean hasRelic(String relicID) {
+        return relics.contains(relicID);
+    }
+
+    public boolean hasRelicReady(String relicID) {
+        return hasRelic(relicID) && !exhaustedRelics.contains(relicID);
     }
 
     public List<String> getExhaustedTechs() {

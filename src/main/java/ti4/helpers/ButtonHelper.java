@@ -187,7 +187,7 @@ public class ButtonHelper {
         {
             return;
         }
-        if(player.getTechs().contains("det") && tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER)))
+        if(player.hasTech("det") && tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER)))
         {
             new ExpFrontier().expFront(event, tile, activeMap, player);
         }
@@ -1076,7 +1076,7 @@ public class ButtonHelper {
             case "relic" -> {
                 String relicId = buttonID;
                 Player player = p1;
-                if (player.getRelics().contains(relicId)) {
+                if (player.hasRelic(relicId)) {
                     player.removeRelic(relicId);
                     player.removeExhaustedRelic(relicId);
                     String relicName = Mapper.getRelic(relicId).split(";")[0];

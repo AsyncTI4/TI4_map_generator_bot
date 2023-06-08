@@ -1577,8 +1577,8 @@ public class Helper {
 
         List<String> techs = new ArrayList<String>();
         //Columns: key = Proper Name | type | prerequisites | faction | text
-        for (String techRep : Mapper.getTechRepresentations().values()) {
-            StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
+        for (Entry<String, String> techRep : Mapper.getTechRepresentations().entrySet()) {
+            StringTokenizer techRepTokenizer = new StringTokenizer(techRep.getValue(),"|");
             String techName = techRepTokenizer.nextToken();
             String techType2 = techRepTokenizer.nextToken();
             String techPrerequisites = techRepTokenizer.nextToken();
@@ -1588,7 +1588,7 @@ public class Helper {
 
             if (techType2.equalsIgnoreCase(techType)) {
 
-                if (!player.getTechs().contains(AliasHandler.resolveTech(techName))) {
+                if (!player.hasTech(techRep.getKey())) {
                     if (!techFaction.equals(" ")) {
                         if (playerfaction.equalsIgnoreCase(techFaction) || (playerfaction.toLowerCase().startsWith("keleres") && techFaction.equalsIgnoreCase("Keleres"))) {
                             factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
