@@ -127,7 +127,7 @@ public class ButtonListener extends ListenerAdapter {
         if (buttonID.startsWith("FFCC_")) {
             buttonID = buttonID.replace("FFCC_", "");
             String factionWhoGeneratedButton = buttonID.substring(0, buttonID.indexOf("_"));
-            buttonID = buttonID.replace(factionWhoGeneratedButton + "_", "");
+            buttonID = buttonID.replaceFirst(factionWhoGeneratedButton + "_", "");
             String factionWhoIsUp = player.getFaction();
             if (!player.getFaction().equalsIgnoreCase(factionWhoGeneratedButton)
                     && !buttonLabel.toLowerCase().contains(factionWhoIsUp)) {
@@ -2113,17 +2113,6 @@ public class ButtonListener extends ListenerAdapter {
                             "Done Gaining CCs");
                     List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
                     if (!activeMap.isFoWMode()) {
-                      //  List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
-                      //  if (threadChannels == null)
-                       //     return;
-                       // String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-leadership";
-                        // SEARCH FOR EXISTING OPEN THREAD
-                       // for (ThreadChannel threadChannel_ : threadChannels) {
-                        //    if (threadChannel_.getName().equals(threadName)) {
-                        //        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) threadChannel_, message,
-                        //                buttons);
-                       //     }
-                      //  }
                         MessageHelper.sendMessageToChannelWithButtons(
                                 (MessageChannel) player.getCardsInfoThread(activeMap), message, buttons);
                     } else {
@@ -2406,8 +2395,6 @@ public class ButtonListener extends ListenerAdapter {
                     if (player.getCommodities() + 1 > player.getCommoditiesTotal()) {
                         player.setCommodities(player.getCommoditiesTotal());
                         message = "Gained No Commodities (at max already)";
-                        
-
                     } else {
                         player.setCommodities(player.getCommodities() + 1);
                         message = "Gained 1 Commodity";
@@ -2422,78 +2409,58 @@ public class ButtonListener extends ListenerAdapter {
                 case "comm_for_AC" -> {
                     boolean hasSchemingAbility = player.hasAbility("scheming");
                     int count2 = hasSchemingAbility ? 2 : 1;
+                    String commOrTg = "";
                     if (player.getCommodities() > 0) {
+                        commOrTg = "commodity";
                         player.setCommodities(player.getCommodities() - 1);
-                        for (int i = 0; i < count2; i++) {
-                            activeMap.drawActionCard(player.getUserID());
-                        }
-                        ACInfo.sendActionCardInfo(activeMap, player, event);
-                        String message = hasSchemingAbility
-                                ? "Spent 1 commodity to draw " + count2
-                                        + " Action Card (Scheming) - please discard an Action Card from your hand"
-                                : "Spent 1 commodity to draw " + count2 + " AC";
-                        addReaction(event, false, false, message, "");
-                        event.getMessage().delete().queue();
                         
-                        if(!activeMap.isFoWMode() &&(event.getChannel() !=  activeMap.getActionsChannel())){
-                            String pF = Helper.getFactionIconFromDiscord(player.getFaction());
-                            MessageHelper.sendMessageToChannel(actionsChannel, pF+" "+message);
-                        }
                     } else if (player.getTg() > 0) {
                         player.setTg(player.getTg() - 1);
-                        for (int i = 0; i < count2; i++) {
-                            activeMap.drawActionCard(player.getUserID());
-                        }
-                        ACInfo.sendActionCardInfo(activeMap, player, event);
-                        String message = hasSchemingAbility
-                                ? "Spent 1 tg to draw " + count2
-                                        + " Action Card (Scheming) - please discard an Action Card from your hand"
-                                : "Spent 1 tg to draw " + count2 + " AC";
-                        addReaction(event, false, false, message, "");
-                        event.getMessage().delete().queue();
-                        
-                        if(!activeMap.isFoWMode() &&(event.getChannel() !=  activeMap.getActionsChannel())){
-                            String pF = Helper.getFactionIconFromDiscord(player.getFaction());
-                            MessageHelper.sendMessageToChannel(actionsChannel, pF+" "+message);
-                        }
+                        commOrTg = "trade good";
                     } else {
                         addReaction(event, false, false, "Didn't have any comms/tg to spend, no AC drawn", "");
+                        break;
                     }
-
+                    for (int i = 0; i < count2; i++) {
+                        activeMap.drawActionCard(player.getUserID());
+                    }
+                    ACInfo.sendActionCardInfo(activeMap, player, event);
+                    String message = hasSchemingAbility
+                            ? "Spent 1 "+commOrTg+" to draw " + count2
+                                    + " Action Card (Scheming) - please discard an Action Card from your hand"
+                            : "Spent 1 "+commOrTg+" to draw " + count2 + " AC";
+                    addReaction(event, false, false, message, "");
+                    event.getMessage().delete().queue();
+                    if(!activeMap.isFoWMode() &&(event.getChannel() !=  activeMap.getActionsChannel())){
+                        String pF = Helper.getFactionIconFromDiscord(player.getFaction());
+                        MessageHelper.sendMessageToChannel(actionsChannel, pF+" "+message);
+                    }
                 }
                 case "comm_for_mech" -> {
                     String labelP = event.getButton().getLabel();
                     String planetName = labelP.substring(labelP.lastIndexOf(" ") + 1, labelP.length());
+                    String commOrTg = "";
                     if (player.getCommodities() > 0) {
                         player.setCommodities(player.getCommodities() - 1);
-                        new AddUnits().unitParsing(event, player.getColor(),
-                                activeMap.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName,
-                                activeMap);
-                        addReaction(event, false, false, "Spent 1 commodity for a mech on " + planetName, "");
-                        event.getMessage().delete().queue();
-                        if(!activeMap.isFoWMode() &&(event.getChannel() !=  activeMap.getActionsChannel())){
-                            String pF = Helper.getFactionIconFromDiscord(player.getFaction());
-                            MessageHelper.sendMessageToChannel(actionsChannel, pF+" Spent 1 commodity for a mech on " + planetName);
-                        }
+                        commOrTg = "commodity";
                     } else if (player.getTg() > 0) {
                         player.setTg(player.getTg() - 1);
-                        new AddUnits().unitParsing(event, player.getColor(),
-                                activeMap.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName,
-                                activeMap);
-                        addReaction(event, false, false, "Spent 1 tg for a mech on " + planetName, "");
-                        event.getMessage().delete().queue();
-                        if(!activeMap.isFoWMode() &&(event.getChannel() !=  activeMap.getActionsChannel())){
-                            String pF = Helper.getFactionIconFromDiscord(player.getFaction());
-                            MessageHelper.sendMessageToChannel(actionsChannel, pF+" Spent 1 tg for a mech on " + planetName);
-                        }
-
+                        commOrTg = "tg";
                     } else {
                         addReaction(event, false, false, "Didn't have any comms/tg to spend, no mech placed", "");
+                        break;
+                    }
+                    new AddUnits().unitParsing(event, player.getColor(),
+                            activeMap.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName,
+                            activeMap);
+                    addReaction(event, false, false, "Spent 1 "+commOrTg+" for a mech on " + planetName, "");
+                    event.getMessage().delete().queue();
+                    if(!activeMap.isFoWMode() &&(event.getChannel() !=  activeMap.getActionsChannel())){
+                        String pF = Helper.getFactionIconFromDiscord(player.getFaction());
+                        MessageHelper.sendMessageToChannel(actionsChannel, pF+" Spent 1 "+commOrTg+" for a mech on " + planetName);
                     }
                 }
                 case "increase_strategy_cc" -> {
-                    // addReaction(event, false, false, "Increased Strategy Pool CCs By 1
-                    // ("+player.getStrategicCC()+"->"+(player.getStrategicCC()+1)+").", "");
                     String originalCCs = Helper.getPlayerCCs(player);
                     player.setStrategicCC(player.getStrategicCC() + 1);
                     String editedMessage = event.getMessage().getContentRaw();
@@ -2530,8 +2497,6 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().editMessage(editedMessage).queue();
                 }
                 case "increase_fleet_cc" -> {
-                    // addReaction(event, false, false, "Increased Fleet Pool CCs By 1
-                    // ("+player.getFleetCC()+"->"+(player.getFleetCC()+1)+").", "");
                     String originalCCs = Helper.getPlayerCCs(player);
                     player.setFleetCC(player.getFleetCC() + 1);
                     String editedMessage = event.getMessage().getContentRaw();
@@ -2551,8 +2516,6 @@ public class ButtonListener extends ListenerAdapter {
                 }
 
                 case "decrease_strategy_cc" -> {
-                    // addReaction(event, false, false, "Decreased Strategy Pool CCs By 1
-                    // ("+player.getStrategicCC()+"->"+(player.getStrategicCC()-1)+").", "");
                     String originalCCs = Helper.getPlayerCCs(player);
                     player.setStrategicCC(player.getStrategicCC() - 1);
                     String editedMessage = event.getMessage().getContentRaw();
@@ -2571,8 +2534,6 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().editMessage(editedMessage).queue();
                 }
                 case "decrease_tactic_cc" -> {
-                    // addReaction(event, false, false, "Decreased Tactic Pool CCs By 1
-                    // ("+player.getTacticalCC()+ "->" +(player.getTacticalCC()-1)+").", "");
                     String originalCCs = Helper.getPlayerCCs(player);
                     player.setTacticalCC(player.getTacticalCC() - 1);
                     String editedMessage = event.getMessage().getContentRaw();
@@ -2591,8 +2552,6 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().editMessage(editedMessage).queue();
                 }
                 case "decrease_fleet_cc" -> {
-                    // addReaction(event, false, false, "Decreased Fleet Pool CCs By 1
-                    // ("+player.getFleetCC()+"->"+(player.getFleetCC()-1)+").", "");
                     String originalCCs = Helper.getPlayerCCs(player);
                     player.setFleetCC(player.getFleetCC() - 1);
                     String editedMessage = event.getMessage().getContentRaw();
@@ -2611,7 +2570,6 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().editMessage(editedMessage).queue();
                 }
                 case "gain_1_tg" -> {
-
                     String message = "";
                     String labelP = event.getButton().getLabel();
                     String planetName = labelP.substring(labelP.lastIndexOf(" ") + 1, labelP.length());
@@ -2634,14 +2592,11 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
                 case "mallice_2_tg" -> {
-
                     String playerRep = Helper.getFactionIconFromDiscord(player.getFaction());
-
                     String message = playerRep + " exhausted Mallice ability and gained 2 tg (" + player.getTg() + "->"
                             + (player.getTg() + 2) + ").";
                     player.setTg(player.getTg() + 2);
                     if (activeMap.isFoWMode() && event.getMessageChannel() != activeMap.getMainGameChannel()) {
-
                         MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
@@ -2682,12 +2637,10 @@ public class ButtonListener extends ListenerAdapter {
                 case "decline_explore" -> {
                     addReaction(event, false, false, "Declined Explore", "");
                     event.getMessage().delete().queue();
-
                     if (!activeMap.isFoWMode() && (event.getChannel() != activeMap.getActionsChannel())) {
                         String pF = Helper.getFactionIconFromDiscord(player.getFaction());
                         MessageHelper.sendMessageToChannel(actionsChannel, pF + " declined explore");
                     }
-
                 }
                 case "confirm_cc" -> {
                     if (player.getMahactCC().size() > 0) {
@@ -2698,7 +2651,6 @@ public class ButtonListener extends ListenerAdapter {
                     } else {
                         addReaction(event, true, false, "Confirmed CCs: " + player.getTacticalCC() + "/"
                                 + player.getFleetCC() + "/" + player.getStrategicCC(), "");
-
                     }
                 }
                 case "draw_1_AC" -> {
@@ -2829,11 +2781,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeMap, event);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
-                }
-
-                
-
-                
+                }  
                 case "vote" -> {
                     String pfaction2 = null;
                     if (player != null) {
@@ -2868,7 +2816,6 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(event.getChannel(),
                                 "You are not the faction who is supposed to press this button.");
                     }
-
                 }
                 case "planet_ready" -> {
                     String message = "";
