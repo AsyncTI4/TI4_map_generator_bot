@@ -52,6 +52,8 @@ public class Map {
     private String latestWhenMsg = "";
     private String latestTransactionMsg = "";
 
+    private int mapImageGenerationCount = 0;
+
     private MiltyDraftManager miltyDraftManager;
     private boolean ccNPlasticLimit = true;
 
@@ -98,7 +100,7 @@ public class Map {
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
     private boolean testBetaFeaturesMode = false;
     private boolean hasEnded = false;
-
+    private long endedDate;
     @Nullable
     private String tableTalkChannelID = null;
     @Nullable
@@ -590,6 +592,14 @@ public class Map {
 
     public void setLastModifiedDate(long lastModifiedDate) {
         this.lastModifiedDate = lastModifiedDate;
+    }
+
+    public long getEndedDate() {
+        return endedDate;
+    }
+
+    public void setEndedDate(long dateEnded) {
+        this.endedDate = dateEnded;
     }
 
     //Position, Tile
@@ -2194,5 +2204,17 @@ public class Map {
         }
 
         return false;
+    }
+
+    public int getMapImageGenerationCount() {
+        return mapImageGenerationCount;
+    }
+
+    public int setMapImageGenerationCount(int mapImageGenerationCount) {
+        return this.mapImageGenerationCount = mapImageGenerationCount;
+    }
+
+    public void incrementMapImageGenerationCount() {
+        this.mapImageGenerationCount++;
     }
 }

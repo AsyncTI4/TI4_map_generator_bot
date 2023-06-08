@@ -144,6 +144,7 @@ public class GenerateMap {
     }
 
     public File saveImage(Map activeMap, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
+        activeMap.incrementMapImageGenerationCount();
         long startup = System.currentTimeMillis();
         init(activeMap);
         if (activeMap.getDisplayTypeForced() != null) {

@@ -1,6 +1,7 @@
 package ti4.commands.game;
 
 import java.io.File;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 
@@ -76,6 +77,7 @@ public class GameEnd extends GameSubcommandData {
         //POST GAME INFO
         MessageHelper.sendMessageToChannel(event.getChannel(), "**Game: `" + gameName + "` has ended!**");
         userActiveMap.setHasEnded(true);
+        userActiveMap.setEndedDate(new Date().getTime());
         MapSaveLoadManager.saveMap(userActiveMap, event);
         String gameEndText = getGameEndText(userActiveMap, event);
         MessageHelper.sendMessageToChannel(event.getChannel(), gameEndText);

@@ -401,6 +401,8 @@ public class MapSaveLoadManager {
         long time = keepModifiedDate ? activeMap.getLastModifiedDate() : new Date().getTime();
         writer.write(Constants.LAST_MODIFIED_DATE + " " + time);
         writer.write(System.lineSeparator());
+        writer.write(Constants.ENDED_DATE + " " + activeMap.getEndedDate());
+        writer.write(System.lineSeparator());
         writer.write(Constants.ROUND + " " + activeMap.getRound());
         writer.write(System.lineSeparator());
         writer.write(Constants.GAME_CUSTOM_NAME + " " + activeMap.getCustomName());
@@ -453,6 +455,10 @@ public class MapSaveLoadManager {
 
         writer.write(Constants.GAME_HAS_ENDED + " " + activeMap.isHasEnded());
         writer.write(System.lineSeparator());
+
+        writer.write(Constants.IMAGE_GEN_COUNT + " " + activeMap.getMapImageGenerationCount());
+        writer.write(System.lineSeparator());
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -1393,6 +1399,22 @@ public class MapSaveLoadManager {
                         activeMap.setLastModifiedDate(Long.parseLong(lastModificationDate));
                     } catch (Exception exception) {
                         BotLogger.log("Could not parse last modified date", exception);
+                    }
+                }
+                case Constants.ENDED_DATE -> {
+                    String lastModificationDate = info;
+                    try {
+                        activeMap.setEndedDate(Long.parseLong(lastModificationDate));
+                    } catch (Exception exception) {
+                        BotLogger.log("Could not parse ended date", exception);
+                    }
+                }
+                case Constants.IMAGE_GEN_COUNT -> {
+                    try {
+                        int count = Integer.parseInt(info);
+                        activeMap.setMapImageGenerationCount(count);
+                    } catch (Exception e) {
+                        //Do nothing
                     }
                 }
             }
