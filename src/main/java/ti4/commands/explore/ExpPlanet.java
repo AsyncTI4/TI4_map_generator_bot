@@ -80,7 +80,7 @@ public class ExpPlanet extends ExploreSubcommandData {
         if (player.getFaction().equalsIgnoreCase("naaz")) {
             if (Helper.mechCheck(planetName, activeMap, player)) {
                 if (!NRACheck) {
-                    if (player.getTechs().contains(AliasHandler.resolveTech("Pre-Fab Arcologies"))) {
+                    if (player.hasTech("pfa")) { //Pre-Fab Arcologies
                         new PlanetRefresh().doAction(player, planetName, activeMap);
                         MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
                     }
@@ -147,7 +147,7 @@ public class ExpPlanet extends ExploreSubcommandData {
         messageText.append("Planet "+ Helper.getPlanetRepresentationPlusEmoji(planetName) +" *(tile "+ tile.getPosition() + ")*:\n");
         messageText.append("> ").append(displayExplore(cardID));
         resolveExplore(event, cardID, tile, planetName, messageText.toString(), false, player, activeMap);
-        if (player.getTechs().contains(AliasHandler.resolveTech("Pre-Fab Arcologies"))) {
+        if (player.hasTech("pfa")) { //Pre-Fab Arcologies
             new PlanetRefresh().doAction(player, planetName, activeMap);
             MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
         }

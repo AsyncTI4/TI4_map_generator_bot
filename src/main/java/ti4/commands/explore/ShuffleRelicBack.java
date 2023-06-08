@@ -24,7 +24,7 @@ public class ShuffleRelicBack extends GenericRelicAction {
             return;
         }
         String relicId = option.getAsString();
-        if (player.getRelics().contains(relicId)) {
+        if (player.hasRelic(relicId)) {
             player.removeRelic(relicId);
             player.removeExhaustedRelic(relicId);
             boolean success = getActiveMap().shuffleRelicBack(relicId);

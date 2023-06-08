@@ -471,7 +471,7 @@ public class FoWHelper {
 		List<String> playerPlanets = player.getPlanets();
 		if (playerPlanets.stream().anyMatch(unitHolderNames::contains)) {
 			return true;
-		} else if ("18".equals(tile.getTileID()) && player.getTechs().contains("iihq")) {
+		} else if ("18".equals(tile.getTileID()) && player.hasTech("iihq")) {
 			return true;
 		} else if ("s11".equals(tile.getTileID()) && canSeeStatsOfFaction(activeMap, "cabal", player)) {
 			return true;

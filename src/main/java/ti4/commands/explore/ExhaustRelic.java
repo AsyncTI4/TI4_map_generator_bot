@@ -29,7 +29,7 @@ public class ExhaustRelic extends GenericRelicAction {
             return;
         }
         String relicId = option.getAsString();
-        if (player.getRelics().contains(relicId)) {
+        if (player.hasRelic(relicId)) {
 			subAction(player, event, relicId);
 		} else {
             sendMessage("Invalid relic or player does not have specified relic");

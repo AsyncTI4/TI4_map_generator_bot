@@ -97,7 +97,7 @@ public class PlayAC extends ACCardsSubcommandData {
         String activePlayerID = activeMap.getActivePlayer();
         if (player.isPassed() && activePlayerID != null) {
             Player activePlayer = activeMap.getPlayer(activePlayerID);
-            if (activePlayer != null && activePlayer.getTechs().contains("tp")) {
+            if (activePlayer != null && activePlayer.hasTech("tp")) {
                 return "You are passed and the active player has researched Transparasteel Plating. AC Play command cancelled.";
             }
         }
@@ -126,10 +126,10 @@ public class PlayAC extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+"You have mechs adjacent to the player who played the AC. Use Buttons to decide whether to cancel.", empyButtons);
 
         }
-        String al = AliasHandler.resolveTech("Instinct Training");
+        String instinctTrainingID = "it";
         for(Player player2 : activeMap.getPlayers().values())
         {
-            if(player2.getTechs().contains(AliasHandler.resolveTech(al)) && !player2.getExhaustedTechs().contains(al) && player2.getStrategicCC() > 0)
+            if(player2.hasTechReady(instinctTrainingID) && player2.getStrategicCC() > 0)
             {
                 Button instinctButton = Button.secondary("sabotage_xxcha_"+actionCardTitle, "Cancel "+actionCardTitle+" With Instinct Training").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("Xxcha")));
                 List<Button> xxchaButtons = new ArrayList<Button>();

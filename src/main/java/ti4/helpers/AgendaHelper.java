@@ -440,7 +440,7 @@ public class AgendaHelper {
 
         }
         //Predictive Intelligence
-        if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
+        if (player.hasTechReady("pi")) {
             if (influenceCount > 0) {
                 influenceCount += 3;
             }
@@ -491,7 +491,7 @@ public class AgendaHelper {
         }
 
         //Check if Player has Edyn Mandate faction tech - if it is, put it at the end of the vote list.
-        Optional<Player> edynPlayer = orderList.stream().filter(player -> player.getFaction() != null && player.getTechs().contains("dsedyny")).findFirst();
+        Optional<Player> edynPlayer = orderList.stream().filter(player -> player.getFaction() != null && player.hasTech("dsedyny")).findFirst();
         if (edynPlayer.isPresent()) {
             orderList.remove(edynPlayer.orElse(null));
             orderList.add(edynPlayer.get());
@@ -559,7 +559,7 @@ public class AgendaHelper {
             Button button = Button.primary("exhaust_argent", "Special Argent Votes ("+numPlayers+")");
             planetButtons.add(button);
         }
-        if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
+        if (player.hasTechReady("pi")) {
             Button button = Button.primary("exhaust_predictive", "Use Predictive Votes (3)");
             planetButtons.add(button);
         }
