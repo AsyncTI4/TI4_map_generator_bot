@@ -12,6 +12,7 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.PromissoryNoteModel;
 
 public class SentPN extends PNCardsSubcommandData {
 	public SentPN() {
@@ -69,43 +70,39 @@ public class SentPN extends PNCardsSubcommandData {
 			sendMessage("No such Promissory Note ID found, please retry");
 			return;
 		}
-		boolean areaPN = false;
-		Player targetPlayer = Helper.getPlayer(activeMap, null, event);
+		PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(id);
+		if (pnModel == null) {
+			sendMessage("No such Promissory Note found, please retry");
+			return;
+		}
 
+		Player targetPlayer = Helper.getPlayer(activeMap, null, event);
 		if (targetPlayer == null) {
 			sendMessage("No such Player in game");
 			return;
 		}
 
-		String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);
-		if (player.getPromissoryNotesInPlayArea().contains(id)) {
-			String playerColor = targetPlayer.getColor();
-			String playerFaction = targetPlayer.getFaction();
-			if (!(playerColor != null && playerColor.equals(promissoryNoteOwner))
-					&& !(playerFaction != null && playerFaction.equals(promissoryNoteOwner))) {
-				sendMessage("Can send Promissory Notes from Play Area just to Owner of the Note");
+		Player pnOwner = activeMap.getPNOwner(id);
+		if (player.getPromissoryNotesInPlayArea().contains(id) ) {
+			if (!targetPlayer.equals(pnOwner)) {
+				sendMessage("Promissory Notes in Play Area can only be sent to the owner of the PN");
 				return;
 			}
 		}
-
+		
 		player.removePromissoryNote(id);
 		targetPlayer.setPromissoryNote(id);
-		boolean sendSftT = false;
-		boolean sendAlliance = false;
-		if ((id.endsWith("_sftt") || id.endsWith("_an")) && !promissoryNoteOwner.equals(targetPlayer.getFaction())
-				&& !promissoryNoteOwner.equals(targetPlayer.getColor())) {
+
+		boolean placeDirectlyInPlayArea = pnModel.playArea;
+		if (placeDirectlyInPlayArea && !targetPlayer.equals(pnOwner)) {
 			targetPlayer.setPromissoryNotesInPlayArea(id);
-			if (id.endsWith("_sftt")) {
-				sendSftT = true;
-			} else {
-				sendAlliance = true;
-			}
-			areaPN = true;
 		}
+
 		PNInfo.sendPromissoryNoteInfo(activeMap, targetPlayer, false);
 		PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
-		String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-		String message = Helper.getPlayerRepresentation(player, activeMap) + " sent " + Emojis.PN + text + "PN to " + Helper.getPlayerRepresentation(targetPlayer, activeMap);
+
+		String extraText = placeDirectlyInPlayArea ? "**" + pnModel.name + "**" : "";
+		String message = Helper.getPlayerRepresentation(player, activeMap) + " sent " + Emojis.PN + extraText + " to " + Helper.getPlayerRepresentation(targetPlayer, activeMap);
 		if (activeMap.isFoWMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
 			String success = message + "\nThe other player has been notified";
@@ -118,14 +115,8 @@ public class SentPN extends PNCardsSubcommandData {
 		// FoW specific pinging
 		if (activeMap.isFoWMode()) {
 			String extra = null;
-			if (sendSftT) extra = "Scores changed.";
-			FoWHelper.pingPlayersTransaction(activeMap, event, player, targetPlayer, Emojis.PN + text + "PN", extra);
+			if (id.endsWith("_sftt")) extra = "Scores changed.";
+			FoWHelper.pingPlayersTransaction(activeMap, event, player, targetPlayer, Emojis.PN + extraText + "PN", extra);
 		}
-
-		// Turned off, as we might change back
-		// if (areaPN) {
-		// 	File file = GenerateMap.getInstance().saveImage(activeMap, event);
-		// 	MessageHelper.sendFileToChannel(event.getChannel(), file);
-		// }
 	}
 }
