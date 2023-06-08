@@ -25,7 +25,7 @@ public class PurgeRelic extends GenericRelicAction {
             return;
         }
         String relicId = option.getAsString();
-        if (player.getRelics().contains(relicId)) {
+        if (player.hasRelic(relicId)) {
             player.removeRelic(relicId);
             player.removeExhaustedRelic(relicId);
             String relicName = Mapper.getRelic(relicId).split(";")[0];

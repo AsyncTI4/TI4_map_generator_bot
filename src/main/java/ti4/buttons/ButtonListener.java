@@ -336,11 +336,11 @@ public class ButtonListener extends ListenerAdapter {
                 {
                     MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+"Reminder this is the window to do Naalu Hero");
                 }
-                if(player2.getRelics() != null && player2.getRelics().contains("mawofworlds") && activeMap.isCustodiansScored())
+                if(player2.getRelics() != null && player2.hasRelic("mawofworlds") && activeMap.isCustodiansScored())
                 {
                     MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+"Reminder this is the window to do Maw of Worlds");
                 }
-                if(player2.getRelics() != null &&player2.getRelics().contains("emphidia"))
+                if(player2.getRelics() != null &&player2.hasRelic("emphidia"))
                 {
                     for(String pl : player2.getPlanets())
                     {
@@ -570,7 +570,7 @@ public class ButtonListener extends ListenerAdapter {
                 Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
                 buttons.add(lost3TG);
             }
-            if (player.getTechs().contains("aida") && !player.getExhaustedTechs().contains("aida")) {
+            if (player.hasTechReady("aida")) {
                 Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
                 buttons.add(aiDEVButton);
             }
@@ -641,7 +641,7 @@ public class ButtonListener extends ListenerAdapter {
             } else if (type.equalsIgnoreCase("xxcha")) {
                 message = message
                         + "the \"Instinct Training\" tech! The tech has been exhausted and a strategy CC removed.";
-                if (player.getTechs().contains(AliasHandler.resolveTech("Instinct Training"))) {
+                if (player.hasTech(AliasHandler.resolveTech("Instinct Training"))) {
                     player.exhaustTech(AliasHandler.resolveTech("Instinct Training"));
                     if (player.getStrategicCC() > 0) {
                         player.setStrategicCC(player.getStrategicCC() - 1);
@@ -1227,7 +1227,7 @@ public class ButtonListener extends ListenerAdapter {
                         Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
                         buttons.add(lost3TG);
                     }
-                    if (player.getTechs().contains("aida") && !player.getExhaustedTechs().contains("aida")) {
+                    if (player.hasTechReady("aida")) {
                         Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
                         buttons.add(aiDEVButton);
                     }

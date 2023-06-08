@@ -93,7 +93,7 @@ public class RelicSend extends GenericRelicAction {
             activeMap.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
         }
 
-        if (player1.getRelics().contains(relicID) || !player2.getRelics().contains(relicID)) {
+        if (player1.hasRelic(relicID) || !player2.hasRelic(relicID)) {
             sendMessage("Something may have gone wrong - please check your relics and ping Bothelper if there is a problem.");
             return;
         }

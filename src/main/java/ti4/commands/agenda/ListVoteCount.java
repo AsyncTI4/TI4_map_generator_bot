@@ -143,7 +143,7 @@ public class ListVoteCount extends AgendaSubcommandData {
         }
 
         //Predictive Intelligence
-        if (player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")) {
+        if (player.hasTechReady("pi")) {
             sb.append(" (+3 for " + Emojis.CyberneticTech + "Predictive Intelligence)");
             additionalVotes += 3;
         }
@@ -157,14 +157,14 @@ public class ListVoteCount extends AgendaSubcommandData {
         }
 
         //Absol's Syncretone - +1 bote for each neighbour
-        if (player.getRelics().contains("absol_syncretone")) {
+        if (player.hasRelicReady("absol_syncretone")) {
             int count = Helper.getNeighbourCount(activeMap, player);
             sb.append(" (+" + count + " for " + Emojis.Relic + "Syncretone)");
             additionalVotes += count;
         }
 
         //Ghoti Wayfarer Tech
-        if (player.getTechs().contains("dsghotg") && !player.getExhaustedTechs().contains("dsghotg")) {
+        if (player.hasTechReady("dsghotg")) {
             int fleetCC = player.getFleetCC();
             sb.append(" (+" + fleetCC + " if Exhaust " + Emojis.BioticTech + "Networked Command)");
             additionalVotes += fleetCC;

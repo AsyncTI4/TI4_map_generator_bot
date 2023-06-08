@@ -65,13 +65,13 @@ public class FighterConscription extends SpecialSubcommandData {
                             }
                             // Titans, Saturn Engine 2, Cruiser 2
                             if (unitType.startsWith("ca")) {
-                                if ("titans".equals(player.getFaction()) || player.getTechs().contains("se2") || player.getTechs().contains("cr2")) {
+                                if ("titans".equals(player.getFaction()) || player.hasTech("se2") || player.hasTech("cr2")) {
                                     hasCap = true;
                                 }
                             }
                             // Argent, Strike Wing Alpha 2
                             if (unitType.startsWith("dd")) {
-                                if ("argent".equals(player.getFaction()) || player.getTechs().contains("swa2")) {
+                                if ("argent".equals(player.getFaction()) || player.hasTech("swa2")) {
                                     hasCap = true;
                                 }
                             }
