@@ -43,4 +43,8 @@ public class PromissoryNoteModel extends Model {
         return faction;
     }
 
+    public boolean isPlayedDirectlyToPlayArea() {
+        return playArea && text.toLowerCase().contains("action:");
+    }
+
 }
