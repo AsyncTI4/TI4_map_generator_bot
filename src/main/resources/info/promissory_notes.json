@@ -24,7 +24,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "rainbow",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **rainbow** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **rainbow** player's units, or if the **rainbow** player is eliminated, lose 1 victory point and return this card to the **rainbow** player."
@@ -44,7 +44,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "rainbow",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **rainbow** player, you must place it faceup in your play area. While this card is in your play area, you can use the **rainbow** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **rainbow** player's units, return this card to the **rainbow** player."
@@ -74,7 +74,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "lime",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **lime** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **lime** player's units, or if the **lime** player is eliminated, lose 1 victory point and return this card to the **lime** player."
@@ -94,7 +94,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "lime",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **lime** player, you must place it faceup in your play area. While this card is in your play area, you can use the **lime** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **lime** player's units, return this card to the **lime** player."
@@ -124,7 +124,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "lavender",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **lavender** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **lavender** player's units, or if the **lavender** player is eliminated, lose 1 victory point and return this card to the **lavender** player."
@@ -144,7 +144,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "lavender",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **lavender** player, you must place it faceup in your play area. While this card is in your play area, you can use the **lavender** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **lavender** player's units, return this card to the **lavender** player."
@@ -174,7 +174,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "bloodred",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **bloodred** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **bloodred** player's units, or if the **bloodred** player is eliminated, lose 1 victory point and return this card to the **bloodred** player."
@@ -194,7 +194,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "bloodred",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **bloodred** player, you must place it faceup in your play area. While this card is in your play area, you can use the **bloodred** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **bloodred** player's units, return this card to the **bloodred** player."
@@ -224,7 +224,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "chocolate",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **chocolate** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **chocolate** player's units, or if the **chocolate** player is eliminated, lose 1 victory point and return this card to the **chocolate** player."
@@ -244,7 +244,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "chocolate",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **chocolate** player, you must place it faceup in your play area. While this card is in your play area, you can use the **chocolate** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **chocolate** player's units, return this card to the **chocolate** player."
@@ -274,7 +274,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "emerald",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **emerald** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **emerald** player's units, or if the **emerald** player is eliminated, lose 1 victory point and return this card to the **emerald** player."
@@ -294,7 +294,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "emerald",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **emerald** player, you must place it faceup in your play area. While this card is in your play area, you can use the **emerald** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **emerald** player's units, return this card to the **emerald** player."
@@ -324,7 +324,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "navy",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **navy** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **navy** player's units, or if the **navy** player is eliminated, lose 1 victory point and return this card to the **navy** player."
@@ -344,7 +344,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "navy",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **navy** player, you must place it faceup in your play area. While this card is in your play area, you can use the **navy** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **navy** player's units, return this card to the **navy** player."
@@ -374,7 +374,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "rose",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **rose** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **rose** player's units, or if the **rose** player is eliminated, lose 1 victory point and return this card to the **rose** player."
@@ -394,7 +394,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "rose",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **rose** player, you must place it faceup in your play area. While this card is in your play area, you can use the **rose** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **rose** player's units, return this card to the **rose** player."
@@ -424,7 +424,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "spring",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **spring** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **spring** player's units, or if the **spring** player is eliminated, lose 1 victory point and return this card to the **spring** player."
@@ -444,7 +444,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "spring",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **spring** player, you must place it faceup in your play area. While this card is in your play area, you can use the **spring** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **spring** player's units, return this card to the **spring** player."
@@ -474,7 +474,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "teal",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **teal** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **teal** player's units, or if the **teal** player is eliminated, lose 1 victory point and return this card to the **teal** player."
@@ -494,7 +494,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "teal",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **teal** player, you must place it faceup in your play area. While this card is in your play area, you can use the **teal** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **teal** player's units, return this card to the **teal** player."
@@ -524,7 +524,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "brown",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **brown** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **brown** player's units, or if the **brown** player is eliminated, lose 1 victory point and return this card to the **brown** player."
@@ -544,7 +544,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "brown",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **brown** player, you must place it faceup in your play area. While this card is in your play area, you can use the **brown** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **brown** player's units, return this card to the **brown** player."
@@ -574,7 +574,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "chrome",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **chrome** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **chrome** player's units, or if the **chrome** player is eliminated, lose 1 victory point and return this card to the **chrome** player."
@@ -594,7 +594,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "chrome",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **chrome** player, you must place it faceup in your play area. While this card is in your play area, you can use the **chrome** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **chrome** player's units, return this card to the **chrome** player."
@@ -624,7 +624,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "forest",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **forest** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **forest** player's units, or if the **forest** player is eliminated, lose 1 victory point and return this card to the **forest** player."
@@ -644,7 +644,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "forest",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **forest** player, you must place it faceup in your play area. While this card is in your play area, you can use the **forest** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **forest** player's units, return this card to the **forest** player."
@@ -674,7 +674,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "gold",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **gold** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **gold** player's units, or if the **gold** player is eliminated, lose 1 victory point and return this card to the **gold** player."
@@ -694,7 +694,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "gold",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **gold** player, you must place it faceup in your play area. While this card is in your play area, you can use the **gold** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **gold** player's units, return this card to the **gold** player."
@@ -724,7 +724,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "lightgray",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **lightgray** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **lightgray** player's units, or if the **lightgray** player is eliminated, lose 1 victory point and return this card to the **lightgray** player."
@@ -744,7 +744,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "lightgray",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **lightgray** player, you must place it faceup in your play area. While this card is in your play area, you can use the **lightgray** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **lightgray** player's units, return this card to the **lightgray** player."
@@ -774,7 +774,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "petrol",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **petrol** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **petrol** player's units, or if the **petrol** player is eliminated, lose 1 victory point and return this card to the **petrol** player."
@@ -794,7 +794,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "petrol",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **petrol** player, you must place it faceup in your play area. While this card is in your play area, you can use the **petrol** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **petrol** player's units, return this card to the **petrol** player."
@@ -824,7 +824,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "sunset",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **sunset** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **sunset** player's units, or if the **sunset** player is eliminated, lose 1 victory point and return this card to the **sunset** player."
@@ -844,7 +844,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "sunset",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **sunset** player, you must place it faceup in your play area. While this card is in your play area, you can use the **sunset** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **sunset** player's units, return this card to the **sunset** player."
@@ -874,7 +874,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "tan",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **tan** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **tan** player's units, or if the **tan** player is eliminated, lose 1 victory point and return this card to the **tan** player."
@@ -894,7 +894,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "tan",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **tan** player, you must place it faceup in your play area. While this card is in your play area, you can use the **tan** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **tan** player's units, return this card to the **tan** player."
@@ -924,7 +924,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "turquoise",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **turquoise** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **turquoise** player's units, or if the **turquoise** player is eliminated, lose 1 victory point and return this card to the **turquoise** player."
@@ -944,7 +944,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "turquoise",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **turquoise** player, you must place it faceup in your play area. While this card is in your play area, you can use the **turquoise** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **turquoise** player's units, return this card to the **turquoise** player."
@@ -974,7 +974,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "purple",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **purple** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **purple** player's units, or if the **purple** player is eliminated, lose 1 victory point and return this card to the **purple** player."
@@ -994,7 +994,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "purple",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **purple** player, you must place it faceup in your play area. While this card is in your play area, you can use the **purple** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **purple** player's units, return this card to the **purple** player."
@@ -1024,7 +1024,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "pink",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **pink** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **pink** player's units, or if the **pink** player is eliminated, lose 1 victory point and return this card to the **pink** player."
@@ -1044,7 +1044,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "pink",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **pink** player, you must place it faceup in your play area. While this card is in your play area, you can use the pink player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **pink** player's units, return this card to the **pink** player."
@@ -1074,7 +1074,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "blue",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **blue** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **blue** player's units, or if the **blue** player is eliminated, lose 1 victory point and return this card to the **blue** player."
@@ -1094,7 +1094,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "blue",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **blue** player, you must place it faceup in your play area. While this card is in your play area, you can use the **blue** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **blue** player's units, return this card to the **blue** player."
@@ -1124,7 +1124,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "green",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **green** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **green** player's units, or if the **green** player is eliminated, lose 1 victory point and return this card to the **green** player."
@@ -1144,7 +1144,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "green",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **green** player, you must place it faceup in your play area. While this card is in your play area, you can use the **green** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **green** player's units, return this card to the **green** player."
@@ -1174,7 +1174,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "gray",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **gray** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **gray** player's units, or if the **gray** player is eliminated, lose 1 victory point and return this card to the **gray** player."
@@ -1194,7 +1194,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "gray",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **gray** player, you must place it faceup in your play area. While this card is in your play area, you can use the **gray** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **gray** player's units, return this card to the **gray** player."
@@ -1224,7 +1224,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "red",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **red** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **red** player's units, or if the **red** player is eliminated, lose 1 victory point and return this card to the **red** player."
@@ -1244,7 +1244,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "red",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **red** player, you must place it faceup in your play area. While this card is in your play area, you can use the **red** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **red** player's units, return this card to the **red** player."
@@ -1274,7 +1274,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "yellow",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **yellow** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **yellow** player's units, or if the **yellow** player is eliminated, lose 1 victory point and return this card to the **yellow** player."
@@ -1294,7 +1294,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "yellow",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **yellow** player, you must place it faceup in your play area. While this card is in your play area, you can use the **yellow** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **yellow** player's units, return this card to the **yellow** player."
@@ -1324,7 +1324,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "black",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **black** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **black** player's units, or if the **black** player is eliminated, lose 1 victory point and return this card to the **black** player."
@@ -1344,7 +1344,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "black",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **black** player, you must place it faceup in your play area. While this card is in your play area, you can use the **black** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **black** player's units, return this card to the **black** player."
@@ -1374,7 +1374,7 @@
         "name": "Support for the Throne",
         "faction": "",
         "colour": "orange",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "Base Game",
         "text": "When you receive this card, if you are not the **orange** player, you must place it faceup in your play area and gain 1 victory point. When you activate a system that contains 1 or more of the **orange** player's units, or if the **orange** player is eliminated, lose 1 victory point and return this card to the **orange** player."
@@ -1394,7 +1394,7 @@
         "name": "Alliance",
         "faction": "",
         "colour": "orange",
-        "playArea": "",
+        "playArea": "true",
         "attachment": "",
         "source": "PoK",
         "text": "When you receive this card, if you are not the **orange** player, you must place it faceup in your play area. While this card is in your play area, you can use the **orange** player's commander ability, if it is unlocked. When you activate a system that contains 1 or more of the **orange** player's units, return this card to the **orange** player."
@@ -1747,7 +1747,7 @@
         "playArea": "true",
         "attachment": "",
         "source": "Discordant Stars",
-        "text": "When you receive this card, if you are not the Celdauri player, you must place it face up in your play area.While this card is in your play area, you can use the Celdauri player's commander ability, if it is unlocked.If you activate a system that contains 1 or more of the Celdauri player's units, return this card to the Celdauri player."
+        "text": "When you receive this card, if you are not the Celdauri player, you must place it face up in your play area. While this card is in your play area, you can use the Celdauri player's commander ability, if it is unlocked. If you activate a system that contains 1 or more of the Celdauri player's units, return this card to the Celdauri player."
     },
     {
         "alias": "dspnchei",
