@@ -329,7 +329,7 @@ public class ButtonHelper {
                     if(numMechs > 0)
                     {
                         String planetName = "";
-                        if(unitHolder.getName().equalsIgnoreCase("space")) {
+                        if(!unitHolder.getName().equalsIgnoreCase("space")) {
                             planetName = " "+unitHolder.getName();
                         }
                         new AddUnits().unitParsing(event, player.getColor(),
@@ -888,6 +888,7 @@ public class ButtonHelper {
             }
         }
         //Relics
+        boolean dontEnigTwice = true;
         for(String relic : p1.getRelics())
         {
             
@@ -907,9 +908,24 @@ public class ButtonHelper {
                 Button rButton = null;
                 if(relic.equalsIgnoreCase(Constants.ENIGMATIC_DEVICE))
                 {
+                    if(!dontEnigTwice){
+                       continue;
+                    }
                     rButton = Button.danger(finChecker+prefix+"relic_"+relic, "Purge Enigmatic Device");
+                    dontEnigTwice = false;
                 } else {
-                    rButton = Button.danger(finChecker+prefix+"relic_"+relic, "Purge "+relicData[0]);
+                    if(relic.equalsIgnoreCase("titanprototype") ||relic.equalsIgnoreCase("absol_jr") )
+                    {
+                        if(!p1.getExhaustedRelics().contains(relic)){
+                            rButton = Button.primary(finChecker+prefix+"relic_"+relic, "Exhaust "+relicData[0]);
+                        }else{
+                            continue;
+                        }
+                        
+                    }else {
+                        rButton = Button.danger(finChecker+prefix+"relic_"+relic, "Purge "+relicData[0]);
+                    }
+                        
                 }
                 compButtons.add(rButton);
             }
@@ -1035,10 +1051,10 @@ public class ButtonHelper {
         String prefix = "componentActionRes_";
         String finChecker = "FFCC_"+p1.getFaction() + "_";
         buttonID = buttonID.replace(prefix, "");
-
+        
         String firstPart = buttonID.substring(0, buttonID.indexOf("_"));
         buttonID = buttonID.replace(firstPart+"_", "");
-
+        
         switch(firstPart) {
             case "tech" -> {
                 p1.exhaustTech(buttonID);
@@ -1101,11 +1117,21 @@ public class ButtonHelper {
             case "relic" -> {
                 String relicId = buttonID;
                 Player player = p1;
+                String purgeOrExhaust = "Purged ";
+                
                 if (player.hasRelic(relicId)) {
-                    player.removeRelic(relicId);
-                    player.removeExhaustedRelic(relicId);
+                    if(relicId.equalsIgnoreCase("titanprototype") ||relicId.equalsIgnoreCase("absol_jr") )
+                    {
+                        player.addExhaustedRelic(relicId);
+                        purgeOrExhaust = "Exhausted ";
+                    }
+                    else{
+                        player.removeRelic(relicId);
+                        player.removeExhaustedRelic(relicId);
+                    }
+                   
                     String relicName = Mapper.getRelic(relicId).split(";")[0];
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Purged " + Emojis.Relic + " relic: " + relicName);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),purgeOrExhaust + Emojis.Relic + " relic: " + relicName);
                     if(relicName.contains("Enigmatic")){
                         activeMap.setComponentAction(true);
                         Button getTech = Button.success("acquireATech", "Get a tech");
