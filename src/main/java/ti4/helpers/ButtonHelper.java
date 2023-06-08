@@ -192,6 +192,27 @@ public class ButtonHelper {
             new ExpFrontier().expFront(event, tile, activeMap, player);
         }
     }
+    public static List<Button> scanlinkResolution(Player player, Map activeMap, ButtonInteractionEvent event) {
+        Tile tile =  activeMap.getTileByPosition(activeMap.getActiveSystem());
+        List<Button> buttons = new ArrayList<Button>();
+        for(UnitHolder planetUnit : tile.getUnitHolders().values()){
+            if(planetUnit.getName().equalsIgnoreCase("space")){
+                continue;
+            }
+            Planet planetReal =  (Planet) planetUnit;
+            String planet = planetReal.getName();    
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && player.getPlanets().contains(planet) && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous"))) {
+                String drawColor = planetReal.getOriginalPlanetType();
+                Button resolveExplore2 = Button.success("movedNExplored_filler_"+planet+"_"+drawColor, "Explore "+Helper.getPlanetRepresentation(planet, activeMap));
+                buttons.add(resolveExplore2);
+            }
+        }
+        return buttons;
+       
+    }
+
+
+
     public static List<Button> getTilesToMoveFrom(Player player, Map activeMap, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
@@ -657,9 +678,12 @@ public class ButtonHelper {
             case "PNs" -> {
                 PNInfo.sendPromissoryNoteInfo(activeMap, p1, false);
                 String message =  Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" Click the PN you would like to send";
+               
                 for(String pnShortHand : p1.getPromissoryNotes().keySet())
                 {
-                    Button transact = Button.success(finChecker+"send_PNs_"+p2.getFaction() + "_"+p1.getPromissoryNotes().get(pnShortHand), ""+p1.getPromissoryNotes().get(pnShortHand));
+                    PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
+                    String pnName = promissoryNote.name;
+                    Button transact = Button.success(finChecker+"send_PNs_"+p2.getFaction() + "_"+p1.getPromissoryNotes().get(pnShortHand), promissoryNote.name);
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(activeMap),message, stuffToTransButtons);
@@ -718,7 +742,8 @@ public class ButtonHelper {
         String amountToTrans = buttonID.substring(buttonID.indexOf("_")+1, buttonID.length());
         Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, factionToTrans);
         String message2 = "";
-        String ident = Helper.getFactionIconFromDiscord(p1.getFaction());
+        String ident = Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), false);
+        String ident2 = Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), false);
         switch(thingToTrans)
         {
             case "TGs" -> {
@@ -726,16 +751,16 @@ public class ButtonHelper {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 p1.setTg(p1.getTg()-tgAmount);
                 p2.setTg(p2.getTg()+tgAmount);
-                message2 = ident + " sent " + tgAmount+ " TGs to "+Helper.getPlayerDependingOnFog(activeMap,p2);
+                message2 = ident + " sent " + tgAmount+ " TGs to "+ident2;
             }
             case "Comms" -> {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 p1.setCommodities(p1.getCommodities()-tgAmount);
                 p2.setTg(p2.getTg()+tgAmount);
-                message2 = ident + " sent " + tgAmount+ " Commodities to "+Helper.getPlayerDependingOnFog(activeMap,p2);
+                message2 = ident + " sent " + tgAmount+ " Commodities to "+ident2;
             }
             case "ACs" -> {
-                message2 =ident + " sent AC #" + amountToTrans+ " to "+Helper.getPlayerDependingOnFog(activeMap,p2);
+                message2 =ident + " sent AC #" + amountToTrans+ " to "+ident2;
                int acNum = Integer.parseInt(amountToTrans);
                String acID = null;
                for (java.util.Map.Entry<String, Integer> so : p1.getActionCards().entrySet()) {
@@ -774,7 +799,7 @@ public class ButtonHelper {
                 PNInfo.sendPromissoryNoteInfo(activeMap, p1, false);
                 PNInfo.sendPromissoryNoteInfo(activeMap, p2, false);
                 String text = sendSftT ? "**Support for the Throne** " : (sendAlliance ? "**Alliance** " : "");
-                message2 = Helper.getPlayerRepresentation(p1, activeMap) + " sent " + Emojis.PN + text + "PN to " + Helper.getPlayerRepresentation(p2, activeMap);   
+                message2 = Helper.getPlayerRepresentation(p1, activeMap) + " sent " + Emojis.PN + text + "PN to " + ident2;   
             }
             case "Frags" -> {
                
