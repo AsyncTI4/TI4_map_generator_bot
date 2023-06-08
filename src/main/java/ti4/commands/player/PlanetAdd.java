@@ -93,7 +93,10 @@ public class PlanetAdd extends PlanetAddRemove {
                 String drawColor = planetReal.getOriginalPlanetType();
                 Button resolveExplore2 = Button.success("movedNExplored_filler_"+planet+"_"+drawColor, "Explore "+Helper.getPlanetRepresentation(planet, activeMap));
                 List<Button> buttons = List.of(resolveExplore2);
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                if(event!=null){
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                }
+                
 
             }
 

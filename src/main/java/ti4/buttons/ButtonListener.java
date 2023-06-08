@@ -415,7 +415,9 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("sc_follow_") && (!buttonID.contains("leadership"))
                 && (!buttonID.contains("trade"))) {
             boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
+            
             if (!used) {
+                ButtonHelper.resolveMuaatCommanderCheck(player, activeMap, event);
                 String message = deductCC(player, event);
                 int scnum = 1;
                 boolean setstatus = true;
@@ -1550,7 +1552,14 @@ public class ButtonListener extends ListenerAdapter {
             {
                 MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity + " this is a courtesy notice that the selected system is in range of opponent deep space cannon units. ");
             }
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select the first system you want to move from", systemButtons);
+            List<Button> button2 = ButtonHelper.scanlinkResolution(player, activeMap, event);
+            if(player.getTechs().contains("sdn") && !button2.isEmpty()){
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please resolve scanlink", button2);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "\n\nUse buttons to select the first system you want to move from", systemButtons);
+            }else {
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select the first system you want to move from", systemButtons);
+
+            }
             event.getMessage().delete().queue();
         }
         else if (buttonID.startsWith("tacticalMoveFrom_")) {
