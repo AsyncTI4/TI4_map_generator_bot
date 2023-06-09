@@ -74,7 +74,7 @@ public class MessageListener extends ListenerAdapter {
 
         // CHECK IF CHANNEL IS MATCHED TO A GAME
         if (!event.getInteraction().getName().equals("help")) { //SKIP /help COMMANDS
-            boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName());
+            boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
             if (!isChannelOK) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Command canceled. Execute command in correct channel, as game name.");
                 return;
@@ -97,7 +97,7 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    public static boolean setActiveGame(MessageChannel channel, String userID, String eventName) {
+    public static boolean setActiveGame(MessageChannel channel, String userID, String eventName, String subCommandName) {
         String channelName = channel.getName();
         MapManager mapManager = MapManager.getInstance();
         Map userActiveMap = mapManager.getUserActiveMap(userID);
@@ -109,7 +109,7 @@ public class MessageListener extends ListenerAdapter {
 
         String gameID = channelNameTokenizer.nextToken();
         boolean anyMatchGameExists = mapList.stream().anyMatch(map -> map.equals(gameID));
-        if (!anyMatchGameExists && !(eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.CREATE_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN))) {
+        if (!anyMatchGameExists && !(eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN)) && !(Constants.GAME.equals(eventName) && Constants.CREATE_GAME.equals(subCommandName))) {
             return false;
         }
         if (anyMatchGameExists && (mapManager.getUserActiveMap(userID) == null || !mapManager.getUserActiveMap(userID).getName().equals(gameID) && (mapManager.getMap(gameID) != null && (mapManager.getMap(gameID).isMapOpen() || mapManager.getMap(gameID).getPlayerIDs().contains(userID))))) {

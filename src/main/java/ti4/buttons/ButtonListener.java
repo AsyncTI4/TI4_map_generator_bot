@@ -75,7 +75,7 @@ public class ButtonListener extends ListenerAdapter {
     public void onButtonInteraction(ButtonInteractionEvent event) {
         event.deferEdit().queue();
         String id = event.getUser().getId();
-        MessageListener.setActiveGame(event.getMessageChannel(), id, "button");
+        MessageListener.setActiveGame(event.getMessageChannel(), id, "button", "no sub command");
         String buttonID = event.getButton().getId();
         String buttonLabel = event.getButton().getLabel();
         String lastchar = StringUtils.right(buttonLabel, 2).replace("#", "");
