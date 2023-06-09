@@ -125,7 +125,6 @@ public class MapGenerator {
         commandManager.addCommand(new AddUnits());
         commandManager.addCommand(new RemoveUnits());
         commandManager.addCommand(new RemoveAllUnits());
-        commandManager.addCommand(new CreateGame());
         commandManager.addCommand(new AllInfo());
         commandManager.addCommand(new CardsInfo());
         commandManager.addCommand(new SetGame());
