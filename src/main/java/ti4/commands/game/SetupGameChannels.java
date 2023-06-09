@@ -17,37 +17,37 @@ public class SetupGameChannels extends GameSubcommandData {
         super(Constants.GAME_CHANNEL_SETUP, "Setup channels and roles for non standard games");
         addOptions(new OptionData(OptionType.CHANNEL, Constants.MAIN_GAME_CHANNEL, "Specify main game channel").setRequired(true));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Specify main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE1, "Specify role for Community Mode").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL1, "Specify private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Main player for Community/Fog mode").setRequired(false));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE1, "Role for Community Mode").setRequired(false));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL1, "Private channel for player/role").setRequired(false));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Specify main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE2, "Specify role for Community Mode").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL2, "Specify private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Main player for Community/Fog mode").setRequired(false));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE2, "Role for Community Mode").setRequired(false));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL2, "Private channel for player/role").setRequired(false));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Specify main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE3, "Specify role for Community Mode").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL3, "Specify private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Main player for Community/Fog mode").setRequired(false));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE3, "Role for Community Mode").setRequired(false));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL3, "Private channel for player/role").setRequired(false));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Specify main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE4, "Specify role for Community Mode").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL4, "Specify private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER4, "Main player for Community/Fog mode").setRequired(false));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE4, "Role for Community Mode").setRequired(false));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL4, "Private channel for player/role").setRequired(false));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Specify main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE5, "Specify role for Community Mode").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL5, "Specify private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER5, "Main player for Community/Fog mode").setRequired(false));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE5, "Role for Community Mode").setRequired(false));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL5, "Private channel for player/role").setRequired(false));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Specify main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE6, "Specify role for Community Mode").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL6, "Specify private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER6, "Main player for Community/Fog mode").setRequired(false));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE6, "Role for Community Mode").setRequired(false));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL6, "Private channel for player/role").setRequired(false));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Specify main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE7, "Specify role for Community Mode").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL7, "Specify private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Main player for Community/Fog mode").setRequired(false));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE7, "Role for Community Mode").setRequired(false));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL7, "Private channel for player/role").setRequired(false));
 
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Specify main player for Community/Fog mode").setRequired(false));
-        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE8, "Specify role for Community Mode").setRequired(false));
-        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL8, "Specify private channel for player/role").setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Main player for Community/Fog mode").setRequired(false));
+        addOptions(new OptionData(OptionType.ROLE, Constants.ROLE8, "Role for Community Mode").setRequired(false));
+        addOptions(new OptionData(OptionType.CHANNEL, Constants.CHANNEL8, "Private channel for player/role").setRequired(false));
     }
 
     @Override
