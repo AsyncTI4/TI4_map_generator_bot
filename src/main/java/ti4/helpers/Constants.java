@@ -67,7 +67,7 @@ public class Constants {
     public static final String LIST_PLANETS = "list_planets";
     public static final String LIST_UNITS = "list_units";
     public static final String LIST_GAMES = "list_games";
-    public static final String CREATE_GAME = "create_game";
+    public static final String CREATE_GAME = "create";
     public static final String DELETE_GAME = "delete_game";
     public static final String POSITION = "position";
     public static final String TILE_NAME = "tile_name";

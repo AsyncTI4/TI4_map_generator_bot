@@ -22,7 +22,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.MapGenerator;
-import ti4.commands.map.CreateGame;
+import ti4.commands.game.GameCreate;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -193,8 +193,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         }
 
         //CREATE GAME
-        CreateGame createGame = new CreateGame();
-        Map newMap = createGame.createNewGame(event, gameName, gameOwner);
+        Map newMap = GameCreate.createNewGame(event, gameName, gameOwner);
 
         //ADD PLAYERS
         for (Member member : members) {
