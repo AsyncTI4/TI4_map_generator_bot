@@ -19,10 +19,6 @@ public class NaaluCommander extends SpecialSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-        if (!activeMap.isTestBetaFeaturesMode()) {
-            sendMessage("BETA TEST GAMES ONLY");
-            return;
-        }
 
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
@@ -32,13 +28,8 @@ public class NaaluCommander extends SpecialSubcommandData {
             return;
         }
 
-        if (!player.getFaction().equals("naalu")) { //TODO: switch logic from isNaalu to hasNaaluCommander
-            sendMessage("Only a Naalu player can use this ability");
-            return;
-        }
-
-        if (player.getLeader("commander").isLocked()) {
-            sendMessage("Your commander is locked.");
+        if (!activeMap.playerHasLeaderUnlockedOrAlliance(player, "naalucommander")) { //TODO: switch logic from isNaalu to hasNaaluCommander
+            sendMessage("Only players with access to an unlocked Naalu Commander can use this ability");
             return;
         }
 
