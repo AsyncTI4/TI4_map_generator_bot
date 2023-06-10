@@ -157,6 +157,10 @@ public class SCPlay extends PlayerSubcommandData {
                             // SEARCH FOR EXISTING OPEN THREAD
                             for (ThreadChannel threadChannel_ : threadChannels) {
                                 if (threadChannel_.getName().equals(threadName)) {
+                                    if(scToPlay == 5){
+                                        Button transaction = Button.primary("transaction", "Transaction");
+                                        scButtons.add(transaction);
+                                    }
                                     MessageHelper.sendMessageToChannelWithButtons((MessageChannel) threadChannel_, "These buttons will work inside the thread", scButtons);
                                 }
                             }
@@ -289,8 +293,8 @@ public class SCPlay extends PlayerSubcommandData {
         Button trade_primary = Button.success("trade_primary", "Resolve Primary");
         Button followButton = Button.success("sc_trade_follow", "Spend A Strategy CC");
         Button noFollowButton = Button.primary("sc_no_follow_5", "Not Following");
-        Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash for SC").withEmoji(Emoji.fromFormatted(Emojis.Wash));
-        Button refresh = Button.secondary("sc_refresh", "Replenish Commodities for SC").withEmoji(Emoji.fromFormatted(Emojis.comm));
+        Button refresh_and_wash = Button.secondary("sc_refresh_and_wash", "Replenish and Wash").withEmoji(Emoji.fromFormatted(Emojis.Wash));
+        Button refresh = Button.secondary("sc_refresh", "Replenish Commodities").withEmoji(Emoji.fromFormatted(Emojis.comm));
         return List.of(trade_primary, followButton, noFollowButton, refresh, refresh_and_wash);
     }
 

@@ -41,7 +41,11 @@ public class ButtonHelper {
         List<Button> startButtons = new ArrayList<>();
         Button tacticalAction = Button.success(finChecker+"tacticalAction", "Tactical Action");
         Button componentAction = Button.success(finChecker+"componentAction", "Component Action");
-        startButtons.add(tacticalAction);
+        if(player.getTacticalCC() > 0)
+        {
+            startButtons.add(tacticalAction);
+        }
+        
         startButtons.add(componentAction);
         boolean hadAnyUnplayedSCs = false;
         for(Integer SC : player.getSCs())
@@ -368,10 +372,10 @@ public class ButtonHelper {
         buttons.add(concludeMove);
         return buttons;
     }
-    public static String buildMessageFromDisplacedUnits(Map activeMap, boolean landing) {
+    public static String buildMessageFromDisplacedUnits(Map activeMap, boolean landing, Player player) {
         String message = "";
         HashMap<String, Integer> displacedUnits =  activeMap.getCurrentMovedUnitsFrom1System();
-        
+        String prefix = " > "+Helper.getFactionIconFromDiscord(player.getFaction());
         for(String unit :displacedUnits.keySet())
         {
             int amount = displacedUnits.get(unit);
@@ -382,7 +386,7 @@ public class ButtonHelper {
             }
             if(landing)
             {
-                message = message + "Landed "+amount + " " +Helper.getEmojiFromDiscord(unit.toLowerCase());
+                message = message + prefix+" Landed "+amount + " " +Helper.getEmojiFromDiscord(unit.toLowerCase());
                 if(planet == null){
                     message = message + "\n";
                 }
@@ -391,7 +395,7 @@ public class ButtonHelper {
                 }
             }
             else {
-                message = message + "Moved "+amount + " " +Helper.getEmojiFromDiscord(unit.toLowerCase());
+                message = message + prefix+" Moved "+amount + " " +Helper.getEmojiFromDiscord(unit.toLowerCase());
                 if(planet == null){
                     message = message + "\n";
                 }
@@ -1311,7 +1315,7 @@ public class ButtonHelper {
         String pnName = promissoryNote2.name;
         String[] pn = promissoryNote.split(";");
         String pnOwner = Mapper.getPromissoryNoteOwner(id);
-        if (pn.length > 3 && pn[3].equals("playarea")) {
+        if (promissoryNote2.playArea) {
             player.setPromissoryNotesInPlayArea(id);
         } else {
             player.removePromissoryNote(id);
