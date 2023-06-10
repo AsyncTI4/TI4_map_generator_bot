@@ -332,7 +332,7 @@ public class ButtonListener extends ListenerAdapter {
                 else {
                     continue;
                 }
-                if(player2.hasLeader("naaluhero") &&!player2.getLeaderByID("naaluhero").isLocked())
+                if(player2.hasLeader("naaluhero") && player2.getLeaderByID("naaluhero") != null && !player2.getLeaderByID("naaluhero").isLocked())
                 {
                     MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+"Reminder this is the window to do Naalu Hero");
                 }
@@ -1627,6 +1627,7 @@ public class ButtonListener extends ListenerAdapter {
                 else {
                     
                     planetName = planet.toLowerCase().replace(" ", "");
+                    planetName = planet.replace("'", "");
                     planetName = AliasHandler.resolvePlanet(planetName);
                    
                 }
@@ -1648,7 +1649,7 @@ public class ButtonListener extends ListenerAdapter {
             else {
                 activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitkey, amount);
             }
-            String message = ButtonHelper.buildMessageFromDisplacedUnits(activeMap, false);
+            String message = ButtonHelper.buildMessageFromDisplacedUnits(activeMap, false, player);
             List<Button> systemButtons = ButtonHelper.getButtonsForAllUnitsInSystem(player, activeMap, activeMap.getTileByPosition(pos));
             event.getMessage().editMessage(message).setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
             
@@ -1676,7 +1677,7 @@ public class ButtonListener extends ListenerAdapter {
             else {
                 activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
             }
-            String message = ButtonHelper.buildMessageFromDisplacedUnits(activeMap, true);
+            String message = ButtonHelper.buildMessageFromDisplacedUnits(activeMap, true, player);
             List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
             event.getMessage().editMessage(message).setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
         }
