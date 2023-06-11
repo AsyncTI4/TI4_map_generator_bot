@@ -1023,6 +1023,20 @@ public class ButtonHelper {
 
         return buttons;
     }
+    public static String getListOfStuffAvailableToSpend(Player player, Map activeMap){
+        String youCanSpend = "You have available to you to spend: ";
+        List<String> planets = new ArrayList<>(player.getPlanets());
+        planets.removeAll(player.getExhaustedPlanets());
+        for (String planet : planets) {
+            youCanSpend = youCanSpend + Helper.getPlanetRepresentation(planet, activeMap) +", ";
+        }
+        if(planets.isEmpty()){
+            youCanSpend = "You have available to you 0 unexhausted planets";
+        }
+        youCanSpend = youCanSpend +"and "+ player.getTg() + " tgs";
+
+        return youCanSpend;
+    }
     public static List<Tile> getTilesOfPlayersSpecificUnit(Map activeMap, Player p1, String unit)
     {
 
@@ -1092,9 +1106,10 @@ public class ButtonHelper {
                         }
                         if ("titanshero".equals(playerLeader.getId())) {
                             String titanshero = Mapper.getTokenID("titanshero");
+                            System.out.println(titanshero);
                             Tile t= activeMap.getTile(AliasHandler.resolveTile(p1.getFaction()));
                             if(Helper.getTileFromPlanet("elysium", activeMap) != null && Helper.getTileFromPlanet("elysium", activeMap).getPosition().equalsIgnoreCase(t.getPosition())){
-                                t.addToken(titanshero, "elysium");
+                                t.addToken("attachment_titanshero.png", "elysium");
                                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Attachment added to Elysium and it has been readied");
                                 new PlanetRefresh().doAction(p1, "elysium", activeMap);
                             }
