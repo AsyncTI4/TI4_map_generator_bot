@@ -526,7 +526,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("refreshVotes_")) {
             String votes = buttonID.replace("refreshVotes_", "");
             List<Button> voteActionRow = Helper.getPlanetRefreshButtons(event, player, activeMap);
-            Button concludeRefreshing = Button.danger(finsFactionCheckerPrefix + "delete_buttons_" + votes,
+            Button concludeRefreshing = Button.danger(finsFactionCheckerPrefix + "votes_" + votes,
                     "Done readying planets.");
             voteActionRow.add(concludeRefreshing);
             String voteMessage2 = "Use the buttons to ready planets. When you're done it will prompt the next person to vote.";
@@ -555,7 +555,7 @@ public class ButtonListener extends ListenerAdapter {
                     + Helper.getTechRepresentation(AliasHandler.resolveTech(tech));
 
             String trueIdentity = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true);
-            String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
+            String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
             player.addTech(AliasHandler.resolveTech(tech));
             List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeMap);
             if (player.getTg() > 0) {
@@ -1456,7 +1456,7 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> buttons = new ArrayList<Button>();
             buttons = Helper.getPlaceUnitButtons(event, player, activeMap,
                     activeMap.getTile(AliasHandler.resolveTile(planet)), "freelancers");
-            String message = Helper.getPlayerRepresentation(player, activeMap) + " Use the buttons to produce 1 unit.";
+            String message = Helper.getPlayerRepresentation(player, activeMap) + " Use the buttons to produce 1 unit. " + ButtonHelper.getListOfStuffAvailableToSpend(player, activeMap);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             event.getMessage().delete().queue();
         }else if (buttonID.startsWith("tacticalActionBuild_")) {
@@ -1464,7 +1464,7 @@ public class ButtonListener extends ListenerAdapter {
                 List<Button> buttons = new ArrayList<Button>();
                 buttons = Helper.getPlaceUnitButtons(event, player, activeMap,
                         activeMap.getTileByPosition(pos), "tacticalAction");
-                String message = Helper.getPlayerRepresentation(player, activeMap) + " Use the buttons to produce units.";
+                String message = Helper.getPlayerRepresentation(player, activeMap) + " Use the buttons to produce units. " + ButtonHelper.getListOfStuffAvailableToSpend(player, activeMap);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
                 event.getMessage().delete().queue();
         }else if (buttonID.startsWith("starforgeTile_")) {
@@ -1912,7 +1912,7 @@ public class ButtonListener extends ListenerAdapter {
                     buttons = Helper.getPlaceUnitButtons(event, player, activeMap,
                             activeMap.getTile(AliasHandler.resolveTile(player.getFaction())), "warfare");
                     String message = Helper.getPlayerRepresentation(player, activeMap)
-                            + " Use the buttons to produce. Reminder that when following warfare, you can only use 1 dock in your home system.";
+                            + " Use the buttons to produce. Reminder that when following warfare, you can only use 1 dock in your home system. " + ButtonHelper.getListOfStuffAvailableToSpend(player, activeMap);
                     if (!activeMap.isFoWMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeMap), message,
                                 buttons);
@@ -3121,6 +3121,11 @@ public class ButtonListener extends ListenerAdapter {
         String messageId = mainMessage.getId();
 
         if (!skipReaction) {
+            if (event.getMessageChannel() instanceof ThreadChannel)
+            {
+                activeMap.getActionsChannel().addReactionById(event.getChannel().getId(), emojiToUse).queue();
+            }
+           
             event.getChannel().addReactionById(messageId, emojiToUse).queue();
             checkForAllReactions(event, activeMap);
             if (message == null || message.isEmpty())
