@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.message.MessageHelper;
+import ti4.model.PublicObjectiveModel;
 
 public class ListPublicObjectives extends HelpSubcommandData {
 
@@ -21,10 +22,9 @@ public class ListPublicObjectives extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        HashMap<String, String> poList = Mapper.getPublicObjectivesStage1();
-        poList.putAll(Mapper.getPublicObjectivesStage2());
+        HashMap<String, PublicObjectiveModel> poList = Mapper.getPublicObjectives();
         String message = "**__Public Objective List__**\n" + poList.entrySet().stream()
-            .map(e -> e.getKey() + " = " + Mapper.getPublicObjective(e.getKey()))
+            .map(e -> e.getKey() + " = " + e.getValue().getRepresentation())
             .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
             .sorted()
             .collect(Collectors.joining("\n"));
