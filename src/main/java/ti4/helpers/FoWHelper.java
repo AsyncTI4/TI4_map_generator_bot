@@ -226,53 +226,35 @@ public class FoWHelper {
 	 *  wormholes
 	 */
 	public static Set<String> getAdjacentTiles(Map activeMap, String position, Player player, boolean toShow) {
-		Set<String> adjacentPositions = traverseHyperlaneAdjacencies(activeMap, position, -1, new HashSet<>(), null);
+		Set<String> adjacentPositions = traverseAdjacencies(activeMap, false, position);
 		
 		List<String> adjacentCustomTiles = activeMap.getCustomAdjacentTiles().get(position);
 		
 		List<String> adjacentCustomTiles2 = new ArrayList<String>();
 		if (adjacentCustomTiles != null) {
-
-			
-			if(!toShow)
-			{
-				for(String t : adjacentCustomTiles)
-				{
-					if(activeMap.getCustomAdjacentTiles().get(t) != null && activeMap.getCustomAdjacentTiles().get(t).contains(position))
-					{
+			if (!toShow) {
+				for (String t : adjacentCustomTiles) {
+					if (activeMap.getCustomAdjacentTiles().get(t) != null && activeMap.getCustomAdjacentTiles().get(t).contains(position)) {
 						adjacentCustomTiles2.add(t);
 					}
 				}
 				adjacentPositions.addAll(adjacentCustomTiles2);
-			}
-			else
-			{
-				
+			} else {
 				adjacentPositions.addAll(adjacentCustomTiles);
 			}
-			
-			
-			
 		}
-		if(!toShow)
-			{
-				for(String primaryTile : activeMap.getCustomAdjacentTiles().keySet())
-				{
-					System.out.println("Primary tile" + primaryTile);
-					System.out.println("Position" + position);
-					if(activeMap.getCustomAdjacentTiles().get(primaryTile).contains(position))
-					{
-						if(!adjacentPositions.contains(primaryTile))
-						{
-							adjacentPositions.add(primaryTile);
-						}
+		if (!toShow) {
+			for (String primaryTile : activeMap.getCustomAdjacentTiles().keySet()) {
+				System.out.println("Primary tile" + primaryTile);
+				System.out.println("Position" + position);
+				if (activeMap.getCustomAdjacentTiles().get(primaryTile).contains(position)) {
+					if (!adjacentPositions.contains(primaryTile)) {
+						adjacentPositions.add(primaryTile);
 					}
 				}
-
 			}
+		}
 		
-
-
 		Set<String> wormholeAdjacencies = getWormholeAdjacencies(activeMap, position, player);
 		if (wormholeAdjacencies != null) {
 			adjacentPositions.addAll(wormholeAdjacencies);
@@ -285,8 +267,16 @@ public class FoWHelper {
 	 * <p>
 	 * Does not traverse wormholes
 	 */
-	private static Set<String> traverseHyperlaneAdjacencies(Map activeMap, String position, Integer sourceDirection,
-			Set<String> exploredSet, String prevTile) {
+	public static Set<String> traverseAdjacencies(Map activeMap, boolean naturalMapOnly, String position) {
+		Set<String> adjacentPositions = traverseAdjacencies(activeMap, naturalMapOnly, position, -1, new HashSet<>(), null);
+		return adjacentPositions;
+	}
+
+	/** Return a list of tile positions that are adjacent to a source position either directly or via hyperlanes
+	 * <p>
+	 * Does not traverse wormholes
+	 */
+	private static Set<String> traverseAdjacencies(Map activeMap, boolean naturalMapOnly, String position, Integer sourceDirection, Set<String> exploredSet, String prevTile) {
 		Set<String> tiles = new HashSet<>();
 		if (exploredSet.contains(position + sourceDirection)) {
 			// We already explored this tile from this direction!
@@ -310,7 +300,7 @@ public class FoWHelper {
 		// we are allowed to see this tile
 		tiles.add(position);
 
-		if (hyperlaneData == null && sourceDirection != -1) {
+		if ((hyperlaneData == null || naturalMapOnly) && sourceDirection != -1) {
 			// do not explore non-hyperlanes except for your starting space
 			return tiles;
 		}
@@ -327,6 +317,7 @@ public class FoWHelper {
 
 			String override = activeMap.getAdjacentTileOverride(position, i);
 			if (override != null) {
+				if (naturalMapOnly) continue;
 				position_ = override;
 			}
 
@@ -336,8 +327,7 @@ public class FoWHelper {
 			}
 
 			// explore that tile now!
-			Set<String> newTiles = traverseHyperlaneAdjacencies(activeMap, position_, (i + 3) % 6, exploredSet,
-					position + sourceDirection);
+			Set<String> newTiles = traverseAdjacencies(activeMap, naturalMapOnly, position_, (i + 3) % 6, exploredSet, position + sourceDirection);
 			tiles.addAll(newTiles);
 		}
 		return tiles;

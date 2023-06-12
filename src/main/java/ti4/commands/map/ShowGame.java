@@ -73,6 +73,8 @@ public class ShowGame implements Command {
                 MessageHelper.sendFileToChannel(event.getChannel(), stats_file);
 
                 displayType = DisplayType.stats;
+            } else if (temp.equals(DisplayType.system.getValue())) {
+                displayType = DisplayType.system;
             }
         }
         File file = GenerateMap.getInstance().saveImage(activeMap, displayType, event);
