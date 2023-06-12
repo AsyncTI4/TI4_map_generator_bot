@@ -67,6 +67,9 @@ public class ButtonHelper {
         {
             Button pass = Button.danger("turnEnd", "End Turn");
             startButtons.add(pass);
+        }else if(player.getTechs().contains("cm")) {
+            Button chaos = Button.secondary("startChaosMapping", "Use Chaos Mapping").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("saar")));
+            startButtons.add(chaos);
         }
 
         Button transaction = Button.primary("transaction", "Transaction");
@@ -841,6 +844,21 @@ public class ButtonHelper {
     
     }
 
+    public static List<Button> getButtonsToTakeSomeonesAC(Map activeMap, Player thief, Player victim)
+    {
+        List<Button> takeACs = new ArrayList<>();
+        String secretScoreMsg = "_ _\nClick a button to take an Action Card";
+        List<Button> acButtons = ACInfo.getToBeStolenActionCardButtons(activeMap, victim);
+        if (acButtons != null && !acButtons.isEmpty()) {
+            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
+            ThreadChannel cardsInfoThreadChannel = thief.getCardsInfoThread(activeMap);
+            for (MessageCreateData message : messageList) {
+                cardsInfoThreadChannel.sendMessage(message).queue();
+            }
+        }
+        return takeACs;
+    }
+
     public static List<Button> getAllPossibleCompButtons(Map activeMap, Player p1, ButtonInteractionEvent event) {
         String finChecker = "FFCC_"+p1.getFaction() + "_";
         String prefix = "componentActionRes_";
@@ -848,6 +866,9 @@ public class ButtonHelper {
         //techs
         for(String tech : p1.getTechs())
         {
+            if(!p1.getExhaustedTechs().isEmpty() && p1.getExhaustedTechs().contains(tech)){
+                continue;
+            }
             String techRep = Mapper.getTechRepresentations().get(tech);
 
             //Columns: key = Proper Name | type | prerequisites | faction | text
@@ -1031,7 +1052,7 @@ public class ButtonHelper {
             youCanSpend = youCanSpend + Helper.getPlanetRepresentation(planet, activeMap) +", ";
         }
         if(planets.isEmpty()){
-            youCanSpend = "You have available to you 0 unexhausted planets";
+            youCanSpend = "You have available to you 0 unexhausted planets ";
         }
         youCanSpend = youCanSpend +"and "+ player.getTg() + " tgs";
 
@@ -1063,7 +1084,18 @@ public class ButtonHelper {
         return tiles;
         
     }
-    
+    public static void firstStepOfChaos(Map activeMap, Player p1, ButtonInteractionEvent event){
+        List<Button> buttons = new ArrayList<Button>();
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, p1, "spacedock");
+        if(tiles.isEmpty()){
+            tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, p1, "cabalspacedock");
+        }
+        for(Tile tile : tiles){
+            Button tileButton = Button.success("produceOneUnitInTile_"+tile.getPosition()+"_chaosM", tile.getRepresentationForButtons(activeMap,p1));
+            buttons.add(tileButton);
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select which tile you would like to chaos map in.", buttons);
+    }
 
     public static void resolvePressedCompButton(Map activeMap, Player p1, ButtonInteractionEvent event, String buttonID) {
         String prefix = "componentActionRes_";
@@ -1076,7 +1108,24 @@ public class ButtonHelper {
         switch(firstPart) {
             case "tech" -> {
                 p1.exhaustTech(buttonID);
+                
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), (Helper.getPlayerRepresentation(p1, activeMap) + " exhausted tech: " + Helper.getTechRepresentation(buttonID)));
+                if(buttonID.equalsIgnoreCase("mi")){
+                    List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, "getACFrom",null);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select who you would like to mageon.", buttons);
+                }
+                if(buttonID.equalsIgnoreCase("sr")){
+                    List<Button> buttons = new ArrayList<Button>();
+                    List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, p1, "spacedock");
+                    if(tiles.isEmpty()){
+                        tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, p1, "cabalspacedock");
+                    }
+                    for(Tile tile : tiles){
+                        Button tileButton = Button.success("produceOneUnitInTile_"+tile.getPosition()+"_sling", tile.getRepresentationForButtons(activeMap,p1));
+                        buttons.add(tileButton);
+                    }
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select which tile you would like to sling in.", buttons);
+                }
             }
             case "leader" -> {
                 Leader playerLeader = p1.getLeader(buttonID);
@@ -1181,7 +1230,7 @@ public class ButtonHelper {
                 } else if(buttonID.equalsIgnoreCase("orbitalDrop")){
                     String successMessage = "Reduced strategy pool CCs by 1 ("+(p1.getStrategicCC())+"->"+(p1.getStrategicCC()-1)  +")";
                     p1.setStrategicCC(p1.getStrategicCC()-1);
-                    MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     String message = "Select the planet you would like to place 2 infantry on.";
                     List<Button> buttons = Helper.getPlanetPlaceUnitButtons(event, p1, activeMap, "2gf");
                     buttons.add(Button.danger("orbitolDropFollowUp", "Done Dropping Infantry"));
@@ -1210,7 +1259,7 @@ public class ButtonHelper {
                     purgeFragButtons.add(transact2);
                     Button transact3 = Button.danger(finChecker+"finishComponentAction", "Done Resolving Fabrication");
                     purgeFragButtons.add(transact3);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),message, purgeFragButtons);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),message, purgeFragButtons);
 
                 }else if(buttonID.equalsIgnoreCase("stallTactics")){
                     String secretScoreMsg = "_ _\nClick a button below to discard an Action Card";
