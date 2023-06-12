@@ -2,6 +2,7 @@ package ti4.model;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 
 public class PublicObjectiveModel extends Model {
@@ -31,5 +32,10 @@ public class PublicObjectiveModel extends Model {
             && phase != null
             && text != null
             && source != null;
+    }
+
+    public String getRepresentation() {
+        String emoji = Helper.getEmojiFromDiscord("Public" + points + "alt");
+        return emoji + "**__" + name + "__**: " + text + " (" + points + " VP)";
     }
 }
