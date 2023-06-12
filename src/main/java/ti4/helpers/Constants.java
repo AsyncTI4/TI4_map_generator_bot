@@ -76,7 +76,8 @@ public class Constants {
     public static final String TILE_NAME_4 = "tile_name_4";
     public static final String TILE_NAME_5 = "tile_name_5";
     public static final String TILE_NAME_TO = "tile_name_to";
-
+    public static final String EXTRA_RINGS = "extra_rings";
+    
     public static final String HELP = "help";
     public static final String HELP_DOCUMENTATION = "documentation";
     public static final String SETUP_TEMPLATES = "setup_templates";

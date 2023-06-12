@@ -144,8 +144,8 @@ public class GenerateMap {
     }
 
     public File saveImage(Map activeMap, @Nullable DisplayType displayType, @Nullable GenericInteractionCreateEvent event) {
+        // long startup = System.currentTimeMillis();
         activeMap.incrementMapImageGenerationCount();
-        long startup = System.currentTimeMillis();
         init(activeMap);
         if (activeMap.getDisplayTypeForced() != null) {
             displayType = activeMap.getDisplayTypeForced();
@@ -281,12 +281,13 @@ public class GenerateMap {
         }
         File jpgFile = new File(absolutePath);
         MapFileDeleter.addFileToDelete(jpgFile);
-        long time = System.currentTimeMillis() - startup;
+        // long time = System.currentTimeMillis() - startup;
         // BotLogger.log("Image for game: " + map.getName() + " Generation took: " + time + " ms");
         return jpgFile;
     }
 
     private Player getFowPlayer(Map activeMap, @Nullable GenericInteractionCreateEvent event) {
+        if (event == null) return null;
         String user = event.getUser().getId();
         return activeMap.getPlayer(user);
     }
@@ -294,8 +295,8 @@ public class GenerateMap {
     @NotNull
     public static String getTimeStamp() {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("yyyy.MM.dd - HH.mm.ss");
-        return ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
-
+        String output = ZonedDateTime.now(ZoneOffset.UTC).format(fmt);
+        return output == null ? "" : output;
     }
 
     @Nullable
@@ -1453,17 +1454,6 @@ public class GenerateMap {
         return deltaX;
     }
 
-    private void drawGeneralImage(int x, int y, String resourceName) {
-        try {
-            String resourcePath = ResourceHelper.getInstance().getGeneralFile(resourceName);
-            @SuppressWarnings("ConstantConditions")
-            BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
-            graphics.drawImage(resourceBufferedImage, x, y, null);
-        } catch (Exception e) {
-            BotLogger.log("Could not display General image: " + resourceName, e);
-        }
-    }
-
     private void drawFactionIconImage(int x, int y, String resourceName, float scale, float opacity) {
         try {
             String resourcePath = ResourceHelper.getInstance().getFactionFile(resourceName);
@@ -1699,7 +1689,7 @@ public class GenerateMap {
             int deltaSplitX = 0;
             int deltaSplitY = 0;
             boolean specialCase = false;
-            if (playerCount == 6 && ringCount == 3){
+            if (playerCount == 6 && ringCount == 3) {
                 String tileID = Constants.setup6p.get(index);
                 Point tilePosition = PositionMapper.getTilePosition(tileID);
                 if (tilePosition != null) {
@@ -1727,7 +1717,7 @@ public class GenerateMap {
                     }
                     index++;
                 }
-            }else if (playerCount == 8 && ringCount == 4){
+            } else if (playerCount == 8 && ringCount == 4) {
                 String tileID = Constants.setup8p.get(index);
                 Point tilePosition = PositionMapper.getTilePosition(tileID);
                 if (tilePosition != null) {
@@ -2482,14 +2472,10 @@ public class GenerateMap {
     }
 
     private void addTile(Tile tile, Map activeMap, TileStep step, boolean setupCheck) {
-        if (tile == null && tile.getTileID() == null){
+        if (tile == null || tile.getTileID() == null){
             return;
         }
         try {
-            BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
-            BufferedImage fogOfWar = ImageIO.read(new File(tile.getFowTilePath(fowPlayer)));
-            boolean tileIsFoggy = isFoWPrivate != null && isFoWPrivate && tile.hasFog(fowPlayer);
-
             String position = tile.getPosition();
             Point positionPoint = PositionMapper.getTilePosition(position);
             if (positionPoint == null) {
@@ -2499,123 +2485,129 @@ public class GenerateMap {
             int x = positionPoint.x;
             int y = positionPoint.y;
             if (!setupCheck) {
-                if ((!position.equalsIgnoreCase("tl") &&
-                        !position.equalsIgnoreCase("tr") &&
-                        !position.equalsIgnoreCase("bl") &&
-                        !position.equalsIgnoreCase("br"))) {
+                if (!position.equalsIgnoreCase("tl") &&
+                    !position.equalsIgnoreCase("tr") &&
+                    !position.equalsIgnoreCase("bl") &&
+                    !position.equalsIgnoreCase("br")) 
+                {
                     minX = Math.min(minX, x);
                     minY = Math.min(minY, y);
                     maxX = Math.max(maxX, x);
                     maxY = Math.max(maxY, y);
                 }
-            } else {
-                if (x < minX || x > maxX || y < minY || y > maxY) {
-                    return;
-                }
+            } else if (x < minX || x > maxX || y < minY || y > maxY) {
+                return;
             }
 
             positionPoint = getTilePosition(activeMap, position, x, y);
-
-
             int tileX = positionPoint.x + extraX;
             int tileY = positionPoint.y + extraY;
 
-            switch (step) {
-                case Setup -> {
-                } //do nothing
-                case Tile -> {
-                    graphics.drawImage(image, tileX, tileY, null);
-
-                    //ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
-                    List<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
-                    for (UnitHolder unitHolder : unitHolders) {
-                        boolean drawAnomaly = false;
-                        Set<String> tokenList = unitHolder.getTokenList();
-                        if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png", "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
-                            drawAnomaly = true;
-                        }
-                        Set<String> unitList = unitHolder.getUnits().keySet();
-                        for (String unit : unitList) {
-                            if (unit.contains("csd.png")) drawAnomaly = true;
-                        }
-                        if (drawAnomaly) {
-                            BufferedImage anomalyImage = ImageIO.read(new File(ResourceHelper.getInstance().getTileFile("tile_anomaly.png")));
-                            graphics.drawImage(anomalyImage, tileX, tileY, null);
-                        }
-                    }
-
-                    //DRAW COORDINATE
-                    graphics.setFont(Storage.getFont20());
-                    graphics.setColor(Color.WHITE);
-                    if (tileIsFoggy) {
-                        graphics.drawImage(fogOfWar, tileX, tileY, null);
-                        graphics.drawString(tile.getFogLabel(fowPlayer), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
-                    }
-                    int textOffset = 0;
-                    if (activeMap.getLargeText().equals("large")) {
-                        graphics.setFont(Storage.getFont50());
-                        textOffset = 160;
-                    } else if (activeMap.getLargeText().equals("medium")) {
-                        graphics.setFont(Storage.getFont35());
-                        textOffset = 40;
-                    } else {
-                        graphics.setFont(Storage.getFont20());
-                        textOffset = 20;
-                    }
-                    graphics.setColor(Color.WHITE);
-                    if (tileIsFoggy) {
-                        graphics.drawImage(fogOfWar, tileX, tileY, null);
-                        graphics.drawString(tile.getFogLabel(fowPlayer), tileX + labelPositionPoint.x, tileY + labelPositionPoint.y);
-                    }
-                    graphics.drawString(position, tileX + tilePositionPoint.x - textOffset, tileY + tilePositionPoint.y);
-                }
-                case Extras -> {
-                    if (tileIsFoggy) return;
-                    String primaryTile = position;
-                    List<String> adj = activeMap.getAdjacentTileOverrides(primaryTile);
-                    int direction = 0;
-                    for (String secondaryTile : adj) {
-                        if (secondaryTile != null) {
-                            image = addAdjacencyArrow(tile, direction, secondaryTile, image, tileX, tileY, activeMap);
-                        }
-                        direction++;
-                    }
-                }
-                case Units -> {
-                    if (tileIsFoggy) return;
-                    ArrayList<Rectangle> rectangles = new ArrayList<>();
-
-                    Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
-                    UnitHolder spaceUnitHolder = unitHolders.stream().filter(unitHolder -> unitHolder.getName().equals(Constants.SPACE)).findFirst().orElse(null);
-                    if (spaceUnitHolder != null) {
-                        image = addSleeperToken(tile, image, tileX, tileY, spaceUnitHolder, GenerateMap::isValidCustodianToken);
-                        image = addToken(tile, image, tileX, tileY, spaceUnitHolder);
-                        unitHolders.remove(spaceUnitHolder);
-                        unitHolders.add(spaceUnitHolder);
-                    }
-                    for (UnitHolder unitHolder : unitHolders) {
-                        image = addSleeperToken(tile, image, tileX, tileY, unitHolder, GenerateMap::isValidToken);
-                        image = addControl(tile, image, tileX, tileY, unitHolder, rectangles, activeMap);
-                    }
-                    if (spaceUnitHolder != null) {
-                        image = addCC(tile, image, tileX, tileY, spaceUnitHolder, activeMap);
-                    }
-                    int degree = 180;
-                    int degreeChange = 5;
-                    for (UnitHolder unitHolder : unitHolders) {
-                        int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
-                        if (unitHolder != spaceUnitHolder) {
-                            image = addPlanetToken(tile, image, tileX, tileY, unitHolder, rectangles);
-                        }
-                        image = addUnits(tile, image, tileX, tileY, rectangles, degree, degreeChange, unitHolder, radius, activeMap);
-                    }
-                }
-            }
+            BufferedImage tileImage = partialTileImage(tile, activeMap, step, fowPlayer, isFoWPrivate);
+            graphics.drawImage(tileImage, tileX, tileY, null);
         } catch (IOException e) {
             BotLogger.log("Error drawing tile: " + tile.getTileID(), e);
         } catch (Exception exception) {
             BotLogger.log("Tile Error, when building map: " + tile.getTileID(), exception);
         }
+    }
+
+
+    public static BufferedImage partialTileImage(Tile tile, Map activeMap, TileStep step, Player frogPlayer, Boolean isFrogPrivate) throws IOException {
+        BufferedImage tileOutput = new BufferedImage(345, 300, BufferedImage.TYPE_INT_ARGB);
+
+        BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
+        BufferedImage fogOfWar = ImageIO.read(new File(tile.getFowTilePath(frogPlayer)));
+        boolean tileIsFoggy = isFrogPrivate != null && isFrogPrivate && tile.hasFog(frogPlayer);
+        String position = tile.getPosition();
+
+        Graphics tileGraphics = tileOutput.createGraphics();
+        switch (step) {
+            case Setup -> {} //do nothing
+            case Tile -> {
+                tileGraphics.drawImage(image, 0, 0, null);
+
+                //ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
+                List<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
+                for (UnitHolder unitHolder : unitHolders) {
+                    boolean drawAnomaly = false;
+                    Set<String> tokenList = unitHolder.getTokenList();
+                    if (CollectionUtils.containsAny(tokenList, "token_gravityrift.png", "token_ds_wound.png", "token_ds_sigil.png", "token_anomalydummy.png")) {
+                        drawAnomaly = true;
+                    }
+                    Set<String> unitList = unitHolder.getUnits().keySet();
+                    for (String unit : unitList) {
+                        if (unit.contains("csd.png")) drawAnomaly = true;
+                    }
+                    if (drawAnomaly) {
+                        BufferedImage anomalyImage = ImageIO.read(new File(ResourceHelper.getInstance().getTileFile("tile_anomaly.png")));
+                        tileGraphics.drawImage(anomalyImage, 0, 0, null);
+                    }
+                }
+
+                int textOffset = 0;
+                if (activeMap.getLargeText().equals("large")) {
+                    tileGraphics.setFont(Storage.getFont50());
+                    textOffset = 160;
+                } else if (activeMap.getLargeText().equals("medium")) {
+                    tileGraphics.setFont(Storage.getFont35());
+                    textOffset = 40;
+                } else {
+                    tileGraphics.setFont(Storage.getFont20());
+                    textOffset = 20;
+                }
+                tileGraphics.setColor(Color.WHITE);
+                if (tileIsFoggy) {
+                    tileGraphics.drawImage(fogOfWar, 0, 0, null);
+                    tileGraphics.drawString(tile.getFogLabel(frogPlayer), labelPositionPoint.x, labelPositionPoint.y);
+                }
+                tileGraphics.drawString(position, tilePositionPoint.x - textOffset, tilePositionPoint.y);
+            }
+            case Extras -> {
+                if (tileIsFoggy) return tileOutput;
+                
+                String primaryTile = position;
+                List<String> adj = activeMap.getAdjacentTileOverrides(primaryTile);
+                int direction = 0;
+                for (String secondaryTile : adj) {
+                    if (secondaryTile != null) {
+                        addAdjacencyArrow(tile, direction, secondaryTile, tileGraphics, activeMap);
+                    }
+                    direction++;
+                }
+            }
+            case Units -> {
+                if (tileIsFoggy) return tileOutput;
+
+                ArrayList<Rectangle> rectangles = new ArrayList<>();
+                Collection<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
+                UnitHolder spaceUnitHolder = unitHolders.stream().filter(unitHolder -> unitHolder.getName().equals(Constants.SPACE)).findFirst().orElse(null);
+
+                if (spaceUnitHolder != null) {
+                    addSleeperToken(tile, tileGraphics, spaceUnitHolder, GenerateMap::isValidCustodianToken);
+                    addToken(tile, tileGraphics, spaceUnitHolder);
+                    unitHolders.remove(spaceUnitHolder);
+                    unitHolders.add(spaceUnitHolder);
+                }
+                for (UnitHolder unitHolder : unitHolders) {
+                    addSleeperToken(tile, tileGraphics, unitHolder, GenerateMap::isValidToken);
+                    addControl(tile, tileGraphics, unitHolder, rectangles, activeMap, frogPlayer, isFrogPrivate);
+                }
+                if (spaceUnitHolder != null) {
+                    addCC(tile, tileGraphics, spaceUnitHolder, activeMap, frogPlayer, isFrogPrivate);
+                }
+                int degree = 180;
+                int degreeChange = 5;
+                for (UnitHolder unitHolder : unitHolders) {
+                    int radius = unitHolder.getName().equals(Constants.SPACE) ? Constants.SPACE_RADIUS : Constants.RADIUS;
+                    if (unitHolder != spaceUnitHolder) {
+                        addPlanetToken(tile, tileGraphics, unitHolder, rectangles);
+                    }
+                    addUnits(tile, tileGraphics, rectangles, degree, degreeChange, unitHolder, radius, activeMap, frogPlayer);
+                }
+            }
+        }
+        return tileOutput;
     }
 
     private static Point getTilePosition(Map activeMap, String position, int x, int y) {
@@ -2651,7 +2643,7 @@ public class GenerateMap {
         return outputImage;
     }
 
-    private BufferedImage addAdjacencyArrow(Tile tile, int direction, String secondaryTile, BufferedImage image, int tileX, int tileY, Map activeMap) {
+    private static void addAdjacencyArrow(Tile tile, int direction, String secondaryTile, Graphics tileGraphics, Map activeMap) {
         int deltaX = 0;
         int deltaY = 0;
         int textOffsetX = 12;
@@ -2713,14 +2705,12 @@ public class GenerateMap {
             AffineTransform tx = AffineTransform.getRotateInstance(rotation, rotateX, rotateY);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
-            graphics.drawImage(op.filter(arrowImage, null), tileX + deltaX, tileY + deltaY, null);
-        } catch (Exception e) {
-        }
-
-        return image;
+            tileGraphics.drawImage(op.filter(arrowImage, null), deltaX, deltaY, null);
+        } catch (Exception e) {}
     }
 
-    private BufferedImage addCC(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, Map activeMap) {
+    private static void addCC(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Map activeMap, Player frogPlayer, Boolean isFrogPrivate) {
+        BufferedImage image = null;
         HashSet<String> ccList = unitHolder.getCCList();
         int deltaX = 0;
         int deltaY = 0;
@@ -2730,7 +2720,6 @@ public class GenerateMap {
                 continue;
             }
             try {
-
                 image = ImageIO.read(new File(ccPath));
 
                 Point centerPosition = unitHolder.getHolderCenterPosition();
@@ -2739,8 +2728,8 @@ public class GenerateMap {
                 Player player = getPlayerByControlMarker(activeMap.getPlayers().values(), ccID);
                 BufferedImage factionImage = null;
                 if (faction != null) {
-                    boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(activeMap, player, fowPlayer);
-                    if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
+                    boolean convertToGeneric = isFrogPrivate != null && isFrogPrivate && !FoWHelper.canSeeStatsOfPlayer(activeMap, player, frogPlayer);
+                    if (!convertToGeneric || frogPlayer != null && frogPlayer.getFaction().equals(faction)) {
                         String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
                         if (factionImagePath != null) {
                             factionImage = ImageIO.read(new File(factionImagePath));
@@ -2751,28 +2740,28 @@ public class GenerateMap {
                 boolean generateImage = true;
                 if (ccID.startsWith("sweep")) {
                     factionImage = null;
-                    if (player != fowPlayer) {
+                    if (player != frogPlayer) {
                         generateImage = false;
                     }
                 }
 
                 if (generateImage) {
-                    graphics.drawImage(image, tileX + 10 + deltaX, tileY + centerPosition.y - 40 + deltaY, null);
+                    tileGraphics.drawImage(image, 10 + deltaX, centerPosition.y - 40 + deltaY, null);
                     if (factionImage != null) {
-                        graphics.drawImage(factionImage, tileX + 10 + deltaX + DELTA_X, tileY + centerPosition.y - 40 + deltaY + DELTA_Y, null);
+                        tileGraphics.drawImage(factionImage, 10 + deltaX + DELTA_X, centerPosition.y - 40 + deltaY + DELTA_Y, null);
                     }
                 }
-            } catch (Exception e) {
+            } catch (Exception e) {}
+
+            if (image != null) {
+                deltaX += image.getWidth() / 5;
+                deltaY += image.getHeight() / 4;
             }
-
-
-            deltaX += image.getWidth() / 5;
-            deltaY += image.getHeight() / 4;
         }
-        return image;
     }
 
-    private BufferedImage addControl(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, ArrayList<Rectangle> rectangles, Map activeMap) {
+    private static void addControl(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, ArrayList<Rectangle> rectangles, Map activeMap, Player frogPlayer, Boolean isFrogPrivate) {
+        BufferedImage controlToken = null;
         ArrayList<String> controlList = new ArrayList<>(unitHolder.getControlList());
         UnitTokenPosition unitTokenPosition = PositionMapper.getPlanetTokenPosition(unitHolder.getName());
         BufferedImage factionImage = null;
@@ -2794,46 +2783,53 @@ public class GenerateMap {
                 try {
                     factionImage = null;
                     if (faction != null) {
-                        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(activeMap, player, fowPlayer);
-                        if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
+                        boolean convertToGeneric = isFrogPrivate != null && isFrogPrivate && !FoWHelper.canSeeStatsOfPlayer(activeMap, player, frogPlayer);
+                        if (!convertToGeneric || frogPlayer != null && frogPlayer.getFaction().equals(faction)) {
                             String factionImagePath = tile.getCCPath("control_faction_" + faction + ".png");
                             if (factionImagePath != null) {
                                 factionImage = ImageIO.read(new File(factionImagePath));
                             }
                         }
                     }
-                    image = ImageIO.read(new File(controlPath));
+                    controlToken = ImageIO.read(new File(controlPath));
                 } catch (Exception e) {
                     BotLogger.log("Could not parse control token file for: " + controlID, e);
+                    return;
                 }
+
                 boolean isMirage = unitHolder.getName().equals(Constants.MIRAGE);
-                if (isMirage) {
-                    tileX += Constants.MIRAGE_POSITION.x;
-                    tileY += Constants.MIRAGE_POSITION.y;
-                }
                 Point position = unitTokenPosition.getPosition(controlID);
+                if (isMirage) {
+                    if (position == null) {
+                        position = new Point(Constants.MIRAGE_POSITION.x, Constants.MIRAGE_POSITION.y);
+                    } else {
+                        position.x += Constants.MIRAGE_POSITION.x;
+                        position.y += Constants.MIRAGE_POSITION.y;
+                    }
+                }
+
                 if (position != null) {
-                    graphics.drawImage(image, tileX + position.x, tileY + position.y, null);
+                    tileGraphics.drawImage(controlToken, position.x, position.y, null);
                     if (factionImage != null) {
-                        graphics.drawImage(factionImage, tileX + position.x, tileY + position.y, null);
+                        tileGraphics.drawImage(factionImage, position.x, position.y, null);
                     }
-                    rectangles.add(new Rectangle(tileX + position.x, tileY + position.y, image.getWidth(), image.getHeight()));
+                    rectangles.add(new Rectangle(position.x, position.y, controlToken.getWidth(), controlToken.getHeight()));
                 } else {
-                    graphics.drawImage(image, tileX + centerPosition.x + xDelta, tileY + centerPosition.y, null);
+                    tileGraphics.drawImage(controlToken, centerPosition.x + xDelta, centerPosition.y, null);
                     if (factionImage != null) {
-                        graphics.drawImage(factionImage, tileX + centerPosition.x + xDelta, tileY + centerPosition.y, null);
+                        tileGraphics.drawImage(factionImage, centerPosition.x + xDelta, centerPosition.y, null);
                     }
-                    rectangles.add(new Rectangle(tileX + centerPosition.x + xDelta, tileY + centerPosition.y, image.getWidth(), image.getHeight()));
+                    rectangles.add(new Rectangle(centerPosition.x + xDelta, centerPosition.y, controlToken.getWidth(), controlToken.getHeight()));
                     xDelta += 10;
                 }
             }
-            return image;
         } else {
-            return oldFormatPlanetTokenAdd(tile, image, tileX, tileY, unitHolder, controlList);
+            oldFormatPlanetTokenAdd(tile, tileGraphics, unitHolder, controlList);
         }
     }
 
-    private BufferedImage addSleeperToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, Function<String, Boolean> isValid) {
+    private static void addSleeperToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Function<String, Boolean> isValid) {
+        BufferedImage tokenImage = null;
         Point centerPosition = unitHolder.getHolderCenterPosition();
         ArrayList<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.remove(null);
@@ -2860,20 +2856,19 @@ public class GenerateMap {
                     scale = 0.8f;
                 }
                 try {
-                    image = resizeImage(ImageIO.read(new File(tokenPath)), scale);
+                    tokenImage = resizeImage(ImageIO.read(new File(tokenPath)), scale);
+                    Point position = new Point(centerPosition.x - (tokenImage.getWidth() / 2), centerPosition.y - (tokenImage.getHeight() / 2));
+                    if (tokenID.contains(Constants.CUSTODIAN_TOKEN)) {
+                        position = new Point(70, 45);
+                    } else if (tokenID.contains(Constants.SLEEPER) && containsDMZ) {
+                        position = new Point(position.x + 10, position.y + 10);
+                    }
+                    tileGraphics.drawImage(tokenImage, position.x, position.y - 10, null);
                 } catch (Exception e) {
                     BotLogger.log("Could not parse sleeper token file for: " + tokenID, e);
                 }
-                Point position = new Point(centerPosition.x - (image.getWidth() / 2), centerPosition.y - (image.getHeight() / 2));
-                if (tokenID.contains(Constants.CUSTODIAN_TOKEN)) {
-                    position = new Point(70, 45);
-                } else if (tokenID.contains(Constants.SLEEPER) && containsDMZ) {
-                    position = new Point(position.x + 10, position.y + 10);
-                }
-                graphics.drawImage(image, tileX + position.x, tileY + position.y - 10, null);
             }
         }
-        return image;
     }
 
     private static boolean isValidToken(String tokenID) {
@@ -2889,7 +2884,7 @@ public class GenerateMap {
         return tokenID.contains(Constants.CUSTODIAN_TOKEN);
     }
 
-    private BufferedImage addPlanetToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, ArrayList<Rectangle> rectangles) {
+    private static void addPlanetToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, ArrayList<Rectangle> rectangles) {
         ArrayList<String> tokenList = new ArrayList<>(unitHolder.getTokenList());
         tokenList.sort((o1, o2) -> {
             if ((o1.contains("nanoforge") || o1.contains("titanspn"))) {
@@ -2914,43 +2909,43 @@ public class GenerateMap {
                     BotLogger.log("Could not parse token file for: " + tokenID + " on tile: " + tile.getRepresentationForAutoComplete());
                     continue;
                 }
-                float scale = 1.00f;
+
                 try {
-                    image = resizeImage(ImageIO.read(new File(tokenPath)), scale);
+                    BufferedImage image = resizeImage(ImageIO.read(new File(tokenPath)), 1.0f);
+                    if (tokenPath.contains(Constants.DMZ_LARGE) ||
+                        tokenPath.contains(Constants.WORLD_DESTROYED) ||
+                        tokenPath.contains(Constants.CONSULATE_TOKEN) ||
+                        tokenPath.contains(Constants.GLEDGE_CORE))
+                    {
+                        tileGraphics.drawImage(image, centerPosition.x - (image.getWidth() / 2), centerPosition.y - (image.getHeight() / 2), null);
+                    } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
+                        tileGraphics.drawImage(image, 70, 45, null);
+                    } else {
+                        Point position = unitTokenPosition.getPosition(tokenID);
+                        if (position != null) {
+                            tileGraphics.drawImage(image, position.x, position.y, null);
+                            rectangles.add(new Rectangle(position.x, position.y, image.getWidth(), image.getHeight()));
+                        } else {
+                            tileGraphics.drawImage(image, centerPosition.x + xDelta, centerPosition.y, null);
+                            rectangles.add(new Rectangle(centerPosition.x + xDelta, centerPosition.y, image.getWidth(), image.getHeight()));
+                            xDelta += 10;
+                        }
+                    }
                 } catch (Exception e) {
                     BotLogger.log("Could not parse control token file for: " + tokenID, e);
                 }
-                if (tokenPath.contains(Constants.DMZ_LARGE) ||
-                        tokenPath.contains(Constants.WORLD_DESTROYED) ||
-                        tokenPath.contains(Constants.CONSULATE_TOKEN) ||
-                        tokenPath.contains(Constants.GLEDGE_CORE)) {
-                    graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - (image.getHeight() / 2), null);
-                } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
-                    graphics.drawImage(image, tileX + 70, tileY + 45, null);
-                } else {
-                    Point position = unitTokenPosition.getPosition(tokenID);
-                    if (position != null) {
-                        graphics.drawImage(image, tileX + position.x, tileY + position.y, null);
-                        rectangles.add(new Rectangle(tileX + position.x, tileY + position.y, image.getWidth(), image.getHeight()));
-                    } else {
-                        graphics.drawImage(image, tileX + centerPosition.x + xDelta, tileY + centerPosition.y, null);
-                        rectangles.add(new Rectangle(tileX + centerPosition.x + xDelta, tileY + centerPosition.y, image.getWidth(), image.getHeight()));
-                        xDelta += 10;
-                    }
-                }
             }
-            return image;
         } else {
-            return oldFormatPlanetTokenAdd(tile, image, tileX, tileY, unitHolder, tokenList);
+            oldFormatPlanetTokenAdd(tile, tileGraphics, unitHolder, tokenList);
         }
     }
 
-    private BufferedImage oldFormatPlanetTokenAdd(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder, ArrayList<String> tokenList) {
+    private static void oldFormatPlanetTokenAdd(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, ArrayList<String> tokenList) {
         int deltaY = 0;
         int offSet = 0;
         Point centerPosition = unitHolder.getHolderCenterPosition();
-        int x = tileX + centerPosition.x;
-        int y = tileY + centerPosition.y - (tokenList.size() > 1 ? 35 : 0);
+        int x = centerPosition.x;
+        int y = centerPosition.y - (tokenList.size() > 1 ? 35 : 0);
         for (String tokenID : tokenList) {
             String tokenPath = tile.getTokenPath(tokenID);
             if (tokenPath == null) {
@@ -2958,27 +2953,26 @@ public class GenerateMap {
                 continue;
             }
             try {
-                image = resizeImage(ImageIO.read(new File(tokenPath)), 0.85f);
+                BufferedImage image = resizeImage(ImageIO.read(new File(tokenPath)), 0.85f);
+                tileGraphics.drawImage(image, x - (image.getWidth() / 2), y + offSet + deltaY - (image.getHeight() / 2), null);
+                y += image.getHeight();
             } catch (Exception e) {
                 BotLogger.log("Could not parse control token file for: " + tokenID, e);
             }
-            graphics.drawImage(image, x - (image.getWidth() / 2), y + offSet + deltaY - (image.getHeight() / 2), null);
-            y += image.getHeight();
         }
-        return image;
     }
 
-    private BufferedImage addToken(Tile tile, BufferedImage image, int tileX, int tileY, UnitHolder unitHolder) {
+    private static void addToken(Tile tile, Graphics tileGraphics, UnitHolder unitHolder) {
         HashSet<String> tokenList = unitHolder.getTokenList();
         Point centerPosition = unitHolder.getHolderCenterPosition();
-        int x = tileX;
-        int y = tileY;
+        int x = 0;
+        int y = 0;
         int deltaX = 80;
         int deltaY = 0;
         ArrayList<Point> spaceTokenPositions = PositionMapper.getSpaceTokenPositions(tile.getTileID());
         if (spaceTokenPositions.isEmpty()) {
-            x = tileX + centerPosition.x;
-            y = tileY + centerPosition.y;
+            x = centerPosition.x;
+            y = centerPosition.y;
         }
         int index = 0;
         for (String tokenID : tokenList) {
@@ -2988,32 +2982,30 @@ public class GenerateMap {
                 continue;
             }
             try {
-                float scale = 1.0f;// tokenPath.contains(Constants.MIRAGE) ? 1.0f : 0.80f;
-                image = resizeImage(ImageIO.read(new File(tokenPath)), scale);
+                BufferedImage tokenImage = resizeImage(ImageIO.read(new File(tokenPath)), 1.0f);
+                if (tokenPath.contains(Constants.MIRAGE)) {
+                    tileGraphics.drawImage(tokenImage, Constants.MIRAGE_POSITION.x, Constants.MIRAGE_POSITION.y, null);
+                } else if (tokenPath.contains(Constants.SLEEPER)) {
+                    tileGraphics.drawImage(tokenImage, centerPosition.x - (tokenImage.getWidth() / 2), centerPosition.y - (tokenImage.getHeight() / 2), null);
+                } else {
+                    if (spaceTokenPositions.size() > index) {
+                        Point point = spaceTokenPositions.get(index);
+                        tileGraphics.drawImage(tokenImage, x + point.x, y + point.y, null);
+                        index++;
+                    } else {
+                        tileGraphics.drawImage(tokenImage, x + deltaX, y + deltaY, null);
+                        deltaX += 30;
+                        deltaY += 30;
+                    }
+                }
             } catch (Exception e) {
                 BotLogger.log("Could not parse control token file for: " + tokenID, e);
             }
-
-            if (tokenPath.contains(Constants.MIRAGE)) {
-                graphics.drawImage(image, tileX + Constants.MIRAGE_POSITION.x, tileY + Constants.MIRAGE_POSITION.y, null);
-            } else if (tokenPath.contains(Constants.SLEEPER)) {
-                graphics.drawImage(image, tileX + centerPosition.x - (image.getWidth() / 2), tileY + centerPosition.y - (image.getHeight() / 2), null);
-            } else {
-                if (spaceTokenPositions.size() > index) {
-                    Point point = spaceTokenPositions.get(index);
-                    graphics.drawImage(image, x + point.x, y + point.y, null);
-                    index++;
-                } else {
-                    graphics.drawImage(image, x + deltaX, y + deltaY, null);
-                    deltaX += 30;
-                    deltaY += 30;
-                }
-            }
         }
-        return image;
     }
 
-    private BufferedImage addUnits(Tile tile, BufferedImage image, int tileX, int tileY, ArrayList<Rectangle> rectangles, int degree, int degreeChange, UnitHolder unitHolder, int radius, Map activeMap) {
+    private static void addUnits(Tile tile, Graphics tileGraphics, ArrayList<Rectangle> rectangles, int degree, int degreeChange, UnitHolder unitHolder, int radius, Map activeMap, Player frogPlayer) {
+        BufferedImage image = null;
         HashMap<String, Integer> tempUnits = new HashMap<>(unitHolder.getUnits());
         LinkedHashMap<String, Integer> units = new LinkedHashMap<>();
         HashMap<String, Point> unitOffset = new HashMap<>();
@@ -3025,10 +3017,10 @@ public class GenerateMap {
 
         boolean isJail = isCabalJail || isNekroJail || isYssarilJail;
         boolean showJail = false;
-        if (fowPlayer == null
-                || (isCabalJail && FoWHelper.canSeeStatsOfFaction(activeMap, "cabal", fowPlayer))
-                || (isNekroJail && FoWHelper.canSeeStatsOfFaction(activeMap, "nekro", fowPlayer))
-                || (isYssarilJail && FoWHelper.canSeeStatsOfFaction(activeMap, "yssaril", fowPlayer))
+        if (frogPlayer == null
+                || (isCabalJail && FoWHelper.canSeeStatsOfFaction(activeMap, "cabal", frogPlayer))
+                || (isNekroJail && FoWHelper.canSeeStatsOfFaction(activeMap, "nekro", frogPlayer))
+                || (isYssarilJail && FoWHelper.canSeeStatsOfFaction(activeMap, "yssaril", frogPlayer))
         ) {
             showJail = true;
         }
@@ -3067,9 +3059,9 @@ public class GenerateMap {
             String unitID = unitEntry.getKey();
             Integer unitCount = unitEntry.getValue();
 
-            if (isJail && fowPlayer != null) {
-                String colorID = Mapper.getColorID(fowPlayer.getColor());
-                if (!showJail && fowPlayer != null && !unitID.startsWith(colorID)) {
+            if (isJail && frogPlayer != null) {
+                String colorID = Mapper.getColorID(frogPlayer.getColor());
+                if (!showJail && frogPlayer != null && !unitID.startsWith(colorID)) {
                     continue;
                 }
             }
@@ -3098,14 +3090,13 @@ public class GenerateMap {
                 image = resizeImage(ImageIO.read(new File(unitPath)), scaleOfUnit);
             } catch (Exception e) {
                 BotLogger.log("Could not parse unit file for: " + unitID, e);
+                continue;
             }
             if (bulkUnitCount != null && bulkUnitCount > 0) {
                 unitCount = 1;
             }
 
-
             Point centerPosition = unitHolder.getHolderCenterPosition();
-
             for (int i = 0; i < unitCount; i++) {
                 Point position = unitTokenPosition != null ? unitTokenPosition.getPosition(unitID) : null;
                 boolean fighterOrInfantry = false;
@@ -3133,8 +3124,8 @@ public class GenerateMap {
                 while (searchPosition && position == null) {
                     x = (int) (radius * Math.sin(degree));
                     y = (int) (radius * Math.cos(degree));
-                    int possibleX = tileX + centerPosition.x + x - (image.getWidth() / 2);
-                    int possibleY = tileY + centerPosition.y + y - (image.getHeight() / 2);
+                    int possibleX = centerPosition.x + x - (image.getWidth() / 2);
+                    int possibleY = centerPosition.y + y - (image.getHeight() / 2);
                     BufferedImage finalImage = image;
                     if (rectangles.stream().noneMatch(rectangle -> rectangle.intersects(possibleX, possibleY, finalImage.getWidth(), finalImage.getHeight()))) {
                         searchPosition = false;
@@ -3147,43 +3138,42 @@ public class GenerateMap {
                         rectangles.add(new Rectangle(possibleX, possibleY, finalImage.getWidth(), finalImage.getHeight()));
                     }
                 }
-                int xOriginal = tileX + centerPosition.x + x;
-                int yOriginal = tileY + centerPosition.y + y;
-                int imageX = position != null ? tileX + position.x : xOriginal - (image.getWidth() / 2);
-                int imageY = position != null ? tileY + position.y : yOriginal - (image.getHeight() / 2);
+                int xOriginal = centerPosition.x + x;
+                int yOriginal = centerPosition.y + y;
+                int imageX = position != null ? position.x : xOriginal - (image.getWidth() / 2);
+                int imageY = position != null ? position.y : yOriginal - (image.getHeight() / 2);
                 if (isMirage) {
                     imageX += Constants.MIRAGE_POSITION.x;
                     imageY += Constants.MIRAGE_POSITION.y;
                 }
-                graphics.drawImage(image, imageX, imageY, null);
+                tileGraphics.drawImage(image, imageX, imageY, null);
                 if (bulkUnitCount != null) {
-                    graphics.setFont(Storage.getFont24());
-                    graphics.setColor(groupUnitColor);
+                    tileGraphics.setFont(Storage.getFont24());
+                    tileGraphics.setColor(groupUnitColor);
                     int scaledNumberPositionX = (int) (numberPositionPoint.x * scaleOfUnit);
                     int scaledNumberPositionY = (int) (numberPositionPoint.y * scaleOfUnit);
-                    graphics.drawString(Integer.toString(bulkUnitCount), imageX + scaledNumberPositionX, imageY + scaledNumberPositionY);
+                    tileGraphics.drawString(Integer.toString(bulkUnitCount), imageX + scaledNumberPositionX, imageY + scaledNumberPositionY);
                 }
 
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
                     if (isSpace && position != null) {
                         position.x = position.x - 7;
                     }
-                    int imageDmgX = position != null ? tileX + position.x + (image.getWidth() / 2) - (dmgImage.getWidth() / 2) : xOriginal - (dmgImage.getWidth() / 2);
-                    int imageDmgY = position != null ? tileY + position.y + (image.getHeight() / 2) - (dmgImage.getHeight() / 2) : yOriginal - (dmgImage.getHeight() / 2);
+                    int imageDmgX = position != null ? position.x + (image.getWidth() / 2) - (dmgImage.getWidth() / 2) : xOriginal - (dmgImage.getWidth() / 2);
+                    int imageDmgY = position != null ? position.y + (image.getHeight() / 2) - (dmgImage.getHeight() / 2) : yOriginal - (dmgImage.getHeight() / 2);
                     if (isMirage) {
                         imageDmgX = imageX;
                         imageDmgY = imageY;
                     } else if (unitID.contains("_mf")) {
-                        imageDmgX = position != null ? tileX + position.x : xOriginal - (dmgImage.getWidth());
-                        imageDmgY = position != null ? tileY + position.y : yOriginal - (dmgImage.getHeight());
+                        imageDmgX = position != null ? position.x : xOriginal - (dmgImage.getWidth());
+                        imageDmgY = position != null ? position.y : yOriginal - (dmgImage.getHeight());
 
                     }
-                    graphics.drawImage(dmgImage, imageDmgX, imageDmgY, null);
+                    tileGraphics.drawImage(dmgImage, imageDmgX, imageDmgY, null);
                     unitDamageCount--;
                 }
             }
         }
-        return image;
     }
 
     /**
