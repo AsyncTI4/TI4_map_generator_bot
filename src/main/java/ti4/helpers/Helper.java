@@ -592,45 +592,45 @@ public class Helper {
         return planetButtons;
     }
     
-    public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, Tile tile, String warfareNOtherstuff) {
+    public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, Tile tile, String warfareNOtherstuff, String placePrefix) {
         List<Button> unitButtons = new ArrayList<>();
         HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();
         if(!warfareNOtherstuff.equalsIgnoreCase("muaatagent"))
         {
             if(player.hasWarsunTech()) {
-                Button wsButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_warsun_"+tp, "Produce Warsun" );
+                Button wsButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_warsun_"+tp, "Produce Warsun" );
                 wsButton = wsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("warsun")));
                 unitButtons.add(wsButton);
             }
-            Button fsButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_flagship_"+tp, "Produce Flagship" );
+            Button fsButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_flagship_"+tp, "Produce Flagship" );
             fsButton = fsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("flagship")));
             unitButtons.add(fsButton);
         }
-        Button dnButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_dreadnought_"+tp, "Produce Dreadnought" );
+        Button dnButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_dreadnought_"+tp, "Produce Dreadnought" );
         dnButton = dnButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("dreadnought")));
         unitButtons.add(dnButton);
-        Button cvButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_carrier_"+tp, "Produce Carrier" );
+        Button cvButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_carrier_"+tp, "Produce Carrier" );
         cvButton = cvButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("carrier")));
         unitButtons.add(cvButton);
-        Button caButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_cruiser_"+tp, "Produce Cruiser" );
+        Button caButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_cruiser_"+tp, "Produce Cruiser" );
         caButton = caButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("cruiser")));
         unitButtons.add(caButton);
-        Button ddButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_destroyer_"+tp, "Produce Destroyer" );
+        Button ddButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_destroyer_"+tp, "Produce Destroyer" );
         ddButton = ddButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("destroyer")));
         unitButtons.add(ddButton);
-        Button ff1Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_fighter_"+tp, "Produce 1 Fighter" );
+        Button ff1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_fighter_"+tp, "Produce 1 Fighter" );
         ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
         unitButtons.add(ff1Button);
-        if(!warfareNOtherstuff.equalsIgnoreCase("freelancers")){
-            Button ff2Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_2ff_"+tp, "Produce 2 Fighters" );
+        if(!warfareNOtherstuff.equalsIgnoreCase("freelancers") && !warfareNOtherstuff.equalsIgnoreCase("sling")&& !warfareNOtherstuff.equalsIgnoreCase("chaosM")){
+            Button ff2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2ff_"+tp, "Produce 2 Fighters" );
             ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
             unitButtons.add(ff2Button);
         }
         
 
         for (UnitHolder unitHolder : unitHolders.values()) {
-            if (unitHolder instanceof Planet planet) {
+            if (unitHolder instanceof Planet planet && !warfareNOtherstuff.equalsIgnoreCase("sling")) {
                 String colorID = Mapper.getColorID(player.getColor());
                 String sdKey =  colorID+ "_sd.png";
                 String csdKey =  colorID+ "_csd.png";
@@ -645,21 +645,24 @@ public class Helper {
                     }
                 }
                 String pp = planet.getName();
-                Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_infantry_"+pp, "Produce 1 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap));
+                Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_"+pp, "Produce 1 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap));
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
                 unitButtons.add(inf1Button);
-                if(!warfareNOtherstuff.equalsIgnoreCase("freelancers")){
-                    Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+"place_2gf_"+pp, "Produce 2 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap) );
+                if(!warfareNOtherstuff.equalsIgnoreCase("freelancers") && !warfareNOtherstuff.equalsIgnoreCase("chaosM")){
+                    Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_"+pp, "Produce 2 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap) );
                     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
                     unitButtons.add(inf2Button);
                 }
-                Button mfButton = Button.success("FFCC_"+player.getFaction()+"_"+"place_mech_"+pp, "Produce Mech on "+Helper.getPlanetRepresentation(pp, activeMap) );
+                Button mfButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_mech_"+pp, "Produce Mech on "+Helper.getPlanetRepresentation(pp, activeMap) );
                 mfButton = mfButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
                 unitButtons.add(mfButton);
             }
         }
-        Button DoneProducingUnits = Button.danger("deleteButtons_"+warfareNOtherstuff, "Done Producing Units");
-        unitButtons.add(DoneProducingUnits);
+        if(placePrefix.equalsIgnoreCase("place")){
+            Button DoneProducingUnits = Button.danger("deleteButtons_"+warfareNOtherstuff, "Done Producing Units");
+            unitButtons.add(DoneProducingUnits);
+        }
+        
         return unitButtons;
     }
 
