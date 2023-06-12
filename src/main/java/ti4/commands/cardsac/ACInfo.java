@@ -213,4 +213,19 @@ public class ACInfo extends ACCardsSubcommandData {
         }
         return acButtons;
     }
+    public static List<Button> getToBeStolenActionCardButtons(Map activeMap, Player player) {
+        List<Button> acButtons = new ArrayList<>();
+        LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+        if (actionCards != null && !actionCards.isEmpty()) {
+            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCardName(key);
+                if (ac_name != null) {
+                    acButtons.add(Button.danger("takeAC_" + value + "_"+player.getFaction(), ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                }
+            }
+        }
+        return acButtons;
+    }
 }

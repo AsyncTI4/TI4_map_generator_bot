@@ -219,7 +219,7 @@
     "alias": "miscount",
     "name": "Miscount Disclosed",
     "type": "Directive",
-    "target": "Elect Law (When this agenda is revealed, if there are no Elect laws in play, discard this card and reveal another agenda from the top of the deck.)",
+    "target": "Elect Law (When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.)",
     "text1": "Vote on the elected law as if it were just revealed from the top of the deck.",
     "text2": "",
     "source": "PoK"
@@ -237,7 +237,7 @@
     "alias": "constitution",
     "name": "New Constitution",
     "type": "Directive",
-    "target": "For/Against (When this agenda is revealed, if there are no Elect laws in play, discard this card and reveal another agenda from the top of the deck.)",
+    "target": "For/Against (When this agenda is revealed, if there are no laws in play, discard this card and reveal another agenda from the top of the deck.)",
     "text1": "For: Discard all laws from play. At the start of the next strategy phase, each player exhausts each planet in their home system.",
     "text2": "Against: No effect.",
     "source": "PoK"
@@ -580,7 +580,7 @@
     "name": "Discretionary Spending",
     "type": "Directive",
     "target": "For/Against",
-    "text1": "For: All players gain trade goods equal to the number of planets they control. The player that cast the most votes \"For\" refreshes their commodities. In voting order, all players may spend any number of trade goods as follows, with the listed costs: use the PRODUCTION ability of units in a system (Cost)| research up to 2 technologies (4 each)| Place a space dock or PDS on a planet they control (3)| draw 3 action cards (2)| explore a planet they control or a frontier token in a system that containst their ships (1).",
+    "text1": "For: All players gain trade goods equal to the number of planets they control. The player that cast the most votes \"For\" refreshes their commodities. In voting order, all players may spend any number of trade goods as follows, with the listed costs: use the PRODUCTION ability of units in a system (Cost)| research up to 2 technologies (4 each)| Place a space dock or PDS on a planet they control (3)| draw 3 action cards (2)| explore a planet they control or a frontier token in a system that containst their ships (1). [Note: You cannot explore the same planet multiple times]",
     "text2": "Against: All players except the player that cast the most votes \"Against\" lose half of their trade goods (rounded up).",
     "source": "absol"
   },
