@@ -476,7 +476,7 @@
     "factionTech": ["dsedyny", "dsedyng"],
     "startingTech": ["aida", "sdn", "det", "pa"],
     "homePlanets": ["edyn", "ekko", "okke"],
-    "abilities": ["enlightenment", "grace", "royal_decree"],
+    "abilities": ["grace", "decree", "radiance"],
     "leaders": ["edynagent", "edyncommander", "edynhero"],
     "promissoryNotes": ["dspnedyn"]
   },
