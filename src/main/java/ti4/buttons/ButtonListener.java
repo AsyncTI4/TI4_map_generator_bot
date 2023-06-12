@@ -1047,8 +1047,12 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("exhaustTech_")) {
             String tech = buttonID.replace("exhaustTech_","");
-            player.exhaustTech(tech);
-            MessageHelper.sendMessageToChannel(event.getMessageChannel(), (Helper.getPlayerRepresentation(player, activeMap) + " exhausted tech: " + Helper.getTechRepresentation(tech)));
+            if (!tech.equals("st")) {
+                player.exhaustTech(tech);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), (Helper.getPlayerRepresentation(player, activeMap) + " exhausted tech: " + Helper.getTechRepresentation(tech)));
+            } else {
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), (Helper.getPlayerRepresentation(player, activeMap) + " used tech: " + Helper.getTechRepresentation(tech)));
+            }
         } else if (buttonID.startsWith("planetOutcomes_")) {
             String factionOrColor = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
             Player planetOwner = Helper.getPlayerFromColorOrFaction(activeMap, factionOrColor);
@@ -1261,6 +1265,10 @@ public class ButtonListener extends ListenerAdapter {
                     if (player.hasTechReady("aida")) {
                         Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
                         buttons.add(aiDEVButton);
+                    }
+                    if (player.hasTechReady("st")) {
+                        Button sarweenButton = Button.danger("exhaustTech_st", "Use Sarween");
+                        buttons.add(sarweenButton);
                     }
                     Button DoneExhausting = null;
                     if (!buttonID.contains("deleteButtons")) {
