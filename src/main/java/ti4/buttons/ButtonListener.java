@@ -1692,7 +1692,7 @@ public class ButtonListener extends ListenerAdapter {
             String trueIdentity = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true);
             MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity + " activated "+activeMap.getTileByPosition(pos).getRepresentationForButtons(activeMap, player));
             activeMap.resetCurrentMovedUnitsFrom1TacticalAction();
-            if(ButtonHelper.tileHasPDS2Cover(player, activeMap, pos) && !activeMap.isFoWMode())
+            if(!activeMap.isFoWMode() && ButtonHelper.tileHasPDS2Cover(player, activeMap, pos))
             {
                 MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity + " this is a courtesy notice that the selected system is in range of opponent deep space cannon units. ");
             }
