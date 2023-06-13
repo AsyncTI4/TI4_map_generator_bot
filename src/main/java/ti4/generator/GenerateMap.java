@@ -40,6 +40,8 @@ public class GenerateMap {
     public static final int DELTA_Y = 24;
     public static final int RING_MAX_COUNT = 8;
     public static final int PLAYER_STATS_HEIGHT = 650;
+    public static final int TILE_PADDING = 100;
+
     private Graphics graphics;
     private BufferedImage mainImage;
     private int width;
@@ -2500,8 +2502,8 @@ public class GenerateMap {
             }
 
             positionPoint = getTilePosition(activeMap, position, x, y);
-            int tileX = positionPoint.x + extraX;
-            int tileY = positionPoint.y + extraY;
+            int tileX = positionPoint.x + extraX - TILE_PADDING;
+            int tileY = positionPoint.y + extraY - TILE_PADDING;
 
             BufferedImage tileImage = partialTileImage(tile, activeMap, step, fowPlayer, isFoWPrivate);
             graphics.drawImage(tileImage, tileX, tileY, null);
@@ -2514,7 +2516,8 @@ public class GenerateMap {
 
 
     public static BufferedImage partialTileImage(Tile tile, Map activeMap, TileStep step, Player frogPlayer, Boolean isFrogPrivate) throws IOException {
-        BufferedImage tileOutput = new BufferedImage(345, 300, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage tileOutput = new BufferedImage(600, 600, BufferedImage.TYPE_INT_ARGB);
+        
 
         BufferedImage image = ImageIO.read(new File(tile.getTilePath()));
         BufferedImage fogOfWar = ImageIO.read(new File(tile.getFowTilePath(frogPlayer)));
@@ -2525,7 +2528,7 @@ public class GenerateMap {
         switch (step) {
             case Setup -> {} //do nothing
             case Tile -> {
-                tileGraphics.drawImage(image, 0, 0, null);
+                tileGraphics.drawImage(image, TILE_PADDING, TILE_PADDING, null);
 
                 //ADD ANOMALY BORDER IF HAS ANOMALY PRODUCING TOKENS OR UNITS
                 List<UnitHolder> unitHolders = new ArrayList<>(tile.getUnitHolders().values());
@@ -2541,7 +2544,7 @@ public class GenerateMap {
                     }
                     if (drawAnomaly) {
                         BufferedImage anomalyImage = ImageIO.read(new File(ResourceHelper.getInstance().getTileFile("tile_anomaly.png")));
-                        tileGraphics.drawImage(anomalyImage, 0, 0, null);
+                        tileGraphics.drawImage(anomalyImage, TILE_PADDING, TILE_PADDING, null);
                     }
                 }
 
@@ -2558,10 +2561,10 @@ public class GenerateMap {
                 }
                 tileGraphics.setColor(Color.WHITE);
                 if (tileIsFoggy) {
-                    tileGraphics.drawImage(fogOfWar, 0, 0, null);
-                    tileGraphics.drawString(tile.getFogLabel(frogPlayer), labelPositionPoint.x, labelPositionPoint.y);
+                    tileGraphics.drawImage(fogOfWar, TILE_PADDING, TILE_PADDING, null);
+                    tileGraphics.drawString(tile.getFogLabel(frogPlayer), TILE_PADDING + labelPositionPoint.x, TILE_PADDING + labelPositionPoint.y);
                 }
-                tileGraphics.drawString(position, tilePositionPoint.x - textOffset, tilePositionPoint.y);
+                tileGraphics.drawString(position, TILE_PADDING + tilePositionPoint.x - textOffset, TILE_PADDING + tilePositionPoint.y);
             }
             case Extras -> {
                 if (tileIsFoggy) return tileOutput;
@@ -2705,7 +2708,7 @@ public class GenerateMap {
             AffineTransform tx = AffineTransform.getRotateInstance(rotation, rotateX, rotateY);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
-            tileGraphics.drawImage(op.filter(arrowImage, null), deltaX, deltaY, null);
+            tileGraphics.drawImage(op.filter(arrowImage, null), TILE_PADDING + deltaX, TILE_PADDING + deltaY, null);
         } catch (Exception e) {}
     }
 
@@ -2746,9 +2749,11 @@ public class GenerateMap {
                 }
 
                 if (generateImage) {
-                    tileGraphics.drawImage(image, 10 + deltaX, centerPosition.y - 40 + deltaY, null);
+                    int imgX = TILE_PADDING + 10 + deltaX;
+                    int imgY = TILE_PADDING + centerPosition.y - 40 + deltaY;
+                    tileGraphics.drawImage(image, imgX, imgY, null);
                     if (factionImage != null) {
-                        tileGraphics.drawImage(factionImage, 10 + deltaX + DELTA_X, centerPosition.y - 40 + deltaY + DELTA_Y, null);
+                        tileGraphics.drawImage(factionImage, imgX + DELTA_X, imgY + DELTA_Y, null);
                     }
                 }
             } catch (Exception e) {}
@@ -2809,17 +2814,21 @@ public class GenerateMap {
                 }
 
                 if (position != null) {
-                    tileGraphics.drawImage(controlToken, position.x, position.y, null);
+                    int imgX = TILE_PADDING + position.x;
+                    int imgY = TILE_PADDING + position.y;
+                    tileGraphics.drawImage(controlToken, imgX, imgY, null);
                     if (factionImage != null) {
-                        tileGraphics.drawImage(factionImage, position.x, position.y, null);
+                        tileGraphics.drawImage(factionImage, imgX, imgY, null);
                     }
-                    rectangles.add(new Rectangle(position.x, position.y, controlToken.getWidth(), controlToken.getHeight()));
+                    rectangles.add(new Rectangle(imgX, imgY, controlToken.getWidth(), controlToken.getHeight()));
                 } else {
-                    tileGraphics.drawImage(controlToken, centerPosition.x + xDelta, centerPosition.y, null);
+                    int imgX = TILE_PADDING + centerPosition.x + xDelta;
+                    int imgY = TILE_PADDING + centerPosition.y;
+                    tileGraphics.drawImage(controlToken, imgX, imgY, null);
                     if (factionImage != null) {
-                        tileGraphics.drawImage(factionImage, centerPosition.x + xDelta, centerPosition.y, null);
+                        tileGraphics.drawImage(factionImage, imgX, imgY, null);
                     }
-                    rectangles.add(new Rectangle(centerPosition.x + xDelta, centerPosition.y, controlToken.getWidth(), controlToken.getHeight()));
+                    rectangles.add(new Rectangle(imgX, imgY, controlToken.getWidth(), controlToken.getHeight()));
                     xDelta += 10;
                 }
             }
@@ -2863,7 +2872,7 @@ public class GenerateMap {
                     } else if (tokenID.contains(Constants.SLEEPER) && containsDMZ) {
                         position = new Point(position.x + 10, position.y + 10);
                     }
-                    tileGraphics.drawImage(tokenImage, position.x, position.y - 10, null);
+                    tileGraphics.drawImage(tokenImage, TILE_PADDING + position.x, TILE_PADDING + position.y - 10, null);
                 } catch (Exception e) {
                     BotLogger.log("Could not parse sleeper token file for: " + tokenID, e);
                 }
@@ -2917,17 +2926,17 @@ public class GenerateMap {
                         tokenPath.contains(Constants.CONSULATE_TOKEN) ||
                         tokenPath.contains(Constants.GLEDGE_CORE))
                     {
-                        tileGraphics.drawImage(image, centerPosition.x - (image.getWidth() / 2), centerPosition.y - (image.getHeight() / 2), null);
+                        tileGraphics.drawImage(image, TILE_PADDING + centerPosition.x - (image.getWidth() / 2), TILE_PADDING + centerPosition.y - (image.getHeight() / 2), null);
                     } else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
-                        tileGraphics.drawImage(image, 70, 45, null);
+                        tileGraphics.drawImage(image, TILE_PADDING + 70, TILE_PADDING + 45, null);
                     } else {
                         Point position = unitTokenPosition.getPosition(tokenID);
                         if (position != null) {
-                            tileGraphics.drawImage(image, position.x, position.y, null);
-                            rectangles.add(new Rectangle(position.x, position.y, image.getWidth(), image.getHeight()));
+                            tileGraphics.drawImage(image, TILE_PADDING + position.x, TILE_PADDING + position.y, null);
+                            rectangles.add(new Rectangle(TILE_PADDING + position.x, TILE_PADDING + position.y, image.getWidth(), image.getHeight()));
                         } else {
-                            tileGraphics.drawImage(image, centerPosition.x + xDelta, centerPosition.y, null);
-                            rectangles.add(new Rectangle(centerPosition.x + xDelta, centerPosition.y, image.getWidth(), image.getHeight()));
+                            tileGraphics.drawImage(image, TILE_PADDING + centerPosition.x + xDelta, TILE_PADDING + centerPosition.y, null);
+                            rectangles.add(new Rectangle(TILE_PADDING + centerPosition.x + xDelta, TILE_PADDING + centerPosition.y, image.getWidth(), image.getHeight()));
                             xDelta += 10;
                         }
                     }
@@ -2954,7 +2963,7 @@ public class GenerateMap {
             }
             try {
                 BufferedImage image = resizeImage(ImageIO.read(new File(tokenPath)), 0.85f);
-                tileGraphics.drawImage(image, x - (image.getWidth() / 2), y + offSet + deltaY - (image.getHeight() / 2), null);
+                tileGraphics.drawImage(image, TILE_PADDING + x - (image.getWidth() / 2), TILE_PADDING + y + offSet + deltaY - (image.getHeight() / 2), null);
                 y += image.getHeight();
             } catch (Exception e) {
                 BotLogger.log("Could not parse control token file for: " + tokenID, e);
@@ -2984,16 +2993,16 @@ public class GenerateMap {
             try {
                 BufferedImage tokenImage = resizeImage(ImageIO.read(new File(tokenPath)), 1.0f);
                 if (tokenPath.contains(Constants.MIRAGE)) {
-                    tileGraphics.drawImage(tokenImage, Constants.MIRAGE_POSITION.x, Constants.MIRAGE_POSITION.y, null);
+                    tileGraphics.drawImage(tokenImage, TILE_PADDING + Constants.MIRAGE_POSITION.x, TILE_PADDING + Constants.MIRAGE_POSITION.y, null);
                 } else if (tokenPath.contains(Constants.SLEEPER)) {
-                    tileGraphics.drawImage(tokenImage, centerPosition.x - (tokenImage.getWidth() / 2), centerPosition.y - (tokenImage.getHeight() / 2), null);
+                    tileGraphics.drawImage(tokenImage, TILE_PADDING + centerPosition.x - (tokenImage.getWidth() / 2), TILE_PADDING + centerPosition.y - (tokenImage.getHeight() / 2), null);
                 } else {
                     if (spaceTokenPositions.size() > index) {
                         Point point = spaceTokenPositions.get(index);
-                        tileGraphics.drawImage(tokenImage, x + point.x, y + point.y, null);
+                        tileGraphics.drawImage(tokenImage, TILE_PADDING + x + point.x, TILE_PADDING + y + point.y, null);
                         index++;
                     } else {
-                        tileGraphics.drawImage(tokenImage, x + deltaX, y + deltaY, null);
+                        tileGraphics.drawImage(tokenImage, TILE_PADDING + x + deltaX, TILE_PADDING + y + deltaY, null);
                         deltaX += 30;
                         deltaY += 30;
                     }
@@ -3146,13 +3155,13 @@ public class GenerateMap {
                     imageX += Constants.MIRAGE_POSITION.x;
                     imageY += Constants.MIRAGE_POSITION.y;
                 }
-                tileGraphics.drawImage(image, imageX, imageY, null);
+                tileGraphics.drawImage(image, TILE_PADDING + imageX, TILE_PADDING + imageY, null);
                 if (bulkUnitCount != null) {
                     tileGraphics.setFont(Storage.getFont24());
                     tileGraphics.setColor(groupUnitColor);
                     int scaledNumberPositionX = (int) (numberPositionPoint.x * scaleOfUnit);
                     int scaledNumberPositionY = (int) (numberPositionPoint.y * scaleOfUnit);
-                    tileGraphics.drawString(Integer.toString(bulkUnitCount), imageX + scaledNumberPositionX, imageY + scaledNumberPositionY);
+                    tileGraphics.drawString(Integer.toString(bulkUnitCount), TILE_PADDING + imageX + scaledNumberPositionX, TILE_PADDING + imageY + scaledNumberPositionY);
                 }
 
                 if (unitDamageCount != null && unitDamageCount > 0 && dmgImage != null) {
@@ -3169,7 +3178,7 @@ public class GenerateMap {
                         imageDmgY = position != null ? position.y : yOriginal - (dmgImage.getHeight());
 
                     }
-                    tileGraphics.drawImage(dmgImage, imageDmgX, imageDmgY, null);
+                    tileGraphics.drawImage(dmgImage, TILE_PADDING + imageDmgX, TILE_PADDING + imageDmgY, null);
                     unitDamageCount--;
                 }
             }

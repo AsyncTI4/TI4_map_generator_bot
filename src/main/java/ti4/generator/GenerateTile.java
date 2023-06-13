@@ -24,16 +24,10 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class GenerateTile {
-    public static final int DELTA_X = 8;
-    public static final int DELTA_Y = 24;
-    public static final int RING_MAX_COUNT = 8;
-    public static final int PLAYER_STATS_HEIGHT = 650;
     private Graphics graphics;
     private BufferedImage mainImage;
     private int width;
     private int height;
-    private int mapHeight;
-    private int mapWidth;
     
     private final int extraX = 100;
     private final int extraY = 100;
@@ -56,11 +50,8 @@ public class GenerateTile {
     }
 
     private void init(int context, String focusTile) {
-        mapHeight = tileHeight * (2 * context + 1) + extraY;
-        mapWidth = tileWidth + (tileExtraWidth * 2 * context) + extraX;
-
-        width = mapWidth;
-        height = mapHeight;
+        width = tileWidth + (tileExtraWidth * 2 * context) + extraX;
+        height = tileHeight * (2 * context + 1) + extraY;
 
         if (focusTile == null) {
             offsetX = 0;
@@ -214,12 +205,12 @@ public class GenerateTile {
                 throw new Exception("Could not map tile to a position on the map: " + activeMap.getName());
             }
 
-            int tileX = positionPoint.x + offsetX;
-            int tileY = positionPoint.y + offsetY;
+            int tileX = positionPoint.x + offsetX - GenerateMap.TILE_PADDING;
+            int tileY = positionPoint.y + offsetY - GenerateMap.TILE_PADDING;
 
             BufferedImage tileImage = GenerateMap.partialTileImage(tile, activeMap, step, fowPlayer, isFoWPrivate);
             graphics.drawImage(tileImage, tileX, tileY, null);
-            
+
         } catch (IOException e) {
             BotLogger.log("Error drawing tile: " + tile.getTileID(), e);
         } catch (Exception exception) {
