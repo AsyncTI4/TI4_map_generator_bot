@@ -203,7 +203,7 @@ public class Player {
     @JsonIgnore
     public ThreadChannel getCardsInfoThread(ti4.map.Map activeMap) {
         TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
-        if (activeMap.isFoWMode()) actionsChannel = (TextChannel) getPrivateChannel();
+        if (activeMap.isFoWMode() || activeMap.isCommunityMode()) actionsChannel = (TextChannel) getPrivateChannel();
         if (actionsChannel == null) {
             BotLogger.log("`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game: " + activeMap.getName());
             return null;
