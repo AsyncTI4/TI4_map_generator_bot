@@ -1325,7 +1325,7 @@ public class ButtonHelper {
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),message, purgeFragButtons);
             }
             case "generic" -> {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Doing unspecified component action. Maybe ping Fin to add this. ");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Doing unspecified component action. You could ping Fin to add this. ");
             }
             case "actionCards" -> {
                 String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
