@@ -259,6 +259,10 @@ public class CreateGameChannels extends BothelperSubcommandData {
     }
 
     private static String getNextGameName() {
+        ArrayList<Integer> existingNums = getAllExistingPBDNumbers();
+        if (existingNums.size() == 0) {
+            return "pbd1";
+        }
         int nextPBDNumber = Collections.max(getAllExistingPBDNumbers()) + 1;
         return "pbd" + nextPBDNumber;
     }

@@ -5,6 +5,7 @@ import ti4.helpers.Storage;
 
 import java.io.File;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class MapFileDeleter {
@@ -15,11 +16,13 @@ public class MapFileDeleter {
             file.delete();
         }
         File mapImageDirectory = Storage.getMapImageDirectory();
-        for (File file : mapImageDirectory.listFiles()) {
-            String absolutePath = file.getAbsolutePath();
-            if (absolutePath.endsWith(Constants.JPG) ||
-                    absolutePath.endsWith(Constants.PNG)) {
-                file.delete();
+        if(Optional.ofNullable(mapImageDirectory.listFiles()).isPresent()) {
+            for (File file : mapImageDirectory.listFiles()) {
+                String absolutePath = file.getAbsolutePath();
+                if (absolutePath.endsWith(Constants.JPG) ||
+                        absolutePath.endsWith(Constants.PNG)) {
+                    file.delete();
+                }
             }
         }
     }

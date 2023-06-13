@@ -168,6 +168,7 @@ public class ResourceHelper {
 
     @Nullable
     public String getInfoFile(String name) {
+        System.out.println();
         return getResourceFromFolder("info/", name, "Could not find info file");
     }
 
