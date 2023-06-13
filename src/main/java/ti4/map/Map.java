@@ -928,10 +928,12 @@ public class Map {
     }
 
     public java.util.Map.Entry<String, Integer> revealState1() {
+        Collections.shuffle(publicObjectives1);
         return revealObjective(publicObjectives1);
     }
 
     public java.util.Map.Entry<String, Integer> revealState2() {
+        Collections.shuffle(publicObjectives2);
         return revealObjective(publicObjectives2);
     }
 
