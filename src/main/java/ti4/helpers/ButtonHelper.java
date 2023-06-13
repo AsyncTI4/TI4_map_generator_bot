@@ -232,7 +232,7 @@ public class ButtonHelper {
 		}
         Button validTile = Button.danger(finChecker+"concludeMove", "Done Moving");
         buttons.add(validTile);
-        Button validTile2 = Button.primary(finChecker+"ChooseDifferentDestination", "Activate A Differen System");
+        Button validTile2 = Button.primary(finChecker+"ChooseDifferentDestination", "Activate a different system");
         buttons.add(validTile2);
         return buttons;
     }
