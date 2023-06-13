@@ -1334,7 +1334,14 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("rider_")) {
             String choice = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.lastIndexOf("_"));
             String rider = buttonID.substring(buttonID.lastIndexOf("_") + 1, buttonID.length());
-            String voteMessage = "Chose to put a " + rider + " on " + StringUtils.capitalize(choice);
+            String agendaDetails = activeMap.getCurrentAgendaInfo();
+            agendaDetails = agendaDetails.substring(agendaDetails.indexOf("_")+1, agendaDetails.length());
+           // if(activeMap)
+           String cleanedChoice = choice;
+           if(agendaDetails.contains("Planet") || agendaDetails.contains("planet")){
+                cleanedChoice = Helper.getPlanetRepresentation(choice, activeMap);
+           }
+            String voteMessage = "Chose to put a " + rider + " on " + StringUtils.capitalize(cleanedChoice);
             String identifier = "";
             if (activeMap.isFoWMode()) {
                 identifier = player.getColor();
@@ -2349,6 +2356,9 @@ public class ButtonListener extends ListenerAdapter {
                         player_.cleanExhaustedPlanets(false);
                     }
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda cleanup run!");
+                    if(activeMap.isFoWMode()){
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "Pinged speaker to pick SC.");
+                    }
                     Player speaker = null;
                     if (activeMap.getPlayer(activeMap.getSpeaker()) != null) {
                         speaker = activeMap.getPlayers().get(activeMap.getSpeaker());
