@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -130,7 +129,7 @@ public class SCPlay extends PlayerSubcommandData {
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
             //GET BUTTONS
             ActionRow actionRow = null;
-            List<Button> scButtons = getSCButtons(scToDisplay, activeMap);
+            List<Button> scButtons = new ArrayList<>(getSCButtons(scToDisplay, activeMap));
             if (scButtons != null && !scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
             if (actionRow != null) baseMessageObject.addComponents(actionRow);
 
@@ -157,7 +156,7 @@ public class SCPlay extends PlayerSubcommandData {
                             // SEARCH FOR EXISTING OPEN THREAD
                             for (ThreadChannel threadChannel_ : threadChannels) {
                                 if (threadChannel_.getName().equals(threadName)) {
-                                    if(scToPlay == 5){
+                                    if (scToPlay == 5) {
                                         Button transaction = Button.primary("transaction", "Transaction");
                                         scButtons.add(transaction);
                                     }
