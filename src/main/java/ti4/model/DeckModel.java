@@ -53,7 +53,7 @@ public class DeckModel extends Model {
     }
 
     public List<String> getShuffledCardList() {
-        List<String> cardList = cardIDs;
+        List<String> cardList = new ArrayList<>(cardIDs);
         Collections.shuffle(cardList);
         return cardList;
     }
