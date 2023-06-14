@@ -668,6 +668,13 @@ public class ButtonListener extends ListenerAdapter {
             // MessageHelper.sendMessageToChannel(event.getChannel(), ident+" Exhausted
             // "+Helper.getPlanetRepresentation(planetName, activeMap));
 
+        } else if (buttonID.startsWith("finishTransaction_")) {
+            String player2Color = buttonID.split("_")[1];
+            Player player2 = Helper.getPlayerFromColorOrFaction(activeMap, player2Color);
+            ButtonHelper.pillageCheck(player, activeMap);
+            ButtonHelper.pillageCheck(player2, activeMap);
+            event.getMessage().delete().queue();
+
         } else if (buttonID.startsWith("sabotage_")) {
             String typeNName = buttonID.replace("sabotage_", "");
             String type = typeNName.substring(0, typeNName.indexOf("_"));
@@ -742,6 +749,40 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().editMessage(editedMessage).queue();
 
             // MessageHelper.sendMessageToChannel(event.getChannel(), message);
+         } else if (buttonID.startsWith("pillage_")) {
+            buttonID = buttonID.replace("pillage_", "");
+            String colorPlayer = buttonID.split("_")[0];
+            String checkedStatus = buttonID.split("_")[1];
+            Player pillaged = Helper.getPlayerFromColorOrFaction(activeMap, colorPlayer);
+            if(checkedStatus.contains("unchecked")){
+                 List<Button> buttons = new ArrayList<Button>();
+                String message2 =  "Please confirm this is a valid pillage opportunity and that you wish to pillage.";
+                buttons.add(Button.danger(finsFactionCheckerPrefix+"pillage_"+pillaged.getColor()+"_checked","Pillage"));
+                buttons.add(Button.success(finsFactionCheckerPrefix+"deleteButtons","Delete these buttons"));
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+            }else{
+                MessageChannel channel1 = activeMap.getMainGameChannel();
+                MessageChannel channel2 = activeMap.getMainGameChannel();
+                String pillagerMessage = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " you pillaged, your tgs have gone from "+player.getTg() +" to "+(player.getTg()+1) +".";
+                String pillagedMessage = Helper.getPlayerRepresentation(pillaged, activeMap, activeMap.getGuild(), true) + " you have been pillaged";
+                if(activeMap.isFoWMode()){
+                    channel1 = pillaged.getPrivateChannel();
+                    channel2 = player.getPrivateChannel();
+                }
+                if(pillaged.getCommodities()>0){
+                    pillagedMessage = pillagedMessage+ ", your comms have gone from "+pillaged.getCommodities() +" to "+(pillaged.getCommodities()-1) +".";
+                    pillaged.setCommodities(pillaged.getCommodities()-1);
+
+                } else {
+                    pillagedMessage = pillagedMessage+ ", your tgs have gone from "+pillaged.getTg() +" to "+(pillaged.getTg()-1) +".";
+                    pillaged.setTg(pillaged.getTg()-1);
+                }
+                player.setTg(player.getTg()+1);
+                MessageHelper.sendMessageToChannel(channel2, pillagerMessage);
+                MessageHelper.sendMessageToChannel(channel1, pillagedMessage);
+            }
+            event.getMessage().delete().queue();
+
         } else if (buttonID.startsWith("exhaust_")) {
             String planetName = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
             String votes = buttonLabel.substring(buttonLabel.indexOf("(") + 1, buttonLabel.indexOf(")"));
@@ -2052,6 +2093,7 @@ public class ButtonListener extends ListenerAdapter {
                                 + "You have a rider to resolve or you voted for the correct outcome. Either way a tg has been added to your total due to your future sight ability. ("
                                 + rid.getTg() + "-->" + (rid.getTg() + 1) + ")";
                         rid.setTg(rid.getTg() + 1);
+                        ButtonHelper.pillageCheck(rid, activeMap);
                     } else {
                         message = rep + "You have a rider to resolve";
                     }
@@ -2455,6 +2497,7 @@ public class ButtonListener extends ListenerAdapter {
                     int commoditiesTotal = player.getCommoditiesTotal();
                     int tg = player.getTg();
                     player.setTg(tg + commoditiesTotal);
+                    ButtonHelper.pillageCheck(player, activeMap);
                     player.setCommodities(0);
                     player.addFollowedSC(5);
                     addReaction(event, false, false, "Replenishing and washing", "");
@@ -2490,6 +2533,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     int tg = player.getTg();
                     player.setTg(tg + 3);
+                    ButtonHelper.pillageCheck(player, activeMap);
                     player.setCommodities(player.getCommoditiesTotal());
                     addReaction(event, false, false, " gained 3" + Emojis.tg + " and replenished commodities ("
                             + String.valueOf(player.getCommodities()) + Emojis.comm + ")", "");
@@ -2789,6 +2833,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = playerRep + " exhausted Mallice ability and gained 2 tg (" + player.getTg() + "->"
                             + (player.getTg() + 2) + ").";
                     player.setTg(player.getTg() + 2);
+                    ButtonHelper.pillageCheck(player, activeMap);
                     if (activeMap.isFoWMode() && event.getMessageChannel() != activeMap.getMainGameChannel()) {
                         MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
                     }
