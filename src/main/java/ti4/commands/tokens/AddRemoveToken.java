@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
@@ -17,6 +18,7 @@ import ti4.message.MessageHelper;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.StringTokenizer;
 
 abstract public class AddRemoveToken implements Command {
@@ -76,7 +78,15 @@ abstract public class AddRemoveToken implements Command {
                 MapSaveLoadManager.saveMap(activeMap, event);
 
                 File file = GenerateMap.getInstance().saveImage(activeMap, event);
-                MessageHelper.replyToMessage(event, file);
+                //MessageHelper.replyToMessage(event, file);
+                if(activeMap.isFoWMode()){
+                    MessageHelper.sendFileToChannel(event.getChannel(), file);
+                }else{
+                    List<Button> buttonsWeb = new ArrayList<Button>();
+                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
+                    buttonsWeb.add(linkToWebsite);
+                    MessageHelper.sendFileToChannelWithButtonsAfter(event.getChannel(), file, "",buttonsWeb);
+                }
             } else {
                 MessageHelper.replyToMessage(event, "Tile needs to be specified.");
             }
