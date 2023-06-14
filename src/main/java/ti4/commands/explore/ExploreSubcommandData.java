@@ -20,6 +20,7 @@ import ti4.commands.player.PlanetRefresh;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -274,14 +275,17 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     case "minent" -> {
                         player.setTg(player.getTg()+1);
                         message = "Gained 1" + Emojis.tg + " (" +(player.getTg()-1) +" -> **"+player.getTg()+"**) ";
+                        ButtonHelper.pillageCheck(player, activeMap);
                     }
                     case "ent" -> {
                         player.setTg(player.getTg()+2);
                         message = "Gained 2" + Emojis.tg + " (" +(player.getTg()-2) +" -> **"+player.getTg()+"**) ";
+                        ButtonHelper.pillageCheck(player, activeMap);
                     }
                     case "majent" -> {
                         player.setTg(player.getTg()+3);
                         message = "Gained 3" + Emojis.tg + " (" +(player.getTg()-3) +" -> **"+player.getTg()+"**) ";
+                        ButtonHelper.pillageCheck(player, activeMap);
                     }
                     default -> message = "";
                 }
