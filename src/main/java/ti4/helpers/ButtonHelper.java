@@ -36,6 +36,32 @@ import ti4.model.PromissoryNoteModel;
 
 
 public class ButtonHelper {
+
+    public static List<Button> getLegendaryExhaustButtons(Player player, Map activeMap) {
+        String finChecker = "FFCC_"+player.getFaction() + "_";
+        List<Button> endButtons = new ArrayList<>();
+        String planet = "mallice";
+        if(player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet))
+        {
+            endButtons.add(Button.success("planetAbilityExhaust_"+planet, "Use Mallice Ability"));
+        }
+        planet = "mirage";
+        if(player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet))
+        {
+            endButtons.add(Button.success("planetAbilityExhaust_"+planet, "Use Mirage Ability"));
+        }
+        planet = "hopesend";
+        if(player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet))
+        {
+            endButtons.add(Button.success("planetAbilityExhaust_"+planet, "Use Hope's End Ability"));
+        }
+        planet = "primor";
+        if(player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet))
+        {
+            endButtons.add(Button.success("planetAbilityExhaust_"+planet, "Use Primor Ability"));
+        }
+        return endButtons;
+    }
     public static List<Button> getStartOfTurnButtons(Player player, Map activeMap, boolean doneActionThisTurn) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> startButtons = new ArrayList<>();
@@ -61,10 +87,12 @@ public class ButtonHelper {
         if(!hadAnyUnplayedSCs && !doneActionThisTurn)
         {
             Button pass = Button.danger(finChecker+"passForRound", "Pass");
+            startButtons.addAll(ButtonHelper.getLegendaryExhaustButtons(player, activeMap));
             startButtons.add(pass);
         }
         if(doneActionThisTurn)
         {
+            startButtons.addAll(ButtonHelper.getLegendaryExhaustButtons(player, activeMap));
             Button pass = Button.danger("turnEnd", "End Turn");
             startButtons.add(pass);
         }else if(player.getTechs().contains("cm")) {
@@ -216,6 +244,17 @@ public class ButtonHelper {
         }
         return buttons;
        
+    }
+
+    public static List<Tile> getTilesWithShipsInTheSystem(Player player, Map activeMap) {
+        List<Tile> buttons = new ArrayList<>();
+        for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(activeMap.getTileMap()).entrySet()) {
+			if (FoWHelper.playerHasShipsInSystem(player, tileEntry.getValue())) {
+                Tile tile = tileEntry.getValue();
+                buttons.add(tile);
+			}
+		}
+        return buttons;
     }
 
 
@@ -1232,7 +1271,7 @@ public class ButtonHelper {
                     p1.setStrategicCC(p1.getStrategicCC()-1);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     String message = "Select the planet you would like to place 2 infantry on.";
-                    List<Button> buttons = Helper.getPlanetPlaceUnitButtons(event, p1, activeMap, "2gf");
+                    List<Button> buttons = Helper.getPlanetPlaceUnitButtons(p1, activeMap, "2gf", "place");
                     buttons.add(Button.danger("orbitolDropFollowUp", "Done Dropping Infantry"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
 

@@ -572,21 +572,20 @@ public class Helper {
         return planetButtons;
     }
 
-    public static List<Button> getPlanetPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, String unit) {
+    public static List<Button> getPlanetPlaceUnitButtons(Player player, Map activeMap, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
-            Button button = Button.danger("FFCC_"+player.getFaction()+"_"+"place_"+unit+"_"+planet, Helper.getPlanetRepresentation(planet, activeMap));
+            Button button = Button.danger("FFCC_"+player.getFaction()+"_"+prefix+"_"+unit+"_"+planet, Helper.getPlanetRepresentation(planet, activeMap));
             planetButtons.add(button);
         }
         return planetButtons;
     }
-    public static List<Button> getSpaceShipsPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, String unit) {
+    public static List<Button> getTileWithShipsPlaceUnitButtons(Player player, Map activeMap, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets());
-      
-        for (String planet : planets) {
-            Button button = Button.danger("FFCC_"+player.getFaction()+"_"+"place_"+unit+"_"+planet, Helper.getPlanetRepresentation(planet, activeMap));
+        List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, activeMap);
+        for (Tile tile : tiles) {
+            Button button = Button.danger("FFCC_"+player.getFaction()+"_"+prefix+"_"+unit+"_"+tile.getPosition(), tile.getRepresentationForButtons(activeMap,player));
             planetButtons.add(button);
         }
         return planetButtons;
