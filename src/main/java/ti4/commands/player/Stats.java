@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.GenerateMap;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -112,7 +113,11 @@ public class Stats extends PlayerSubcommandData {
 
 		OptionMapping optionTG = event.getOption(Constants.TG);
 		if (optionTG != null) {
+			if(optionTG.getAsString().contains("+")){
+				ButtonHelper.pillageCheck(player, activeMap);
+			}
 			setValue(event, activeMap, player, optionTG, player::setTg, player::getTg);
+
 		}
 
 		OptionMapping optionC = event.getOption(Constants.COMMODITIES);
@@ -294,6 +299,7 @@ public class Stats extends PlayerSubcommandData {
 				}
 
 				player.setTg(tg);
+				ButtonHelper.pillageCheck(player, activeMap);
 			}
 			return true;
 
