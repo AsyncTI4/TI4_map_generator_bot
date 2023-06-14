@@ -2896,12 +2896,12 @@ public class ButtonListener extends ListenerAdapter {
                             if (threadChannel_.getName().equals(threadName)) {
                                 foundsomething = true;
                                 if(activeMap.isFoWMode()){
-                                    MessageHelper.sendFileToChannel(event.getChannel(), file);
+                                    MessageHelper.sendFileToChannel((MessageChannel) threadChannel_, file);
                                 }else{
                                     List<Button> buttonsWeb = new ArrayList<Button>();
                                     Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
                                     buttonsWeb.add(linkToWebsite);
-                                    MessageHelper.sendFileToChannelWithButtonsAfter(event.getChannel(), file, "",buttonsWeb);
+                                    MessageHelper.sendFileToChannelWithButtonsAfter((MessageChannel) threadChannel_, file, "",buttonsWeb);
                                 }
 
 
@@ -2957,7 +2957,7 @@ public class ButtonListener extends ListenerAdapter {
                                     List<Button> buttonsWeb = new ArrayList<Button>();
                                     Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
                                     buttonsWeb.add(linkToWebsite);
-                                    MessageHelper.sendFileToChannelWithButtonsAfter(event.getChannel(), file, "",buttonsWeb);
+                                    MessageHelper.sendFileToChannelWithButtonsAfter((MessageChannel) threadChannel_, file, "",buttonsWeb);
                                 }
                                 foundsomething = true;
                             }
