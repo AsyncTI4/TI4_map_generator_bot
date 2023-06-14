@@ -22,4 +22,13 @@ public class TestResourceHelper {
         assertEquals(tileID, tileID);
     }
 
+    @Test
+    public void loadPlanetInfoIntoJson() {
+        //set up all the loaders
+        Mapper.init();
+        //import everything into the new SystemModel object
+        //export to json
+        //verify all the output is the same
+    }
+
 }

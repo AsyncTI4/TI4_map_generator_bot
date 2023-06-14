@@ -163,12 +163,14 @@ public class ResourceHelper {
         if (resourceFile.exists()){
             return resourceFile.getAbsolutePath();
         }
+        else {
+            System.out.println("Could not find resource file " + name + " in folder " + folder);
+        }
         return null;
     }
 
     @Nullable
     public String getInfoFile(String name) {
-        System.out.println();
         return getResourceFromFolder("info/", name, "Could not find info file");
     }
 
