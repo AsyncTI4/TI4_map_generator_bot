@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
@@ -15,6 +16,8 @@ import ti4.map.MapManager;
 import ti4.message.MessageHelper;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShowGame implements Command {
 
@@ -78,7 +81,14 @@ public class ShowGame implements Command {
             }
         }
         File file = GenerateMap.getInstance().saveImage(activeMap, displayType, event);
-        MessageHelper.sendFileToChannel(event.getChannel(), file);
+        if(activeMap.isFoWMode()){
+            MessageHelper.sendFileToChannel(event.getChannel(), file);
+        }else{
+            List<Button> buttonsWeb = new ArrayList<Button>();
+            Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
+            buttonsWeb.add(linkToWebsite);
+            MessageHelper.sendFileToChannelWithButtonsAfter(event.getChannel(), file, "",buttonsWeb);
+        }
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
