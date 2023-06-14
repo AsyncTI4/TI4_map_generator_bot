@@ -97,6 +97,11 @@ public class MessageHelper {
 		FileUpload fileUpload = FileUpload.fromData(file);
 		channel.sendFiles(fileUpload).queue();
 	}
+	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, File file, String message, List<Button> buttons) {
+		FileUpload fileUpload = FileUpload.fromData(file);
+		channel.sendFiles(fileUpload).queue();
+		splitAndSent(message, channel, buttons);
+	}
 
 	public static void replyToMessage(GenericInteractionCreateEvent event, String messageText) {
 		splitAndSent(messageText, event.getMessageChannel());
