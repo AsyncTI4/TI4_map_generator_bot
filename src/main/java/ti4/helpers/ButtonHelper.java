@@ -1,5 +1,6 @@
 package ti4.helpers;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
@@ -11,6 +12,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.io.File;
 import java.util.*;
+import org.apache.commons.lang3.StringUtils;
 
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
@@ -37,28 +39,49 @@ import ti4.model.PromissoryNoteModel;
 
 public class ButtonHelper {
 
+    public static void pillageCheck(Player player, Map activeMap) {
+        if(Helper.getPlayerFromAbility(activeMap, "pillage") != null && !Helper.getPlayerFromAbility(activeMap, "pillage").getFaction().equalsIgnoreCase(player.getFaction())){
+             
+            Player pillager = Helper.getPlayerFromAbility(activeMap, "pillage");
+            String finChecker = "FFCC_"+pillager.getFaction() + "_";
+            if(player.getTg() > 2 && Helper.getNeighbouringPlayers(activeMap, player).contains(pillager)){
+                List<Button> buttons = new ArrayList<Button>();
+                String playerIdent = StringUtils.capitalize(player.getFaction());
+                MessageChannel channel = activeMap.getMainGameChannel();
+                if(activeMap.isFoWMode()){
+                    playerIdent = StringUtils.capitalize(player.getColor());
+                    channel = pillager.getPrivateChannel();
+                }
+                String message = Helper.getPlayerRepresentation(pillager, activeMap, activeMap.getGuild(), true) + " you may have the opportunity to pillage "+playerIdent+". Please check this is a valid pillage opportunity, and use buttons to resolve.";
+                buttons.add(Button.danger(finChecker+"pillage_"+player.getColor()+"_unchecked","Pillage "+playerIdent));
+                buttons.add(Button.success(finChecker+"deleteButtons","Decline Pillage Window"));
+                MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+            }
+        }
+
+    }
     public static List<Button> getLegendaryExhaustButtons(Player player, Map activeMap) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> endButtons = new ArrayList<>();
         String planet = "mallice";
         if(player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet))
         {
-            endButtons.add(Button.success("planetAbilityExhaust_"+planet, "Use Mallice Ability"));
+            endButtons.add(Button.success(finChecker+"planetAbilityExhaust_"+planet, "Use Mallice Ability"));
         }
         planet = "mirage";
         if(player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet))
         {
-            endButtons.add(Button.success("planetAbilityExhaust_"+planet, "Use Mirage Ability"));
+            endButtons.add(Button.success(finChecker+"planetAbilityExhaust_"+planet, "Use Mirage Ability"));
         }
         planet = "hopesend";
         if(player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet))
         {
-            endButtons.add(Button.success("planetAbilityExhaust_"+planet, "Use Hope's End Ability"));
+            endButtons.add(Button.success(finChecker+"planetAbilityExhaust_"+planet, "Use Hope's End Ability"));
         }
         planet = "primor";
         if(player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet))
         {
-            endButtons.add(Button.success("planetAbilityExhaust_"+planet, "Use Primor Ability"));
+            endButtons.add(Button.success(finChecker+"planetAbilityExhaust_"+planet, "Use Primor Ability"));
         }
         return endButtons;
     }
@@ -863,7 +886,7 @@ public class ButtonHelper {
             }
         }
         Button button = Button.secondary(finChecker+"transactWith_"+p2.getColor(), "Send something else to player?");
-        Button done = Button.secondary("deleteButtons", "Done With This Transaction");
+        Button done = Button.secondary("finishTransaction_"+p2.getColor(), "Done With This Transaction");
                     
         goAgainButtons.add(button);
         goAgainButtons.add(done);
