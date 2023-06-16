@@ -189,7 +189,7 @@ public class Player {
         return false;
     }
     public boolean hasWarsunTech() {
-        if(getTechs().contains("pws2") ||getTechs().contains("dsrohdws") ||getTechs().contains("ws"))
+        if(getTechs().contains("pws2") ||getTechs().contains("dsrohdws") ||getTechs().contains("ws") || getFaction().equalsIgnoreCase("muaat"))
         {
             return true; 
         }
