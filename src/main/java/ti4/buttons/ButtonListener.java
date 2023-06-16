@@ -60,6 +60,7 @@ import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.AgendaModel;
 import ti4.map.Tile;
 
 import java.io.File;
@@ -2001,6 +2002,22 @@ public class ButtonListener extends ListenerAdapter {
             new PutAgendaTop().putTop((GenericInteractionCreateEvent) event, Integer.parseInt(agendaNumID), activeMap);
             MessageHelper.sendMessageToChannel(event.getChannel(),
                     "Put " + agendaNumID + " on the top of the agenda deck.");
+        } else if (buttonID.startsWith("primaryOfWarfare")) {
+            List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeMap, event, "warfare");
+            MessageChannel channel = event.getMessageChannel();
+            if(activeMap.isFoWMode()){
+                channel = player.getPrivateChannel();
+            }
+            MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("mahactCommander")) {
+            List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeMap, event, "mahactCommander");
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to remove token.", buttons);
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("removeCCFromBoard_")) {
+            ButtonHelper.resolveRemovingYourCC(player, activeMap, event, buttonID);
+            event.getMessage().delete().queue();
+
         } else if (buttonID.startsWith("bottomAgenda_")) {
             String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
             new PutAgendaBottom().putBottom((GenericInteractionCreateEvent) event, Integer.parseInt(agendaNumID),
@@ -2015,7 +2032,9 @@ public class ButtonListener extends ListenerAdapter {
             if (agendaid.equalsIgnoreCase("CL")) {
                 String id2 = activeMap.revealAgenda(false);
                 LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
-                MessageHelper.sendMessageToChannel(actionsChannel, "The hidden agenda was " + Mapper.getAgendaTitle(id2)
+                AgendaModel agendaDetails = Mapper.getAgenda(id2);
+                String agendaName = agendaDetails.name;
+                MessageHelper.sendMessageToChannel(actionsChannel, "The hidden agenda was " + agendaName
                         + "! You can find it added as a law or in the discard.");
                 Integer uniqueID = discardAgendas.get(id2);
                 aID = uniqueID;
