@@ -39,6 +39,19 @@ import ti4.model.PromissoryNoteModel;
 
 public class ButtonHelper {
 
+    public static List<Player> getOtherPlayersWithShipsInTheSystem(Player player, Map activeMap, Tile tile) {
+        List<Player> playersWithShips = new ArrayList<>();
+        for(Player p2 : activeMap.getPlayers().values()){
+            if(p2 == player || !p2.isRealPlayer()){
+                continue;
+            }
+            if(FoWHelper.playerHasShipsInSystem(p2, tile)){
+                playersWithShips.add(p2);
+            }
+        }
+        return playersWithShips;
+    }
+
     public static List<Tile> getTilesWithYourCC(Player player, Map activeMap, GenericInteractionCreateEvent event) {
         List<Tile> tilesWithCC = new ArrayList<>();
         for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(activeMap.getTileMap()).entrySet()) {
@@ -367,9 +380,19 @@ public class ButtonHelper {
             AddCC.addCC(event, player.getColor(), tile, true);
         }
         for(String unit :displacedUnits.keySet()){
+            
             int amount = displacedUnits.get(unit);
-            new AddUnits().unitParsing(event, player.getColor(),
-            tile, amount +" " +unit, activeMap);
+            if(unit.contains("damaged")){
+                unit = unit.replace("damaged", "");
+                 String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unit), player.getColor());
+                 new AddUnits().unitParsing(event, player.getColor(),
+                    tile, amount +" " +unit, activeMap);
+                tile.addUnitDamage("space", unitID, amount);
+            }else{
+                new AddUnits().unitParsing(event, player.getColor(),
+                            tile, amount +" " +unit, activeMap);
+            }
+           
         }
         activeMap.resetCurrentMovedUnitsFrom1TacticalAction();
         String colorID = Mapper.getColorID(player.getColor());
@@ -474,8 +497,16 @@ public class ButtonHelper {
             String[] combo = unit.split("_");
             combo[1] = combo[1].toLowerCase().replace(" ", "");
             combo[1] = combo[1].replace("'", "");
-            new AddUnits().unitParsing(event, player.getColor(),
-            tile, amount +" " +combo[0]+" "+combo[1], activeMap);
+            if(combo[0].contains("damaged")){
+                combo[0]=combo[0].replace("damaged","");
+                new AddUnits().unitParsing(event, player.getColor(),
+                    tile, amount +" " +combo[0]+" "+combo[1], activeMap);
+                tile.addUnitDamage(combo[1], combo[0],amount);
+            }else{
+                 new AddUnits().unitParsing(event, player.getColor(),
+                tile, amount +" " +combo[0]+" "+combo[1], activeMap);
+            }
+           
             String key = Mapper.getUnitID(AliasHandler.resolveUnit(combo[0]), player.getColor());
             tile.removeUnit("space",key, amount);
         }
@@ -490,9 +521,15 @@ public class ButtonHelper {
         String message = "";
         HashMap<String, Integer> displacedUnits =  activeMap.getCurrentMovedUnitsFrom1System();
         String prefix = " > "+Helper.getFactionIconFromDiscord(player.getFaction());
+        
         for(String unit :displacedUnits.keySet())
         {
             int amount = displacedUnits.get(unit);
+            String damagedMsg = "";
+            if(unit.contains("damaged")){
+                unit = unit.replace("damaged", "");
+                damagedMsg = " damaged ";
+            }
             String planet  = null;
             if(unit.contains("_")){
                 planet = unit.substring(unit.lastIndexOf("_")+1, unit.length());
@@ -500,7 +537,7 @@ public class ButtonHelper {
             }
             if(landing)
             {
-                message = message + prefix+" Landed "+amount + " " +Helper.getEmojiFromDiscord(unit.toLowerCase());
+                message = message + prefix+" Landed "+amount + " "+damagedMsg +Helper.getEmojiFromDiscord(unit.toLowerCase());
                 if(planet == null){
                     message = message + "\n";
                 }
@@ -509,7 +546,7 @@ public class ButtonHelper {
                 }
             }
             else {
-                message = message + prefix+" Moved "+amount + " " +Helper.getEmojiFromDiscord(unit.toLowerCase());
+                message = message + prefix+" Moved "+amount + " "+damagedMsg +Helper.getEmojiFromDiscord(unit.toLowerCase());
                 if(planet == null){
                     message = message + "\n";
                 }
@@ -518,6 +555,9 @@ public class ButtonHelper {
                 }
             }
             
+        }
+        if(message.equalsIgnoreCase("")){
+            message = "Nothing moved.";
         }
         return message;
     }
@@ -608,9 +648,23 @@ public class ButtonHelper {
                         if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {
                             
                             String unitKey = key.replace(cID+"_", "");
+                            
+                            int totalUnits = unitEntry.getValue();
                             unitKey  = unitKey.replace(".png", "");
                             unitKey = ButtonHelper.getUnitName(unitKey);
-                            for(int x = 1; x < unitEntry.getValue() +1; x++){
+                            int damagedUnits = 0;
+                            if(unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null){
+                                damagedUnits = unitHolder.getUnitDamage().get(key);
+                            }
+                            for(int x = 1; x < damagedUnits +1; x++){
+                                if(x > 2){
+                                    break;
+                                }
+                                Button validTile2 = Button.danger(finChecker+"unitTacticalMove_"+tile.getPosition()+"_"+x+unitKey+"damaged", "Move "+x+" damaged "+unitRepresentation.get(unitRepresentationKey)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
+                                buttons.add(validTile2);
+                                totalUnits = totalUnits-1;
+                            }
+                            for(int x = 1; x < totalUnits +1; x++){
                                 if(x > 2){
                                     break;
                                 }
@@ -632,6 +686,12 @@ public class ButtonHelper {
         {
             String unitkey = "";
             String planet = "";
+            String origUnit = unit;
+            String damagedMsg = "";
+            if(unit.contains("damaged")){
+                unit = unit.replace("damaged", "");
+                damagedMsg = " damaged ";
+            }
             if(unit.contains("_"))
             {
                 unitkey =unit.split("_")[0];
@@ -640,14 +700,14 @@ public class ButtonHelper {
             else{
                 unitkey = unit;
             }
-            for(int x = 1; x < displacedUnits.get(unit)+1; x++)
+            for(int x = 1; x < displacedUnits.get(origUnit)+1; x++)
             {
-                String blabel =  "Undo move of "+x+" "+unitkey;
+                String blabel =  "Undo move of "+x+" "+damagedMsg+unitkey;
                 if(!planet.equalsIgnoreCase(""))
                 {
                     blabel = blabel + " from "+Helper.getPlanetRepresentation(planet.toLowerCase(), activeMap);
                 }
-                Button validTile2 = Button.success(finChecker+"unitTacticalMove_"+tile.getPosition()+"_"+x+unit+"_reverse",blabel).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitkey.toLowerCase().replace(" ", ""))));
+                Button validTile2 = Button.success(finChecker+"unitTacticalMove_"+tile.getPosition()+"_"+x+unit+damagedMsg.replace(" ","")+"_reverse",blabel).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitkey.toLowerCase().replace(" ", ""))));
                 buttons.add(validTile2);
             }
         }
