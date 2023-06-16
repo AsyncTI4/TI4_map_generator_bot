@@ -9,6 +9,8 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -1847,9 +1849,20 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 unitkey = rest;
             }
+            unitkey = unitkey.replace("damaged", "");
+            planet = planet.replace("damaged", "");
+            String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitkey), player.getColor());
+            rest = rest.replace("damaged", "");
             if (amount < 0) {
+                
                 new AddUnits().unitParsing(event, player.getColor(),
                         activeMap.getTileByPosition(pos), (amount * -1) + " " + unitkey + " " + planet, activeMap);
+                if(buttonLabel.toLowerCase().contains("damaged")){
+                    if (planet.equalsIgnoreCase("")) {
+                        planet = "space";
+                    }
+                    activeMap.getTileByPosition(pos).addUnitDamage(planet, unitID, (amount * -1));
+                }
             } else {
                 String planetName = "";
                 if (planet.equalsIgnoreCase("")) {
@@ -1861,15 +1874,27 @@ public class ButtonListener extends ListenerAdapter {
                     planetName = AliasHandler.resolvePlanet(planetName);
 
                 }
-
-                String key = Mapper.getUnitID(AliasHandler.resolveUnit(unitkey), player.getColor());
-                activeMap.getTileByPosition(pos).removeUnit(planetName, key, amount);
+                
+                if(buttonLabel.toLowerCase().contains("damaged")){
+                    new RemoveUnits().removeStuff(event, activeMap.getTileByPosition(pos), amount, planetName, unitID, player.getColor(), true);
+                }else{
+                    new RemoveUnits().removeStuff(event, activeMap.getTileByPosition(pos), amount, planetName, unitID, player.getColor(), false);
+                }
+               // String key = Mapper.getUnitID(AliasHandler.resolveUnit(unitkey), player.getColor());
+                //activeMap.getTileByPosition(pos).removeUnit(planetName, key, amount);
+            }
+            if(buttonLabel.toLowerCase().contains("damaged")){ 
+                unitkey = unitkey + "damaged";
+                rest = rest+"damaged";
             }
             HashMap<String, Integer> currentSystem = activeMap.getCurrentMovedUnitsFrom1System();
             if (currentSystem.containsKey(rest)) {
                 activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
             } else {
                 activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
+            }
+            if(currentSystem.get(rest) == 0){
+                currentSystem.remove(rest);
             }
             HashMap<String, Integer> currentActivation = activeMap.getMovedUnitsFromCurrentActivation();
             if (currentActivation.containsKey(unitkey)) {
@@ -1897,6 +1922,9 @@ public class ButtonListener extends ListenerAdapter {
                 planet = rest.split("_")[1].replace(" ", "").toLowerCase();
             } else {
                 unitkey = rest;
+            }
+            if(buttonLabel.toLowerCase().contains("damaged")){
+                rest = rest+"damaged";
             }
             HashMap<String, Integer> currentSystem = activeMap.getCurrentMovedUnitsFrom1System();
             if (currentSystem.containsKey(rest)) {
@@ -2996,8 +3024,8 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "concludeMove" -> {
 
-                    String message = "Moved all units to the space area. Make sure to resolve any space combat, and then use the buttons to land troops.";
-
+                    String message = "Moved all units to the space area.";
+                    Tile tile = activeMap.getTileByPosition(activeMap.getActiveSystem());
                     List<Button> systemButtons = null;
                     if (activeMap.getMovedUnitsFromCurrentActivation().isEmpty()) {
                         message = "Nothing moved. Use buttons to decide if you want to build (if you can) or finish the activation";
@@ -3005,6 +3033,37 @@ public class ButtonListener extends ListenerAdapter {
                         systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeMap, event);
                     } else {
                         systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
+                        List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeMap, tile);
+                        if(players.size() > 0){
+                            Player player2 = players.get(0);
+                            String messageCombat = "Resolve space combat.";
+                            if(!activeMap.isFoWMode() && !activeMap.isAllianceMode()){
+                                MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(messageCombat);
+                                TextChannel textChannel = (TextChannel)mainGameChannel;
+                                String threadName =  activeMap.getName() + "-round-" + activeMap.getRound() + "-system-" + tile.getPosition()+"-"+player.getFaction()+"-vs-"+player2.getFaction();
+                                Player p1 = player;
+                                mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
+                                    ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
+                                    threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
+                                    threadChannel.queue(m5 -> {
+                                        List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+                                        if (threadChannels != null) {
+                                            for (ThreadChannel threadChannel_ : threadChannels) {
+                                                if (threadChannel_.getName().equals(threadName)) {
+                                                    MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_, Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true) + Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true) + " Please resolve the interaction here. The first step is any pds fire or playing of experimental battle station. Then the playing of any start of combat or start of a combat round abilities (includes skilled retreat). Then the rolling of anti-fighter-barrage. Then the declaration of retreats (includes the playing of rout). Then the rolling of dice. None of this is automated yet.");
+                                                }
+                                            }
+                                        }
+                                    });
+                                });
+                            }
+                            else{
+                                message = message + " Make sure to resolve space combat";
+                            }
+                        }
+                        if(systemButtons.size() > 1){
+                            message = message + " Use the buttons to land troops.";
+                        }
                     }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
