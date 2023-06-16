@@ -39,6 +39,55 @@ import ti4.model.PromissoryNoteModel;
 
 public class ButtonHelper {
 
+    public static List<Tile> getTilesWithYourCC(Player player, Map activeMap, GenericInteractionCreateEvent event) {
+        List<Tile> tilesWithCC = new ArrayList<>();
+        for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(activeMap.getTileMap()).entrySet()) {
+			if (AddCC.hasCC(event, player.getColor(), tileEntry.getValue())) {
+                Tile tile = tileEntry.getValue();
+                tilesWithCC.add(tile);
+			}
+		}
+        return tilesWithCC;
+    }
+    public static void resolveRemovingYourCC(Player player, Map activeMap, GenericInteractionCreateEvent event, String buttonID) {
+        buttonID = buttonID.replace("removeCCFromBoard_","");
+        String whatIsItFor = buttonID.split("_")[0];
+        String pos = buttonID.split("_")[1];
+        Tile tile = activeMap.getTileByPosition(pos);
+        RemoveCC.removeCC(event, player.getColor(), tile, activeMap);
+         String ident = Helper.getFactionIconFromDiscord(player.getFaction());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+" removed CC from "+tile.getRepresentationForButtons(activeMap, player));
+
+        if(whatIsItFor.equalsIgnoreCase("mahactCommander")){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+ "reduced their tactic CCs from " + player.getTacticalCC() +" to "+ (player.getTacticalCC()-1));
+            player.setTacticalCC(player.getTacticalCC()-1);
+            List<Button> conclusionButtons = new ArrayList<Button>();
+            Button endTurn = Button.danger("turnEnd", "End Turn");
+            conclusionButtons.add(endTurn);
+            conclusionButtons.addAll(ButtonHelper.getLegendaryExhaustButtons(player, activeMap));
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn.", conclusionButtons);
+        }
+        if(whatIsItFor.equalsIgnoreCase("warfare")){
+             List<Button> redistributeButton = new ArrayList<Button>();
+            Button redistribute= Button.success("FFCC_"+player.getFaction()+"_"+"redistributeCCButtons", "Redistribute & Gain CCs");
+            Button deleButton= Button.danger("FFCC_"+player.getFaction()+"_"+"deleteButtons", "Delete These Buttons");
+            redistributeButton.add(redistribute);
+            redistributeButton.add(deleButton);
+            MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), false) +" click this after picking up a CC.", redistributeButton);
+        }
+
+    }
+
+
+    public static List<Button> getButtonsToRemoveYourCC(Player player, Map activeMap, GenericInteractionCreateEvent event, String whatIsItFor) {
+        List<Button> buttonsToRemoveCC = new ArrayList<>();
+        String finChecker = "FFCC_"+player.getFaction() + "_";
+        for (Tile tile : ButtonHelper.getTilesWithYourCC(player, activeMap, event)) {
+			buttonsToRemoveCC.add(Button.success(finChecker+"removeCCFromBoard_"+whatIsItFor+"_"+tile.getPosition(), "Remove CC from "+tile.getRepresentationForButtons(activeMap, player)));
+		}
+        return buttonsToRemoveCC;
+    }
+
     public static void pillageCheck(Player player, Map activeMap) {
         if(Helper.getPlayerFromAbility(activeMap, "pillage") != null && !Helper.getPlayerFromAbility(activeMap, "pillage").getFaction().equalsIgnoreCase(player.getFaction())){
              
@@ -970,6 +1019,9 @@ public class ButtonHelper {
                 if(leaderAbilityWindow.equalsIgnoreCase("ACTION:") || leaderName.contains("Ssruu"))
                 {
                     Button lButton = Button.secondary(finChecker+prefix+"leader_"+leaderID, "Use "+leaderName).withEmoji(Emoji.fromFormatted(factionEmoji));
+                    compButtons.add(lButton);
+                }else if(leaderID.equalsIgnoreCase("mahactcommander") && p1.getTacticalCC() > 0 && ButtonHelper.getTilesWithYourCC(p1,activeMap,event).size()>0){
+                     Button lButton = Button.secondary(finChecker+"mahactCommander", "Use "+leaderName).withEmoji(Emoji.fromFormatted(factionEmoji));
                     compButtons.add(lButton);
                 }
             }
