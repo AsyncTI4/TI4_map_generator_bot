@@ -26,6 +26,8 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
+import ti4.generator.PositionMapper;
+import ti4.generator.UnitTokenPosition;
 import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.MapSaveLoadManager;
@@ -39,6 +41,75 @@ import ti4.model.PromissoryNoteModel;
 
 public class ButtonHelper {
 
+    public static List<String> getPlanetsWithSleeperTokens(Player player, Map activeMap, Tile tile) {
+        List<String> planetsWithSleepers = new ArrayList();
+        for(UnitHolder unitHolder :tile.getUnitHolders().values()){
+            if(unitHolder instanceof Planet planet){
+                if(planet.getTokenList().contains(Constants.TOKEN_SLEEPER_PNG)){
+                    planetsWithSleepers.add(planet.getName());
+                }
+            }
+        }
+        return planetsWithSleepers;
+    }
+    public static List<String> getPlanetsWithSpecificUnit(Player player, Map activeMap, Tile tile,String unit) {
+        List<String> planetsWithUnit = new ArrayList();
+        for(UnitHolder unitHolder :tile.getUnitHolders().values()){
+            if(unitHolder instanceof Planet planet){
+                if(planet.getUnits().keySet().contains(Mapper.getUnitID(AliasHandler.resolveUnit(unit), player.getColor()))){
+                    planetsWithUnit.add(planet.getName());
+                }
+            }
+        }
+        return planetsWithUnit;
+    }
+    public static List<String> getAllPlanetsWithSleeperTokens(Player player, Map activeMap) {
+        List<String> planetsWithSleepers = new ArrayList();
+        for(Tile tile :activeMap.getTileMap().values()){
+            planetsWithSleepers.addAll(getPlanetsWithSleeperTokens(player, activeMap, tile));
+        }
+        return planetsWithSleepers;
+    }
+    public static void doButtonsForSleepers(Player player, Map activeMap, Tile tile, ButtonInteractionEvent event) {
+         String finChecker = "FFCC_"+player.getFaction() + "_";
+       
+        for(String planet : ButtonHelper.getPlanetsWithSleeperTokens(player, activeMap, tile)){
+            List<Button> planetsWithSleepers = new ArrayList();
+            planetsWithSleepers.add(Button.success(finChecker+"replaceSleeperWith_pds_"+planet, "Replace sleeper on "+planet+ " with a pds."));
+            if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, player, "mech") < 4){
+                planetsWithSleepers.add(Button.success(finChecker+"replaceSleeperWith_mech_"+planet, "Replace sleeper on "+planet+ " with a mech and an infantry."));
+            }
+            planetsWithSleepers.add(Button.danger("deleteButtons", "Delete these buttons"));
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to resolve sleeper", planetsWithSleepers);
+        }
+        
+        
+    }
+    public static List<Button> getButtonsForTurningPDSIntoFS(Player player, Map activeMap, Tile tile) {
+         String finChecker = "FFCC_"+player.getFaction() + "_";
+        List<Button> planetsWithPDS = new ArrayList();
+        for(String planet : ButtonHelper.getPlanetsWithSpecificUnit(player, activeMap, tile, "pds")){
+            planetsWithPDS.add(Button.success(finChecker+"replacePDSWithFS_"+planet, "Replace pds on "+planet+ " with your flagship."));
+        }
+        planetsWithPDS.add(Button.danger("deleteButtons", "Delete these buttons"));
+        return planetsWithPDS;
+    }
+    public static List<Button> getButtonsForRemovingASleeper(Player player, Map activeMap) {
+         String finChecker = "FFCC_"+player.getFaction() + "_";
+        List<Button> planetsWithSleepers = new ArrayList();
+        for(String planet : ButtonHelper.getAllPlanetsWithSleeperTokens(player, activeMap)){
+            planetsWithSleepers.add(Button.success(finChecker+"removeSleeperFromPlanet_"+planet, "Remove the sleeper on "+planet+ "."));
+        }
+        planetsWithSleepers.add(Button.danger("deleteButtons", "Delete these buttons"));
+        return planetsWithSleepers;
+    }
+    public static void resolveTitanShenanigansOnActivation(Player player, Map activeMap, Tile tile, ButtonInteractionEvent event) {
+        List<Button> buttons = ButtonHelper.getButtonsForTurningPDSIntoFS(player, activeMap, tile);
+        if(buttons.size() > 1){
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to decide which pds to replace with your flagship", buttons);
+        }
+       ButtonHelper.doButtonsForSleepers(player, activeMap, tile, event);
+    }
     public static List<Player> getOtherPlayersWithShipsInTheSystem(Player player, Map activeMap, Tile tile) {
         List<Player> playersWithShips = new ArrayList<>();
         for(Player p2 : activeMap.getPlayers().values()){
@@ -1234,9 +1305,7 @@ public class ButtonHelper {
     }
     public static List<Tile> getTilesOfPlayersSpecificUnit(Map activeMap, Player p1, String unit)
     {
-
         List<Tile> tiles = new ArrayList<Tile>();
-
         for(Tile tile : activeMap.getTileMap().values())
         {
             boolean tileHasIt = false;
@@ -1253,10 +1322,34 @@ public class ButtonHelper {
                 tiles.add(tile);
             }
         }
-
-
-        return tiles;
-        
+        return tiles;  
+    }
+    public static int getNumberOfUnitsOnTheBoard(Map activeMap, Player p1, String unit)
+    {
+        int count = 0;
+        for(Tile tile : activeMap.getTileMap().values())
+        {
+            String unitKey = Mapper.getUnitID(AliasHandler.resolveUnit(unit), p1.getColor());
+            for(UnitHolder unitH : tile.getUnitHolders().values())
+            {
+                if(unitH.getUnits().containsKey(unitKey))
+                {
+                    count = count + unitH.getUnits().get(unitKey);
+                }
+            }
+            for (Player player_ : activeMap.getPlayers().values()) {
+                UnitHolder unitH = player_.getNomboxTile().getUnitHolders().get(Constants.SPACE);
+                if (unitH == null){
+                    continue;
+                }else{
+                    if(unitH.getUnits().containsKey(unitKey))
+                    {
+                        count = count + unitH.getUnits().get(unitKey);
+                    }
+                }
+            }
+        }
+        return count;  
     }
     public static void firstStepOfChaos(Map activeMap, Player p1, ButtonInteractionEvent event){
         List<Button> buttons = new ArrayList<Button>();
