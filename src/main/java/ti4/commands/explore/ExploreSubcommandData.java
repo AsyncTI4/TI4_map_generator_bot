@@ -333,5 +333,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             default -> MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + message);
         }
+
+        if(player.hasAbility("awaken") && !ButtonHelper.getAllPlanetsWithSleeperTokens(player, activeMap).contains(planetName)){
+            Button gainCC= Button.success("putSleeperOnPlanet_"+planetName, "Put Sleeper on "+planetName);
+            Button Decline3 = Button.danger("deleteButtons", "Decline To Put a Sleeper Down");
+            List<Button> buttons = List.of(gainCC, Decline3);
+            MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
+        }
     }
+
 }
