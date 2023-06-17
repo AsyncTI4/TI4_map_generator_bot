@@ -48,6 +48,7 @@ import ti4.commands.player.Stats;
 import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.Turn;
+import ti4.commands.special.SleeperToken;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.helpers.AgendaHelper;
@@ -1793,12 +1794,17 @@ public class ButtonListener extends ListenerAdapter {
             if (player.getTechs().contains("sdn") && !button2.isEmpty()) {
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Please resolve scanlink",
                         button2);
+                if(player.hasAbility("awaken")){
+                    ButtonHelper.resolveTitanShenanigansOnActivation(player, activeMap, activeMap.getTileByPosition(pos), event);
+                }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                         "\n\nUse buttons to select the first system you want to move from", systemButtons);
             } else {
+                if(player.hasAbility("awaken")){
+                    ButtonHelper.resolveTitanShenanigansOnActivation(player, activeMap, activeMap.getTileByPosition(pos), event);
+                }
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                         "Use buttons to select the first system you want to move from", systemButtons);
-
             }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("tacticalMoveFrom_")) {
@@ -2029,6 +2035,48 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("send_")) {
             ButtonHelper.resolveSpecificTransButtonPress(activeMap, player, buttonID, event);
+            event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("replacePDSWithFS_")) {
+            String ident = Helper.getFactionIconFromDiscord(player.getFaction());
+            buttonID = buttonID.replace("replacePDSWithFS_", "");
+            String planet = buttonID;
+            String message = ident + " replaced "+ Helper.getEmojiFromDiscord("pds") +" on " + Helper.getPlanetRepresentation(planet,activeMap)+ " with a "+ Helper.getEmojiFromDiscord("flagship");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            new AddUnits().unitParsing(event, player.getColor(),activeMap.getTile(AliasHandler.resolveTile(planet)), "flagship",activeMap);
+            String key = Mapper.getUnitID(AliasHandler.resolveUnit("pds"), player.getColor());
+            activeMap.getTile(AliasHandler.resolveTile(planet)).removeUnit(planet,key, 1);
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("putSleeperOnPlanet_")) {
+            String ident = Helper.getFactionIconFromDiscord(player.getFaction());
+            buttonID = buttonID.replace("putSleeperOnPlanet_", "");
+            String planet = buttonID;
+            String message = ident+" put a sleeper on " + Helper.getPlanetRepresentation(planet,activeMap);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            new SleeperToken().addOrRemoveSleeper(event, activeMap, planet, player);
+            event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("removeSleeperFromPlanet_")) {
+            String ident = Helper.getFactionIconFromDiscord(player.getFaction());
+            buttonID = buttonID.replace("removeSleeperFromPlanet_", "");
+            String planet = buttonID;
+            String message = ident + " removed a sleeper from " + planet;
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            new SleeperToken().addOrRemoveSleeper(event, activeMap, planet, player);
+            event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("replaceSleeperWith_")) {
+            String ident = Helper.getFactionIconFromDiscord(player.getFaction());
+            buttonID = buttonID.replace("replaceSleeperWith_", "");
+            String planetName = buttonID.split("_")[1];
+            String unit = buttonID.split("_")[0];
+            String message = "";
+            new SleeperToken().addOrRemoveSleeper(event, activeMap, planetName, player);
+            if(unit.equalsIgnoreCase("mech")){
+                new AddUnits().unitParsing(event, player.getColor(),activeMap.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName + ", inf "+planetName,activeMap);
+                message = ident + " replaced a sleeper on " + Helper.getPlanetRepresentation(planetName,activeMap) + " with a "+ Helper.getEmojiFromDiscord("pds") +" and "+ Helper.getEmojiFromDiscord("infantry");
+            }else{
+                new AddUnits().unitParsing(event, player.getColor(),activeMap.getTile(AliasHandler.resolveTile(planetName)), "pds " + planetName,activeMap);
+                message = ident + " replaced a sleeper on " + Helper.getPlanetRepresentation(planetName,activeMap) + " with a "+ Helper.getEmojiFromDiscord("pds");
+            }
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("topAgenda_")) {
             String agendaNumID = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
