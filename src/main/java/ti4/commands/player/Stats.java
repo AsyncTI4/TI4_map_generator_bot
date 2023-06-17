@@ -319,11 +319,17 @@ public class Stats extends PlayerSubcommandData {
 			Consumer<Integer> consumer, Supplier<Integer> supplier, String value, boolean suppressMessage) {
 		try {
 			boolean setValue = !value.startsWith("+") && !value.startsWith("-");
+			String explanation = "";
+			if(value.contains("?")){	
+				explanation = value.substring(value.indexOf("?")+1, value.length());
+				value = value.substring(0, value.indexOf("?")).replace(" ", "");		
+			}
+			
 			int number = Integer.parseInt(value);
 			int existingNumber = supplier.get();
 			if (setValue) {
 				consumer.accept(number);
-				String messageToSend = getSetValueMessage(event, player, optionName, number, existingNumber);
+				String messageToSend = getSetValueMessage(event, player, optionName, number, existingNumber, explanation);
 				if (!suppressMessage) sendMessage(messageToSend);
 				if (activeMap.isFoWMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
@@ -332,7 +338,7 @@ public class Stats extends PlayerSubcommandData {
 				int newNumber = existingNumber + number;
 				newNumber = Math.max(newNumber, 0);
 				consumer.accept(newNumber);
-				String messageToSend = getChangeValueMessage(event, player, optionName, number, existingNumber, newNumber);
+				String messageToSend = getChangeValueMessage(event, player, optionName, number, existingNumber, newNumber, explanation);
 				if (!suppressMessage) sendMessage(messageToSend);
 				if (activeMap.isFoWMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
@@ -343,22 +349,35 @@ public class Stats extends PlayerSubcommandData {
 		}
 	}
 
-	public static String getSetValueMessage(SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber) {
-		return "> set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was "
+	public static String getSetValueMessage(SlashCommandInteractionEvent event, Player player, String optionName, Integer setToNumber, Integer existingNumber, String explanation) {
+		if(explanation == null || explanation.equalsIgnoreCase("")){
+			return "> set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was "
+							+ String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber - existingNumber)
+							+ ")_";
+		}else{
+			return "> set **" + optionName + "** to **" + String.valueOf(setToNumber) + "**   _(was "
 				+ String.valueOf(existingNumber) + ", a change of " + String.valueOf(setToNumber - existingNumber)
-				+ ")_";
+				+ ")_ for the reason of: "+explanation;
+		}
+		
 	}
 
 	public static String getChangeValueMessage(SlashCommandInteractionEvent event, Player player, String optionName,
-			Integer changeNumber, Integer existingNumber, Integer newNumber) {
+			Integer changeNumber, Integer existingNumber, Integer newNumber, String explanation) {
 		String changeDescription = "changed";
 		if (changeNumber > 0) {
 			changeDescription = "increased";
 		} else if (changeNumber < 0) {
 			changeDescription = "decreased";
 		}
-		return "> " + changeDescription + " **" + optionName + "** by " + String.valueOf(changeNumber) + "   _(was "
+		if(explanation == null || explanation.equalsIgnoreCase("")){
+			return "> " + changeDescription + " **" + optionName + "** by " + String.valueOf(changeNumber) + "   _(was "
 				+ String.valueOf(existingNumber) + ", now **" + String.valueOf(newNumber) + "**)_";
+		}else{
+			return "> " + changeDescription + " **" + optionName + "** by " + String.valueOf(changeNumber) + "   _(was "
+				+ String.valueOf(existingNumber) + ", now **" + String.valueOf(newNumber) + "**)_ for the reason of: "+explanation; 
+		}
+		
 	}
 
 	private static String getGeneralMessage(SlashCommandInteractionEvent event, Player player, OptionMapping option) {
