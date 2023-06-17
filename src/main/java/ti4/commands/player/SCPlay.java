@@ -292,7 +292,6 @@ public class SCPlay extends PlayerSubcommandData {
 
     private List<Button> getWarfareButtons() {
         Button warfarePrimary= Button.primary("primaryOfWarfare", "Do Warfare Primary");
-
         Button followButton = Button.success("sc_follow_6", "Spend A Strategy CC");
         Button homeBuild = Button.success("warfareBuild", "Build At Home");
         Button noFollowButton = Button.primary("sc_no_follow_6", "Not Following");

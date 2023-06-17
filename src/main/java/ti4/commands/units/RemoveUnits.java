@@ -71,7 +71,6 @@ public class RemoveUnits extends AddRemoveUnits {
                 Integer unitDamageCountInSystem = unitHolder.getUnitDamage().get(unitID);
                 if (unitDamageCountInSystem != null) {
                     countToRemove = unitDamageCountInSystem - (unitCountInSystem - count);
-
                 }
             }
         } else {
