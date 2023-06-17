@@ -2933,7 +2933,7 @@ public class ButtonListener extends ListenerAdapter {
                             + (player.getTg() + 2) + ").";
                     player.setTg(player.getTg() + 2);
                     ButtonHelper.pillageCheck(player, activeMap);
-                    if (activeMap.isFoWMode() && event.getMessageChannel() != activeMap.getMainGameChannel()) {
+                    if (!activeMap.isFoWMode() && event.getMessageChannel() != activeMap.getMainGameChannel()) {
                         MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
@@ -2947,7 +2947,7 @@ public class ButtonListener extends ListenerAdapter {
                             + player.getTg() + "->" + (player.getTg() + player.getCommodities()) + ").";
                     player.setTg(player.getTg() + player.getCommodities());
                     player.setCommodities(0);
-                    if (activeMap.isFoWMode() && event.getMessageChannel() != activeMap.getMainGameChannel()) {
+                    if (!activeMap.isFoWMode() && event.getMessageChannel() != activeMap.getMainGameChannel()) {
                         MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
                     }
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
