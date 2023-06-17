@@ -1034,9 +1034,9 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), summary2 + "\n \n");
 
                 String resMessage = "Please hold while people resolve shenanigans. " + losers.size()
-                        + " players have the opportunity to play deadly plot/bribery.";
+                        + " players have the opportunity to play deadly plot.";
                 if ((!activeMap.isACInDiscard("Bribery") || !activeMap.isACInDiscard("Deadly Plot"))
-                        && losers.size() > 0) {
+                        && (losers.size() > 0 || activeMap.isAbsolMode())) {
                     Button noDeadly = Button.primary("genericReact1", "No Deadly Plot");
                     Button noBribery = Button.primary("genericReact2", "No Bribery");
                     List<Button> deadlyActionRow = List.of(noBribery, noDeadly);
@@ -1058,9 +1058,14 @@ public class ButtonListener extends ListenerAdapter {
                                 "Please respond to bribery/deadly plot window");
                     }
                 } else {
-                    activeMap.getMainGameChannel().sendMessage(
-                            "Either both bribery and deadly plot were in the discard or noone could legally play them.")
-                            .queue();
+                    String messageShen = "Either both bribery and deadly plot were in the discard or noone could legally play them.";
+                    
+                    if (activeMap.getCurrentAgendaInfo().contains("Elect Player")&& (!activeMap.isACInDiscard("Confounding") || !activeMap.isACInDiscard("Confusing"))){
+
+                    } else{
+                        messageShen = messageShen + " There are no shenanigans possible. Please resolve the agenda. ";
+                    }
+                    activeMap.getMainGameChannel().sendMessage(messageShen).queue();
                 }
                 if (activeMap.getCurrentAgendaInfo().contains("Elect Player")
                         && (!activeMap.isACInDiscard("Confounding") || !activeMap.isACInDiscard("Confusing"))) {
@@ -2037,7 +2042,6 @@ public class ButtonListener extends ListenerAdapter {
                 channel = player.getPrivateChannel();
             }
             MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to remove token.", buttons);
-            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("mahactCommander")) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeMap, event, "mahactCommander");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to remove token.", buttons);
