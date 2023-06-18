@@ -7,8 +7,8 @@ public class PromissoryNoteModel implements ModelInterface {
     private String colour;
     private Boolean playArea;
     private String attachment;
-    private String text;
     private String source;
+    private String text; 
 
     public PromissoryNoteModel() {}
 
@@ -16,7 +16,6 @@ public class PromissoryNoteModel implements ModelInterface {
         return alias != null
             && name != null
             && (faction != null && colour != null)
-            && playArea != null
             && attachment != null
             && text != null
             && source != null;
