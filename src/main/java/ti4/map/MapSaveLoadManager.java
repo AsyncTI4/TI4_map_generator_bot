@@ -242,6 +242,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.LATEST_TRANSACTION_MSG + " " + activeMap.getLatestTransactionMsg());
         writer.write(System.lineSeparator());
+        writer.write(Constants.LATEST_UPNEXT_MSG + " " + activeMap.getLatestUpNextMsg());
+        writer.write(System.lineSeparator());
 
         writer.write(Constants.SO + " " + String.join(",", activeMap.getSecretObjectives()));
         writer.write(System.lineSeparator());
@@ -1012,6 +1014,7 @@ public class MapSaveLoadManager {
                 case Constants.LATEST_AFTER_MSG -> activeMap.setLatestAfterMsg(info);
                 case Constants.LATEST_WHEN_MSG -> activeMap.setLatestWhenMsg(info);
                 case Constants.LATEST_TRANSACTION_MSG -> activeMap.setLatestTransactionMsg(info);
+                case Constants.LATEST_UPNEXT_MSG -> activeMap.setLatestUpNextMsg(info);
                 case Constants.SO -> activeMap.setSecretObjectives(getCardList(info));
                 case Constants.AC -> activeMap.setActionCards(getCardList(info));
                 case Constants.PO1 -> activeMap.setPublicObjectives1(getCardList(info));
