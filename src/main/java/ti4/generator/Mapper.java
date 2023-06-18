@@ -68,7 +68,6 @@ public class Mapper {
     private static final java.util.Map<String, PlanetModel> allPlanetsMap = new HashMap<>();
 
     public static void init() {
-        readData("tiles.properties", tiles, "Could not read tiles name file"); //TODO: DELETE
         readData("units.properties", units, "Could not read unit name file");
         readData("color.properties", colors, "Could not read color name file");
         readData("cc_tokens.properties", cc_tokens, "Could not read cc token name file");
@@ -94,15 +93,12 @@ public class Mapper {
         readData("planets.properties", planets, "Could not read planets file");
         readData("attachments_info.properties", attachmentInfo, "Could not read attachment info file");
         readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
-        readData("planets_representation.properties", planet_representation, "Could not read planet representation file"); //TODO: DELETE
-        readData("tile_representation.properties", tile_representation, "Could not read tile representation file"); //TODO: DELETE
         readData("leader_representation.properties", leader_representation, "Could not read leader representation file");
         readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
         importJsonObjects("faction_setup.json", factionSetup, FactionModel.class, "Could not read faction setup file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("agenda_representation.properties", agendaRepresentation, "Could not read agenda representaion file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
-        readData("wormholes.properties", wormholes, "Could not read wormholes file"); //TODO: DELETE
         readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
         importJsonObjects("decks.json", decks, DeckModel.class, "couild not read decks file");
         jsonInit();

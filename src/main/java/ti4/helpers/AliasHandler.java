@@ -45,14 +45,9 @@ public class AliasHandler {
     private static final java.util.Map<String, String> allPlanetAliases = new HashMap<>();
 
     public static void init() {
-        readAliasFile("tile_alias.properties", tileAliasList, "Could not read tiles alias file"); //TODO: DELETE
-        readAliasFile("tile_alias.properties", tileAliasEntryList); //TODO: DELETE
         readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
         readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
         readAliasFile("unit_alias.properties", unitValuesList, false);
-        readAliasFile("planet_alias.properties", planetKeyList, true); //TODO: DELETE
-        readAliasFile("planet_alias.properties", planetAliasEntryList); //TODO: DELETE
-        readAliasFile("planet_alias.properties", planetAliasList, "Could not read planet alias file"); //TODO: DELETE
         readAliasFile("cc_token_alias.properties", cctokenAliasList, "Could not read cc token alias file");
         readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
         readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");

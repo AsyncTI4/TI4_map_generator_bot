@@ -52,11 +52,6 @@ public class PositionMapper {
         readData("6player.properties", positionTileMap6Player, "Could not read position file");
         readData("8player.properties", positionTileMap8Player, "Could not read position file");
         readData("8ring.properties", positionTileMap8Ring, "Could not read position file");
-        readData("planet.properties", planetPositions, "Could not read planet position file"); //TODO: DELETE
-        readData("ship_position_tilesbytype.properties", tileType, "Could not read tile type file"); //TODO: DELETE
-        readData("ship_position.properties", shipPosition, "Could not read ship position file"); // TODO: DELETE
-        readData("space_token.properties", spaceTokenPositions, "Could not read space token position file"); //TODO: DELETE
-        readData("planet_token.properties", planetTokenPositions, "Could not read planet token position file"); //TODO: DELETE
         readData("6player_info.properties", playerInfo, "Could not read player info position file");
         readData("8player_info.properties", playerInfo8, "Could not read player info position file");
         readData("8ring_info.properties", playerInfo8ring, "Could not read player info position file");
