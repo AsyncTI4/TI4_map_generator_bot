@@ -208,7 +208,15 @@ public class PositionMapper {
 
 
     public static UnitTokenPosition getPlanetTokenPosition(String planetName) {
-        return allPlanetsMap.get(planetName).getUnitPositions();
+        try {
+            return allPlanetsMap.get(planetName).getUnitPositions();
+        }
+        catch (Exception e){
+            System.out.println("ERROR");
+            System.out.println(planetName);
+            System.out.println(e.toString());
+        }
+        return null;
     }
 
     public static UnitTokenPosition getReinforcementsPosition(String unitId) {

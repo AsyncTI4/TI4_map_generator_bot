@@ -38,8 +38,8 @@ public class Tile {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
         if (player != null) {
-        	fog.put(player, fog_);
-        	fogLabel.put(player, fogLabel_);
+            fog.put(player, fog_);
+            fogLabel.put(player, fogLabel_);
         }
         initPlanetsAndSpace(tileID);
     }
@@ -52,6 +52,8 @@ public class Tile {
     }
 
     private void initPlanetsAndSpace(String tileID) {
+        if(tileID.equals("nombox"))
+            return;
 
         Space space = new Space(Constants.SPACE, Constants.SPACE_CENTER_POSITION);
         unitHolders.put(Constants.SPACE, space);
