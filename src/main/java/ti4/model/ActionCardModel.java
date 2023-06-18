@@ -1,40 +1,54 @@
 package ti4.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import ti4.message.BotLogger;
 import ti4.helpers.Emojis;
 
-public class ActionCardModel extends Model {
-    public String name;
-    public String phase;
-    public String window;
-    public String text;
-    public String flavorText;
-    public String source;
+public class ActionCardModel implements ModelInterface {
+    private String alias;
+    private String name;
+    private String phase;
+    private String window;
+    private String text;
+    private String flavorText;
+    private String source;
 
-    public ActionCardModel(JsonNode json) {
-        try {
-            alias = json.get("alias").asText();
-            name = json.get("name").asText();
-            phase = json.get("phase").asText();
-            window = json.get("window").asText();
-            text = json.get("text").asText();
-            flavorText = json.get("flavorText").asText();
-            source = json.get("source").asText();
-        } catch (Exception e) {
-            BotLogger.log("Could not load agenda.");
-        }
-    }
+    public ActionCardModel() {}
 
     public boolean isValid() {
-        return super.isValid()
+        return alias != null
             && name != null
             && phase != null
             && window != null
             && text != null
             && flavorText != null
             && source != null;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public String getName() {
+        return source;
+    }
+
+    public String getPhase() {
+        return flavorText;
+    }
+
+    public String getWindow() {
+        return text;
+    }
+
+    public String getText() {
+        return window;
+    }
+
+    public String getFlavorText() {
+        return phase;
+    }
+
+    public String getSource() {
+        return name;
     }
 
     public String getRepresentation() {

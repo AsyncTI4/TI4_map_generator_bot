@@ -86,8 +86,8 @@ public class AgendaHelper {
             button = Button.secondary(prefix+"_for", "For");
             button2 = Button.danger(prefix+"_against", "Against");
         } else {
-            button = Button.primary("rider_for_"+rider, "For");
-            button2 = Button.danger("rider_against_"+rider, "Against");
+            button = Button.primary("rider_fa;for_"+rider, "For");
+            button2 = Button.danger("rider_fa;against_"+rider, "Against");
         }
         voteButtons.add(button);
         voteButtons.add(button2);
@@ -143,7 +143,7 @@ public class AgendaHelper {
             if (rider == null) {
                 button = Button.secondary(prefix+"_"+law.getKey(), law.getKey());
             } else {
-                button = Button.secondary(prefix+"rider_"+law.getKey()+"_"+rider, law.getKey());
+                button = Button.secondary(prefix+"rider_law;"+law.getKey()+"_"+rider, law.getKey());
             }
             lawButtons.add(button);
         }
@@ -160,7 +160,7 @@ public class AgendaHelper {
                     
                     button = Button.secondary(prefix+"_"+so.getKey(), soName);
                 } else {
-                    button = Button.secondary(prefix+"rider_"+so.getKey()+"_"+rider, soName);
+                    button = Button.secondary(prefix+"rider_so;"+so.getKey()+"_"+rider, soName);
                 }
                 secretButtons.add(button);
             }
@@ -175,7 +175,7 @@ public class AgendaHelper {
             if (rider == null) {
                 button = Button.secondary(prefix+"_"+x, x+"");
             } else {
-                button = Button.secondary(prefix+"rider_"+x+"_"+rider, x+"");
+                button = Button.secondary(prefix+"rider_sc;"+x+"_"+rider, x+"");
             }
             strategyButtons.add(button);
         }
@@ -190,7 +190,7 @@ public class AgendaHelper {
             if (rider == null) {
                 button = Button.secondary(prefix+"_"+planet, Helper.getPlanetRepresentation(planet, activeMap));
             } else {
-                button = Button.secondary(prefix+"rider_"+planet+"_"+rider, Helper.getPlanetRepresentation(planet, activeMap));
+                button = Button.secondary(prefix+"rider_planet;"+planet+"_"+rider, Helper.getPlanetRepresentation(planet, activeMap));
             }
             planetOutcomeButtons.add(button);
         }
@@ -214,7 +214,7 @@ public class AgendaHelper {
                             }
                             else
                             {
-                                button = Button.secondary(prefix+"rider_"+faction+"_"+rider, " ");
+                                button = Button.secondary(prefix+"rider_player;"+faction+"_"+rider, " ");
                             }
                            
                         } else {
@@ -230,7 +230,7 @@ public class AgendaHelper {
                             }
                             else
                             {
-                                 button = Button.secondary(prefix+"rider_"+player.getColor()+"_"+rider, player.getColor());
+                                 button = Button.secondary(prefix+"rider_player;"+player.getColor()+"_"+rider, player.getColor());
                             }
                         } else {
                             button = Button.secondary(prefix+"_"+player.getColor(), player.getColor());
@@ -724,27 +724,9 @@ public class AgendaHelper {
                 outcome = specificVote.substring(specificVote.lastIndexOf(".")+3,specificVote.length());
             }
         }
-        if(currentHighest == 0)
-        {
+        if (currentHighest == 0) {
             return null;
         }
         return winner;
     }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 }
-

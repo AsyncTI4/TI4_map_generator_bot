@@ -81,7 +81,7 @@ public class SOInfo extends SOCardsSubcommandData {
     public static String getSecretObjectiveRepresentationShort(String soID, Integer soUniqueID) {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
-        String soName = so.name;
+        String soName = so.getName();
         sb.append(Emojis.SecretObjective).append("__" + soName + "__").append("\n");
         return sb.toString();
     }
@@ -93,9 +93,9 @@ public class SOInfo extends SOCardsSubcommandData {
     private static String getSecretObjectiveRepresentation(String soID, Integer soUniqueID) {
         StringBuilder sb = new StringBuilder();
         SecretObjectiveModel so = Mapper.getSecretObjective(soID);
-        String soName = so.name;
-        String soPhase = so.phase;
-        String soDescription = so.text;
+        String soName = so.getName();
+        String soPhase = so.getPhase();
+        String soDescription = so.getText();
         sb.append(Emojis.SecretObjective).append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
         return sb.toString();
     }
@@ -147,7 +147,7 @@ public class SOInfo extends SOCardsSubcommandData {
         if (secretObjective != null && !secretObjective.isEmpty()) {
             for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
                 SecretObjectiveModel so_ = Mapper.getSecretObjective(so.getKey());
-                String soName = so_.name;
+                String soName = so_.getName();
                 Integer idValue = so.getValue();
                 if (soName != null) {
                     soButtons.add(Button.primary(Constants.SO_SCORE_FROM_HAND + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));
@@ -162,7 +162,7 @@ public class SOInfo extends SOCardsSubcommandData {
         if (secretObjective != null && !secretObjective.isEmpty()) {
             for (java.util.Map.Entry<String, Integer> so : secretObjective.entrySet()) {
                 SecretObjectiveModel so_ = Mapper.getSecretObjective(so.getKey());
-                String soName = so_.name;
+                String soName = so_.getName();
                 Integer idValue = so.getValue();
                 if (soName != null) {
                     soButtons.add(Button.danger("SODISCARD_" + idValue, "(" + idValue + ") " + soName).withEmoji(Emoji.fromFormatted(Emojis.SecretObjective)));

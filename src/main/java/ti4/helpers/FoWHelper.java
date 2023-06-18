@@ -165,7 +165,7 @@ public class FoWHelper {
 		} else {
 			FactionModel playerSetup = Mapper.getFactionSetup(faction);
 			if (playerSetup != null) {
-				hsIDs.add(playerSetup.homeSystemTile);
+				hsIDs.add(playerSetup.getHomeSystem());
 			}
 		}
 

@@ -51,6 +51,7 @@ public class Map {
     private String latestAfterMsg = "";
     private String latestWhenMsg = "";
     private String latestTransactionMsg = "";
+    private String latestUpNextMsg = "";
 
     private int mapImageGenerationCount = 0;
 
@@ -261,6 +262,9 @@ public class Map {
     public String getLatestTransactionMsg() {
         return latestTransactionMsg;
     }
+    public String getLatestUpNextMsg() {
+        return latestUpNextMsg;
+    }
 
     public void setLatestOutcomeVotedFor(String outcomeVotedFor) {
         latestOutcomeVotedFor = outcomeVotedFor;
@@ -273,6 +277,9 @@ public class Map {
     }
     public void setLatestTransactionMsg(String latestTransaction) {
         latestTransactionMsg = latestTransaction;
+    }
+    public void setLatestUpNextMsg(String latestTransaction) {
+        latestUpNextMsg = latestTransaction;
     }
 
 
@@ -326,7 +333,7 @@ public class Map {
         boolean isInDiscard = false;
         for (java.util.Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
 
-            if (Mapper.getActionCard(ac.getKey()).name.contains(name)) {
+            if (Mapper.getActionCard(ac.getKey()).getName().contains(name)) {
                 return true;
             }
         }
@@ -928,12 +935,10 @@ public class Map {
     }
 
     public java.util.Map.Entry<String, Integer> revealState1() {
-        Collections.shuffle(publicObjectives1);
         return revealObjective(publicObjectives1);
     }
 
     public java.util.Map.Entry<String, Integer> revealState2() {
-        Collections.shuffle(publicObjectives2);
         return revealObjective(publicObjectives2);
     }
 
