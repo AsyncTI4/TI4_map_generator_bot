@@ -23,6 +23,7 @@ import ti4.commands.player.PlanetRefresh;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -275,14 +276,17 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     case "minent" -> {
                         player.setTg(player.getTg()+1);
                         message = "Gained 1" + Emojis.tg + " (" +(player.getTg()-1) +" -> **"+player.getTg()+"**) ";
+                        ButtonHelper.pillageCheck(player, activeMap);
                     }
                     case "ent" -> {
                         player.setTg(player.getTg()+2);
                         message = "Gained 2" + Emojis.tg + " (" +(player.getTg()-2) +" -> **"+player.getTg()+"**) ";
+                        ButtonHelper.pillageCheck(player, activeMap);
                     }
                     case "majent" -> {
                         player.setTg(player.getTg()+3);
                         message = "Gained 3" + Emojis.tg + " (" +(player.getTg()-3) +" -> **"+player.getTg()+"**) ";
+                        ButtonHelper.pillageCheck(player, activeMap);
                     }
                     default -> message = "";
                 }
@@ -330,5 +334,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             default -> MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + message);
         }
+
+        if(player.hasAbility("awaken") && !ButtonHelper.getAllPlanetsWithSleeperTokens(player, activeMap).contains(planetName)){
+            Button gainCC= Button.success("putSleeperOnPlanet_"+planetName, "Put Sleeper on "+planetName);
+            Button Decline3 = Button.danger("deleteButtons", "Decline To Put a Sleeper Down");
+            List<Button> buttons = List.of(gainCC, Decline3);
+            MessageHelper.sendMessageToChannelWithButtons((MessageChannel)event.getChannel(), message, buttons);
+        }
     }
+
 }

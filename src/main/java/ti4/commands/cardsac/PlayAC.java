@@ -14,7 +14,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -89,10 +88,8 @@ public class PlayAC extends ACCardsSubcommandData {
             return "No such Action Card ID found, please retry";
         }
         ActionCardModel actionCard = Mapper.getActionCard(acID);
-        String actionCardTitle = actionCard.name;
-        String actionCardPhase = actionCard.phase;
-        String actionCardWindow = actionCard.window;
-        String actionCardText = actionCard.text;
+        String actionCardTitle = actionCard.getName();
+        String actionCardWindow = actionCard.getWindow();
 
         String activePlayerID = activeMap.getActivePlayer();
         if (player.isPassed() && activePlayerID != null) {

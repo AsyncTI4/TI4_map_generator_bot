@@ -167,9 +167,9 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 java.util.Map<String, PublicObjectiveModel> publicObjectives = Mapper.getPublicObjectives();
                 List<Command.Choice> options = publicObjectives.entrySet().stream()
-                        .filter(value -> value.getValue().name.toLowerCase().contains(enteredValue))
+                        .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue))
                         .limit(25)
-                        .map(value -> new Command.Choice(value.getValue().name, value.getKey()))
+                        .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
@@ -207,9 +207,9 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 HashMap<String, PromissoryNoteModel> PNs = Mapper.getPromissoryNotes();
                 List<Command.Choice> options = PNs.values().stream()
-                        .filter(pn -> (pn.alias + " " + pn.name + " " + pn.getOwner()).toLowerCase().contains(enteredValue))
+                        .filter(pn -> (pn.getAlias() + " " + pn.getName() + " " + pn.getOwner()).toLowerCase().contains(enteredValue))
                         .limit(25)
-                        .map(pn -> new Command.Choice(pn.alias + " " + pn.name + " " + pn.getOwner(), pn.alias))
+                        .map(pn -> new Command.Choice(pn.getAlias() + " " + pn.getName() + " " + pn.getOwner(), pn.getAlias()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
@@ -467,8 +467,8 @@ public class AutoCompleteProvider {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 HashMap<String, DeckModel> decks = Mapper.getDecks();
                 List<Command.Choice> options = decks.values().stream()
-                    .filter(value -> value.alias.contains(enteredValue))
-                    .map((deck) -> new Command.Choice(deck.getName(), deck.alias))
+                    .filter(value -> value.getAlias().contains(enteredValue))
+                    .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
                     .limit(25)
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
