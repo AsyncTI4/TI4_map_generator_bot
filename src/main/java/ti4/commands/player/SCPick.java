@@ -171,6 +171,7 @@ public class SCPick extends PlayerSubcommandData {
                 msgExtra += " " + Helper.getPlayerRepresentation(nextPlayer, activeMap) + " is up for an action";
                 privatePlayer = nextPlayer;
                 activeMap.updateActivePlayer(nextPlayer);
+                activeMap.setCurrentPhase("action");
             }
         }
         msg = sb.toString();
@@ -184,6 +185,7 @@ public class SCPick extends PlayerSubcommandData {
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(privatePlayer, activeMap, event, msgExtra, fail, success);
+            activeMap.updateActivePlayer(privatePlayer);
             if(!allPicked&& !activeMap.isHomeBrewSCMode())
             {
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
@@ -196,6 +198,7 @@ public class SCPick extends PlayerSubcommandData {
             if (!msgExtra.isEmpty()) {
                 if(!allPicked && !activeMap.isHomeBrewSCMode())
                 {
+                    activeMap.updateActivePlayer(privatePlayer);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra+"\nUse Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
                 }
                 else{

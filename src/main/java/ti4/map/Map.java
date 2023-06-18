@@ -153,7 +153,7 @@ public class Map {
     private LinkedHashMap<String, Integer> purgedActionCards = new LinkedHashMap<>();
     private HashMap<String, Integer> displacedUnitsFrom1System = new HashMap<String, Integer>();
     private HashMap<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<String, Integer>();
-
+    private String phaseOfGame = "";
     private String currentAgendaInfo = null;
     private boolean hasHackElectionBeenPlayed = false;
     private List<String> agendas;
@@ -242,6 +242,13 @@ public class Map {
 
     public String getLatestCommand() {
         return latestCommand;
+    }
+
+    public String getCurrentPhase() {
+        return phaseOfGame;
+    }
+    public void setCurrentPhase(String phase) {
+        phaseOfGame = phase;
     }
 
     public void setLatestCommand(String latestCommand) {

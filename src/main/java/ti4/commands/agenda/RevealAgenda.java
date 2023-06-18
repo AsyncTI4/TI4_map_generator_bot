@@ -17,6 +17,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(id);
 
-        
+        activeMap.setCurrentPhase("agendawaiting");
         AgendaModel agendaDetails = Mapper.getAgenda(id);
         String agendaTarget = agendaDetails.target;
         String agendaType = agendaDetails.type;
@@ -104,7 +105,8 @@ public class RevealAgenda extends AgendaSubcommandData {
         Button playWhen = Button.danger("play_when", "Play A Non-AC When");
         Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
         Button noWhenPersistent = Button.primary("no_when_persistent", "No Whens No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-
+        Date newTime = new Date();
+        activeMap.setLastActivePlayerPing(newTime);
         List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
         List<Button> afterButtons = AgendaHelper.getAfterButtons(activeMap);
 
