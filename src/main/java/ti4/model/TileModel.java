@@ -13,6 +13,7 @@ public class TileModel {
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
+
     public TileModel(String id) {
         this.id = id;
     }

@@ -57,7 +57,7 @@ public class TestResourceHelper {
         HashMap<String, String> allTiles = Mapper.getTileRepresentations();
         Set<Object> allTileIds = Mapper.getAllTileIDs();
         System.out.println(Mapper.getTilesList());
-        HashMap<String, String> allTileAliases = AliasHandler.getTileAliasEntryList();
+        Map<String, String> allTileAliases = AliasHandler.getTileAliasEntryList();
         ShipPositionModel shipPositionModel = new ShipPositionModel();
         WormholeModel wormholeModel = new WormholeModel();
 
