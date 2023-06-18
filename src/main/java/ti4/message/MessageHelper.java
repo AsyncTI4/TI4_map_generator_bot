@@ -97,6 +97,11 @@ public class MessageHelper {
 		FileUpload fileUpload = FileUpload.fromData(file);
 		channel.sendFiles(fileUpload).queue();
 	}
+	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, File file, String message, List<Button> buttons) {
+		FileUpload fileUpload = FileUpload.fromData(file);
+		channel.sendFiles(fileUpload).queue();
+		splitAndSent(message, channel, buttons);
+	}
 
 	public static void replyToMessage(GenericInteractionCreateEvent event, String messageText) {
 		splitAndSent(messageText, event.getMessageChannel());
@@ -171,7 +176,30 @@ public class MessageHelper {
 						gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
 						gameName = gameName.substring(0, gameName.indexOf("-"));
 						Map activeMap = MapManager.getInstance().getMap(gameName);
-						activeMap.setLatestTransactionMsg(complete.getId());
+						if(!activeMap.isFoWMode()){
+							activeMap.setLatestTransactionMsg(complete.getId());
+						}
+						
+					}
+					if(messageText.toLowerCase().contains("up next") && messageText.contains("#"))
+					{
+						String gameName = channel.getName();
+						gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+						gameName = gameName.substring(0, gameName.indexOf("-"));
+						Map activeMap = MapManager.getInstance().getMap(gameName);
+						if(!activeMap.isFoWMode()){
+							if(activeMap.getLatestUpNextMsg()!= null && !activeMap.getLatestUpNextMsg().equalsIgnoreCase("")){
+								String id = activeMap.getLatestUpNextMsg().split("_")[0];
+								String message = activeMap.getLatestUpNextMsg().split("_")[1].replace("#", "");
+								message = message.replace("UP NEXT", "started their turn");
+								
+								activeMap.getActionsChannel().editMessageById(id, message).queue();
+							}
+							
+							activeMap.setLatestUpNextMsg(complete.getId()+"_"+messageText);
+							
+						}
+
 
 					}
 					

@@ -44,15 +44,16 @@ public class StasisInfantry extends SpecialSubcommandData {
             boolean setValue = !value.startsWith("+") && !value.startsWith("-");
             int number = Integer.parseInt(value);
             int existingNumber = supplier.get();
+            String explanation = "";
             if (setValue) {
                 consumer.accept(number);
-                String messageToSend = Stats.getSetValueMessage(event, player, Constants.COUNT, number, existingNumber);
+                String messageToSend = Stats.getSetValueMessage(event, player, Constants.COUNT, number, existingNumber,explanation);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageToSend);
             } else {
                 int newNumber = existingNumber + number;
                 newNumber = Math.max(newNumber, 0);
                 consumer.accept(newNumber);
-                String messageToSend = Stats.getChangeValueMessage(event, player, Constants.COUNT, number, existingNumber, newNumber);
+                String messageToSend = Stats.getChangeValueMessage(event, player, Constants.COUNT, number, existingNumber, newNumber, explanation);
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageToSend);
             }
         } catch (Exception e) {

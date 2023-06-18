@@ -189,7 +189,7 @@ public class Player {
         return false;
     }
     public boolean hasWarsunTech() {
-        if(getTechs().contains("pws2") ||getTechs().contains("dsrohdws") ||getTechs().contains("ws"))
+        if(getTechs().contains("pws2") ||getTechs().contains("dsrohdws") ||getTechs().contains("ws") || getFaction().equalsIgnoreCase("muaat"))
         {
             return true; 
         }
@@ -203,7 +203,7 @@ public class Player {
     @JsonIgnore
     public ThreadChannel getCardsInfoThread(ti4.map.Map activeMap) {
         TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
-        if (activeMap.isFoWMode()) actionsChannel = (TextChannel) getPrivateChannel();
+        if (activeMap.isFoWMode() || activeMap.isCommunityMode()) actionsChannel = (TextChannel) getPrivateChannel();
         if (actionsChannel == null) {
             BotLogger.log("`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game: " + activeMap.getName());
             return null;
@@ -737,13 +737,13 @@ public class Player {
     private List<String> getFactionStartingAbilities() {
         FactionModel factionSetupInfo = getFactionSetupInfo();
         if (factionSetupInfo == null) return new ArrayList<String>();
-        return new ArrayList<String>(factionSetupInfo.abilities);
+        return new ArrayList<String>(factionSetupInfo.getAbilities());
     }
 
     private List<String> getFactionStartingLeaders() {
         FactionModel factionSetupInfo = getFactionSetupInfo();
         if(factionSetupInfo == null) return new ArrayList<String>();
-        return new ArrayList<String>(factionSetupInfo.leaders);
+        return new ArrayList<String>(factionSetupInfo.getLeaders());
     }
 
     public void initLeaders() {
@@ -906,7 +906,7 @@ public class Player {
                 try {
                     PublicObjectiveModel po = Mapper.getPublicObjective(poID);
                     if (po != null) {//IS A PO
-                        vpCount += po.points;
+                        vpCount += po.getPoints();
                     } else { //IS A CUSTOM PO
                         int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
                         int poValue = activeMap.getCustomPublicVP().getOrDefault(poID, 0);

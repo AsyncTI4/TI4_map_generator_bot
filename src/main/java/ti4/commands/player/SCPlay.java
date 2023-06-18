@@ -19,6 +19,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -183,19 +184,11 @@ public class SCPlay extends PlayerSubcommandData {
             MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), false)+" click this after assigning speaker.", drawAgendaButton);
         }
 
-        if (scToPlay == 6 && !activeMap.isHomeBrewSCMode()) {
-            List<Button> redistributeButton = new ArrayList<Button>();
-            Button redistribute= Button.success("FFCC_"+player.getFaction()+"_"+"redistributeCCButtons", "Redistribute & Gain CCs");
-            Button deleButton= Button.danger("FFCC_"+player.getFaction()+"_"+"deleteButtons", "Delete These Buttons");
-            redistributeButton.add(redistribute);
-            redistributeButton.add(deleButton);
-            MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), false) +" click this after picking up a CC.", redistributeButton);
-        }
-
         List<Button> conclusionButtons = new ArrayList<Button>();
         Button endTurn = Button.danger("turnEnd", "End Turn");
         Button deleteButton = Button.danger("doAnotherAction", "Do Another Action");
         conclusionButtons.add(endTurn);
+        conclusionButtons.addAll(ButtonHelper.getLegendaryExhaustButtons(player, activeMap));
         conclusionButtons.add(deleteButton);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
 
@@ -298,10 +291,11 @@ public class SCPlay extends PlayerSubcommandData {
     }
 
     private List<Button> getWarfareButtons() {
+        Button warfarePrimary= Button.primary("primaryOfWarfare", "Do Warfare Primary");
         Button followButton = Button.success("sc_follow_6", "Spend A Strategy CC");
         Button homeBuild = Button.success("warfareBuild", "Build At Home");
         Button noFollowButton = Button.primary("sc_no_follow_6", "Not Following");
-        return List.of(followButton,homeBuild, noFollowButton);
+        return List.of(warfarePrimary,followButton,homeBuild, noFollowButton);
     }
 
     private List<Button> getTechnologyButtons() {

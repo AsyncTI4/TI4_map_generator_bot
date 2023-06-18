@@ -572,21 +572,20 @@ public class Helper {
         return planetButtons;
     }
 
-    public static List<Button> getPlanetPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, String unit) {
+    public static List<Button> getPlanetPlaceUnitButtons(Player player, Map activeMap, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
         for (String planet : planets) {
-            Button button = Button.danger("FFCC_"+player.getFaction()+"_"+"place_"+unit+"_"+planet, Helper.getPlanetRepresentation(planet, activeMap));
+            Button button = Button.danger("FFCC_"+player.getFaction()+"_"+prefix+"_"+unit+"_"+planet, Helper.getPlanetRepresentation(planet, activeMap));
             planetButtons.add(button);
         }
         return planetButtons;
     }
-    public static List<Button> getSpaceShipsPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, String unit) {
+    public static List<Button> getTileWithShipsPlaceUnitButtons(Player player, Map activeMap, String unit, String prefix) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets());
-      
-        for (String planet : planets) {
-            Button button = Button.danger("FFCC_"+player.getFaction()+"_"+"place_"+unit+"_"+planet, Helper.getPlanetRepresentation(planet, activeMap));
+        List<Tile> tiles = ButtonHelper.getTilesWithShipsInTheSystem(player, activeMap);
+        for (Tile tile : tiles) {
+            Button button = Button.danger("FFCC_"+player.getFaction()+"_"+prefix+"_"+unit+"_"+tile.getPosition(), tile.getRepresentationForButtons(activeMap,player));
             planetButtons.add(button);
         }
         return planetButtons;
@@ -926,7 +925,7 @@ public class Helper {
         return getGamePing(activeMap.getGuild(), activeMap);
     }
 
-    public static String getGamePing(@NotNull Guild guild, @NotNull Map activeMap) {
+    public static String getGamePing(Guild guild, Map activeMap) {
         if (guild != null) {
             for (Role role : guild.getRoles()) {
                 if (activeMap.getName().equals(role.getName().toLowerCase())) {
@@ -955,7 +954,6 @@ public class Helper {
             mention += " " + Emojis.SpoonAbides;
         } else if (player.getUserID().equals("228999251328368640")) { //Jazzx
             mention += " " + Emojis.Scout;
-
         }
         return mention;
     }
@@ -1573,11 +1571,10 @@ public class Helper {
             }
             techButtons.add(techB);
         }
-
         return techButtons;
     }
-    public static List<String> getAllTechOfAType(String techType, String playerfaction, Player player) {
 
+    public static List<String> getAllTechOfAType(String techType, String playerfaction, Player player) {
         List<String> techs = new ArrayList<String>();
         //Columns: key = Proper Name | type | prerequisites | faction | text
         for (Entry<String, String> techRep : Mapper.getTechRepresentations().entrySet()) {
@@ -1635,49 +1632,8 @@ public class Helper {
     }
 
     public static String getAgendaRepresentation(@NotNull String agendaID, @Nullable Integer uniqueID) {
-        StringBuilder sb = new StringBuilder();
         AgendaModel agendaDetails = Mapper.getAgenda(agendaID);
-        String agendaName = agendaDetails.name;
-        String agendaType = agendaDetails.type;
-        String agendaTarget = agendaDetails.target;
-        String arg1 = agendaDetails.text1;
-        String arg2 = agendaDetails.text2;
-        String agendaSource = agendaDetails.source;
-
-        if (agendaName == null || agendaType == null || agendaTarget == null || arg1 == null || arg2 == null || agendaSource == null) {
-            BotLogger.log("Agenda improperly formatted: " + agendaID);
-            sb.append("Agenda ----------\n").append(Mapper.getAgenda(agendaID)).append("\n------------------");
-        } else {
-            sb.append("**__");
-            if (uniqueID != null) {
-                sb.append("(").append(uniqueID).append(") - ");
-            }
-            sb.append(agendaName).append("__** ");
-            switch (agendaSource) {
-                case "absol" -> sb.append(Emojis.Absol);
-                case "PoK" -> sb.append(Emojis.AgendaWhite);
-                default -> sb.append(Emojis.AsyncTI4Logo);
-            }
-            sb.append("\n");
-
-            sb.append("> **").append(agendaType).append(":** *").append(agendaTarget).append("*\n");
-            if (arg1.length() > 0) {
-                arg1 = arg1.replace("For:", "**For:**");
-                sb.append("> ").append(arg1).append("\n");
-            }
-            if (arg2.length() > 0) {
-                arg2 = arg2.replace("Against:", "**Against:**");
-                sb.append("> ").append(arg2).append("\n");
-            }
-        }
-
-        switch (agendaID) {
-            case ("mutiny") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Mutiny public_vp_worth:1`").append("\n");
-            case ("seed_empire") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Seed of an Empire public_vp_worth:1`").append("\n");
-            case ("censure") -> sb.append("Use this command to add the objective: `/status po_add_custom public_name:Political Censure public_vp_worth:1`").append("\n");
-        }
-
-        return sb.toString();
+        return agendaDetails.getRepresentation(uniqueID);
     }
 
     public static String getRelicRepresentation(String relicID) {
@@ -1845,30 +1801,30 @@ public class Helper {
         //removing Action Cards
         HashMap<String,ActionCardModel> actionCards = Mapper.getActionCards();
         for (ActionCardModel ac : actionCards.values()) {
-            if (ac.source.equals("pok")) {
-                activeMap.removeACFromGame(ac.alias);
-            } else if (ac.source.equals("codex1") && removeCodex) {
-                activeMap.removeACFromGame(ac.alias);
+            if (ac.getSource().equals("pok")) {
+                activeMap.removeACFromGame(ac.getAlias());
+            } else if (ac.getSource().equals("codex1") && removeCodex) {
+                activeMap.removeACFromGame(ac.getAlias());
             }
         }
 
         //removing SOs
         HashMap<String, SecretObjectiveModel> soList = Mapper.getSecretObjectives();
         for (SecretObjectiveModel so : soList.values()) {
-            if (so.source.equals("pok")) {
-                activeMap.removeSOFromGame(so.alias);
+            if (so.getSource().equals("pok")) {
+                activeMap.removeSOFromGame(so.getAlias());
             }
         }
 
         //removing POs
         HashMap<String, PublicObjectiveModel> poList = Mapper.getPublicObjectives();
         for (PublicObjectiveModel po : poList.values()) {
-            if (po.source.equals("pok")) {
-                if (po.points == 1) {
-                    activeMap.removePublicObjective1(po.alias);
+            if (po.getSource().equals("pok")) {
+                if (po.getPoints() == 1) {
+                    activeMap.removePublicObjective1(po.getAlias());
                 }
-                if (po.points == 2) {
-                    activeMap.removePublicObjective2(po.alias);
+                if (po.getPoints() == 2) {
+                    activeMap.removePublicObjective2(po.getAlias());
                 }
             }
         }
