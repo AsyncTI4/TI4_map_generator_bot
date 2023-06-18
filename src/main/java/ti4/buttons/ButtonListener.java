@@ -965,7 +965,7 @@ public class ButtonListener extends ListenerAdapter {
                     message = AgendaHelper.getSummaryOfVotes(activeMap, true) + "\n \n " + realIdentity + message;
                     Button Vote = Button.success("vote", pFaction + " Choose To Vote");
                     Button Abstain = Button.danger("delete_buttons_0", pFaction + " Choose To Abstain");
-
+                    activeMap.updateActivePlayer(nextInLine);
                     List<Button> buttons = List.of(Vote, Abstain);
                     if (activeMap.isFoWMode()) {
                         if (nextInLine.getPrivateChannel() != null) {
@@ -1027,7 +1027,8 @@ public class ButtonListener extends ListenerAdapter {
                 List<Player> losers = AgendaHelper.getLosers(winner, activeMap);
                 String summary2 = AgendaHelper.getSummaryOfVotes(activeMap, true);
                 MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), summary2 + "\n \n");
-
+                activeMap.setCurrentPhase("agendaEnd");
+                activeMap.setActivePlayer(null);
                 String resMessage = "Please hold while people resolve shenanigans. " + losers.size()
                         + " players have the opportunity to play deadly plot.";
                 if ((!activeMap.isACInDiscard("Bribery") || !activeMap.isACInDiscard("Deadly Plot"))
@@ -2520,6 +2521,8 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String message = Helper.getPlayerRepresentation(speaker, activeMap, event.getGuild(), true)
                             + " UP TO PICK SC\n";
+                    activeMap.updateActivePlayer(speaker);
+                    activeMap.setCurrentPhase("strategy");
                     if (activeMap.isFoWMode()) {
 
                         if (!activeMap.isHomeBrewSCMode()) {
@@ -2646,7 +2649,8 @@ public class ButtonListener extends ListenerAdapter {
                             .primary("no_when_persistent", "No Whens No Matter What (for this agenda)")
                             .withEmoji(Emoji.fromFormatted(Emojis.noafters));
                     List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
-
+                    Date newTime = new Date();
+                    activeMap.setLastActivePlayerPing(newTime);
                     MessageHelper.sendMessageToChannelWithPersistentReacts(actionsChannel,
                             "Please indicate no whens again.", activeMap, whenButtons, "when");
                     // addPersistentReactions(event, activeMap, "when");
@@ -3514,6 +3518,41 @@ public class ButtonListener extends ListenerAdapter {
         MessageHelper.sendMessageToChannel(Helper.getThreadChannelIfExists(event), text);
     }
 
+    public List<Player> getPlayersWhoHaventReacted(String messageId, Map activeMap){
+        List<Player> playersWhoAreMissed = new ArrayList<Player>();
+        if(messageId == null || messageId.equalsIgnoreCase("")){
+            return playersWhoAreMissed;
+        }
+        Message mainMessage = activeMap.getMainGameChannel().retrieveMessageById(messageId).completeAfter(500,
+                TimeUnit.MILLISECONDS);
+        for (Player player : activeMap.getPlayers().values()) {
+            if (!player.isRealPlayer()) {
+                continue;
+            }
+
+            String faction = player.getFaction();
+            if (faction == null || faction.isEmpty() || faction.equals("null")){
+                continue;
+            }
+
+            Emoji reactionEmoji = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction));
+            if (activeMap.isFoWMode()) {
+                int index = 0;
+                for (Player player_ : activeMap.getPlayers().values()) {
+                    if (player_ == player)
+                        break;
+                    index++;
+                }
+                reactionEmoji = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, messageId));
+            }
+            MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+            if (reaction == null){
+                playersWhoAreMissed.add(player);
+            }
+        }
+        return playersWhoAreMissed;
+    }
+
     private void checkForAllReactions(@NotNull ButtonInteractionEvent event, Map activeMap) {
         String messageId = event.getInteraction().getMessage().getId();
 
@@ -3528,8 +3567,10 @@ public class ButtonListener extends ListenerAdapter {
             }
 
             String faction = player.getFaction();
-            if (faction == null || faction.isEmpty() || faction.equals("null"))
+            if (faction == null || faction.isEmpty() || faction.equals("null")){
+                matchingFactionReactions++;
                 continue;
+            }
 
             Emoji reactionEmoji = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction));
             if (activeMap.isFoWMode()) {
@@ -3623,6 +3664,8 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     String message = Helper.getPlayerRepresentation(speaker, activeMap, event.getGuild(), true)
                             + " UP TO PICK SC\n";
+                    activeMap.updateActivePlayer(speaker);
+                    activeMap.setCurrentPhase("strategy");
                     if (activeMap.isFoWMode()) {
                         // MessageHelper.sendPrivateMessageToPlayer(speaker, activeMap, message);
                         if (!activeMap.isHomeBrewSCMode()) {
