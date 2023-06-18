@@ -50,6 +50,9 @@ public class TileModel {
     public String getName() {
         return name;
     }
+    public String getNameNullSafe() {
+        return Optional.ofNullable(this.name).orElse("");
+    }
 
     public void setName(String name) {
         this.name = name;

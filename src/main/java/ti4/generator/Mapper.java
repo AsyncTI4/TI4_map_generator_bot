@@ -522,7 +522,7 @@ public class Mapper {
 
     public static Map<String, String> getTileRepresentations() {
         return allTilesMap.values().stream()
-                .collect(Collectors.toMap(TileModel::getId, TileModel::getName));
+                .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
     }
 
     public static HashMap<String, String> getTechRepresentations() {

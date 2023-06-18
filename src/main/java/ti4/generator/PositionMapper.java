@@ -208,15 +208,9 @@ public class PositionMapper {
 
 
     public static UnitTokenPosition getPlanetTokenPosition(String planetName) {
-        try {
-            return allPlanetsMap.get(planetName).getUnitPositions();
-        }
-        catch (Exception e){
-            System.out.println("ERROR");
-            System.out.println(planetName);
-            System.out.println(e.toString());
-        }
-        return null;
+        if(planetName.equals("space"))
+            return null;
+        return allPlanetsMap.get(planetName).getUnitPositions();
     }
 
     public static UnitTokenPosition getReinforcementsPosition(String unitId) {
@@ -254,6 +248,9 @@ public class PositionMapper {
     }
 
     public static UnitTokenPosition getSpaceUnitPosition(String planetName, String tileID) {
+        if(tileID.equals("0g"))
+            return null;
+
         String shipPositionString = allTilesMap.get(tileID).getShipPositionsType().getPositions();
 
         UnitTokenPosition unitTokenPosition = new UnitTokenPosition(planetName, false);
