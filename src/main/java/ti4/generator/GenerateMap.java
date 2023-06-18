@@ -1206,8 +1206,11 @@ public class GenerateMap {
                     drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName);
                 } else {
                     String originalPlanetType = planetHolder.getOriginalPlanetType();
+                    if (originalPlanetType.equals("none") && planet.equals("mr"))
+                        originalPlanetType = "mr";
                     if (originalPlanetType.equals("none"))
                         originalPlanetType=player.getFaction();
+                    
                     if (!originalPlanetType.isEmpty()) {
                         if ("keleres".equals(player.getFaction()) && ("mentak".equals(originalPlanetType) ||
                                 "xxcha".equals(originalPlanetType) ||
@@ -1549,6 +1552,7 @@ public class GenerateMap {
                     }
                 }
 
+                System.out.println(faction);
                 factionImage = null;
                 float scale = 0.7f;
                 if (!convertToGeneric) {

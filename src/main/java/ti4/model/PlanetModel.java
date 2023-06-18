@@ -6,6 +6,7 @@ import ti4.generator.UnitTokenPosition;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Optional;
 
 public class PlanetModel {
     private String id;
@@ -33,6 +34,9 @@ public class PlanetModel {
 
     public String getName() {
         return name;
+    }
+    public String getNameNullSafe() {
+        return Optional.ofNullable(name).orElse("");
     }
 
     public void setName(String name) {
