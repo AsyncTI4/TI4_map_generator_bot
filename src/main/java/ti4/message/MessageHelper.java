@@ -176,7 +176,30 @@ public class MessageHelper {
 						gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
 						gameName = gameName.substring(0, gameName.indexOf("-"));
 						Map activeMap = MapManager.getInstance().getMap(gameName);
-						activeMap.setLatestTransactionMsg(complete.getId());
+						if(!activeMap.isFoWMode()){
+							activeMap.setLatestTransactionMsg(complete.getId());
+						}
+						
+					}
+					if(messageText.toLowerCase().contains("up next") && messageText.contains("#"))
+					{
+						String gameName = channel.getName();
+						gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+						gameName = gameName.substring(0, gameName.indexOf("-"));
+						Map activeMap = MapManager.getInstance().getMap(gameName);
+						if(!activeMap.isFoWMode()){
+							if(activeMap.getLatestUpNextMsg()!= null && !activeMap.getLatestUpNextMsg().equalsIgnoreCase("")){
+								String id = activeMap.getLatestUpNextMsg().split("_")[0];
+								String message = activeMap.getLatestUpNextMsg().split("_")[1].replace("#", "");
+								message = message.replace("UP NEXT", "started their turn");
+								
+								activeMap.getActionsChannel().editMessageById(id, message).queue();
+							}
+							
+							activeMap.setLatestUpNextMsg(complete.getId()+"_"+messageText);
+							
+						}
+
 
 					}
 					

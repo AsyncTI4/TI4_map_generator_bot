@@ -18,6 +18,7 @@ import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.SendFragments;
+import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.player.PlanetRefresh;
 import ti4.commands.special.KeleresHeroMentak;
 import ti4.commands.tokens.AddCC;
@@ -41,6 +42,121 @@ import ti4.model.PromissoryNoteModel;
 
 public class ButtonHelper {
 
+    public static void commanderUnlockCheck(Player player, Map activeMap, String faction, GenericInteractionCreateEvent event) {
+
+        boolean shouldBeUnlocked = false;
+        switch(faction){
+            case "yssaril" -> {
+                if(player.getActionCards().size() > 7){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "hacan" -> {
+                if(player.getTg() > 9){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "sardakk" -> {
+                if(player.getPlanets().size() > 6){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "sol" -> {
+                int resources = 0;
+                for(String planet : player.getPlanets()){
+                    resources = resources + Helper.getPlanetResources(planet, activeMap);
+                }
+                if(resources > 11){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "xxcha" -> {
+                int resources = 0;
+                for(String planet : player.getPlanets()){
+                    resources = resources + Helper.getPlanetInfluence(planet, activeMap);
+                }
+                if(resources > 11){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "mentak" -> {
+                if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, player, "cruiser") > 3){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "l1z1x" -> {
+                if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, player, "dreadnought") > 3){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "argent" -> {
+                int num = ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, player, "pds") + ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, player, "dreadnought") + ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, player, "destroyer");
+                if(num> 5){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "titans" -> {
+                int num = ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, player, "pds") +  ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, player, "spacedock");
+                if(num> 4){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "nekro" -> {
+                if(player.getTechs().size()> 2){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "jolnar" -> {
+                if(player.getTechs().size()> 7){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "saar" -> {
+                if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, player, "spacedock") > 2){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "naaz" -> {
+                if(ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, player, "mech").size() > 2){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "nomad" -> {
+                if(player.getSoScored() > 0){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "mahact" -> {
+                if(player.getMahactCC().size() > 1){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "empyrean" -> {
+                if(Helper.getNeighbourCount(activeMap, player) > (activeMap.getRealPlayers().size()-2)){
+                    shouldBeUnlocked = true;
+                }
+            }
+            case "muaat" -> {
+                shouldBeUnlocked = true;
+            }
+            case "winnu" -> {
+                shouldBeUnlocked = true;
+            }
+            case "keleres" -> {
+                shouldBeUnlocked = true;
+            }
+            case "arborec" -> {
+                int num = ButtonHelper.getAmountOfSpecificUnitsOnPlanets(player, activeMap, "infantry") +  ButtonHelper.getAmountOfSpecificUnitsOnPlanets(player, activeMap, "mech");
+                if(num> 11){
+                    shouldBeUnlocked = true;
+                }
+            }
+            // missing: yin, ghost, cabal, naalu,letnev
+        }
+        if(shouldBeUnlocked){
+            new UnlockLeader().unlockLeader(event, faction + "commander", activeMap, player);
+        }
+    }
     public static List<String> getPlanetsWithSleeperTokens(Player player, Map activeMap, Tile tile) {
         List<String> planetsWithSleepers = new ArrayList();
         for(UnitHolder unitHolder :tile.getUnitHolders().values()){
@@ -52,6 +168,22 @@ public class ButtonHelper {
         }
         return planetsWithSleepers;
     }
+    public static int getAmountOfSpecificUnitsOnPlanets(Player player, Map activeMap, String unit) {
+        int num = 0;
+        for(Tile tile : activeMap.getTileMap().values()){
+            for(UnitHolder unitHolder :tile.getUnitHolders().values()){
+                if(unitHolder instanceof Planet planet){
+                    String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unit), player.getColor());
+                    if(planet.getUnits().keySet().contains(unitID)){
+                        num = num + planet.getUnits().get(unitID);
+                    }
+                }
+            }
+        }
+        return num;
+    }
+    
+    
     public static List<String> getPlanetsWithSpecificUnit(Player player, Map activeMap, Tile tile,String unit) {
         List<String> planetsWithUnit = new ArrayList();
         for(UnitHolder unitHolder :tile.getUnitHolders().values()){
@@ -261,6 +393,7 @@ public class ButtonHelper {
         if(activeMap.getLatestTransactionMsg() != null && !activeMap.getLatestTransactionMsg().equalsIgnoreCase(""))
         {
             activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestTransactionMsg()).queue();
+            activeMap.setLatestTransactionMsg("");
         }
         
 
@@ -773,6 +906,9 @@ public class ButtonHelper {
             }
             for(int x = 1; x < displacedUnits.get(origUnit)+1; x++)
             {
+                if(x > 2){
+                    break;
+                }
                 String blabel =  "Undo move of "+x+" "+damagedMsg+unitkey;
                 if(!planet.equalsIgnoreCase(""))
                 {

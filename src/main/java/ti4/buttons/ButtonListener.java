@@ -1180,6 +1180,11 @@ public class ButtonListener extends ListenerAdapter {
                         numPlayers++;
                 }
                 minvote = minvote + numPlayers;
+                
+            }
+            if (activeMap.getLaws() != null && (activeMap.getLaws().keySet().contains("rep_govt") || activeMap.getLaws().keySet().contains("absol_government"))) {
+                    minvote = 1;
+                    voteArray[0] = 1;
             }
             if (voteArray[0] - minvote > 20) {
                 voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome)
@@ -2071,7 +2076,7 @@ public class ButtonListener extends ListenerAdapter {
             new SleeperToken().addOrRemoveSleeper(event, activeMap, planetName, player);
             if(unit.equalsIgnoreCase("mech")){
                 new AddUnits().unitParsing(event, player.getColor(),activeMap.getTile(AliasHandler.resolveTile(planetName)), "mech " + planetName + ", inf "+planetName,activeMap);
-                message = ident + " replaced a sleeper on " + Helper.getPlanetRepresentation(planetName,activeMap) + " with a "+ Helper.getEmojiFromDiscord("pds") +" and "+ Helper.getEmojiFromDiscord("infantry");
+                message = ident + " replaced a sleeper on " + Helper.getPlanetRepresentation(planetName,activeMap) + " with a "+ Helper.getEmojiFromDiscord("mech") +" and "+ Helper.getEmojiFromDiscord("infantry");
             }else{
                 new AddUnits().unitParsing(event, player.getColor(),activeMap.getTile(AliasHandler.resolveTile(planetName)), "pds " + planetName,activeMap);
                 message = ident + " replaced a sleeper on " + Helper.getPlanetRepresentation(planetName,activeMap) + " with a "+ Helper.getEmojiFromDiscord("pds");
