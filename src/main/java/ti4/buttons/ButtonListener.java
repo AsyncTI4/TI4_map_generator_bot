@@ -391,10 +391,8 @@ public class ButtonListener extends ListenerAdapter {
 
             String message2 = null;
             message2 = "Resolve status homework using the buttons. Only the Ready for [X] button is essential to hit, all others are optional. ";
-            Button draw1AC = Button.success("draw_1_AC", "Draw 1 AC");
-            // Button confirmCCs = Button.primary("confirm_cc", "Confirm Your CC Update is
-            // Complete & Final");
-            Button getCCs = Button.success("redistributeCCButtons", "Redistribute, Gain, & Confirm CCs");
+            Button draw1AC = Button.success("draw_1_AC", "Draw 1 AC").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
+            Button getCCs = Button.success("redistributeCCButtons", "Redistribute, Gain, & Confirm CCs").withEmoji(Emoji.fromFormatted("🔺"));
             boolean custodiansTaken = activeMap.isCustodiansScored();
             Button passOnAbilities;
 
@@ -542,8 +540,7 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("refreshVotes_")) {
             String votes = buttonID.replace("refreshVotes_", "");
             List<Button> voteActionRow = Helper.getPlanetRefreshButtons(event, player, activeMap);
-            Button concludeRefreshing = Button.danger(finsFactionCheckerPrefix + "votes_" + votes,
-                    "Done readying planets.");
+            Button concludeRefreshing = Button.danger(finsFactionCheckerPrefix + "votes_" + votes, "Done readying planets.");
             voteActionRow.add(concludeRefreshing);
             String voteMessage2 = "Use the buttons to ready planets. When you're done it will prompt the next person to vote.";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage2, voteActionRow);
@@ -552,15 +549,12 @@ public class ButtonListener extends ListenerAdapter {
 
         else if (buttonID.startsWith("getAllTechOfType_")) {
             String techType = buttonID.replace("getAllTechOfType_", "");
-            List<Button> buttons = Helper
-                    .getTechButtons(Helper.getAllTechOfAType(techType, player.getFaction(), player), techType, player);
+            List<Button> buttons = Helper.getTechButtons(Helper.getAllTechOfAType(techType, player.getFaction(), player), techType, player);
 
-            String message = Helper.getPlayerRepresentation(player, activeMap)
-                    + " Use The Buttons To Get The Tech You Want";
-
+            String message = Helper.getPlayerRepresentation(player, activeMap) + " Use The Buttons To Get The Tech You Want";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
-
             event.getMessage().delete().queue();
+            
         } else if (buttonID.startsWith("getTech_")) {
 
             String tech = buttonID.replace("getTech_", "");
@@ -2118,7 +2112,7 @@ public class ButtonListener extends ListenerAdapter {
                 String id2 = activeMap.revealAgenda(false);
                 LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
                 AgendaModel agendaDetails = Mapper.getAgenda(id2);
-                String agendaName = agendaDetails.name;
+                String agendaName = agendaDetails.getName();
                 MessageHelper.sendMessageToChannel(actionsChannel, "The hidden agenda was " + agendaName
                         + "! You can find it added as a law or in the discard.");
                 Integer uniqueID = discardAgendas.get(id2);
@@ -2265,47 +2259,30 @@ public class ButtonListener extends ListenerAdapter {
                 case "acquireATech" -> {
 
                     List<Button> buttons = new ArrayList<Button>();
-                    Button bioticTech = Button.success(finsFactionCheckerPrefix + "getAllTechOfType_biotic",
-                            "Get A Green Tech");
+
+                    Button propulsionTech = Button.primary(finsFactionCheckerPrefix + "getAllTechOfType_propulsion", "Get a Blue Tech");
+                    propulsionTech = propulsionTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Propulsiontech")));
+                    buttons.add(propulsionTech);
+
+                    Button bioticTech = Button.success(finsFactionCheckerPrefix + "getAllTechOfType_biotic", "Get a Green Tech");
                     bioticTech = bioticTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Biotictech")));
                     buttons.add(bioticTech);
-                    Button warfareTech = Button.danger(finsFactionCheckerPrefix + "getAllTechOfType_warfare",
-                            "Get A Red Tech");
+
+                    Button cyberneticTech = Button.secondary(finsFactionCheckerPrefix + "getAllTechOfType_cybernetic", "Get a Yellow Tech");
+                    cyberneticTech = cyberneticTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Cybernetictech")));
+                    buttons.add(cyberneticTech);
+
+                    Button warfareTech = Button.danger(finsFactionCheckerPrefix + "getAllTechOfType_warfare", "Get a Red Tech");
                     warfareTech = warfareTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Warfaretech")));
                     buttons.add(warfareTech);
-                    Button propulsionTech = Button.primary(finsFactionCheckerPrefix + "getAllTechOfType_propulsion",
-                            "Get A Blue Tech");
-                    propulsionTech = propulsionTech
-                            .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Propulsiontech")));
-                    buttons.add(propulsionTech);
-                    Button cyberneticTech = Button.secondary(finsFactionCheckerPrefix + "getAllTechOfType_cybernetic",
-                            "Get A Yellow Tech");
-                    cyberneticTech = cyberneticTech
-                            .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("Cybernetictech")));
-                    buttons.add(cyberneticTech);
-                    Button unitupgradesTech = Button.secondary(
-                            finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade", "Get A Unit Upgrade Tech");
-                    unitupgradesTech = unitupgradesTech
-                            .withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("UnitUpgradeTech")));
 
+                    Button unitupgradesTech = Button.secondary(finsFactionCheckerPrefix + "getAllTechOfType_unitupgrade", "Get A Unit Upgrade Tech");
+                    unitupgradesTech = unitupgradesTech.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("UnitUpgradeTech")));
                     buttons.add(unitupgradesTech);
-                    String message = Helper.getPlayerRepresentation(player, activeMap)
-                            + " What type of tech would you want?";
+
+                    String message = Helper.getPlayerRepresentation(player, activeMap) + " What type of tech would you want?";
                     if (!activeMap.isFoWMode()) {
-                        // List<ThreadChannel> threadChannels =
-                        // activeMap.getActionsChannel().getThreadChannels();
-                        // if (threadChannels == null) return;
-                        // String threadName =
-                        // activeMap.getName()+"-round-"+activeMap.getRound()+"-technology";
-                        // SEARCH FOR EXISTING OPEN THREAD
-                        // for (ThreadChannel threadChannel_ : threadChannels) {
-                        // if (threadChannel_.getName().equals(threadName)) {
-                        // MessageHelper.sendMessageToChannelWithButtons((MessageChannel)threadChannel_,
-                        // message, buttons);
-                        // }
-                        // }
-                        MessageHelper.sendMessageToChannelWithButtons(
-                                (MessageChannel) player.getCardsInfoThread(activeMap), message, buttons);
+                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player.getCardsInfoThread(activeMap), message, buttons);
                     } else {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
                     }

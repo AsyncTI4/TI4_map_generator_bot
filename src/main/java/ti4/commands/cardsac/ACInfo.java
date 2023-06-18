@@ -190,7 +190,7 @@ public class ACInfo extends ACCardsSubcommandData {
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
                 ActionCardModel actionCard = Mapper.getActionCard(key);
-                String actionCardWindow = actionCard.window;
+                String actionCardWindow = actionCard.getWindow();
                 if (ac_name != null && actionCardWindow.equalsIgnoreCase("Action")) {
                     acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
