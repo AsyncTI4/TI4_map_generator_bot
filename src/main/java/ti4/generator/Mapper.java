@@ -501,7 +501,7 @@ public class Mapper {
 
     public static Map<String, String> getPlanetRepresentations() {
         return allPlanetsMap.values().stream()
-                .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getName));
+                .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
     }
 
     public static HashMap<String, String> getFactionRepresentations() {
