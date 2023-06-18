@@ -1,5 +1,6 @@
 package ti4.commands.explore;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -141,7 +142,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
 
                 PlanetModel planetInfo = Mapper.getPlanet(planetName);
                 if (Optional.ofNullable(planetInfo).isPresent()) {
-                    if (planetInfo.getTechSpecialties().size() > 0) {
+                    if (Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0) {
                         if ((token.equals(Constants.WARFARE) ||
                              token.equals(Constants.PROPULSION) ||
                              token.equals(Constants.CYBERNETIC) ||
