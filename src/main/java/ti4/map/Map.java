@@ -51,6 +51,7 @@ public class Map {
     private String latestAfterMsg = "";
     private String latestWhenMsg = "";
     private String latestTransactionMsg = "";
+    private String latestUpNextMsg = "";
 
     private int mapImageGenerationCount = 0;
 
@@ -261,6 +262,9 @@ public class Map {
     public String getLatestTransactionMsg() {
         return latestTransactionMsg;
     }
+    public String getLatestUpNextMsg() {
+        return latestUpNextMsg;
+    }
 
     public void setLatestOutcomeVotedFor(String outcomeVotedFor) {
         latestOutcomeVotedFor = outcomeVotedFor;
@@ -273,6 +277,9 @@ public class Map {
     }
     public void setLatestTransactionMsg(String latestTransaction) {
         latestTransactionMsg = latestTransaction;
+    }
+    public void setLatestUpNextMsg(String latestTransaction) {
+        latestUpNextMsg = latestTransaction;
     }
 
 
