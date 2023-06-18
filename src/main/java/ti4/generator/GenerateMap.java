@@ -642,8 +642,8 @@ public class GenerateMap {
             String pnName = "pa_pn_name_" + pn + ".png";
             drawPAImage(x + deltaX, y, pnName);
             PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pn);
-            if (promissoryNote != null && promissoryNote.attachment != null && !promissoryNote.attachment.isBlank()) {
-                String tokenID = promissoryNote.attachment;
+            if (promissoryNote != null && promissoryNote.getAttachment() != null && !promissoryNote.getAttachment().isBlank()) {
+                String tokenID = promissoryNote.getAttachment();
                 found:
                 for (Tile tile : activeMap.getTileMap().values()) {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {

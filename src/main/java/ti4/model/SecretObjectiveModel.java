@@ -1,35 +1,51 @@
 package ti4.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
+public class SecretObjectiveModel implements ModelInterface {
+    private String alias;
+    private String name;
+    private String phase;
+    private String window;
+    private String text;
+    private int points;
+    private String source;
 
-import ti4.message.BotLogger;
-
-public class SecretObjectiveModel extends Model {
-    public String name;
-    public String phase;
-    public String window;
-    public String text;
-    public int points;
-    public String source;
-
-    public SecretObjectiveModel(JsonNode json) {
-        try {
-            alias = json.get("alias").asText();
-            name = json.get("name").asText();
-            phase = json.get("phase").asText();
-            text = json.get("text").asText();
-            points = json.get("points").asInt();
-            source = json.get("source").asText();
-        } catch (Exception e) {
-            BotLogger.log("Could not load agenda.");
-        }
-    }
+    public SecretObjectiveModel() {}
 
     public boolean isValid() {
-        return super.isValid()
+        return alias != null
             && name != null
             && phase != null
+            && window != null
             && text != null
+            && points != 0
             && source != null;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getPhase() { 
+        return phase;
+    }
+
+    public String getWindow() { 
+        return window;
+    }
+
+    public String getText() { 
+        return text;
+    }
+
+    public int getPoints() { 
+        return points;
+    }
+
+    public String getSource() { 
+        return source;
     }
 }

@@ -5,7 +5,6 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
@@ -28,15 +27,11 @@ public class RevealStage1 extends StatusSubcommandData {
 
 
         PublicObjectiveModel po = Mapper.getPublicObjective(objective.getKey());
-        String objectiveName = po.name;
-        String objectiveDescription = po.text;
-
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getGamePing(event, activeMap));
         sb.append(" **Stage 1 Public Objective Revealed**").append("\n");
         sb.append("(").append(objective.getValue()).append(") ");
-        sb.append(Emojis.Public1alt).append(" ");
-        sb.append("**").append(objectiveName).append("** - ").append(objectiveDescription).append("\n");
+        sb.append(po.getRepresentation()).append("\n");
         MessageHelper.sendMessageToChannelAndPin(channel, sb.toString());
     }
 

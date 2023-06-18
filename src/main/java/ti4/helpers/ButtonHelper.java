@@ -558,7 +558,7 @@ public class ButtonHelper {
                 buttons.add(validTile);
 			}
 		}
-        Button validTile = Button.danger(finChecker+"concludeMove", "Done Moving");
+        Button validTile = Button.danger(finChecker+"concludeMove", "Done moving");
         buttons.add(validTile);
         Button validTile2 = Button.primary(finChecker+"ChooseDifferentDestination", "Activate a different system");
         buttons.add(validTile2);
@@ -647,7 +647,7 @@ public class ButtonHelper {
                 }
             }
         }
-        Button concludeMove = Button.primary(finChecker+"doneLanding", "Done landing troops.");
+        Button concludeMove = Button.primary(finChecker+"doneLanding", "Done landing troops");
         buttons.add(concludeMove);
         return buttons;
     }
@@ -715,7 +715,7 @@ public class ButtonHelper {
             tile.removeUnit("space",key, amount);
         }
         activeMap.resetCurrentMovedUnitsFrom1System();
-        Button buildButton = Button.danger(finChecker+"tacticalActionBuild_"+activeMap.getActiveSystem(), "Build in this system.");
+        Button buildButton = Button.danger(finChecker+"tacticalActionBuild_"+activeMap.getActiveSystem(), "Build in this system");
         buttons.add(buildButton);
         Button concludeMove = Button.danger(finChecker+"doneWithTacticalAction", "Conclude tactical action");
         buttons.add(concludeMove);
@@ -1067,8 +1067,7 @@ public class ButtonHelper {
                 for(String pnShortHand : p1.getPromissoryNotes().keySet())
                 {
                     PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
-                    String pnName = promissoryNote.name;
-                    Button transact = Button.success(finChecker+"send_PNs_"+p2.getFaction() + "_"+p1.getPromissoryNotes().get(pnShortHand), promissoryNote.name);
+                    Button transact = Button.success(finChecker+"send_PNs_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName());
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(activeMap),message, stuffToTransButtons);
@@ -1323,13 +1322,13 @@ public class ButtonHelper {
                     if(relic.equalsIgnoreCase("titanprototype") ||relic.equalsIgnoreCase("absol_jr") )
                     {
                         if(!p1.getExhaustedRelics().contains(relic)){
-                            rButton = Button.primary(finChecker+prefix+"relic_"+relic, "Exhaust "+relicData[0]);
+                            rButton = Button.primary(finChecker+prefix+"relic_"+relic, "Exhaust " + relicData[0]);
                         }else{
                             continue;
                         }
                         
                     }else {
-                        rButton = Button.danger(finChecker+prefix+"relic_"+relic, "Purge "+relicData[0]);
+                        rButton = Button.danger(finChecker+prefix+"relic_"+relic, "Purge " + relicData[0]);
                     }
                         
                 }
@@ -1344,7 +1343,7 @@ public class ButtonHelper {
                 if(pnText.contains("Action:"))
                 {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
-                    String pnName = pnModel.name;
+                    String pnName = pnModel.getName();
                     Button pnButton = Button.danger(finChecker+prefix+"pn_"+pn, "Use "+pnName);
                     compButtons.add(pnButton);
                 }
@@ -1752,14 +1751,10 @@ public class ButtonHelper {
         }
         File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.all, event);
         event.getMessage().delete().queue();
-        
-
     }
-    public static void resolveMuaatCommanderCheck(Player player, Map activeMap, GenericInteractionCreateEvent event)
-    {
 
-        if(activeMap.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander"))
-        {
+    public static void resolveMuaatCommanderCheck(Player player, Map activeMap, GenericInteractionCreateEvent event) {
+        if (activeMap.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander")) {
             int old = player.getTg();
             int newTg = player.getTg()+1;
             player.setTg(player.getTg()+1);
@@ -1773,16 +1768,13 @@ public class ButtonHelper {
             }
         }
     }
-    public static void resolvePNPlay(String id, Player player, Map activeMap, GenericInteractionCreateEvent event)
-    {
+
+    public static void resolvePNPlay(String id, Player player, Map activeMap, GenericInteractionCreateEvent event) {
         boolean longPNDisplay = false;
-        
-        PromissoryNoteModel promissoryNote2 = Mapper.getPromissoryNoteByID(id);
-        String promissoryNote = Mapper.getPromissoryNote(id, true);
-        String pnName = promissoryNote2.name;
-        String[] pn = promissoryNote.split(";");
+        PromissoryNoteModel pn = Mapper.getPromissoryNoteByID(id);
+        String pnName = pn.getName();
         String pnOwner = Mapper.getPromissoryNoteOwner(id);
-        if (promissoryNote2.playArea) {
+        if (pn.getPlayArea()) {
             player.setPromissoryNotesInPlayArea(id);
         } else {
             player.removePromissoryNote(id);

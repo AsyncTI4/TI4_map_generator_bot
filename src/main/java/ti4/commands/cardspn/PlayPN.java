@@ -76,9 +76,9 @@ public class PlayPN extends PNCardsSubcommandData {
         }
 
         PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnID);
-        String pnName = promissoryNote.name;
+        String pnName = promissoryNote.getName();
         String pnOwner = Mapper.getPromissoryNoteOwner(pnID);
-        if (promissoryNote.playArea) {
+        if (promissoryNote.getPlayArea()) {
             player.setPromissoryNotesInPlayArea(pnID);
         } else { //return to owner
             player.removePromissoryNote(pnID);
