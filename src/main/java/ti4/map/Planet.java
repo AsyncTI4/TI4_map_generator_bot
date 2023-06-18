@@ -36,7 +36,7 @@ public class Planet extends UnitHolder {
         PlanetModel planetInfo = Mapper.getPlanet(name);
         if (Optional.ofNullable(planetInfo).isPresent()) {
             originalPlanetType = planetInfo.getPlanetType().toString();
-            if(planetInfo.getTechSpecialties().size() > 0)
+            if(Optional.ofNullable(planetInfo.getTechSpecialties()).orElse(new ArrayList<>()).size() > 0)
                 originalTechSpeciality = planetInfo.getTechSpecialties().get(0).toString(); //TODO: Make this support multiple specialties
             if (StringUtils.isBlank(planetInfo.getLegendaryAbilityName()))
                 hasAbility = true;

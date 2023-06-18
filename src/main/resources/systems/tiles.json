@@ -1,5 +1,30 @@
 [
   {
+    "id": "88b300",
+    "name": "Hyperlane",
+    "aliases": [
+      "88b5"
+    ],
+    "imagePath": "88b300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "01",
     "name": "Jord (Sol)",
     "aliases": [
@@ -381,6 +406,31 @@
     "wormholes": []
   },
   {
+    "id": "87b180",
+    "name": "Hyperlane",
+    "aliases": [
+      "87b3"
+    ],
+    "imagePath": "87b180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "06",
     "name": "[0.0.0] (L1z1X)",
     "aliases": [
@@ -710,6 +760,81 @@
       {
         "x": 95.0,
         "y": 170.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "85a120",
+    "name": "Hyperlane",
+    "aliases": [
+      "85a2"
+    ],
+    "imagePath": "85a120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "85a240",
+    "name": "Hyperlane",
+    "aliases": [
+      "85a4"
+    ],
+    "imagePath": "85a240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "87b60",
+    "name": "Hyperlane",
+    "aliases": [
+      "87b1"
+    ],
+    "imagePath": "87b60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
       }
     ],
     "wormholes": []
@@ -1267,6 +1392,31 @@
     "wormholes": []
   },
   {
+    "id": "91a180",
+    "name": "Hyperlane",
+    "aliases": [
+      "91a3"
+    ],
+    "imagePath": "91a180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "15",
     "name": "Retillion/Shalloq (Yssaril)",
     "aliases": [
@@ -1710,6 +1860,156 @@
     "wormholes": []
   },
   {
+    "id": "90a",
+    "name": "Hyperlane",
+    "aliases": [
+      "90a0"
+    ],
+    "imagePath": "90a_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "90b",
+    "name": "Hyperlane",
+    "aliases": [
+      "90b0"
+    ],
+    "imagePath": "90b_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "90b120",
+    "name": "Hyperlane",
+    "aliases": [
+      "90b2"
+    ],
+    "imagePath": "90b120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "86a60",
+    "name": "Hyperlane",
+    "aliases": [
+      "86a1"
+    ],
+    "imagePath": "86a60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "87a300",
+    "name": "Hyperlane",
+    "aliases": [
+      "87a5"
+    ],
+    "imagePath": "87a300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "90b240",
+    "name": "Hyperlane",
+    "aliases": [
+      "90b4"
+    ],
+    "imagePath": "90b240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "20",
     "name": "Vefut II",
     "aliases": [
@@ -1782,6 +2082,31 @@
     "wormholes": []
   },
   {
+    "id": "86b120",
+    "name": "Hyperlane",
+    "aliases": [
+      "86b2"
+    ],
+    "imagePath": "86b120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "21",
     "name": "Thibah",
     "aliases": [
@@ -1845,6 +2170,31 @@
       {
         "x": 145.0,
         "y": 205.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "86b240",
+    "name": "Hyperlane",
+    "aliases": [
+      "86b4"
+    ],
+    "imagePath": "86b240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
       }
     ],
     "wormholes": []
@@ -2511,6 +2861,156 @@
       {
         "x": 95.0,
         "y": 170.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "83b180",
+    "name": "Hyperlane",
+    "aliases": [
+      "83b3"
+    ],
+    "imagePath": "83b180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "91a",
+    "name": "Hyperlane",
+    "aliases": [
+      "91a0"
+    ],
+    "imagePath": "91a_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "91b",
+    "name": "Hyperlane",
+    "aliases": [
+      "91b0"
+    ],
+    "imagePath": "91b_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "86a180",
+    "name": "Hyperlane",
+    "aliases": [
+      "86a3"
+    ],
+    "imagePath": "86a180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "87a60",
+    "name": "Hyperlane",
+    "aliases": [
+      "87a1"
+    ],
+    "imagePath": "87a60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "84b300",
+    "name": "Hyperlane",
+    "aliases": [
+      "84b5"
+    ],
+    "imagePath": "84b300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
       }
     ],
     "wormholes": []
@@ -3492,6 +3992,131 @@
     ]
   },
   {
+    "id": "83a300",
+    "name": "Hyperlane",
+    "aliases": [
+      "83a5"
+    ],
+    "imagePath": "83a300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "90a180",
+    "name": "Hyperlane",
+    "aliases": [
+      "90a3"
+    ],
+    "imagePath": "90a180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "89a120",
+    "name": "Hyperlane",
+    "aliases": [
+      "89a2"
+    ],
+    "imagePath": "89a120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "89a240",
+    "name": "Hyperlane",
+    "aliases": [
+      "89a4"
+    ],
+    "imagePath": "89a240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "91b180",
+    "name": "Hyperlane",
+    "aliases": [
+      "91b3"
+    ],
+    "imagePath": "91b180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "40",
     "name": "Beta Wormhole",
     "aliases": [
@@ -3798,6 +4423,31 @@
     "wormholes": []
   },
   {
+    "id": "83b120",
+    "name": "Hyperlane",
+    "aliases": [
+      "83b2"
+    ],
+    "imagePath": "83b120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "48",
     "name": "Empty System",
     "aliases": [
@@ -3867,6 +4517,106 @@
       {
         "x": 60.0,
         "y": 130.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "83b240",
+    "name": "Hyperlane",
+    "aliases": [
+      "83b4"
+    ],
+    "imagePath": "83b240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "89b300",
+    "name": "Hyperlane",
+    "aliases": [
+      "89b5"
+    ],
+    "imagePath": "89b300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "88b180",
+    "name": "Hyperlane",
+    "aliases": [
+      "88b3"
+    ],
+    "imagePath": "88b180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "86a120",
+    "name": "Hyperlane",
+    "aliases": [
+      "86a2"
+    ],
+    "imagePath": "86a120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
       }
     ],
     "wormholes": []
@@ -4123,6 +4873,31 @@
       {
         "x": 145.0,
         "y": 205.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "86a240",
+    "name": "Hyperlane",
+    "aliases": [
+      "86a4"
+    ],
+    "imagePath": "86a240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
       }
     ],
     "wormholes": []
@@ -4613,6 +5388,31 @@
     "wormholes": []
   },
   {
+    "id": "88a300",
+    "name": "Hyperlane",
+    "aliases": [
+      "88a5"
+    ],
+    "imagePath": "88a300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "59",
     "name": "Archon Vail",
     "aliases": [
@@ -4687,6 +5487,31 @@
       {
         "x": 145.0,
         "y": 205.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "87a180",
+    "name": "Hyperlane",
+    "aliases": [
+      "87a3"
+    ],
+    "imagePath": "87a180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
       }
     ],
     "wormholes": []
@@ -4844,6 +5669,56 @@
       "GAMMA",
       "ALPHA"
     ]
+  },
+  {
+    "id": "91a300",
+    "name": "Hyperlane",
+    "aliases": [
+      "91a5"
+    ],
+    "imagePath": "91a300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "88b60",
+    "name": "Hyperlane",
+    "aliases": [
+      "88b1"
+    ],
+    "imagePath": "88b60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
   },
   {
     "id": "60",
@@ -5616,6 +6491,181 @@
     "wormholes": []
   },
   {
+    "id": "83a",
+    "name": "Hyperlane",
+    "aliases": [
+      "83a0"
+    ],
+    "imagePath": "83a_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "83b",
+    "name": "Hyperlane",
+    "aliases": [
+      "83b0"
+    ],
+    "imagePath": "83b_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "87b240",
+    "name": "Hyperlane",
+    "aliases": [
+      "87b4"
+    ],
+    "imagePath": "87b240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "89b60",
+    "name": "Hyperlane",
+    "aliases": [
+      "89b1"
+    ],
+    "imagePath": "89b60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "90b180",
+    "name": "Hyperlane",
+    "aliases": [
+      "90b3"
+    ],
+    "imagePath": "90b180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "91b300",
+    "name": "Hyperlane",
+    "aliases": [
+      "91b5"
+    ],
+    "imagePath": "91b300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "87b120",
+    "name": "Hyperlane",
+    "aliases": [
+      "87b2"
+    ],
+    "imagePath": "87b120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "70",
     "name": "Kraag/Siig",
     "aliases": [
@@ -5822,6 +6872,31 @@
       {
         "x": 95.0,
         "y": 170.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "84b180",
+    "name": "Hyperlane",
+    "aliases": [
+      "84b3"
+    ],
+    "imagePath": "84b180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
       }
     ],
     "wormholes": []
@@ -6665,6 +7740,181 @@
     ]
   },
   {
+    "id": "84a",
+    "name": "Hyperlane",
+    "aliases": [
+      "84a0"
+    ],
+    "imagePath": "84a_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "84b",
+    "name": "Hyperlane",
+    "aliases": [
+      "84b0"
+    ],
+    "imagePath": "84b_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "83a180",
+    "name": "Hyperlane",
+    "aliases": [
+      "83a3"
+    ],
+    "imagePath": "83a180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "85b300",
+    "name": "Hyperlane",
+    "aliases": [
+      "85b5"
+    ],
+    "imagePath": "85b300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "88a60",
+    "name": "Hyperlane",
+    "aliases": [
+      "88a1"
+    ],
+    "imagePath": "88a60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "83b60",
+    "name": "Hyperlane",
+    "aliases": [
+      "83b1"
+    ],
+    "imagePath": "83b60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "84a300",
+    "name": "Hyperlane",
+    "aliases": [
+      "84a5"
+    ],
+    "imagePath": "84a300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "80",
     "name": "Supernova",
     "aliases": [
@@ -6731,6 +7981,181 @@
       {
         "x": 60.0,
         "y": 130.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "85a",
+    "name": "Hyperlane",
+    "aliases": [
+      "85a0"
+    ],
+    "imagePath": "85a_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "85b",
+    "name": "Hyperlane",
+    "aliases": [
+      "85b0"
+    ],
+    "imagePath": "85b_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "89a60",
+    "name": "Hyperlane",
+    "aliases": [
+      "89a1"
+    ],
+    "imagePath": "89a60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "84b60",
+    "name": "Hyperlane",
+    "aliases": [
+      "84b1"
+    ],
+    "imagePath": "84b60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "84b120",
+    "name": "Hyperlane",
+    "aliases": [
+      "84b2"
+    ],
+    "imagePath": "84b120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "84b240",
+    "name": "Hyperlane",
+    "aliases": [
+      "84b4"
+    ],
+    "imagePath": "84b240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "89b180",
+    "name": "Hyperlane",
+    "aliases": [
+      "89b3"
+    ],
+    "imagePath": "89b180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
       }
     ],
     "wormholes": []
@@ -7041,6 +8466,331 @@
     "wormholes": []
   },
   {
+    "id": "90a300",
+    "name": "Hyperlane",
+    "aliases": [
+      "90a5"
+    ],
+    "imagePath": "90a300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "90b60",
+    "name": "Hyperlane",
+    "aliases": [
+      "90b1"
+    ],
+    "imagePath": "90b60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "83a240",
+    "name": "Hyperlane",
+    "aliases": [
+      "83a4"
+    ],
+    "imagePath": "83a240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "86a",
+    "name": "Hyperlane",
+    "aliases": [
+      "86a0"
+    ],
+    "imagePath": "86a_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "83a120",
+    "name": "Hyperlane",
+    "aliases": [
+      "83a2"
+    ],
+    "imagePath": "83a120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "86b",
+    "name": "Hyperlane",
+    "aliases": [
+      "86b0"
+    ],
+    "imagePath": "86b_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "89a300",
+    "name": "Hyperlane",
+    "aliases": [
+      "89a5"
+    ],
+    "imagePath": "89a300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "83a60",
+    "name": "Hyperlane",
+    "aliases": [
+      "83a1"
+    ],
+    "imagePath": "83a60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "88a180",
+    "name": "Hyperlane",
+    "aliases": [
+      "88a3"
+    ],
+    "imagePath": "88a180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "87a",
+    "name": "Hyperlane",
+    "aliases": [
+      "87a0"
+    ],
+    "imagePath": "87a_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "87b",
+    "name": "Hyperlane",
+    "aliases": [
+      "87b0"
+    ],
+    "imagePath": "87b_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "85a300",
+    "name": "Hyperlane",
+    "aliases": [
+      "85a5"
+    ],
+    "imagePath": "85a300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "85b60",
+    "name": "Hyperlane",
+    "aliases": [
+      "85b1"
+    ],
+    "imagePath": "85b60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "setup8",
     "name": "setup",
     "aliases": null,
@@ -7058,6 +8808,156 @@
     "planets": [],
     "shipPositionsType": null,
     "spaceTokenLocations": [],
+    "wormholes": []
+  },
+  {
+    "id": "88b120",
+    "name": "Hyperlane",
+    "aliases": [
+      "88b2"
+    ],
+    "imagePath": "88b120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "88b240",
+    "name": "Hyperlane",
+    "aliases": [
+      "88b4"
+    ],
+    "imagePath": "88b240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "90a60",
+    "name": "Hyperlane",
+    "aliases": [
+      "90a1"
+    ],
+    "imagePath": "90a60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "88a",
+    "name": "Hyperlane",
+    "aliases": [
+      "88a0"
+    ],
+    "imagePath": "88a_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "88b",
+    "name": "Hyperlane",
+    "aliases": [
+      "88b0"
+    ],
+    "imagePath": "88b_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "85b180",
+    "name": "Hyperlane",
+    "aliases": [
+      "85b3"
+    ],
+    "imagePath": "85b180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
     "wormholes": []
   },
   {
@@ -7104,6 +9004,56 @@
     ],
     "shipPositionsType": "TYPE01",
     "spaceTokenLocations": [],
+    "wormholes": []
+  },
+  {
+    "id": "91a120",
+    "name": "Hyperlane",
+    "aliases": [
+      "91a2"
+    ],
+    "imagePath": "91a120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "91a240",
+    "name": "Hyperlane",
+    "aliases": [
+      "91a4"
+    ],
+    "imagePath": "91a240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
     "wormholes": []
   },
   {
@@ -7701,6 +9651,81 @@
     "wormholes": []
   },
   {
+    "id": "87a120",
+    "name": "Hyperlane",
+    "aliases": [
+      "87a2"
+    ],
+    "imagePath": "87a120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "87a240",
+    "name": "Hyperlane",
+    "aliases": [
+      "87a4"
+    ],
+    "imagePath": "87a240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "84a60",
+    "name": "Hyperlane",
+    "aliases": [
+      "84a1"
+    ],
+    "imagePath": "84a60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "d35b",
     "name": "Supernova",
     "aliases": [
@@ -7722,6 +9747,31 @@
     "planets": [],
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [],
+    "wormholes": []
+  },
+  {
+    "id": "86b300",
+    "name": "Hyperlane",
+    "aliases": [
+      "86b5"
+    ],
+    "imagePath": "86b300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
     "wormholes": []
   },
   {
@@ -7838,6 +9888,156 @@
       {
         "x": 80.0,
         "y": 185.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "84a180",
+    "name": "Hyperlane",
+    "aliases": [
+      "84a3"
+    ],
+    "imagePath": "84a180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "90b300",
+    "name": "Hyperlane",
+    "aliases": [
+      "90b5"
+    ],
+    "imagePath": "90b300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "89a",
+    "name": "Hyperlane",
+    "aliases": [
+      "89a0"
+    ],
+    "imagePath": "89a_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "91b240",
+    "name": "Hyperlane",
+    "aliases": [
+      "91b4"
+    ],
+    "imagePath": "91b240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "89b",
+    "name": "Hyperlane",
+    "aliases": [
+      "89b0"
+    ],
+    "imagePath": "89b_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "91b120",
+    "name": "Hyperlane",
+    "aliases": [
+      "91b2"
+    ],
+    "imagePath": "91b120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
       }
     ],
     "wormholes": []
@@ -8546,6 +10746,56 @@
     ],
     "shipPositionsType": "TYPE02",
     "spaceTokenLocations": [],
+    "wormholes": []
+  },
+  {
+    "id": "85a60",
+    "name": "Hyperlane",
+    "aliases": [
+      "85a1"
+    ],
+    "imagePath": "85a60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "87b300",
+    "name": "Hyperlane",
+    "aliases": [
+      "87b5"
+    ],
+    "imagePath": "87b300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
     "wormholes": []
   },
   {
@@ -9561,6 +11811,31 @@
     "wormholes": []
   },
   {
+    "id": "85b120",
+    "name": "Hyperlane",
+    "aliases": [
+      "85b2"
+    ],
+    "imagePath": "85b120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "c09",
     "name": "Jarrah",
     "aliases": [
@@ -9603,6 +11878,81 @@
     ],
     "shipPositionsType": "TYPE04",
     "spaceTokenLocations": [],
+    "wormholes": []
+  },
+  {
+    "id": "85b240",
+    "name": "Hyperlane",
+    "aliases": [
+      "85b4"
+    ],
+    "imagePath": "85b240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "84a240",
+    "name": "Hyperlane",
+    "aliases": [
+      "84a4"
+    ],
+    "imagePath": "84a240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "84a120",
+    "name": "Hyperlane",
+    "aliases": [
+      "84a2"
+    ],
+    "imagePath": "84a120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
     "wormholes": []
   },
   {
@@ -9768,6 +12118,31 @@
     ],
     "shipPositionsType": "TYPE05",
     "spaceTokenLocations": [],
+    "wormholes": []
+  },
+  {
+    "id": "89a180",
+    "name": "Hyperlane",
+    "aliases": [
+      "89a3"
+    ],
+    "imagePath": "89a180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
     "wormholes": []
   },
   {
@@ -10170,6 +12545,31 @@
     "wormholes": []
   },
   {
+    "id": "91b60",
+    "name": "Hyperlane",
+    "aliases": [
+      "91b1"
+    ],
+    "imagePath": "91b60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "d30",
     "name": "Cymiae",
     "aliases": [
@@ -10213,6 +12613,31 @@
     ],
     "shipPositionsType": "TYPE01",
     "spaceTokenLocations": [],
+    "wormholes": []
+  },
+  {
+    "id": "85a180",
+    "name": "Hyperlane",
+    "aliases": [
+      "85a3"
+    ],
+    "imagePath": "85a180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
     "wormholes": []
   },
   {
@@ -10450,6 +12875,31 @@
     "wormholes": []
   },
   {
+    "id": "86a300",
+    "name": "Hyperlane",
+    "aliases": [
+      "86a5"
+    ],
+    "imagePath": "86a300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
     "id": "d33",
     "name": "BohlDhur",
     "aliases": [
@@ -10505,6 +12955,131 @@
     "planets": [],
     "shipPositionsType": "TYPE08",
     "spaceTokenLocations": [],
+    "wormholes": []
+  },
+  {
+    "id": "83b300",
+    "name": "Hyperlane",
+    "aliases": [
+      "83b5"
+    ],
+    "imagePath": "83b300_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "90a120",
+    "name": "Hyperlane",
+    "aliases": [
+      "90a2"
+    ],
+    "imagePath": "90a120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "89b120",
+    "name": "Hyperlane",
+    "aliases": [
+      "89b2"
+    ],
+    "imagePath": "89b120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "90a240",
+    "name": "Hyperlane",
+    "aliases": [
+      "90a4"
+    ],
+    "imagePath": "90a240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "89b240",
+    "name": "Hyperlane",
+    "aliases": [
+      "89b4"
+    ],
+    "imagePath": "89b240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
     "wormholes": []
   },
   {
@@ -10752,6 +13327,131 @@
     ],
     "shipPositionsType": "TYPE03",
     "spaceTokenLocations": [],
+    "wormholes": []
+  },
+  {
+    "id": "86b180",
+    "name": "Hyperlane",
+    "aliases": [
+      "86b3"
+    ],
+    "imagePath": "86b180_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "86b60",
+    "name": "Hyperlane",
+    "aliases": [
+      "86b1"
+    ],
+    "imagePath": "86b60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "91a60",
+    "name": "Hyperlane",
+    "aliases": [
+      "91a1"
+    ],
+    "imagePath": "91a60_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "88a240",
+    "name": "Hyperlane",
+    "aliases": [
+      "88a4"
+    ],
+    "imagePath": "88a240_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
+    "wormholes": []
+  },
+  {
+    "id": "88a120",
+    "name": "Hyperlane",
+    "aliases": [
+      "88a2"
+    ],
+    "imagePath": "88a120_Hyperlane.png",
+    "planets": [],
+    "shipPositionsType": null,
+    "spaceTokenLocations": [
+      {
+        "x": 125.0,
+        "y": 102.0
+      },
+      {
+        "x": 165.0,
+        "y": 8.0
+      },
+      {
+        "x": 225.0,
+        "y": 102.0
+      }
+    ],
     "wormholes": []
   }
 ]
