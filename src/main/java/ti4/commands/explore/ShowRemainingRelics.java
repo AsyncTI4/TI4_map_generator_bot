@@ -50,7 +50,7 @@ public class ShowRemainingRelics extends GenericRelicAction {
         Player player2 = activeMap.getPlayer(getUser().getId());
         player2 = Helper.getGamePlayer(activeMap, player2, event, null);
 
-        if (player != null && !player.getSCs().isEmpty() && !over && activeMap.isFoWMode()) {
+        if (player != null && activeMap.getCurrentPhase().equalsIgnoreCase("action") && !over && activeMap.isFoWMode()) {
                 sendMessage("It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
         } else {
                 sendMessage(text.toString());
