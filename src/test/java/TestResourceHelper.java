@@ -55,12 +55,15 @@ public class TestResourceHelper {
         //import everything into the new SystemModel object
         List<TileModel> tileModels = new ArrayList<>();
         HashMap<String, String> allTiles = Mapper.getTileRepresentations();
+        Set<Object> allTileIds = Mapper.getAllTileIDs();
+        System.out.println(Mapper.getTilesList());
         HashMap<String, String> allTileAliases = AliasHandler.getTileAliasEntryList();
         ShipPositionModel shipPositionModel = new ShipPositionModel();
         WormholeModel wormholeModel = new WormholeModel();
 
         List<TileModel> tileObjects = new ArrayList<>();
-        for (String id : allTiles.keySet()) {
+        for (Object objId : allTileIds) {
+            String id = (String) objId;
             TileModel tile = new TileModel(id);
             tile.setName(allTiles.get(id));
             String aliases = allTileAliases.get(id);
