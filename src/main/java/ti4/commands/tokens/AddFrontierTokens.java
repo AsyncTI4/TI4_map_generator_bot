@@ -12,9 +12,11 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
+import ti4.model.TileModel;
 
 import java.io.File;
 import java.util.Collection;
+import java.util.List;
 
 public class AddFrontierTokens implements Command {
 
@@ -30,7 +32,7 @@ public class AddFrontierTokens implements Command {
 
     void parsingForTile(SlashCommandInteractionEvent event, Map activeMap) {
         Collection<Tile> tileList = activeMap.getTileMap().values();
-        String frontierTileList = Mapper.getSpecialCaseValues(Constants.FRONTIER);
+        List<String> frontierTileList = Mapper.getFrontierTileIds();
         for (Tile tile : tileList) {
             if (frontierTileList.contains(tile.getTileID())) {
                 boolean hasMirage = false;

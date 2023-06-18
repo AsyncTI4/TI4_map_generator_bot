@@ -1,12 +1,18 @@
 package ti4.helpers;
 
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.message.BotLogger;
+import ti4.model.PlanetModel;
+import ti4.model.TileModel;
 
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class AliasHandler {
     private static HashMap<String, String> tileAliasList = new HashMap<>();
@@ -33,16 +39,20 @@ public class AliasHandler {
     private static HashMap<String, String> ttpgAttachmentAliasList = new HashMap<>();
     private static HashMap<String, String> ttpgTokenAliasList = new HashMap<>();
     private static HashMap<String, String> ttpgUnitAliasList = new HashMap<>();
+    private static final java.util.Map<String, TileModel> allTilesMap = new HashMap<>();
+    private static final java.util.Map<String, String> allTileAliases = new HashMap<>();
+    private static final java.util.Map<String, PlanetModel> allPlanetsMap = new HashMap<>();
+    private static final java.util.Map<String, String> allPlanetAliases = new HashMap<>();
 
     public static void init() {
-        readAliasFile("tile_alias.properties", tileAliasList, "Could not read tiles alias file");
-        readAliasFile("tile_alias.properties", tileAliasEntryList);
+        readAliasFile("tile_alias.properties", tileAliasList, "Could not read tiles alias file"); //TODO: DELETE
+        readAliasFile("tile_alias.properties", tileAliasEntryList); //TODO: DELETE
         readAliasFile("tilemap_alias.properties", tilemapAliasList, "Could not read tilemap alias file");
         readAliasFile("unit_alias.properties", unitAliasList, "Could not read unit alias file");
         readAliasFile("unit_alias.properties", unitValuesList, false);
-        readAliasFile("planet_alias.properties", planetKeyList, true);
-        readAliasFile("planet_alias.properties", planetAliasEntryList);
-        readAliasFile("planet_alias.properties", planetAliasList, "Could not read planet alias file");
+        readAliasFile("planet_alias.properties", planetKeyList, true); //TODO: DELETE
+        readAliasFile("planet_alias.properties", planetAliasEntryList); //TODO: DELETE
+        readAliasFile("planet_alias.properties", planetAliasList, "Could not read planet alias file"); //TODO: DELETE
         readAliasFile("cc_token_alias.properties", cctokenAliasList, "Could not read cc token alias file");
         readAliasFile("attachment_alias.properties", attachmentAliasList, "Could not read attachement token alias file");
         readAliasFile("tokens_alias.properties", tokenAliasList, "Could not read token alias file");
@@ -59,6 +69,7 @@ public class AliasHandler {
         readAliasFile("ttpg_attachment_alias.properties", ttpgAttachmentAliasList, "Could not read TTPG attachment_alias file");
         readAliasFile("ttpg_token_alias.properties", ttpgTokenAliasList, "Could not read TTPG token_alias file");
         readAliasFile("ttpg_unit_alias.properties", ttpgUnitAliasList, "Could not read TTPG unit_alias file");
+        jsonInit();
     }
 
     /** Loads aliases in a simple format - used primarily for displaying aliases to users with the /help commands
@@ -137,15 +148,45 @@ public class AliasHandler {
         }
     }
 
+    public static void jsonInit() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<TileModel> allTiles = new ArrayList<>();
+        String file = ResourceHelper.getInstance().getTileJsonFile("tiles.json");
+        if(Optional.ofNullable(file).isEmpty()) {
+            BotLogger.log("Tile JSON is null!");
+            return;
+        }
+
+        try {
+            InputStream input = new FileInputStream(file);
+            allTiles = objectMapper.readValue(input, new TypeReference<List<TileModel>>(){});
+        } catch (Exception e) {
+            BotLogger.log("Could not deserialise tile JSON!");
+            System.out.println(e.getMessage());
+        }
+
+        allTiles.forEach(
+                tileModel -> {
+                    allTilesMap.put(tileModel.getId(), tileModel);
+                    tileModel.getAliases().forEach(alias -> allTileAliases.put(alias, tileModel.getId()));
+                    tileModel.getPlanets().forEach(
+                            planetModel -> {
+                                allPlanetsMap.put(planetModel.getId(), planetModel);
+                                planetModel.getAliases().forEach(alias -> allPlanetAliases.put(alias, planetModel.getId()));
+                            }
+                    );
+                }
+        );
+    }
+
     public static String resolveTile(String name) {
-        
         if(name.equalsIgnoreCase("mirage"))
         {
             return name;
         }
-        String aliasID = tileAliasList.get(name.toLowerCase());
-        if (aliasID != null) {
-            return aliasID;
+        String tileId = allTileAliases.get(name.toLowerCase());
+        if (tileId != null) {
+            return tileId;
         } else {
             System.out.println("Could not find an alias for Tile: " + name);
             return name;
@@ -200,23 +241,25 @@ public class AliasHandler {
         return unitValuesList;
     }
 
-    public static ArrayList<String> getPlanetKeyList() {
-        return planetKeyList;
+    public static List<String> getPlanetKeyList() {
+        return allPlanetsMap.values().stream()
+                .map(PlanetModel::getId)
+                .toList();
     }
 
     public static String resolvePlanet(String name) {
         if (name.contains(" ")) name = name.substring(0, name.lastIndexOf(" ")); //if there is a space " " then cut off remainder
-        String aliasID = planetAliasList.get(name.toLowerCase());
+        String aliasID = allPlanetAliases.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
-            //System.out.println("Could not find an alias for Planet: " + name);
+            System.out.println("Could not find an alias for Planet: " + name);
             return name;
         }
     }
 
     public static String resolveAttachment(String name) {
-        String aliasID = planetAliasList.get(name.toLowerCase());
+        String aliasID = allPlanetAliases.get(name.toLowerCase());
         if (aliasID != null) {
             return aliasID;
         } else {
@@ -345,11 +388,13 @@ public class AliasHandler {
         return aliasID != null ? aliasID : null;
     }
 
-    public static HashMap<String, String> getPlanetAliasEntryList() {
-        return planetAliasEntryList;
+    public static Map<String, String> getPlanetAliasEntryList() {
+        return allPlanetsMap.values().stream()
+                .collect(Collectors.toMap(PlanetModel::getId, planetModel -> StringUtils.join(planetModel.getAliases(), ", ")));
     }
 
-    public static HashMap<String, String> getTileAliasEntryList() {
-        return tileAliasEntryList;
+    public static Map<String, String> getTileAliasEntryList() {
+        return allTilesMap.values().stream()
+                .collect(Collectors.toMap(TileModel::getId, tileModel -> StringUtils.join(tileModel.getAliases(), ", ")));
     }
 }

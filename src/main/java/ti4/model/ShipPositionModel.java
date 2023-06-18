@@ -1,5 +1,6 @@
 package ti4.model;
 
+import java.awt.*;
 import java.util.Arrays;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,30 +27,37 @@ public class ShipPositionModel {
 
         private final String positions;
 
+        private static final Point offset = new Point(12,-7);
+        private static final Point allianceOffset = new Point(8,-5);
+
         ShipPosition(String positions) {
             this.positions = positions;
         }
 
-        private String getPositions() {
+        public String getPositions() {
             return this.positions;
         }
+
         @Override
         public String toString() {
             return super.toString().toLowerCase();
         }
     }
 
-        public ShipPosition getTypeFromString(String type) {
-            Map<String, ShipPosition> allTypes = Arrays.stream(ShipPosition.values())
-                    .collect(
-                            Collectors.toMap(
-                                    ShipPosition::toString,
-                                    (shipPositionModel -> shipPositionModel)
-                            )
-                    );
-            if (allTypes.containsKey(type))
-                return allTypes.get(type);
-            return null;
-        }
+    public Point getOffset() { return ShipPosition.offset; }
+    public Point getAllianceOffset() { return ShipPosition.allianceOffset; }
+
+    public ShipPosition getTypeFromString(String type) {
+        Map<String, ShipPosition> allTypes = Arrays.stream(ShipPosition.values())
+                .collect(
+                        Collectors.toMap(
+                                ShipPosition::toString,
+                                (shipPositionModel -> shipPositionModel)
+                        )
+                );
+        if (allTypes.containsKey(type))
+            return allTypes.get(type);
+        return null;
+    }
 
 }

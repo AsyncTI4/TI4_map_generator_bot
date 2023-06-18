@@ -1,6 +1,7 @@
 package ti4.commands.explore;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -19,6 +20,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
+import ti4.model.PlanetModel;
 
 public class ExpPlanet extends ExploreSubcommandData {
 
@@ -46,13 +48,12 @@ public class ExpPlanet extends ExploreSubcommandData {
             return;
         }
         planetName = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planetName));
-        String planet = Mapper.getPlanet(planetName);
-        if (planet == null) {
+        PlanetModel planet = Mapper.getPlanet(planetName);
+        if (Optional.ofNullable(planet).isEmpty()) {
             sendMessage("Invalid planet");
             return;
         }
-        String[] planetInfo = planet.split(",");
-        String drawColor = planetInfo[1];
+        String drawColor = planet.getPlanetType().toString();
         OptionMapping traitOption = event.getOption(Constants.TRAIT);
         if (traitOption != null){
             drawColor = traitOption.getAsString();

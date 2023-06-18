@@ -78,7 +78,7 @@ public class TrapReveal extends DiscordantStarsSubcommandData {
                     String trapName = split[1];
                     String trapText = split[2];
 
-                    HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+                    java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
                     String representation = planetRepresentations.get(planet);
                     if (representation == null) {
                         representation = planet;

@@ -58,7 +58,7 @@ public class SystemInfo extends SpecialSubcommandData {
             StringBuilder sb = new StringBuilder();
             sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
             java.util.Map<String, String> unitRepresentation = Mapper.getUnits();
-            HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+            java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
             java.util.Map<String, String> colorToId = Mapper.getColorToId();
             Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
             for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {

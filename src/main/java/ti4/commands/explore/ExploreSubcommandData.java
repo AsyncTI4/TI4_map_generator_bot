@@ -1,7 +1,9 @@
 package ti4.commands.explore;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -29,6 +31,7 @@ import ti4.map.MapManager;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.message.MessageHelper;
+import ti4.model.PlanetModel;
 
 public abstract class ExploreSubcommandData extends SubcommandData {
 
@@ -136,16 +139,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             String tokenFilename = Mapper.getAttachmentID(token);
             if (tokenFilename != null && tile != null && planetName != null) {
 
-                String planetInfo = Mapper.getPlanet(planetName);
-                if (planetInfo != null) {
-                    String[] split = planetInfo.split(",");
-                    if (split.length > 4) {
-                        String techSpec = split[4];
-                        if (!techSpec.isEmpty() &&
-                                (token.equals(Constants.WARFARE) ||
-                                 token.equals(Constants.PROPULSION) ||
-                                 token.equals(Constants.CYBERNETIC) ||
-                                 token.equals(Constants.BIOTIC))) {
+                PlanetModel planetInfo = Mapper.getPlanet(planetName);
+                if (Optional.ofNullable(planetInfo).isPresent()) {
+                    if (planetInfo.getTechSpecialties().size() > 0) {
+                        if ((token.equals(Constants.WARFARE) ||
+                             token.equals(Constants.PROPULSION) ||
+                             token.equals(Constants.CYBERNETIC) ||
+                             token.equals(Constants.BIOTIC))) {
                             String attachmentID = Mapper.getAttachmentID(token + "stat");
                             if (attachmentID != null){
                                 tokenFilename = attachmentID;
@@ -216,8 +216,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             }
             case "mirage" -> {
                 String mirageID = Constants.MIRAGE;
-                String planetValue = Mapper.getPlanet(mirageID);
-                if (planetValue == null) {
+                PlanetModel planetValue = Mapper.getPlanet(mirageID);
+                if (Optional.ofNullable(planetValue).isEmpty()) {
                     sendMessage("Invalid planet: " + mirageID);
                     return;
                 }

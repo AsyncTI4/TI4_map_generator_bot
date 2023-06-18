@@ -260,7 +260,7 @@ public class AutoCompleteProvider {
                 MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName(), event.getSubcommandName());
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Set<String> planetIDs;
-                HashMap<String, String> planets = Mapper.getPlanetRepresentations();
+                java.util.Map<String, String> planets = Mapper.getPlanetRepresentations();
                 if (activeMap != null && !activeMap.isFoWMode()) {
                     planetIDs = activeMap.getPlanets();
                     List<Command.Choice> options = planets.entrySet().stream()
