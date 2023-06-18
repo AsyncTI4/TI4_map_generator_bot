@@ -168,11 +168,13 @@ public class AliasHandler {
         allTiles.forEach(
                 tileModel -> {
                     allTilesMap.put(tileModel.getId(), tileModel);
-                    tileModel.getAliases().forEach(alias -> allTileAliases.put(alias, tileModel.getId()));
-                    tileModel.getPlanets().forEach(
+                    Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>())
+                            .forEach(alias -> allTileAliases.put(alias, tileModel.getId()));
+                    Optional.ofNullable(tileModel.getPlanets()).orElse(new ArrayList<>()).forEach(
                             planetModel -> {
                                 allPlanetsMap.put(planetModel.getId(), planetModel);
-                                planetModel.getAliases().forEach(alias -> allPlanetAliases.put(alias, planetModel.getId()));
+                                Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>())
+                                        .forEach(alias -> allPlanetAliases.put(alias, planetModel.getId()));
                             }
                     );
                 }

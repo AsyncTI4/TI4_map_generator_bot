@@ -133,7 +133,7 @@ public class Mapper {
         allTiles.forEach(
                 tileModel -> {
                     allTilesMap.put(tileModel.getId(), tileModel);
-                    tileModel.getPlanets().forEach(
+                    Optional.ofNullable(tileModel.getPlanets()).orElse(new ArrayList<>()).forEach(
                             planetModel -> allPlanetsMap.put(planetModel.getId(), planetModel)
                     );
                 }

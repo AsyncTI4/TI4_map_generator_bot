@@ -90,7 +90,7 @@ public class PositionMapper {
         allTiles.forEach(
                 tileModel -> {
                     allTilesMap.put(tileModel.getId(), tileModel);
-                    tileModel.getPlanets().forEach(
+                    Optional.ofNullable(tileModel.getPlanets()).orElse(new ArrayList<>()).forEach(
                             planetModel -> allPlanetsMap.put(planetModel.getId(), planetModel)
                     );
                 }
@@ -117,6 +117,9 @@ public class PositionMapper {
     }
 
     public static java.util.Map<String, Point> getTilePlanetPositions(String tileID) {
+        if (tileID.equals("nombox")) {
+            return null;
+        }
         return allTilesMap.get(tileID).getPlanets().stream()
                 .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
     }
