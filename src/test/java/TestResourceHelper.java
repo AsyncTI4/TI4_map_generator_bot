@@ -2,11 +2,14 @@ import com.amazonaws.util.json.Jackson;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 //import ti4.ResourceHelper;
+import ti4.commands.map.AddTile;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.AliasHandler;
+import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.map.Planet;
+import ti4.map.Tile;
 import ti4.model.*;
 
 import java.awt.*;
@@ -31,6 +34,9 @@ public class TestResourceHelper {
         //String tilePath = ResourceHelper.getInstance().getTileFile(tileID);
 
         assertEquals(tileID, tileID);
+        Tile tile = new Tile(AliasHandler.resolveTile(Constants.MALLICE), "TL");
+        tile = new Tile(AliasHandler.resolveTile(Constants.MR), "000");
+        AddTile.addCustodianToken(tile);
     }
 
     /*public void loadPlanetInfoIntoJson() throws IOException {

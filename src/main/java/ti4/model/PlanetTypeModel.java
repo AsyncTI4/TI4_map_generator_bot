@@ -19,6 +19,9 @@ public class PlanetTypeModel {
     }
 
     public PlanetType getPlanetTypeFromString(String type) {
+        if (type == null) {
+            return PlanetType.NONE;
+        }
         Map<String, PlanetType> allTypes = Arrays.stream(PlanetType.values())
                 .collect(
                         Collectors.toMap(

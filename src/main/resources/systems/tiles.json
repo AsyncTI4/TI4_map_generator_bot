@@ -5532,7 +5532,7 @@
     "imagePath": "82a_Mallice_locked.png",
     "planets": [
       {
-        "id": "mallice",
+        "id": "mallicelocked",
         "name": "Mallice",
         "aliases": [
           "mallice",
