@@ -324,6 +324,21 @@ public class PositionMapper {
         return null;
     }
 
+    public static String getTileSpaceUnitLayout(String tileId) {
+        if (tileTypeList.isEmpty()) {
+            for (java.util.Map.Entry<Object, Object> tileTypeEntry : tileType.entrySet()) {
+                String tileTypeKey = (String) tileTypeEntry.getKey();
+                String values = (String) tileTypeEntry.getValue();
+                values = values.replaceAll(" ", "");
+                String[] split = values.split(",");
+                for (String tileID_ : split) {
+                    tileTypeList.put(tileID_, tileTypeKey);
+                }
+            }
+        }
+        return tileTypeList.get(tileId);
+    }
+
     public static UnitTokenPosition getSpaceUnitPosition(String planetName, String tileID) {
         if (tileTypeList.isEmpty()) {
             for (java.util.Map.Entry<Object, Object> tileTypeEntry : tileType.entrySet()) {
