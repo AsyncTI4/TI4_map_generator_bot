@@ -240,8 +240,8 @@ public class ButtonHelper {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         
         List<Button> buttons = new ArrayList<>();
-        HashMap<String, Integer> displacedUnits =  activeMap.getMovedUnitsFromCurrentActivation();
-        HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+        java.util.Map<String, Integer> displacedUnits =  activeMap.getMovedUnitsFromCurrentActivation();
+        java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         Tile tile = activeMap.getTileByPosition(activeMap.getActiveSystem());
         tile = MoveUnits.flipMallice(event, tile, activeMap);
         if (tile == null) {
@@ -354,8 +354,8 @@ public class ButtonHelper {
     public static List<Button> landAndGetBuildButtons(Player player, Map activeMap, ButtonInteractionEvent event) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
-        HashMap<String, Integer> displacedUnits =  activeMap.getCurrentMovedUnitsFrom1System();
-        HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+        java.util.Map<String, Integer> displacedUnits =  activeMap.getCurrentMovedUnitsFrom1System();
+        java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         Tile tile = activeMap.getTileByPosition(activeMap.getActiveSystem());
         
         for(String unit :displacedUnits.keySet()){
@@ -451,7 +451,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
 
         java.util.Map<String, String> unitRepresentation = Mapper.getUnits();
-        HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+        java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         String cID = Mapper.getColorID(player.getColor());
         for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
             String name = entry.getKey();

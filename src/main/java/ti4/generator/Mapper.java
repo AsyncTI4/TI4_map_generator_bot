@@ -1,5 +1,6 @@
 package ti4.generator;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -61,8 +62,11 @@ public class Mapper {
     private static final HashMap<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
     private static final HashMap<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
 
+    private static final java.util.Map<String, TileModel> allTilesMap = new HashMap<>();
+    private static final java.util.Map<String, PlanetModel> allPlanetsMap = new HashMap<>();
+
     public static void init() {
-        readData("tiles.properties", tiles, "Could not read tiles name file");
+        readData("tiles.properties", tiles, "Could not read tiles name file"); //TODO: DELETE
         readData("units.properties", units, "Could not read unit name file");
         readData("color.properties", colors, "Could not read color name file");
         readData("cc_tokens.properties", cc_tokens, "Could not read cc token name file");
@@ -81,20 +85,21 @@ public class Mapper {
         readData("relics.properties", relics, "Could not read relic file");
         readData("tech.properties", techs, "Could not read tech file");
         readData("tech_representation.properties", tech_representation, "Could not read tech representation file");
-        readData("planets.properties", planets, "Could not read planets file");
+        readData("planets.properties", planets, "Could not read planets file"); //TODO: DELETE
         readData("attachments_info.properties", attachmentInfo, "Could not read attachment info file");
         readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
-        readData("planets_representation.properties", planet_representation, "Could not read planet representation file");
-        readData("tile_representation.properties", tile_representation, "Could not read tile representation file");
+        readData("planets_representation.properties", planet_representation, "Could not read planet representation file"); //TODO: DELETE
+        readData("tile_representation.properties", tile_representation, "Could not read tile representation file"); //TODO: DELETE
         readData("leader_representation.properties", leader_representation, "Could not read leader representation file");
         readData("unit_representation.properties", unit_representation, "Could not read unit representation file");
         readJsonData("faction_setup.json", factionSetup, FactionModel::new, "Could not read faction setup file");
         readData("milty_draft.properties", miltyDraft, "Could not read milty draft file");
         readData("agenda_representation.properties", agendaRepresentation, "Could not read agenda representaion file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
-        readData("wormholes.properties", wormholes, "Could not read wormholes file");
+        readData("wormholes.properties", wormholes, "Could not read wormholes file"); //TODO: DELETE
         readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
         readJsonData("decks.json", decks, DeckModel::new, "couild not read decks file");
+        jsonInit();
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -106,6 +111,33 @@ public class Mapper {
                 BotLogger.log(s);
             }
         }
+    }
+
+    public static void jsonInit() {
+        ObjectMapper objectMapper = new ObjectMapper();
+        List<TileModel> allTiles = new ArrayList<>();
+        String file = ResourceHelper.getInstance().getTileJsonFile("tiles.json");
+        if(Optional.ofNullable(file).isEmpty()) {
+            BotLogger.log("Tile JSON is null!");
+            return;
+        }
+
+        try {
+            InputStream input = new FileInputStream(file);
+            allTiles = objectMapper.readValue(input, new TypeReference<List<TileModel>>(){});
+        } catch (Exception e) {
+            BotLogger.log("Could not deserialise tile JSON!");
+            System.out.println(e.getMessage());
+        }
+
+        allTiles.forEach(
+                tileModel -> {
+                    allTilesMap.put(tileModel.getId(), tileModel);
+                    tileModel.getPlanets().forEach(
+                            planetModel -> allPlanetsMap.put(planetModel.getId(), planetModel)
+                    );
+                }
+        );
     }
 
     interface ModelContructor<T> {
@@ -190,8 +222,15 @@ public class Mapper {
         return property != null ? property : "";
     }
 
+    public static List<String> getFrontierTileIds() {
+        return allTilesMap.values().stream()
+                .filter(tileModel -> tileModel.getPlanets().size() == 0)
+                .map(TileModel::getId)
+                .toList();
+    }
+
     public static String getTileID(String tileID) {
-        return tiles.getProperty(tileID);
+        return allTilesMap.get(tileID).getImagePath();
     }
 
     public static List<List<Boolean>> getHyperlaneData(String tileID) {
@@ -210,24 +249,18 @@ public class Mapper {
     }
 
     public static Set<String> getWormholes(String tileID) {
-        String property = wormholes.getProperty(tileID);
-        if (property == null) {
-            return new HashSet<>();
-        }
-        return Arrays.stream(property.split(",")).collect(Collectors.toSet());
+        return allTilesMap.get(tileID).getWormholes().stream()
+                .map(WormholeModel.Wormhole::toString)
+                .collect(Collectors.toSet());
     }
 
     public static Set<String> getWormholesTiles(String wormholeID) {
-        Set<String> tileIDs = new HashSet<>();
-        for (Map.Entry<Object, Object> wormholeEntry : wormholes.entrySet()) {
-            Object value = wormholeEntry.getValue();
-            if (value instanceof String) {
-                if (Arrays.asList(((String) value).split(",")).contains(wormholeID)) {
-                    tileIDs.add((String) wormholeEntry.getKey());
-                }
-            }
-        }
-        return tileIDs;
+        WormholeModel wormholeModel = new WormholeModel();
+        WormholeModel.Wormhole wormhole = wormholeModel.getWormholeFromString(wormholeID);
+        return allTilesMap.values().stream()
+                .filter(tileModel -> tileModel.getWormholes().contains(wormhole))
+                .map(TileModel::getId)
+                .collect(Collectors.toSet());
     }
 
     public static String getFactionFileName(String factionID) {
@@ -399,8 +432,8 @@ public class Mapper {
         return (String) relics.get(id);
     }
 
-    public static String getPlanet(String id) {
-        return (String) planets.get(id);
+    public static PlanetModel getPlanet(String id) {
+        return allPlanetsMap.get(id);
     }
 
     public static String getAttachmentInfo(String id) {
@@ -466,12 +499,9 @@ public class Mapper {
         return soList;
     }
 
-    public static HashMap<String, String> getPlanetRepresentations() {
-        HashMap<String, String> planets = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : planet_representation.entrySet()) {
-            planets.put((String) entry.getKey(), (String) entry.getValue());
-        }
-        return planets;
+    public static Map<String, String> getPlanetRepresentations() {
+        return allPlanetsMap.values().stream()
+                .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getName));
     }
 
     public static HashMap<String, String> getFactionRepresentations() {
@@ -490,12 +520,9 @@ public class Mapper {
         return leaders;
     }
 
-    public static HashMap<String, String> getTileRepresentations() {
-        HashMap<String, String> tiles = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : tile_representation.entrySet()) {
-            tiles.put((String) entry.getKey(), (String) entry.getValue());
-        }
-        return tiles;
+    public static Map<String, String> getTileRepresentations() {
+        return allTilesMap.values().stream()
+                .collect(Collectors.toMap(TileModel::getId, TileModel::getName));
     }
 
     public static HashMap<String, String> getTechRepresentations() {
@@ -697,10 +724,9 @@ public class Mapper {
     }
 
     public static String getTilesList() {
-        return "__**Tiles:**__\n> " + tiles.values().stream()
+        return "__**Tiles:**__\n> " + allTilesMap.values().stream()
+                .map(TileModel::getImagePath)
                 .sorted()
-                .filter(value -> value instanceof String)
-                .map(value -> (String) value)
                 .collect(Collectors.joining("\n> "));
     }
 

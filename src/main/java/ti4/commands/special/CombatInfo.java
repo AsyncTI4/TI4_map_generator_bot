@@ -57,7 +57,7 @@ public class CombatInfo extends SpecialSubcommandData {
             sb_roll.append("/roll roll_command:");
             sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
             java.util.Map<String, String> unitRepresentation = Mapper.getUnits();
-            HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+            java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
             Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
             String baseRoll = "d10hv";
             String playerColor = player.getColor();

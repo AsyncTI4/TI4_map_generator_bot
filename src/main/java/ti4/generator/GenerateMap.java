@@ -2978,7 +2978,7 @@ public class GenerateMap {
         int y = 0;
         int deltaX = 80;
         int deltaY = 0;
-        ArrayList<Point> spaceTokenPositions = PositionMapper.getSpaceTokenPositions(tile.getTileID());
+        List<Point> spaceTokenPositions = PositionMapper.getSpaceTokenPositions(tile.getTileID());
         if (spaceTokenPositions.isEmpty()) {
             x = centerPosition.x;
             y = centerPosition.y;

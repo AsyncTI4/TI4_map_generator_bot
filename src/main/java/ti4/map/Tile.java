@@ -55,20 +55,9 @@ public class Tile {
 
         Space space = new Space(Constants.SPACE, Constants.SPACE_CENTER_POSITION);
         unitHolders.put(Constants.SPACE, space);
-        String tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
-        if (tilePlanetPositions != null) {
-            StringTokenizer tokenizer = new StringTokenizer(tilePlanetPositions, ";");
-            while (tokenizer.hasMoreTokens()) {
-                String planetInfo = tokenizer.nextToken();
-                if (planetInfo.length() > 4) {
-                    StringTokenizer planetTokenizer = new StringTokenizer(planetInfo, " ");
-                    String planetName = planetTokenizer.nextToken().toLowerCase();
-                    Point planetPosition = PositionMapper.getPoint(planetTokenizer.nextToken());
-                    Planet planet = new Planet(planetName, planetPosition);
-                    unitHolders.put(planetName, planet);
-                }
-            }
-        }
+        java.util.Map<String, Point> tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
+
+        tilePlanetPositions.forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
     }
 
     @Nullable

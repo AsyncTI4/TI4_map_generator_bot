@@ -1,5 +1,7 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import ti4.generator.UnitTokenPosition;
 
 import java.awt.*;
@@ -18,6 +20,8 @@ public class PlanetModel {
     private String legendaryAbilityName;
     private String legendaryAbilityText;
     private UnitTokenPosition unitPositions;
+
+    public PlanetModel() {}
 
     public String getId() {
         return id;

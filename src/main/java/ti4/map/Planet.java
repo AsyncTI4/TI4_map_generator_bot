@@ -1,5 +1,6 @@
 package ti4.map;
 
+import org.apache.commons.lang3.StringUtils;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -8,11 +9,13 @@ import ti4.message.BotLogger;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonTypeName;
+import ti4.model.PlanetModel;
 
 @JsonTypeName("planet")
 public class Planet extends UnitHolder {
@@ -30,30 +33,22 @@ public class Planet extends UnitHolder {
     @JsonCreator
     public Planet(@JsonProperty("name") String name, @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
         super(name, holderCenterPosition);
-        String planetInfo = Mapper.getPlanet(name);
-        if (planetInfo != null) {
-            String[] split = planetInfo.split(",");
-            originalPlanetType = split[1];
-            if (split.length > 4) {
-                originalTechSpeciality = split[4];
-            }
-            if (split.length > 5) {
+        PlanetModel planetInfo = Mapper.getPlanet(name);
+        if (Optional.ofNullable(planetInfo).isPresent()) {
+            originalPlanetType = planetInfo.getPlanetType().toString();
+            if(planetInfo.getTechSpecialties().size() > 0)
+                originalTechSpeciality = planetInfo.getTechSpecialties().get(0).toString(); //TODO: Make this support multiple specialties
+            if (StringUtils.isBlank(planetInfo.getLegendaryAbilityName()))
                 hasAbility = true;
-            }
         }
         resetOriginalPlanetResInf();
     }
 
     private void resetOriginalPlanetResInf() {
-        String planetInfo = Mapper.getPlanet(getName());
-        if (planetInfo != null) {
-            String[] split = planetInfo.split(",");
-            try {
-                resourcesOriginal = Integer.parseInt(split[2]);
-                influenceOriginal = Integer.parseInt(split[3]);
-            } catch (Exception e) {
-                BotLogger.log("Could not reset the original res/inf of unitHolder " + getName(), e);
-            }
+        PlanetModel planetInfo = Mapper.getPlanet(getName());
+        if (Optional.ofNullable(planetInfo).isPresent()) {
+            resourcesOriginal = planetInfo.getResources();
+            influenceOriginal = planetInfo.getInfluence();
         }
     }
 

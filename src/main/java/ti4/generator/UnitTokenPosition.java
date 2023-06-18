@@ -10,6 +10,8 @@ public class UnitTokenPosition {
     LinkedHashMap<String, ArrayList<Point>> coordinateMap = new LinkedHashMap<>();
     private boolean removeUnitCoordinate = true;
 
+    public UnitTokenPosition() {}
+
     public UnitTokenPosition(String unitHolderName) {
         this(unitHolderName, true);
     }

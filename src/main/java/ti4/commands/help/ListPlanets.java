@@ -1,6 +1,7 @@
 package ti4.commands.help;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -21,7 +22,7 @@ public class ListPlanets extends HelpSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        HashMap<String, String> planetList= AliasHandler.getPlanetAliasEntryList();
+        Map<String, String> planetList= AliasHandler.getPlanetAliasEntryList();
         boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
         String message = "**__Planet List__**\n" + planetList.entrySet().stream().map(e -> {
             if (includeAliases) {

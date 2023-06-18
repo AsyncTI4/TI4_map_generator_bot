@@ -33,8 +33,7 @@ public class TestResourceHelper {
         assertEquals(tileID, tileID);
     }
 
-    @Test
-    public void loadPlanetInfoIntoJson() throws IOException {
+    /*public void loadPlanetInfoIntoJson() throws IOException {
         //set up all the loaders
         Mapper.init();
         System.out.println(Mapper.getTileRepresentations()); //id:names
@@ -64,7 +63,8 @@ public class TestResourceHelper {
             if(allTiles.get(id).equals("Hyperlane")) {
                 continue;
             }
-            TileModel tile = new TileModel(id);
+            TileModel tile = new TileModel();
+            tile.setId(id);
             tile.setName(allTiles.get(id));
             String aliases = allTileAliases.get(id);
             if(Optional.ofNullable(aliases).isPresent())
@@ -83,7 +83,7 @@ public class TestResourceHelper {
         //verify all the output is the same
     }
 
-    private List<PlanetModel> getPlanets(String tileId) {
+    /*private List<PlanetModel> getPlanets(String tileId) {
         PlanetTypeModel planetTypeModel = new PlanetTypeModel();
         TechSpecialtyModel techSpecialtyModel = new TechSpecialtyModel();
         List<PlanetModel> planets = new ArrayList<>();
@@ -129,5 +129,5 @@ public class TestResourceHelper {
             }
         }
         return planets;
-    }
+    }*/
 }

@@ -1,6 +1,7 @@
 package ti4.commands.help;
 
 import java.util.HashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -20,7 +21,7 @@ public class ListTiles extends HelpSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        HashMap<String, String> tilesList= AliasHandler.getTileAliasEntryList();
+        Map<String, String> tilesList= AliasHandler.getTileAliasEntryList();
         boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
         String message = "**__Tile List__**\n" + tilesList.entrySet().stream().map(e -> {
             if (includeAliases) {

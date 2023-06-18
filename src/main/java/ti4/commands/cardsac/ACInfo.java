@@ -100,7 +100,7 @@ public class ACInfo extends ACCardsSubcommandData {
         String planet = trapCardsPlanets.get(trapID);
         sb.append("__**").append(trapName).append("**__").append(" - ").append(trapText);
         if (planet != null) {
-            HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+            java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
             String representation = planetRepresentations.get(planet);
             if (representation == null) {
                 representation = planet;

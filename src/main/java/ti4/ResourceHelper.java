@@ -54,6 +54,10 @@ public class ResourceHelper {
         return getResourceFromFolder("positions/", name, "Could not find position files");
     }
 
+    public String getTileJsonFile(String name) {
+        return getResourceFromFolder("systems/", name, "Could not find tile JSON!");
+    }
+
     @Nullable
     public String getTileFile(String name) {
         String unitPath = tileCache.get(name);
