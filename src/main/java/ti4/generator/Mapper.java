@@ -3,9 +3,7 @@ package ti4.generator;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ti4.ResourceHelper;
@@ -22,8 +20,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Mapper {
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
     private static final Properties tiles = new Properties();
     private static final Properties units = new Properties();
     private static final Properties colors = new Properties();
