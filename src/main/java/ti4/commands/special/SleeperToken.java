@@ -1,9 +1,14 @@
 package ti4.commands.special;
 
+import java.util.List;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.*;
@@ -32,20 +37,23 @@ public class SleeperToken extends SpecialSubcommandData {
             return;
         }
 
-        sleeperForPlanet(event, activeMap, Constants.PLANET);
-        sleeperForPlanet(event, activeMap, Constants.PLANET2);
-        sleeperForPlanet(event, activeMap, Constants.PLANET3);
-        sleeperForPlanet(event, activeMap, Constants.PLANET4);
-        sleeperForPlanet(event, activeMap, Constants.PLANET5);
-        sleeperForPlanet(event, activeMap, Constants.PLANET6);
+        sleeperForPlanet(event, activeMap, Constants.PLANET, player);
+        sleeperForPlanet(event, activeMap, Constants.PLANET2, player);
+        sleeperForPlanet(event, activeMap, Constants.PLANET3, player);
+        sleeperForPlanet(event, activeMap, Constants.PLANET4, player);
+        sleeperForPlanet(event, activeMap, Constants.PLANET5, player);
+        sleeperForPlanet(event, activeMap, Constants.PLANET6, player);
     }
 
-    private void sleeperForPlanet(SlashCommandInteractionEvent event, Map activeMap, String planet) {
+    private void sleeperForPlanet(SlashCommandInteractionEvent event, Map activeMap, String planet, Player player) {
         OptionMapping planetOption = event.getOption(planet);
         if (planetOption == null){
             return;
         }
         String planetName = planetOption.getAsString();
+        addOrRemoveSleeper(event, activeMap, planetName, player);
+    }
+    public void addOrRemoveSleeper(GenericInteractionCreateEvent event, Map activeMap, String planetName, Player player) {
         if (!activeMap.getPlanets().contains(planetName)) {
             MessageHelper.replyToMessage(event, "Planet not found in map");
             return;
@@ -73,6 +81,15 @@ public class SleeperToken extends SpecialSubcommandData {
             tile.removeToken(Constants.TOKEN_SLEEPER_PNG, unitHolder.getName());
         } else {
             tile.addToken(Constants.TOKEN_SLEEPER_PNG, unitHolder.getName());
+            List<String> planetsWithSleepers = ButtonHelper.getAllPlanetsWithSleeperTokens(player, activeMap);
+            String ident = Helper.getFactionIconFromDiscord(player.getFaction());
+            if(planetsWithSleepers.size() > 5){
+                String message2 = ident + " has more than 5 sleepers out. Use buttons to remove a sleeper token";
+                List<Button> buttons = ButtonHelper.getButtonsForRemovingASleeper(player, activeMap);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message2, buttons);
+            }
         }
     }
+
+
 }

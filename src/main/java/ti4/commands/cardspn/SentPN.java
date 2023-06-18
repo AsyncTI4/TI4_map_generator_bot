@@ -101,7 +101,7 @@ public class SentPN extends PNCardsSubcommandData {
 		PNInfo.sendPromissoryNoteInfo(activeMap, targetPlayer, false);
 		PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
 
-		String extraText = placeDirectlyInPlayArea ? "**" + pnModel.name + "**" : "";
+		String extraText = placeDirectlyInPlayArea ? "**" + pnModel.getName() + "**" : "";
 		String message = Helper.getPlayerRepresentation(player, activeMap) + " sent " + Emojis.PN + extraText + " to " + Helper.getPlayerRepresentation(targetPlayer, activeMap);
 		if (activeMap.isFoWMode()) {
 			String fail = "User for faction not found. Report to ADMIN";

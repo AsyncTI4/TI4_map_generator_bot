@@ -189,11 +189,11 @@ public class Turn extends PlayerSubcommandData {
                     }
                     return "";
                 } else {
-                   // MessageHelper.sendMessageToChannel(gameChannel, text);
+                   MessageHelper.sendMessageToChannel(gameChannel, text);
                    
                    
                     
-                    MessageHelper.sendMessageToChannelWithButtons(gameChannel,text + "\n"+buttonText, buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(gameChannel,buttonText, buttons);
                     if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
                         MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeMap, player));
                     }

@@ -52,8 +52,8 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
                 acKey = ac.getKey();
             }
             ActionCardModel actionCard = Mapper.getActionCard(acKey);
-            String acName = actionCard.name;
-            String acWindow = actionCard.window;
+            String acName = actionCard.getName();
+            String acWindow = actionCard.getWindow();
             if (acWindow.equalsIgnoreCase("Action")) {
                 acDrawMessage.append("> `").append(String.format("%02d", index)).append(".` ").append(actionCard.getRepresentation());
                 componentActionACCount++;
@@ -110,8 +110,8 @@ public class KeleresHeroMentak extends SpecialSubcommandData {
                 acKey = ac.getKey();
             }
             ActionCardModel actionCard = Mapper.getActionCard(acKey);
-            String acName = actionCard.name;
-            String acWindow = actionCard.window;
+            String acName = actionCard.getName();
+            String acWindow = actionCard.getWindow();
             if (acWindow.equalsIgnoreCase("Action")) {
                 acDrawMessage.append("> `").append(String.format("%02d", index)).append(".` ").append(actionCard.getRepresentation());
                 componentActionACCount++;

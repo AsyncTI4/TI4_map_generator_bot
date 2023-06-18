@@ -31,6 +31,9 @@ public class RemoveUnits extends AddRemoveUnits {
                 priorityDmg = false;
             }
         }
+        removeStuff(event, tile, count, planetName, unitID, color, priorityDmg);
+    }
+    public void removeStuff(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, boolean priorityDmg) {
 
         int countToRemove = 0;
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
@@ -68,7 +71,6 @@ public class RemoveUnits extends AddRemoveUnits {
                 Integer unitDamageCountInSystem = unitHolder.getUnitDamage().get(unitID);
                 if (unitDamageCountInSystem != null) {
                     countToRemove = unitDamageCountInSystem - (unitCountInSystem - count);
-
                 }
             }
         } else {

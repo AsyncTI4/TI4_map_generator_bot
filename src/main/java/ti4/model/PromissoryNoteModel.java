@@ -1,41 +1,57 @@
 package ti4.model;
 
-import com.fasterxml.jackson.databind.JsonNode;
+public class PromissoryNoteModel implements ModelInterface {
+    private String alias;
+    private String name;
+    private String faction;
+    private String colour;
+    private Boolean playArea;
+    private String attachment;
+    private String text;
+    private String source;
 
-import ti4.message.BotLogger;
-
-public class PromissoryNoteModel extends Model {
-    public String name;
-    public String faction;
-    public String colour;
-    public Boolean playArea;
-    public String attachment;
-    public String text;
-    public String source;
-
-    public PromissoryNoteModel(JsonNode json) {
-        try {
-            alias = json.get("alias").asText();
-            name = json.get("name").asText();
-            faction = json.get("faction").asText();
-            colour = json.get("colour").asText();
-            playArea = json.get("playArea").asBoolean();
-            attachment = json.get("attachment").asText();
-            text = json.get("text").asText();
-            source = json.get("source").asText();
-        } catch (Exception e) {
-            BotLogger.log("Could not load agenda.");
-        }
-    }
+    public PromissoryNoteModel() {}
 
     public boolean isValid() {
-        return super.isValid()
+        return alias != null
             && name != null
             && (faction != null && colour != null)
             && playArea != null
             && attachment != null
             && text != null
             && source != null;
+    }
+
+    public String getAlias() {
+        return alias;
+    }
+    
+    public String getName() {
+        return name;
+    }
+    
+    public String getFaction() {
+        return faction;
+    }
+
+    public String getColour() {
+        return colour;
+    }
+
+    public Boolean getPlayArea() {
+        return playArea;
+    }
+
+    public String getAttachment() {
+        return attachment;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public String getSource() {
+        return source;
     }
 
     public String getOwner() {

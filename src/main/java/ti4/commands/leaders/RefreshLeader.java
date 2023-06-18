@@ -1,7 +1,7 @@
 package ti4.commands.leaders;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -23,7 +23,7 @@ public class RefreshLeader extends LeaderAction {
                 return;
             }
             int tgCount = playerLeader.getTgCount();
-            refreshLeader(player, playerLeader);
+            refreshLeader(player, playerLeader, activeMap);
             sendMessage(Helper.getFactionLeaderEmoji(playerLeader));
             StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
                     .append(" readied ")
@@ -37,13 +37,14 @@ public class RefreshLeader extends LeaderAction {
         }
     }
 
-    public static void refreshLeader(Player player, Leader playerLeader) {
+    public static void refreshLeader(Player player, Leader playerLeader, Map activeMap) {
         int tgCount = playerLeader.getTgCount();
         playerLeader.setExhausted(false);
         if (tgCount > 0) {
             int tg = player.getTg();
             tg += tgCount;
             player.setTg(tg);
+            ButtonHelper.pillageCheck(player, activeMap);
             playerLeader.setTgCount(0);
         }
     }
