@@ -392,11 +392,13 @@ public class AliasHandler {
 
     public static Map<String, String> getPlanetAliasEntryList() {
         return allPlanetsMap.values().stream()
-                .collect(Collectors.toMap(PlanetModel::getId, planetModel -> StringUtils.join(planetModel.getAliases(), ", ")));
+                .collect(Collectors.toMap(PlanetModel::getId,
+                        planetModel -> StringUtils.join(Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>()), ", ")));
     }
 
     public static Map<String, String> getTileAliasEntryList() {
         return allTilesMap.values().stream()
-                .collect(Collectors.toMap(TileModel::getId, tileModel -> StringUtils.join(tileModel.getAliases(), ", ")));
+                .collect(Collectors.toMap(TileModel::getId,
+                        tileModel -> StringUtils.join(Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>()), ", ")));
     }
 }

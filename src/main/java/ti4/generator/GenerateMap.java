@@ -1552,7 +1552,6 @@ public class GenerateMap {
                     }
                 }
 
-                System.out.println(faction);
                 factionImage = null;
                 float scale = 0.7f;
                 if (!convertToGeneric) {
