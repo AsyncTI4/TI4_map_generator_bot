@@ -61,9 +61,6 @@ public class TestResourceHelper {
 
         List<TileModel> tileObjects = new ArrayList<>();
         for (String id : allTiles.keySet()) {
-            if(allTiles.get(id).equals("Hyperlane")) {
-                continue;
-            }
             TileModel tile = new TileModel(id);
             tile.setName(allTiles.get(id));
             String aliases = allTileAliases.get(id);
