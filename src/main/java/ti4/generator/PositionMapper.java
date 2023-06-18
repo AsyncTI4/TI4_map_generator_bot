@@ -3,6 +3,7 @@ package ti4.generator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.map.Map;
@@ -205,7 +206,8 @@ public class PositionMapper {
     public static UnitTokenPosition getPlanetTokenPosition(String planetName) {
         if(planetName.equals("space"))
             return null;
-        return allPlanetsMap.get(planetName).getUnitPositions();
+        UnitTokenPosition pos = allPlanetsMap.get(planetName).getUnitPositions();
+        return SerializationUtils.clone(pos);
     }
 
     public static UnitTokenPosition getReinforcementsPosition(String unitId) {

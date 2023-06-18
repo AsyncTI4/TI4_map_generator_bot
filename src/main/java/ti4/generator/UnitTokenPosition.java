@@ -4,18 +4,19 @@ import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.awt.*;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.List;
 
-public class UnitTokenPosition {
+public class UnitTokenPosition implements Serializable {
     private String unitHolderName;
     private LinkedHashMap<String, List<Point>> coordinateMap = new LinkedHashMap<>();
     private boolean removeUnitCoordinate = true;
 
     @JsonCreator
-    public UnitTokenPosition(@JsonProperty("unitHolderName")  String unitHolderName,
+    public UnitTokenPosition(@JsonProperty("unitHolderName") String unitHolderName,
                              @JsonProperty("coordinateMap") LinkedHashMap<String, List<Point>> coordinateMap,
                              @JsonProperty("removeUnitCoordinate") boolean removeUnitCoordinate) {
         this.unitHolderName = unitHolderName;
@@ -33,7 +34,15 @@ public class UnitTokenPosition {
     }
 
     public String getUnitHolderName() { return this.unitHolderName; }
-    public Map<String, List<Point>> getCoordinateMap() { return this.coordinateMap; }
+    public LinkedHashMap<String, List<Point>> getCoordinateMap() { return this.coordinateMap; }
+
+    /*public ArrayList<String> getUnitOrder() {
+        ArrayList<String> unitOrder = new ArrayList<>();
+        for (Map.Entry<String, List<Point>> entry : coordinateMap.entrySet()) {
+            unitOrder.add(entry.getKey());
+        }
+        return unitOrder;
+    }*/
 
     public boolean getRemoveUnitCoordinate() { return this.removeUnitCoordinate; }
     public int getPositionCount(String id) {
