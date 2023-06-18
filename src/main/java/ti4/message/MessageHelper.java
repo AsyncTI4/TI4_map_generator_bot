@@ -190,7 +190,7 @@ public class MessageHelper {
 						if(!activeMap.isFoWMode()){
 							if(activeMap.getLatestUpNextMsg()!= null && !activeMap.getLatestUpNextMsg().equalsIgnoreCase("")){
 								String id = activeMap.getLatestUpNextMsg().split("_")[0];
-								String message = activeMap.getLatestUpNextMsg().split("_")[1].replace("#", "");
+								String message = activeMap.getLatestUpNextMsg().substring(activeMap.getLatestUpNextMsg().indexOf("_")+1, activeMap.getLatestUpNextMsg().length()).replace("#", "");
 								message = message.replace("UP NEXT", "started their turn");
 								
 								activeMap.getActionsChannel().editMessageById(id, message).queue();

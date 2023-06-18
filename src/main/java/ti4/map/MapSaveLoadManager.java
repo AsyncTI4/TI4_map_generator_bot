@@ -233,7 +233,8 @@ public class MapSaveLoadManager {
         //game information
         writer.write(Constants.LATEST_COMMAND + " " + activeMap.getLatestCommand());
         writer.write(System.lineSeparator());
-
+        writer.write(Constants.PHASE_OF_GAME + " " + activeMap.getCurrentPhase());
+        writer.write(System.lineSeparator());
         writer.write(Constants.LATEST_OUTCOME_VOTED_FOR + " " + activeMap.getLatestOutcomeVotedFor());
         writer.write(System.lineSeparator());
         writer.write(Constants.LATEST_AFTER_MSG + " " + activeMap.getLatestWhenMsg());
@@ -1014,6 +1015,7 @@ public class MapSaveLoadManager {
                 case Constants.LATEST_AFTER_MSG -> activeMap.setLatestAfterMsg(info);
                 case Constants.LATEST_WHEN_MSG -> activeMap.setLatestWhenMsg(info);
                 case Constants.LATEST_TRANSACTION_MSG -> activeMap.setLatestTransactionMsg(info);
+                case Constants.PHASE_OF_GAME -> activeMap.setCurrentPhase(info);
                 case Constants.LATEST_UPNEXT_MSG -> activeMap.setLatestUpNextMsg(info);
                 case Constants.SO -> activeMap.setSecretObjectives(getCardList(info));
                 case Constants.AC -> activeMap.setActionCards(getCardList(info));

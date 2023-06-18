@@ -232,7 +232,7 @@ public class Turn extends PlayerSubcommandData {
 
     private void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Map activeMap, MessageChannel gameChannel) {
         String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeMap);
-
+        activeMap.setCurrentPhase("status");
         LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
         Player arborec = Helper.getPlayerFromAbility(activeMap, "mitosis");
         if (arborec != null) {
