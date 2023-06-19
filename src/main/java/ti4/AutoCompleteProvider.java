@@ -16,6 +16,7 @@ import ti4.message.BotLogger;
 import ti4.model.DeckModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.TechnologyModel;
 
 import java.io.File;
 import java.util.*;
@@ -238,20 +239,20 @@ public class AutoCompleteProvider {
             }
             case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> techs = Mapper.getTechs();
+                HashMap<String, TechnologyModel> techs = Mapper.getTechs();
                 if (activeMap != null && activeMap.isDiscordantStarsMode()) {
                     List<Command.Choice> options = techs.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                        .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue))
                         .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
                 } else {
                     List<Command.Choice> options = techs.entrySet().stream()
                         .filter(Predicate.not(value -> value.getKey().toLowerCase().startsWith("ds") && !value.getKey().equals("ds")))
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                        .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue))
                         .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
                 }

@@ -10,6 +10,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
+import ti4.model.TechnologyModel;
 
 import java.util.HashMap;
 import java.util.List;
@@ -55,8 +56,8 @@ public abstract class TechAddRemove extends PlayerSubcommandData{
             if (Mapper.isValidTech(techID)) {
                 doAction(player, techID);
             } else {
-                HashMap<String, String> techs = Mapper.getTechs();
-                List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().toLowerCase().contains(techID))
+                HashMap<String, TechnologyModel> techs = Mapper.getTechs();
+                List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().getName().toLowerCase().contains(techID))
                         .map(java.util.Map.Entry::getKey).toList();
                 if (possibleTechs.isEmpty()){
                     sendMessage("No matching Tech found");
