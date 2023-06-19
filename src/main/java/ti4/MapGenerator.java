@@ -89,11 +89,11 @@ public class MapGenerator {
         }
 
         userID = args[1];
+        TileHelper.init();
         PositionMapper.init();
         Mapper.init();
         AliasHandler.init();
         Storage.init();
-        TileHelper.init();
 
         //ROLES - FOR COMMAND PERMISSIONS
         //ADMIN ROLES
