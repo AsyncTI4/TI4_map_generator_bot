@@ -48,7 +48,8 @@ public class GameCreate extends GameSubcommandData {
         newMap.setOwnerID(ownerID);
         newMap.setOwnerName(gameOwner.getEffectiveName());
         newMap.setName(mapName);
-
+        newMap.setAutoPing(true);
+        newMap.setAutoPingSpacer(36);
         MapManager mapManager = MapManager.getInstance();
         mapManager.addMap(newMap);
         boolean setMapSuccessful = mapManager.setMapForUser(ownerID, mapName);

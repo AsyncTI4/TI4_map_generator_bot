@@ -348,6 +348,13 @@ public class ButtonHelper {
         {
             endButtons.add(Button.success(finChecker+"planetAbilityExhaust_"+planet, "Use Primor Ability"));
         }
+        if(player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet))
+        {
+            endButtons.add(Button.success(finChecker+"planetAbilityExhaust_"+planet, "Use Primor Ability"));
+        }
+        if(player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")){
+            endButtons.add(Button.danger(finChecker+"exhaustTech_pi", "Exhaust Predictive Intelligence"));
+        }
         return endButtons;
     }
     public static List<Button> getStartOfTurnButtons(Player player, Map activeMap, boolean doneActionThisTurn) {
@@ -649,6 +656,12 @@ public class ButtonHelper {
         }
         Button concludeMove = Button.primary(finChecker+"doneLanding", "Done landing troops.");
         buttons.add(concludeMove);
+        if(player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "naaz", event);
+        }
+        if(player.getLeaderIDs().contains("empyreancommander") && !player.hasLeaderUnlocked("empyreancommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "empyrean", event);
+        }
         return buttons;
     }
     public static String putInfWithMechsForStarforge(String pos, String successMessage, Map activeMap, Player player, ButtonInteractionEvent event) {
@@ -1136,12 +1149,18 @@ public class ButtonHelper {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 p1.setTg(p1.getTg()-tgAmount);
                 p2.setTg(p2.getTg()+tgAmount);
+                if(p2.getLeaderIDs().contains("hacancommander") && !p2.hasLeaderUnlocked("hacancommander")){
+					ButtonHelper.commanderUnlockCheck(p2, activeMap, "hacan", event);
+				}
                 message2 = ident + " sent " + tgAmount+ " TGs to "+ident2;
             }
             case "Comms" -> {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 p1.setCommodities(p1.getCommodities()-tgAmount);
                 p2.setTg(p2.getTg()+tgAmount);
+                if(p2.getLeaderIDs().contains("hacancommander") && !p2.hasLeaderUnlocked("hacancommander")){
+					ButtonHelper.commanderUnlockCheck(p2, activeMap, "hacan", event);
+				}
                 message2 = ident + " sent " + tgAmount+ " Commodities to "+ident2;
             }
             case "ACs" -> {
@@ -1751,7 +1770,6 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         }
         File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.all, event);
-        event.getMessage().delete().queue();
         
 
     }

@@ -98,10 +98,19 @@ public class PlanetAdd extends PlanetAddRemove {
                 if(event!=null){
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
                 }
-                
-
             }
-
+        }
+        if(player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "sol", event);
+        }
+        if(player.getLeaderIDs().contains("xxchacommander") && !player.hasLeaderUnlocked("xxchacommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "xxcha", event);
+        }
+        if(player.getLeaderIDs().contains("sardakkcommander") && !player.hasLeaderUnlocked("sardakkcommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "sardakk", event);
+        }
+        if(player.getLeaderIDs().contains("winnucommander") && !player.hasLeaderUnlocked("winnucommander") && player.getPlanets().contains("mr")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "winnu", event);
         }
     }
 }
