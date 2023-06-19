@@ -9,7 +9,7 @@ public class TileModel {
     private String name;
     private List<String> aliases;
     private String imagePath;
-    private List<PlanetModel> planets;
+    private List<String> planetIds;
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
@@ -50,12 +50,12 @@ public class TileModel {
         this.imagePath = imagePath;
     }
 
-    public List<PlanetModel> getPlanets() {
-        return planets;
+    public List<String> getPlanets() {
+        return planetIds;
     }
 
-    public void setPlanets(List<PlanetModel> planets) {
-        this.planets = planets;
+    public void setPlanets(List<String> planetIds) {
+        this.planetIds = planetIds;
     }
 
     public ShipPositionModel.ShipPosition getShipPositionsType() {
