@@ -47,9 +47,9 @@ public class RevealAgenda extends AgendaSubcommandData {
 
         activeMap.setCurrentPhase("agendawaiting");
         AgendaModel agendaDetails = Mapper.getAgenda(id);
-        String agendaTarget = agendaDetails.target;
-        String agendaType = agendaDetails.type;
-        String agendaName = agendaDetails.name;
+        String agendaTarget = agendaDetails.getTarget();
+        String agendaType = agendaDetails.getType();
+        String agendaName = agendaDetails.getName();
 
         if(agendaName.equalsIgnoreCase("Emergency Session"))
         {
@@ -76,9 +76,9 @@ public class RevealAgenda extends AgendaSubcommandData {
                 }
                 String id2 = activeMap.getNextAgenda(revealFromBottom);
                 AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
-                agendaTarget = agendaDetails2.target;
-                agendaType = agendaDetails2.type;
-                agendaName = agendaDetails.name;
+                agendaTarget = agendaDetails2.getTarget();
+                agendaType = agendaDetails2.getType();
+                agendaName = agendaDetails.getName();
                 activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget+"_CL");
                 if(agendaName.equalsIgnoreCase("Emergency Session"))
                 {

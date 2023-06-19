@@ -340,7 +340,7 @@ public class Map {
         boolean isInDiscard = false;
         for (java.util.Map.Entry<String, Integer> ac : discardActionCards.entrySet()) {
 
-            if (Mapper.getActionCard(ac.getKey()).name.contains(name)) {
+            if (Mapper.getActionCard(ac.getKey()).getName().contains(name)) {
                 return true;
             }
         }
