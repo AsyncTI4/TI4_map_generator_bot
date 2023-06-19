@@ -31,6 +31,6 @@ public class PlanetTypeModel {
                 );
         if (allTypes.containsKey(type))
             return allTypes.get(type);
-        return null;
+        return PlanetType.NONE;
     }
 }
