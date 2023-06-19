@@ -7,6 +7,9 @@ import java.util.List;
 
 public class PlanetModel {
     private String id;
+
+    private String tileId;
+
     private String name;
     private List<String> aliases;
     private Point positionInTile;
@@ -18,7 +21,6 @@ public class PlanetModel {
     private String legendaryAbilityName;
     private String legendaryAbilityText;
     private UnitTokenPosition unitPositions;
-
     public String getId() {
         return id;
     }
@@ -33,6 +35,14 @@ public class PlanetModel {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getTileId() {
+        return tileId;
+    }
+
+    public void setTileId(String tileId) {
+        this.tileId = tileId;
     }
 
     public List<String> getAliases() {
