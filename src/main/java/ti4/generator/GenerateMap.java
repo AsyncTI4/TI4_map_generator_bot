@@ -17,6 +17,7 @@ import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TechnologyModel;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
@@ -1284,7 +1285,7 @@ public class GenerateMap {
         }
 
 
-        HashMap<String, String[]> techInfo = Mapper.getTechsInfo();
+        HashMap<String, TechnologyModel> techInfo = Mapper.getTechs();
         java.util.Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : techs) {
             String techType = Mapper.getTechType(tech);
@@ -1300,12 +1301,12 @@ public class GenerateMap {
             list.sort(new Comparator<String>() {
                 @Override
                 public int compare(String tech1, String tech2) {
-                    String[] tech1Info = techInfo.get(tech1);
-                    String[] tech2Info = techInfo.get(tech2);
+                    TechnologyModel tech1Info = techInfo.get(tech1);
+                    TechnologyModel tech2Info = techInfo.get(tech2);
                     try {
-                        int t1 = tech1Info.length >= 3 ? tech1Info[2].length() : 0;
-                        int t2 = tech2Info.length >= 3 ? tech2Info[2].length() : 0;
-                        return (t1 < t2) ? -1 : ((t1 == t2) ? (tech1Info[0].compareTo(tech2Info[0])) : 1);
+                        int t1 = tech1Info.getRequirements().length();
+                        int t2 = tech2Info.getRequirements().length();
+                        return (t1 < t2) ? -1 : ((t1 == t2) ? (tech1Info.getName().compareTo(tech2Info.getName())) : 1);
                     } catch (Exception e) {
                         //do nothing
                     }
@@ -1328,7 +1329,7 @@ public class GenerateMap {
         return x + deltaX + 20;
     }
 
-    private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, String[]> techInfo, int deltaX) {
+    private int techField(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, TechnologyModel> techInfo, int deltaX) {
         if (techs == null) {
             return deltaX;
         }
@@ -1343,10 +1344,10 @@ public class GenerateMap {
                 techStatus = "_rdy.png";
             }
 
-            String[] techInformation = techInfo.get(tech);
+            TechnologyModel techInformation = techInfo.get(tech);
 
             String techIcon;
-            switch (techInformation[1]) {
+            switch (techInformation.getType()) {
                 case Constants.WARFARE -> techIcon = Constants.WARFARE;
                 case Constants.PROPULSION -> techIcon = Constants.PROPULSION;
                 case Constants.CYBERNETIC -> techIcon = Constants.CYBERNETIC;
@@ -1359,8 +1360,8 @@ public class GenerateMap {
                 drawPAImage(x + deltaX, y, techSpec);
             }
 
-            if (techInformation.length >= 4 && !techInformation[3].isEmpty()) {
-                String techSpec = "pa_tech_factionicon_" + techInformation[3] + "_rdy.png";
+            if (!techInformation.getFaction().isEmpty()) {
+                String techSpec = "pa_tech_factionicon_" + techInformation.getFaction() + "_rdy.png";
                 drawPAImage(x + deltaX, y, techSpec);
             }
 
@@ -1374,7 +1375,7 @@ public class GenerateMap {
         return deltaX;
     }
 
-    private int techStasisCapsule(int x, int y, int deltaX, Player player, List<String> techs, HashMap<String, String[]> techInfo) {
+    private int techStasisCapsule(int x, int y, int deltaX, Player player, List<String> techs, HashMap<String, TechnologyModel> techInfo) {
         int stasisInfantry = player.getStasisInfantry();
         if ((techs == null && stasisInfantry == 0) || !hasInfantryII(techs, techInfo) && stasisInfantry == 0) {
             return deltaX;
@@ -1396,22 +1397,20 @@ public class GenerateMap {
         return deltaX;
     }
 
-    private boolean hasInfantryII(List<String> techs, HashMap<String, String[]> techInfo) {
+    private boolean hasInfantryII(List<String> techs, HashMap<String, TechnologyModel> techInfo) {
         if (techs == null) {
             return false;
         }
         for (String tech : techs) {
-            String[] techInformation = techInfo.get(tech);
-            if (techInformation.length >= 5) {
-                if (techInformation[4].equals("inf2")) {
-                    return true;
-                }
+            TechnologyModel techInformation = techInfo.get(tech);
+            if (techInformation.getBaseUpgrade().equals("inf2") || tech.equals("inf2")) {
+                return true;
             }
         }
         return false;
     }
 
-    private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, String[]> techInfo, int deltaX, Player player, Map activeMap) {
+    private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, TechnologyModel> techInfo, int deltaX, Player player, Map activeMap) {
         String outline = "pa_tech_unitsnew_outlines_generic.png";
         if ("nomad".equals(player.getFaction())) {
             outline = "pa_tech_unitsnew_outlines_nomad.png";
@@ -1432,21 +1431,21 @@ public class GenerateMap {
             return deltaX;
         }
         for (String tech : techs) {
-            String[] techInformation = techInfo.get(tech);
+            TechnologyModel techInformation = techInfo.get(tech);
 
             String unit = "pa_tech_unitsnew_" + Mapper.getColorID(player.getColor()) + "_";
-            if (techInformation.length >= 5) {
-                unit += techInformation[4] + ".png";
-            } else {
+            if (techInformation.getBaseUpgrade().isEmpty()) {
                 if (tech.equals("dt2")) {
                     unit += "sd2.png";
                 } else {
                     unit += tech + ".png";
                 }
+            } else {
+                unit += techInformation.getBaseUpgrade() + ".png";
             }
             drawPAImage(x + deltaX, y, unit);
-            if (techInformation.length >= 4 && !techInformation[3].isEmpty()) {
-                String factionIcon = "pa_tech_unitsnew_" + techInformation[3] + "_" + tech + ".png";
+            if (!techInformation.getFaction().isEmpty()) {
+                String factionIcon = "pa_tech_unitsnew_" + techInformation.getFaction() + "_" + tech + ".png";
                 drawPAImage(x + deltaX, y, factionIcon);
             }
         }

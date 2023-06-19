@@ -64,6 +64,7 @@ import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.model.TechnologyModel;
 import ti4.map.Tile;
 
 import java.io.File;
@@ -549,9 +550,10 @@ public class ButtonListener extends ListenerAdapter {
 
         else if (buttonID.startsWith("getAllTechOfType_")) {
             String techType = buttonID.replace("getAllTechOfType_", "");
-            List<Button> buttons = Helper.getTechButtons(Helper.getAllTechOfAType(techType, player.getFaction(), player), techType, player);
+            List<TechnologyModel> techs = Helper.getAllTechOfAType(techType, player.getFaction(), player);
+            List<Button> buttons = Helper.getTechButtons(techs, techType, player);
 
-            String message = Helper.getPlayerRepresentation(player, activeMap) + " Use The Buttons To Get The Tech You Want";
+            String message = Helper.getPlayerRepresentation(player, activeMap) + " Use the buttons to get the tech you want";
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             event.getMessage().delete().queue();
             
@@ -561,8 +563,7 @@ public class ButtonListener extends ListenerAdapter {
             String techFancy = buttonLabel;
             String ident = Helper.getFactionIconFromDiscord(player.getFaction());
 
-            String message = ident + " Acquired The Tech "
-                    + Helper.getTechRepresentation(AliasHandler.resolveTech(tech));
+            String message = ident + " Acquired The Tech " + Helper.getTechRepresentation(AliasHandler.resolveTech(tech));
 
             String trueIdentity = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true);
             String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
@@ -584,7 +585,7 @@ public class ButtonListener extends ListenerAdapter {
                 Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
                 buttons.add(aiDEVButton);
             }
-            Button DoneExhausting = Button.danger("deleteButtons_technology", "Done Exhausting Planets");
+            Button DoneExhausting = Button.danger("deleteButtons_technology", "Done exhausting planets");
             buttons.add(DoneExhausting);
 
             if (activeMap.isFoWMode()) {

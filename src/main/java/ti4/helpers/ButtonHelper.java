@@ -38,6 +38,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TechnologyModel;
 
 
 public class ButtonHelper {
@@ -1246,20 +1247,13 @@ public class ButtonHelper {
             if(!p1.getExhaustedTechs().isEmpty() && p1.getExhaustedTechs().contains(tech)){
                 continue;
             }
-            String techRep = Mapper.getTechRepresentations().get(tech);
-
-            //Columns: key = Proper Name | type | prerequisites | faction | text
-            StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
-            String techName = techRepTokenizer.nextToken();
-            String techType = techRepTokenizer.nextToken();
-            String techPrerequisites = techRepTokenizer.nextToken();
-            String techFaction = techRepTokenizer.nextToken();
-            String factionEmoji = "";
-            if (!techFaction.equals(" ")) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
+            TechnologyModel techRep = Mapper.getTechs().get(tech);
+            String techName = techRep.getName(); 
+            String techType = techRep.getType();
             String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
-            String techText = techRepTokenizer.nextToken();
-            if(techText.contains("ACTION"))
-            {
+            String techText = techRep.getText();
+
+            if(techText.contains("ACTION")) {
                 Button tButton = Button.danger(finChecker+prefix+"tech_"+tech, "Exhaust "+techName).withEmoji(Emoji.fromFormatted(techEmoji));
                 compButtons.add(tButton);
             }
