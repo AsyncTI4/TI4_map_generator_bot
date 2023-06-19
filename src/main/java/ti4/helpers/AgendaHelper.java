@@ -36,6 +36,8 @@ public class AgendaHelper {
             for(Player player : missingPlayersAfters){
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + messageAfters);
             }
+            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "Sent reminder pings to players who have not yet reacted");
+
         }else{
             for(Player player : missingPlayersWhens){
                 messageWhens = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + messageWhens;

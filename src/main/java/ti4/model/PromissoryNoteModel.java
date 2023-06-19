@@ -59,6 +59,9 @@ public class PromissoryNoteModel implements ModelInterface {
     }
 
     public boolean isPlayedDirectlyToPlayArea() {
+        if(playArea == null){
+            return false;
+        }
         return playArea && !text.toLowerCase().contains("action:");
     }
 
