@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -35,5 +36,8 @@ public class DrawAC extends ACCardsSubcommandData {
             activeMap.drawActionCard(player.getUserID());
         }
         ACInfo.sendActionCardInfo(activeMap, player);
+        if(player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "yssaril", event);
+        }
     }
 }

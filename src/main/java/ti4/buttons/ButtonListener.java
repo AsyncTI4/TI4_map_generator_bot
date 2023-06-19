@@ -573,6 +573,9 @@ public class ButtonListener extends ListenerAdapter {
             String trueIdentity = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true);
             String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
             player.addTech(AliasHandler.resolveTech(tech));
+            if(player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "jolnar", event);
+            }
             List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeMap);
             if (player.getTg() > 0) {
                 Button lost1TG = Button.danger("reduceTG_1", "Spend 1 TG");
@@ -968,18 +971,20 @@ public class ButtonListener extends ListenerAdapter {
                     String realIdentity = "";
                     realIdentity = Helper.getPlayerRepresentation(nextInLine, activeMap, event.getGuild(), true);
                     String pFaction = StringUtils.capitalize(nextInLine.getFaction());
-                    message = AgendaHelper.getSummaryOfVotes(activeMap, true) + "\n \n " + realIdentity + message;
+                    
                     Button Vote = Button.success("vote", pFaction + " Choose To Vote");
                     Button Abstain = Button.danger("delete_buttons_0", pFaction + " Choose To Abstain");
                     activeMap.updateActivePlayer(nextInLine);
                     List<Button> buttons = List.of(Vote, Abstain);
                     if (activeMap.isFoWMode()) {
                         if (nextInLine.getPrivateChannel() != null) {
+                            MessageHelper.sendMessageToChannel(nextInLine.getPrivateChannel(),AgendaHelper.getSummaryOfVotes(activeMap, true) + "\n ");
                             MessageHelper.sendMessageToChannelWithButtons(nextInLine.getPrivateChannel(), message,
                                     buttons);
                             event.getChannel().sendMessage("Notified next in line").queue();
                         }
                     } else {
+                        message = AgendaHelper.getSummaryOfVotes(activeMap, true) + "\n \n " + realIdentity + message;
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
                     }
                 } else {
@@ -1115,6 +1120,14 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         (Helper.getPlayerRepresentation(player, activeMap) + " exhausted tech: "
                                 + Helper.getTechRepresentation(tech)));
+                if(tech.equals("pi")){
+                    List<Button> redistributeButton = new ArrayList<Button>();
+                    Button redistribute = Button.success("redistributeCCButtons", "Redistribute CCs");
+                    Button deleButton= Button.danger("FFCC_"+player.getFaction()+"_"+"deleteButtons", "Delete These Buttons");
+                    redistributeButton.add(redistribute);
+                    redistributeButton.add(deleButton);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), false) +" use buttons to redistribute", redistributeButton);
+                }
             } else {
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(),
                         (Helper.getPlayerRepresentation(player, activeMap) + " used tech: "
@@ -1684,6 +1697,32 @@ public class ButtonListener extends ListenerAdapter {
                 }
 
             }
+
+            if(player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titancommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "titans", event);
+            }
+            if(player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "saar", event);
+            }
+            if(player.getLeaderIDs().contains("mentakcommander") && !player.hasLeaderUnlocked("mentakcommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "mentak", event);
+            }
+            if(player.getLeaderIDs().contains("l1z1xcommander") && !player.hasLeaderUnlocked("l1z1xcommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "l1z1x", event);
+            }
+            if(player.getLeaderIDs().contains("muaatcommander") && !player.hasLeaderUnlocked("muaatcommander") && unitLong.equalsIgnoreCase("warsun")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "muaat", event);
+            }
+            if(player.getLeaderIDs().contains("argentcommander") && !player.hasLeaderUnlocked("argentcommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "argent", event);
+            }
+            if(player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "naaz", event);
+            }
+            if(player.getLeaderIDs().contains("arboreccommander") && !player.hasLeaderUnlocked("arboreccommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "arborec", event);
+            }
+
 
         } else if (buttonID.startsWith("freelancersBuild_")) {
             String planet = buttonID.replace("freelancersBuild_", "");
@@ -2640,6 +2679,9 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     int tg = player.getTg();
                     player.setTg(tg + 3);
+                    if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
+                        ButtonHelper.commanderUnlockCheck(player, activeMap, "hacan", event);
+                    }
                     ButtonHelper.pillageCheck(player, activeMap);
                     player.setCommodities(player.getCommoditiesTotal());
                     addReaction(event, false, false, " gained 3" + Emojis.tg + " and replenished commodities ("
@@ -2767,8 +2809,11 @@ public class ButtonListener extends ListenerAdapter {
                         break;
                     }
                     for (int i = 0; i < count2; i++) {
-                        activeMap.drawActionCard(player.getUserID());
+                        activeMap.drawActionCard(player.getUserID());  
                     }
+                    if(player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")){
+                            ButtonHelper.commanderUnlockCheck(player, activeMap, "yssaril", event);
+                        }
                     ACInfo.sendActionCardInfo(activeMap, player, event);
                     String message = hasSchemingAbility
                             ? "Spent 1 " + commOrTg + " to draw " + count2
@@ -2941,6 +2986,9 @@ public class ButtonListener extends ListenerAdapter {
                     String message = playerRep + " exhausted Mallice ability and gained 2 tg (" + player.getTg() + "->"
                             + (player.getTg() + 2) + ").";
                     player.setTg(player.getTg() + 2);
+                    if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
+                        ButtonHelper.commanderUnlockCheck(player, activeMap, "hacan", event);
+                    }
                     ButtonHelper.pillageCheck(player, activeMap);
                     if (!activeMap.isFoWMode() && event.getMessageChannel() != activeMap.getMainGameChannel()) {
                         MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
@@ -2984,10 +3032,16 @@ public class ButtonListener extends ListenerAdapter {
                 case "draw_1_AC" -> {
                     activeMap.drawActionCard(player.getUserID());
                     ACInfo.sendActionCardInfo(activeMap, player, event);
+                    if(player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")){
+                        ButtonHelper.commanderUnlockCheck(player, activeMap, "yssaril", event);
+                    }
                     addReaction(event, true, false, "Drew 1 AC", "");
                 }
                 case "draw_1_ACDelete" -> {
                     activeMap.drawActionCard(player.getUserID());
+                    if(player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")){
+                        ButtonHelper.commanderUnlockCheck(player, activeMap, "yssaril", event);
+                    }
                     ACInfo.sendActionCardInfo(activeMap, player, event);
                     addReaction(event, true, false, "Drew 1 AC", "");
                     event.getMessage().delete().queue();
@@ -2995,6 +3049,9 @@ public class ButtonListener extends ListenerAdapter {
                 case "draw_2_AC" -> {
                     activeMap.drawActionCard(player.getUserID());
                     activeMap.drawActionCard(player.getUserID());
+                    if(player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")){
+                        ButtonHelper.commanderUnlockCheck(player, activeMap, "yssaril", event);
+                    }
                     ACInfo.sendActionCardInfo(activeMap, player, event);
                     addReaction(event, true, false, "Drew 2 AC", "");
                 }
