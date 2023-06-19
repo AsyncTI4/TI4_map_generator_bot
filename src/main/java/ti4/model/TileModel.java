@@ -14,6 +14,8 @@ public class TileModel {
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
 
+    public TileModel() {}
+
     public TileModel(String id) {
         this.id = id;
     }
@@ -28,6 +30,10 @@ public class TileModel {
 
     public String getName() {
         return name;
+    }
+
+    public String getNameNullSafe() {
+        return Optional.ofNullable(name).orElse("");
     }
 
     public void setName(String name) {

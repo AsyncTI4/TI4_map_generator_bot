@@ -11,6 +11,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
+import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.model.*;
 
@@ -23,8 +24,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public class Mapper {
-    private static ObjectMapper objectMapper = new ObjectMapper();
-
     private static final Properties tiles = new Properties();
     private static final Properties units = new Properties();
     private static final Properties colors = new Properties();
@@ -42,16 +41,13 @@ public class Mapper {
     private static final HashMap<String, String[]> techListInfo = new HashMap<>();
     private static final Properties planets = new Properties();
     private static final Properties faction_representation = new Properties();
-    private static final Properties planet_representation = new Properties();
     private static final Properties leader_representation = new Properties();
-    private static final Properties tile_representation = new Properties();
     private static final Properties tech_representation = new Properties();
     private static final Properties unit_representation = new Properties();
     private static final Properties attachmentInfo = new Properties();
     private static final Properties miltyDraft = new Properties();
     private static final Properties agendaRepresentation = new Properties();
     private static final Properties hyperlaneAdjacencies = new Properties();
-    private static final Properties wormholes = new Properties();
     private static final Properties ds_handcards = new Properties();
 
     //TODO: (Jazz) Finish moving all files over from properties to json
@@ -63,9 +59,6 @@ public class Mapper {
     private static final HashMap<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
     private static final HashMap<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
     private static final HashMap<String, TechnologyModel> technologies = new HashMap<>();
-
-    private static final java.util.Map<String, TileModel> allTilesMap = new HashMap<>();
-    private static final java.util.Map<String, PlanetModel> allPlanetsMap = new HashMap<>();
 
     public static void init() {
         readData("units.properties", units, "Could not read unit name file");
@@ -101,7 +94,6 @@ public class Mapper {
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
         readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
         importJsonObjects("decks.json", decks, DeckModel.class, "couild not read decks file");
-        jsonInit();
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -113,33 +105,6 @@ public class Mapper {
                 BotLogger.log(s);
             }
         }
-    }
-
-    public static void jsonInit() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<TileModel> allTiles = new ArrayList<>();
-        String file = ResourceHelper.getInstance().getTileJsonFile("tiles.json");
-        if(Optional.ofNullable(file).isEmpty()) {
-            BotLogger.log("Tile JSON is null!");
-            return;
-        }
-
-        try {
-            InputStream input = new FileInputStream(file);
-            allTiles = objectMapper.readValue(input, new TypeReference<List<TileModel>>(){});
-        } catch (Exception e) {
-            BotLogger.log("Could not deserialise tile JSON!");
-            System.out.println(e.getMessage());
-        }
-
-        allTiles.forEach(
-                tileModel -> {
-                    allTilesMap.put(tileModel.getId(), tileModel);
-                    Optional.ofNullable(tileModel.getPlanets()).orElse(new ArrayList<>()).forEach(
-                            planetModel -> allPlanetsMap.put(planetModel.getId(), planetModel)
-                    );
-                }
-        );
     }
 
     private static <T extends ModelInterface> void importJsonObjects(String jsonFileName, HashMap<String, T> objectMap, Class<T> target, String error) {
@@ -221,14 +186,14 @@ public class Mapper {
     }
 
     public static List<String> getFrontierTileIds() {
-        return allTilesMap.values().stream()
+        return TileHelper.getAllTiles().values().stream()
                 .filter(tileModel -> tileModel.getPlanets().size() == 0)
                 .map(TileModel::getId)
                 .toList();
     }
 
     public static String getTileID(String tileID) {
-        return allTilesMap.get(tileID).getImagePath();
+        return TileHelper.getAllTiles().get(tileID).getImagePath();
     }
 
     public static List<List<Boolean>> getHyperlaneData(String tileID) {
@@ -247,7 +212,7 @@ public class Mapper {
     }
 
     public static Set<String> getWormholes(String tileID) {
-        return allTilesMap.get(tileID).getWormholes().stream()
+        return TileHelper.getAllTiles().get(tileID).getWormholes().stream()
                 .map(WormholeModel.Wormhole::toString)
                 .collect(Collectors.toSet());
     }
@@ -255,7 +220,7 @@ public class Mapper {
     public static Set<String> getWormholesTiles(String wormholeID) {
         WormholeModel wormholeModel = new WormholeModel();
         WormholeModel.Wormhole wormhole = wormholeModel.getWormholeFromString(wormholeID);
-        return allTilesMap.values().stream()
+        return TileHelper.getAllTiles().values().stream()
                 .filter(tileModel -> tileModel.getWormholes().contains(wormhole))
                 .map(TileModel::getId)
                 .collect(Collectors.toSet());
@@ -431,7 +396,7 @@ public class Mapper {
     }
 
     public static PlanetModel getPlanet(String id) {
-        return allPlanetsMap.get(id);
+        return TileHelper.getAllPlanets().get(id);
     }
 
     public static String getAttachmentInfo(String id) {
@@ -498,7 +463,7 @@ public class Mapper {
     }
 
     public static Map<String, String> getPlanetRepresentations() {
-        return allPlanetsMap.values().stream()
+        return TileHelper.getAllPlanets().values().stream()
                 .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
     }
 
@@ -519,7 +484,7 @@ public class Mapper {
     }
 
     public static Map<String, String> getTileRepresentations() {
-        return allTilesMap.values().stream()
+        return TileHelper.getAllTiles().values().stream()
                 .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
     }
 
@@ -726,7 +691,7 @@ public class Mapper {
     }
 
     public static String getTilesList() {
-        return "__**Tiles:**__\n> " + allTilesMap.values().stream()
+        return "__**Tiles:**__\n> " + TileHelper.getAllTiles().values().stream()
                 .map(TileModel::getImagePath)
                 .sorted()
                 .collect(Collectors.joining("\n> "));
