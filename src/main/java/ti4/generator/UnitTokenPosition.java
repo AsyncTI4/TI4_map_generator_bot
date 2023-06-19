@@ -49,6 +49,7 @@ public class UnitTokenPosition implements Serializable {
         return coordinateMap.get(id).size();
     }
 
+
     public void addPosition(String id, Point point) {
         List<Point> points = coordinateMap.computeIfAbsent(id, key -> new ArrayList<>());
         points.add(point);

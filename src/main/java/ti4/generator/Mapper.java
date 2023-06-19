@@ -721,6 +721,10 @@ public class Mapper {
                 .collect(Collectors.toList());
     }
 
+    public static Set<Object> getAllTileIDs() {
+        return tiles.keySet();
+    }
+
     public static String getTilesList() {
         return "__**Tiles:**__\n> " + allTilesMap.values().stream()
                 .map(TileModel::getImagePath)

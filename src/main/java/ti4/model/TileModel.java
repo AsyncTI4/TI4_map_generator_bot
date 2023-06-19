@@ -1,9 +1,5 @@
 package ti4.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import ti4.map.Tile;
-
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -13,31 +9,14 @@ public class TileModel {
     private String name;
     private List<String> aliases;
     private String imagePath;
-    private List<PlanetModel> planets;
+    private List<String> planetIds;
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
 
-    public TileModel() {}
-
-    /*@JsonCreator
-    public TileModel(@JsonProperty("id") String id,
-                     @JsonProperty("name") String name,
-                     @JsonProperty("aliases") List<String> aliases,
-                     @JsonProperty("imagePath") String imagePath,
-                     @JsonProperty("planets") List<PlanetModel> planets,
-                     @JsonProperty("shipPositionsType") ShipPositionModel.ShipPosition shipPositionsType,
-                     @JsonProperty("spaceTokenLocations") List<Point> spaceTokenLocations,
-                     @JsonProperty("wormholes") Set<WormholeModel.Wormhole> wormholes) {
+    public TileModel(String id) {
         this.id = id;
-        this.name = name;
-        this.aliases = aliases;
-        this.imagePath = imagePath;
-        this.planets = planets;
-        this.shipPositionsType = shipPositionsType;
-        this.spaceTokenLocations = spaceTokenLocations;
-        this.wormholes = wormholes;
-    }*/
+    }
 
     public String getId() {
         return id;
@@ -49,9 +28,6 @@ public class TileModel {
 
     public String getName() {
         return name;
-    }
-    public String getNameNullSafe() {
-        return Optional.ofNullable(this.name).orElse("");
     }
 
     public void setName(String name) {
@@ -74,12 +50,12 @@ public class TileModel {
         this.imagePath = imagePath;
     }
 
-    public List<PlanetModel> getPlanets() {
-        return planets;
+    public List<String> getPlanets() {
+        return planetIds;
     }
 
-    public void setPlanets(List<PlanetModel> planets) {
-        this.planets = planets;
+    public void setPlanets(List<String> planetIds) {
+        this.planetIds = planetIds;
     }
 
     public ShipPositionModel.ShipPosition getShipPositionsType() {

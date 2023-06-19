@@ -1,15 +1,15 @@
 package ti4.model;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import ti4.generator.UnitTokenPosition;
 
 import java.awt.*;
 import java.util.List;
-import java.util.Optional;
 
 public class PlanetModel {
     private String id;
+
+    private String tileId;
+
     private String name;
     private List<String> aliases;
     private Point positionInTile;
@@ -21,9 +21,6 @@ public class PlanetModel {
     private String legendaryAbilityName;
     private String legendaryAbilityText;
     private UnitTokenPosition unitPositions;
-
-    public PlanetModel() {}
-
     public String getId() {
         return id;
     }
@@ -35,12 +32,17 @@ public class PlanetModel {
     public String getName() {
         return name;
     }
-    public String getNameNullSafe() {
-        return Optional.ofNullable(name).orElse("");
-    }
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getTileId() {
+        return tileId;
+    }
+
+    public void setTileId(String tileId) {
+        this.tileId = tileId;
     }
 
     public List<String> getAliases() {
