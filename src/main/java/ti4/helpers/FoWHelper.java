@@ -512,6 +512,9 @@ public class FoWHelper {
 
 	/** Ping the players adjacent to a given system */
 	public static void pingSystem(Map activeMap, GenericInteractionCreateEvent event, String position, String message) {
+		if(activeMap.getTileByPosition(position) == null){
+			return;
+		}
 		// get players adjacent
 		List<Player> players = getAdjacentPlayers(activeMap, position, true);
 		int successfulCount = 0;

@@ -289,6 +289,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                     default -> message = "";
                 }
+                if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
+                            ButtonHelper.commanderUnlockCheck(player, activeMap, "hacan", event);
+                        }
                 Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
                 Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
                 Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
