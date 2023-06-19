@@ -737,13 +737,13 @@ public class Player {
     private List<String> getFactionStartingAbilities() {
         FactionModel factionSetupInfo = getFactionSetupInfo();
         if (factionSetupInfo == null) return new ArrayList<String>();
-        return new ArrayList<String>(factionSetupInfo.abilities);
+        return new ArrayList<String>(factionSetupInfo.getAbilities());
     }
 
     private List<String> getFactionStartingLeaders() {
         FactionModel factionSetupInfo = getFactionSetupInfo();
         if(factionSetupInfo == null) return new ArrayList<String>();
-        return new ArrayList<String>(factionSetupInfo.leaders);
+        return new ArrayList<String>(factionSetupInfo.getLeaders());
     }
 
     public void initLeaders() {
@@ -906,7 +906,7 @@ public class Player {
                 try {
                     PublicObjectiveModel po = Mapper.getPublicObjective(poID);
                     if (po != null) {//IS A PO
-                        vpCount += po.points;
+                        vpCount += po.getPoints();
                     } else { //IS A CUSTOM PO
                         int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
                         int poValue = activeMap.getCustomPublicVP().getOrDefault(poID, 0);

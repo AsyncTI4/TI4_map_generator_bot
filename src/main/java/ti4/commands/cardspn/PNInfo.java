@@ -127,14 +127,14 @@ public class PNInfo extends PNCardsSubcommandData {
             BotLogger.log(error);
             return error;
         }
-        String pnName = pnModel.name;
+        String pnName = pnModel.getName();
         StringBuilder sb = new StringBuilder();
 
         sb.append(Emojis.PN);
-        if (pnModel.faction != null && !pnModel.faction.isEmpty()) sb.append(Helper.getFactionIconFromDiscord(pnModel.faction));
+        if (pnModel.getFaction() != null && !pnModel.getFaction().isEmpty()) sb.append(Helper.getFactionIconFromDiscord(pnModel.getFaction()));
         sb.append("__**" + pnName + "**__   ");
 
-        String pnText = pnModel.text;
+        String pnText = pnModel.getText();
         Player pnOwner = activeMap.getPNOwner(pnID);
         if (pnOwner != null && pnOwner.isRealPlayer()) {
             if (!activeMap.isFoWMode()) sb.append(Helper.getFactionIconFromDiscord(pnOwner.getFaction()));
@@ -143,7 +143,7 @@ public class PNInfo extends PNCardsSubcommandData {
             pnText = pnText.replaceAll(pnOwner.getColor(), Helper.getRoleMentionByName(activeMap.getGuild(), pnOwner.getColor()));
         }
         
-        if (longFormat || Mapper.isFaction(pnModel.faction.toLowerCase()) || pnModel.source.equalsIgnoreCase("Absol")) sb.append("      ").append(pnText);
+        if (longFormat || Mapper.isFaction(pnModel.getFaction().toLowerCase()) || pnModel.getSource().equalsIgnoreCase("Absol")) sb.append("      ").append(pnText);
         sb.append("\n");
         return sb.toString();
     }
