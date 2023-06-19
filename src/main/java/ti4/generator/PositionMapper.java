@@ -1,8 +1,5 @@
 package ti4.generator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.SerializationUtils;
 import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
@@ -10,7 +7,6 @@ import ti4.map.Map;
 import ti4.message.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.ShipPositionModel;
-import ti4.model.TileModel;
 
 import java.awt.*;
 import java.io.FileInputStream;
@@ -26,14 +22,6 @@ public class PositionMapper {
     private static final Properties positionTileMap6Player = new Properties();
     private static final Properties positionTileMap8Player = new Properties();
     private static final Properties positionTileMap8Ring = new Properties();
-    private static final Properties planetPositions = new Properties();
-    private static final Properties spaceTokenPositions = new Properties();
-    private static final Properties planetTokenPositions = new Properties();
-
-    private static final Properties tileType = new Properties();
-    private static final HashMap<String, String> tileTypeList = new HashMap<>();
-    private static final Properties shipPosition = new Properties();
-
     private static final Properties playerInfo = new Properties();
     private static final Properties playerInfo8 = new Properties();
     private static final Properties playerInfo8ring = new Properties();
@@ -46,8 +34,6 @@ public class PositionMapper {
     private static final Properties migrate = new Properties();
     private static final Properties migrate8rings = new Properties();
 
-    private static final java.util.Map<String, TileModel> allTilesMap = new HashMap<>();
-    private static final java.util.Map<String, PlanetModel> allPlanetsMap = new HashMap<>();
 
     public static void init() {
         readData("6player.properties", positionTileMap6Player, "Could not read position file");
@@ -63,34 +49,6 @@ public class PositionMapper {
 
         readData("migrate.properties", migrate, "Could not read wormholes file");
         readData("migrate8rings.properties", migrate8rings, "Could not read wormholes file");
-        jsonInit();
-    }
-
-    public static void jsonInit() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<TileModel> allTiles = new ArrayList<>();
-        String file = ResourceHelper.getInstance().getTileJsonFile("tiles.json");
-        if(Optional.ofNullable(file).isEmpty()) {
-            BotLogger.log("Tile JSON is null!");
-            return;
-        }
-
-        try {
-            InputStream input = new FileInputStream(file);
-            allTiles = objectMapper.readValue(input, new TypeReference<List<TileModel>>(){});
-        } catch (Exception e) {
-            BotLogger.log("Could not deserialise tile JSON!");
-            System.out.println(e.getMessage());
-        }
-
-        allTiles.forEach(
-                tileModel -> {
-                    allTilesMap.put(tileModel.getId(), tileModel);
-                    Optional.ofNullable(tileModel.getPlanets()).orElse(new ArrayList<>()).forEach(
-                            planetModel -> allPlanetsMap.put(planetModel.getId(), planetModel)
-                    );
-                }
-        );
     }
 
     private static void readData(String fileName, Properties positionMap, String errorMessage) {
@@ -116,12 +74,14 @@ public class PositionMapper {
         if (tileID.equals("nombox")) {
             return null;
         }
-        return allTilesMap.get(tileID).getPlanets().stream()
+        return TileHelper.getAllPlanets().values().stream()
+                .filter(planetModel -> Optional.ofNullable(planetModel.getTileId()).isPresent())
+                .filter(planetModel -> planetModel.getTileId().equals(tileID))
                 .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getPositionInTile));
     }
 
     public static List<Point> getSpaceTokenPositions(String tileID) {
-        return allTilesMap.get(tileID).getSpaceTokenLocations();
+        return TileHelper.getAllTiles().get(tileID).getSpaceTokenLocations();
     }
 
     public static boolean isTilePositionValid(String position) {
@@ -206,7 +166,7 @@ public class PositionMapper {
     public static UnitTokenPosition getPlanetTokenPosition(String planetName) {
         if(planetName.equals("space"))
             return null;
-        UnitTokenPosition pos = allPlanetsMap.get(planetName).getUnitPositions();
+        UnitTokenPosition pos = TileHelper.getAllPlanets().get(planetName).getUnitPositions();
         return SerializationUtils.clone(pos);
     }
 
@@ -241,14 +201,14 @@ public class PositionMapper {
     }
 
     public static String getTileSpaceUnitLayout(String tileId) {
-        return allTilesMap.get(tileId).getShipPositionsType().getPositions();
+        return TileHelper.getAllTiles().get(tileId).getShipPositionsType().getPositions();
     }
 
     public static UnitTokenPosition getSpaceUnitPosition(String planetName, String tileID) {
         if(tileID.equals("0g"))
             return null;
 
-        String shipPositionString = allTilesMap.get(tileID).getShipPositionsType().getPositions();
+        String shipPositionString = TileHelper.getAllTiles().get(tileID).getShipPositionsType().getPositions();
 
         UnitTokenPosition unitTokenPosition = new UnitTokenPosition(planetName, false);
         StringTokenizer tokenizer = new StringTokenizer(shipPositionString, ";");
@@ -279,13 +239,5 @@ public class PositionMapper {
             return Collections.emptyList();
         }
         return Arrays.stream(property.split(",")).toList();
-    }
-
-    public static java.util.Map<String, TileModel> getAllTiles() {
-        return allTilesMap;
-    }
-
-    public static java.util.Map<String, PlanetModel> getAllPlanets() {
-        return allPlanetsMap;
     }
 }

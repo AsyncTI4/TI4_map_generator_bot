@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
+import ti4.generator.TileHelper;
 import ti4.message.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
@@ -15,14 +16,9 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class AliasHandler {
-    private static HashMap<String, String> tileAliasList = new HashMap<>();
-    private static HashMap<String, String> tileAliasEntryList = new HashMap<>();
     private static HashMap<String, String> tilemapAliasList = new HashMap<>();
     private static HashMap<String, String> unitAliasList = new HashMap<>();
     private static ArrayList<String> unitValuesList = new ArrayList<>();
-    private static ArrayList<String> planetKeyList = new ArrayList<>();
-    private static HashMap<String, String> planetAliasList = new HashMap<>();
-    private static HashMap<String, String> planetAliasEntryList = new HashMap<>();
     private static HashMap<String, String> cctokenAliasList = new HashMap<>();
     private static HashMap<String, String> attachmentAliasList = new HashMap<>();
     private static HashMap<String, String> tokenAliasList = new HashMap<>();
@@ -39,9 +35,7 @@ public class AliasHandler {
     private static HashMap<String, String> ttpgAttachmentAliasList = new HashMap<>();
     private static HashMap<String, String> ttpgTokenAliasList = new HashMap<>();
     private static HashMap<String, String> ttpgUnitAliasList = new HashMap<>();
-    private static final java.util.Map<String, TileModel> allTilesMap = new HashMap<>();
     private static final java.util.Map<String, String> allTileAliases = new HashMap<>();
-    private static final java.util.Map<String, PlanetModel> allPlanetsMap = new HashMap<>();
     private static final java.util.Map<String, String> allPlanetAliases = new HashMap<>();
 
     public static void init() {
@@ -64,7 +58,7 @@ public class AliasHandler {
         readAliasFile("ttpg_attachment_alias.properties", ttpgAttachmentAliasList, "Could not read TTPG attachment_alias file");
         readAliasFile("ttpg_token_alias.properties", ttpgTokenAliasList, "Could not read TTPG token_alias file");
         readAliasFile("ttpg_unit_alias.properties", ttpgUnitAliasList, "Could not read TTPG unit_alias file");
-        jsonInit();
+        initAliases();
     }
 
     /** Loads aliases in a simple format - used primarily for displaying aliases to users with the /help commands
@@ -143,35 +137,17 @@ public class AliasHandler {
         }
     }
 
-    public static void jsonInit() {
-        ObjectMapper objectMapper = new ObjectMapper();
-        List<TileModel> allTiles = new ArrayList<>();
-        String file = ResourceHelper.getInstance().getTileJsonFile("tiles.json");
-        if(Optional.ofNullable(file).isEmpty()) {
-            BotLogger.log("Tile JSON is null!");
-            return;
-        }
-
-        try {
-            InputStream input = new FileInputStream(file);
-            allTiles = objectMapper.readValue(input, new TypeReference<List<TileModel>>(){});
-        } catch (Exception e) {
-            BotLogger.log("Could not deserialise tile JSON!");
-            System.out.println(e.getMessage());
-        }
-
-        allTiles.forEach(
+    public static void initAliases() {
+        TileHelper.getAllTiles().values().forEach(
                 tileModel -> {
-                    allTilesMap.put(tileModel.getId(), tileModel);
                     Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>())
                             .forEach(alias -> allTileAliases.put(alias, tileModel.getId()));
-                    Optional.ofNullable(tileModel.getPlanets()).orElse(new ArrayList<>()).forEach(
-                            planetModel -> {
-                                allPlanetsMap.put(planetModel.getId(), planetModel);
-                                Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>())
-                                        .forEach(alias -> allPlanetAliases.put(alias, planetModel.getId()));
-                            }
-                    );
+                }
+        );
+        TileHelper.getAllPlanets().values().forEach(
+                planetModel -> {
+                    Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>())
+                            .forEach(alias -> allPlanetAliases.put(alias, planetModel.getId()));
                 }
         );
     }
@@ -239,7 +215,7 @@ public class AliasHandler {
     }
 
     public static List<String> getPlanetKeyList() {
-        return allPlanetsMap.values().stream()
+        return TileHelper.getAllPlanets().values().stream()
                 .map(PlanetModel::getId)
                 .toList();
     }
@@ -386,13 +362,13 @@ public class AliasHandler {
     }
 
     public static Map<String, String> getPlanetAliasEntryList() {
-        return allPlanetsMap.values().stream()
+        return TileHelper.getAllPlanets().values().stream()
                 .collect(Collectors.toMap(PlanetModel::getId,
                         planetModel -> StringUtils.join(Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>()), ", ")));
     }
 
     public static Map<String, String> getTileAliasEntryList() {
-        return allTilesMap.values().stream()
+        return TileHelper.getAllTiles().values().stream()
                 .collect(Collectors.toMap(TileModel::getId,
                         tileModel -> StringUtils.join(Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>()), ", ")));
     }

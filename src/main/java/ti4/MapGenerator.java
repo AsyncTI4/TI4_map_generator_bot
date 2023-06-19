@@ -38,6 +38,7 @@ import ti4.commands.tokens.*;
 import ti4.commands.units.*;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Storage;
@@ -92,6 +93,7 @@ public class MapGenerator {
         Mapper.init();
         AliasHandler.init();
         Storage.init();
+        TileHelper.init();
 
         //ROLES - FOR COMMAND PERMISSIONS
         //ADMIN ROLES
