@@ -1693,7 +1693,7 @@ public class ButtonListener extends ListenerAdapter {
 
             }
 
-            if(player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titancommander")){
+            if(player.getLeaderIDs().contains("titanscommander") && !player.hasLeaderUnlocked("titanscommander")){
                 ButtonHelper.commanderUnlockCheck(player, activeMap, "titans", event);
             }
             if(player.getLeaderIDs().contains("saarcommander") && !player.hasLeaderUnlocked("saarcommander")){

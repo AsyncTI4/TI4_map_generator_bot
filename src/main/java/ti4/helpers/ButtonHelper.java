@@ -103,7 +103,7 @@ public class ButtonHelper {
                 }
             }
             case "nekro" -> {
-                if(player.getTechs().size()> 2){
+                if(player.getTechs().size()> 4){
                     shouldBeUnlocked = true;
                 }
             }
