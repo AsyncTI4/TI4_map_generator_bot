@@ -4,7 +4,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "rainbow",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **rainbow** player activates a system that contains 1 or more of your units: The **rainbow** player cannot move units to the active system. Then return this card to the **rainbow** player."
@@ -14,7 +14,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "rainbow",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **rainbow** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **rainbow** player."
@@ -34,7 +34,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "rainbow",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **rainbow** player replenishes commodities: The **rainbow** player gives you all of their commodities. Then, return this card to the **rainbow** player."
@@ -54,7 +54,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "lime",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **lime** player activates a system that contains 1 or more of your units: The **lime** player cannot move units to the active system. Then return this card to the **lime** player."
@@ -64,7 +64,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "lime",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **lime** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **lime** player."
@@ -84,7 +84,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "lime",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **lime** player replenishes commodities: The **lime** player gives you all of their commodities. Then, return this card to the **lime** player."
@@ -104,7 +104,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "lavender",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **lavender** player activates a system that contains 1 or more of your units: The **lavender** player cannot move units to the active system. Then return this card to the **lavender** player."
@@ -114,7 +114,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "lavender",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **lavender** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **lavender** player."
@@ -134,7 +134,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "lavender",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **lavender** player replenishes commodities: The **lavender** player gives you all of their commodities. Then, return this card to the **lavender** player."
@@ -154,7 +154,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "bloodred",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **bloodred** player activates a system that contains 1 or more of your units: The **bloodred** player cannot move units to the active system. Then return this card to the **bloodred** player."
@@ -164,7 +164,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "bloodred",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **bloodred** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **bloodred** player."
@@ -184,7 +184,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "bloodred",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **bloodred** player replenishes commodities: The **bloodred** player gives you all of their commodities. Then, return this card to the **bloodred** player."
@@ -204,7 +204,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "chocolate",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **chocolate** player activates a system that contains 1 or more of your units: The **chocolate** player cannot move units to the active system. Then return this card to the **chocolate** player."
@@ -214,7 +214,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "chocolate",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **chocolate** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **chocolate** player."
@@ -234,7 +234,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "chocolate",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **chocolate** player replenishes commodities: The **chocolate** player gives you all of their commodities. Then, return this card to the **chocolate** player."
@@ -254,7 +254,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "emerald",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **emerald** player activates a system that contains 1 or more of your units: The **emerald** player cannot move units to the active system. Then return this card to the **emerald** player."
@@ -264,7 +264,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "emerald",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **emerald** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **emerald** player."
@@ -284,7 +284,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "emerald",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **emerald** player replenishes commodities: The **emerald** player gives you all of their commodities. Then, return this card to the **emerald** player."
@@ -304,7 +304,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "navy",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **navy** player activates a system that contains 1 or more of your units: The **navy** player cannot move units to the active system. Then return this card to the **navy** player."
@@ -314,7 +314,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "navy",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **navy** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **navy** player."
@@ -334,7 +334,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "navy",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **navy** player replenishes commodities: The **navy** player gives you all of their commodities. Then, return this card to the **navy** player."
@@ -354,7 +354,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "rose",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **rose** player activates a system that contains 1 or more of your units: The **rose** player cannot move units to the active system. Then return this card to the **rose** player."
@@ -364,7 +364,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "rose",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **rose** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **rose** player."
@@ -384,7 +384,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "rose",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **rose** player replenishes commodities: The **rose** player gives you all of their commodities. Then, return this card to the **rose** player."
@@ -404,7 +404,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "spring",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **spring** player activates a system that contains 1 or more of your units: The **spring** player cannot move units to the active system. Then return this card to the **spring** player."
@@ -414,7 +414,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "spring",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **spring** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **spring** player."
@@ -434,7 +434,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "spring",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **spring** player replenishes commodities: The **spring** player gives you all of their commodities. Then, return this card to the **spring** player."
@@ -454,7 +454,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "teal",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **teal** player activates a system that contains 1 or more of your units: The **teal** player cannot move units to the active system. Then return this card to the **teal** player."
@@ -464,7 +464,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "teal",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **teal** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **teal** player."
@@ -484,7 +484,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "teal",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **teal** player replenishes commodities: The **teal** player gives you all of their commodities. Then, return this card to the **teal** player."
@@ -504,7 +504,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "brown",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **brown** player activates a system that contains 1 or more of your units: The **brown** player cannot move units to the active system. Then return this card to the **brown** player."
@@ -514,7 +514,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "brown",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **brown** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **brown** player."
@@ -534,7 +534,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "brown",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **brown** player replenishes commodities: The **brown** player gives you all of their commodities. Then, return this card to the **brown** player."
@@ -554,7 +554,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "chrome",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **chrome** player activates a system that contains 1 or more of your units: The **chrome** player cannot move units to the active system. Then return this card to the **chrome** player."
@@ -564,7 +564,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "chrome",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **chrome** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **chrome** player."
@@ -584,7 +584,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "chrome",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **chrome** player replenishes commodities: The **chrome** player gives you all of their commodities. Then, return this card to the **chrome** player."
@@ -604,7 +604,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "forest",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **forest** player activates a system that contains 1 or more of your units: The **forest** player cannot move units to the active system. Then return this card to the **forest** player."
@@ -614,7 +614,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "forest",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **forest** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **forest** player."
@@ -634,7 +634,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "forest",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **forest** player replenishes commodities: The **forest** player gives you all of their commodities. Then, return this card to the **forest** player."
@@ -654,7 +654,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "gold",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **gold** player activates a system that contains 1 or more of your units: The **gold** player cannot move units to the active system. Then return this card to the **gold** player."
@@ -664,7 +664,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "gold",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **gold** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **gold** player."
@@ -684,7 +684,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "gold",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **gold** player replenishes commodities: The **gold** player gives you all of their commodities. Then, return this card to the **gold** player."
@@ -704,7 +704,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "lightgray",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **lightgray** player activates a system that contains 1 or more of your units: The **lightgray** player cannot move units to the active system. Then return this card to the **lightgray** player."
@@ -714,7 +714,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "lightgray",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **lightgray** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **lightgray** player."
@@ -734,7 +734,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "lightgray",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **lightgray** player replenishes commodities: The **lightgray** player gives you all of their commodities. Then, return this card to the **lightgray** player."
@@ -754,7 +754,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "petrol",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **petrol** player activates a system that contains 1 or more of your units: The **petrol** player cannot move units to the active system. Then return this card to the **petrol** player."
@@ -764,7 +764,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "petrol",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **petrol** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **petrol** player."
@@ -784,7 +784,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "petrol",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **petrol** player replenishes commodities: The **petrol** player gives you all of their commodities. Then, return this card to the **petrol** player."
@@ -804,7 +804,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "sunset",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **sunset** player activates a system that contains 1 or more of your units: The **sunset** player cannot move units to the active system. Then return this card to the **sunset** player."
@@ -814,7 +814,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "sunset",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **sunset** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **sunset** player."
@@ -834,7 +834,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "sunset",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **sunset** player replenishes commodities: The **sunset** player gives you all of their commodities. Then, return this card to the **sunset** player."
@@ -854,7 +854,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "tan",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **tan** player activates a system that contains 1 or more of your units: The **tan** player cannot move units to the active system. Then return this card to the **tan** player."
@@ -864,7 +864,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "tan",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **tan** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **tan** player."
@@ -884,7 +884,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "tan",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **tan** player replenishes commodities: The **tan** player gives you all of their commodities. Then, return this card to the **tan** player."
@@ -904,7 +904,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "turquoise",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **turquoise** player activates a system that contains 1 or more of your units: The **turquoise** player cannot move units to the active system. Then return this card to the **turquoise** player."
@@ -914,7 +914,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "turquoise",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **turquoise** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **turquoise** player."
@@ -934,7 +934,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "turquoise",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **turquoise** player replenishes commodities: The **turquoise** player gives you all of their commodities. Then, return this card to the **turquoise** player."
@@ -954,7 +954,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "purple",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **purple** player activates a system that contains 1 or more of your units: The **purple** player cannot move units to the active system. Then return this card to the **purple** player."
@@ -964,7 +964,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "purple",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **purple** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **purple** player."
@@ -984,7 +984,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "purple",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **purple** player replenishes commodities: The **purple** player gives you all of their commodities. Then, return this card to the **purple** player."
@@ -1004,7 +1004,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "pink",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **pink** player activates a system that contains 1 or more of your units: The **pink** player cannot move units to the active system. Then return this card to the **pink** player."
@@ -1014,7 +1014,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "pink",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **pink** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **pink** player."
@@ -1034,7 +1034,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "pink",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the pink player replenishes commodities: The **pink** player gives you all of their commodities. Then, return this card to the **pink** player."
@@ -1054,7 +1054,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "blue",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **blue** player activates a system that contains 1 or more of your units: The **blue** player cannot move units to the active system. Then return this card to the **blue** player."
@@ -1064,7 +1064,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "blue",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **blue** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **blue** player."
@@ -1084,7 +1084,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "blue",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **blue** player replenishes commodities: The **blue** player gives you all of their commodities. Then, return this card to the **blue** player."
@@ -1104,7 +1104,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "green",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **green** player activates a system that contains 1 or more of your units: The **green** player cannot move units to the active system. Then return this card to the **green** player."
@@ -1114,7 +1114,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "green",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **green** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **green** player."
@@ -1134,7 +1134,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "green",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **green** player replenishes commodities: The **green** player gives you all of their commodities. Then, return this card to the **green** player."
@@ -1154,7 +1154,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "gray",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **gray** player activates a system that contains 1 or more of your units: The **gray** player cannot move units to the active system. Then return this card to the **gray** player."
@@ -1164,7 +1164,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "gray",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **gray** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **gray** player."
@@ -1184,7 +1184,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "gray",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **gray** player replenishes commodities: The **gray** player gives you all of their commodities. Then, return this card to the **gray** player."
@@ -1204,7 +1204,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "red",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **red** player activates a system that contains 1 or more of your units: The **red** player cannot move units to the active system. Then return this card to the **red** player."
@@ -1214,7 +1214,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "red",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **red** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **red** player."
@@ -1234,7 +1234,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "red",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **red** player replenishes commodities: The **red** player gives you all of their commodities. Then, return this card to the **red** player."
@@ -1254,7 +1254,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "yellow",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **yellow** player activates a system that contains 1 or more of your units: The **yellow** player cannot move units to the active system. Then return this card to the **yellow** player."
@@ -1264,7 +1264,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "yellow",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **yellow** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **yellow** player."
@@ -1284,7 +1284,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "yellow",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **yellow** player replenishes commodities: The **yellow** player gives you all of their commodities. Then, return this card to the **yellow** player."
@@ -1304,7 +1304,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "black",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **black** player activates a system that contains 1 or more of your units: The **black** player cannot move units to the active system. Then return this card to the **black** player."
@@ -1314,7 +1314,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "black",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **black** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **black** player."
@@ -1334,7 +1334,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "black",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **black** player replenishes commodities: The **black** player gives you all of their commodities. Then, return this card to the **black** player."
@@ -1354,7 +1354,7 @@
         "name": "Ceasefire",
         "faction": "",
         "colour": "orange",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the **orange** player activates a system that contains 1 or more of your units: The **orange** player cannot move units to the active system. Then return this card to the **orange** player."
@@ -1364,7 +1364,7 @@
         "name": "Political Secret",
         "faction": "",
         "colour": "orange",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: The **orange** player cannot vote, play action cards, or use faction abilities until after that agenda has been resolved. Then, return this card to the **orange** player."
@@ -1384,7 +1384,7 @@
         "name": "Trade Agreement",
         "faction": "",
         "colour": "orange",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the **orange** player replenishes commodities: The **orange** player gives you all of their commodities. Then, return this card to the **orange** player."
@@ -1404,7 +1404,7 @@
         "name": "Strike Wing Ambuscade",
         "faction": "argent",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "PoK",
         "text": "When 1 or more of your units make a roll for a unit ability: Choose 1 of those units to roll 1 additional die. Then, return this card to the Argent player."
@@ -1414,7 +1414,7 @@
         "name": "War Funding",
         "faction": "letnev",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After you and your opponent roll dice during space combat: You may reroll all of your opponent's dice. You may reroll any number of your dice. Then, return this card to the Letnev player."
@@ -1424,7 +1424,7 @@
         "name": "Raghs Call",
         "faction": "saar",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After you commit 1 or more units to land on a planet: Remove all of the Saar player's ground forces from that planet and place them on a planet controlled by the Saar player. Then, return this card to the Saar player."
@@ -1434,7 +1434,7 @@
         "name": "Fires of the Gashlai",
         "faction": "muaat",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "Action: Remove 1 token from the Muaat player's fleet pool and return it to their reinforcements. Then, gain your war sun unit upgrade technology card.  Then, return this card to the Muaat Player."
@@ -1464,7 +1464,7 @@
         "name": "Military Support",
         "faction": "sol",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "At the start of the Sol player's turn: Remove 1 token from the Sol player's strategy pool, if able, and return it to their reinforcements. Then, you may place 2 infantry from your reinforcements on any planet you control. Then, return this card to the Sol player."
@@ -1474,7 +1474,7 @@
         "name": "Creuss Iff",
         "faction": "ghost",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "At the start of your turn during the action phase: Place or move a Creuss wormhole token into either a system that contains a planet you control or a non-home system that does not contain another player's ships. Then, return this card to the Creuss player."
@@ -1484,7 +1484,7 @@
         "name": "Cybernetic Enhancements",
         "faction": "l1z1x",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When you gain command tokens during the status phase: Gain 1 additional command token. Then, return this card to the L1Z1X player."
@@ -1494,7 +1494,7 @@
         "name": "Scepter of Dominion",
         "faction": "mahact",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "PoK",
         "text": "At the start of the strategy phase: Choose 1 non-home system that contains your units, each other player who has a token on the Mahact player's command sheet places a token from their reinforcements in that system. Then, return this card to the Mahact player."
@@ -1524,7 +1524,7 @@
         "name": "Black Market Forgery",
         "faction": "naaz",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "PoK",
         "text": "Action: Purge 2 of your relic fragments of the same type to gain 1 relic. Then, return this card to the Naaz-Rokha player."
@@ -1544,7 +1544,7 @@
         "name": "The Cavalry",
         "faction": "nomad",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "PoK",
         "text": "At the start of a space combat against a player other than the Nomad: During this combat, treat 1 of your non-fighter ships as if it has the Sustain Damage ability, combat value, and Anti-Fighter Barrage value of the Nomad's flagship. Return this card to the Nomad player at the end of the combat."
@@ -1554,7 +1554,7 @@
         "name": "Tekklar Legion",
         "faction": "sardakk",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "At the start of an invasion combat: Apply +1 to the result of each of your unit's combat rolls during this combat. If your opponent is the N'orr player, apply -1 to the result of each of their unit's combat rolls during this combat. Then, return this card to the N'orr player."
@@ -1574,7 +1574,7 @@
         "name": "Research Agreement",
         "faction": "jolnar",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After the Jol-Nar player researches a technology that is not a faction technology: Gain that technology. Then, return this card to the Jol-Nar player."
@@ -1584,7 +1584,7 @@
         "name": "Crucible",
         "faction": "cabal",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "PoK",
         "text": "After you activate a system: Your ships do not roll for gravity rifts during this movement, apply an additional +1 to the move values of your ships that would move out of or through a gravity rift instead. Then, return this card to the Vuil'raith player."
@@ -1594,7 +1594,7 @@
         "name": "Acquiescence",
         "faction": "winnu",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When the Winnu player resolves a strategic action: You do not have to spend or place a command token to resolve the secondary ability of that strategy card. Then, return this card to the Winnu player."
@@ -1604,7 +1604,7 @@
         "name": "Political Favor",
         "faction": "xxcha",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "When an agenda is revealed: Remove 1 token from the Xxcha player's strategy pool and return it to their reinforcements. Then, discard the revealed agenda and reveal 1 agenda from the top of the deck. Players vote on this agenda instead. Then, return this card to the Xxcha player."
@@ -1614,7 +1614,7 @@
         "name": "Greyfire Mutagen",
         "faction": "yin",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "At the start of a ground combat against 2 or more ground forces that are not controlled by the Yin player: Replace 1 of your opponent's infantry with 1 infantry from your reinforcements. Then, return this card to the Yin player."
@@ -1624,7 +1624,7 @@
         "name": "Spy Net",
         "faction": "yssaril",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "At the start of your turn: Look at the Yssaril player's hand of action cards. Choose 1 of those cards and add it to your hand. Then, return this card to the Yssaril player."
@@ -1634,7 +1634,7 @@
         "name": "Stymie",
         "faction": "arborec",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Base Game",
         "text": "After another player moves ships into a system that contains 1 or more of your units: You may place 1 command token from that player's reinforcements in any non-home system. Then, return this card to the Arborec player."
@@ -1654,7 +1654,7 @@
         "name": "Keleres Rider",
         "faction": "keleres",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Codex III",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 1 action card and gain 2 trade goods. Then, return this card to the Keleres player."
@@ -1664,7 +1664,7 @@
         "name": "Keleres Rider",
         "faction": "keleresa",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Codex III",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 1 action card and gain 2 trade goods. Then, return this card to the Keleres player."
@@ -1674,7 +1674,7 @@
         "name": "Keleres Rider",
         "faction": "keleresm",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Codex III",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 1 action card and gain 2 trade goods. Then, return this card to the Keleres player."
@@ -1684,7 +1684,7 @@
         "name": "Keleres Rider",
         "faction": "keleresx",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Codex III",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, draw 1 action card and gain 2 trade goods. Then, return this card to the Keleres player."
@@ -1694,7 +1694,7 @@
         "name": "Mass Transference",
         "faction": "admins",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Admins",
         "text": "Action: move one of your structures to another eligible area that contains one or more of your units and place a command token from you reinforcements in that system. Then, return this card to the Admins player."
@@ -1734,7 +1734,7 @@
         "name": "Shared Misery",
         "faction": "blex",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "At the start of a ground combat against a player other than the Blex player: Apply -1 to the result of each of your opponent's unit's combat rolls during this combat.Then, return this card to the Blex player."
@@ -1754,7 +1754,7 @@
         "name": "Carcinisation",
         "faction": "cheiran",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "When 1 of your non-fighter ships is destroyed during combat: You may place 2 fighters from your reinforcements in the space area of the active system.At the end of that combat, return this card to the Cheiran Hordes player."
@@ -1764,7 +1764,7 @@
         "name": "Algorithmic Replication",
         "faction": "cymiae",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "Action: Choose 1 action card from the action card discard pile and add it to your hand.Then, purge this card."
@@ -1784,7 +1784,7 @@
         "name": "Edyn Rider",
         "faction": "edyn",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 1 command token from another player's reinforcements in a system that contains your units. Then, return this card to the Edyn player."
@@ -1794,7 +1794,7 @@
         "name": "Underground Market",
         "faction": "florzen",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "When you would gain a relic:You may draw 1 additional card.  Choose 1 to gain and return the rest to the relic deck. Then, shuffle the relic deck.Then, return this card to the Florzen player."
@@ -1804,7 +1804,7 @@
         "name": "Broadcast Teams",
         "faction": "freesystems",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "When you gain control of a planet during a tactical action:If the active system does not contain another player's ships, you may produce up to 2 ships in that system.Then, return this card to the Free Systems player."
@@ -1814,7 +1814,7 @@
         "name": "Raid Leaders",
         "faction": "ghemina",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "After you activate a system:Choose 1 non-fighter ship you control.  During this action, that unit gains BOMBARDMENT 5(x2) and a capacity value of 2.Return this card to the Ghemina player at the end of this action."
@@ -1844,7 +1844,7 @@
         "name": "Stone Speakers",
         "faction": "khrask",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "During a tactical action, when you produce 1 or more hits during a BOMBARDMENT roll:For each hit you produced, you may instead place 1 infantry from your reinforcements on the planet being bombarded.Then, return this card to the L'tokk Khrask player."
@@ -1854,7 +1854,7 @@
         "name": "Vassalage",
         "faction": "kjalengard",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "At the start of combat:Apply +1 to the results of each of your fighters' combat rolls during this combat. The Kjalengard player captures each of your fighters destroyed during this combat.Then, return this card to the Kjalengard player."
@@ -1864,7 +1864,7 @@
         "name": "AI Survey",
         "faction": "kollecc",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "At the start of your turn:You may look at either the top card of the cultural, hazardous, and industrial exploration decks, or the top card of the relic deck.Then, return this card to the Kollecc player."
@@ -1894,7 +1894,7 @@
         "name": "Kyro Rider",
         "faction": "kyro",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "After an agenda is revealed: You cannot vote on this agenda. Predict aloud an outcome of this agenda. If your prediction is correct, place 3 infantry from your reinforcements on a planet you control. Then, return this card to the Kyro player."
@@ -1914,7 +1914,7 @@
         "name": "Trusted Counselor",
         "faction": "lizho",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "At the start of a space combat you are participating in:You may place up to 2 fighters from your reinforcements into the space area of the active system.Then, return this card to the Li-Zho player."
@@ -1924,7 +1924,7 @@
         "name": "Rapid Assembly",
         "faction": "mirveda",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "At the start of your turn:You may move up to 2 PDS units you control to a planet you control. Then, return this card to the Mirveda player."
@@ -1934,7 +1934,7 @@
         "name": "Secrets of the Weave",
         "faction": "mortheus",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "At the start of a space combat:Choose 1 of your opponent's ships in the active system, you may produce 1 unit of that type in that system, spending influence instead of resources.Then, return this card to the Mortheus player."
@@ -1954,7 +1954,7 @@
         "name": "Nivyn Guidance",
         "faction": "nivyn",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "After you activate a system:During this activation, you may ignore the effects of each anomaly.Return this card to the Nivyn player at the end of this activation."
@@ -1964,7 +1964,7 @@
         "name": "Nokar Navigator",
         "faction": "nokar",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "At the start of a space combat:During this combat, the active system is adjacent to each system that contains a planet you control for the purposes of announcing and resolving retreats.At the end of this combat, return this card to the Nokar player."
@@ -1994,7 +1994,7 @@
         "name": "Plots Within Plots",
         "faction": "tnelis",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "When you draw 1 or more secret objective cards: Draw 1 additional secret objective card. Then, return 1 secret objective card to the secret objective deck.  Shuffle that deck. Then, return this card to the Tnelis player."
@@ -2004,7 +2004,7 @@
         "name": "Vaden Handshake",
         "faction": "vaden",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "After you activate a system:You may spend any number of trade goods. For each trade good spent, apply +1 to the move value of 1 non-fighter ship you control during this activation.Return this card to the Vaden player at the end of this activation."
@@ -2014,7 +2014,7 @@
         "name": "Clan's Favor",
         "faction": "vaylerian",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "At the start of a round of space combat:The Vaylerian player discards 1 action card. Then, move all of your ships from the active system to an adjacent system that does not contain another player's ships.  The space combat ends in a draw.Then, place a command token from your reinforcements in that system and return this card to the Vaylerian player."
@@ -2064,7 +2064,7 @@
         "name": "Favor of Rhodun",
         "faction": "zealots",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "When you ignore a prerequisite on a technology card you are researching: You may ignore 1 additional prerequisite of the same color.Then, return this card to the Rhodun player."
@@ -2074,7 +2074,7 @@
         "name": "Hyperkinetic Ordinance",
         "faction": "zelian",
         "colour": "",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Discordant Stars",
         "text": "When 1 or more of your units would make a BOMBARDMENT roll:If you produce 1 or more hits during this BOMBARDMENT roll, produce 1 additional hit for that roll.Then, return this card to the Zelian player."
@@ -2084,7 +2084,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "purple",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the purple player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the purple player."
@@ -2094,7 +2094,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "pink",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the pink player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the pink player."
@@ -2104,7 +2104,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "blue",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the blue player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the blue player."
@@ -2114,7 +2114,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "green",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the green player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the green player."
@@ -2124,7 +2124,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "gray",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the gray player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the gray player."
@@ -2134,7 +2134,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "red",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the red player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the red player."
@@ -2144,7 +2144,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "yellow",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the yellow player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the yellow player."
@@ -2154,7 +2154,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "black",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the black player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the black player."
@@ -2164,7 +2164,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "orange",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the orange player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the orange player."
@@ -2174,7 +2174,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "rainbow",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the rainbow player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the rainbow player."
@@ -2184,7 +2184,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "lime",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the lime player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the lime player."
@@ -2194,7 +2194,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "lavender",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the lavender player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the lavender player."
@@ -2204,7 +2204,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "bloodred",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the bloodred player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the bloodred player."
@@ -2214,7 +2214,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "chocolate",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the chocolate player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the chocolate player."
@@ -2224,7 +2224,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "emerald",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the emerald player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the emerald player."
@@ -2234,7 +2234,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "navy",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the navy player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the navy player."
@@ -2244,7 +2244,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "rose",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the rose player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the rose player."
@@ -2254,7 +2254,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "spring",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the spring player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the spring player."
@@ -2264,7 +2264,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "teal",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the teal player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the teal player."
@@ -2274,7 +2274,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "brown",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the brown player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the brown player."
@@ -2284,7 +2284,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "chrome",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the chrome player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the chrome player."
@@ -2294,7 +2294,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "forest",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the forest player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the forest player."
@@ -2304,7 +2304,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "gold",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the gold player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the gold player."
@@ -2314,7 +2314,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "lightgray",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the lightgray player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the lightgray player."
@@ -2324,7 +2324,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "petrol",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the petrol player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the petrol player."
@@ -2334,7 +2334,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "sunset",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the sunset player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the sunset player."
@@ -2344,7 +2344,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "tan",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the tan player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the tan player."
@@ -2354,7 +2354,7 @@
         "name": "Absol's Political Secret",
         "faction": "",
         "colour": "turquoise",
-        "playArea": "",
+        "playArea": "false",
         "attachment": "",
         "source": "Absol",
         "text": "When you cast votes: You may exhaust up to 3 of the turquoise player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the turquoise player."

@@ -43,7 +43,7 @@ public class SetDeck extends GameSubcommandData {
             case "relic" -> activeMap.setRelics(new ArrayList<>(deck.getShuffledCardList()));
             case "explore" -> activeMap.setExploreDeck(new ArrayList<>(deck.getShuffledCardList()));
         }
-        String message = deck.getType() + " deck has been changed to:\n`" + deck.alias +"`: " + deck.getName() + "\n> " + deck.getDescription();
+        String message = deck.getType() + " deck has been changed to:\n`" + deck.getAlias() +"`: " + deck.getName() + "\n> " + deck.getDescription();
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 

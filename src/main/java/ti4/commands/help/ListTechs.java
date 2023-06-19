@@ -11,6 +11,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.message.MessageHelper;
+import ti4.model.TechnologyModel;
 
 public class ListTechs extends HelpSubcommandData {
 
@@ -22,7 +23,7 @@ public class ListTechs extends HelpSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        HashMap<String, String> techList = Mapper.getTechs();
+        HashMap<String, TechnologyModel> techList = Mapper.getTechs();
         String message = "**__Tech List__**\n" + techList.entrySet().stream()
             .map(e -> e.getKey() + " = " + Helper.getTechRepresentationLong(e.getKey()))
             .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))

@@ -92,7 +92,7 @@ public class Setup extends PlayerSubcommandData {
         FactionModel setupInfo = player.getFactionSetupInfo();
 
         //HOME SYSTEM
-        String hsTile = AliasHandler.resolveTile(setupInfo.homeSystemTile);
+        String hsTile = AliasHandler.resolveTile(setupInfo.getHomeSystem());
 
         ArrayList<String> setup;
         boolean useSpecified = false;
@@ -170,10 +170,10 @@ public class Setup extends PlayerSubcommandData {
         }
 
         //STARTING COMMODITIES
-        player.setCommoditiesTotal(setupInfo.commodities);
+        player.setCommoditiesTotal(setupInfo.getCommodities());
         
         //STARTING PLANETS
-        for (String planet : setupInfo.homePlanets) {
+        for (String planet : setupInfo.getHomePlanets()) {
             if (planet.isEmpty()){
                 continue;
             }
@@ -193,7 +193,7 @@ public class Setup extends PlayerSubcommandData {
         }
         
         //STARTING TECH
-        for (String tech : setupInfo.startingTech) {
+        for (String tech : setupInfo.getStartingTech()) {
             if (tech.trim().isEmpty()){
                 continue;
             }
@@ -213,7 +213,7 @@ public class Setup extends PlayerSubcommandData {
     }
 
     private void addUnits(FactionModel setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {
-        String units = setupInfo.startingFleet;
+        String units = setupInfo.getStartingFleet();
         units = units.replace(", ", ",");
         StringTokenizer tokenizer = new StringTokenizer(units, ",");
         while (tokenizer.hasMoreTokens()) {
