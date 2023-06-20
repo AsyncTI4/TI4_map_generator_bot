@@ -152,7 +152,7 @@ public class TestResourceHelper {
                     String planetId = planetTokenizer.nextToken().toLowerCase();
                     Point planetPosition = PositionMapper.getPoint(planetTokenizer.nextToken());
 
-                    planetsInSystem = allPlanets.stream().filter(planetModel -> planetModel.getId().equals(planetId)).toList();
+                    planetsInSystem.addAll(allPlanets.stream().filter(planetModel -> planetModel.getId().equals(planetId)).toList());
                     planetsInSystem.forEach(planetModel -> {
                         planetModel.setTileId(tileId);
                         planetModel.setPositionInTile(planetPosition);
