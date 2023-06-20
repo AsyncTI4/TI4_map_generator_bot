@@ -81,7 +81,9 @@ public class PositionMapper {
     }
 
     public static List<Point> getSpaceTokenPositions(String tileID) {
-        return TileHelper.getAllTiles().get(tileID).getSpaceTokenLocations();
+        List<Point> backup = List.of(new Point(190, 30), new Point(215, 110), new Point(185,205),
+                new Point(100, 190), new Point(60, 130));
+        return Optional.ofNullable(TileHelper.getAllTiles().get(tileID).getSpaceTokenLocations()).orElse(backup);
     }
 
     public static boolean isTilePositionValid(String position) {
@@ -201,14 +203,12 @@ public class PositionMapper {
     }
 
     public static String getTileSpaceUnitLayout(String tileId) {
-        return TileHelper.getAllTiles().get(tileId).getShipPositionsType().getPositions();
+        return Optional.ofNullable(TileHelper.getAllTiles().get(tileId).getShipPositionsType())
+                .orElse(ShipPositionModel.ShipPosition.TYPE08).getPositions();
     }
 
     public static UnitTokenPosition getSpaceUnitPosition(String planetName, String tileID) {
-        if(tileID.equals("0g"))
-            return null;
-
-        String shipPositionString = TileHelper.getAllTiles().get(tileID).getShipPositionsType().getPositions();
+        String shipPositionString = getTileSpaceUnitLayout(tileID);
 
         UnitTokenPosition unitTokenPosition = new UnitTokenPosition(planetName, false);
         StringTokenizer tokenizer = new StringTokenizer(shipPositionString, ";");
