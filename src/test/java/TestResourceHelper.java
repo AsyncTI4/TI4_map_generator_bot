@@ -154,8 +154,10 @@ public class TestResourceHelper {
 
                     planetsInSystem.addAll(allPlanets.stream().filter(planetModel -> planetModel.getId().equals(planetId)).toList());
                     planetsInSystem.forEach(planetModel -> {
-                        planetModel.setTileId(tileId);
-                        planetModel.setPositionInTile(planetPosition);
+                        if (Optional.ofNullable(planetModel.getTileId()).isEmpty())
+                            planetModel.setTileId(tileId);
+                        if (Optional.ofNullable(planetModel.getPositionInTile()).isEmpty())
+                            planetModel.setPositionInTile(planetPosition);
                     });
                 }
             }
