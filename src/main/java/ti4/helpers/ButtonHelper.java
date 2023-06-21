@@ -43,6 +43,27 @@ import ti4.model.TechnologyModel;
 
 public class ButtonHelper {
 
+     public static boolean NomadHeroCheck(Player player, Map activeMap, Tile tile) {
+        boolean isFSThere = false;
+
+        if(player.hasLeader("nomadhero")){
+            Leader playerLeader = player.getLeader("nomadhero");
+            if(playerLeader.isActive()){
+                String colorID = Mapper.getColorID(player.getColor());
+                String fsKey = colorID + "_fs.png";
+                if(tile.getUnitHolders().get("space").getUnits().containsKey(fsKey)){
+                    return true;
+                }
+            }
+        }
+
+        return isFSThere;
+
+
+        
+
+     }
+
     public static void commanderUnlockCheck(Player player, Map activeMap, String faction, GenericInteractionCreateEvent event) {
 
         boolean shouldBeUnlocked = false;
@@ -560,7 +581,7 @@ public class ButtonHelper {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(activeMap.getTileMap()).entrySet()) {
-			if (FoWHelper.playerHasUnitsInSystem(player, tileEntry.getValue()) && !AddCC.hasCC(event, player.getColor(), tileEntry.getValue())) {
+			if (FoWHelper.playerHasUnitsInSystem(player, tileEntry.getValue()) && (!AddCC.hasCC(event, player.getColor(), tileEntry.getValue())) || ButtonHelper.NomadHeroCheck(player, activeMap, tileEntry.getValue())) {
                 Tile tile = tileEntry.getValue();
                 Button validTile = Button.success(finChecker+"tacticalMoveFrom_"+tileEntry.getKey(), tile.getRepresentationForButtons(activeMap, player));
                 buttons.add(validTile);

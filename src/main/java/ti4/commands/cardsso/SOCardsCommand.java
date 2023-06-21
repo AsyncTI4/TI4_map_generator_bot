@@ -134,6 +134,7 @@ public class SOCardsCommand implements Command {
         subcommands.add(new ShowAllSOToAll());
         subcommands.add(new DealSOToAll());
         subcommands.add(new DrawSpecificSO());
+        subcommands.add(new ShowUnScoredSOs());
         return subcommands;
     }
 

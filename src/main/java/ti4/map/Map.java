@@ -234,9 +234,10 @@ public class Map {
             }
            if(player.getSecrets() != null){
                 currentSecrets.addAll(player.getSecrets().keySet());
+           }
+           if(player.getSecretsScored() != null){
                 currentSecrets.addAll(player.getSecretsScored().keySet());
            }
-          
         }
 
         for(String defaultSO : defaultSecrets){
@@ -256,10 +257,10 @@ public class Map {
             if(player == null){
                 continue;
             }
-           if(player.getSecrets() != null){
-                soNum = soNum + player.getSo();
-                soNum = soNum + player.getSoScored();
-           }
+           
+            soNum = soNum + player.getSo();
+            soNum = soNum + player.getSoScored();
+        
           
         }
         return soNum;
