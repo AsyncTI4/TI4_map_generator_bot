@@ -170,24 +170,39 @@ public class MessageListener extends ListenerAdapter {
 
     private void autoPingGames() {
         Map mapreference = MapManager.getInstance().getMap("finreference");
-        if (mapreference != null && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 10*60*1000) //10 minutes
+        int multiplier = 1000;
+        if (mapreference != null && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 10*60*multiplier) //10 minutes
         {
             mapreference.setLastTimeGamesChecked(new Date());
             MapSaveLoadManager.saveMap(mapreference);
             HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
+            
             for (Map activeMap : mapList.values()) {
                 if (activeMap.getAutoPingStatus() && activeMap.getAutoPingSpacer() != 0) {
                     String playerID = activeMap.getActivePlayer();
+                    
                     if (playerID != null) {
                         Player player = activeMap.getPlayer(playerID);
                         if (player != null) {
                             long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
-                            if (milliSinceLastPing > (60*60*1000* activeMap.getAutoPingSpacer())) {
+                            if (milliSinceLastPing > (60*60*multiplier* activeMap.getAutoPingSpacer())) {
                                 String realIdentity = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
                                 String ping = realIdentity + " this is a gentle reminder that the game is waiting on you.";
                                 if(activeMap.getCurrentPhase().equalsIgnoreCase("agendawaiting")){
                                     AgendaHelper.pingMissingPlayers(activeMap);
                                 }else{
+                                     long milliSinceLastTurnChange = new Date().getTime() - activeMap.getLastActivePlayerChange().getTime();
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*2) ){
+                                        ping = realIdentity + " this is a courtesy notice that the game AWAITS.";
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*3) && milliSinceLastTurnChange < (60*60*multiplier* activeMap.getAutoPingSpacer()*4)){
+                                        ping = realIdentity + " this is your final warning. I hope you are doing well, wherever you are, and I'm sure whatever you are doing is far more important than TI. ";
+                                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), Helper.getGamePing(activeMap.getGuild(), activeMap)+ " the game has stalled on a player, and autoping will now stop pinging them. ");
+                                        
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*4)){
+                                        continue;
+                                    }
                                     if (activeMap.isFoWMode()) {
                                         MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);
                                     } else {
@@ -204,7 +219,7 @@ public class MessageListener extends ListenerAdapter {
                         }
                     }else{
                         long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
-                        if (milliSinceLastPing > (60*60*1000* activeMap.getAutoPingSpacer())) {
+                        if (milliSinceLastPing > (60*60*multiplier* activeMap.getAutoPingSpacer())) {
                             if(activeMap.getCurrentPhase().equalsIgnoreCase("agendawaiting")){
                                 AgendaHelper.pingMissingPlayers(activeMap);
                             }

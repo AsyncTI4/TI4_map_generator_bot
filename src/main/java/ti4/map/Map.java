@@ -226,25 +226,23 @@ public class Map {
         MessageHelper.sendMessageToChannel(getActionsChannel(), "The number of SOs in the deck before this operation is "+getNumberOfSOsInTheDeck() +". The number in players hands is "+getNumberOfSOsInPlayersHands());
 
         List<String> defaultSecrets = Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList();
-        System.out.println(defaultSecrets);
         List<String> currentSecrets = new ArrayList<String>();
         currentSecrets.addAll(secretObjectives);
-        System.out.println("Stopper");
-        System.out.println(currentSecrets);
         for(Player player : getPlayers().values()){
             if(player == null){
                 continue;
             }
            if(player.getSecrets() != null){
                 currentSecrets.addAll(player.getSecrets().keySet());
+           }
+           if(player.getSecretsScored() != null){
                 currentSecrets.addAll(player.getSecretsScored().keySet());
            }
-           System.out.println("doneWith"+player.getFaction());
         }
 
         for(String defaultSO : defaultSecrets){
             if(!currentSecrets.contains(defaultSO)){
-                System.out.println(defaultSO);
+                
                 secretObjectives.add(defaultSO);
             }
         }
@@ -259,10 +257,10 @@ public class Map {
             if(player == null){
                 continue;
             }
-           if(player.getSecrets() != null){
-                soNum = soNum + player.getSo();
-                soNum = soNum + player.getSoScored();
-           }
+           
+            soNum = soNum + player.getSo();
+            soNum = soNum + player.getSoScored();
+        
           
         }
         return soNum;

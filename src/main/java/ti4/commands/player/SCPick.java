@@ -186,10 +186,18 @@ public class SCPick extends PlayerSubcommandData {
             String success = "The next player has been notified";
             MessageHelper.sendPrivateMessageToPlayer(privatePlayer, activeMap, event, msgExtra, fail, success);
             activeMap.updateActivePlayer(privatePlayer);
-            if(!allPicked&& !activeMap.isHomeBrewSCMode())
+            
+            if(!allPicked)
             {
                 MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
             }
+            else{
+                   
+                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false));
+
+                    
+                    
+                }
 
         } else {
             if (allPicked) {
@@ -204,7 +212,8 @@ public class SCPick extends PlayerSubcommandData {
                 else{
                     if(allPicked)
                     {
-                        MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), msgExtra + "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false));
+                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
+                        MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false));
 
                     }
                     else
