@@ -34,7 +34,7 @@
         "type": "secret_objective",
         "description": "All secret objectives in a 'vanilla' PoK game",
         "cardIDs": [
-            "ans","baf","bam","dfat","btv","csl","ctr","dfat","dhw","dp","dtd","dtgs","dts","dyp","eap","eh","faa","fc","fsn","fwm","fwp","gamf","hrm","lsc","mew","mlp","mp","mrm","mtm","ose","otf","pe","pem","sai","sar","sb","syc","te","ttfd","uf"
+            "ans","baf","bam","dfat","btv","btgk","csl","ctr","dfat","dhw","dp","dtd","dtgs","dts","dyp","eap","eh","faa","fc","fsn","fwm","fwp","gamf","hrm","lsc","mew","mlp","mp","mrm","mtm","ose","otf","pe","pem","sai","sar","sb","syc","te","ttfd","uf"
         ]
     },
     {
