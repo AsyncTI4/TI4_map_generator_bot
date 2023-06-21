@@ -133,8 +133,9 @@ public class Turn extends PlayerSubcommandData {
 
         MessageChannel gameChannel = activeMap.getMainGameChannel() == null ? event.getMessageChannel() : activeMap.getMainGameChannel();
         if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value) || activeMap.getPlayers().values().stream().allMatch(Player::isPassed)) {
-            activeMap.updateActivePlayer(null);
+            
             showPublicObjectivesWhenAllPassed(event, activeMap, gameChannel);
+            activeMap.updateActivePlayer(null);
             return "";
         }
 
@@ -234,34 +235,7 @@ public class Turn extends PlayerSubcommandData {
         String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeMap);
         activeMap.setCurrentPhase("status");
         LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
-        Player arborec = Helper.getPlayerFromAbility(activeMap, "mitosis");
-        if (arborec != null) {
-            String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeMap, event.getGuild(), true) + " reminder to do mitosis!";
-            MessageHelper.sendMessageToChannel((MessageChannel) arborec.getCardsInfoThread(activeMap), mitosisMessage);
-            
-        }
-        Player solPlayer =  Helper.getPlayerFromColorOrFaction(activeMap, "sol");
-
-        if (solPlayer != null) {
-            String colorID = Mapper.getColorID(solPlayer.getColor());
-            String fsKey = colorID + "_fs.png";
-            String infKey = colorID + "_gf.png";
-            for (Tile tile : activeMap.getTileMap().values()) {
-                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    if (unitHolder.getUnits() != null) {
-                        if (unitHolder.getUnits().get(fsKey) != null && unitHolder.getUnits().get(fsKey) > 0) {
-                            unitHolder.addUnit(infKey, 1);
-                            String genesisMessage = Helper.getPlayerRepresentation(solPlayer, activeMap, event.getGuild(), true) + " an infantry was added to the space area of your flagship automatically.";
-                            if (activeMap.isFoWMode()) {
-                                MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
-                            } else {
-                                MessageHelper.sendMessageToChannel(gameChannel, genesisMessage);
-                            }
-                        }
-                    }
-                }
-            }
-        }
+        
 
         
 
@@ -330,5 +304,33 @@ public class Turn extends PlayerSubcommandData {
                 .addComponents(actionRows).build();
 
         gameChannel.sendMessage(messageObject).queue();
+        Player arborec = Helper.getPlayerFromAbility(activeMap, "mitosis");
+        if (arborec != null) {
+            String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeMap, event.getGuild(), true) + " reminder to do mitosis!";
+            MessageHelper.sendMessageToChannel((MessageChannel) arborec.getCardsInfoThread(activeMap), mitosisMessage);
+            
+        }
+        Player solPlayer =  Helper.getPlayerFromColorOrFaction(activeMap, "sol");
+
+        if (solPlayer != null) {
+            String colorID = Mapper.getColorID(solPlayer.getColor());
+            String fsKey = colorID + "_fs.png";
+            String infKey = colorID + "_gf.png";
+            for (Tile tile : activeMap.getTileMap().values()) {
+                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                    if (unitHolder.getUnits() != null) {
+                        if (unitHolder.getUnits().get(fsKey) != null && unitHolder.getUnits().get(fsKey) > 0) {
+                            unitHolder.addUnit(infKey, 1);
+                            String genesisMessage = Helper.getPlayerRepresentation(solPlayer, activeMap, event.getGuild(), true) + " an infantry was added to the space area of your flagship automatically.";
+                            if (activeMap.isFoWMode()) {
+                                MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
+                            } else {
+                                MessageHelper.sendMessageToChannel(gameChannel, genesisMessage);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }
