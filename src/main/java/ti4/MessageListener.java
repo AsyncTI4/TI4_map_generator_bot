@@ -170,7 +170,7 @@ public class MessageListener extends ListenerAdapter {
 
     private void autoPingGames() {
         Map mapreference = MapManager.getInstance().getMap("finreference");
-        int multiplier = 1000;
+        int multiplier = 1000; //should be 1000
         if (mapreference != null && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 10*60*multiplier) //10 minutes
         {
             mapreference.setLastTimeGamesChecked(new Date());
@@ -217,16 +217,16 @@ public class MessageListener extends ListenerAdapter {
                                     if(pingNumber == 9){
                                          ping = realIdentity + " There's a rumor going around that some game is looking for a replacement player. Not that I'd know anything about that. ";
                                     }
-                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*10) && milliSinceLastTurnChange < (60*60*multiplier* activeMap.getAutoPingSpacer()*11)){
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*10) && milliSinceLastTurnChange < (60*60*multiplier* activeMap.getAutoPingSpacer()*11) && !activeMap.isFoWMode()){
                                         ping = realIdentity + " this is your final reminder. I hope you are doing well, wherever you are, and I'm sure whatever you are doing is far more important than TI. Or your name is Frox";
                                         MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), Helper.getGamePing(activeMap.getGuild(), activeMap)+ " the game has stalled on a player, and autoping will now stop pinging them. ");
                                     }
-                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*11)){
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*11) && !activeMap.isFoWMode()){
                                         continue;
                                     }
                                     if (activeMap.isFoWMode()) {
                                         MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);
-                                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(),  "Active player has been pinged. This is ping #:"+pingNumber);
+                                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(),  "Active player has been pinged. This is ping #"+pingNumber);
                                     } else {
                                         MessageChannel gameChannel = activeMap.getMainGameChannel();
                                         if (gameChannel != null) {

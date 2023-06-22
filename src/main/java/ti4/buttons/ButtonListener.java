@@ -974,7 +974,7 @@ public class ButtonListener extends ListenerAdapter {
                     if (activeMap.isFoWMode()) {
                         if (nextInLine.getPrivateChannel() != null) {
                             MessageHelper.sendMessageToChannel(nextInLine.getPrivateChannel(),AgendaHelper.getSummaryOfVotes(activeMap, true) + "\n ");
-                            MessageHelper.sendMessageToChannelWithButtons(nextInLine.getPrivateChannel(), message,
+                            MessageHelper.sendMessageToChannelWithButtons(nextInLine.getPrivateChannel(), "\n " + realIdentity+message,
                                     buttons);
                             event.getChannel().sendMessage("Notified next in line").queue();
                         }
