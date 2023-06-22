@@ -214,7 +214,7 @@ public class MessageListener extends ListenerAdapter {
                                     if(pingNumber == 8){
                                          ping = realIdentity + " What rhymes with send burn, do you know? I don't";
                                     }
-                                    if(pingNumber == 9){
+                                    if(pingNumber > 8){
                                          ping = realIdentity + " There's a rumor going around that some game is looking for a replacement player. Not that I'd know anything about that. ";
                                     }
                                     if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*10) && milliSinceLastTurnChange < (60*60*multiplier* activeMap.getAutoPingSpacer()*11) && !activeMap.isFoWMode()){
