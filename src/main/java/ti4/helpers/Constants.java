@@ -26,6 +26,26 @@ public class Constants {
     public static final String COMPONENT_ACTION = "component_action";
     public static final String ACTIVATION_COUNT = "activation_count";
     public static final String SHUTDOWN = "shutdown";
+    public static final String PLANET_ID = "planet_id";
+    public static final String PLANET_NAME = "planet_name";
+    public static final String PLANET_TILE_ID = "planet_tile_id";
+    public static final String PLANET_ALIASES = "planet_aliases";
+    public static final String PLANET_POSITION_X = "planet_position_x";
+    public static final String PLANET_POSITION_Y = "planet_position_y";
+    public static final String PLANET_RESOURCES = "planet_resources";
+    public static final String PLANET_INFLUENCE = "planet_influence";
+    public static final String PLANET_TYPE = "planet_type";
+    public static final String PLANET_TECH_SKIPS = "planet_tech_skips";
+    public static final String PLANET_LEGENDARY_NAME = "planet_legendary_name";
+    public static final String PLANET_LEGENDARY_TEXT = "planet_legendary_text";
+    public static final String TILE_ID = "tile_id";
+    public static final String TILE_NAME = "tile_name";
+    public static final String TILE_ALIASES = "tile_aliases";
+    public static final String TILE_IMAGE = "tile_image";
+    public static final String TILE_PLANET_IDS = "tile_planet_ids";
+    public static final String TILE_TYPE = "tile_type";
+    public static final String TILE_TOKEN_LOCATIONS = "tile_token_locations";
+    public static final String TILE_WORMHOLES = "tile_wormholes";
     public static final String RESET_EMOJI_CACHE = "reset_emoji_cache";
     public static final String STATISTICS = "statistics";
     public static final String LOG_MESSAGE = "log_message";
@@ -70,7 +90,6 @@ public class Constants {
     public static final String CREATE_GAME = "create";
     public static final String DELETE_GAME = "delete_game";
     public static final String POSITION = "position";
-    public static final String TILE_NAME = "tile_name";
     public static final String TILE_NAME_2 = "tile_name_2";
     public static final String TILE_NAME_3 = "tile_name_3";
     public static final String TILE_NAME_4 = "tile_name_4";
@@ -83,7 +102,6 @@ public class Constants {
     public static final String SETUP_TEMPLATES = "setup_templates";
 
     public static final String UNIT_CAP = "unit_cap";
-    public static final String PLANET_NAME = "planet_name";
     public static final String TOKEN = "token";
     public static final String TILE_LIST = "tile_list";
     public static final String UNIT_NAMES = "unit_names";
@@ -625,6 +643,8 @@ public class Constants {
     public static final String GAME_END = "end";
     public static final String GAME_HAS_ENDED = "game_has_ended";
     public static final String ARCHIVE_OLD_THREADS = "archive_old_threads";
+    public static final String CREATE_TILE = "create_tile";
+    public static final String CREATE_PLANET = "create_planet";
     public static final String THREAD_COUNT = "thread_count";
     public static final String LIST_OLD_CHANNELS = "list_old_channels";
     public static final String LIST_OLD_THREADS = "list_old_threads";

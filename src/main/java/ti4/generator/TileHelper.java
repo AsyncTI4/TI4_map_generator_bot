@@ -63,4 +63,12 @@ public class TileHelper {
             }
         });
     }
+
+    public static void addNewTileToList(TileModel tile) {
+        allTiles.put(tile.getId(), tile);
+    }
+
+    public static void addNewPlanetToList(PlanetModel planet) {
+        allPlanets.put(planet.getId(), planet);
+    }
 }

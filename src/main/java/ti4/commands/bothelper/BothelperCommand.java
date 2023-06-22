@@ -99,6 +99,8 @@ public class BothelperCommand implements Command {
         subcommands.add(new FixGameChannelPermissions());
         subcommands.add(new ListCategoryChannelCounts());
         subcommands.add(new BeginVideoGeneration());
+        subcommands.add(new CreatePlanet());
+        subcommands.add(new CreateTile());
         return subcommands;
     }
 

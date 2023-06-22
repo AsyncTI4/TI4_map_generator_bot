@@ -36,6 +36,22 @@ public class TestResourceHelper {
     }
 
     @Test
+    public void checkTokenLocations() {
+        TileHelper.init();
+
+        Collection<TileModel> allTiles = TileHelper.getAllTiles().values();
+
+        allTiles.forEach(tile -> {
+            if(tile.getShipPositionsType() == ShipPositionModel.ShipPosition.TYPE16) {
+                System.out.print(String.format("%12s", tile.getId()) + " - ");
+                List<String> pointString = tile.getSpaceTokenLocations().stream().map(point -> point.x + "/" + point.y).toList();
+                System.out.print(String.format("%6s", tile.getShipPositionsType()) + " - ");
+                System.out.println(pointString);
+            }
+        });
+    }
+
+    @Test
     public void checkPlanetCenterpointFromUnitCoordinates() {
         TileHelper.init();
 
@@ -50,6 +66,7 @@ public class TestResourceHelper {
             }
 
             Map<String, List<BigDecimal>> distanceMap = new HashMap<>();
+            Map<String, List<String>> relativePositionMap = new HashMap<>();
 
             positions.getCoordinateMap().forEach((category, points) -> {
                 List<BigDecimal> distances = (points.stream().map(point -> point.distance(planetCenter.x, planetCenter.y))
@@ -57,61 +74,20 @@ public class TestResourceHelper {
 
                 distanceMap.put(category, distances);
             });
+
+            positions.getCoordinateMap().forEach((category, points) -> {
+                List<String> relativePos = (points.stream().map(point ->
+                        new Point(point.x - planetCenter.x, point.y - planetCenter.y))
+                        .map(point -> point.x + "/" + point.y)
+                        .toList());
+
+                relativePositionMap.put(category, relativePos);
+            });
+            String key = "att";
+            System.out.print(String.format("%12s", planet.getId()) + " - ");
+            System.out.println(relativePositionMap.get(key));
             allPlanetsWithDistances.put(planet.getId(), distanceMap);
         }
-
-        Map<Map<String, List<BigDecimal>>, String> positionGroups = new HashMap<>();
-        int threshold = 5;
-
-        System.out.println(allPlanetsWithDistances.entrySet());
-
-        /*allPlanetsWithDistances.entrySet().forEach(entry -> {
-            String id = entry.getKey();
-            Map<String, List<BigDecimal>> coordinateMap = entry.getValue();
-            if(allPlanetsWithDistances.keySet().isEmpty()) {
-                positionGroups.put(coordinateMap, id);
-            }
-            else {
-                //coordinate map is the current one being looked at
-                Map<String, List<BigDecimal>> currentCoordinateMap = coordinateMap;
-                //iterate through all the group keys
-                boolean needsNewGroup = true;
-                for(Map<String, List<BigDecimal>> currentGroup : positionGroups.keySet()) {
-                    boolean isWithinRange = true;
-                    //if all distances < threshold
-
-                    for(Map.Entry<String, List<BigDecimal>> locationEntries : currentCoordinateMap.entrySet()) {
-                        String category = locationEntries.getKey();
-                        List<BigDecimal> locations = locationEntries.getValue();
-                        if(!isWithinRange)
-                            break;
-
-                        if(currentGroup.get(category).size() != locations.size()) {
-                            isWithinRange = false;
-                            break;
-                        }
-                        else {
-                            for(int i = 0; i < locations.size(); i++) {
-                                if (Math.abs(locations.get(i).subtract(currentGroup.get(category).get(i)).doubleValue()) > threshold) {
-                                    isWithinRange = false;
-                                    break;
-                                }
-                            }
-                        }
-                    }
-                    //add to that group
-                    if(isWithinRange) {
-                        positionGroups.put(currentGroup, id);
-                        needsNewGroup = false;
-                        break;
-                    }
-                }
-                //else, make new group
-                if (needsNewGroup) {
-                    positionGroups.put(currentCoordinateMap, id);
-                }
-            }
-        });
-        System.out.println(positionGroups);*/
+        //System.out.println(allPlanetsWithDistances.entrySet());
     }
 }

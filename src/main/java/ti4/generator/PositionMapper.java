@@ -7,6 +7,7 @@ import ti4.map.Map;
 import ti4.message.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.ShipPositionModel;
+import ti4.model.TileModel;
 
 import java.awt.*;
 import java.io.FileInputStream;
@@ -83,7 +84,14 @@ public class PositionMapper {
     public static List<Point> getSpaceTokenPositions(String tileID) {
         List<Point> backup = List.of(new Point(190, 30), new Point(215, 110), new Point(185,205),
                 new Point(100, 190), new Point(60, 130));
-        return Optional.ofNullable(TileHelper.getAllTiles().get(tileID).getSpaceTokenLocations()).orElse(backup);
+        TileModel tile = TileHelper.getAllTiles().get(tileID);
+
+        return Optional.ofNullable(tile.getSpaceTokenLocations())
+                .orElse(Optional.ofNullable(tile.getShipPositionsType()).isPresent()
+                        ?
+                        Optional.ofNullable(tile.getShipPositionsType().getSpaceTokenLayout())
+                                .orElse(backup)
+                        : backup);
     }
 
     public static boolean isTilePositionValid(String position) {
