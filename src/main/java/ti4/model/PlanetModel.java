@@ -1,5 +1,6 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import ti4.generator.UnitTokenPosition;
 
 import java.awt.*;
@@ -35,6 +36,7 @@ public class PlanetModel {
         return name;
     }
 
+    @JsonIgnore
     public String getNameNullSafe() {
         return Optional.ofNullable(name).orElse("");
     }

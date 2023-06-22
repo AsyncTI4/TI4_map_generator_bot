@@ -1,5 +1,7 @@
 package ti4.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -32,6 +34,7 @@ public class TileModel {
         return name;
     }
 
+    @JsonIgnore
     public String getNameNullSafe() {
         return Optional.ofNullable(name).orElse("");
     }
