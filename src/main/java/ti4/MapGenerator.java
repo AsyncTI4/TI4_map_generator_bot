@@ -47,6 +47,7 @@ import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.login.LoginException;
@@ -101,21 +102,21 @@ public class MapGenerator {
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
         adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
         adminRoles.add(jda.getRoleById("1109657180170371182")); // Jazz's Server
-        adminRoles.removeIf(r -> r == null);
+        adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
         developerRoles.addAll(adminRoles); //admins can also execute developer commands
         developerRoles.add(jda.getRoleById("947648366056185897")); // Async TI4 Server (Hub)
         developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
-        developerRoles.removeIf(r -> r == null);
+        developerRoles.removeIf(Objects::isNull);
 
         //BOTHELPER ROLES
         bothelperRoles.addAll(developerRoles); //admins and developers can also execute bothelper commands
         bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server (Hub)
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
-        bothelperRoles.removeIf(r -> r == null);
+        bothelperRoles.removeIf(Objects::isNull);
 
 
 
