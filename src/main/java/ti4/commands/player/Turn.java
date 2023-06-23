@@ -231,16 +231,8 @@ public class Turn extends PlayerSubcommandData {
         return sendReminder ? sb.toString() : null;
     }
 
-    private void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Map activeMap, MessageChannel gameChannel) {
-        String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeMap);
-        activeMap.setCurrentPhase("status");
+     public List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Map activeMap) {
         LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
-        
-
-        
-
-        
-
         HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
         HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
         LinkedHashMap<String, Integer> customPublicVP = activeMap.getCustomPublicVP();
@@ -285,12 +277,20 @@ public class Turn extends PlayerSubcommandData {
                 }
             }
         }
-
-        Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "No PO Scored");
-        Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");
+       
         poButtons.addAll(poButtons1);
         poButtons.addAll(poButtons2);
         poButtons.addAll(poButtonsCustom);
+        poButtons.removeIf(Objects::isNull);
+        return poButtons;
+     }
+
+    private void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Map activeMap, MessageChannel gameChannel) {
+        String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeMap);
+        activeMap.setCurrentPhase("status");
+        List<Button> poButtons = getScoreObjectiveButtons(event, activeMap);
+        Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "No PO Scored");
+        Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");
         poButtons.add(noPOScoring);
         poButtons.add(noSOScoring);
         poButtons.removeIf(Objects::isNull);
@@ -304,6 +304,9 @@ public class Turn extends PlayerSubcommandData {
                 .addComponents(actionRows).build();
 
         gameChannel.sendMessage(messageObject).queue();
+
+
+
         Player arborec = Helper.getPlayerFromAbility(activeMap, "mitosis");
         if (arborec != null) {
             String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeMap, event.getGuild(), true) + " reminder to do mitosis!";

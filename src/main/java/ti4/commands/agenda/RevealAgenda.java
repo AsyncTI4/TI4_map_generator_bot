@@ -102,12 +102,10 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getAgendaRepresentation(id, uniqueID));
         String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you abstain from playing whens/afters by pressing the buttons below. If you have an action card with those windows, you can simply play it.";
 
-        Button playWhen = Button.danger("play_when", "Play A Non-AC When");
-        Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-        Button noWhenPersistent = Button.primary("no_when_persistent", "No Whens No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
+        
         Date newTime = new Date();
         activeMap.setLastActivePlayerPing(newTime);
-        List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
+        List<Button> whenButtons = AgendaHelper.getWhenButtons(activeMap);
         List<Button> afterButtons = AgendaHelper.getAfterButtons(activeMap);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
