@@ -54,6 +54,7 @@ public class Info extends GameSubcommandData{
         sb.append("Auto-Ping Time Interval (hrs): " + activeMap.getAutoPingSpacer()).append(NEW_LINE);
         sb.append("Created: " + activeMap.getCreationDate()).append(NEW_LINE);
         sb.append("Last Modified: " + Helper.getDateRepresentation(activeMap.getLastModifiedDate())).append(NEW_LINE);
+        sb.append("Map Images Generated: " + activeMap.getMapImageGenerationCount()).append(NEW_LINE);
         if (privateGame == null || privateGame == false) {
             sb.append("Map String: `" + Helper.getMapString(activeMap)).append("`").append(NEW_LINE);
         } else {
@@ -76,6 +77,9 @@ public class Info extends GameSubcommandData{
         } else {
             sb.append("Players: Cannot show players for private games").append(NEW_LINE);
         }
+        sb.append("Public Objectives:\n> ").append(activeMap.getRevealedPublicObjectives()).append(NEW_LINE);
+        sb.append("Laws:\n> ").append(activeMap.getLaws()).append(NEW_LINE);
+
         return sb;
     }
 }
