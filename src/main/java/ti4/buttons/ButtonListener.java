@@ -2685,13 +2685,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "play_when" -> {
                     clearAllReactions(event);
                     addReaction(event, true, true, "Playing When", "When Played");
-                    Button playWhen = Button.danger("play_when", "Play When");
-                    Button noWhen = Button.primary("no_when", "No Whens")
-                            .withEmoji(Emoji.fromFormatted(Emojis.noafters));
-                    Button noWhenPersistent = Button
-                            .primary("no_when_persistent", "No Whens No Matter What (for this agenda)")
-                            .withEmoji(Emoji.fromFormatted(Emojis.noafters));
-                    List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
+                    List<Button> whenButtons = AgendaHelper.getWhenButtons(activeMap);
                     Date newTime = new Date();
                     activeMap.setLastActivePlayerPing(newTime);
                     MessageHelper.sendMessageToChannelWithPersistentReacts(actionsChannel,
@@ -3281,6 +3275,22 @@ public class ButtonListener extends ListenerAdapter {
                 case "turnEnd" -> {
                     new Turn().execute(event, player, activeMap);
                     event.getMessage().delete().queue();
+                }
+                case "quash" -> {
+                    int stratCC = player.getStrategicCC();
+                    player.setStrategicCC(stratCC-1);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Quashed agenda. Strategic CCs went from "+stratCC+ " -> "+(stratCC-1));
+                    new RevealAgenda().revealAgenda(event, false, activeMap, activeMap.getMainGameChannel());
+                    event.getMessage().delete().queue();
+                }
+                case "scoreAnObjective" -> {
+                    List<Button> poButtons = new Turn().getScoreObjectiveButtons(event, activeMap);
+                    poButtons.add(Button.danger("deleteButtons", "Delete These Buttons"));
+                    MessageChannel channel = event.getMessageChannel();
+                    if(activeMap.isFoWMode()){
+                        channel = player.getPrivateChannel();
+                    }
+                    MessageHelper.sendMessageToChannelWithButtons(channel, "Use buttons to score an objective", poButtons);
                 }
                 case "startChaosMapping" -> {
                     ButtonHelper.firstStepOfChaos(activeMap, player, event);

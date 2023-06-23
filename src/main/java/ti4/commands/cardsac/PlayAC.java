@@ -170,16 +170,10 @@ public class PlayAC extends ACCardsSubcommandData {
 
             }
             if (actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto")) {
-                Button playWhen = Button.danger("play_when", "Play When");
-                Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-                Button noWhenPersistent = Button.primary("no_when_persistent", "No Whens No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
                 Date newTime = new Date();
                 activeMap.setLastActivePlayerPing(newTime);
-                List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
+                List<Button> whenButtons = AgendaHelper.getWhenButtons(activeMap);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", activeMap, whenButtons, "when");
-
-
-
 
             }
         }

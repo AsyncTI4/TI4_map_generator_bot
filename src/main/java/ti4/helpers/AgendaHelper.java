@@ -57,6 +57,27 @@ public class AgendaHelper {
         Date newTime = new Date();
         activeMap.setLastActivePlayerPing(newTime);
      }
+     public static List<Button> getWhenButtons(Map activeMap) {
+        Button playWhen = Button.danger("play_when", "Play When");
+        Button noWhen = Button.primary("no_when", "No Whens")
+                .withEmoji(Emoji.fromFormatted(Emojis.noafters));
+        Button noWhenPersistent = Button
+                .primary("no_when_persistent", "No Whens No Matter What (for this agenda)")
+                .withEmoji(Emoji.fromFormatted(Emojis.noafters));
+        List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
+        Player quasher = Helper.getPlayerFromAbility(activeMap, "quash");
+        if(quasher != null && quasher.getStrategicCC()>0){
+             String finChecker = "FFCC_"+quasher.getFaction() + "_";
+            Button quashButton = Button.danger(finChecker+"quash", "Quash Agenda").withEmoji(Emoji.fromFormatted(Emojis.Xxcha));
+            if(activeMap.isFoWMode()){
+                List<Button> quashButtons = new ArrayList<>(List.of(quashButton));
+                MessageHelper.sendMessageToChannelWithButtons(quasher.getPrivateChannel(), "Use Button To Quash If You Want", quashButtons);
+            }else{
+                whenButtons.add(quashButton);
+            }
+        }
+        return whenButtons;
+     }
     public static List<Button> getAfterButtons(Map activeMap) {
         List<Button> afterButtons = new ArrayList<Button>();
         Button playAfter = Button.danger("play_after_Non-AC Rider", "Play A Non-AC Rider");
