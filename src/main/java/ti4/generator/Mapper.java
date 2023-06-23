@@ -187,7 +187,7 @@ public class Mapper {
 
     public static List<String> getFrontierTileIds() {
         return TileHelper.getAllTiles().values().stream()
-                .filter(tileModel -> tileModel.getPlanets().size() == 0)
+                .filter(tileModel -> tileModel.getPlanetIds().size() == 0)
                 .map(TileModel::getId)
                 .toList();
     }
