@@ -2,6 +2,7 @@ package ti4.generator;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.collections4.CollectionUtils;
 import ti4.ResourceHelper;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
@@ -42,7 +43,7 @@ public class TileHelper {
                 .toList());
 
         File[] storedFiles = new File(storagePath).listFiles();
-        if(Optional.ofNullable(storedFiles).isPresent()) {
+        if(Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
                     .filter(file -> !file.isDirectory())
                     .toList());
@@ -66,7 +67,7 @@ public class TileHelper {
                 .filter(file -> !file.isDirectory())
                 .toList());
         File[] storedFiles = new File(storagePath).listFiles();
-        if(Optional.ofNullable(storedFiles).isPresent()) {
+        if(Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
                     .filter(file -> !file.isDirectory())
                     .toList());

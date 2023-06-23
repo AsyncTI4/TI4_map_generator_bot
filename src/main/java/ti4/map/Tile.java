@@ -52,9 +52,6 @@ public class Tile {
     }
 
     private void initPlanetsAndSpace(String tileID) {
-        if(tileID.equals("nombox"))
-            return;
-
         Space space = new Space(Constants.SPACE, Constants.SPACE_CENTER_POSITION);
         unitHolders.put(Constants.SPACE, space);
         java.util.Map<String, Point> tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
