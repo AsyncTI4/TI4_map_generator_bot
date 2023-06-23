@@ -11,6 +11,8 @@ RUN mvn --batch-mode clean compile assembly:single && \
     mvn --batch-mode package && \
     cp $(pwd)/target/TI4_map_generator_discord_bot-1.0-SNAPSHOT-jar-with-dependencies.jar tibot.jar
 COPY ./src/main/resources /opt/resources
+COPY ./src/main/resources/systems /opt/STORAGE/systems
+COPY ./src/main/resources/planets /opt/STORAGE/planets
 ENV DB_PATH=/opt/STORAGE
 ENV RESOURCE_PATH=/opt/resources
 ARG DISCORD_BOT_KEY

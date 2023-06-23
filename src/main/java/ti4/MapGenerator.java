@@ -90,6 +90,9 @@ public class MapGenerator {
         }
 
         userID = args[1];
+        guildPrimary = jda.getGuildById(args[2]);
+        MessageHelper.sendMessageToBotLogWebhook("BOT IS STARTING UP");
+
         TileHelper.init();
         PositionMapper.init();
         Mapper.init();
@@ -171,7 +174,6 @@ public class MapGenerator {
         commandManager.addCommand(new GenericButtonCommand());
         commandManager.addCommand(new DiscordantStarsCommand());
 
-        guildPrimary = jda.getGuildById(args[2]);
 
         CommandListUpdateAction commands = guildPrimary.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
