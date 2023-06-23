@@ -207,7 +207,10 @@ public class ButtonListener extends ListenerAdapter {
                     ACInfo.sendActionCardInfo(activeMap, player);
                     String message = "Use buttons to end turn or do another action.";
                     List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeMap, true);
-                    MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
+                    if(player.hasAbility("stall_tactics")){
+                        MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
+                    }
+                    
                     event.getMessage().delete().queue();
                 } catch (Exception e) {
                 }
@@ -597,6 +600,7 @@ public class ButtonListener extends ListenerAdapter {
             } else {
 
                 String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-technology";
+                
                 List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
                 if (!activeMap.getComponentAction()) {
                     for (ThreadChannel threadChannel_ : threadChannels) {
@@ -1357,7 +1361,7 @@ public class ButtonListener extends ListenerAdapter {
                     } else {
                         DoneExhausting = Button.danger("deleteButtons", "Done Exhausting Planets");
                     }
-
+                    ButtonHelper.updateMap(activeMap, event);
                     buttons.add(DoneExhausting);
                     MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
 
@@ -2509,6 +2513,7 @@ public class ButtonListener extends ListenerAdapter {
                         activeMap.drawActionCard(player.getUserID());
                     }
                     ACInfo.sendActionCardInfo(activeMap, player, event);
+                     ButtonHelper.checkACLimit(activeMap, event, player);
                     addReaction(event, false, false, message, "");
                 }
                 case "sc_draw_so" -> {
@@ -2783,6 +2788,7 @@ public class ButtonListener extends ListenerAdapter {
                     for (int i = 0; i < count2; i++) {
                         activeMap.drawActionCard(player.getUserID());  
                     }
+                     ButtonHelper.checkACLimit(activeMap, event, player);
                     if(player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")){
                             ButtonHelper.commanderUnlockCheck(player, activeMap, "yssaril", event);
                         }
@@ -3008,6 +3014,7 @@ public class ButtonListener extends ListenerAdapter {
                         ButtonHelper.commanderUnlockCheck(player, activeMap, "yssaril", event);
                     }
                     addReaction(event, true, false, "Drew 1 AC", "");
+                     ButtonHelper.checkACLimit(activeMap, event, player);
                 }
                 case "draw_1_ACDelete" -> {
                     activeMap.drawActionCard(player.getUserID());
@@ -3017,6 +3024,7 @@ public class ButtonListener extends ListenerAdapter {
                     ACInfo.sendActionCardInfo(activeMap, player, event);
                     addReaction(event, true, false, "Drew 1 AC", "");
                     event.getMessage().delete().queue();
+                    ButtonHelper.checkACLimit(activeMap, event, player);
                 }
                 case "draw_2_AC" -> {
                     activeMap.drawActionCard(player.getUserID());
@@ -3026,6 +3034,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     ACInfo.sendActionCardInfo(activeMap, player, event);
                     addReaction(event, true, false, "Drew 2 AC", "");
+                     ButtonHelper.checkACLimit(activeMap, event, player);
                 }
                 case "pass_on_abilities" -> {
                     addReaction(event, false, false, " Is " + event.getButton().getLabel(), "");
@@ -3065,45 +3074,12 @@ public class ButtonListener extends ListenerAdapter {
                 case "doneWithTacticalAction" -> {
                     ButtonHelper.exploreDET(player, activeMap, event);
 
-                    String threadName = activeMap.getName() + "-bot-map-updates";
-                    List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+                   
                     String message = "Use buttons to end turn or do another action.";
                     List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeMap, true);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
-                    boolean foundsomething = false;
-                    File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.all, event);
-                    if (!activeMap.isFoWMode()) {
-                        for (ThreadChannel threadChannel_ : threadChannels) {
-                            if (threadChannel_.getName().equals(threadName)) {
-                                foundsomething = true;
-                                if(activeMap.isFoWMode()){
-                                    MessageHelper.sendFileToChannel((MessageChannel) threadChannel_, file);
-                                }else{
-                                    List<Button> buttonsWeb = new ArrayList<Button>();
-                                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
-                                    buttonsWeb.add(linkToWebsite);
-                                    MessageHelper.sendFileToChannelWithButtonsAfter((MessageChannel) threadChannel_, file, "",buttonsWeb);
-                                }
-
-
-
-                            }
-                        }
-                    } else {
-                        MessageHelper.sendFileToChannel(event.getChannel(), file);
-                        foundsomething = true;
-                    }
-                    if (!foundsomething) {
-                        if(activeMap.isFoWMode()){
-                            MessageHelper.sendFileToChannel(event.getChannel(), file);
-                        }else{
-                            List<Button> buttonsWeb = new ArrayList<Button>();
-                            Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
-                            buttonsWeb.add(linkToWebsite);
-                            MessageHelper.sendFileToChannelWithButtonsAfter(event.getChannel(), file, "",buttonsWeb);
-                        }
-                    }
+                    ButtonHelper.updateMap(activeMap, event);
 
                 }
                 case "doAnotherAction" -> {
@@ -3157,38 +3133,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
-                    String threadName = activeMap.getName() + "-bot-map-updates";
-                    boolean foundsomething = false;
-                    List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
-                    File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.all, event);
-                    if (!activeMap.isFoWMode()) {
-                        for (ThreadChannel threadChannel_ : threadChannels) {
-                            if (threadChannel_.getName().equals(threadName)) {
-                                if(activeMap.isFoWMode()){
-                                    MessageHelper.sendFileToChannel(event.getChannel(), file);
-                                }else{
-                                    List<Button> buttonsWeb = new ArrayList<Button>();
-                                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
-                                    buttonsWeb.add(linkToWebsite);
-                                    MessageHelper.sendFileToChannelWithButtonsAfter((MessageChannel) threadChannel_, file, "",buttonsWeb);
-                                }
-                                foundsomething = true;
-                            }
-                        }
-                    } else {
-                        MessageHelper.sendFileToChannel(event.getChannel(), file);
-                        foundsomething = true;
-                    }
-                    if (!foundsomething) {
-                        if(activeMap.isFoWMode()){
-                                    MessageHelper.sendFileToChannel(event.getChannel(), file);
-                                }else{
-                                    List<Button> buttonsWeb = new ArrayList<Button>();
-                                    Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
-                                    buttonsWeb.add(linkToWebsite);
-                                    MessageHelper.sendFileToChannelWithButtonsAfter(event.getChannel(), file, "",buttonsWeb);
-                                }
-                    }
+                    ButtonHelper.updateMap(activeMap, event);
 
                 }
                 case "doneLanding" -> {
@@ -3558,6 +3503,7 @@ public class ButtonListener extends ListenerAdapter {
 
         if (!skipReaction) {
             if (event.getMessageChannel() instanceof ThreadChannel) {
+                
                 activeMap.getActionsChannel().addReactionById(event.getChannel().getId(), emojiToUse).queue();
             }
 

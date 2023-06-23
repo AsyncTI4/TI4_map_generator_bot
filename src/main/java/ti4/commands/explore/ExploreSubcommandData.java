@@ -190,11 +190,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 for (int i = 0; i < count; i++) {
                     activeMap.drawActionCard(player.getUserID());
                 }
+                
                 if (activeMap.isFoWMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew 2 AC");
                 }
                 ACInfo.sendActionCardInfo(activeMap, player, event);
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + message);
+                 ButtonHelper.checkACLimit(activeMap, event, player);
             }
             case "dv1", "dv2" -> {
                 message = "Drew Secret Objective";
