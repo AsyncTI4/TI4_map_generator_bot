@@ -94,11 +94,15 @@ public class MapGenerator {
         
         MessageHelper.sendMessageToBotLogWebhook("BOT IS STARTING UP");
 
-        TileHelper.init();
-        PositionMapper.init();
-        Mapper.init();
-        AliasHandler.init();
-        Storage.init();
+        try {
+            TileHelper.init();
+            PositionMapper.init();
+            Mapper.init();
+            AliasHandler.init();
+            Storage.init();   
+        } catch (Exception e) {
+            BotLogger.log("Error Initiating Objects", e);
+        }
 
         //ROLES - FOR COMMAND PERMISSIONS
         //ADMIN ROLES
