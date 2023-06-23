@@ -6,7 +6,6 @@ import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ti4.ResourceHelper;
@@ -34,15 +33,11 @@ public class Mapper {
     private static final Properties faction_abilities = new Properties();
     private static final Properties factions = new Properties();
     private static final Properties general = new Properties();
-    private static final Properties techs = new Properties();
     private static final Properties explore = new Properties();
     private static final Properties relics = new Properties();
-    private static final HashMap<String, String> techList = new HashMap<>();
-    private static final HashMap<String, String[]> techListInfo = new HashMap<>();
     private static final Properties planets = new Properties();
     private static final Properties faction_representation = new Properties();
     private static final Properties leader_representation = new Properties();
-    private static final Properties tech_representation = new Properties();
     private static final Properties unit_representation = new Properties();
     private static final Properties attachmentInfo = new Properties();
     private static final Properties miltyDraft = new Properties();
@@ -78,11 +73,6 @@ public class Mapper {
         readData("exploration.properties", explore, "Could not read explore file");
         readData("relics.properties", relics, "Could not read relic file");
         importJsonObjects("technology.json", technologies, TechnologyModel.class, "Could not read technology file");
-        
-        //TODO: delete me
-        readData("tech.properties", techs, "Could not read tech file");
-        readData("tech_representation.properties", tech_representation, "Could not read tech representation file");
-        
         readData("planets.properties", planets, "Could not read planets file");
         readData("attachments_info.properties", attachmentInfo, "Could not read attachment info file");
         readData("faction_representation.properties", faction_representation, "Could not read faction representation file");
@@ -488,14 +478,6 @@ public class Mapper {
                 .collect(Collectors.toMap(TileModel::getId, TileModel::getNameNullSafe));
     }
 
-    public static HashMap<String, String> getTechRepresentations() {
-        HashMap<String, String> techs = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : tech_representation.entrySet()) {
-            techs.put((String) entry.getKey(), (String) entry.getValue());
-        }
-        return techs;
-    }
-
     public static HashMap<String, String> getMiltyDraftTiles() {
         HashMap<String, String> tiles = new HashMap<>();
         for (Map.Entry<Object, Object> entry : miltyDraft.entrySet()) {
@@ -540,7 +522,6 @@ public class Mapper {
     public static String getCCPath(String ccID) {
         String ccPath = ResourceHelper.getInstance().getCCFile(ccID);
         if (ccPath == null) {
-//            LoggerHandler.log("Could not find command counter: " + ccID);
             return null;
         }
         return ccPath;
@@ -581,35 +562,15 @@ public class Mapper {
     }
 
     public static String getTechType(String id) {
-        String property = techs.getProperty(id);
-        return property.split(",")[1];
+        return technologies.get(id).getType();
     }
 
-    public static HashMap<String, String> getTechs() {
-        if (techList.isEmpty()) {
-            for (Map.Entry<Object, Object> entry : techs.entrySet()) {
-                String value = (String) entry.getValue();
-                value = value.split(",")[0];
-                techList.put((String) entry.getKey(), value);
-            }
-        }
-        return techList;
-    }
-
-    public static HashMap<String, String[]> getTechsInfo() {
-        if (techListInfo.isEmpty()) {
-            for (Map.Entry<Object, Object> entry : techs.entrySet()) {
-                String value = (String) entry.getValue();
-                String[] split = value.split(",");
-                techListInfo.put((String) entry.getKey(), split);
-            }
-        }
-        return techListInfo;
+    public static HashMap<String, TechnologyModel> getTechs() {
+        return technologies;
     }
 
     public static boolean isValidTech(String id) {
-        HashMap<String, String> techs = getTechs();
-        return techs.get(id) != null;
+        return technologies.get(id) != null;
     }
 
     public static boolean isValidPlanet(String id) {

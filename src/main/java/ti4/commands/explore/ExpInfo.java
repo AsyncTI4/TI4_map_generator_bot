@@ -66,7 +66,7 @@ public class ExpInfo extends ExploreSubcommandData {
                 sendMessage(info.toString());
             }
         }
-        if (player != null && !player.getSCs().isEmpty() && !over && activeMap.isFoWMode()) {
+        if (player != null && activeMap.getCurrentPhase().equalsIgnoreCase("action") && !over && activeMap.isFoWMode()) {
                 sendMessage("It is foggy outside, please wait until status/agenda to do this command, or override the fog.");
             }
     }

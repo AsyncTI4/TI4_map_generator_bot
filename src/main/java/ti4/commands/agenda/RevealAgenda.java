@@ -17,6 +17,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -44,7 +45,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(id);
 
-        
+        activeMap.setCurrentPhase("agendawaiting");
         AgendaModel agendaDetails = Mapper.getAgenda(id);
         String agendaTarget = agendaDetails.getTarget();
         String agendaType = agendaDetails.getType();
@@ -101,11 +102,10 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getAgendaRepresentation(id, uniqueID));
         String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you abstain from playing whens/afters by pressing the buttons below. If you have an action card with those windows, you can simply play it.";
 
-        Button playWhen = Button.danger("play_when", "Play A Non-AC When");
-        Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-        Button noWhenPersistent = Button.primary("no_when_persistent", "No Whens No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-
-        List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
+        
+        Date newTime = new Date();
+        activeMap.setLastActivePlayerPing(newTime);
+        List<Button> whenButtons = AgendaHelper.getWhenButtons(activeMap);
         List<Button> afterButtons = AgendaHelper.getAfterButtons(activeMap);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);

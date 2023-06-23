@@ -26,6 +26,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.commands.fow.Whisper;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -169,32 +170,83 @@ public class MessageListener extends ListenerAdapter {
 
     private void autoPingGames() {
         Map mapreference = MapManager.getInstance().getMap("finreference");
-        if (mapreference != null && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 1000*10*60) //10 minutes
+        int multiplier = 1000; //should be 1000
+        if (mapreference != null && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 10*60*multiplier) //10 minutes
         {
             mapreference.setLastTimeGamesChecked(new Date());
             MapSaveLoadManager.saveMap(mapreference);
             HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
+            
             for (Map activeMap : mapList.values()) {
                 if (activeMap.getAutoPingStatus() && activeMap.getAutoPingSpacer() != 0) {
                     String playerID = activeMap.getActivePlayer();
+                    
                     if (playerID != null) {
                         Player player = activeMap.getPlayer(playerID);
                         if (player != null) {
                             long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
-                            if (milliSinceLastPing > (1000 *60*60* activeMap.getAutoPingSpacer())) {
+                            if (milliSinceLastPing > (60*60*multiplier* activeMap.getAutoPingSpacer())) {
                                 String realIdentity = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
-                                String ping = realIdentity + " this is a gentle reminder that it is your turn.";
-                                if (activeMap.isFoWMode()) {
-                                    MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);
-                                } else {
-                                    MessageChannel gameChannel = activeMap.getMainGameChannel();
-                                    if (gameChannel != null) {
-                                        MessageHelper.sendMessageToChannel(gameChannel, ping);
+                                String ping = realIdentity + " this is a gentle reminder that the game is waiting on you.";
+                                if(activeMap.getCurrentPhase().equalsIgnoreCase("agendawaiting")){
+                                    AgendaHelper.pingMissingPlayers(activeMap);
+                                }else{
+                                     long milliSinceLastTurnChange = new Date().getTime() - activeMap.getLastActivePlayerChange().getTime();
+                                     int pingNumber = ((int)milliSinceLastTurnChange) / (60*60*multiplier* (int)activeMap.getAutoPingSpacer());
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*2) ){
+                                        ping = realIdentity + " this is a courtesy notice that the game AWAITS.";
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*3) ){
+                                        ping = realIdentity + " this is a brusk missive stating that while you may sleep, the game never does.";
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*4) ){
+                                        ping = realIdentity + " this is a sternly worded letter regarding your noted absense.";
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*5) ){
+                                        ping = realIdentity + " this is a firm request that you do something to end this situation.";
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*6) ){
+                                        ping = realIdentity + " Half dozen times the charm they say. Surely the game will move now ";
+                                    }
+                                    if(pingNumber == 7){
+                                         ping = realIdentity + " I can write whatever I want here, not like anyone reads these anyways.";
+                                    }
+                                    if(pingNumber == 8){
+                                         ping = realIdentity + " What rhymes with send burn, do you know? I don't";
+                                    }
+                                    if(pingNumber > 8){
+                                         ping = realIdentity + " There's a rumor going around that some game is looking for a replacement player. Not that I'd know anything about that. ";
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*10) && milliSinceLastTurnChange < (60*60*multiplier* activeMap.getAutoPingSpacer()*11) && !activeMap.isFoWMode()){
+                                        ping = realIdentity + " this is your final reminder. I hope you are doing well, wherever you are, and I'm sure whatever you are doing is far more important than TI. Or your name is Frox";
+                                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), Helper.getGamePing(activeMap.getGuild(), activeMap)+ " the game has stalled on a player, and autoping will now stop pinging them. ");
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*11) && !activeMap.isFoWMode()){
+                                        continue;
+                                    }
+                                    if (activeMap.isFoWMode()) {
+                                        MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);
+                                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(),  "Active player has been pinged. This is ping #"+pingNumber);
+                                    } else {
+                                        MessageChannel gameChannel = activeMap.getMainGameChannel();
+                                        if (gameChannel != null) {
+                                            MessageHelper.sendMessageToChannel(gameChannel, ping);
+                                        }
                                     }
                                 }
+                                
                                 activeMap.setLastActivePlayerPing(new Date());
                                 MapSaveLoadManager.saveMap(activeMap);
                             }
+                        }
+                    }else{
+                        long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
+                        if (milliSinceLastPing > (60*60*multiplier* activeMap.getAutoPingSpacer())) {
+                            if(activeMap.getCurrentPhase().equalsIgnoreCase("agendawaiting")){
+                                AgendaHelper.pingMissingPlayers(activeMap);
+                            }
+                            activeMap.setLastActivePlayerPing(new Date());
+                            MapSaveLoadManager.saveMap(activeMap);
                         }
                     }
                 }

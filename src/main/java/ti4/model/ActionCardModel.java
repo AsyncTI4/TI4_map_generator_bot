@@ -28,27 +28,27 @@ public class ActionCardModel implements ModelInterface {
     }
 
     public String getName() {
-        return source;
+        return name;
     }
 
     public String getPhase() {
-        return flavorText;
-    }
-
-    public String getWindow() {
-        return text;
-    }
-
-    public String getText() {
-        return window;
-    }
-
-    public String getFlavorText() {
         return phase;
     }
 
+    public String getWindow() {
+        return window;
+    }
+
+    public String getText() {
+        return text;
+    }
+
+    public String getFlavorText() {
+        return flavorText;
+    }
+
     public String getSource() {
-        return name;
+        return source;
     }
 
     public String getRepresentation() {

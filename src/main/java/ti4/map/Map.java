@@ -25,6 +25,7 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -153,7 +154,7 @@ public class Map {
     private LinkedHashMap<String, Integer> purgedActionCards = new LinkedHashMap<>();
     private HashMap<String, Integer> displacedUnitsFrom1System = new HashMap<String, Integer>();
     private HashMap<String, Integer> displacedUnitsFromEntireTacticalAction = new HashMap<String, Integer>();
-
+    private String phaseOfGame = "";
     private String currentAgendaInfo = null;
     private boolean hasHackElectionBeenPlayed = false;
     private List<String> agendas;
@@ -221,6 +222,50 @@ public class Map {
         return m;
     }
 
+    public void fixScrewedSOs(){
+        MessageHelper.sendMessageToChannel(getActionsChannel(), "The number of SOs in the deck before this operation is "+getNumberOfSOsInTheDeck() +". The number in players hands is "+getNumberOfSOsInPlayersHands());
+
+        List<String> defaultSecrets = Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList();
+        List<String> currentSecrets = new ArrayList<String>();
+        currentSecrets.addAll(secretObjectives);
+        for(Player player : getPlayers().values()){
+            if(player == null){
+                continue;
+            }
+           if(player.getSecrets() != null){
+                currentSecrets.addAll(player.getSecrets().keySet());
+           }
+           if(player.getSecretsScored() != null){
+                currentSecrets.addAll(player.getSecretsScored().keySet());
+           }
+        }
+
+        for(String defaultSO : defaultSecrets){
+            if(!currentSecrets.contains(defaultSO)){
+                
+                secretObjectives.add(defaultSO);
+            }
+        }
+        MessageHelper.sendMessageToChannel(getActionsChannel(), "Fixed the SOs, the total amount of SOs in deck is "+getNumberOfSOsInTheDeck()+". The number in players hands is "+getNumberOfSOsInPlayersHands());
+    }
+    public int getNumberOfSOsInTheDeck(){
+        return secretObjectives.size();
+    }
+    public int getNumberOfSOsInPlayersHands(){
+        int soNum = 0;
+        for(Player player : getPlayers().values()){
+            if(player == null){
+                continue;
+            }
+           
+            soNum = soNum + player.getSo();
+            soNum = soNum + player.getSoScored();
+        
+          
+        }
+        return soNum;
+    }
+
     public HashMap<String, Object> getExportableFieldMap() {
         Class<? extends Map> aClass = this.getClass();
         Field[] fields = aClass.getDeclaredFields();
@@ -242,6 +287,13 @@ public class Map {
 
     public String getLatestCommand() {
         return latestCommand;
+    }
+
+    public String getCurrentPhase() {
+        return phaseOfGame;
+    }
+    public void setCurrentPhase(String phase) {
+        phaseOfGame = phase;
     }
 
     public void setLatestCommand(String latestCommand) {

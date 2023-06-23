@@ -133,8 +133,9 @@ public class Turn extends PlayerSubcommandData {
 
         MessageChannel gameChannel = activeMap.getMainGameChannel() == null ? event.getMessageChannel() : activeMap.getMainGameChannel();
         if (scPassed.isEmpty() || scPassed.values().stream().allMatch(value -> value) || activeMap.getPlayers().values().stream().allMatch(Player::isPassed)) {
-            activeMap.updateActivePlayer(null);
+            
             showPublicObjectivesWhenAllPassed(event, activeMap, gameChannel);
+            activeMap.updateActivePlayer(null);
             return "";
         }
 
@@ -230,43 +231,8 @@ public class Turn extends PlayerSubcommandData {
         return sendReminder ? sb.toString() : null;
     }
 
-    private void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Map activeMap, MessageChannel gameChannel) {
-        String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeMap);
-
+     public List<Button> getScoreObjectiveButtons(GenericInteractionCreateEvent event, Map activeMap) {
         LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
-        Player arborec = Helper.getPlayerFromAbility(activeMap, "mitosis");
-        if (arborec != null) {
-            String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeMap, event.getGuild(), true) + " reminder to do mitosis!";
-            MessageHelper.sendMessageToChannel((MessageChannel) arborec.getCardsInfoThread(activeMap), mitosisMessage);
-            
-        }
-        Player solPlayer =  Helper.getPlayerFromColorOrFaction(activeMap, "sol");
-
-        if (solPlayer != null) {
-            String colorID = Mapper.getColorID(solPlayer.getColor());
-            String fsKey = colorID + "_fs.png";
-            String infKey = colorID + "_gf.png";
-            for (Tile tile : activeMap.getTileMap().values()) {
-                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-                    if (unitHolder.getUnits() != null) {
-                        if (unitHolder.getUnits().get(fsKey) != null && unitHolder.getUnits().get(fsKey) > 0) {
-                            unitHolder.addUnit(infKey, 1);
-                            String genesisMessage = Helper.getPlayerRepresentation(solPlayer, activeMap, event.getGuild(), true) + " an infantry was added to the space area of your flagship automatically.";
-                            if (activeMap.isFoWMode()) {
-                                MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
-                            } else {
-                                MessageHelper.sendMessageToChannel(gameChannel, genesisMessage);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        
-
-        
-
         HashMap<String, String> publicObjectivesState1 = Mapper.getPublicObjectivesStage1();
         HashMap<String, String> publicObjectivesState2 = Mapper.getPublicObjectivesStage2();
         LinkedHashMap<String, Integer> customPublicVP = activeMap.getCustomPublicVP();
@@ -311,12 +277,20 @@ public class Turn extends PlayerSubcommandData {
                 }
             }
         }
-
-        Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "No PO Scored");
-        Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");
+       
         poButtons.addAll(poButtons1);
         poButtons.addAll(poButtons2);
         poButtons.addAll(poButtonsCustom);
+        poButtons.removeIf(Objects::isNull);
+        return poButtons;
+     }
+
+    private void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Map activeMap, MessageChannel gameChannel) {
+        String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeMap);
+        activeMap.setCurrentPhase("status");
+        List<Button> poButtons = getScoreObjectiveButtons(event, activeMap);
+        Button noPOScoring = Button.danger(Constants.PO_NO_SCORING, "No PO Scored");
+        Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");
         poButtons.add(noPOScoring);
         poButtons.add(noSOScoring);
         poButtons.removeIf(Objects::isNull);
@@ -330,5 +304,36 @@ public class Turn extends PlayerSubcommandData {
                 .addComponents(actionRows).build();
 
         gameChannel.sendMessage(messageObject).queue();
+
+
+
+        Player arborec = Helper.getPlayerFromAbility(activeMap, "mitosis");
+        if (arborec != null) {
+            String mitosisMessage = Helper.getPlayerRepresentation(arborec, activeMap, event.getGuild(), true) + " reminder to do mitosis!";
+            MessageHelper.sendMessageToChannel((MessageChannel) arborec.getCardsInfoThread(activeMap), mitosisMessage);
+            
+        }
+        Player solPlayer =  Helper.getPlayerFromColorOrFaction(activeMap, "sol");
+
+        if (solPlayer != null) {
+            String colorID = Mapper.getColorID(solPlayer.getColor());
+            String fsKey = colorID + "_fs.png";
+            String infKey = colorID + "_gf.png";
+            for (Tile tile : activeMap.getTileMap().values()) {
+                for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+                    if (unitHolder.getUnits() != null) {
+                        if (unitHolder.getUnits().get(fsKey) != null && unitHolder.getUnits().get(fsKey) > 0) {
+                            unitHolder.addUnit(infKey, 1);
+                            String genesisMessage = Helper.getPlayerRepresentation(solPlayer, activeMap, event.getGuild(), true) + " an infantry was added to the space area of your flagship automatically.";
+                            if (activeMap.isFoWMode()) {
+                                MessageHelper.sendMessageToChannel(solPlayer.getPrivateChannel(), genesisMessage);
+                            } else {
+                                MessageHelper.sendMessageToChannel(gameChannel, genesisMessage);
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 }

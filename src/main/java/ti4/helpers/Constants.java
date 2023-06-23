@@ -5,6 +5,10 @@ import java.util.ArrayList;
 
 public class Constants {
     public static final String SHOW_GAME = "show_game";
+    public static final String FIX_SO_DECK = "fix_so_deck";
+    public static final String SET_THREAD_NAME = "set_thread_name";
+    public static final String THREAD_NAME = "thread_name";
+    public static final String SHOW_UNSCORED_SOS = "show_unscored_sos";
     public static final String SHOW_GAME_INFO = "show_game_info";
     public static final String GAME_NAME = "game_name";
     public static final String GAME_CUSTOM_NAME = "game_custom_name";
@@ -688,6 +692,7 @@ public class Constants {
     public static final String LATEST_WHEN_MSG = "latest_when_msg";
     public static final String LATEST_TRANSACTION_MSG = "latest_transaction_msg";
     public static final String LATEST_UPNEXT_MSG = "latest_upnext_msg";
+    public static final String PHASE_OF_GAME = "phase_of_game";
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_AFTER = "players_who_hit_persistent_no_after";
     public static final String PLAYERS_WHO_HIT_PERSISTENT_NO_WHEN = "players_who_hit_persistent_no_when";
     public static final String HACK_ELECTION_STATUS = "hack_election_status";
