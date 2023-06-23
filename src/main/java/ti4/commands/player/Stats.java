@@ -299,6 +299,9 @@ public class Stats extends PlayerSubcommandData {
 				}
 
 				player.setTg(tg);
+				if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
+					ButtonHelper.commanderUnlockCheck(player, activeMap, "hacan", event);
+				}
 				ButtonHelper.pillageCheck(player, activeMap);
 			}
 			return true;

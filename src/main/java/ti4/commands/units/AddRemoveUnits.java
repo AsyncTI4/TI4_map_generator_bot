@@ -179,7 +179,7 @@ abstract public class AddRemoveUnits implements Command {
             }
             if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-                FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
+                FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has modified units in the system. Refresh map to see what changed");
                 if (count <10) {
                     activeMap.setPingSystemCounter(count);
                     activeMap.setTileAsPinged(count, tile.getPosition());
@@ -256,7 +256,7 @@ abstract public class AddRemoveUnits implements Command {
             }
             if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-                FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
+                FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has modified units in the system. Refresh map to see what changed");
                 if (count <10) {
                     activeMap.setPingSystemCounter(count);
                     activeMap.setTileAsPinged(count, tile.getPosition());
@@ -334,7 +334,7 @@ abstract public class AddRemoveUnits implements Command {
             }
             if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-                FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
+                FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has modified units in the system. Refresh map to see what changed");
                 if (count <10) {
                     activeMap.setPingSystemCounter(count);
                     activeMap.setTileAsPinged(count, tile.getPosition());
@@ -412,7 +412,7 @@ abstract public class AddRemoveUnits implements Command {
             }
             if (!pingedAlready) {
                 String colorMention = Helper.getColourAsMention(event.getGuild(), color);
-                FoWHelper.pingSystem(activeMap, (GenericInteractionCreateEvent) event, tile.getPosition(), colorMention + " has modified units in the system. Specific units modified are: "+unitList);
+                FoWHelper.pingSystem(activeMap, (GenericInteractionCreateEvent) event, tile.getPosition(), colorMention + " has modified units in the system. Refresh map to see what changed");
                 activeMap.setPingSystemCounter(count);
                 activeMap.setTileAsPinged(count, tile.getPosition());
             }

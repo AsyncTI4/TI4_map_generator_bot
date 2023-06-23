@@ -38,9 +38,85 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
+import ti4.model.TechnologyModel;
 
 
 public class ButtonHelper {
+
+    public static void checkACLimit(Map activeMap, GenericInteractionCreateEvent event, Player player) {
+        if(player.hasAbility("crafty")){
+            return;
+        }
+        int limit = 7;
+        if(activeMap.getLaws().containsKey("sanctions")){
+            limit = 3;
+        }
+        if(player.getAc() > limit){
+            MessageChannel channel = activeMap.getMainGameChannel();
+            if(activeMap.isFoWMode()){
+                channel = player.getPrivateChannel();
+            }
+            String ident = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
+            MessageHelper.sendMessageToChannel(channel, ident+ " you are exceeding the AC hand limit of "+limit+". Please discard down to the limit");
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeMap), ident+" use buttons to discard", ACInfo.getDiscardActionCardButtons(activeMap, player));
+        }
+    }
+    public static void updateMap(Map activeMap, GenericInteractionCreateEvent event) {
+        String threadName = activeMap.getName() + "-bot-map-updates";
+        List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+        boolean foundsomething = false;
+        File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.all, event);
+        if (!activeMap.isFoWMode()) {
+            for (ThreadChannel threadChannel_ : threadChannels) {
+                if (threadChannel_.getName().equals(threadName)) {
+                    foundsomething = true;
+                    if(activeMap.isFoWMode()){
+                        MessageHelper.sendFileToChannel((MessageChannel) threadChannel_, file);
+                    }else{
+                        List<Button> buttonsWeb = new ArrayList<Button>();
+                        Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
+                        buttonsWeb.add(linkToWebsite);
+                        MessageHelper.sendFileToChannelWithButtonsAfter((MessageChannel) threadChannel_, file, "",buttonsWeb);
+                    }
+                }
+            }
+        } else {
+            MessageHelper.sendFileToChannel(event.getMessageChannel(), file);
+            foundsomething = true;
+        }
+        if (!foundsomething) {
+            if(activeMap.isFoWMode()){
+                MessageHelper.sendFileToChannel(event.getMessageChannel(), file);
+            }else{
+                List<Button> buttonsWeb = new ArrayList<Button>();
+                Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
+                buttonsWeb.add(linkToWebsite);
+                MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), file, "",buttonsWeb);
+            }
+        }
+
+    }
+
+     public static boolean NomadHeroCheck(Player player, Map activeMap, Tile tile) {
+        boolean isFSThere = false;
+
+        if(player.hasLeader("nomadhero")){
+            Leader playerLeader = player.getLeader("nomadhero");
+            if(playerLeader.isActive()){
+                String colorID = Mapper.getColorID(player.getColor());
+                String fsKey = colorID + "_fs.png";
+                if(tile.getUnitHolders().get("space").getUnits().containsKey(fsKey)){
+                    return true;
+                }
+            }
+        }
+
+        return isFSThere;
+
+
+        
+
+     }
 
     public static void commanderUnlockCheck(Player player, Map activeMap, String faction, GenericInteractionCreateEvent event) {
 
@@ -102,7 +178,7 @@ public class ButtonHelper {
                 }
             }
             case "nekro" -> {
-                if(player.getTechs().size()> 2){
+                if(player.getTechs().size()> 4){
                     shouldBeUnlocked = true;
                 }
             }
@@ -348,6 +424,13 @@ public class ButtonHelper {
         {
             endButtons.add(Button.success(finChecker+"planetAbilityExhaust_"+planet, "Use Primor Ability"));
         }
+        if(player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet))
+        {
+            endButtons.add(Button.success(finChecker+"planetAbilityExhaust_"+planet, "Use Primor Ability"));
+        }
+        if(player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")){
+            endButtons.add(Button.danger(finChecker+"exhaustTech_pi", "Exhaust Predictive Intelligence"));
+        }
         return endButtons;
     }
     public static List<Button> getStartOfTurnButtons(Player player, Map activeMap, boolean doneActionThisTurn) {
@@ -552,7 +635,7 @@ public class ButtonHelper {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(activeMap.getTileMap()).entrySet()) {
-			if (FoWHelper.playerHasUnitsInSystem(player, tileEntry.getValue()) && !AddCC.hasCC(event, player.getColor(), tileEntry.getValue())) {
+			if (FoWHelper.playerHasUnitsInSystem(player, tileEntry.getValue()) && (!AddCC.hasCC(event, player.getColor(), tileEntry.getValue())) || ButtonHelper.NomadHeroCheck(player, activeMap, tileEntry.getValue())) {
                 Tile tile = tileEntry.getValue();
                 Button validTile = Button.success(finChecker+"tacticalMoveFrom_"+tileEntry.getKey(), tile.getRepresentationForButtons(activeMap, player));
                 buttons.add(validTile);
@@ -649,6 +732,12 @@ public class ButtonHelper {
         }
         Button concludeMove = Button.primary(finChecker+"doneLanding", "Done landing troops");
         buttons.add(concludeMove);
+        if(player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "naaz", event);
+        }
+        if(player.getLeaderIDs().contains("empyreancommander") && !player.hasLeaderUnlocked("empyreancommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "empyrean", event);
+        }
         return buttons;
     }
     public static String putInfWithMechsForStarforge(String pos, String successMessage, Map activeMap, Player player, ButtonInteractionEvent event) {
@@ -1135,12 +1224,18 @@ public class ButtonHelper {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 p1.setTg(p1.getTg()-tgAmount);
                 p2.setTg(p2.getTg()+tgAmount);
+                if(p2.getLeaderIDs().contains("hacancommander") && !p2.hasLeaderUnlocked("hacancommander")){
+					ButtonHelper.commanderUnlockCheck(p2, activeMap, "hacan", event);
+				}
                 message2 = ident + " sent " + tgAmount+ " TGs to "+ident2;
             }
             case "Comms" -> {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 p1.setCommodities(p1.getCommodities()-tgAmount);
                 p2.setTg(p2.getTg()+tgAmount);
+                if(p2.getLeaderIDs().contains("hacancommander") && !p2.hasLeaderUnlocked("hacancommander")){
+					ButtonHelper.commanderUnlockCheck(p2, activeMap, "hacan", event);
+				}
                 message2 = ident + " sent " + tgAmount+ " Commodities to "+ident2;
             }
             case "ACs" -> {
@@ -1246,20 +1341,13 @@ public class ButtonHelper {
             if(!p1.getExhaustedTechs().isEmpty() && p1.getExhaustedTechs().contains(tech)){
                 continue;
             }
-            String techRep = Mapper.getTechRepresentations().get(tech);
-
-            //Columns: key = Proper Name | type | prerequisites | faction | text
-            StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
-            String techName = techRepTokenizer.nextToken();
-            String techType = techRepTokenizer.nextToken();
-            String techPrerequisites = techRepTokenizer.nextToken();
-            String techFaction = techRepTokenizer.nextToken();
-            String factionEmoji = "";
-            if (!techFaction.equals(" ")) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
+            TechnologyModel techRep = Mapper.getTechs().get(tech);
+            String techName = techRep.getName(); 
+            String techType = techRep.getType();
             String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
-            String techText = techRepTokenizer.nextToken();
-            if(techText.contains("ACTION"))
-            {
+            String techText = techRep.getText();
+
+            if(techText.contains("ACTION")) {
                 Button tButton = Button.danger(finChecker+prefix+"tech_"+tech, "Exhaust "+techName).withEmoji(Emoji.fromFormatted(techEmoji));
                 compButtons.add(tButton);
             }
@@ -1750,7 +1838,6 @@ public class ButtonHelper {
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         }
         File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.all, event);
-        event.getMessage().delete().queue();
     }
 
     public static void resolveMuaatCommanderCheck(Player player, Map activeMap, GenericInteractionCreateEvent event) {

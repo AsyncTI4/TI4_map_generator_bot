@@ -191,11 +191,13 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 for (int i = 0; i < count; i++) {
                     activeMap.drawActionCard(player.getUserID());
                 }
+                
                 if (activeMap.isFoWMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew 2 AC");
                 }
                 ACInfo.sendActionCardInfo(activeMap, player, event);
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + message);
+                 ButtonHelper.checkACLimit(activeMap, event, player);
             }
             case "dv1", "dv2" -> {
                 message = "Drew Secret Objective";
@@ -290,6 +292,9 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     }
                     default -> message = "";
                 }
+                if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
+                            ButtonHelper.commanderUnlockCheck(player, activeMap, "hacan", event);
+                        }
                 Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
                 Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
                 Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");

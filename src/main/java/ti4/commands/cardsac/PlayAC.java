@@ -1,6 +1,7 @@
 package ti4.commands.cardsac;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.Guild;
@@ -152,7 +153,8 @@ public class PlayAC extends ACCardsSubcommandData {
                 
                 List<Button> afterButtons = AgendaHelper.getAfterButtons(activeMap);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no afters again.", activeMap, afterButtons, "after");
-
+                Date newTime = new Date();
+                activeMap.setLastActivePlayerPing(newTime);
 
                 String finChecker = "FFCC_"+player.getFaction() + "_";
                 if (actionCardTitle.contains("Rider") || actionCardTitle.contains("Sanction") ) {
@@ -168,15 +170,10 @@ public class PlayAC extends ACCardsSubcommandData {
 
             }
             if (actionCardWindow.contains("When an agenda is revealed") && !actionCardTitle.contains("Veto")) {
-                Button playWhen = Button.danger("play_when", "Play When");
-                Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-                Button noWhenPersistent = Button.primary("no_when_persistent", "No Whens No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-
-                List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
+                Date newTime = new Date();
+                activeMap.setLastActivePlayerPing(newTime);
+                List<Button> whenButtons = AgendaHelper.getWhenButtons(activeMap);
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", activeMap, whenButtons, "when");
-
-
-
 
             }
         }

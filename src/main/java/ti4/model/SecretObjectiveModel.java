@@ -4,7 +4,6 @@ public class SecretObjectiveModel implements ModelInterface {
     private String alias;
     private String name;
     private String phase;
-    private String window;
     private String text;
     private int points;
     private String source;
@@ -15,7 +14,6 @@ public class SecretObjectiveModel implements ModelInterface {
         return alias != null
             && name != null
             && phase != null
-            && window != null
             && text != null
             && points != 0
             && source != null;
@@ -31,10 +29,6 @@ public class SecretObjectiveModel implements ModelInterface {
 
     public String getPhase() { 
         return phase;
-    }
-
-    public String getWindow() { 
-        return window;
     }
 
     public String getText() { 

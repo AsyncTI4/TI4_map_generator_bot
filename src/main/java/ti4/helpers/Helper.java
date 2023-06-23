@@ -1,5 +1,28 @@
 package ti4.helpers;
 
+import java.awt.Point;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Random;
+import java.util.Set;
+import java.util.StringTokenizer;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.exception.ExceptionUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Invite;
@@ -16,46 +39,29 @@ import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
-import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.managers.channel.concrete.TextChannelManager;
-
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.exception.ExceptionUtils;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import ti4.MapGenerator;
 import ti4.ResourceHelper;
-import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.bothelper.ArchiveOldThreads;
 import ti4.commands.bothelper.ListOldThreads;
+import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
-import ti4.map.*;
+import ti4.map.Leader;
+import ti4.map.Map;
+import ti4.map.Planet;
+import ti4.map.Player;
+import ti4.map.Tile;
+import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
 import ti4.model.AgendaModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.SecretObjectiveModel;
-
-import java.awt.*;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.Map.Entry;
-import java.util.Random;
-import java.util.Set;
-import java.util.StringTokenizer;
-import java.util.stream.Collectors;
+import ti4.model.TechnologyModel;
 
 public class Helper {
 
@@ -388,6 +394,7 @@ public class Helper {
             case "cabal" -> Emojis.Cabal;
             case "empyrean" -> Emojis.Empyrean;
             case "ghost" -> Emojis.Ghost;
+            case "creuss" -> Emojis.Ghost;
             case "hacan" -> Emojis.Hacan;
             case "jolnar" -> Emojis.Jolnar;
             case "l1z1x" -> Emojis.L1Z1X;
@@ -1526,47 +1533,93 @@ public class Helper {
     }
 
     public static String getTechRepresentation(String techID) {
-        String techRep = Mapper.getTechRepresentations().get(techID);
+        TechnologyModel tech = Mapper.getTechs().get(techID);
 
-        //Columns: key = Proper Name | type | prerequisites | faction | text
-        StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
-        String techName = techRepTokenizer.nextToken();
-        String techType = techRepTokenizer.nextToken();
-        String techPrerequisites = techRepTokenizer.nextToken();
-        String techFaction = techRepTokenizer.nextToken();
+        String techName = tech.getName();
+        String techType = tech.getType();
+        String techFaction = tech.getFaction();
         String factionEmoji = "";
-        if (!techFaction.equals(" ")) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
+        if (!techFaction.isBlank()) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
         String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
-        // if (!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.length() + 1);
-        String techText = techRepTokenizer.nextToken();
         return techEmoji + "**" + techName + "**" + factionEmoji + "\n";
     }
 
-    public static List<Button> getTechButtons(List<String> techs, String techType, Player player) {
+    public static List<Button> getTechButtons(List<TechnologyModel> techs, String techType, Player player) {
         List<Button> techButtons = new ArrayList<Button>();
 
-        for (String tech : techs) {
-            String techName = tech.substring(tech.lastIndexOf("_")+1, tech.length());
-            String buttonID = "FFCC_"+player.getFaction()+"_getTech_"+techName;
+        techs.sort(new Comparator<TechnologyModel>() {
+            @Override
+            public int compare(TechnologyModel tech1, TechnologyModel tech2) {
+                try {
+                    int req1 = tech1.getRequirements().length();
+                    int req2 = tech2.getRequirements().length();
+                    if (req1 < req2) return -1;
+                    if (req2 < req1) return 1;
+                    return tech1.getName().compareTo(tech2.getName());
+                } catch (Exception e) {}
+                return 0;
+            }
+        });
+
+        for (TechnologyModel tech : techs) {
+            String techName = tech.getName();
+            String buttonID = "FFCC_" + player.getFaction() + "_getTech_" + techName;
             Button techB = null;
             switch (techType) {
                 case "propulsion" -> {
                     techB = Button.primary(buttonID, techName);
+                    switch (tech.getRequirements()) {
+                        case "" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.PropulsionDisabled));
+                        case "B" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.PropulsionTech));
+                        case "BB" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Propulsion2));
+                        case "BBB" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Propulsion3));
+                    }
                 }
                 case "cybernetic" -> {
-                    techB = Button.secondary(buttonID,techName);
+                    techB = Button.secondary(buttonID, techName);
+                    switch (tech.getRequirements()) {
+                        case "" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.CyberneticDisabled));
+                        case "Y" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
+                        case "YY" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Cybernetic2));
+                        case "YYY" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Cybernetic3));
+                    }
                 }
                 case "biotic" -> {
                     techB = Button.success(buttonID, techName);
+                    switch (tech.getRequirements()) {
+                        case "" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.BioticDisabled));
+                        case "G" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.BioticTech));
+                        case "GG" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Biotic2));
+                        case "GGG" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Biotic3));
+                    }
                 }
                 case "warfare" -> {
                     techB = Button.danger(buttonID, techName);
+                    switch (tech.getRequirements()) {
+                        case "" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.WarfareDisabled));
+                        case "R" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.WarfareTech));
+                        case "RR" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Warfare2));
+                        case "RRR" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.Warfare3));
+                    }
                 }
                 case "unitupgrade" -> {
-                    techB = Button.secondary(buttonID,techName);
+                    techB = Button.secondary(buttonID, techName);
+                    String unitType = tech.getBaseUpgrade().isEmpty() ? tech.getAlias() : tech.getBaseUpgrade();
+                    switch (unitType) {
+                        case "inf2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.infantry));
+                        case "ff2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.fighter));
+                        case "pds2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.pds));
+                        case "sd2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.spacedock));
+                        case "dd2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.destroyer));
+                        case "cr2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.cruiser));
+                        case "cv2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.carrier));
+                        case "dn2" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.dreadnought));
+                        case "ws" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.warsun));
+                        case "fs" -> techB = techB.withEmoji(Emoji.fromFormatted(Emojis.flagship));
+                    }
                 }
                 default -> {
-                    techB = Button.secondary(buttonID,techName);
+                    techB = Button.secondary(buttonID, techName);
                 }
             }
             techButtons.add(techB);
@@ -1574,53 +1627,36 @@ public class Helper {
         return techButtons;
     }
 
-    public static List<String> getAllTechOfAType(String techType, String playerfaction, Player player) {
-        List<String> techs = new ArrayList<String>();
-        //Columns: key = Proper Name | type | prerequisites | faction | text
-        for (Entry<String, String> techRep : Mapper.getTechRepresentations().entrySet()) {
-            StringTokenizer techRepTokenizer = new StringTokenizer(techRep.getValue(),"|");
-            String techName = techRepTokenizer.nextToken();
-            String techType2 = techRepTokenizer.nextToken();
-            String techPrerequisites = techRepTokenizer.nextToken();
-            String techFaction = techRepTokenizer.nextToken();
-            String factionEmoji = "";
-            String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
-
-            if (techType2.equalsIgnoreCase(techType)) {
-
-                if (!player.hasTech(techRep.getKey())) {
-                    if (!techFaction.equals(" ")) {
-                        if (playerfaction.equalsIgnoreCase(techFaction) || (playerfaction.toLowerCase().startsWith("keleres") && techFaction.equalsIgnoreCase("Keleres"))) {
-                            factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
-
-                            techs.add(techEmoji +"_"+ factionEmoji +"_"+techName);
+    public static List<TechnologyModel> getAllTechOfAType(String techType, String playerfaction, Player player) {
+        List<TechnologyModel> techs = new ArrayList<TechnologyModel>();
+        for (TechnologyModel tech : Mapper.getTechs().values()) {
+            String faction = tech.getFaction();
+            if (tech.getType().equalsIgnoreCase(techType)) {
+                if (!player.hasTech(tech.getAlias())) {
+                    if (!faction.isEmpty()) {
+                        if (playerfaction.equalsIgnoreCase(faction) || (playerfaction.toLowerCase().startsWith("keleres") && faction.equalsIgnoreCase("Keleres"))) {
+                            techs.add(tech);
                         }
-
                     } else {
-                        techs.add(techEmoji +"_"+ techName);
+                        techs.add(tech);
                     }
                 }
             }
-            // if (!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.length() + 1);
-            String techText = techRepTokenizer.nextToken();
         }
         return techs;
     }
 
     public static String getTechRepresentationLong(String techID) {
-        String techRep = Mapper.getTechRepresentations().get(techID);
+        TechnologyModel tech = Mapper.getTechs().get(techID);
 
-        //Columns: key = Proper Name | type | prerequisites | faction | text
-        StringTokenizer techRepTokenizer = new StringTokenizer(techRep,"|");
-        String techName = techRepTokenizer.nextToken();
-        String techType = techRepTokenizer.nextToken();
-        String techPrerequisites = techRepTokenizer.nextToken();
-        String techFaction = techRepTokenizer.nextToken();
+        String techName = tech.getName();
+        String techType = tech.getType();
+        String techFaction = tech.getFaction();
         String factionEmoji = "";
-        if (!techFaction.equals(" ")) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
+        if (!techFaction.isBlank()) factionEmoji = Helper.getFactionIconFromDiscord(techFaction);
         String techEmoji = Helper.getEmojiFromDiscord(techType + "tech");
-        // if (!techType.equalsIgnoreCase(Constants.UNIT_UPGRADE)) techEmoji = techEmoji.repeat(techPrerequisites.replace(" ","").length() + 1);
-        String techText = techRepTokenizer.nextToken();
+        
+        String techText = tech.getText();
         StringBuilder sb = new StringBuilder();
         sb.append(techEmoji + "**" + techName + "**" + factionEmoji + "\n");
         sb.append("> ").append(techText).append("\n");

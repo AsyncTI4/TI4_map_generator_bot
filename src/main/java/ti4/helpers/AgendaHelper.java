@@ -8,6 +8,7 @@ import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 
+import ti4.buttons.ButtonListener;
 import ti4.generator.Mapper;
 import ti4.map.Leader;
 import ti4.map.Map;
@@ -18,6 +19,65 @@ import ti4.message.MessageHelper;
 
 
 public class AgendaHelper {
+
+     public static void pingMissingPlayers(Map activeMap) {
+        List<Player> missingPlayersWhens = new ButtonListener().getPlayersWhoHaventReacted(activeMap.getLatestWhenMsg(), activeMap);
+        List<Player> missingPlayersAfters = new ButtonListener().getPlayersWhoHaventReacted(activeMap.getLatestAfterMsg(), activeMap);
+        if(missingPlayersAfters.size() == 0 && missingPlayersWhens.size() == 0){
+            return;
+        }
+
+        String messageWhens = " please indicate no whens";
+        String messageAfters = " please indicate no afters";
+        if(activeMap.isFoWMode()){
+            for(Player player : missingPlayersWhens){
+                MessageHelper.sendMessageToChannel(player.getPrivateChannel(), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + messageWhens);
+            }
+            for(Player player : missingPlayersAfters){
+                MessageHelper.sendMessageToChannel(player.getPrivateChannel(), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + messageAfters);
+            }
+            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "Sent reminder pings to players who have not yet reacted");
+
+        }else{
+            for(Player player : missingPlayersWhens){
+                messageWhens = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + messageWhens;
+            }
+            if(missingPlayersWhens.size()> 0){
+                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(),  messageWhens);
+            }
+           
+
+            for(Player player : missingPlayersAfters){
+                messageAfters = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + messageAfters;
+            }
+            if(missingPlayersAfters.size()> 0){
+                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), messageAfters);
+            }
+        }
+        Date newTime = new Date();
+        activeMap.setLastActivePlayerPing(newTime);
+     }
+     public static List<Button> getWhenButtons(Map activeMap) {
+        Button playWhen = Button.danger("play_when", "Play When");
+        Button noWhen = Button.primary("no_when", "No Whens")
+                .withEmoji(Emoji.fromFormatted(Emojis.noafters));
+        Button noWhenPersistent = Button
+                .primary("no_when_persistent", "No Whens No Matter What (for this agenda)")
+                .withEmoji(Emoji.fromFormatted(Emojis.noafters));
+        List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
+        Player quasher = Helper.getPlayerFromAbility(activeMap, "quash");
+        if(quasher != null && quasher.getStrategicCC()>0){
+             String finChecker = "FFCC_"+quasher.getFaction() + "_";
+            Button quashButton = Button.danger(finChecker+"quash", "Quash Agenda").withEmoji(Emoji.fromFormatted(Emojis.Xxcha));
+            if(activeMap.isFoWMode()){
+                List<Button> quashButtons = new ArrayList<>(List.of(quashButton));
+                MessageHelper.sendMessageToChannelWithButtons(quasher.getPrivateChannel(), "Use Button To Quash If You Want", quashButtons);
+            }else{
+                whenButtons.add(quashButton);
+            }
+        }
+        return whenButtons;
+     }
     public static List<Button> getAfterButtons(Map activeMap) {
         List<Button> afterButtons = new ArrayList<Button>();
         Button playAfter = Button.danger("play_after_Non-AC Rider", "Play A Non-AC Rider");
@@ -95,6 +155,7 @@ public class AgendaHelper {
     }
 
     public static void startTheVoting(Map activeMap, GenericInteractionCreateEvent event) {
+        activeMap.setCurrentPhase("agendaVoting");
         if (activeMap.getCurrentAgendaInfo() != null) {
             String message = " up to vote! Resolve using buttons. \n \n" + AgendaHelper.getSummaryOfVotes(activeMap, true);
             Player nextInLine = AgendaHelper.getNextInLine(null, AgendaHelper.getVotingOrder(activeMap), activeMap);
@@ -121,7 +182,7 @@ public class AgendaHelper {
             message = realIdentity + message;
             Button Vote= Button.success("vote", pFaction+" Choose To Vote");
             Button Abstain = Button.danger("delete_buttons_0", pFaction+" Choose To Abstain");
-           
+            activeMap.updateActivePlayer(nextInLine);
             List<Button> buttons = List.of(Vote, Abstain);
             if (activeMap.isFoWMode()) {
                 if (nextInLine.getPrivateChannel() != null) {
