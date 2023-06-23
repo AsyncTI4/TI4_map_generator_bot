@@ -34,10 +34,15 @@ public class TileHelper {
 
     public static void initPlanetsFromJson() {
         ObjectMapper objectMapper = new ObjectMapper();
-        String path = Storage.getResourcePath() + File.separator + "planets" + File.separator;
-        List<File> files = Stream.of(new File(path).listFiles())
+        String resourcePath = Storage.getResourcePath() + File.separator + "planets" + File.separator;
+        String storagePath = Storage.getStoragePath() + File.separator + "planets" + File.separator;
+        List<File> files = new java.util.ArrayList<>(Stream.of(new File(resourcePath).listFiles())
                 .filter(file -> !file.isDirectory())
-                .toList();
+                .toList());
+        files.addAll(Stream.of(new File(storagePath).listFiles())
+                .filter(file -> !file.isDirectory())
+                .toList());
+
         files.forEach(file -> {
                     try {
                         PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
@@ -46,14 +51,19 @@ public class TileHelper {
                         throw new RuntimeException(e);
                     }
                 });
+
     }
 
     public static void initTilesFromJson() {
         ObjectMapper objectMapper = new ObjectMapper();
-        String path = Storage.getResourcePath() + File.separator + "systems" + File.separator;
-        List<File> files = Stream.of(new File(path).listFiles())
+        String resourcePath = Storage.getResourcePath() + File.separator + "systems" + File.separator;
+        String storagePath = Storage.getStoragePath() + File.separator + "systems" + File.separator;
+        List<File> files = new java.util.ArrayList<>(Stream.of(new File(resourcePath).listFiles())
                 .filter(file -> !file.isDirectory())
-                .toList();
+                .toList());
+        files.addAll(Stream.of(new File(storagePath).listFiles())
+                .filter(file -> !file.isDirectory())
+                .toList());
         files.forEach(file -> {
             try {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);

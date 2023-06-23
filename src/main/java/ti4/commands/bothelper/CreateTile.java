@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
+import ti4.helpers.Storage;
 import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.model.*;
@@ -65,7 +66,7 @@ public class CreateTile extends BothelperSubcommandData {
         tile.setName(name);
         tile.setAliases(getAliasListFromString(aliases));
         tile.setImagePath(image);
-        tile.setPlanets(getPlanetListFromString(planetIds));
+        tile.setPlanetIds(getPlanetListFromString(planetIds));
         tile.setShipPositionsType(shipPositionModel.getTypeFromString(type));
         //tile.setSpaceTokenLocations();
         tile.setWormholes(getWormholesFromString(wormholes));
@@ -89,7 +90,8 @@ public class CreateTile extends BothelperSubcommandData {
     private static void exportTileModelToJson(TileModel tileModel) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            mapper.writeValue(new File("src/main/resources/systems/"+tileModel.getId()+".json"),tileModel);
+            mapper.writeValue(new File(Storage.getResourcePath() + File.separator + "systems" + File.separator+tileModel.getId()+".json"),tileModel);
+            mapper.writeValue(new File(Storage.getStoragePath() + File.separator + "systems" + File.separator + tileModel.getId()+".json"),tileModel);
         } catch (IOException e) {
             BotLogger.log("Something went wrong creating new tile JSON!", e);
         }

@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.TileHelper;
 import ti4.generator.UnitTokenPosition;
 import ti4.helpers.Constants;
+import ti4.helpers.Storage;
 import ti4.message.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.PlanetTypeModel;
@@ -136,7 +137,8 @@ public class CreatePlanet extends BothelperSubcommandData {
     private static void exportPlanetModelToJson(PlanetModel planetModel) {
         ObjectMapper mapper = new ObjectMapper();
         try {
-            mapper.writeValue(new File("src/main/resources/planets/"+planetModel.getId()+".json"),planetModel);
+            mapper.writeValue(new File(Storage.getResourcePath() + File.separator + "planets" + File.separator + planetModel.getId()+".json"),planetModel);
+            mapper.writeValue(new File(Storage.getStoragePath() + File.separator + "planets" + File.separator + planetModel.getId()+".json"),planetModel);
         } catch (IOException e) {
             BotLogger.log("Something went wrong creating new planet JSON!", e);
         }
