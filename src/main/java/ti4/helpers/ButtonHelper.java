@@ -43,6 +43,60 @@ import ti4.model.TechnologyModel;
 
 public class ButtonHelper {
 
+    public static void checkACLimit(Map activeMap, GenericInteractionCreateEvent event, Player player) {
+        if(player.hasAbility("crafty")){
+            return;
+        }
+        int limit = 7;
+        if(activeMap.getLaws().containsKey("sanctions")){
+            limit = 3;
+        }
+        if(player.getAc() > limit){
+            MessageChannel channel = activeMap.getMainGameChannel();
+            if(activeMap.isFoWMode()){
+                channel = player.getPrivateChannel();
+            }
+            String ident = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
+            MessageHelper.sendMessageToChannel(channel, ident+ " you are exceeding the AC hand limit of "+limit+". Please discard down to the limit");
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeMap), ident+" use buttons to discard", ACInfo.getDiscardActionCardButtons(activeMap, player));
+        }
+    }
+    public static void updateMap(Map activeMap, GenericInteractionCreateEvent event) {
+        String threadName = activeMap.getName() + "-bot-map-updates";
+        List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+        boolean foundsomething = false;
+        File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.all, event);
+        if (!activeMap.isFoWMode()) {
+            for (ThreadChannel threadChannel_ : threadChannels) {
+                if (threadChannel_.getName().equals(threadName)) {
+                    foundsomething = true;
+                    if(activeMap.isFoWMode()){
+                        MessageHelper.sendFileToChannel((MessageChannel) threadChannel_, file);
+                    }else{
+                        List<Button> buttonsWeb = new ArrayList<Button>();
+                        Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
+                        buttonsWeb.add(linkToWebsite);
+                        MessageHelper.sendFileToChannelWithButtonsAfter((MessageChannel) threadChannel_, file, "",buttonsWeb);
+                    }
+                }
+            }
+        } else {
+            MessageHelper.sendFileToChannel(event.getMessageChannel(), file);
+            foundsomething = true;
+        }
+        if (!foundsomething) {
+            if(activeMap.isFoWMode()){
+                MessageHelper.sendFileToChannel(event.getMessageChannel(), file);
+            }else{
+                List<Button> buttonsWeb = new ArrayList<Button>();
+                Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
+                buttonsWeb.add(linkToWebsite);
+                MessageHelper.sendFileToChannelWithButtonsAfter(event.getMessageChannel(), file, "",buttonsWeb);
+            }
+        }
+
+    }
+
      public static boolean NomadHeroCheck(Player player, Map activeMap, Tile tile) {
         boolean isFSThere = false;
 
