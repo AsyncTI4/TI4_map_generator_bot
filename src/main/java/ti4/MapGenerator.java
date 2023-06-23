@@ -91,7 +91,6 @@ public class MapGenerator {
 
         userID = args[1];
         guildPrimary = jda.getGuildById(args[2]);
-        
         MessageHelper.sendMessageToBotLogWebhook("BOT IS STARTING UP");
 
         TileHelper.init();
