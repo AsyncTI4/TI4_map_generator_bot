@@ -12,6 +12,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 public class TileHelper {
@@ -39,10 +40,13 @@ public class TileHelper {
         List<File> files = new java.util.ArrayList<>(Stream.of(new File(resourcePath).listFiles())
                 .filter(file -> !file.isDirectory())
                 .toList());
-        files.addAll(Stream.of(new File(storagePath).listFiles())
-                .filter(file -> !file.isDirectory())
-                .toList());
 
+        File[] storedFiles = new File(storagePath).listFiles();
+        if(Optional.ofNullable(storedFiles).isPresent()) {
+            files.addAll(Stream.of(storedFiles)
+                    .filter(file -> !file.isDirectory())
+                    .toList());
+        }
         files.forEach(file -> {
                     try {
                         PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
@@ -61,9 +65,12 @@ public class TileHelper {
         List<File> files = new java.util.ArrayList<>(Stream.of(new File(resourcePath).listFiles())
                 .filter(file -> !file.isDirectory())
                 .toList());
-        files.addAll(Stream.of(new File(storagePath).listFiles())
-                .filter(file -> !file.isDirectory())
-                .toList());
+        File[] storedFiles = new File(storagePath).listFiles();
+        if(Optional.ofNullable(storedFiles).isPresent()) {
+            files.addAll(Stream.of(storedFiles)
+                    .filter(file -> !file.isDirectory())
+                    .toList());
+        }
         files.forEach(file -> {
             try {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
