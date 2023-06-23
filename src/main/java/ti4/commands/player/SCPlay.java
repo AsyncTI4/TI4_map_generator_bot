@@ -310,7 +310,9 @@ public class SCPlay extends PlayerSubcommandData {
         Button noFollowButton = Button.primary("sc_no_follow_8", "Not Following");
         Button draw_so = Button.secondary("sc_draw_so", "Draw Secret Objective").withEmoji(Emoji.fromFormatted(Emojis.SecretObjective));
         Button scoreImperial = Button.secondary("score_imperial", "Score Imperial").withEmoji(Emoji.fromFormatted(Emojis.MecatolRex));
-        return List.of(followButton, noFollowButton, draw_so, scoreImperial);
+        Button scoreAnObjective = Button.secondary("scoreAnObjective", "Score A Public").withEmoji(Emoji.fromFormatted(Emojis.Public1));
+
+        return List.of(followButton, noFollowButton, draw_so, scoreImperial, scoreAnObjective);
     }
 
     private List<Button> getGenericButtons(int sc) {
