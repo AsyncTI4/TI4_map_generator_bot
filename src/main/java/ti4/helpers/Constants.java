@@ -42,6 +42,7 @@ public class Constants {
     public static final String PLANET_TECH_SKIPS = "planet_tech_skips";
     public static final String PLANET_LEGENDARY_NAME = "planet_legendary_name";
     public static final String PLANET_LEGENDARY_TEXT = "planet_legendary_text";
+    public static final String PLANET_FACTION_HOMEWORLD = "planet_faction_homeworld";
     public static final String TILE_ID = "tile_id";
     public static final String TILE_NAME = "tile_name";
     public static final String TILE_ALIASES = "tile_aliases";
