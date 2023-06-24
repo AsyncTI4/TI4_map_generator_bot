@@ -33,6 +33,7 @@ import ti4.commands.map.*;
 import ti4.commands.milty.MiltyCommand;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.special.SpecialCommand;
+import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
 import ti4.commands.tokens.*;
 import ti4.commands.units.*;
@@ -173,6 +174,7 @@ public class MapGenerator {
         commandManager.addCommand(new CaptureCommand());
         commandManager.addCommand(new GenericButtonCommand());
         commandManager.addCommand(new DiscordantStarsCommand());
+        commandManager.addCommand(new StatisticsCommand());
 
 
         CommandListUpdateAction commands = guildPrimary.updateCommands();
