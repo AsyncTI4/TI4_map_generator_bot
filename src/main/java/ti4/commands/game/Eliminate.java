@@ -72,8 +72,7 @@ public class Eliminate extends AddRemovePlayer {
                 for(String pnID :pns){
 
                     PromissoryNoteModel pn = PNss.get(pnID);
-                    System.out.println(pn.getOwner());
-                    if(!pn.getOwner().equalsIgnoreCase(player.getColor()) && !pn.getOwner().equalsIgnoreCase(player.getFaction())){
+                    if(pn!= null && !pn.getOwner().equalsIgnoreCase(player.getColor()) && !pn.getOwner().equalsIgnoreCase(player.getFaction())){
                         Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, pn.getOwner());
                         player.removePromissoryNote(pnID);
                         p2.setPromissoryNote(pnID);
@@ -87,7 +86,7 @@ public class Eliminate extends AddRemovePlayer {
                     pns.addAll(p2.getPromissoryNotes().keySet());
                     for(String pnID : pns){
                         PromissoryNoteModel pn = PNss.get(pnID);
-                        if(pn.getOwner().equalsIgnoreCase(player.getColor()) || pn.getOwner().equalsIgnoreCase(player.getFaction())){
+                        if(pn!= null &&(pn.getOwner().equalsIgnoreCase(player.getColor()) || pn.getOwner().equalsIgnoreCase(player.getFaction()))){
                             p2.removePromissoryNote(pnID);
                             PNInfo.sendPromissoryNoteInfo(activeMap, p2, false);
                         }
