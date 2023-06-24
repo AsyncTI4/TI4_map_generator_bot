@@ -1,6 +1,11 @@
 package ti4.commands.game;
 
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -25,8 +30,6 @@ public class Eliminate extends AddRemovePlayer {
     private StringBuilder sb = new StringBuilder();
     public Eliminate() {
         super(Constants.ELIMINATE, "Eliminate player from game");
-        addOptions(new OptionData(OptionType.STRING, Constants.CONFIRM, "Confirm you want to eliminate with YES").setRequired(true));
-
     }
 
 
@@ -51,33 +54,40 @@ public class Eliminate extends AddRemovePlayer {
         OptionMapping option;
         option = event.getOption(playerID);
 
-        OptionMapping option2 = event.getOption(Constants.CONFIRM);
-        if(!option2.getAsString().equalsIgnoreCase("yes"))
-        {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Please confirm with yes");
-            return;
-        }
+        // OptionMapping option2 = event.getOption(Constants.CONFIRM);
+        // if(!option2.getAsString().equalsIgnoreCase("yes"))
+        // {
+        //     MessageHelper.sendMessageToChannel(event.getChannel(), "Please confirm with yes");
+        //     return;
+        // }
         if (option != null){
             
             User extraUser = option.getAsUser();
             Player player = activeMap.getPlayer(extraUser.getId());
-            HashMap<String, PromissoryNoteModel> PNs = Mapper.getPromissoryNotes();
+            HashMap<String, PromissoryNoteModel> PNss = Mapper.getPromissoryNotes();
             if(player != null && player.getFaction() != null){
                 //send back all the PNs of others that the player was holding
-                for(String pnID : player.getPromissoryNotes().keySet()){
-                    PromissoryNoteModel pn = PNs.get(pnID);
-                    if(!pn.getOwner().equalsIgnoreCase(player.getFaction())){
+                Set<String> pns = new HashSet<String>();
+                pns.addAll(player.getPromissoryNotes().keySet());
+                for(String pnID :pns){
+
+                    PromissoryNoteModel pn = PNss.get(pnID);
+                    System.out.println(pn.getOwner());
+                    if(!pn.getOwner().equalsIgnoreCase(player.getColor()) && !pn.getOwner().equalsIgnoreCase(player.getFaction())){
                         Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, pn.getOwner());
                         player.removePromissoryNote(pnID);
                         p2.setPromissoryNote(pnID);
                         PNInfo.sendPromissoryNoteInfo(activeMap, p2, false);
                     }
                 }
+                
                 //Purge all the PNs of the eliminated player that other players were holding
                 for(Player p2 : activeMap.getPlayers().values()){
-                    for(String pnID : p2.getPromissoryNotes().keySet()){
-                        PromissoryNoteModel pn = PNs.get(pnID);
-                        if(pn.getOwner().equalsIgnoreCase(player.getFaction())){
+                     pns = new HashSet<String>();
+                    pns.addAll(p2.getPromissoryNotes().keySet());
+                    for(String pnID : pns){
+                        PromissoryNoteModel pn = PNss.get(pnID);
+                        if(pn.getOwner().equalsIgnoreCase(player.getColor()) || pn.getOwner().equalsIgnoreCase(player.getFaction())){
                             p2.removePromissoryNote(pnID);
                             PNInfo.sendPromissoryNoteInfo(activeMap, p2, false);
                         }
@@ -91,7 +101,9 @@ public class Eliminate extends AddRemovePlayer {
                     }
                 }
                 //discard all of a players ACs
-                for(java.util.Map.Entry<String, Integer> ac : player.getActionCards().entrySet()){
+                LinkedHashMap<String, Integer> acs = new LinkedHashMap<String, Integer>();
+                acs.putAll(player.getActionCards());
+                for(java.util.Map.Entry<String, Integer> ac : acs.entrySet()){
                     boolean removed = activeMap.discardActionCard(player.getUserID(), ac.getValue());
                     StringBuilder sb = new StringBuilder();
                     sb.append("Player: ").append(player.getUserName()).append(" - ");
@@ -100,16 +112,28 @@ public class Eliminate extends AddRemovePlayer {
                     MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
                 }
                 //unscore all of a players SOs
-                for(int so : player.getSecretsScored().values()){
+                acs = new LinkedHashMap<String, Integer>();
+                acs.putAll(player.getSecretsScored());
+                for(int so : acs.values()){
                     boolean scored = activeMap.unscoreSecretObjective(extraUser.getId(), so);
                 }
                 //discard all of a players SOs
-                for(int so : player.getSecrets().values()){
+              
+                acs = new LinkedHashMap<String, Integer>();
+                acs.putAll(player.getSecrets());
+                for(int so : acs.values()){
                     boolean removed = activeMap.discardSecretObjective(player.getUserID(), so);
+                }
+                 //return SCs
+                Set<Integer> scs =  new HashSet<Integer>();
+                scs.addAll(player.getSCs());
+                for(int sc : scs){
+                   player.removeSC(sc);
                 }
             }
             activeMap.removePlayer(extraUser.getId());
             sb.append("Eliminated player: ").append(extraUser.getName()).append(" from game: ").append(activeMap.getName()).append("\n");
+            MessageHelper.sendMessageToChannel(event.getChannel(),sb.toString());
         }
     }
 }
