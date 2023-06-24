@@ -168,7 +168,7 @@ public class ResourceHelper {
             return resourceFile.getAbsolutePath();
         }
         else {
-            System.out.println("Could not find resource file " + name + " in folder " + folder);
+           // System.out.println("Could not find resource file " + name + " in folder " + folder);
             System.out.println(errorDescription);
         }
         return null;
