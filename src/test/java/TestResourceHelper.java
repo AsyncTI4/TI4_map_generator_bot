@@ -52,6 +52,24 @@ public class TestResourceHelper {
     }
 
     @Test
+    public void updateJson() {
+        TileHelper.init();
+        Collection<PlanetModel> allPlanets = TileHelper.getAllPlanets().values();
+        allPlanets.size();
+        ObjectMapper mapper = new ObjectMapper();
+
+        for (PlanetModel planet : allPlanets) {
+            try {
+                mapper.writeValue(new File(Storage.getResourcePath() + File.separator + "planets" + File.separator + planet.getId()+".json"),planet);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+    }
+
+
+
+    @Test
     public void checkPlanetCenterpointFromUnitCoordinates() {
         TileHelper.init();
 
