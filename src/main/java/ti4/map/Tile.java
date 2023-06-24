@@ -14,11 +14,8 @@ import ti4.helpers.FoWHelper;
 import ti4.message.BotLogger;
 
 import java.awt.*;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.Set;
-import java.util.StringTokenizer;
 
 public class Tile {
     private final String tileID;
@@ -52,14 +49,12 @@ public class Tile {
     }
 
     private void initPlanetsAndSpace(String tileID) {
-        if(tileID.equals("nombox"))
-            return;
-
         Space space = new Space(Constants.SPACE, Constants.SPACE_CENTER_POSITION);
         unitHolders.put(Constants.SPACE, space);
         java.util.Map<String, Point> tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
 
-        tilePlanetPositions.forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
+        if(Optional.ofNullable(tilePlanetPositions).isPresent())
+            tilePlanetPositions.forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
     }
 
     @Nullable
