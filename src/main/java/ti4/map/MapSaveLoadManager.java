@@ -202,7 +202,7 @@ public class MapSaveLoadManager {
                         .map(fileName -> fileName.replace(mapNameForUndoStart, ""))
                         .map(fileName -> fileName.replace(Constants.TXT, ""))
                         .map(Integer::parseInt).toList();
-                if (numbers.size() == 10) {
+                if (numbers.size() == 25) {
                     int minNumber = numbers.stream().mapToInt(value -> value)
                             .min().orElseThrow(NoSuchElementException::new);
                     File mapToDelete = Storage.getMapUndoStorage(mapName + "_" + minNumber + Constants.TXT);

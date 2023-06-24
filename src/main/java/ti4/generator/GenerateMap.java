@@ -2011,7 +2011,7 @@ public class GenerateMap {
         boolean secondColumn = false;
         for (java.util.Map.Entry<String, Integer> lawEntry : laws.entrySet()) {
             String lawID = lawEntry.getKey();
-            String lawNumberID = " (" + lawEntry.getValue() + ")";
+            String lawNumberID = "(" + lawEntry.getValue() + ") ";
             String optionalText = lawsInfo.get(lawID);
             graphics.setFont(Storage.getFont35());
             graphics.setColor(new Color(228, 255, 0));
@@ -2021,6 +2021,9 @@ public class GenerateMap {
             if (agendaTitle == null) {
                 agendaTitle = Mapper.getAgendaJustNames().get(lawID);
             }
+            if (optionalText != null && !optionalText.isEmpty() && Helper.getPlayerFromColorOrFaction(activeMap, optionalText) == null) {
+                agendaTitle += "   [" + optionalText + "]";
+            }
             graphics.drawString(agendaTitle, x + 95, y + 30);
             graphics.setFont(Storage.getFont26());
             graphics.setColor(Color.WHITE);
@@ -2029,7 +2032,7 @@ public class GenerateMap {
             if (agendaText == null) {
                 agendaText = Mapper.getAgendaForOnly(lawID);
             }
-            agendaText += lawNumberID;
+            agendaText = lawNumberID + agendaText;
             int width = g2.getFontMetrics().stringWidth(agendaText);
 
             int index = 0;
