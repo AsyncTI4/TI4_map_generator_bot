@@ -43,6 +43,30 @@ import ti4.model.TechnologyModel;
 
 public class ButtonHelper {
 
+    public static void sendAllTechsNTechSkipPlanetsToReady(Map activeMap, GenericInteractionCreateEvent event, Player player) {
+        List<Button> buttons = new ArrayList<Button>();
+        for(String tech : player.getExhaustedTechs()){
+            buttons.add(Button.success("biostimsReady_tech_"+tech, "Ready "+Mapper.getTechs().get(tech).getName()));
+        }
+        for(String planet : player.getExhaustedPlanets()){
+            if(Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0){
+                buttons.add(Button.success("biostimsReady_planet_"+planet, "Ready "+Helper.getPlanetRepresentation(planet, activeMap)));
+            }
+        }
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to select a planet or tech to ready", buttons);
+    }
+    public static void bioStimsReady(Map activeMap, GenericInteractionCreateEvent event, Player player, String buttonID) {
+       buttonID = buttonID.replace("biostimsReady_", "");
+       String last = buttonID.substring(buttonID.lastIndexOf("_")+1, buttonID.length());
+       if(buttonID.contains("tech_")){
+            player.refreshTech(last);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeMap) + " readied tech: " + Helper.getTechRepresentation(last));
+       }else{
+            player.refreshPlanet(last);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeMap) + " readied planet: " + Helper.getPlanetRepresentation(last, activeMap));
+       }
+    }
+
     public static void checkACLimit(Map activeMap, GenericInteractionCreateEvent event, Player player) {
         if(player.hasAbility("crafty")){
             return;
@@ -356,7 +380,9 @@ public class ButtonHelper {
             List<Button> conclusionButtons = new ArrayList<Button>();
             Button endTurn = Button.danger("turnEnd", "End Turn");
             conclusionButtons.add(endTurn);
-            conclusionButtons.addAll(ButtonHelper.getLegendaryExhaustButtons(player, activeMap));
+            if(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()> 1){
+                conclusionButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability ("+(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()- 1)+")"));
+            }
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn.", conclusionButtons);
         }
         if(whatIsItFor.equalsIgnoreCase("warfare")){
@@ -401,7 +427,7 @@ public class ButtonHelper {
         }
 
     }
-    public static List<Button> getLegendaryExhaustButtons(Player player, Map activeMap) {
+    public static List<Button> getEndOfTurnAbilities(Player player, Map activeMap) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> endButtons = new ArrayList<>();
         String planet = "mallice";
@@ -431,13 +457,18 @@ public class ButtonHelper {
         if(player.getTechs().contains("pi") && !player.getExhaustedTechs().contains("pi")){
             endButtons.add(Button.danger(finChecker+"exhaustTech_pi", "Exhaust Predictive Intelligence"));
         }
+        if(player.getTechs().contains("bs") && !player.getExhaustedTechs().contains("bs")){
+            endButtons.add(Button.success(finChecker+"exhaustTech_bs", "Exhaust Bio-Stims"));
+        }
+        endButtons.add(Button.danger("deleteButtons", "Delete these buttons"));
         return endButtons;
     }
-    public static List<Button> getStartOfTurnButtons(Player player, Map activeMap, boolean doneActionThisTurn) {
+    public static List<Button> getStartOfTurnButtons(Player player, Map activeMap, boolean doneActionThisTurn, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> startButtons = new ArrayList<>();
-        Button tacticalAction = Button.success(finChecker+"tacticalAction", "Tactical Action");
-        Button componentAction = Button.success(finChecker+"componentAction", "Component Action");
+        Button tacticalAction = Button.success(finChecker+"tacticalAction", "Tactical Action ("+player.getTacticalCC()+")");
+        int numOfComponentActions = ButtonHelper.getAllPossibleCompButtons(activeMap,player, event).size()-2;
+        Button componentAction = Button.success(finChecker+"componentAction", "Component Action ("+numOfComponentActions+")");
         if(player.getTacticalCC() > 0)
         {
             startButtons.add(tacticalAction);
@@ -458,12 +489,17 @@ public class ButtonHelper {
         if(!hadAnyUnplayedSCs && !doneActionThisTurn)
         {
             Button pass = Button.danger(finChecker+"passForRound", "Pass");
-            startButtons.addAll(ButtonHelper.getLegendaryExhaustButtons(player, activeMap));
+            if(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()> 1){
+                startButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability ("+(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()- 1)+")"));
+            }
+            
             startButtons.add(pass);
         }
         if(doneActionThisTurn)
         {
-            startButtons.addAll(ButtonHelper.getLegendaryExhaustButtons(player, activeMap));
+            if(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()> 1){
+                startButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability ("+(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()- 1)+")"));
+            }
             Button pass = Button.danger("turnEnd", "End Turn");
             startButtons.add(pass);
         }else if(player.getTechs().contains("cm")) {
@@ -1331,7 +1367,7 @@ public class ButtonHelper {
         return takeACs;
     }
 
-    public static List<Button> getAllPossibleCompButtons(Map activeMap, Player p1, ButtonInteractionEvent event) {
+    public static List<Button> getAllPossibleCompButtons(Map activeMap, Player p1, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_"+p1.getFaction() + "_";
         String prefix = "componentActionRes_";
         List<Button> compButtons = new ArrayList<>();
@@ -1834,7 +1870,7 @@ public class ButtonHelper {
         if(!firstPart.contains("ability") && !firstPart.contains("getRelic"))
         {
             String message = "Use buttons to end turn or do another action.";
-            List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(p1, activeMap, true);
+            List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(p1, activeMap, true, event);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
         }
         File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.all, event);
