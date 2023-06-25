@@ -24,7 +24,7 @@ public class StatisticsCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return true;
+        return event.getName().equals(getActionID());
     }
 
     @Override
