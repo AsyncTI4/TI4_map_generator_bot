@@ -35,6 +35,7 @@ public class CreatePlanet extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_TECH_SKIPS, "Comma-separated list of skips (Biotic, Cybernetic, Propulsion, Warfare, Unitskip, Nonunitskip)").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_LEGENDARY_NAME, "If the planet has a legendary ability, this is its name. An ability must have both a name and text.").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_LEGENDARY_TEXT, "If the planet has a legendary ability, this is its text. An ability must have both a name and text.").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET_FACTION_HOMEWORLD, "If this planet is in a faction's home system, put that faction's ID here").setRequired(false));
     }
 
     @Override
@@ -43,6 +44,7 @@ public class CreatePlanet extends BothelperSubcommandData {
         String techString = Optional.ofNullable(event.getOption(Constants.PLANET_TECH_SKIPS)).isPresent() ? event.getOption(Constants.PLANET_TECH_SKIPS).getAsString() : null;
         String legendaryName = Optional.ofNullable(event.getOption(Constants.PLANET_LEGENDARY_NAME)).isPresent() ? event.getOption(Constants.PLANET_LEGENDARY_NAME).getAsString() : null;
         String legendaryAbility = Optional.ofNullable(event.getOption(Constants.PLANET_LEGENDARY_TEXT)).isPresent() ? event.getOption(Constants.PLANET_LEGENDARY_TEXT).getAsString() : null;
+        String factionHomeworld = Optional.ofNullable(event.getOption(Constants.PLANET_FACTION_HOMEWORLD)).isPresent() ? event.getOption(Constants.PLANET_FACTION_HOMEWORLD).getAsString() : null;
 
         PlanetModel planet = createPlanetModel(event.getOption(Constants.PLANET_ID).getAsString(),
                 event.getOption(Constants.PLANET_TILE_ID).getAsString(),
@@ -55,7 +57,8 @@ public class CreatePlanet extends BothelperSubcommandData {
                 event.getOption(Constants.PLANET_TYPE).getAsString(),
                 techString,
                 legendaryName,
-                legendaryAbility
+                legendaryAbility,
+                factionHomeworld
         );
         exportPlanetModelToJson(planet);
         TileHelper.addNewPlanetToList(planet);
@@ -73,7 +76,8 @@ public class CreatePlanet extends BothelperSubcommandData {
                                                 String planetType,
                                                 String skips,
                                                 String legendaryName,
-                                                String legendaryText) {
+                                                String legendaryText,
+                                                String factionHomeworld) {
         PlanetTypeModel typeModel = new PlanetTypeModel();
 
         PlanetModel planet = new PlanetModel();
@@ -91,6 +95,8 @@ public class CreatePlanet extends BothelperSubcommandData {
             planet.setLegendaryAbilityName(legendaryName);
             planet.setLegendaryAbilityText(legendaryText);
         }
+        if(Optional.ofNullable(factionHomeworld).isPresent())
+            planet.setFactionHomeworld(factionHomeworld);
         planet.setUnitPositions(createDefaultUnitTokenPosition(planet));
 
         return planet;

@@ -17,6 +17,7 @@ public class PlanetModel {
     private Point positionInTile;
     private int resources;
     private int influence;
+    private String factionHomeworld;
     private PlanetTypeModel.PlanetType planetType;
     private String cardImagePath; //todo
     private List<TechSpecialtyModel.TechSpecialty> techSpecialties;
