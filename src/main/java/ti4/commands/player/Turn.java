@@ -169,7 +169,7 @@ public class Turn extends PlayerSubcommandData {
                 }
                 String text = "# " + Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " UP NEXT";
                 String buttonText = "Use buttons to do your turn. ";
-                List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeMap, false);
+                List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeMap, false, event);
                 activeMap.updateActivePlayer(player);
                 if (isFowPrivateGame) {
                     String fail = "User for next faction not found. Report to ADMIN";

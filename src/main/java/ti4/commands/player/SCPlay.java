@@ -188,7 +188,9 @@ public class SCPlay extends PlayerSubcommandData {
         Button endTurn = Button.danger("turnEnd", "End Turn");
         Button deleteButton = Button.danger("doAnotherAction", "Do Another Action");
         conclusionButtons.add(endTurn);
-        conclusionButtons.addAll(ButtonHelper.getLegendaryExhaustButtons(player, activeMap));
+        if(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()> 1){
+                conclusionButtons.add(Button.primary("endOfTurnAbilities", "Do End Of Turn Ability ("+(ButtonHelper.getEndOfTurnAbilities(player, activeMap).size()- 1)+")"));
+        }
         conclusionButtons.add(deleteButton);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
 
