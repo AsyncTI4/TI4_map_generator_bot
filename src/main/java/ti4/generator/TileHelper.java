@@ -38,16 +38,18 @@ public class TileHelper {
         ObjectMapper objectMapper = new ObjectMapper();
         String resourcePath = Storage.getResourcePath() + File.separator + "planets" + File.separator;
         String storagePath = Storage.getStoragePath() + File.separator + "planets" + File.separator;
-        List<File> files = new java.util.ArrayList<>(Stream.of(new File(resourcePath).listFiles())
-                .filter(file -> !file.isDirectory())
-                .toList());
-
+        List<File> files = new java.util.ArrayList<>();
         File[] storedFiles = new File(storagePath).listFiles();
+
         if(Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
                     .filter(file -> !file.isDirectory())
                     .toList());
         }
+        files.addAll(Stream.of(new File(resourcePath).listFiles())
+                .filter(file -> !file.isDirectory())
+                .toList());
+
         files.forEach(file -> {
                     try {
                         PlanetModel planet = objectMapper.readValue(new FileInputStream(file), PlanetModel.class);
@@ -63,15 +65,17 @@ public class TileHelper {
         ObjectMapper objectMapper = new ObjectMapper();
         String resourcePath = Storage.getResourcePath() + File.separator + "systems" + File.separator;
         String storagePath = Storage.getStoragePath() + File.separator + "systems" + File.separator;
-        List<File> files = new java.util.ArrayList<>(Stream.of(new File(resourcePath).listFiles())
-                .filter(file -> !file.isDirectory())
-                .toList());
+        List<File> files = new java.util.ArrayList<>();
         File[] storedFiles = new File(storagePath).listFiles();
+
         if(Optional.ofNullable(storedFiles).isPresent() && CollectionUtils.isNotEmpty(List.of(storedFiles))) {
             files.addAll(Stream.of(storedFiles)
                     .filter(file -> !file.isDirectory())
                     .toList());
         }
+        files.addAll(Stream.of(new File(resourcePath).listFiles())
+                .filter(file -> !file.isDirectory())
+                .toList());
         files.forEach(file -> {
             try {
                 TileModel tile = objectMapper.readValue(new FileInputStream(file), TileModel.class);
