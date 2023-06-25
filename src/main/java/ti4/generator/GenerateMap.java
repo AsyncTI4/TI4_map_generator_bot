@@ -1213,8 +1213,6 @@ public class GenerateMap {
                         originalPlanetType=TileHelper.getAllPlanets().get(planet).getFactionHomeworld();
                     if (Optional.ofNullable(originalPlanetType).isEmpty()) {
                         originalPlanetType = "none";
-                        BotLogger.log("Planet " + planet + " has a null originalPlanetType! Setting type to whoever owns it. This is the model:");
-                        BotLogger.log("```json\n" + TileHelper.getAllPlanets().get(planet).toString() + "\n```");
                     }
                     if (originalPlanetType.equals("none"))
                         originalPlanetType=player.getFaction();
