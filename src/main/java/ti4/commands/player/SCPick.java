@@ -193,7 +193,7 @@ public class SCPick extends PlayerSubcommandData {
             }
             else{
                    
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false));
+                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false, event));
 
                     
                     
@@ -213,7 +213,7 @@ public class SCPick extends PlayerSubcommandData {
                     if(allPicked)
                     {
                         MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
-                        MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false));
+                        MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false, event));
 
                     }
                     else
