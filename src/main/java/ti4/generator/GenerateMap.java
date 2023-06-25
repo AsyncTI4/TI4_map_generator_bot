@@ -1211,6 +1211,8 @@ public class GenerateMap {
                         originalPlanetType = "mr";
                     if (originalPlanetType.equals("none"))
                         originalPlanetType=TileHelper.getAllPlanets().get(planet).getFactionHomeworld();
+                    if (Optional.ofNullable(originalPlanetType).isEmpty())
+                        originalPlanetType = "none";
                     if (originalPlanetType.equals("none"))
                         originalPlanetType=player.getFaction();
                     
