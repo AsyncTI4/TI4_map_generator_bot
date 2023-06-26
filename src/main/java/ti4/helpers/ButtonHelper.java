@@ -12,6 +12,8 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.io.File;
 import java.util.*;
+
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.commands.cardsac.ACInfo;
@@ -42,14 +44,26 @@ import ti4.model.TechnologyModel;
 
 
 public class ButtonHelper {
-
+    public static boolean checkForTechSkipAttachments(Map activeMap, String planetName) {
+        boolean techPresent = false;
+        if(planetName.equalsIgnoreCase("custodiavigilia")){
+            return false;
+        }
+        Tile tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
+        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        Set<String> tokenList = unitHolder.getTokenList();
+        if (CollectionUtils.containsAny(tokenList, "attachment_warfare.png", "attachment_cybernetic.png", "attachment_biotic.png", "attachment_propulsion.png")) {
+            techPresent = true;
+        }
+        return techPresent;
+    }
     public static void sendAllTechsNTechSkipPlanetsToReady(Map activeMap, GenericInteractionCreateEvent event, Player player) {
         List<Button> buttons = new ArrayList<Button>();
         for(String tech : player.getExhaustedTechs()){
             buttons.add(Button.success("biostimsReady_tech_"+tech, "Ready "+Mapper.getTechs().get(tech).getName()));
         }
         for(String planet : player.getExhaustedPlanets()){
-            if(Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0){
+            if((Mapper.getPlanet(planet).getTechSpecialties() != null && Mapper.getPlanet(planet).getTechSpecialties().size() > 0) || ButtonHelper.checkForTechSkipAttachments(activeMap, planet)){
                 buttons.add(Button.success("biostimsReady_planet_"+planet, "Ready "+Helper.getPlanetRepresentation(planet, activeMap)));
             }
         }
