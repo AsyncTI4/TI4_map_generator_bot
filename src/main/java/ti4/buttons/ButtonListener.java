@@ -102,7 +102,7 @@ public class ButtonListener extends ListenerAdapter {
         Map activeMap = MapManager.getInstance().getMap(gameName);
         Player player = activeMap.getPlayer(id);
         player = Helper.getGamePlayer(activeMap, player, event.getMember(), id);
-        if (player == null || player.getFaction() == null) {
+        if (player == null) {
             event.getChannel().sendMessage("You're not a player of the game").queue();
             return;
         }
@@ -2354,8 +2354,14 @@ public class ButtonListener extends ListenerAdapter {
                 case "proceedToVoting" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                             "Decided to skip waiting for afters and proceed to voting.");
-                    AgendaHelper.startTheVoting(activeMap, event);
-                    event.getMessage().delete().queue();
+                     try {
+                         AgendaHelper.startTheVoting(activeMap, event);
+                        } catch (Exception e) {
+                            BotLogger.log(event, "Could not start the voting", e);
+                        }
+                    
+
+                    //event.getMessage().delete().queue();
                 }
                 case "drawAgenda_2" -> {
                     new DrawAgenda().drawAgenda(event, 2, activeMap, player);
