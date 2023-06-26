@@ -15,6 +15,7 @@ import ti4.map.Map;
 import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.UnitHolder;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 
@@ -158,7 +159,13 @@ public class AgendaHelper {
         activeMap.setCurrentPhase("agendaVoting");
         if (activeMap.getCurrentAgendaInfo() != null) {
             String message = " up to vote! Resolve using buttons. \n \n" + AgendaHelper.getSummaryOfVotes(activeMap, true);
-            Player nextInLine = AgendaHelper.getNextInLine(null, AgendaHelper.getVotingOrder(activeMap), activeMap);
+            
+            Player nextInLine = null;
+             try {
+                    nextInLine = AgendaHelper.getNextInLine(null, AgendaHelper.getVotingOrder(activeMap), activeMap);
+                } catch (Exception e) {
+                    BotLogger.log(event, "Could not find next in line", e);
+                }
             String realIdentity = Helper.getPlayerRepresentation(nextInLine, activeMap, event.getGuild(), true);
             int[] voteInfo = AgendaHelper.getVoteTotal(event, nextInLine, activeMap);
             if (nextInLine == null) {
@@ -182,7 +189,12 @@ public class AgendaHelper {
             message = realIdentity + message;
             Button Vote= Button.success("vote", pFaction+" Choose To Vote");
             Button Abstain = Button.danger("delete_buttons_0", pFaction+" Choose To Abstain");
-            activeMap.updateActivePlayer(nextInLine);
+            try {
+                    activeMap.updateActivePlayer(nextInLine);
+                } catch (Exception e) {
+                    BotLogger.log(event, "Could not update active player", e);
+                }
+            
             List<Button> buttons = List.of(Vote, Abstain);
             if (activeMap.isFoWMode()) {
                 if (nextInLine.getPrivateChannel() != null) {
