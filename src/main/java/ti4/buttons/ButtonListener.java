@@ -2354,9 +2354,6 @@ public class ButtonListener extends ListenerAdapter {
                 case "proceedToVoting" -> {
                     MessageHelper.sendMessageToChannel(event.getChannel(),
                             "Decided to skip waiting for afters and proceed to voting.");
-                    if (activeMap.getLatestOutcomeVotedFor() != null && activeMap.getLatestOutcomeVotedFor() != "") {
-                        activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestOutcomeVotedFor()).queue();
-                    }
                     AgendaHelper.startTheVoting(activeMap, event);
                     event.getMessage().delete().queue();
                 }
