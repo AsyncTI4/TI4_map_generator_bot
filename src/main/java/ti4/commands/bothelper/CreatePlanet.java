@@ -100,7 +100,7 @@ public class CreatePlanet extends BothelperSubcommandData {
         PlanetTypeModel typeModel = new PlanetTypeModel();
 
         PlanetModel planet = new PlanetModel();
-        planet.setId(planetId);
+        planet.setId(planetId.toLowerCase());
         planet.setTileId(planetTileId);
         planet.setName(planetName);
         planet.setAliases(getAliasListFromString(planetAliases));
