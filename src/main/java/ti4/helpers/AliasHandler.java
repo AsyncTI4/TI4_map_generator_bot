@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.lang3.StringUtils;
 import ti4.ResourceHelper;
 import ti4.generator.TileHelper;
+import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
@@ -138,18 +139,18 @@ public class AliasHandler {
     }
 
     public static void initAliases() {
-        TileHelper.getAllTiles().values().forEach(
-                tileModel -> {
-                    Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>())
-                            .forEach(alias -> allTileAliases.put(alias, tileModel.getId()));
-                }
-        );
-        TileHelper.getAllPlanets().values().forEach(
-                planetModel -> {
-                    Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>())
-                            .forEach(alias -> allPlanetAliases.put(alias, planetModel.getId()));
-                }
-        );
+        TileHelper.getAllTiles().values().forEach(AliasHandler::addNewTileAliases);
+        TileHelper.getAllPlanets().values().forEach(AliasHandler::addNewPlanetAliases);
+    }
+
+    public static void addNewPlanetAliases(PlanetModel planetModel) {
+        Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>())
+                .forEach(alias -> allPlanetAliases.put(alias, planetModel.getId()));
+    }
+
+    public static void addNewTileAliases(TileModel tileModel) {
+        Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>())
+                .forEach(alias -> allTileAliases.put(alias, tileModel.getId()));
     }
 
     public static String resolveTile(String name) {

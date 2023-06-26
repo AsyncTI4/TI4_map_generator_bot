@@ -82,7 +82,7 @@ public class CreateTile extends BothelperSubcommandData {
         ShipPositionModel shipPositionModel = new ShipPositionModel();
 
         TileModel tile = new TileModel();
-        tile.setId(id);
+        tile.setId(id.toLowerCase());
         tile.setName(name);
         tile.setAliases(getAliasListFromString(aliases));
         tile.setImagePath(image);
