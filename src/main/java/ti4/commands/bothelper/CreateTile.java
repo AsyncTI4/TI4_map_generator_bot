@@ -39,17 +39,37 @@ public class CreateTile extends BothelperSubcommandData {
         sendMessage("Creating tile " + event.getOption(Constants.TILE_NAME).getAsString());
         OptionMapping whOption = event.getOption(Constants.TILE_WORMHOLES);
         String whString = Optional.ofNullable(whOption).isPresent() ? whOption.getAsString() : "";
-        TileModel tile = createNewTile(
-                event.getOption(Constants.TILE_ID).getAsString(),
-                event.getOption(Constants.TILE_NAME).getAsString(),
-                event.getOption(Constants.TILE_ALIASES).getAsString(),
-                event.getOption(Constants.TILE_IMAGE).getAsString(),
-                event.getOption(Constants.TILE_PLANET_IDS).getAsString(),
-                event.getOption(Constants.TILE_TYPE).getAsString(),
-                whString
-                );
-        exportTileModelToJson(tile);
-        TileHelper.addNewTileToList(tile);
+        TileModel tile = null;
+        try {
+            tile = createNewTile(
+                    event.getOption(Constants.TILE_ID).getAsString(),
+                    event.getOption(Constants.TILE_NAME).getAsString(),
+                    event.getOption(Constants.TILE_ALIASES).getAsString(),
+                    event.getOption(Constants.TILE_IMAGE).getAsString(),
+                    event.getOption(Constants.TILE_PLANET_IDS).getAsString(),
+                    event.getOption(Constants.TILE_TYPE).getAsString(),
+                    whString
+            );
+        } catch (Exception e) {
+            BotLogger.log("Something went wrong creating the tile! "
+                    + e.getMessage() + "\n" + e.getStackTrace());
+        }
+        if(Optional.ofNullable(tile).isPresent()) {
+            try {
+                exportTileModelToJson(tile);
+            } catch (Exception e) {
+                BotLogger.log("Something went wrong exporting the tile to json! "
+                        + e.getMessage() + "\n" +e.getStackTrace());
+            }
+            try {
+                TileHelper.addNewTileToList(tile);
+            } catch (Exception e) {
+                BotLogger.log("Something went wrong adding the tile to the active tiles list! " +
+                        e.getMessage() + "\n" + e.getStackTrace());
+            }
+        }
+        sendMessage("Created new tile! Please check and make sure everything generated properly. This is the model:\n" +
+                "```json\n" + TileHelper.getAllTiles().get(event.getOption(Constants.TILE_ID).getAsString()) + "\n```");
     }
 
     private static TileModel createNewTile(String id,
@@ -62,7 +82,7 @@ public class CreateTile extends BothelperSubcommandData {
         ShipPositionModel shipPositionModel = new ShipPositionModel();
 
         TileModel tile = new TileModel();
-        tile.setId(id);
+        tile.setId(id.toLowerCase());
         tile.setName(name);
         tile.setAliases(getAliasListFromString(aliases));
         tile.setImagePath(image);

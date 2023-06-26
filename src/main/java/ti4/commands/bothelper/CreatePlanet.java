@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.generator.PlanetHelper;
 import ti4.generator.TileHelper;
 import ti4.generator.UnitTokenPosition;
 import ti4.helpers.Constants;
@@ -45,24 +46,42 @@ public class CreatePlanet extends BothelperSubcommandData {
         String legendaryName = Optional.ofNullable(event.getOption(Constants.PLANET_LEGENDARY_NAME)).isPresent() ? event.getOption(Constants.PLANET_LEGENDARY_NAME).getAsString() : null;
         String legendaryAbility = Optional.ofNullable(event.getOption(Constants.PLANET_LEGENDARY_TEXT)).isPresent() ? event.getOption(Constants.PLANET_LEGENDARY_TEXT).getAsString() : null;
         String factionHomeworld = Optional.ofNullable(event.getOption(Constants.PLANET_FACTION_HOMEWORLD)).isPresent() ? event.getOption(Constants.PLANET_FACTION_HOMEWORLD).getAsString() : null;
-
-        PlanetModel planet = createPlanetModel(event.getOption(Constants.PLANET_ID).getAsString(),
-                event.getOption(Constants.PLANET_TILE_ID).getAsString(),
-                event.getOption(Constants.PLANET_NAME).getAsString(),
-                event.getOption(Constants.PLANET_ALIASES).getAsString(),
-                event.getOption(Constants.PLANET_POSITION_X).getAsInt(),
-                event.getOption(Constants.PLANET_POSITION_Y).getAsInt(),
-                event.getOption(Constants.PLANET_RESOURCES).getAsInt(),
-                event.getOption(Constants.PLANET_INFLUENCE).getAsInt(),
-                event.getOption(Constants.PLANET_TYPE).getAsString(),
-                techString,
-                legendaryName,
-                legendaryAbility,
-                factionHomeworld
-        );
-        exportPlanetModelToJson(planet);
-        TileHelper.addNewPlanetToList(planet);
-        sendMessage("Created new planet! Please check and make sure everything generated properly.");
+        PlanetModel planet = null;
+        try {
+            planet = createPlanetModel(event.getOption(Constants.PLANET_ID).getAsString(),
+                    event.getOption(Constants.PLANET_TILE_ID).getAsString(),
+                    event.getOption(Constants.PLANET_NAME).getAsString(),
+                    event.getOption(Constants.PLANET_ALIASES).getAsString(),
+                    event.getOption(Constants.PLANET_POSITION_X).getAsInt(),
+                    event.getOption(Constants.PLANET_POSITION_Y).getAsInt(),
+                    event.getOption(Constants.PLANET_RESOURCES).getAsInt(),
+                    event.getOption(Constants.PLANET_INFLUENCE).getAsInt(),
+                    event.getOption(Constants.PLANET_TYPE).getAsString(),
+                    techString,
+                    legendaryName,
+                    legendaryAbility,
+                    factionHomeworld
+            );
+        } catch (Exception e) {
+            BotLogger.log("Something went wrong creating the planet! "
+                    + e.getMessage() + "\n" + e.getStackTrace());
+        }
+        if(Optional.ofNullable(planet).isPresent()) {
+            try {
+                exportPlanetModelToJson(planet);
+            } catch (Exception e) {
+                BotLogger.log("Something went wrong exporting the planet to json! "
+                        + e.getMessage() + "\n" +e.getStackTrace());
+            }
+            try {
+                TileHelper.addNewPlanetToList(planet);
+            } catch (Exception e) {
+                BotLogger.log("Something went wrong adding the planet to the active planets list! " +
+                        e.getMessage() + "\n" + e.getStackTrace());
+            }
+            sendMessage("Created new planet! Please check and make sure everything generated properly. This is the model:\n" +
+                    "```json\n" + TileHelper.getAllPlanets().get(event.getOption(Constants.PLANET_ID).getAsString()) + "\n```");
+        }
     }
 
     private static PlanetModel createPlanetModel(String planetId,
@@ -81,7 +100,7 @@ public class CreatePlanet extends BothelperSubcommandData {
         PlanetTypeModel typeModel = new PlanetTypeModel();
 
         PlanetModel planet = new PlanetModel();
-        planet.setId(planetId);
+        planet.setId(planetId.toLowerCase());
         planet.setTileId(planetTileId);
         planet.setName(planetName);
         planet.setAliases(getAliasListFromString(planetAliases));
