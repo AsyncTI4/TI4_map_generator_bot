@@ -1416,11 +1416,8 @@ public class ButtonHelper {
                 //leaderID = 0:LeaderName ; 1:LeaderTitle ; 2:BacksideTitle/HeroAbility ; 3:AbilityWindow ; 4:AbilityText
                 String[] leaderRepSplit = leaderRep.split(";");
                 String leaderName = leaderRepSplit[0];
-                String leaderTitle = leaderRepSplit[1];
-                String heroAbilityName = leaderRepSplit[2];
                 String leaderAbilityWindow = leaderRepSplit[3];
-                String leaderAbilityText = leaderRepSplit[4];
-                String leaderUnlockCondition = leaderRepSplit[5];
+                
                 
                 String factionEmoji =Helper.getFactionLeaderEmoji(leader);
                 if(leaderAbilityWindow.equalsIgnoreCase("ACTION:") || leaderName.contains("Ssruu"))
