@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import org.jetbrains.annotations.NotNull;
 import ti4.generator.TileHelper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.map.Tile;
@@ -63,6 +64,7 @@ public class CreateTile extends BothelperSubcommandData {
             }
             try {
                 TileHelper.addNewTileToList(tile);
+                AliasHandler.addNewTileAliases(tile);
             } catch (Exception e) {
                 BotLogger.log("Something went wrong adding the tile to the active tiles list! " +
                         e.getMessage() + "\n" + e.getStackTrace());
@@ -88,7 +90,7 @@ public class CreateTile extends BothelperSubcommandData {
         tile.setImagePath(image);
         tile.setPlanetIds(getPlanetListFromString(planetIds));
         tile.setShipPositionsType(shipPositionModel.getTypeFromString(type));
-        //tile.setSpaceTokenLocations();
+        tile.setSpaceTokenLocations(tile.getShipPositionsType().getSpaceTokenLayout());
         tile.setWormholes(getWormholesFromString(wormholes));
 
         return tile;

@@ -27,8 +27,8 @@ public class TechSpecialtyModel {
                                 (techSpecialty -> techSpecialty)
                         )
                 );
-        if (allTypes.containsKey(specialty))
-            return allTypes.get(specialty);
+        if (allTypes.containsKey(specialty.toLowerCase()))
+            return allTypes.get(specialty.toLowerCase());
         return null;
     }
 }

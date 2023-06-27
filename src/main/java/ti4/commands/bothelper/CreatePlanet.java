@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.PlanetHelper;
 import ti4.generator.TileHelper;
 import ti4.generator.UnitTokenPosition;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
@@ -75,6 +76,7 @@ public class CreatePlanet extends BothelperSubcommandData {
             }
             try {
                 TileHelper.addNewPlanetToList(planet);
+                AliasHandler.addNewPlanetAliases(planet);
             } catch (Exception e) {
                 BotLogger.log("Something went wrong adding the planet to the active planets list! " +
                         e.getMessage() + "\n" + e.getStackTrace());

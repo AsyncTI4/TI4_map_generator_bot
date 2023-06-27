@@ -60,8 +60,8 @@ public class ShipPositionModel {
                                 (shipPositionModel -> shipPositionModel)
                         )
                 );
-        if (allTypes.containsKey(type))
-            return allTypes.get(type);
+        if (allTypes.containsKey(type.toLowerCase()))
+            return allTypes.get(type.toLowerCase());
         return null;
     }
 
