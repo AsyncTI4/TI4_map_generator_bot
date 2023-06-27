@@ -208,8 +208,8 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannel(channel2, sb.toString());
                     ACInfo.sendActionCardInfo(activeMap, player);
                     String message = "Use buttons to end turn or do another action.";
-                    List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeMap, true, event);
                     if(player.hasAbility("stall_tactics")){
+                        List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeMap, true, event);
                         MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
                     }
                     
