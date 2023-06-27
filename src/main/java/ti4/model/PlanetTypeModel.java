@@ -29,8 +29,8 @@ public class PlanetTypeModel {
                                 (t -> t)
                         )
                 );
-        if (allTypes.containsKey(type))
-            return allTypes.get(type);
+        if (allTypes.containsKey(type.toLowerCase()))
+            return allTypes.get(type.toLowerCase());
         return PlanetType.NONE;
     }
 }

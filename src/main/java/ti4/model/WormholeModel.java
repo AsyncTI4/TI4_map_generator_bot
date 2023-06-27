@@ -46,8 +46,8 @@ public class WormholeModel {
                                 (wormholeModel -> wormholeModel)
                         )
                 );
-        if (allWormholes.containsKey(wh))
-            return allWormholes.get(wh);
+        if (allWormholes.containsKey(wh.toLowerCase()))
+            return allWormholes.get(wh.toLowerCase());
         return null;
     }
 }
