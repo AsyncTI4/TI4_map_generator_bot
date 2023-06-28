@@ -144,10 +144,13 @@ public class Setup extends PlayerSubcommandData {
                        position = "bl";
                    } else {
                        position = "tl";
+
                        Tile mallice = activeMap.getTile(position);
-                       mallice.setPosition("tr");
-                       activeMap.removeTile("tl");
-                       activeMap.setTile(mallice);
+                       if(mallice != null){
+                            mallice.setPosition("tr");
+                            activeMap.removeTile("tl");
+                            activeMap.setTile(mallice);
+                       }
                    }
                 } else {
                     if (positionNumber == 1 || positionNumber == 2 || positionNumber == 3 ){
@@ -159,9 +162,11 @@ public class Setup extends PlayerSubcommandData {
                     } else {
                         position = "tl";
                         Tile mallice = activeMap.getTile(position);
-                        mallice.setPosition("tr");
-                        activeMap.removeTile("tl");
-                        activeMap.setTile(mallice);
+                        if(mallice != null){
+                            mallice.setPosition("tr");
+                            activeMap.removeTile("tl");
+                            activeMap.setTile(mallice);
+                        }
                     }
                 }
             }
