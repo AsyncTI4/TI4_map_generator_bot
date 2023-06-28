@@ -250,7 +250,7 @@
     "alias": "titans",
     "factionName": "The Titans of Ul",
     "homeSystem": "55",
-    "startingFleet": "dn,2 cr,2 ff,3 inf e,sd e",
+    "startingFleet": "dn,2 cr,2 ff,3 inf elysium,sd elysium",
     "commodities": 2,
     "factionTech": ["ht2", "se2"],
     "startingTech": ["amd", "sdn"],

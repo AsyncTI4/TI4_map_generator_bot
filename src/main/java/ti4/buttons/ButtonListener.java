@@ -148,7 +148,8 @@ public class ButtonListener extends ListenerAdapter {
         String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
         String trueIdentity = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true);
         String ident = Helper.getFactionIconFromDiscord(player.getFaction());
-
+  try {
+                    
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
             String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
             MessageChannel channel = null;
@@ -211,10 +212,16 @@ public class ButtonListener extends ListenerAdapter {
                     if(player.hasAbility("stall_tactics")){
                         List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeMap, true, event);
                         MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
+                       
                     }
-                    
+
+                    ButtonHelper.checkACLimit(activeMap, event, player);
                     event.getMessage().delete().queue();
+                    
+                    
+                   
                 } catch (Exception e) {
+                    BotLogger.log(event, "Something went wrong discarding", e);
                 }
             } else {
                 event.getChannel().sendMessage("Could not find channel to play card. Please ping Bothelper.").queue();
@@ -2078,7 +2085,10 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("resolvePNPlay_")) {
             String pnID = buttonID.replace("resolvePNPlay_", "");
             ButtonHelper.resolvePNPlay(pnID, player, activeMap, event);
-            event.getMessage().delete().queue();
+            if(!pnID.equalsIgnoreCase("bmf")){
+                event.getMessage().delete().queue();
+            }
+            
         } else if (buttonID.startsWith("send_")) {
             ButtonHelper.resolveSpecificTransButtonPress(activeMap, player, buttonID, event);
             event.getMessage().delete().queue();
@@ -3354,6 +3364,9 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 default -> event.getHook().sendMessage("Button " + buttonID + " pressed.").queue();
             }
+        }
+        } catch (Exception e) {
+            BotLogger.log(event, "Something went wrong with a button press", e);
         }
         MapSaveLoadManager.saveMap(activeMap, event);
     }
