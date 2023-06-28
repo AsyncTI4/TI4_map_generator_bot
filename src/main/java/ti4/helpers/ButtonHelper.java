@@ -95,7 +95,7 @@ public class ButtonHelper {
                 channel = player.getPrivateChannel();
             }
             String ident = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
-            MessageHelper.sendMessageToChannel(channel, ident+ " you are exceeding the AC hand limit of "+limit+". Please discard down to the limit");
+            MessageHelper.sendMessageToChannel(channel, ident+ " you are exceeding the AC hand limit of "+limit+". Please discard down to the limit. Check your cards info thread for the blue discard buttons. ");
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeMap), ident+" use buttons to discard", ACInfo.getDiscardActionCardButtons(activeMap, player));
         }
     }
@@ -460,10 +460,6 @@ public class ButtonHelper {
             endButtons.add(Button.success(finChecker+"planetAbilityExhaust_"+planet, "Use Hope's End Ability"));
         }
         planet = "primor";
-        if(player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet))
-        {
-            endButtons.add(Button.success(finChecker+"planetAbilityExhaust_"+planet, "Use Primor Ability"));
-        }
         if(player.getPlanets().contains(planet) && !player.getExhaustedPlanetsAbilities().contains(planet))
         {
             endButtons.add(Button.success(finChecker+"planetAbilityExhaust_"+planet, "Use Primor Ability"));
@@ -1478,7 +1474,7 @@ public class ButtonHelper {
             if(!Mapper.getPromissoryNoteOwner(pn).equalsIgnoreCase(p1.getFaction()) && !p1.getPromissoryNotesInPlayArea().contains(pn))
             {
                 String pnText = Mapper.getPromissoryNote(pn, true);
-                if(pnText.contains("Action:"))
+                if(pnText.contains("Action:") && !pn.equalsIgnoreCase("bmf"))
                 {
                     PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                     String pnName = pnModel.getName();
