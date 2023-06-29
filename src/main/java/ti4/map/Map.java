@@ -1613,6 +1613,7 @@ public class Map {
 
     public String drawRelic() {
         ArrayList<String> relics_ = new ArrayList<>(relics);
+        Collections.shuffle(relics_);
         relics_.remove(Constants.ENIGMATIC_DEVICE);
         if (relics_.isEmpty()) {
             return "";
