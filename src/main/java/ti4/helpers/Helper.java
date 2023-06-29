@@ -479,6 +479,7 @@ public class Helper {
     public static String getPlanetRepresentation(String planet, Map activeMap) {
         planet = planet.toLowerCase().replace(" ", "");
         planet = planet.replace("'", "");
+        planet = planet.replace("-", "");
         UnitHolder unitHolder = activeMap.getPlanetsInfo().get(AliasHandler.resolvePlanet(planet));
         Planet planet2 = (Planet) unitHolder;
         String planetProper = Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planet)) + " (" +planet2.getResources() + "/"+planet2.getInfluence()+")";
