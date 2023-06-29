@@ -1057,10 +1057,10 @@ public class ButtonHelper {
 
         return buttons;
     }
-    public static boolean tileHasPDS2Cover(Player player, Map activeMap, String tilePos) {
+    public static List<Player> tileHasPDS2Cover(Player player, Map activeMap, String tilePos) {
         
         Set<String> adjTiles = FoWHelper.getAdjacentTiles(activeMap, tilePos, player, false);
-
+        List<Player> playersWithPds2 = new ArrayList<Player>();
         for (String tilePo : adjTiles) {
 			Tile tile = activeMap.getTileByPosition(tilePo);
             for(UnitHolder area : tile.getUnitHolders().values())
@@ -1072,7 +1072,9 @@ public class ButtonHelper {
                         String unitKey1 = Mapper.getUnitID(AliasHandler.resolveUnit("pds"), p.getColor());
                         if(area.getUnits().containsKey(unitKey1) && p.hasPDS2Tech())
                         {
-                            return true;
+                            if(!playersWithPds2.contains(p)){
+                                playersWithPds2.add(p);
+                            }
                         }
                         if(p.getFaction().equalsIgnoreCase("xxcha"))
                         {
@@ -1080,14 +1082,16 @@ public class ButtonHelper {
                             String unitKey3 = Mapper.getUnitID(AliasHandler.resolveUnit("mech"), p.getColor());
                             if(area.getUnits().containsKey(unitKey2) || area.getUnits().containsKey(unitKey3))
                             {
-                                return true;
+                                if(!playersWithPds2.contains(p)){
+                                    playersWithPds2.add(p);
+                                }
                             }
                         }
                     }
                 }
             }
 		}
-        return false;
+        return playersWithPds2;
     }
 
 
