@@ -366,6 +366,9 @@ public class Mapper {
     }
 
     public static String getPromissoryNoteOwner(String id) {
+        if(promissoryNotes.get(id) == null){
+            return "finNullDodger";
+        }
         return promissoryNotes.get(id).getOwner();
     }
 
