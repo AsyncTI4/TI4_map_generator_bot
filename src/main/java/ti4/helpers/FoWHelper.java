@@ -367,6 +367,12 @@ public class FoWHelper {
 					wormholeIDs.add(Constants.DELTA);
 				} else if (token.contains(Constants.EPSILON)) {
 					wormholeIDs.add(Constants.EPSILON);
+				} else if (token.contains(Constants.VOYAGE)) {
+					wormholeIDs.add(Constants.VOYAGE);
+				} else if (token.contains(Constants.CHAMPION)) {
+					wormholeIDs.add(Constants.CHAMPION);
+				} else if (token.contains(Constants.NARROWS)) {
+					wormholeIDs.add(Constants.NARROWS);
 				} else if (token.contains(Constants.ZETA)) {
 					wormholeIDs.add(Constants.ZETA);
 				} else if (token.contains(Constants.ETA)) {

@@ -1840,7 +1840,10 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity + " activated "
                     + activeMap.getTileByPosition(pos).getRepresentationForButtons(activeMap, player));
             activeMap.resetCurrentMovedUnitsFrom1TacticalAction();
-            List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, activeMap, pos);
+            List<Player> playersWithPds2 = new ArrayList<Player>();
+            if(!activeMap.isFoWMode()){
+                playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, activeMap, pos);
+            }
             if (!activeMap.isFoWMode() && playersWithPds2.size() > 0) {
                 String pdsMessage = trueIdentity + " this is a courtesy notice that the selected system is in range of deep space cannon units owned by";
 
