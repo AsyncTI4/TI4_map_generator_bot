@@ -72,6 +72,7 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import ti4.generator.GenerateMap;
+import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 
 public class ButtonListener extends ListenerAdapter {
@@ -1839,9 +1840,14 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity + " activated "
                     + activeMap.getTileByPosition(pos).getRepresentationForButtons(activeMap, player));
             activeMap.resetCurrentMovedUnitsFrom1TacticalAction();
-            if (!activeMap.isFoWMode() && ButtonHelper.tileHasPDS2Cover(player, activeMap, pos)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity
-                        + " this is a courtesy notice that the selected system is in range of opponent deep space cannon units. ");
+            List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, activeMap, pos);
+            if (!activeMap.isFoWMode() && playersWithPds2.size() > 0) {
+                String pdsMessage = trueIdentity + " this is a courtesy notice that the selected system is in range of deep space cannon units owned by";
+
+                for(Player playerWithPds : playersWithPds2){
+                    pdsMessage = pdsMessage + " "+Helper.getPlayerRepresentation(playerWithPds, activeMap, activeMap.getGuild(), false);
+                }
+                MessageHelper.sendMessageToChannel(event.getChannel(), pdsMessage);
             }
             List<Button> button2 = ButtonHelper.scanlinkResolution(player, activeMap, event);
             if (player.getTechs().contains("sdn") && !button2.isEmpty()) {
@@ -3127,6 +3133,20 @@ public class ButtonListener extends ListenerAdapter {
                                             for (ThreadChannel threadChannel_ : threadChannels) {
                                                 if (threadChannel_.getName().equals(threadName)) {
                                                     MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_, Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true) + Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true) + " Please resolve the interaction here. The first step is any pds fire or playing of experimental battle station. Then the playing of any start of combat or start of a combat round abilities (includes skilled retreat). Then the rolling of anti-fighter-barrage. Then the declaration of retreats (includes the playing of rout). Then the rolling of dice. None of this is automated yet.");
+                                                    List<Player> playersWithPds2 = ButtonHelper.tileHasPDS2Cover(p1, activeMap, tile.getPosition());
+                                                    int context = 0;
+                                                    if(playersWithPds2.size()> 0){
+                                                        context =1;
+                                                    }
+                                                    File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, context, tile.getPosition(), event);
+                                                    MessageHelper.sendMessageWithFile((MessageChannel) threadChannel_, systemWithContext, "Picture of system", false);
+                                                    if (playersWithPds2.size() > 0) {
+                                                        String pdsMessage = "The following players have pds2 cover in the region:";
+                                                        for(Player playerWithPds : playersWithPds2){
+                                                            pdsMessage = pdsMessage + " "+Helper.getPlayerRepresentation(playerWithPds, activeMap, activeMap.getGuild(), false);
+                                                        }
+                                                        MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_, pdsMessage);
+                                                    }
                                                 }
                                             }
                                         }
