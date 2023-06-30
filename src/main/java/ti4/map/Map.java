@@ -202,10 +202,20 @@ public class Map {
 
         //Card Decks
         this.secretObjectives = Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList();
+        Collections.shuffle(this.secretObjectives);
+
         this.actionCards = Mapper.getDecks().get("action_cards_pok").getShuffledCardList();
+        Collections.shuffle(this.actionCards);
+
         this.explore = Mapper.getDecks().get("explores_pok").getShuffledCardList();
+        Collections.shuffle(this.explore);
+
         this.publicObjectives1 = Mapper.getDecks().get("public_stage_1_objectives_pok").getShuffledCardList();
+        Collections.shuffle(this.publicObjectives1);
+
         this.publicObjectives2 = Mapper.getDecks().get("public_stage_2_objectives_pok").getShuffledCardList();
+        Collections.shuffle(this.publicObjectives2);
+
         resetAgendas();
         resetRelics();
         
@@ -1307,6 +1317,7 @@ public class Map {
         } else {
             this.agendas = Mapper.getDecks().get("agendas_pok").getShuffledCardList();
         }
+        Collections.shuffle(this.agendas);
         discardAgendas = new LinkedHashMap<>();
     }
 
@@ -1614,7 +1625,7 @@ public class Map {
     public String drawRelic() {
         ArrayList<String> relics_ = new ArrayList<>(relics);
         Collections.shuffle(relics_);
-        relics_.remove(Constants.ENIGMATIC_DEVICE);
+        relics_.remove(Constants.ENIGMATIC_DEVICE); //Legacy, deck no longer includes this - can be removed once all games before pbd682 are finished
         if (relics_.isEmpty()) {
             return "";
         }
@@ -1917,6 +1928,7 @@ public class Map {
         } else {
             this.relics = Mapper.getDecks().get("relics_pok").getShuffledCardList();
         }
+        Collections.shuffle(this.relics);
     }
 
     public void setSecretObjectives(List<String> secretObjectives) {

@@ -649,7 +649,7 @@ public class Player {
     public void addRelic(String relicID) {
         if (!relics.contains(relicID) || Constants.ENIGMATIC_DEVICE.equals(relicID)) {
             if (relicID.equals("dynamiscore") || relicID.equals("absol_dynamiscore")){
-                commoditiesTotal += 2;
+                setCommoditiesTotal(getCommoditiesTotal() + 2);
             }
             relics.add(relicID);
         }
@@ -660,8 +660,8 @@ public class Player {
     }
 
     public void removeRelic(String relicID) {
-        if (relicID.equals("dynamiscore")){
-            commoditiesTotal -= 2;
+        if (relicID.equals("dynamiscore") || relicID.equals("absol_dynamiscore")){
+            setCommoditiesTotal(getCommoditiesTotal() - 2);
         }
         relics.remove(relicID);
     }
