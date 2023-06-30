@@ -61,7 +61,7 @@
         "type": "relic",
         "description": "All Relics in a 'vanilla' PoK game",
         "cardIDs": [
-            "codex","dominusorb","dynamiscore","emelpar","emphidia","enigmaticdevice","mawofworlds","nanoforge","obsidian","prophetstears","shard","stellarconverter","thalnos","titanprototype"
+            "codex","dominusorb","dynamiscore","emelpar","emphidia","mawofworlds","nanoforge","obsidian","prophetstears","shard","stellarconverter","thalnos","titanprototype"
         ]
     },
     {
@@ -91,7 +91,7 @@
         "type": "relic",
         "description": "All Relics for Absol Mode",
         "cardIDs": [
-            "absol_codex","absol_dominusorb","absol_dynamiscore","absol_emelpar","absol_emphidia","absol_jr","absol_luxarchtreatise","absol_mawofworlds","absol_nanoforge","absol_obsidian","absol_plenaryorbital","absol_prophetstears","absol_quantumcore","absol_shardofthethrone1","absol_shardofthethrone2","absol_shardofthethrone3","absol_stellarconverter","absol_syncretone","absol_thalnos","absol_tyrantslament","enigmaticdevice"
+            "absol_codex","absol_dominusorb","absol_dynamiscore","absol_emelpar","absol_emphidia","absol_jr","absol_luxarchtreatise","absol_mawofworlds","absol_nanoforge","absol_obsidian","absol_plenaryorbital","absol_prophetstears","absol_quantumcore","absol_shardofthethrone1","absol_shardofthethrone2","absol_shardofthethrone3","absol_stellarconverter","absol_syncretone","absol_thalnos","absol_tyrantslament"
         ]
     },
 
