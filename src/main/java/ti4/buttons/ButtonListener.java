@@ -2983,6 +2983,7 @@ public class ButtonListener extends ListenerAdapter {
                     String message = playerRep + " exhausted Mallice ability and gained 2 tg (" + player.getTg() + "->"
                             + (player.getTg() + 2) + ").";
                     player.setTg(player.getTg() + 2);
+                    ButtonHelper.pillageCheck(player, activeMap);
                     if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
                         ButtonHelper.commanderUnlockCheck(player, activeMap, "hacan", event);
                     }

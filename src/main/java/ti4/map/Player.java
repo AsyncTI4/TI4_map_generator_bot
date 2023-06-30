@@ -648,7 +648,7 @@ public class Player {
 
     public void addRelic(String relicID) {
         if (!relics.contains(relicID) || Constants.ENIGMATIC_DEVICE.equals(relicID)) {
-            if (relicID.equals("dynamiscore")){
+            if (relicID.equals("dynamiscore") || relicID.equals("absol_dynamiscore")){
                 commoditiesTotal += 2;
             }
             relics.add(relicID);
