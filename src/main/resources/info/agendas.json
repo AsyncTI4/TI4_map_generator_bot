@@ -553,7 +553,7 @@
     "name": "Compensated Disarmamanet",
     "type": "Directive",
     "target": "Elect non-home Planet",
-    "text1": "Remove each ground force on the elected planet| the player that controls that planet gains 1 trade good for each infantry removed and 2 trade goods for each mech removed. The other player that controls the elected planet gives the other player that cast the most votes for that planet 1 promissory note from their hand.",
+    "text1": "Remove each ground force on the elected planet. The player that controls that planet gains 1 trade good for each infantry removed and 2 trade goods for each mech removed. The player that controls the elected planet gives the other player that cast the most votes for that planet 1 promissory note from their hand.",
     "text2": "",
     "source": "absol"
   },
@@ -658,10 +658,10 @@
   },
   {
     "alias": "absol_crisis",
-    "name": "Glactic Crisis Pact",
+    "name": "Galactic Crisis Pact",
     "type": "Directive",
     "target": "Elect Strategy Card",
-    "text1": "Each player may perform the secondary ability of the elected strategy card without spending a command token| command tokens placed by the ability are placed from a player\"s reinforcements, instead. The player that cast the most votes for the elected strategy card may choose to perform the primary ability, instead.",
+    "text1": "Each player may perform the secondary ability of the elected strategy card without spending a command token. Command tokens placed by the ability are placed from a player\"s reinforcements, instead. The player that cast the most votes for the elected strategy card may choose to perform the primary ability, instead.",
     "text2": "",
     "source": "absol"
   },
