@@ -1,1 +1,1 @@
-{"id":"94new","name":"Moll Primus Keleres","aliases":null,"imagePath":"94new_MollPrimusKeleres.png","shipPositionsType":"TYPE01","spaceTokenLocations":[{"x":195.0,"y":10.0},{"x":225.0,"y":75.0},{"x":225.0,"y":155.0},{"x":145.0,"y":205.0}],"wormholes":[],"planets":["mollprimusk"]}
+{"id":"94new","name":"Moll Primus Keleres","aliases":["keleresm"],"imagePath":"94new_MollPrimusKeleres.png","shipPositionsType":"TYPE01","spaceTokenLocations":[{"x":195.0,"y":10.0},{"x":225.0,"y":75.0},{"x":225.0,"y":155.0},{"x":145.0,"y":205.0}],"wormholes":[],"planets":["mollprimusk"]}
