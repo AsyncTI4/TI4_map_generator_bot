@@ -29,11 +29,14 @@ import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.map.UnitHolder;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowAllAC;
+import ti4.commands.cardspn.ShowAllPN;
 import ti4.commands.cardsso.DiscardSO;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
+import ti4.commands.cardsso.ShowAllSO;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpPlanet;
+import ti4.commands.fow.PingSystem;
 import ti4.commands.status.Cleanup;
 import ti4.commands.status.RevealStage1;
 import ti4.commands.status.RevealStage2;
@@ -55,6 +58,7 @@ import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Leader;
 import ti4.map.Map;
@@ -1733,12 +1737,39 @@ public class ButtonListener extends ListenerAdapter {
                 ButtonHelper.commanderUnlockCheck(player, activeMap, "arborec", event);
             }
 
+        } else if (buttonID.startsWith("yssarilcommander_")) {
 
+            buttonID = buttonID.replace("yssarilcommander_", "");
+            String enemyFaction = buttonID.split("_")[1];
+            Player enemy = Helper.getPlayerFromColorOrFaction(activeMap, enemyFaction);
+            String message = "";
+            String type = buttonID.split("_")[0];
+            if(type.equalsIgnoreCase("ac")){
+                ShowAllAC.showAll(enemy, player, activeMap);
+                message = "Yssaril commander used to look at ACs";
+            }
+            if(type.equalsIgnoreCase("so")){
+                new ShowAllSO().showAll(enemy, player, activeMap);
+                message = "Yssaril commander used to look at SOs";
+            }
+            if(type.equalsIgnoreCase("pn")){
+                new ShowAllPN().showAll(enemy, player, activeMap, false);
+                message = "Yssaril commander used to look at PNs";
+            }
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            if(activeMap.isFoWMode()){
+                MessageHelper.sendMessageToChannel(enemy.getPrivateChannel(), message);
+            }
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("freelancersBuild_")) {
             String planet = buttonID.replace("freelancersBuild_", "");
             List<Button> buttons = new ArrayList<Button>();
+            Tile tile = activeMap.getTile(AliasHandler.resolveTile(planet));
+            if(tile == null){
+                tile = activeMap.getTileByPosition(planet);
+            }
             buttons = Helper.getPlaceUnitButtons(event, player, activeMap,
-                    activeMap.getTile(AliasHandler.resolveTile(planet)), "freelancers", "placeOneNDone_dontskip");
+                    tile, "freelancers", "placeOneNDone_dontskip");
             String message = Helper.getPlayerRepresentation(player, activeMap) + " Use the buttons to produce 1 unit. "
                     + ButtonHelper.getListOfStuffAvailableToSpend(player, activeMap);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
@@ -1829,9 +1860,13 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> buttons = ButtonHelper.getButtonsToTakeSomeonesAC(activeMap, player, victim);
             ShowAllAC.showAll(victim, player, activeMap);
             MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeMap),
-                    Helper.getPlayerRepresentation(player, activeMap, null, true)
+                    Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)
                             + " Select which AC you would like to steal",
                     buttons);
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("doActivation_")) {
+            String pos = buttonID.replace("doActivation_", "");
+            ButtonHelper.resolveOnActivationEnemyAbilities(activeMap, activeMap.getTileByPosition(pos), player, false);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("ringTile_")) {
             String pos = buttonID.replace("ringTile_", "");
@@ -1843,6 +1878,20 @@ public class ButtonListener extends ListenerAdapter {
             List<Player> playersWithPds2 = new ArrayList<Player>();
             if(!activeMap.isFoWMode()){
                 playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, activeMap, pos);
+                int abilities = ButtonHelper.resolveOnActivationEnemyAbilities(activeMap, activeMap.getTileByPosition(pos), player, true);
+                if(abilities > 0){
+                    List<Button> buttons = new ArrayList<Button>();
+                    buttons.add(Button.success(finsFactionCheckerPrefix+"doActivation_"+pos, "Confirm"));
+                    buttons.add(Button.danger(finsFactionCheckerPrefix+"deleteButtons", "This activation was a mistake"));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ident+" You are about to automatically trigger some abilities by activating this system, are you should you want to proceed?", buttons);
+                }
+            }else{
+                 List<Player> playersAdj = FoWHelper.getAdjacentPlayers(activeMap, pos, true);
+                for (Player player_ : playersAdj) {
+                    String playerMessage = Helper.getPlayerRepresentation(player_, activeMap, event.getGuild(), true) + " - System " + pos + " has been activated ";
+                    boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
+                }
+                ButtonHelper.resolveOnActivationEnemyAbilities(activeMap, activeMap.getTileByPosition(pos), player, false);
             }
             if (!activeMap.isFoWMode() && playersWithPds2.size() > 0) {
                 String pdsMessage = trueIdentity + " this is a courtesy notice that the selected system is in range of deep space cannon units owned by";

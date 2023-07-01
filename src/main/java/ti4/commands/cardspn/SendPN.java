@@ -14,8 +14,8 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.PromissoryNoteModel;
 
-public class SentPN extends PNCardsSubcommandData {
-	public SentPN() {
+public class SendPN extends PNCardsSubcommandData {
+	public SendPN() {
 		super(Constants.SEND_PN, "Send Promissory Note to player");
 		addOptions(new OptionData(OptionType.STRING, Constants.PROMISSORY_NOTE_ID,"Promissory Note ID that is sent between () or Name/Part of Name").setRequired(true));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setRequired(true).setAutoComplete(true));

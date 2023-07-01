@@ -123,7 +123,7 @@ public class PNCardsCommand implements Command {
         subcommands.add(new ShowAllPN());
         subcommands.add(new ShowPNToAll());
         subcommands.add(new PlayPN());
-        subcommands.add(new SentPN());
+        subcommands.add(new SendPN());
         subcommands.add(new PurgePN());
         subcommands.add(new PNInfo());
         subcommands.add(new PNReset());
