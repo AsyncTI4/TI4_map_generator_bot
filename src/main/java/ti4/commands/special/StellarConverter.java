@@ -57,6 +57,7 @@ public class StellarConverter extends SpecialSubcommandData {
 
         activeMap.removePlanet(unitHolder);
         tile.addToken(Constants.WORLD_DESTROYED_PNG, unitHolder.getName());
+        MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "You feel a great disturbance in the Force, as if millions of voices suddenly cried out in terror and were suddenly silenced");
     }
 
     @Override
