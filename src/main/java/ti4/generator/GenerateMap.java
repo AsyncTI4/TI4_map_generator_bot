@@ -2493,6 +2493,9 @@ public class GenerateMap {
             String position = tile.getPosition();
             Point positionPoint = PositionMapper.getTilePosition(position);
             if (positionPoint == null) {
+                if(tile.getTileID().equalsIgnoreCase("-1")){
+                    return;
+                }
                 throw new Exception("Could not map tile to a position on the map: " + activeMap.getName());
             }
 
