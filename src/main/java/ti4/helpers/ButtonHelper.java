@@ -132,7 +132,7 @@ public class ButtonHelper {
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
-                if(pnModel.getText().contains("return this card") && pnModel.getText().contains("you activate a system that contains")){
+                if(pnModel.getText().contains("return this card") && pnModel.getText().contains("you activate a system that contains") && FoWHelper.playerHasUnitsInSystem(pnOwner, activeSystem)){
                     if(justChecking){
                         if(!activeMap.isFoWMode()){
                             MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger the return of a PN");
