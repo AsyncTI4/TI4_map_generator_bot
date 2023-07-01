@@ -450,10 +450,16 @@ public class GenerateMap {
                 }
 
 
+                String activePlayerID = activeMap.getActivePlayer();
+                String phase = activeMap.getCurrentPhase();
                 if (player.isPassed()) {
                     graphics.setFont(Storage.getFont20());
                     graphics.setColor(new Color(238, 58, 80));
                     graphics.drawString("PASSED", x + 5, y + 95 + yDelta);
+                } else if (player.getUserID().equals(activePlayerID) && phase.equals("action")) {
+                    graphics.setFont(Storage.getFont20());
+                    graphics.setColor(new Color(50, 230, 80));
+                    graphics.drawString("ACTIVE", x + 9, y + 95 + yDelta);
                 }
 
                 graphics.setFont(Storage.getFont32());
@@ -1850,10 +1856,17 @@ public class GenerateMap {
                     graphics.setColor(Color.WHITE);
                 }
             }
+            String activePlayerID = activeMap.getActivePlayer();
+            String phase = activeMap.getCurrentPhase();
             if (player.isPassed()) {
                 point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
                 graphics.setColor(new Color(238, 58, 80));
                 graphics.drawString("PASSED", point.x + deltaX, point.y + deltaY);
+                graphics.setColor(Color.WHITE);
+            } else if (player.getUserID().equals(activePlayerID) && phase.equals("action")) {
+                point = PositionMapper.getPlayerStats(Constants.STATS_PASSED);
+                graphics.setColor(new Color(50, 230, 80));
+                graphics.drawString("ACTIVE", point.x + deltaX + 4, point.y + deltaY);
                 graphics.setColor(Color.WHITE);
             }
             if (inverted) {
