@@ -57,7 +57,7 @@ public class ButtonHelper {
         }
         for(Player nonActivePlayer : activeMap.getPlayers().values()){
             
-            if(nonActivePlayer == player || !nonActivePlayer.isRealPlayer()){
+            if(!nonActivePlayer.isRealPlayer() || nonActivePlayer.getFaction().equalsIgnoreCase(player.getFaction())){
                 continue;
             }
             if(activeMap.isFoWMode()){
@@ -128,7 +128,7 @@ public class ButtonHelper {
             pns.addAll(player.getPromissoryNotesInPlayArea());
             for(String pn: pns){
                 Player pnOwner = activeMap.getPNOwner(pn);
-                if(pnOwner!= nonActivePlayer){
+                if(!pnOwner.isRealPlayer() || !pnOwner.getFaction().equalsIgnoreCase(nonActivePlayer.getFaction())){
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
