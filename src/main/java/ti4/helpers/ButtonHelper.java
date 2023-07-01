@@ -44,6 +44,113 @@ import ti4.model.TechnologyModel;
 
 
 public class ButtonHelper {
+    public static int resolveOnActivationEnemyAbilities(Map activeMap, Tile activeSystem, Player player, boolean justChecking) {
+        int numberOfAbilities = 0;
+        
+        String activePlayerident = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
+        MessageChannel channel = activeMap.getActionsChannel();
+        if(justChecking){
+            Player ghostPlayer = Helper.getPlayerFromColorOrFaction(activeMap,"ghost");
+            if(ghostPlayer != null && ghostPlayer != player && ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, ghostPlayer, "mech") > 0){
+                MessageHelper.sendMessageToChannel(channel, "This is a reminder that if you are moving via creuss wormhole, you should first pause and check if the creuss player wants to use their mech to move that wormhole. ");
+            }
+        }
+        for(Player nonActivePlayer : activeMap.getPlayers().values()){
+            
+            if(nonActivePlayer == player || !nonActivePlayer.isRealPlayer()){
+                continue;
+            }
+            if(activeMap.isFoWMode()){
+                channel = nonActivePlayer.getPrivateChannel();
+            }
+            String fincheckerForNonActive = "FFCC_"+nonActivePlayer.getFaction() + "_";
+            String ident = Helper.getPlayerRepresentation(nonActivePlayer, activeMap, activeMap.getGuild(), true);
+            //eres
+            if(nonActivePlayer.getTechs().contains("ers") && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)){
+                if(justChecking){
+                        if(!activeMap.isFoWMode()){
+                            MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger eres.");
+                        }
+                        numberOfAbilities++;
+                }else{
+                    int cTG = nonActivePlayer.getTg();
+                    nonActivePlayer.setTg(cTG+4);
+                    MessageHelper.sendMessageToChannel(channel, ident + " gained 4 tg ("+cTG+"->"+nonActivePlayer.getTg()+")");
+                    ButtonHelper.pillageCheck(nonActivePlayer, activeMap);
+                }
+            }
+            //neuroglaive
+            if(nonActivePlayer.getTechs().contains("ng") && FoWHelper.playerHasShipsInSystem(nonActivePlayer, activeSystem)){
+                if(justChecking){
+                        if(!activeMap.isFoWMode()){
+                            MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger neuroglaive");
+                        }
+                        numberOfAbilities++;
+                    }else{
+                    int cTG = player.getFleetCC();
+                    player.setFleetCC(cTG-1);
+                    if(activeMap.isFoWMode()){
+                        MessageHelper.sendMessageToChannel(channel, ident + " you triggered neuroglaive");
+                        channel = player.getPrivateChannel();
+                    }
+                    MessageHelper.sendMessageToChannel(channel, activePlayerident + " lost 1 fleet cc due to neuroglaive ("+cTG+"->"+player.getFleetCC()+")");
+                }
+            }
+            if(activeMap.playerHasLeaderUnlockedOrAlliance(nonActivePlayer, "arboreccommander") && Helper.playerHasProductionUnitInSystem(activeSystem, activeMap, nonActivePlayer)){
+                if(justChecking){
+                        if(!activeMap.isFoWMode()){
+                            MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger the arborec commander");
+                        }
+                        numberOfAbilities++;
+                    }else{
+                    Button gainTG= Button.success(fincheckerForNonActive+"freelancersBuild_"+activeSystem.getPosition(), "Build 1 Unit");
+                    Button Decline2 = Button.danger(fincheckerForNonActive+"deleteButtons", "Decline Commander");
+                    List<Button> buttons = List.of(gainTG,Decline2);
+                    MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Arborec commander ", buttons);
+                }
+            }
+            if(activeMap.playerHasLeaderUnlockedOrAlliance(nonActivePlayer, "yssarilcommander") && FoWHelper.playerHasUnitsInSystem(nonActivePlayer, activeSystem)){
+                if(justChecking){
+                        if(!activeMap.isFoWMode()){
+                            MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger yssaril commander");
+                        }
+                        numberOfAbilities++;
+                    }else{
+                        Button lookAtACs= Button.success(fincheckerForNonActive+"yssarilcommander_ac_"+player.getFaction(), "Look at ACs");
+                        Button lookAtPNs= Button.success(fincheckerForNonActive+"yssarilcommander_pn_"+player.getFaction(), "Look at PNs");
+                        Button lookAtSOs= Button.success(fincheckerForNonActive+"yssarilcommander_so_"+player.getFaction(), "Look at SOs");
+                        Button Decline2 = Button.danger(fincheckerForNonActive+"deleteButtons", "Decline Commander");
+                        List<Button> buttons = List.of(lookAtACs, lookAtPNs, lookAtSOs,Decline2);
+                        MessageHelper.sendMessageToChannelWithButtons(channel, ident + " use buttons to resolve Yssaril commander ", buttons);
+                    }
+            }
+            List<String> pns = new ArrayList<String>();
+            pns.addAll(player.getPromissoryNotesInPlayArea());
+            for(String pn: pns){
+                Player pnOwner = activeMap.getPNOwner(pn);
+                if(pnOwner!= nonActivePlayer){
+                    continue;
+                }
+                PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
+                if(pnModel.getText().contains("return this card") && pnModel.getText().contains("you activate a system that contains")){
+                    if(justChecking){
+                        if(!activeMap.isFoWMode()){
+                            MessageHelper.sendMessageToChannel(channel, "Warning: you would trigger the return of a PN");
+                        }
+                        numberOfAbilities++;
+                    }else{
+                        player.removePromissoryNote(pn);
+                        nonActivePlayer.setPromissoryNote(pn);  
+                        PNInfo.sendPromissoryNoteInfo(activeMap, nonActivePlayer, false);
+		                PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
+                        MessageHelper.sendMessageToChannel(channel, pnModel.getName() + " was returned");
+                    }
+
+                }
+            }
+        }
+        return numberOfAbilities;
+    }
     public static boolean checkForTechSkipAttachments(Map activeMap, String planetName) {
         boolean techPresent = false;
         if(planetName.equalsIgnoreCase("custodiavigilia")){
