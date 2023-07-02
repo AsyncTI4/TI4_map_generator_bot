@@ -64,6 +64,7 @@ import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
+import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
@@ -583,6 +584,9 @@ public class ButtonListener extends ListenerAdapter {
 
             String message2 = trueIdentity + " Click the names of the planets you wish to exhaust. ";
             player.addTech(AliasHandler.resolveTech(tech));
+            if(AliasHandler.resolveTech(tech).equalsIgnoreCase("iihq")){
+                message = message + "\n Automatically added the Custodia Vigilia planet";
+            }
             if(player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")){
             ButtonHelper.commanderUnlockCheck(player, activeMap, "jolnar", event);
             }
@@ -2177,6 +2181,14 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("componentActionRes_")) {
             ButtonHelper.resolvePressedCompButton(activeMap, player, event, buttonID);
             event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("terraformPlanet_")) {
+            String planet = buttonID.replace("terraformPlanet_","");
+            UnitHolder unitHolder = activeMap.getPlanetsInfo().get(planet);
+            Planet planetReal = (Planet) unitHolder;
+            planetReal.addToken(Constants.ATTACHMENT_TITANSPN_PNG);
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Attached terraform to "+Helper.getPlanetRepresentation(planet, activeMap));
+            event.getMessage().delete().queue();
+
         } else if (buttonID.startsWith("resolvePNPlay_")) {
             String pnID = buttonID.replace("resolvePNPlay_", "");
             ButtonHelper.resolvePNPlay(pnID, player, activeMap, event);
