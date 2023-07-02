@@ -17,7 +17,7 @@ public class RemoveAllUnits extends AddRemoveUnits {
     protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
         tile.removeAllUnits(color);
         for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder.getName());
+            addPlanetToPlayArea(event, tile, unitHolder.getName(), activeMap);
         }
     }
 

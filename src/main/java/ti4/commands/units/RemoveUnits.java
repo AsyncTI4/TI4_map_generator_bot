@@ -96,7 +96,7 @@ public class RemoveUnits extends AddRemoveUnits {
             }
         }
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(),null);
         }
     }
 
@@ -109,7 +109,7 @@ public class RemoveUnits extends AddRemoveUnits {
     protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map activeMap) {
         super.actionAfterAll(event, tile, color, activeMap);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeMap);
         }
     }
 

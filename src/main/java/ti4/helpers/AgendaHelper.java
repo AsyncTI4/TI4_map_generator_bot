@@ -612,6 +612,9 @@ public class AgendaHelper {
         for (String planet : planets) {
             int voteAmount = 0;
             Planet p = (Planet) planetsInfo.get(planet);
+            if(p == null){
+                continue;
+            }
             voteAmount += p.getInfluence();
             if (voteInfo[2] != 0) {
                 voteAmount+=1;
