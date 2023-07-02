@@ -586,25 +586,15 @@ public class ButtonListener extends ListenerAdapter {
             if(player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")){
             ButtonHelper.commanderUnlockCheck(player, activeMap, "jolnar", event);
             }
-            List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeMap);
-            if (player.getTg() > 0) {
-                Button lost1TG = Button.danger("reduceTG_1", "Spend 1 TG");
-                buttons.add(lost1TG);
-            }
-            if (player.getTg() > 1) {
-                Button lost2TG = Button.danger("reduceTG_2", "Spend 2 TGs");
-                buttons.add(lost2TG);
-            }
-            if (player.getTg() > 2) {
-                Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
-                buttons.add(lost3TG);
-            }
+            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
             if (player.hasTechReady("aida")) {
-                Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
-                buttons.add(aiDEVButton);
-            }
-            Button DoneExhausting = Button.danger("deleteButtons_technology", "Done exhausting planets");
+                        Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
+                        buttons.add(aiDEVButton);
+                    }
+            Button DoneExhausting = Button.danger("deleteButtons_technology", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
+            
+
 
             if (activeMap.isFoWMode()) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), message);
@@ -1351,19 +1341,7 @@ public class ButtonListener extends ListenerAdapter {
                 if (buttonLabel.equalsIgnoreCase("Done Producing Units")) {
                     String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
 
-                    List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeMap);
-                    if (player.getTg() > 0) {
-                        Button lost1TG = Button.danger("reduceTG_1", "Spend 1 TG");
-                        buttons.add(lost1TG);
-                    }
-                    if (player.getTg() > 1) {
-                        Button lost2TG = Button.danger("reduceTG_2", "Spend 2 TGs");
-                        buttons.add(lost2TG);
-                    }
-                    if (player.getTg() > 2) {
-                        Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
-                        buttons.add(lost3TG);
-                    }
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
                     if (player.hasTechReady("aida")) {
                         Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
                         buttons.add(aiDEVButton);
@@ -1591,23 +1569,8 @@ public class ButtonListener extends ListenerAdapter {
 
             String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
 
-            List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeMap);
-            if (player.getTg() > 0) {
-                Button lost1TG = Button.danger("reduceTG_1", "Spend 1 TG");
-                buttons.add(lost1TG);
-            }
-            if (player.getTg() > 1) {
-                Button lost2TG = Button.danger("reduceTG_2", "Spend 2 TGs");
-                buttons.add(lost2TG);
-            }
-            if (player.getTg() > 2) {
-                Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
-                buttons.add(lost3TG);
-                // if (player.hasTechReady("aida")) {
-                // Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
-                // buttons.add(aiDEVButton);
-                // } }}
-            }
+            List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
+
 
             Button DoneExhausting = null;
             if (!buttonID.contains("deleteButtons")) {
@@ -1820,6 +1783,25 @@ public class ButtonListener extends ListenerAdapter {
                     + ButtonHelper.getListOfStuffAvailableToSpend(player, activeMap);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
             event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("getModifyTiles")) {
+            List<Button> buttons = new ArrayList<Button>();
+            buttons = ButtonHelper.getTilesToModify(player, activeMap, event);
+            String message = Helper.getPlayerRepresentation(player, activeMap) + " Use the buttons to select the tile in which you wish to modify units. ";
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+        } else if (buttonID.startsWith("genericModify_")) {
+            String pos = buttonID.replace("genericModify_", "");
+            Tile tile = activeMap.getTileByPosition(pos);
+            ButtonHelper.offerBuildOrRemove(player, activeMap, event, tile);
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("genericBuild_")) {
+            String pos = buttonID.replace("genericBuild_", "");
+            activeMap.resetCurrentMovedUnitsFrom1TacticalAction();
+            List<Button> buttons = new ArrayList<Button>();
+            buttons = Helper.getPlaceUnitButtons(event, player, activeMap,
+                    activeMap.getTileByPosition(pos), "genericBuild", "place");
+            String message = Helper.getPlayerRepresentation(player, activeMap) + " Use the buttons to produce units. ";
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("starforgeTile_")) {
             String pos = buttonID.replace("starforgeTile_", "");
 
@@ -1955,10 +1937,21 @@ public class ButtonListener extends ListenerAdapter {
                         "Use buttons to select the first system you want to move from", systemButtons);
             }
             event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("genericRemove_")) {
+            String pos = buttonID.replace("genericRemove_", "");
+            activeMap.resetCurrentMovedUnitsFrom1System();
+            activeMap.resetCurrentMovedUnitsFrom1TacticalAction();
+            List<Button> systemButtons = ButtonHelper.getButtonsForAllUnitsInSystem(player, activeMap,
+                    activeMap.getTileByPosition(pos), "Remove");
+            activeMap.resetCurrentMovedUnitsFrom1System();
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Chose to remove units from "
+                            + activeMap.getTileByPosition(pos).getRepresentationForButtons(activeMap, player));
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),"Use buttons to select the units you want to remove.",systemButtons);
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("tacticalMoveFrom_")) {
             String pos = buttonID.replace("tacticalMoveFrom_", "");
             List<Button> systemButtons = ButtonHelper.getButtonsForAllUnitsInSystem(player, activeMap,
-                    activeMap.getTileByPosition(pos));
+                    activeMap.getTileByPosition(pos), "Move");
             activeMap.resetCurrentMovedUnitsFrom1System();
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
                     "Chose to move from "
@@ -1989,8 +1982,15 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
         }
 
-        else if (buttonID.startsWith("unitTacticalMove_")) {
-            String rest = buttonID.replace("unitTacticalMove_", "");
+        else if (buttonID.startsWith("unitTactical")) {
+            String remove = "Move";
+            String rest = "";
+            if(buttonID.contains("Remove")){
+                remove = "Remove";
+                rest = buttonID.replace("unitTacticalRemove_", "");
+            }else{
+                rest = buttonID.replace("unitTacticalMove_", "");
+            }
             String pos = rest.substring(0, rest.indexOf("_"));
             rest = rest.replace(pos + "_", "");
             int amount = Integer.parseInt(rest.charAt(0) + "");
@@ -2062,9 +2062,9 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitkey, amount);
             }
-            String message = ButtonHelper.buildMessageFromDisplacedUnits(activeMap, false, player);
+            String message = ButtonHelper.buildMessageFromDisplacedUnits(activeMap, false, player, remove);
             List<Button> systemButtons = ButtonHelper.getButtonsForAllUnitsInSystem(player, activeMap,
-                    activeMap.getTileByPosition(pos));
+                    activeMap.getTileByPosition(pos), remove);
             event.getMessage().editMessage(message)
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
 
@@ -2091,7 +2091,7 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
             }
-            String message = ButtonHelper.buildMessageFromDisplacedUnits(activeMap, true, player);
+            String message = ButtonHelper.buildMessageFromDisplacedUnits(activeMap, true, player, "Move");
             List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
             event.getMessage().editMessage(message)
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
@@ -2491,20 +2491,7 @@ public class ButtonListener extends ListenerAdapter {
                     addReaction(event, false, false, "", "");
                     String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
 
-                    List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeMap);
-
-                    if (player.getTg() > 0) {
-                        Button lost1TG = Button.danger("reduceTG_1", "Spend 1 TG");
-                        buttons.add(lost1TG);
-                    }
-                    if (player.getTg() > 1) {
-                        Button lost2TG = Button.danger("reduceTG_2", "Spend 2 TGs");
-                        buttons.add(lost2TG);
-                    }
-                    if (player.getTg() > 2) {
-                        Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
-                        buttons.add(lost3TG);
-                    }
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
                     Button DoneExhausting = Button.danger("deleteButtons_leadership", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
                     if (!activeMap.isFoWMode()) {
@@ -2664,6 +2651,7 @@ public class ButtonListener extends ListenerAdapter {
                             + " UP TO PICK SC\n";
                     activeMap.updateActivePlayer(speaker);
                     activeMap.setCurrentPhase("strategy");
+                    ButtonHelper.giveKeleresCommsNTg(activeMap, event);
                     if (activeMap.isFoWMode()) {
 
                         if (!activeMap.isHomeBrewSCMode()) {
@@ -3250,6 +3238,11 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.updateMap(activeMap, event);
 
                 }
+                 case "doneRemoving" -> {
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
+                    event.getMessage().delete().queue();
+                    ButtonHelper.updateMap(activeMap, event);
+                 }
                 case "doneLanding" -> {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
                     String message = "Landed troops. Use buttons to decide if you want to build or finish the activation";
@@ -3374,20 +3367,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "orbitolDropExhaust" -> {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
-                    List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeMap);
-
-                    if (player.getTg() > 0) {
-                        Button lost1TG = Button.danger("reduceTG_1", "Spend 1 TG");
-                        buttons.add(lost1TG);
-                    }
-                    if (player.getTg() > 1) {
-                        Button lost2TG = Button.danger("reduceTG_2", "Spend 2 TGs");
-                        buttons.add(lost2TG);
-                    }
-                    if (player.getTg() > 2) {
-                        Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
-                        buttons.add(lost3TG);
-                    }
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
                     Button DoneExhausting = Button.danger("finishComponentAction", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),
@@ -3763,6 +3743,7 @@ public class ButtonListener extends ListenerAdapter {
                             + " UP TO PICK SC\n";
                     activeMap.updateActivePlayer(speaker);
                     activeMap.setCurrentPhase("strategy");
+                    ButtonHelper.giveKeleresCommsNTg(activeMap, event);
                     if (activeMap.isFoWMode()) {
                         // MessageHelper.sendPrivateMessageToPlayer(speaker, activeMap, message);
                         if (!activeMap.isHomeBrewSCMode()) {
