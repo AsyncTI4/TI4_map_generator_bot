@@ -1540,19 +1540,37 @@ public class ButtonListener extends ListenerAdapter {
                 successMessage = "Placed a " + Helper.getEmojiFromDiscord("pds") + " on "
                         + Helper.getPlanetRepresentation(planetName, activeMap) + ".";
             } else {
+                Tile tile = null;
                 if (unit.equalsIgnoreCase("gf") || unit.equalsIgnoreCase("mf") || unitLong.equalsIgnoreCase("2gf")) {
                     if (unitLong.equalsIgnoreCase("2gf")) {
-                        new AddUnits().unitParsing(event, player.getColor(),
+                        if(!planetName.contains("space")){
+                            new AddUnits().unitParsing(event, player.getColor(),
                                 activeMap.getTile(AliasHandler.resolveTile(planetName)), "2 gf " + planetName,
                                 activeMap);
-                        successMessage = producedOrPlaced+" 2 " + Helper.getEmojiFromDiscord("infantry") + " on "
-                                + Helper.getPlanetRepresentation(planetName, activeMap) + ".";
-                    } else {
-                        new AddUnits().unitParsing(event, player.getColor(),
-                                activeMap.getTile(AliasHandler.resolveTile(planetName)), unit + " " + planetName,
+                            successMessage = producedOrPlaced+" 2 " + Helper.getEmojiFromDiscord("infantry") + " on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
+                        }else {
+                            tile = activeMap.getTileByPosition(planetName.replace("space",""));
+                            new AddUnits().unitParsing(event, player.getColor(),
+                                tile, "2 gf ",
                                 activeMap);
-                        successMessage = producedOrPlaced+" a " + Helper.getEmojiFromDiscord(unitLong) + " on "
-                                + Helper.getPlanetRepresentation(planetName, activeMap) + ".";
+                            successMessage = producedOrPlaced+" 2 " + Helper.getEmojiFromDiscord("infantry") + " in space.";
+                        }
+                    } else {
+                       
+                        if(!planetName.contains("space")){
+                            tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
+                            new AddUnits().unitParsing(event, player.getColor(),
+                                tile, unit + " " + planetName,
+                                activeMap);
+                            successMessage = producedOrPlaced+" a " + Helper.getEmojiFromDiscord(unitLong) + " on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
+                        } else {
+                            tile = activeMap.getTileByPosition(planetName.replace("space",""));
+                            new AddUnits().unitParsing(event, player.getColor(),
+                                tile, unit,
+                                activeMap);
+                            successMessage = producedOrPlaced+" a " + Helper.getEmojiFromDiscord(unitLong) + " in space.";
+                        }
+                        
                     }
                 } else {
                     if (unitLong.equalsIgnoreCase("2ff")) {
@@ -1638,19 +1656,38 @@ public class ButtonListener extends ListenerAdapter {
                 successMessage = "Placed a " + Helper.getEmojiFromDiscord("pds") + " on "
                         + Helper.getPlanetRepresentation(planetName, activeMap) + ".";
             } else {
+                 Tile tile = null;
+                 String producedOrPlaced = "Produced";
                 if (unit.equalsIgnoreCase("gf") || unit.equalsIgnoreCase("mf") || unitLong.equalsIgnoreCase("2gf")) {
                     if (unitLong.equalsIgnoreCase("2gf")) {
-                        new AddUnits().unitParsing(event, player.getColor(),
+                        if(!planetName.contains("space")){
+                            new AddUnits().unitParsing(event, player.getColor(),
                                 activeMap.getTile(AliasHandler.resolveTile(planetName)), "2 gf " + planetName,
                                 activeMap);
-                        successMessage = "Produced 2 " + Helper.getEmojiFromDiscord("infantry") + " on "
-                                + Helper.getPlanetRepresentation(planetName, activeMap) + ".";
-                    } else {
-                        new AddUnits().unitParsing(event, player.getColor(),
-                                activeMap.getTile(AliasHandler.resolveTile(planetName)), unit + " " + planetName,
+                            successMessage = producedOrPlaced+" 2 " + Helper.getEmojiFromDiscord("infantry") + " on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
+                        }else {
+                            tile = activeMap.getTileByPosition(planetName.replace("space",""));
+                            new AddUnits().unitParsing(event, player.getColor(),
+                                tile, "2 gf",
                                 activeMap);
-                        successMessage = "Produced a " + Helper.getEmojiFromDiscord(unitLong) + " on "
-                                + Helper.getPlanetRepresentation(planetName, activeMap) + ".";
+                            successMessage = producedOrPlaced+" 2 " + Helper.getEmojiFromDiscord("infantry") + " in space.";
+                        }
+                    } else {
+                       
+                        if(!planetName.contains("space")){
+                            tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
+                            new AddUnits().unitParsing(event, player.getColor(),
+                                tile, unit + " " + planetName,
+                                activeMap);
+                            successMessage = producedOrPlaced+" a " + Helper.getEmojiFromDiscord(unitLong) + " on "+ Helper.getPlanetRepresentation(planetName, activeMap) + ".";
+                        } else {
+                            tile = activeMap.getTileByPosition(planetName.replace("space",""));
+                            new AddUnits().unitParsing(event, player.getColor(),
+                                tile, unit,
+                                activeMap);
+                            successMessage = producedOrPlaced+" a " + Helper.getEmojiFromDiscord(unitLong) + " in space.";
+                        }
+                        
                     }
                 } else {
                     if (unitLong.equalsIgnoreCase("2ff")) {
@@ -2471,17 +2508,8 @@ public class ButtonListener extends ListenerAdapter {
                     Button DoneExhausting = Button.danger("deleteButtons_leadership", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
                     if (!activeMap.isFoWMode()) {
-                        List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
-                        if (threadChannels == null)
-                            return;
-                        String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-leadership";
-                        // SEARCH FOR EXISTING OPEN THREAD
-                        for (ThreadChannel threadChannel_ : threadChannels) {
-                            if (threadChannel_.getName().equals(threadName)) {
-                                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) threadChannel_, message,
-                                        buttons);
-                            }
-                        }
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeMap), message,
+                                buttons);
                     } else {
                         MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
                     }
@@ -2685,6 +2713,7 @@ public class ButtonListener extends ListenerAdapter {
                     player.setCommodities(player.getCommoditiesTotal());
                     player.addFollowedSC(5);
                     addReaction(event, false, false, "Replenishing Commodities", "");
+                    ButtonHelper.resolveMinisterOfCommerceCheck(activeMap, player, event);
                 }
                 case "sc_refresh_and_wash" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "Replenish and Wash");
@@ -2698,6 +2727,7 @@ public class ButtonListener extends ListenerAdapter {
                     player.setCommodities(0);
                     player.addFollowedSC(5);
                     addReaction(event, false, false, "Replenishing and washing", "");
+                    ButtonHelper.resolveMinisterOfCommerceCheck(activeMap, player, event);
                 }
                 case "sc_follow" -> {
                     boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
@@ -2737,6 +2767,7 @@ public class ButtonListener extends ListenerAdapter {
                     player.setCommodities(player.getCommoditiesTotal());
                     addReaction(event, false, false, " gained 3" + Emojis.tg + " and replenished commodities ("
                             + String.valueOf(player.getCommodities()) + Emojis.comm + ")", "");
+                    ButtonHelper.resolveMinisterOfCommerceCheck(activeMap, player, event);
                 }
                 case "score_imperial" -> {
                     if (player == null || activeMap == null) {
@@ -3617,40 +3648,7 @@ public class ButtonListener extends ListenerAdapter {
         MessageHelper.sendMessageToChannel(Helper.getThreadChannelIfExists(event), text);
     }
 
-    public List<Player> getPlayersWhoHaventReacted(String messageId, Map activeMap){
-        List<Player> playersWhoAreMissed = new ArrayList<Player>();
-        if(messageId == null || messageId.equalsIgnoreCase("")){
-            return playersWhoAreMissed;
-        }
-        Message mainMessage = activeMap.getMainGameChannel().retrieveMessageById(messageId).completeAfter(500,
-                TimeUnit.MILLISECONDS);
-        for (Player player : activeMap.getPlayers().values()) {
-            if (!player.isRealPlayer()) {
-                continue;
-            }
-
-            String faction = player.getFaction();
-            if (faction == null || faction.isEmpty() || faction.equals("null")){
-                continue;
-            }
-
-            Emoji reactionEmoji = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction));
-            if (activeMap.isFoWMode()) {
-                int index = 0;
-                for (Player player_ : activeMap.getPlayers().values()) {
-                    if (player_ == player)
-                        break;
-                    index++;
-                }
-                reactionEmoji = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, messageId));
-            }
-            MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
-            if (reaction == null){
-                playersWhoAreMissed.add(player);
-            }
-        }
-        return playersWhoAreMissed;
-    }
+    
 
     private void checkForAllReactions(@NotNull ButtonInteractionEvent event, Map activeMap) {
         String messageId = event.getInteraction().getMessage().getId();

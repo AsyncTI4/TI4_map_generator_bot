@@ -217,6 +217,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 message = "Replenished Commodities (" +player.getCommodities() +"->"+player.getCommoditiesTotal()+"). Reminder that this is optional, and that you can instead convert your existing comms.";
                 player.setCommodities(player.getCommoditiesTotal());
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + "\n" + message);
+                ButtonHelper.resolveMinisterOfCommerceCheck(activeMap, player, event);
             }
             case "mirage" -> {
                 String mirageID = Constants.MIRAGE;

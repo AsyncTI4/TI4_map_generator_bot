@@ -22,8 +22,8 @@ import ti4.message.MessageHelper;
 public class AgendaHelper {
 
      public static void pingMissingPlayers(Map activeMap) {
-        List<Player> missingPlayersWhens = new ButtonListener().getPlayersWhoHaventReacted(activeMap.getLatestWhenMsg(), activeMap);
-        List<Player> missingPlayersAfters = new ButtonListener().getPlayersWhoHaventReacted(activeMap.getLatestAfterMsg(), activeMap);
+        List<Player> missingPlayersWhens = ButtonHelper.getPlayersWhoHaventReacted(activeMap.getLatestWhenMsg(), activeMap);
+        List<Player> missingPlayersAfters = ButtonHelper.getPlayersWhoHaventReacted(activeMap.getLatestAfterMsg(), activeMap);
         if(missingPlayersAfters.size() == 0 && missingPlayersWhens.size() == 0){
             return;
         }
@@ -655,8 +655,8 @@ public class AgendaHelper {
 
     public static void eraseVotesOfFaction(Map activeMap, String faction) {
 
-        HashMap<String, String> outcomes = activeMap.getCurrentAgendaVotes();
-
+        HashMap<String, String> outcomes = new HashMap<String, String>();
+        outcomes.putAll(activeMap.getCurrentAgendaVotes());
         if (outcomes.keySet().size() == 0) {
             return;
         } else {

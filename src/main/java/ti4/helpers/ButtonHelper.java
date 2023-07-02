@@ -1,4 +1,6 @@
 package ti4.helpers;
+import net.dv8tion.jda.api.entities.Message;
+import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -12,6 +14,7 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import java.io.File;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -44,6 +47,122 @@ import ti4.model.TechnologyModel;
 
 
 public class ButtonHelper {
+
+    public static List<Player> getPlayersWhoHaventReacted(String messageId, Map activeMap){
+        List<Player> playersWhoAreMissed = new ArrayList<Player>();
+        if(messageId == null || messageId.equalsIgnoreCase("")){
+            return playersWhoAreMissed;
+        }
+        Message mainMessage = activeMap.getMainGameChannel().retrieveMessageById(messageId).completeAfter(500,
+                TimeUnit.MILLISECONDS);
+        for (Player player : activeMap.getPlayers().values()) {
+            if (!player.isRealPlayer()) {
+                continue;
+            }
+
+            String faction = player.getFaction();
+            if (faction == null || faction.isEmpty() || faction.equals("null")){
+                continue;
+            }
+
+            Emoji reactionEmoji = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(faction));
+            if (activeMap.isFoWMode()) {
+                int index = 0;
+                for (Player player_ : activeMap.getPlayers().values()) {
+                    if (player_ == player)
+                        break;
+                    index++;
+                }
+                reactionEmoji = Emoji.fromFormatted(Helper.getRandomizedEmoji(index, messageId));
+            }
+            MessageReaction reaction = mainMessage.getReaction(reactionEmoji);
+            if (reaction == null){
+                playersWhoAreMissed.add(player);
+            }
+        }
+        return playersWhoAreMissed;
+    }
+
+    public static boolean canIBuildGFInSpace(Map activeMap, Player player, Tile tile, String kindOfBuild) {
+         HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
+
+         if(kindOfBuild.equalsIgnoreCase("freelancers") || kindOfBuild.equalsIgnoreCase("genericBuild")){
+            return true;
+         }
+        String colorID = Mapper.getColorID(player.getColor());
+        String mechKey = colorID + "_mf.png";
+        for (UnitHolder unitHolder : unitHolders.values()) {
+            if(unitHolder instanceof Planet){
+                continue;
+            }
+            if (unitHolder.getUnits() == null || unitHolder.getUnits().isEmpty()) continue;
+            mechKey = colorID + "_sd.png";
+            if (unitHolder.getUnits().get(mechKey) != null) {
+                return true;
+            }
+            mechKey = colorID + "_gf.png";
+            if (unitHolder.getUnits().get(mechKey) != null && player.getFaction().equalsIgnoreCase("arborec")) {
+                return true;
+            }
+            mechKey = colorID + "_mf.png";
+            if (unitHolder.getUnits().get(mechKey) != null && player.getFaction().equalsIgnoreCase("arborec")) {
+                return true;
+            }
+        }
+        
+        if(player.getTechs().contains("mr") && (tile.getRepresentation().equalsIgnoreCase("Supernova") || tile.getRepresentation().equalsIgnoreCase("Nova Seed"))){
+            return true;
+        }
+        boolean canBuildGFInSpace = false;
+        
+
+        return canBuildGFInSpace;
+    }
+
+    public static void resolveMinisterOfCommerceCheck(Map activeMap, Player player, GenericInteractionCreateEvent event) {
+        for(String law : activeMap.getLaws().keySet()){
+            if(law.equalsIgnoreCase("minister_commrece") || law.equalsIgnoreCase("absol_minscomm")){
+                if(activeMap.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())){
+                    MessageChannel channel = event.getMessageChannel();
+                    if(activeMap.isFoWMode()){
+                        channel = player.getPrivateChannel();
+                    }
+                    int numOfNeighbors = Helper.getNeighbourCount(activeMap,player);
+                    String message = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Minister of Commerce triggerd, your tgs have increased due to your "+numOfNeighbors+" neighbors ("+player.getTg()+"->"+(player.getTg()+numOfNeighbors)+")";
+                    player.setTg(numOfNeighbors+player.getTg());
+                    MessageHelper.sendMessageToChannel(channel, message);
+                    ButtonHelper.pillageCheck(player, activeMap);
+                    
+                }
+            }
+        }
+    }
+
+    public static void resolveDarkPactCheck(Map activeMap, Player sender, Player receiver, int numOfComms, GenericInteractionCreateEvent event) {
+        for(String pn : sender.getPromissoryNotesInPlayArea()){
+            if(pn.equalsIgnoreCase("dark_pact") && activeMap.getPNOwner(pn).getFaction().equalsIgnoreCase(receiver.getFaction())){
+                if(numOfComms == sender.getCommoditiesTotal()){
+                    MessageChannel channel = event.getMessageChannel();
+                    if(activeMap.isFoWMode()){
+                        channel = sender.getPrivateChannel();
+                    }
+                    String message =  Helper.getPlayerRepresentation(sender, activeMap, activeMap.getGuild(), true)+" Dark Pact triggerd, your tgs have increased by 1 ("+sender.getTg()+"->"+(sender.getTg()+1)+")";
+                    sender.setTg(sender.getTg()+1);
+                    MessageHelper.sendMessageToChannel(channel, message);
+                    message =  Helper.getPlayerRepresentation(receiver, activeMap, activeMap.getGuild(), true)+" Dark Pact triggerd, your tgs have increased by 1 ("+receiver.getTg()+"->"+(receiver.getTg()+1)+")";
+                    receiver.setTg(receiver.getTg()+1);
+                    if(activeMap.isFoWMode()){
+                        channel = receiver.getPrivateChannel();
+                    }
+                    MessageHelper.sendMessageToChannel(channel, message);
+                    ButtonHelper.pillageCheck(sender, activeMap);
+                    ButtonHelper.pillageCheck(receiver, activeMap);    
+                }
+            }
+        }
+    }
+
+
     public static int resolveOnActivationEnemyAbilities(Map activeMap, Tile activeSystem, Player player, boolean justChecking) {
         int numberOfAbilities = 0;
         
@@ -1393,6 +1512,9 @@ public class ButtonHelper {
                 if(p2.getLeaderIDs().contains("hacancommander") && !p2.hasLeaderUnlocked("hacancommander")){
 					ButtonHelper.commanderUnlockCheck(p2, activeMap, "hacan", event);
 				}
+                ButtonHelper.pillageCheck(p1, activeMap);
+                ButtonHelper.pillageCheck(p2, activeMap);
+                ButtonHelper.resolveDarkPactCheck(activeMap, p1, p2, tgAmount, event);
                 message2 = ident + " sent " + tgAmount+ " Commodities to "+ident2;
             }
             case "ACs" -> {
