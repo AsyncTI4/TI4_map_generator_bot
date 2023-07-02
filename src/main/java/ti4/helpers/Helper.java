@@ -664,18 +664,18 @@ public class Helper {
                 mfButton = mfButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
                 unitButtons.add(mfButton);
             }
-            else if(!warfareNOtherstuff.equalsIgnoreCase("sling")) {
-                // Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_space", "Produce 1 Infantry in space");
-                // inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
-                // unitButtons.add(inf1Button);
-                // if(!warfareNOtherstuff.equalsIgnoreCase("freelancers") && !warfareNOtherstuff.equalsIgnoreCase("chaosM")){
-                //     Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_space", "Produce 2 Infantry in space" );
-                //     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
-                //     unitButtons.add(inf2Button);
-                // }
-                // Button mfButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_mech_space", "Produce Mech in space" );
-                // mfButton = mfButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
-                // unitButtons.add(mfButton);
+            else if(ButtonHelper.canIBuildGFInSpace(activeMap, player, tile, warfareNOtherstuff) && !warfareNOtherstuff.equalsIgnoreCase("sling")) {
+                Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_space"+tile.getPosition(), "Produce 1 Infantry in space");
+                inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                unitButtons.add(inf1Button);
+                if(!warfareNOtherstuff.equalsIgnoreCase("freelancers") && !warfareNOtherstuff.equalsIgnoreCase("chaosM")){
+                    Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_space"+tile.getPosition(), "Produce 2 Infantry in space" );
+                    inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                    unitButtons.add(inf2Button);
+                }
+                Button mfButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_mech_space"+tile.getPosition(), "Produce Mech in space" );
+                mfButton = mfButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
+                unitButtons.add(mfButton);
             }
         }
         if(placePrefix.equalsIgnoreCase("place")){

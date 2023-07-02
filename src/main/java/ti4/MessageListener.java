@@ -181,13 +181,20 @@ public class MessageListener extends ListenerAdapter {
                 if (activeMap.getAutoPingStatus() && activeMap.getAutoPingSpacer() != 0) {
                     String playerID = activeMap.getActivePlayer();
                     
-                    if (playerID != null) {
-                        Player player = activeMap.getPlayer(playerID);
-                        if (player != null) {
+                    if (playerID != null || activeMap.getCurrentPhase().equalsIgnoreCase("agendawaiting")) {
+                        Player player = null;
+                        if(playerID != null){
+                            player = activeMap.getPlayer(playerID);
+                        }
+                        if (player != null || activeMap.getCurrentPhase().equalsIgnoreCase("agendawaiting")) {
                             long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
                             if (milliSinceLastPing > (60*60*multiplier* activeMap.getAutoPingSpacer())) {
-                                String realIdentity = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
-                                String ping = realIdentity + " this is a gentle reminder that the game is waiting on you.";
+                                String realIdentity = null;
+                                String ping = null;
+                                if(player != null){
+                                    realIdentity = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
+                                    ping = realIdentity + " this is a gentle reminder that the game is waiting on you.";
+                                }
                                 if(activeMap.getCurrentPhase().equalsIgnoreCase("agendawaiting")){
                                     AgendaHelper.pingMissingPlayers(activeMap);
                                 }else{
