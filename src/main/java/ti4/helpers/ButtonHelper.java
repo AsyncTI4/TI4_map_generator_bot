@@ -2197,6 +2197,22 @@ public class ButtonHelper {
             }
         }
     }
+    public static void offerTerraformButtons(Player player, Map activeMap, GenericInteractionCreateEvent event) {
+        List<Button> buttons = new ArrayList<Button>();
+        for(String planet : player.getPlanets()){
+            UnitHolder unitHolder = activeMap.getPlanetsInfo().get(planet);
+            Planet planetReal = (Planet) unitHolder;
+            boolean oneOfThree = false;
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous"))) {
+                oneOfThree = true;
+            }
+            if ( oneOfThree || planet.contains("custodiavigilia")) {
+                buttons.add(Button.success("terraformPlanet_"+planet, Helper.getPlanetRepresentation(planet, activeMap)));
+            }
+        }
+        String message = "Use buttons to select which planet to terraform";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+    }
 
     public static void resolvePNPlay(String id, Player player, Map activeMap, GenericInteractionCreateEvent event) {
         boolean longPNDisplay = false;
@@ -2233,7 +2249,7 @@ public class ButtonHelper {
 
         //TERRAFORM TIP
         if (id.equalsIgnoreCase("terraform")) {
-            sb.append("`/add_token token:titanspn`\n");
+            ButtonHelper.offerTerraformButtons(player, activeMap, event);
         }
 
         //Fog of war ping

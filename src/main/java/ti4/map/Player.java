@@ -1114,6 +1114,9 @@ public class Player {
     public void addTech(String tech) {
         if (!techs.contains(tech)) {
             techs.add(tech);
+            if(tech.equalsIgnoreCase("iihq")){
+                addPlanet("custodiavigilia");
+            }
         }
     }
 
