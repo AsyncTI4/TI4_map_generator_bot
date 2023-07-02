@@ -1,5 +1,8 @@
 package ti4.model;
 
+import java.util.Arrays;
+import java.util.List;
+
 public class PromissoryNoteModel implements ModelInterface {
     private String alias;
     private String name;
@@ -62,7 +65,13 @@ public class PromissoryNoteModel implements ModelInterface {
         if(playArea == null){
             return false;
         }
-        return playArea && !text.toLowerCase().contains("action:");
+        List<String> pnIDsToHoldInHandBeforePlayArea = Arrays.asList(
+            "gift", "antivirus", "convoys", "dark_pact", "blood_pact", 
+            "pop", "terraform", "dspnauge", "dspnaxis", "dspnbent",
+            "dspndihm", "dspnghot", "dspngled", "dspnkolu", "dspnkort",
+            "dspnlane", "dspnmyko", "dspnolra", "dspnrohd"); //TODO: just add a field to the model for this
+
+        return playArea && !pnIDsToHoldInHandBeforePlayArea.contains(alias);
     }
 
 }
