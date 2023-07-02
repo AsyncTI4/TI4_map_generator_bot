@@ -64,7 +64,7 @@ abstract public class AddRemoveUnits implements Command {
 
         unitParsingForTile(event, color, tile, activeMap);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeMap);
         }
 
         MapSaveLoadManager.saveMap(activeMap, event);
@@ -162,7 +162,7 @@ abstract public class AddRemoveUnits implements Command {
             unitAction(event, tile, count, planetName, unitID, color);
 
 
-            addPlanetToPlayArea(event, tile, planetName);
+            addPlanetToPlayArea(event, tile, planetName, activeMap);
         }
         if (activeMap.isFoWMode()) {
             boolean pingedAlready = false;
@@ -239,7 +239,7 @@ abstract public class AddRemoveUnits implements Command {
             unitAction(event, tile, count, planetName, unitID, color);
 
 
-            addPlanetToPlayArea(event, tile, planetName);
+            addPlanetToPlayArea(event, tile, planetName, activeMap);
         }
         if (activeMap.isFoWMode()) {
             boolean pingedAlready = false;
@@ -317,7 +317,7 @@ abstract public class AddRemoveUnits implements Command {
             unitAction(event, tile, count, planetName, unitID, color);
 
 
-            addPlanetToPlayArea(event, tile, planetName);
+            addPlanetToPlayArea(event, tile, planetName, activeMap);
         }
         if (activeMap.isFoWMode()) {
             boolean pingedAlready = false;
@@ -395,7 +395,7 @@ abstract public class AddRemoveUnits implements Command {
 
             planetName = getPlanet(event, tile, planetName);
             unitAction(event, tile, count, planetName, unitID, color);
-            addPlanetToPlayArea(event, tile, planetName);
+            addPlanetToPlayArea(event, tile, planetName, activeMap);
         }
         if (activeMap.isFoWMode()) {
             boolean pingedAlready = false;
@@ -419,10 +419,13 @@ abstract public class AddRemoveUnits implements Command {
         }
     }
 
-    public void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName) {
+    public void addPlanetToPlayArea(GenericInteractionCreateEvent event, Tile tile, String planetName, Map activeMap) {
         String userID = event.getUser().getId();
         MapManager mapManager = MapManager.getInstance();
-        Map activeMap = mapManager.getUserActiveMap(userID);
+        if(activeMap == null){
+            activeMap = mapManager.getUserActiveMap(userID);
+        }
+       // Map activeMap = mapManager.getUserActiveMap(userID);
         if (!activeMap.isAllianceMode() && !Constants.SPACE.equals(planetName)){
             UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
             if (unitHolder != null){
