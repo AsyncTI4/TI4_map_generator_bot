@@ -119,7 +119,7 @@ public class MoveUnits extends AddRemoveUnits {
         AddCC.addCC(event, color, tile, false);
         Helper.isCCCountCorrect(event, activeMap, color);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeMap);
         }
     }
 

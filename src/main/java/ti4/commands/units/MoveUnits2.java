@@ -55,7 +55,7 @@ public class MoveUnits2 extends AddRemoveUnits {
 
         unitParsingForTile(event, color, tile, activeMap);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeMap);
         }
         MapSaveLoadManager.saveMap(activeMap, event);
 
@@ -147,7 +147,7 @@ public class MoveUnits2 extends AddRemoveUnits {
         AddCC.addCC(event, color, tile, false);
         Helper.isCCCountCorrect(event, activeMap, color);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeMap);
         }
     }
 
