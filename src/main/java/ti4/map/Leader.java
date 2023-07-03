@@ -7,7 +7,7 @@ import ti4.helpers.Constants;
 
 public class Leader {
     private final String id;
-    private final String name;
+    private String type = null;
     private int tgCount = 0;
     private boolean exhausted = false;
     private boolean locked = true;
@@ -15,37 +15,39 @@ public class Leader {
 
     @JsonCreator
     public Leader(@JsonProperty("id") String id,
-                  @JsonProperty("name") String name,
+                  @JsonProperty("type") String type,
                   @JsonProperty("tgCount") int tgCount,
                   @JsonProperty("exhausted") boolean exhausted,
                   @JsonProperty("locked") boolean locked,
                   @JsonProperty("active") boolean active) {
         this.id = id;
-        this.name = name;
+        this.type = type;
         this.tgCount = tgCount;
         this.exhausted = exhausted;
         this.locked = locked;
         this.active = active;
     }
 
-    public Leader(String id, String name) {
+    public Leader(String id) {
         this.id = id;
-        if (Constants.AGENT.equals(id)){
+        if (id.contains(Constants.AGENT)) {
             locked = false;
-        }
-        if (!name.equals(".")) {
-            this.name = name;
-        } else {
-            this.name = "";
+            type = Constants.AGENT;
+        } else if (id.contains(Constants.COMMANDER)) {
+            type = Constants.COMMANDER;
+        } else if (id.contains(Constants.HERO)) {
+            type = Constants.HERO;
+        } else if (id.contains(Constants.ENVOY)) {
+            type = Constants.ENVOY;
         }
     }
 
     public String getId() {
         return id;
     }
-
-    public String getName() {
-        return name;
+    
+    public String getType() {
+        return type;
     }
 
     public int getTgCount() {

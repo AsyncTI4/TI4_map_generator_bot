@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.player.PlanetRemove;
+
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -28,8 +28,7 @@ public class AddToken extends AddRemoveToken {
             tokenName = AliasHandler.resolveAttachment(tokenName);
             addToken(event, tile, tokenName, activeMap);
             activeMap.clearPlanetsCache();
-        }
-        else {
+        } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Token not specified.");
         }
     }

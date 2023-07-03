@@ -1,12 +1,12 @@
 package ti4.commands.leaders;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class PurgeLeader extends LeaderAction {
     public PurgeLeader() {
@@ -14,14 +14,13 @@ public class PurgeLeader extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeader(leader);
-        boolean purged = player.removeLeader(leader);
+    void action(SlashCommandInteractionEvent event, String leaderID, Map activeMap, Player player) {
+        Leader playerLeader = player.getLeader(leaderID);
+        boolean purged = player.removeLeader(playerLeader);
         if (purged) {
-            sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
-            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
-                    .append(" purged ")
-                    .append(Helper.getLeaderFullRepresentation(player, playerLeader));
+            sendMessage(Helper.getFactionLeaderEmoji(playerLeader));
+            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
+                    .append(" purged ").append(Helper.getLeaderShortRepresentation(playerLeader));
             sendMessage(message.toString());
         } else {
             sendMessage("Leader not found");

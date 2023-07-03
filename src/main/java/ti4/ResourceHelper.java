@@ -37,8 +37,7 @@ public class ResourceHelper {
         InputStream stream = classLoader.getResourceAsStream(name);
         try
         {
-            if (stream == null)
-            {
+            if (stream == null) {
                 throw new Exception("Cannot find file " + name);
             }
             return new File(stream.toString());
@@ -51,17 +50,18 @@ public class ResourceHelper {
     }
 
     @Nullable
-    public String getPositionFile(String name)
-    {
+    public String getPositionFile(String name) {
         return getResourceFromFolder("positions/", name, "Could not find position files");
     }
 
+    public String getTileJsonFile(String name) {
+        return getResourceFromFolder("systems/", name, "Could not find tile JSON!");
+    }
+
     @Nullable
-    public String getTileFile(String name)
-    {
+    public String getTileFile(String name) {
         String unitPath = tileCache.get(name);
-        if (unitPath != null)
-        {
+        if (unitPath != null) {
             return unitPath;
         }
         String tile = getResourceFromFolder("tiles/", name, "Could not find tile file");
@@ -70,11 +70,9 @@ public class ResourceHelper {
     }
 
     @Nullable
-    public String getFactionFile(String name)
-    {
+    public String getFactionFile(String name) {
         String unitPath = factionCache.get(name);
-        if (unitPath != null)
-        {
+        if (unitPath != null) {
             return unitPath;
         }
         String tile = getResourceFromFolder("factions/", name, "Could not find faction file");
@@ -83,11 +81,9 @@ public class ResourceHelper {
     }
 
     @Nullable
-    public String getGeneralFile(String name)
-    {
+    public String getGeneralFile(String name) {
         String unitPath = generalCache.get(name);
-        if (unitPath != null)
-        {
+        if (unitPath != null) {
             return unitPath;
         }
         String tile = getResourceFromFolder("general/", name, "Could not find general file");
@@ -111,11 +107,9 @@ public class ResourceHelper {
         return unit;
     }
     @Nullable
-    public String getCCFile(String name)
-    {
+    public String getCCFile(String name) {
         String ccPath = ccCache.get(name);
-        if (ccPath != null)
-        {
+        if (ccPath != null) {
             return ccPath;
         }
         String cc = getResourceFromFolder("command_token/", name, "Could not find command token file");
@@ -124,11 +118,9 @@ public class ResourceHelper {
     }
 
     @Nullable
-    public String getAttachmentFile(String name)
-    {
+    public String getAttachmentFile(String name) {
         String tokenPath = attachmentCache.get(name);
-        if (tokenPath != null)
-        {
+        if (tokenPath != null) {
             return tokenPath;
         }
         String token = getResourceFromFolder("attachment_token/", name, "Could not find attachment token file");
@@ -137,11 +129,9 @@ public class ResourceHelper {
     }
 
     @Nullable
-    public String getPlanetResource(String name)
-    {
+    public String getPlanetResource(String name) {
         String planetInfoPath = planetCache.get(name);
-        if (planetInfoPath != null)
-        {
+        if (planetInfoPath != null) {
             return planetInfoPath;
         }
         String token = getResourceFromFolder("planet_cards/", name, "Could not find planet token file");
@@ -150,11 +140,9 @@ public class ResourceHelper {
     }
 
     @Nullable
-    public String getPAResource(String name)
-    {
+    public String getPAResource(String name) {
         String paInfoPath = paCache.get(name);
-        if (paInfoPath != null)
-        {
+        if (paInfoPath != null) {
             return paInfoPath;
         }
         String token = getResourceFromFolder("player_area/", name, "Could not find player area token file");
@@ -163,11 +151,9 @@ public class ResourceHelper {
     }
 
     @Nullable
-    public String getTokenFile(String name)
-    {
+    public String getTokenFile(String name) {
         String tokenPath = tokenCache.get(name);
-        if (tokenPath != null)
-        {
+        if (tokenPath != null) {
             return tokenPath;
         }
         String token = getResourceFromFolder("tokens/", name, "Could not find token file");
@@ -181,30 +167,30 @@ public class ResourceHelper {
         if (resourceFile.exists()){
             return resourceFile.getAbsolutePath();
         }
+        else {
+           // System.out.println("Could not find resource file " + name + " in folder " + folder);
+            System.out.println(errorDescription);
+        }
         return null;
     }
 
     @Nullable
-    public String getInfoFile(String name)
-    {
+    public String getInfoFile(String name) {
         return getResourceFromFolder("info/", name, "Could not find info file");
     }
 
     @Nullable
-    public String getWebFile(String name)
-    {
+    public String getWebFile(String name) {
         return getResourceFromFolder("web/", name, "Could not find web file");
     }
 
     @Nullable
-    public String getAliasFile(String name)
-    {
+    public String getAliasFile(String name) {
         return getResourceFromFolder("alias/", name, "Could not find alias file");
     }
 
     @Nullable
-    public String getHelpFile(String name)
-    {
+    public String getHelpFile(String name) {
         return getResourceFromFolder("help/", name, "Could not find alias file");
     }
 }

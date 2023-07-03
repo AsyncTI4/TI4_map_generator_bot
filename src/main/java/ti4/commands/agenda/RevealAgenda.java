@@ -8,13 +8,16 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.message.MessageHelper;
+import ti4.model.AgendaModel;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -41,44 +44,79 @@ public class RevealAgenda extends AgendaSubcommandData {
         String id = activeMap.revealAgenda(revealFromBottom);
         LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
         Integer uniqueID = discardAgendas.get(id);
-        String[] agendaDetails = Mapper.getAgenda(id).split(";");
-        String agendaTarget = agendaDetails[2];
-        String agendaType = agendaDetails[1];
-        String agendaName = agendaDetails[0];
-        if(agendaName!= null && !agendaName.equalsIgnoreCase("Covert Legislation"))
+
+        activeMap.setCurrentPhase("agendawaiting");
+        AgendaModel agendaDetails = Mapper.getAgenda(id);
+        String agendaTarget = agendaDetails.getTarget();
+        String agendaType = agendaDetails.getType();
+        String agendaName = agendaDetails.getName();
+
+        if(agendaName.equalsIgnoreCase("Emergency Session"))
         {
-            activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget + "_"+uniqueID);
+            MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeMap.getGuild(), activeMap)+" Emergency Session revealed, flipping next agenda");
+            revealAgenda(event, revealFromBottom, activeMap, channel);
+            return;
         }
-        else
+        if(agendaTarget.contains("Law") && (activeMap.getLaws().isEmpty() || activeMap.getLaws().size() == 0))
         {
-            String id2 = activeMap.getNextAgenda(revealFromBottom);
-            String[] agendaDetails2 = Mapper.getAgenda(id2).split(";");
-            agendaTarget = agendaDetails2[2];
-            agendaType = agendaDetails2[1];
-            agendaName = agendaDetails[0];
-            activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget);
+            MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeMap.getGuild(), activeMap)+"An \"Elect Law\" Agenda ("+agendaName+") was revealed when no laws in play, flipping next agenda");
+            revealAgenda(event, revealFromBottom, activeMap, channel);
+            return;
+        }
+        if (agendaName!= null && !agendaName.equalsIgnoreCase("Covert Legislation")) {
+            activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget + "_"+uniqueID);
+        } else {
+            boolean notEmergency = false;
+            while(!notEmergency)
+            {
+                if(agendaName.equalsIgnoreCase("Emergency Session"))
+                {
+                    String id3 = activeMap.revealAgenda(revealFromBottom);
+                    MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeMap.getGuild(), activeMap)+" Emergency Session revealed underneath Covert Legislation, discarding it.");
+                }
+                String id2 = activeMap.getNextAgenda(revealFromBottom);
+                AgendaModel agendaDetails2 = Mapper.getAgenda(id2);
+                agendaTarget = agendaDetails2.getTarget();
+                agendaType = agendaDetails2.getType();
+                agendaName = agendaDetails.getName();
+                activeMap.setCurrentAgendaInfo(agendaType+"_"+agendaTarget+"_CL");
+                if(agendaName.equalsIgnoreCase("Emergency Session"))
+                {
+                    notEmergency = false;
+                }
+                else
+                {
+                    notEmergency = true;
+                }
+
+            }
+            
         }
         activeMap.resetCurrentAgendaVotes();
         activeMap.setHackElectionStatus(false);
         activeMap.setPlayersWhoHitPersistentNoAfter("");
+        activeMap.setPlayersWhoHitPersistentNoWhen("");
+        activeMap.setLatestOutcomeVotedFor("");
+        activeMap.setLatestWhenMsg("");
+        activeMap.setLatestAfterMsg("");
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getAgendaRepresentation(id, uniqueID));
-        String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you will **Play a When** or **Play an After** or not by pressing the buttons below:";
+        String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you abstain from playing whens/afters by pressing the buttons below. If you have an action card with those windows, you can simply play it.";
 
-        Button playWhen = Button.danger("play_when", "Play When");
-        Button noWhen = Button.primary("no_when", "No Whens").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-        Button noWhenPersistent = Button.primary("no_when_persistent", "No Whens No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.nowhens));
-
-        List<Button> whenButtons = new ArrayList<>(List.of(playWhen, noWhen, noWhenPersistent));
         
-        Button playAfter = Button.danger("play_after", "Play A Non-AC Rider");
-        Button noAfter = Button.primary("no_after", "No Afters").withEmoji(Emoji.fromFormatted(Emojis.noafters));
-        Button noAfterPersistent = Button.primary("no_after_persistent", "No Afters No Matter What (for this agenda)").withEmoji(Emoji.fromFormatted(Emojis.noafters));
-        List<Button> afterButtons = new ArrayList<>(List.of(playAfter, noAfter, noAfterPersistent));
+        Date newTime = new Date();
+        activeMap.setLastActivePlayerPing(newTime);
+        List<Button> whenButtons = AgendaHelper.getWhenButtons(activeMap);
+        List<Button> afterButtons = AgendaHelper.getAfterButtons(activeMap);
 
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
-        
-        MessageHelper.sendMessageToChannelWithButtons(channel, Emojis.nowhens, whenButtons);
-        MessageHelper.sendMessageToChannelWithButtons(channel, Emojis.noafters, afterButtons);
+
+        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, Emojis.nowhens, activeMap, whenButtons, "when");
+        MessageHelper.sendMessageToChannelWithPersistentReacts(channel, Emojis.noafters,activeMap, afterButtons,"after");
+
         ListVoteCount.turnOrder(event, activeMap, channel);
+        Button proceed = Button.danger( "proceedToVoting", "Proceed to voting without waiting for everyone to react");
+        List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
+        MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters", proceedButtons);
+
     }
 }

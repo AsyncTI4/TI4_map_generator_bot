@@ -4,8 +4,8 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.units.AddRemoveUnits;
 import ti4.commands.units.AddUnits;
+import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -14,7 +14,7 @@ import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
-import java.util.ArrayList;
+import java.io.File;
 import java.util.HashMap;
 import java.util.Objects;
 
@@ -22,6 +22,7 @@ public class SystemInfo extends SpecialSubcommandData {
     public SystemInfo() {
         super(Constants.SYSTEM_INFO, "Info for system (all units)");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.EXTRA_RINGS, "Show additional rings around the selected system for context (Max 2)").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_2, "System/Tile name").setRequired(false).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_3, "System/Tile name").setRequired(false).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_4, "System/Tile name").setRequired(false).setAutoComplete(true));
@@ -31,12 +32,21 @@ public class SystemInfo extends SpecialSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
+
+        int context = 0;
+        OptionMapping ringsMapping = event.getOption(Constants.EXTRA_RINGS);
+        if (ringsMapping != null) {
+            context = ringsMapping.getAsInt();
+            if (context > 2) context = 2;
+            if (context < 0) context = 0;
+        }
+
         for (OptionMapping tileOption : event.getOptions()) {
-            if (tileOption == null){
+            if (tileOption == null || tileOption.getName().equals(Constants.EXTRA_RINGS)){
                 continue;
             }
             String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
-            Tile tile = new AddUnits().getTile(event, tileID, activeMap);
+            Tile tile = AddUnits.getTile(event, tileID, activeMap);
             if (tile == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Tile " + tileOption.getAsString() + " not found");
                 continue;
@@ -48,7 +58,7 @@ public class SystemInfo extends SpecialSubcommandData {
             StringBuilder sb = new StringBuilder();
             sb.append("__**Tile: ").append(tile.getPosition()).append(tileName).append("**__\n");
             java.util.Map<String, String> unitRepresentation = Mapper.getUnits();
-            HashMap<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+            java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
             java.util.Map<String, String> colorToId = Mapper.getColorToId();
             Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
             for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
@@ -61,13 +71,6 @@ public class SystemInfo extends SpecialSubcommandData {
                 if (unitHolder instanceof Planet planet) {
                     sb.append(Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(representation, activeMap));
                     sb.append(" Resources: ").append(planet.getResources()).append("/").append(planet.getInfluence());
-
-                    //commented as not all planets get traits still
-    //                sb.append(" Trait: ");
-    //                ArrayList<String> planetType = planet.getPlanetType();
-    //                for (String type : planet.getPlanetType()) {
-    //                    sb.append(type).append(" ");
-    //                }
                 } else {
                     sb.append(representation);
                 }
@@ -128,7 +131,8 @@ public class SystemInfo extends SpecialSubcommandData {
                 }
                 sb.append("----------\n");
             }
-            MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+            File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, context, tileID, event);
+            MessageHelper.sendMessageWithFile(event.getChannel(), systemWithContext, sb.toString(), false);
         }
     }
 

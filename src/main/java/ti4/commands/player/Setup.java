@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
@@ -12,11 +13,12 @@ import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapStringMapper;
 import ti4.map.Player;
 import ti4.map.Tile;
+import ti4.model.FactionModel;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.StringTokenizer;
 
@@ -87,10 +89,10 @@ public class Setup extends PlayerSubcommandData {
             }
         }
 
-        String[] setupInfo = player.getFactionSetupInfo();
-       
+        FactionModel setupInfo = player.getFactionSetupInfo();
+
         //HOME SYSTEM
-        String hsTile = setupInfo[1];
+        String hsTile = AliasHandler.resolveTile(setupInfo.getHomeSystem());
 
         ArrayList<String> setup;
         boolean useSpecified = false;
@@ -105,8 +107,7 @@ public class Setup extends PlayerSubcommandData {
         } else {
             setup = Constants.setup8p;
             is6playerMap = false;
-            if (activeMap.getRingCount() == 8)
-            {
+            if (activeMap.getRingCount() == 8) {
                 useSpecified = true;
             } else if (PositionMapper.isTilePositionValid(positionHS)){
                 useSpecified = true;
@@ -143,12 +144,15 @@ public class Setup extends PlayerSubcommandData {
                        position = "bl";
                    } else {
                        position = "tl";
+
                        Tile mallice = activeMap.getTile(position);
-                       mallice.setPosition("tr");
-                       activeMap.removeTile("tl");
-                       activeMap.setTile(mallice);
+                       if(mallice != null){
+                            mallice.setPosition("tr");
+                            activeMap.removeTile("tl");
+                            activeMap.setTile(mallice);
+                       }
                    }
-                }else{
+                } else {
                     if (positionNumber == 1 || positionNumber == 2 || positionNumber == 3 ){
                         position = "tr";
                     } else if (positionNumber == 4 || positionNumber == 5) {
@@ -158,9 +162,11 @@ public class Setup extends PlayerSubcommandData {
                     } else {
                         position = "tl";
                         Tile mallice = activeMap.getTile(position);
-                        mallice.setPosition("tr");
-                        activeMap.removeTile("tl");
-                        activeMap.setTile(mallice);
+                        if(mallice != null){
+                            mallice.setPosition("tr");
+                            activeMap.removeTile("tl");
+                            activeMap.setTile(mallice);
+                        }
                     }
                 }
             }
@@ -169,16 +175,10 @@ public class Setup extends PlayerSubcommandData {
         }
 
         //STARTING COMMODITIES
-        player.setCommoditiesTotal(Integer.parseInt(setupInfo[3]));
-        for (String tech : setupInfo[5].split(",")) {
-            if (tech.trim().isEmpty()){
-                continue;
-            }
-            player.addTech(tech);
-        }
-
+        player.setCommoditiesTotal(setupInfo.getCommodities());
+        
         //STARTING PLANETS
-        for (String planet : setupInfo[6].split(",")) {
+        for (String planet : setupInfo.getHomePlanets()) {
             if (planet.isEmpty()){
                 continue;
             }
@@ -191,22 +191,34 @@ public class Setup extends PlayerSubcommandData {
 
         //STARTING UNITS
         addUnits(setupInfo, tile, color, event);
-        if(!activeMap.isFoWMode()) {
-            sendMessage("Player: " + Helper.getPlayerRepresentation(event, player) + " has been set up");
+        if (!activeMap.isFoWMode()) {
+            sendMessage("Player: " + Helper.getPlayerRepresentation(player, activeMap) + " has been set up");
         } else {
             sendMessage("Player was set up.");
         }
-
+        
         //STARTING TECH
+        for (String tech : setupInfo.getStartingTech()) {
+            if (tech.trim().isEmpty()){
+                continue;
+            }
+            player.addTech(tech);
+        }
+
+        //STARTING PNs
+        player.initPNs(activeMap);
+        HashSet<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
+        player.setPromissoryNotesOwned(playerPNs);
 
         //SEND STUFF
         AbilityInfo.sendAbilityInfo(activeMap, player, event);
         TechInfo.sendTechInfo(activeMap, player, event);
         LeaderInfo.sendLeadersInfo(activeMap, player, event);
+        PNInfo.sendPromissoryNoteInfo(activeMap, player, false, event);
     }
 
-    private void addUnits(String[] setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {
-        String units = setupInfo[2];
+    private void addUnits(FactionModel setupInfo, Tile tile, String color, SlashCommandInteractionEvent event) {
+        String units = setupInfo.getStartingFleet();
         units = units.replace(", ", ",");
         StringTokenizer tokenizer = new StringTokenizer(units, ",");
         while (tokenizer.hasMoreTokens()) {
@@ -229,7 +241,7 @@ public class Setup extends PlayerSubcommandData {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
             String unitID = Mapper.getUnitID(unit, color);
-            String unitPath = tile.getUnitPath(unitID);
+            String unitPath = Tile.getUnitPath(unitID);
             if (unitPath == null) {
                 sendMessage("Unit: " + unit + " is not valid and not supported.");
                 continue;

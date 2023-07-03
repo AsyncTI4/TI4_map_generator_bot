@@ -4,12 +4,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
+import ti4.helpers.Emojis;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class DealSOToAll extends SOCardsSubcommandData {
     public DealSOToAll() {
@@ -20,20 +18,18 @@ public class DealSOToAll extends SOCardsSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-        OptionMapping option = event.getOption(Constants.COUNT);
-        int count = 1;
-        if (option != null) {
-            int providedCount = option.getAsInt();
-            count = providedCount > 0 ? providedCount : 1;
+        int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
+        if (count < 1) {
+            sendMessage("`count` option must be greater than 0");
+            return;
         }
-        for (Player player : activeMap.getPlayers().values()) {
-            if (player.getFaction() != null && player.getColor() != null && !player.getColor().equals("null")) {
+
+        for (Player player : activeMap.getRealPlayers()) {
                 for (int i = 0; i < count; i++) {
                     activeMap.drawSecretObjective(player.getUserID());
                 }
                 SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
-            }
         }
-        sendMessage(count + " SO Dealt to All");
+        sendMessage(count + Emojis.SecretObjective + " dealt to all players. Check your Cards-Info threads.");
     }
 }

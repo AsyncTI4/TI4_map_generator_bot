@@ -18,7 +18,6 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.ChannelType;
-import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.CommandAutoCompleteInteractionEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -27,6 +26,7 @@ import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import ti4.commands.Command;
 import ti4.commands.CommandManager;
 import ti4.commands.fow.Whisper;
+import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -47,7 +47,7 @@ public class MessageListener extends ListenerAdapter {
             event.replyChoice("Please try again in a moment. The bot is rebooting.", 0).queue();
             return;
         }
-        
+
         try {
             AutoCompleteProvider.autoCompleteListener(event);
         } catch (Exception e) {
@@ -66,11 +66,16 @@ public class MessageListener extends ListenerAdapter {
 
         String userID = event.getUser().getId();
         Member member = event.getMember();
-        if (member != null) event.getChannel().sendMessage("```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```").queue();
+
+        if (member != null) {
+            String commandText = "```fix\n" + member.getEffectiveName() + " used " + event.getCommandString() + "\n```";
+            event.getChannel().sendMessage(commandText).queue();
+            // BotLogger.log(commandText); //TEMPORARY LOG ALL COMMANDS
+        }
 
         // CHECK IF CHANNEL IS MATCHED TO A GAME
-        if (!event.getInteraction().getName().equals("help")) { //SKIP /help COMMANDS
-            boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName());
+        if (!event.getInteraction().getName().equals(Constants.HELP) && !event.getInteraction().getName().equals(Constants.STATISTICS)) { //SKIP /help COMMANDS
+            boolean isChannelOK = setActiveGame(event.getChannel(), userID, event.getName(), event.getSubcommandName());
             if (!isChannelOK) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Command canceled. Execute command in correct channel, as game name.");
                 return;
@@ -93,7 +98,7 @@ public class MessageListener extends ListenerAdapter {
         }
     }
 
-    public static boolean setActiveGame(MessageChannel channel, String userID, String eventName) {
+    public static boolean setActiveGame(MessageChannel channel, String userID, String eventName, String subCommandName) {
         String channelName = channel.getName();
         MapManager mapManager = MapManager.getInstance();
         Map userActiveMap = mapManager.getUserActiveMap(userID);
@@ -105,7 +110,7 @@ public class MessageListener extends ListenerAdapter {
 
         String gameID = channelNameTokenizer.nextToken();
         boolean anyMatchGameExists = mapList.stream().anyMatch(map -> map.equals(gameID));
-        if (!anyMatchGameExists && !(eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.CREATE_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN))) {
+        if (!anyMatchGameExists && !(eventName.contains(Constants.SHOW_GAME) || eventName.contains(Constants.BOTHELPER) || eventName.contains(Constants.ADMIN)) && !(Constants.GAME.equals(eventName) && Constants.CREATE_GAME.equals(subCommandName))) {
             return false;
         }
         if (anyMatchGameExists && (mapManager.getUserActiveMap(userID) == null || !mapManager.getUserActiveMap(userID).getName().equals(gameID) && (mapManager.getMap(gameID) != null && (mapManager.getMap(gameID).isMapOpen() || mapManager.getMap(gameID).getPlayerIDs().contains(userID))))) {
@@ -165,50 +170,90 @@ public class MessageListener extends ListenerAdapter {
 
     private void autoPingGames() {
         Map mapreference = MapManager.getInstance().getMap("finreference");
-        if (mapreference != null && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 1000*10*60) //10 minutes
+        int multiplier = 1000; //should be 1000
+        if (mapreference != null && (new Date().getTime()) - mapreference.getLastTimeGamesChecked().getTime() > 10*60*multiplier) //10 minutes
         {
             mapreference.setLastTimeGamesChecked(new Date());
             MapSaveLoadManager.saveMap(mapreference);
             HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
+            
             for (Map activeMap : mapList.values()) {
-                if(activeMap.getAutoPingStatus() && activeMap.getAutoPingSpacer() != 0)
-                {
+                if (activeMap.getAutoPingStatus() && activeMap.getAutoPingSpacer() != 0) {
                     String playerID = activeMap.getActivePlayer();
-                    if (playerID != null) 
-                    {
-                        Player player = activeMap.getPlayer(playerID);
-                        if (player != null) 
-                        {
+                    
+                    if (playerID != null || activeMap.getCurrentPhase().equalsIgnoreCase("agendawaiting")) {
+                        Player player = null;
+                        if(playerID != null){
+                            player = activeMap.getPlayer(playerID);
+                        }
+                        if (player != null || activeMap.getCurrentPhase().equalsIgnoreCase("agendawaiting")) {
                             long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
-                            if (milliSinceLastPing > (1000 *60*60* activeMap.getAutoPingSpacer())) 
-                            {
-                                String realIdentity = "";
-                                if(activeMap.isCommunityMode())
-                                {
-                                    if(player.getRoleForCommunity() == null)
-                                    {
-                                        return;
+                            if (milliSinceLastPing > (60*60*multiplier* activeMap.getAutoPingSpacer())) {
+                                String realIdentity = null;
+                                String ping = null;
+                                if(player != null){
+                                    realIdentity = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
+                                    ping = realIdentity + " this is a gentle reminder that the game is waiting on you.";
+                                }
+                                if(activeMap.getCurrentPhase().equalsIgnoreCase("agendawaiting")){
+                                    AgendaHelper.pingMissingPlayers(activeMap);
+                                }else{
+                                     long milliSinceLastTurnChange = new Date().getTime() - activeMap.getLastActivePlayerChange().getTime();
+                                     int pingNumber = ((int)milliSinceLastTurnChange) / (60*60*multiplier* (int)activeMap.getAutoPingSpacer());
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*2) ){
+                                        ping = realIdentity + " this is a courtesy notice that the game AWAITS.";
                                     }
-                                    GuildChannel guildGetter = (GuildChannel) activeMap.getMainGameChannel();
-                                    realIdentity = Helper.getRoleMentionByName(guildGetter.getGuild(), player.getRoleForCommunity().getName()); //need to get right guild later
-                                }
-                                else
-                                {
-                                    realIdentity = Helper.getPlayerRepresentation(player);
-                                }
-                                String ping = realIdentity + " this is a gentle reminder that it is your turn.";
-                                if(activeMap.isFoWMode()) {
-                                    MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);
-                                } else {
-                                    MessageChannel gameChannel = activeMap.getMainGameChannel();
-                                    if(gameChannel != null)
-                                    {
-                                        MessageHelper.sendMessageToChannel(gameChannel, ping);
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*3) ){
+                                        ping = realIdentity + " this is a brusk missive stating that while you may sleep, the game never does.";
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*4) ){
+                                        ping = realIdentity + " this is a sternly worded letter regarding your noted absense.";
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*5) ){
+                                        ping = realIdentity + " this is a firm request that you do something to end this situation.";
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*6) ){
+                                        ping = realIdentity + " Half dozen times the charm they say. Surely the game will move now ";
+                                    }
+                                    if(pingNumber == 7){
+                                         ping = realIdentity + " I can write whatever I want here, not like anyone reads these anyways.";
+                                    }
+                                    if(pingNumber == 8){
+                                         ping = realIdentity + " What rhymes with send burn, do you know? I don't";
+                                    }
+                                    if(pingNumber > 8){
+                                         ping = realIdentity + " There's a rumor going around that some game is looking for a replacement player. Not that I'd know anything about that. ";
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*10) && milliSinceLastTurnChange < (60*60*multiplier* activeMap.getAutoPingSpacer()*11) && !activeMap.isFoWMode()){
+                                        ping = realIdentity + " this is your final reminder. I hope you are doing well, wherever you are, and I'm sure whatever you are doing is far more important than TI. Or your name is Frox";
+                                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), Helper.getGamePing(activeMap.getGuild(), activeMap)+ " the game has stalled on a player, and autoping will now stop pinging them. ");
+                                    }
+                                    if( milliSinceLastTurnChange > (60*60*multiplier* activeMap.getAutoPingSpacer()*11) && !activeMap.isFoWMode()){
+                                        continue;
+                                    }
+                                    if (activeMap.isFoWMode()) {
+                                        MessageHelper.sendPrivateMessageToPlayer(player, activeMap, ping);
+                                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(),  "Active player has been pinged. This is ping #"+pingNumber);
+                                    } else {
+                                        MessageChannel gameChannel = activeMap.getMainGameChannel();
+                                        if (gameChannel != null) {
+                                            MessageHelper.sendMessageToChannel(gameChannel, ping);
+                                        }
                                     }
                                 }
+                                
                                 activeMap.setLastActivePlayerPing(new Date());
                                 MapSaveLoadManager.saveMap(activeMap);
                             }
+                        }
+                    }else{
+                        long milliSinceLastPing = new Date().getTime() - activeMap.getLastActivePlayerPing().getTime();
+                        if (milliSinceLastPing > (60*60*multiplier* activeMap.getAutoPingSpacer())) {
+                            if(activeMap.getCurrentPhase().equalsIgnoreCase("agendawaiting")){
+                                AgendaHelper.pingMissingPlayers(activeMap);
+                            }
+                            activeMap.setLastActivePlayerPing(new Date());
+                            MapSaveLoadManager.saveMap(activeMap);
                         }
                     }
                 }
@@ -220,21 +265,28 @@ public class MessageListener extends ListenerAdapter {
         if (msg.getContentRaw().contains("used /fow whisper")) {
             msg.delete().queue();
         }
+
         if (msg.getContentRaw().toLowerCase().startsWith("tored") || msg.getContentRaw().toLowerCase().startsWith("topurple")
-        || msg.getContentRaw().toLowerCase().startsWith("toblue") || msg.getContentRaw().toLowerCase().startsWith("toyellow") 
-        || msg.getContentRaw().toLowerCase().startsWith("toorange") || msg.getContentRaw().toLowerCase().startsWith("togreen")) {
-            
+        || msg.getContentRaw().toLowerCase().startsWith("toblue") || msg.getContentRaw().toLowerCase().startsWith("toyellow")
+        || msg.getContentRaw().toLowerCase().startsWith("toorange") || msg.getContentRaw().toLowerCase().startsWith("togreen") || msg.getContentRaw().toLowerCase().startsWith("tosunset")
+        || msg.getContentRaw().toLowerCase().startsWith("tobloodred") || msg.getContentRaw().toLowerCase().startsWith("tospring")
+        || msg.getContentRaw().toLowerCase().startsWith("togray") || msg.getContentRaw().toLowerCase().startsWith("tochocolate") || msg.getContentRaw().toLowerCase().startsWith("tochrome")
+        || msg.getContentRaw().toLowerCase().startsWith("togold") || msg.getContentRaw().toLowerCase().startsWith("tonavy")
+        || msg.getContentRaw().toLowerCase().startsWith("tolightgray") || msg.getContentRaw().toLowerCase().startsWith("toteal") || msg.getContentRaw().toLowerCase().startsWith("toforest")
+        || msg.getContentRaw().toLowerCase().startsWith("torose") || msg.getContentRaw().toLowerCase().startsWith("toturquoise")
+        || msg.getContentRaw().toLowerCase().startsWith("tolime") || msg.getContentRaw().toLowerCase().startsWith("toemerald") || msg.getContentRaw().toLowerCase().startsWith("topetrol")
+        || msg.getContentRaw().toLowerCase().startsWith("tobrown") || msg.getContentRaw().toLowerCase().startsWith("totan")
+        || msg.getContentRaw().toLowerCase().startsWith("toblack") || msg.getContentRaw().toLowerCase().startsWith("topink")||msg.getContentRaw().toLowerCase().startsWith("tolavender")) {
+
             String gameName = event.getChannel().getName();
 			gameName = gameName.substring(0, gameName.indexOf("-"));
-			Map map = MapManager.getInstance().getMap(gameName);
-            if(map.isFoWMode())
-            {
+			Map activeMap = MapManager.getInstance().getMap(gameName);
+            if (activeMap.isFoWMode()) {
                 String msg3 = msg.getContentRaw();
                 String msg2 = msg3.substring(msg3.indexOf(" ")+1,msg3.length());
-                Player player = map.getPlayer(event.getAuthor().getId());
-                if(map.isCommunityMode())
-                {
-                    Collection<Player> players = map.getPlayers().values();
+                Player player = activeMap.getPlayer(event.getAuthor().getId());
+                if (activeMap.isCommunityMode()) {
+                    Collection<Player> players = activeMap.getPlayers().values();
                     java.util.List<Role> roles = event.getMember().getRoles();
                     for (Player player2 : players) {
                         if (roles.contains(player2.getRoleForCommunity())) {
@@ -242,20 +294,19 @@ public class MessageListener extends ListenerAdapter {
                         }
                     }
                 }
-                Player player_ = map.getPlayer(event.getAuthor().getId());
+                Player player_ = activeMap.getPlayer(event.getAuthor().getId());
                 String factionColor = msg3.substring(2,msg3.indexOf(" ")).toLowerCase();
                 factionColor = AliasHandler.resolveFaction(factionColor);
-                for (Player player3 : map.getPlayers().values()) {
+                for (Player player3 : activeMap.getPlayers().values()) {
                     if (Objects.equals(factionColor, player3.getFaction()) ||
                             Objects.equals(factionColor, player3.getColor())) {
                         player_ = player3;
                         break;
                     }
                 }
-                
-                if (map != null)
-                {
-                    Whisper.sendWhisper(map, player, player_, msg2, "n", (MessageChannel) event.getChannel(), event.getGuild());
+
+                if (activeMap != null) {
+                    Whisper.sendWhisper(activeMap, player, player_, msg2, "n", (MessageChannel) event.getChannel(), event.getGuild());
                 }
                 msg.delete().queue();
             }

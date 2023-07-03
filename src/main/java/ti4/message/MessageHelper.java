@@ -3,11 +3,11 @@ package ti4.message;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel.AutoArchiveDuration;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
-import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.FileUpload;
@@ -15,7 +15,9 @@ import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
 import ti4.MapGenerator;
+import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.helpers.Constants;
+import ti4.helpers.DiscordWebhook;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -45,9 +47,9 @@ public class MessageHelper {
 	public static void sendMessageToChannelWithButtons(MessageChannel channel, String messageText, List<Button> buttons) {
 		splitAndSent(messageText, channel, buttons);
 	}
-	
+
 	private static void addFactionReactToMessage(Map activeMap, Player player, Message message) {
-		Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player, message); 
+		Emoji reactionEmoji = Helper.getPlayerEmoji(activeMap, player, message);
 		if (reactionEmoji != null) {
 			message.addReaction(reactionEmoji).queue();
 		}
@@ -60,12 +62,17 @@ public class MessageHelper {
 	public static void sendMessageToChannelWithPersistentReacts(MessageChannel channel, String messageText, Map activeMap, List<Button> buttons, String whenOrAfter) {
 		MessageFunction addFactionReact = (msg) -> {
 			StringTokenizer players  = null;
-			if(whenOrAfter != null && whenOrAfter.equalsIgnoreCase("when"))
-			{
+			if (whenOrAfter != null && whenOrAfter.equalsIgnoreCase("when")) {
+				if (activeMap.getLatestWhenMsg() != null && activeMap.getLatestWhenMsg() != "") {
+					activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestWhenMsg()).queue();
+				}
+				activeMap.setLatestWhenMsg(msg.getId());
 				players = new StringTokenizer(activeMap.getPlayersWhoHitPersistentNoWhen(), "_");
-			}
-			else
-			{
+			} else {
+				if (activeMap.getLatestAfterMsg() != null && activeMap.getLatestAfterMsg() != "") {
+					activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestAfterMsg()).queue();
+				}
+				activeMap.setLatestAfterMsg(msg.getId());
 				players = new StringTokenizer(activeMap.getPlayersWhoHitPersistentNoAfter(), "_");
 			}
 			while (players.hasMoreTokens()) {
@@ -73,8 +80,10 @@ public class MessageHelper {
 				Player player_ = Helper.getPlayerFromColorOrFaction(activeMap, player);
 				addFactionReactToMessage(activeMap, player_, msg);
 			}
-		};	
-		
+
+
+		};
+
 		splitAndSentWithAction(messageText, channel, addFactionReact, buttons);
 	}
 
@@ -87,6 +96,11 @@ public class MessageHelper {
 	public static void sendFileToChannel(MessageChannel channel, File file) {
 		FileUpload fileUpload = FileUpload.fromData(file);
 		channel.sendFiles(fileUpload).queue();
+	}
+	public static void sendFileToChannelWithButtonsAfter(MessageChannel channel, File file, String message, List<Button> buttons) {
+		FileUpload fileUpload = FileUpload.fromData(file);
+		channel.sendFiles(fileUpload).queue();
+		splitAndSent(message, channel, buttons);
 	}
 
 	public static void replyToMessage(GenericInteractionCreateEvent event, String messageText) {
@@ -110,11 +124,10 @@ public class MessageHelper {
 			String gameName = event.getChannel().getName();
 			gameName = gameName.replace(Constants.CARDS_INFO_THREAD_PREFIX, "");
 			gameName = gameName.substring(0, gameName.indexOf("-"));
-			Map activeMap = MapManager.getInstance().getMap(gameName);
 			if (event.getChannel() instanceof MessageChannel) {
 				sendMessageWithFile((MessageChannel)event.getChannel(), file, messageText, pinMessage);
 			}
-			
+
 		} catch (Exception e) {
 			replyToMessage(event, "Could not send response, use /show_game or contact Admins or Bothelper");
 		}
@@ -156,6 +169,40 @@ public class MessageHelper {
 				channel.sendMessage(messageCreateData).queue();
 			} else { //last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
+
+					if(messageText.contains("Use buttons to do your turn") || messageText.contains("Use buttons to end turn"))
+					{
+						String gameName = channel.getName();
+						gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+						gameName = gameName.substring(0, gameName.indexOf("-"));
+						Map activeMap = MapManager.getInstance().getMap(gameName);
+						if(!activeMap.isFoWMode()){
+							activeMap.setLatestTransactionMsg(complete.getId());
+						}
+						
+					}
+					if(messageText.toLowerCase().contains("up next") && messageText.contains("#"))
+					{
+						String gameName = channel.getName();
+						gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+						gameName = gameName.substring(0, gameName.indexOf("-"));
+						Map activeMap = MapManager.getInstance().getMap(gameName);
+						if(!activeMap.isFoWMode()){
+							if(activeMap.getLatestUpNextMsg()!= null && !activeMap.getLatestUpNextMsg().equalsIgnoreCase("")){
+								String id = activeMap.getLatestUpNextMsg().split("_")[0];
+								String message = activeMap.getLatestUpNextMsg().substring(activeMap.getLatestUpNextMsg().indexOf("_")+1, activeMap.getLatestUpNextMsg().length()).replace("#", "");
+								message = message.replace("UP NEXT", "started their turn");
+								
+								activeMap.getActionsChannel().editMessageById(id, message).queue();
+							}
+							
+							activeMap.setLatestUpNextMsg(complete.getId()+"_"+messageText);
+							
+						}
+
+
+					}
+					
 					if (restAction != null) restAction.run(complete);
 				});
 			}
@@ -164,17 +211,17 @@ public class MessageHelper {
 
 	/**
 	 * Send a private message to the player.
-	 * 
+	 *
 	 * @param player      Player to send a message to
-	 * @param map         Active map
+	 * @param activeMap   Active map
 	 * @param event       Event that caused the message
 	 * @param messageText Message to send
 	 * @param failText    Feedback if the message failed to send
 	 * @param successText Feedback if the message successfully sent
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Map map, SlashCommandInteractionEvent event, String messageText, String failText, String successText) {
-		return sendPrivateMessageToPlayer(player, map, event.getChannel(), messageText, failText, successText);
+	public static boolean sendPrivateMessageToPlayer(Player player, Map activeMap, GenericInteractionCreateEvent event, String messageText, String failText, String successText) {
+		return sendPrivateMessageToPlayer(player, activeMap, event.getMessageChannel(), messageText, failText, successText);
 	}
 
 	/**
@@ -183,26 +230,26 @@ public class MessageHelper {
 	 * This implementation does not provide feedback
 	 *
 	 * @param player      Player to send a message to
-	 * @param map         Active map
+	 * @param activeMap   Active map
 	 * @param messageText Message to send
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Map map, String messageText) {
-		return sendPrivateMessageToPlayer(player, map, (MessageChannel) null, messageText, null, null);
+	public static boolean sendPrivateMessageToPlayer(Player player, Map activeMap, String messageText) {
+		return sendPrivateMessageToPlayer(player, activeMap, (MessageChannel) null, messageText, null, null);
 	}
 
 	/**
 	 * Send a private message to the player.
-	 * 
+	 *
 	 * @param player          Player to send a message to
-	 * @param map             Active map
+	 * @param activeMap       Active map
 	 * @param feedbackChannel Channel to send feedback to
 	 * @param messageText     Message to send
 	 * @param failText        Feedback if the message failed to send
 	 * @param successText     Feedback if the message successfully sent
 	 * @return True if the message was send successfully, false otherwise
 	 */
-	public static boolean sendPrivateMessageToPlayer(Player player, Map map, MessageChannel feedbackChannel, String messageText, String failText, String successText) {
+	public static boolean sendPrivateMessageToPlayer(Player player, Map activeMap, MessageChannel feedbackChannel, String messageText, String failText, String successText) {
         if (messageText == null || messageText.length() == 0) return true; // blank message counts as a success
 		User user = MapGenerator.jda.getUserById(player.getUserID());
 		if (user == null) {
@@ -211,7 +258,7 @@ public class MessageHelper {
 		} else {
 			MessageChannel privateChannel = player.getPrivateChannel();
 			if (privateChannel == null) {
-				sendMessageToUser(map.getName() + " " + messageText, user);
+				sendMessageToUser(activeMap.getName() + " " + messageText, user);
 			} else {
 				sendMessageToChannel(privateChannel, messageText);
 			}
@@ -220,10 +267,24 @@ public class MessageHelper {
 		}
 	}
 
+	public static boolean privatelyPingPlayerList(List<Player> players, Map activeMap, String message) {
+		return privatelyPingPlayerList(players, activeMap, (MessageChannel) null, message, null, null);
+	}
+
+	public static boolean privatelyPingPlayerList(List<Player> players, Map activeMap, MessageChannel feedbackChannel, String message, String failText, String successText) {
+		int count = 0;
+		for (Player player : players) {
+			String playerRepresentation = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
+			boolean success = sendPrivateMessageToPlayer(player, activeMap, feedbackChannel, playerRepresentation + message, failText, successText);
+			if (success) count++;
+		}
+		return count == players.size();
+	}
+
     public static void sendMessageToUser(String messageText, GenericInteractionCreateEvent event) {
         sendMessageToUser(messageText, event.getUser());
     }
-    
+
     public static void sendMessageToUser(String messageText, User user) {
         user.openPrivateChannel().queue(channel -> {
             splitAndSent(messageText, channel);
@@ -244,6 +305,7 @@ public class MessageHelper {
         }
 
         //SEND MESSAGES
+		if (messageText == null || messageText.isEmpty()) return;
         for (String text : splitLargeText(messageText, 2000)) {
             threadChannel.sendMessage(text).queue();
         }
@@ -252,13 +314,14 @@ public class MessageHelper {
 	/**
 	 * Given a text string and a maximum length, will return a List<String> split by
 	 * either the max length or the last newline "\n"
-	 * 
+	 *
 	 * @param messageText any non-null, non-empty string
 	 * @param maxLength   maximum length, any positive integer
 	 * @return
 	 */
-	private static List<String> splitLargeText(@NotNull String messageText, @NotNull int maxLength) {
+	private static List<String> splitLargeText(String messageText, int maxLength) {
 		List<String> texts = new ArrayList<>();
+		if (messageText == null || messageText.isEmpty()) return Collections.emptyList();
 		Integer messageLength = messageText.length();
         if (messageLength <= maxLength) return Collections.singletonList(messageText);
 		int index = 0;
@@ -293,42 +356,79 @@ public class MessageHelper {
     public static List<MessageCreateData> getMessageCreateDataObjects(String message, List<Button> buttons) {
 		List<MessageCreateData> messageCreateDataList = new ArrayList<>();
 
-		//ADD MESSAGES
-		if (message != null && !message.isEmpty()) {
-			for (String text : splitLargeText(message, 2000)) {
-				messageCreateDataList.add(new MessageCreateBuilder()
-						.addContent(text).build());
+		List<List<ActionRow>> partitionedButtons = getPartitionedButtonLists(buttons);
+		Iterator<List<ActionRow>> buttonIterator = partitionedButtons.iterator();
+
+		List<String> messageList = splitLargeText(message, 2000);
+		Iterator<String> messageIterator = messageList.iterator();
+
+		while (messageIterator.hasNext()) {
+			String smallMessage = messageIterator.next();
+
+			//More messages exists, so just frontload the plain messages
+			if (messageIterator.hasNext() && smallMessage != null && !smallMessage.isEmpty()) {
+				messageCreateDataList.add(new MessageCreateBuilder().addContent(smallMessage).build());
+
+			//We are at the last message, so try and add the first row of buttons
+			} else if (!messageIterator.hasNext() && smallMessage != null && !smallMessage.isEmpty()) {
+				MessageCreateBuilder messageCreateBuilder = new MessageCreateBuilder();
+				messageCreateBuilder.addContent(smallMessage);
+
+				//add first row of buttons if it exists
+				if (buttonIterator.hasNext()) {
+					List<ActionRow> actionRows = buttonIterator.next();
+					if (actionRows != null && !actionRows.isEmpty()) {
+						messageCreateBuilder.addComponents(actionRows);
+					}
+				}
+				messageCreateDataList.add(messageCreateBuilder.build());
 			}
 		}
 
-		//ADD BUTTONS
-        if (buttons != null && !buttons.isEmpty()) {
-			try {
-				buttons.removeIf(Objects::isNull);
-			} catch (Exception e) {
-				//Do nothing
-			}
-			List<List<Button>> partitions = ListUtils.partition(buttons, 5);
-			List<ActionRow> buttonRows = new ArrayList<>();
-			for (List<Button> partition : partitions) {
-				buttonRows.add(ActionRow.of(partition));
-			}
-			List<List<ActionRow>> partitionedButtonRows = ListUtils.partition(buttonRows, 5);
-			for (List<ActionRow> partitionActionRow : partitionedButtonRows) {
-				messageCreateDataList.add(new MessageCreateBuilder()
-						.addComponents(partitionActionRow).build());
+		//ADD REMAINING BUTTONS IF THEY EXIST
+		while (buttonIterator.hasNext()) {
+			List<ActionRow> actionRows = buttonIterator.next();
+			if (actionRows != null && !actionRows.isEmpty()) {
+				messageCreateDataList.add(new MessageCreateBuilder().addComponents(actionRows).build());
 			}
 		}
         return messageCreateDataList;
     }
 
+	private static List<List<ActionRow>> getPartitionedButtonLists(List<Button> buttons) {
+		List<List<ActionRow>> partitionedButtonRows = new ArrayList<>();
+		if (buttons == null || buttons.isEmpty()) return partitionedButtonRows;
+		try {
+			buttons.removeIf(Objects::isNull);
+		} catch (Exception e) {
+			//Do nothing
+		}
+		List<List<Button>> partitions = ListUtils.partition(buttons, 5);
+		List<ActionRow> buttonRows = new ArrayList<>();
+		for (List<Button> partition : partitions) {
+			buttonRows.add(ActionRow.of(partition));
+		}
+		partitionedButtonRows = ListUtils.partition(buttonRows, 5);
+		return partitionedButtonRows;
+	}
+
     public static void sendMessageToThread(MessageChannelUnion channel, String threadName, String messageToSend) {
 		if (channel == null || threadName == null || messageToSend == null || threadName.isEmpty() || messageToSend.isEmpty()) return;
         if (channel instanceof TextChannel) {
-            channel.asTextChannel().createThreadChannel(threadName).queueAfter(500, TimeUnit.MILLISECONDS, t -> MessageHelper.sendMessageToChannel(t, messageToSend));
+            channel.asTextChannel().createThreadChannel(threadName).setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR).queueAfter(500, TimeUnit.MILLISECONDS, t -> MessageHelper.sendMessageToChannel(t, messageToSend));
         } else if (channel instanceof ThreadChannel) {
             MessageHelper.sendMessageToChannel(channel, messageToSend);
         }
     }
 
+    public static void sendMessageToBotLogWebhook(String message) {
+        if (!MapGenerator.guildPrimary.getId().equals("943410040369479690")) return; //Only run in Prod
+        DiscordWebhook webhook = new DiscordWebhook("https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v");
+		webhook.setContent(message);
+		try {
+			webhook.execute();
+		} catch (Exception e) {
+			// Do nothing
+		}
+    }
 }

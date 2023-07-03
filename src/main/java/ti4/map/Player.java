@@ -12,6 +12,8 @@ import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.message.BotLogger;
+import ti4.model.FactionModel;
+import ti4.model.PublicObjectiveModel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -25,7 +27,7 @@ import java.util.Map.Entry;
 import java.util.*;
 
 public class Player {
-    
+
     private String userID;
     private String userName;
 
@@ -34,6 +36,11 @@ public class Player {
     private boolean isDummy = false;
 
     private String faction;
+    private Faction faction_;
+    //abilities
+    //factiontech
+    //home
+
     private String color;
     private String autoCompleteRepresentation = null;
 
@@ -49,10 +56,14 @@ public class Player {
     private Set<Integer> followedSCs = new HashSet<>();
 
     private LinkedHashMap<String, Integer> actionCards = new LinkedHashMap<>();
+    private LinkedHashMap<String, Integer> trapCards = new LinkedHashMap<>();
+    private LinkedHashMap<String, String> trapCardsPlanets = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secrets = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>();
     private LinkedHashMap<String, Integer> promissoryNotes = new LinkedHashMap<>();
-    private HashSet<String> factionAbilities = new HashSet<>();
+    private HashSet<String> abilities = new HashSet<>();
+    private HashSet<String> exhaustedAbilities = new HashSet<>();
+    private HashSet<String> promissoryNotesOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
     private List<String> exhaustedTechs = new ArrayList<>();
@@ -66,14 +77,15 @@ public class Player {
 
     private HashMap<String,String> debt_tokens = new HashMap<>();
     private HashMap<String,String> fow_seenTiles = new HashMap<>();
+    private HashMap<String,Integer> unitCaps = new HashMap<>();
     private HashMap<String,String> fow_customLabels = new HashMap<>();
     private String fowFogFilter = null;
     private boolean fogInitialized = false;
 
     @Nullable
-    private Role roleForCommunity = null;
+    private String roleIDForCommunity = null;
     @Nullable
-    private MessageChannel privateChannel = null;
+    private String privateChannelID = null;
     @Nullable
     private String cardsInfoThreadID = null;
 
@@ -129,26 +141,59 @@ public class Player {
          mahactCC.remove(cc);
     }
 
-    @Nullable
+    public String getRoleIDForCommunity() {
+        return roleIDForCommunity;
+    }
+
+    public void setRoleIDForCommunity(String roleIDForCommunity) {
+        this.roleIDForCommunity = roleIDForCommunity;
+    }
+
+    @Nullable @JsonIgnore
     public Role getRoleForCommunity() {
-        return roleForCommunity;
+        try {
+            return MapGenerator.jda.getRoleById(getRoleIDForCommunity());
+        } catch (Exception e) {
+            // BotLogger.log("Could not retrieve MainGameChannel for " + getName(), e);
+        }
+        return null;
     }
 
-    public void setRoleForCommunity(Role roleForCommunity) {
-        this.roleForCommunity = roleForCommunity;
+    public String getPrivateChannelID() {
+        return privateChannelID;
     }
 
-    @Nullable
+    public void setPrivateChannelID(String privateChannelID) {
+        this.privateChannelID = privateChannelID;
+    }
+
+    @Nullable @JsonIgnore
     public MessageChannel getPrivateChannel() {
-        return privateChannel;
-    }
-
-    public void setPrivateChannel(MessageChannel privateChannel) {
-        this.privateChannel = privateChannel;
+        try {
+            return MapGenerator.jda.getTextChannelById(getPrivateChannelID());
+        } catch (Exception e) {
+            // BotLogger.log("Could not retrieve privateChannel for " + getName(), e);
+        }
+        return null;
     }
 
     public String getCardsInfoThreadID() {
         return cardsInfoThreadID;
+    }
+
+    public boolean hasPDS2Tech() {
+        if(getTechs().contains("ht2") ||getTechs().contains("pds2") ||getTechs().contains("dsgledpds") || getTechs().contains("dsmirvpds"))
+        {
+            return true; 
+        }
+        return false;
+    }
+    public boolean hasWarsunTech() {
+        if(getTechs().contains("pws2") ||getTechs().contains("dsrohdws") ||getTechs().contains("ws") || getFaction().equalsIgnoreCase("muaat"))
+        {
+            return true; 
+        }
+        return false;
     }
 
     public void setCardsInfoThreadID(String cardsInfoThreadID) {
@@ -158,15 +203,14 @@ public class Player {
     @JsonIgnore
     public ThreadChannel getCardsInfoThread(ti4.map.Map activeMap) {
         TextChannel actionsChannel = (TextChannel) activeMap.getMainGameChannel();
-        if (activeMap.isFoWMode()) actionsChannel = (TextChannel) getPrivateChannel();
+        if (activeMap.isFoWMode() || activeMap.isCommunityMode()) actionsChannel = (TextChannel) getPrivateChannel();
         if (actionsChannel == null) {
             BotLogger.log("`Helper.getPlayerCardsInfoThread`: actionsChannel is null for game: " + activeMap.getName());
             return null;
         }
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + getUserName().replaceAll("/", "");
-        if(activeMap.isFoWMode())
-            {
+        if (activeMap.isFoWMode()) {
                 threadName = activeMap.getName() + "-" + "cards-info-"+ getUserName().replaceAll("/", "") + "-private";
             }
 
@@ -176,10 +220,10 @@ public class Player {
             if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !cardsInfoThreadID.equals("null")) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
                 if (threadChannels == null) return null;
-    
+
                 ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null) return threadChannel;
-                
+
                 // SEARCH FOR EXISTING OPEN THREAD
                 for (ThreadChannel threadChannel_ : threadChannels) {
                     if (threadChannel_.getId().equals(cardsInfoThreadID)) {
@@ -187,7 +231,7 @@ public class Player {
                         return threadChannel_;
                     }
                 }
-                
+
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
                 List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
@@ -198,7 +242,6 @@ public class Player {
                 }
             }
         } catch (Exception e) {
-            // TODO: handle exception
             BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using ID: " + cardsInfoThreadID + " for potential thread name: " + threadName, e);
         }
 
@@ -207,10 +250,10 @@ public class Player {
             if (cardsInfoThreadID != null && !cardsInfoThreadID.isBlank() && !cardsInfoThreadID.isEmpty() && !cardsInfoThreadID.equals("null")) {
                 List<ThreadChannel> threadChannels = actionsChannel.getThreadChannels();
                 if (threadChannels == null) return null;
-    
+
                 ThreadChannel threadChannel = MapGenerator.jda.getThreadChannelById(cardsInfoThreadID);
                 if (threadChannel != null) return threadChannel;
-                
+
                 // SEARCH FOR EXISTING OPEN THREAD
                 for (ThreadChannel threadChannel_ : threadChannels) {
                     if (threadChannel_.getName().equals(threadName)) {
@@ -218,7 +261,7 @@ public class Player {
                         return threadChannel_;
                     }
                 }
-                
+
                 // SEARCH FOR EXISTING CLOSED/ARCHIVED THREAD
                 List<ThreadChannel> hiddenThreadChannels = actionsChannel.retrieveArchivedPrivateThreadChannels().complete();
                 for (ThreadChannel threadChannel_ : hiddenThreadChannels) {
@@ -229,10 +272,9 @@ public class Player {
                 }
             }
         } catch (Exception e) {
-            // TODO: handle exception
             BotLogger.log("`Player.getCardsInfoThread`: Could not find existing Cards Info thead using name: " + threadName, e);
         }
-        
+
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
         boolean isPrivateChannel = (!activeMap.isCommunityMode() && !activeMap.isFoWMode());
@@ -262,28 +304,94 @@ public class Player {
         this.passed = passed;
     }
 
-    public HashSet<String> getFactionAbilities() {
-        return factionAbilities;
+    public HashSet<String> getAbilities() {
+        return abilities;
     }
 
-    public void setFactionAbilities(HashSet<String> factionAbilities) {
-        this.factionAbilities = factionAbilities;
+    public void setAbilities(HashSet<String> abilities) {
+        this.abilities = abilities;
     }
 
     /**
      * @param abilityID The ID of the ability - does not check if valid
-     * @see faction_abilities.properties
      */
-    public void addFactionAbility(String abilityID) {
-        factionAbilities.add(abilityID);
+    public void addAbility(String abilityID) {
+        abilities.add(abilityID);
     }
 
-    public void removeFactionAbility(String abilityID) {
-        factionAbilities.remove(abilityID);
+    public void removeAbility(String abilityID) {
+        abilities.remove(abilityID);
+    }
+
+    public boolean hasAbility(String ability) {
+        return getAbilities().contains(ability);
+    }
+
+    public HashSet<String> getExhaustedAbilities() {
+        return exhaustedAbilities;
+    }
+
+    public void setExhaustedAbilities(HashSet<String> exhaustedAbilities) {
+        this.exhaustedAbilities = exhaustedAbilities;
+    }
+
+    public boolean addExhaustedAbility(String ability) {
+        return exhaustedAbilities.add(ability);
+    }
+
+    public boolean removeExhaustedAbility(String ability) {
+        return exhaustedAbilities.remove(ability);
+    }
+
+    public void clearExhaustedAbilities() {
+        exhaustedAbilities.clear();
+    }
+
+    public int getUnitCap(String unit) {
+        if (unitCaps.get(unit) == null) {
+            return 0;
+        }
+        return unitCaps.get(unit);
+    }
+
+    public HashMap<String, Integer> getUnitCaps() {
+        return unitCaps;
+    }
+
+    public void setUnitCap(String unit, int cap) {
+        unitCaps.put(unit, cap);
     }
 
     public LinkedHashMap<String, Integer> getActionCards() {
         return actionCards;
+    }
+
+    public LinkedHashMap<String, Integer> getTrapCards() {
+        return trapCards;
+    }
+
+    public LinkedHashMap<String, String> getTrapCardsPlanets() {
+        return trapCardsPlanets;
+    }
+
+    public HashSet<String> getPromissoryNotesOwned() {
+        return promissoryNotesOwned;
+    }
+
+    public void setPromissoryNotesOwned(HashSet<String> promissoryNotesOwned) {
+        this.promissoryNotesOwned = promissoryNotesOwned;
+    }
+
+    public boolean ownsPromissoryNote(String promissoryNoteID) {
+        return promissoryNotesOwned.contains(promissoryNoteID);
+    }
+
+    public boolean removeOwnedPromissoryNoteByID(String promissoryNoteID) {
+        return promissoryNotesOwned.remove(promissoryNoteID);
+    }
+
+    public boolean addOwnedPromissoryNoteByID(String promissoryNoteID) {
+        return promissoryNotesOwned.add(promissoryNoteID);
     }
 
     public LinkedHashMap<String, Integer> getPromissoryNotes() {
@@ -301,6 +409,19 @@ public class Player {
             identifier = new Random().nextInt(1000);
         }
         actionCards.put(id, identifier);
+    }
+
+    public void setTrapCard(String id) {
+        Collection<Integer> values = trapCards.values();
+        int identifier = new Random().nextInt(1000);
+        while (values.contains(identifier)) {
+            identifier = new Random().nextInt(1000);
+        }
+        trapCards.put(id, identifier);
+    }
+
+    public void setTrapCardPlanet(String id, String planet) {
+        trapCardsPlanets.put(id, planet);
     }
 
     public void setPromissoryNote(String id) {
@@ -324,13 +445,7 @@ public class Player {
 
     @JsonSetter
     public void setPromissoryNotesInPlayArea(List<String> promissoryNotesInPlayArea) {
-        List<String> replaced = new ArrayList<>();
-        for (String id : promissoryNotesInPlayArea) {
-            id = id.replace("torquoise", "turquoise");
-            replaced.add(id);
-        }
-
-        this.promissoryNotesInPlayArea = replaced;
+        this.promissoryNotesInPlayArea = promissoryNotesInPlayArea;
     }
 
     public void setPromissoryNotes(LinkedHashMap<String, Integer> promissoryNotes) {
@@ -345,8 +460,11 @@ public class Player {
         actionCards.put(id, identifier);
     }
 
+    public void setTrapCard(String id, Integer identifier) {
+        trapCards.put(id, identifier);
+    }
+
     public void setPromissoryNote(String id, Integer identifier) {
-        id = id.replace("torquoise", "turquoise");
         promissoryNotes.put(id, identifier);
     }
 
@@ -410,9 +528,9 @@ public class Player {
         return secretsScored;
     }
 
-    public void setSecretScored(String id, ti4.map.Map map) {
+    public void setSecretScored(String id, ti4.map.Map activeMap) {
         Collection<Integer> values = secretsScored.values();
-        List<Integer> allIDs = map.getPlayers().values().stream().flatMap(player -> player.getSecretsScored().values().stream()).toList();
+        List<Integer> allIDs = activeMap.getPlayers().values().stream().flatMap(player -> player.getSecretsScored().values().stream()).toList();
         int identifier = new Random().nextInt(1000);
         while (values.contains(identifier) || allIDs.contains(identifier)) {
             identifier = new Random().nextInt(1000);
@@ -456,6 +574,38 @@ public class Player {
         return fragments;
     }
 
+    public boolean enoughFragsForRelic(){
+        boolean enough = false;
+        int haz = 0;
+        int ind = 0;
+        int cult = 0;
+        int frontier = 0;
+		for (String id : fragments) {
+			String[] cardInfo = Mapper.getExplore(id).split(";");
+			if (cardInfo[1].equalsIgnoreCase("hazardous")) {
+				haz = haz + 1;
+			} else if (cardInfo[1].equalsIgnoreCase(Constants.FRONTIER)) {
+				frontier = frontier+1;
+			}else if (cardInfo[1].equalsIgnoreCase("industrial")) {
+				ind = ind+1;
+			}else if (cardInfo[1].equalsIgnoreCase("cultural")) {
+				cult = cult+1;
+			}
+		}
+        int targetToHit = 3 - frontier;
+        if(hasAbility("fabrication") || getPromissoryNotes().containsKey("bmf"))
+        {
+            targetToHit = targetToHit-1;
+        }
+        if(haz >= targetToHit || cult >= targetToHit || ind >= targetToHit)
+        {
+            enough = true;
+        }
+
+        return enough;
+    }
+
+
     public void setFragments(ArrayList<String> fragmentList) {
         fragments = fragmentList;
         updateFragments();
@@ -498,8 +648,8 @@ public class Player {
 
     public void addRelic(String relicID) {
         if (!relics.contains(relicID) || Constants.ENIGMATIC_DEVICE.equals(relicID)) {
-            if (relicID.equals("dynamiscore")){
-                commoditiesTotal += 2;
+            if (relicID.equals("dynamiscore") || relicID.equals("absol_dynamiscore")){
+                setCommoditiesTotal(getCommoditiesTotal() + 2);
             }
             relics.add(relicID);
         }
@@ -510,8 +660,8 @@ public class Player {
     }
 
     public void removeRelic(String relicID) {
-        if (relicID.equals("dynamiscore")){
-            commoditiesTotal -= 2;
+        if (relicID.equals("dynamiscore") || relicID.equals("absol_dynamiscore")){
+            setCommoditiesTotal(getCommoditiesTotal() - 2);
         }
         relics.remove(relicID);
     }
@@ -548,7 +698,6 @@ public class Player {
 
     public void setFaction(String faction) {
         this.faction = faction;
-        initPNs();
         initLeaders();
         initAbilities();
     }
@@ -562,60 +711,72 @@ public class Player {
                 abilities.add(ability);
             }
         }
-        setFactionAbilities(abilities);
-    }
-
-    @JsonIgnore
-    public String[] getFactionSetupInfo() {
-        if (faction == null || faction.equals("null") || faction.equals("keleres")) return null;
-        String factionSetupInfo = Mapper.getPlayerSetup(faction);
-        if (factionSetupInfo == null) {
-            BotLogger.log("Could not get faction setup info for: " + faction);
-            return null;
-        }
-        long count = factionSetupInfo.chars().filter(ch -> ch == ';').count();
-        int expectedTokenCount = 7;
-        if (count != expectedTokenCount) {
-            BotLogger.log("Faction setup raw text is incorrectly formatted (needs " + (expectedTokenCount - 1) + " ; to split properly):\n> " + factionSetupInfo);
-            return null;
-        }
-        String[] setupInfo = factionSetupInfo.split(";");
-        return setupInfo;
-    }
-    
-    private List<String> getFactionStartingAbilities() {
-        String[] factionSetupInfo = getFactionSetupInfo();
-        if(factionSetupInfo == null) return new ArrayList<String>();
-        return Arrays.asList(getFactionSetupInfo()[7].split(","));
-    }
-
-    public void initLeaders() {
-        if (faction != null && Mapper.isFaction(faction)) {
-            leaders.clear();
-            HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = Mapper.getLeadersInfo();
-            HashMap<String, ArrayList<String>> factionLeaders = leadersInfo.get(faction);
-            if (factionLeaders != null) {
-                for (Map.Entry<String, ArrayList<String>> factionLeaderEntry : factionLeaders.entrySet()) {
-                    String leaderType = factionLeaderEntry.getKey();
-                    ArrayList<String> uniqueLeaders = factionLeaderEntry.getValue();
-                    if (uniqueLeaders.isEmpty()){
-                        Leader leader = new Leader(leaderType, "");
-                        leaders.add(leader);
-                    } else {
-                        for (String uniqueLeader : uniqueLeaders) {
-                            Leader leader = new Leader(leaderType, uniqueLeader);
-                            leaders.add(leader);
-                        }
-                    }
+        setAbilities(abilities);
+        if (faction.equals(Constants.LIZHO)){
+            Map<String, String> dsHandcards = Mapper.getDSHandcards();
+            for (Entry<String, String> entry : dsHandcards.entrySet()) {
+                String key = entry.getKey();
+                if (key.endsWith(Constants.LIZHO)){
+                    setTrapCard(key);
                 }
             }
         }
     }
 
+    @JsonIgnore
+    public FactionModel getFactionSetupInfo() {
+        if (faction == null || faction.equals("null") || faction.equals("keleres")) return null;
+        FactionModel factionSetupInfo = Mapper.getFactionSetup(faction);
+        if (factionSetupInfo == null) {
+            BotLogger.log("Could not get faction setup info for: " + faction);
+            return null;
+        }
+        return factionSetupInfo;
+    }
+
+    private List<String> getFactionStartingAbilities() {
+        FactionModel factionSetupInfo = getFactionSetupInfo();
+        if (factionSetupInfo == null) return new ArrayList<String>();
+        return new ArrayList<String>(factionSetupInfo.getAbilities());
+    }
+
+    private List<String> getFactionStartingLeaders() {
+        FactionModel factionSetupInfo = getFactionSetupInfo();
+        if(factionSetupInfo == null) return new ArrayList<String>();
+        return new ArrayList<String>(factionSetupInfo.getLeaders());
+    }
+
+    public void initLeaders() {
+        leaders.clear();
+        for (String leaderID : getFactionStartingLeaders()) {
+            Leader leader = new Leader(leaderID);
+            leaders.add(leader);
+        }
+    }
+
     @Nullable
-    public Leader getLeader(String leaderID) {
+    public Leader getLeader(String leaderIdOrType) {
+        Leader leader = getLeaderByID(leaderIdOrType);
+        if (leader == null) {
+            return getLeaderByType(leaderIdOrType);
+        }
+        return leader;
+    }
+
+    @Nullable
+    public Leader getLeaderByType(String leaderType) {
         for (Leader leader : leaders) {
-            if (leader.getId().equals(leaderID) || leader.getName().equals(leaderID)){
+            if (leader.getType().equals(leaderType)) {
+                return leader;
+            }
+        }
+        return null;
+    }
+
+    @Nullable
+    public Leader getLeaderByID(String leaderID) {
+        for (Leader leader : leaders) {
+            if (leader.getId().equals(leaderID)) {
                 return leader;
             }
         }
@@ -626,6 +787,18 @@ public class Player {
         return leaders;
     }
 
+    public List<String> getLeaderIDs() {
+        return getLeaders().stream().map(l -> l.getId()).toList();
+    }
+
+    public boolean hasLeader(String leaderID) {
+        return getLeaderIDs().contains(leaderID);
+    }
+
+    public boolean hasLeaderUnlocked(String leaderID) {
+        return hasLeader(leaderID) && !getLeader(leaderID).isLocked();
+    }
+
     public void setLeaders(List<Leader> leaders) {
         this.leaders = leaders;
     }
@@ -633,7 +806,7 @@ public class Player {
     public boolean removeLeader(String leaderID) {
         Leader leaderToPurge = null;
         for (Leader leader : leaders) {
-            if (leader.getId().equals(leaderID) || leader.getName().equals(leaderID)){
+            if (leader.getId().equals(leaderID)) {
                 leaderToPurge = leader;
                 break;
             }
@@ -644,17 +817,21 @@ public class Player {
         return leaders.remove(leaderToPurge);
     }
 
-    public boolean addLeader(String leaderID) {
-        Leader leaderToPurge = null;
-        for (Leader leader : leaders) {
-            if (leader.getId().equals(leaderID) || leader.getName().equals(leaderID)){
-                return false;
-            }
+    public boolean removeLeader(Leader leader) {
+        return leaders.remove(leader);
+    }
+    
+    public void addLeader(String leaderID) {
+        if (!getLeaderIDs().contains(leaderID)) {
+            Leader leader = new Leader(leaderID);
+            leaders.add(leader);
         }
-        if (leaderToPurge == null){
-            return false;
+    }
+
+    public void addLeader(Leader leader) {
+        if (!getLeaderIDs().contains(leader.getId())) {
+            leaders.add(leader);
         }
-        return leaders.remove(leaderToPurge);
     }
 
     public String getColor() {
@@ -665,7 +842,6 @@ public class Player {
         if (!color.equals("null")) {
             this.color = AliasHandler.resolveColor(color);
         }
-        initPNs();
     }
 
     public void changeColor(String color) {
@@ -674,12 +850,18 @@ public class Player {
         }
     }
 
-    public void initPNs() {
-        if (color != null && faction != null && Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
+    public void initPNs(ti4.map.Map activeMap) {
+        if (activeMap != null && color != null && faction != null && Mapper.isColorValid(color) && Mapper.isFaction(faction)) {
             promissoryNotes.clear();
-            List<String> promissoryNotes = Mapper.getPromissoryNotes(color, faction);
+            List<String> promissoryNotes = Mapper.getColourFactionPromissoryNoteIDs(activeMap, color, faction);
             for (String promissoryNote : promissoryNotes) {
-                if ("mahact".equals(faction) && promissoryNote.endsWith("_an")){
+                if (promissoryNote.endsWith("_an") && hasAbility("hubris")) {
+                    continue;
+                }
+                if (promissoryNote.equalsIgnoreCase("blood_pact") && !hasAbility("dark_whispers")) {
+                    continue;
+                }
+                if (promissoryNote.endsWith("_sftt") && hasAbility("enlightenment")) {
                     continue;
                 }
                 setPromissoryNote(promissoryNote);
@@ -715,24 +897,23 @@ public class Player {
         return tg;
     }
 
-    public int getPublicVictoryPoints(ti4.map.Map map) {
-        LinkedHashMap<String, List<String>> scoredPOs = map.getScoredPublicObjectives();
+    public int getPublicVictoryPoints(ti4.map.Map activeMap) {
+        LinkedHashMap<String, List<String>> scoredPOs = activeMap.getScoredPublicObjectives();
         int vpCount = 0;
         for (Entry<String, List<String>> scoredPOEntry : scoredPOs.entrySet()) {
             if (scoredPOEntry.getValue().contains(getUserID())) {
                 String poID = scoredPOEntry.getKey();
                 try {
-                    String poText = Mapper.getPublicObjective(poID);
-                    if (poText != null) {//IS A PO 
-                        int poValue = Integer.valueOf(poText.split(";")[3]);
-                        vpCount += poValue;
+                    PublicObjectiveModel po = Mapper.getPublicObjective(poID);
+                    if (po != null) {//IS A PO
+                        vpCount += po.getPoints();
                     } else { //IS A CUSTOM PO
                         int frequency = Collections.frequency(scoredPOEntry.getValue(), userID);
-                        int poValue = map.getCustomPublicVP().getOrDefault(poID, 0);
+                        int poValue = activeMap.getCustomPublicVP().getOrDefault(poID, 0);
                         vpCount += poValue * frequency;
                     }
                 } catch (Exception e) {
-                    BotLogger.log("`Player.getPublicVictoryPoints   map=" + map.getName() + "  player=" + getUserName() + "` - error finding value of `PO_ID=" + poID, e);
+                    BotLogger.log("`Player.getPublicVictoryPoints   map=" + activeMap.getName() + "  player=" + getUserName() + "` - error finding value of `PO_ID=" + poID, e);
                 }
             }
         }
@@ -741,8 +922,12 @@ public class Player {
     }
 
     @JsonIgnore
-    public int getSecretVictoryPoints() {
-        return getSecretsScored().size();
+    public int getSecretVictoryPoints(ti4.map.Map activeMap) {
+        Map<String, Integer> scoredSecrets = getSecretsScored();
+        for (String id : activeMap.getSoToPoList()) {
+            scoredSecrets.remove(id);
+        }
+        return scoredSecrets.size();
     }
 
     @JsonIgnore
@@ -759,7 +944,7 @@ public class Player {
 
     @JsonIgnore
     public int getTotalVictoryPoints(ti4.map.Map activeMap) {
-        return getPublicVictoryPoints(activeMap) + getSecretVictoryPoints() + getSupportForTheThroneVictoryPoints();
+        return getPublicVictoryPoints(activeMap) + getSecretVictoryPoints(activeMap) + getSupportForTheThroneVictoryPoints();
     }
 
     public void setTg(int tg) {
@@ -851,6 +1036,14 @@ public class Player {
         return techs;
     }
 
+    public boolean hasTech(String techID) {
+        return techs.contains(techID);
+    }
+
+    public boolean hasTechReady(String techID) {
+        return hasTech(techID) && !exhaustedTechs.contains(techID);
+    }
+
     public List<String> getPlanets() {
         return planets;
     }
@@ -887,6 +1080,14 @@ public class Player {
         this.exhaustedRelics = exhaustedRelics;
     }
 
+    public boolean hasRelic(String relicID) {
+        return relics.contains(relicID);
+    }
+
+    public boolean hasRelicReady(String relicID) {
+        return hasRelic(relicID) && !exhaustedRelics.contains(relicID);
+    }
+
     public List<String> getExhaustedTechs() {
         return exhaustedTechs;
     }
@@ -913,6 +1114,9 @@ public class Player {
     public void addTech(String tech) {
         if (!techs.contains(tech)) {
             techs.add(tech);
+            if(tech.equalsIgnoreCase("iihq")){
+                addPlanet("custodiavigilia");
+            }
         }
     }
 
@@ -953,7 +1157,7 @@ public class Player {
 
     public void refreshPlanet(String planet) {
         boolean isRemoved = exhaustedPlanets.remove(planet);
-        if(isRemoved) refreshPlanet(planet);
+        if (isRemoved) refreshPlanet(planet);
     }
 
     public void refreshPlanetAbility(String planet) {
@@ -1006,7 +1210,7 @@ public class Player {
 
     public void addFogTile(String tileID, String position, String label) {
         fow_seenTiles.put(position, tileID);
-        if(label != null && !label.equals(".") && !label.equals("")) {
+        if (label != null && !label.equals(".") && !label.equals("")) {
             fow_customLabels.put(position, label);
         }
     }
@@ -1046,11 +1250,14 @@ public class Player {
     public boolean isDummy() {
         return isDummy;
     }
-    
+
     public void setDummy(boolean isDummy) {
         this.isDummy = isDummy;
     }
 
+    /**
+     * @return true if the player is: not a "dummy", faction != null, color != null, & color != "null"
+     */
     @JsonIgnore
     public boolean isRealPlayer() {
         return !(isDummy || faction == null || color == null || color.equals("null"));
@@ -1072,7 +1279,7 @@ public class Player {
     public int getNumberTurns() {
         return numberOfTurns;
     }
-    
+
     public void setNumberTurns(int numTurns) {
         numberOfTurns = numTurns;
     }
@@ -1080,7 +1287,7 @@ public class Player {
     public long getTotalTurnTime() {
         return totalTimeSpent;
     }
-    
+
     public void setTotalTurnTime(long totalTime) {
         totalTimeSpent = totalTime;
     }
@@ -1099,15 +1306,15 @@ public class Player {
             } else {
                 faction = Mapper.getFactionRepresentations().get(faction);
             }
-    
+
             String color = getColor();
             if (color == null || color == "null") color = "No Color";
-    
+
             String userName = getUserName();
             if (userName == null || userName.isEmpty() || userName.isBlank()) {
                 userName = "No User";
             }
-            
+
             String representation = color + " / " + faction + " / " + userName;
             setAutoCompleteRepresentation(representation);
             return getAutoCompleteRepresentation();
@@ -1135,7 +1342,7 @@ public class Player {
     public void setHasFoundHazFrag(boolean hasFoundHazFrag) {
         this.hasFoundHazFrag = hasFoundHazFrag;
     }
-    
+
     public boolean hasFoundIndFrag() {
         return hasFoundIndFrag;
     }

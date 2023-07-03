@@ -10,19 +10,18 @@ import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.message.BotLogger;
 
 import java.awt.*;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class Tile {
     private final String tileID;
     private String position;
     private HashMap<String, UnitHolder> unitHolders = new HashMap<>();
-    
+
     private HashMap<Player,Boolean> fog = new HashMap<>();
     private HashMap<Player,String> fogLabel = new HashMap<>();
 
@@ -35,10 +34,9 @@ public class Tile {
     public Tile(String tileID, String position, Player player, Boolean fog_, String fogLabel_) {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
-        if(player != null)
-        {
-        	fog.put(player, fog_);
-        	fogLabel.put(player, fogLabel_);
+        if (player != null) {
+            fog.put(player, fog_);
+            fogLabel.put(player, fogLabel_);
         }
         initPlanetsAndSpace(tileID);
     }
@@ -51,23 +49,12 @@ public class Tile {
     }
 
     private void initPlanetsAndSpace(String tileID) {
-
         Space space = new Space(Constants.SPACE, Constants.SPACE_CENTER_POSITION);
         unitHolders.put(Constants.SPACE, space);
-        String tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
-        if (tilePlanetPositions != null) {
-            StringTokenizer tokenizer = new StringTokenizer(tilePlanetPositions, ";");
-            while (tokenizer.hasMoreTokens()) {
-                String planetInfo = tokenizer.nextToken();
-                if (planetInfo.length() > 4) {
-                    StringTokenizer planetTokenizer = new StringTokenizer(planetInfo, " ");
-                    String planetName = planetTokenizer.nextToken().toLowerCase();
-                    Point planetPosition = PositionMapper.getPoint(planetTokenizer.nextToken());
-                    Planet planet = new Planet(planetName, planetPosition);
-                    unitHolders.put(planetName, planet);
-                }
-            }
-        }
+        java.util.Map<String, Point> tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
+
+        if(Optional.ofNullable(tilePlanetPositions).isPresent())
+            tilePlanetPositions.forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
     }
 
     @Nullable
@@ -162,7 +149,7 @@ public class Tile {
     public boolean removeToken(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
-            if(unitHolder.removeToken(tokenID)) return true;
+            if (unitHolder.removeToken(tokenID)) return true;
         }
         return false;
     }
@@ -172,7 +159,7 @@ public class Tile {
         if (unitHolder != null) {
             unitHolder.removeCC(ccID);
         }
-        
+
     }
 
     public void removeAllCC() {
@@ -183,6 +170,7 @@ public class Tile {
     }
 
     public void removeUnit(String spaceHolder, String unitID, Integer count) {
+        
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
             unitHolder.removeUnit(unitID, count);
@@ -283,11 +271,11 @@ public class Tile {
         String fogTileColor = player == null ? "default" : player.getFogFilter();
         String fogTileColorSuffix = "_" + fogTileColor;
         String fowTileID = "fow" + fogTileColorSuffix;
-        
-        if(this.tileID.equals("82b") || this.tileID.equals("51")) { //mallice || creuss
+
+        if (this.tileID.equals("82b") || this.tileID.equals("51")) { //mallice || creuss
             fowTileID = "fowb" + fogTileColorSuffix;
         }
-        if(this.tileID.equals("82a")) { //mallicelocked
+        if (this.tileID.equals("82a")) { //mallicelocked
             fowTileID = "fowc" + fogTileColorSuffix;
         }
 
@@ -306,11 +294,33 @@ public class Tile {
     @JsonIgnore
     public String getRepresentation() {
         try {
-            return Mapper.getTileRepresentations().get(getTileID());     
+            return Mapper.getTileRepresentations().get(getTileID());
         } catch (Exception e) {
             // TODO: handle exception
         }
         return null;
+    }
+    public String getRepresentationForButtons(Map activeMap, Player player) {
+        try {
+            if(activeMap.isFoWMode())
+            {
+                Set<String> tilesToShow = FoWHelper.getTilePositionsToShow(activeMap, player);
+                if(tilesToShow.contains(getPosition()))
+                {
+                    return getPosition() + " (" + getRepresentation() + ")";
+                }
+                else
+                {
+                    return getPosition();
+                }
+            }
+            else {
+                return getPosition() + " (" + getRepresentation() + ")";
+            }
+            
+        } catch (Exception e) {
+            return getTileID();
+        }
     }
 
     @JsonIgnore

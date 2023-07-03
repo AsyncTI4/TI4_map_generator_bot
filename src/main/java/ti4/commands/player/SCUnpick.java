@@ -1,6 +1,5 @@
 package ti4.commands.player;
 
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -11,8 +10,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -30,10 +27,10 @@ public class SCUnpick extends PlayerSubcommandData {
         Map activeMap = getActiveMap();
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
-        
+
         Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
         boolean isFowPrivateGame = (privateGame != null && privateGame);
-        
+
         if (player == null) {
             sendMessage("You're not a player of this game");
             return;
@@ -43,12 +40,12 @@ public class SCUnpick extends PlayerSubcommandData {
                 .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("null"))
                 .collect(Collectors.toList());
         int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
-        
+
         OptionMapping option = event.getOption(Constants.STRATEGY_CARD);
         int scUnpicked = option.getAsInt();
-        
+
         player.removeSC(scUnpicked);
-        
+
         int playerSCCount = player.getSCs().size();
         if (playerSCCount >= maxSCsPerPlayer) {
             return;
@@ -60,7 +57,7 @@ public class SCUnpick extends PlayerSubcommandData {
         String msgExtra = "";
         boolean allPicked = true;
         Player privatePlayer = null;
-        
+
         boolean nextCorrectPing = false;
         Queue<Player> players = new ArrayDeque<>(activePlayers);
         while (players.iterator().hasNext()) {
@@ -70,7 +67,7 @@ public class SCUnpick extends PlayerSubcommandData {
             }
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
-                msgExtra += Helper.getPlayerRepresentation(event, player_, true) + " To Pick SC";
+                msgExtra += Helper.getPlayerRepresentation(player_, activeMap, event.getGuild(), true) + " To Pick SC";
                 privatePlayer = player_;
                 allPicked = false;
                 break;
@@ -92,7 +89,7 @@ public class SCUnpick extends PlayerSubcommandData {
             for (Player player_ : activePlayers) {
                 scPickedList.addAll(player_.getSCs());
             }
-            
+
             //ADD A TG TO UNPICKED SC
             for (Integer scNumber : scTradeGoods.keySet()) {
                 if (!scPickedList.contains(scNumber) && scNumber != 0) {
@@ -119,7 +116,7 @@ public class SCUnpick extends PlayerSubcommandData {
 
             //INFORM FIRST PLAYER IS UP FOR ACTION
             if (nextPlayer != null) {
-                msgExtra += " " + Helper.getPlayerRepresentation(event, nextPlayer) + " is up for an action";
+                msgExtra += " " + Helper.getPlayerRepresentation(nextPlayer, activeMap) + " is up for an action";
                 privatePlayer = nextPlayer;
                 activeMap.updateActivePlayer(nextPlayer);
             }
@@ -128,7 +125,7 @@ public class SCUnpick extends PlayerSubcommandData {
         //SEND EXTRA MESSAGE
         if (isFowPrivateGame ) {
             if (allPicked) {
-                msgExtra = Helper.getPlayerRepresentation(event, privatePlayer, true) + " UP NEXT";
+                msgExtra = "# " + Helper.getPlayerRepresentation(privatePlayer, activeMap, event.getGuild(), true) + " UP NEXT";
             }
             String fail = "User for next faction not found. Report to ADMIN";
             String success = "The next player has been notified";

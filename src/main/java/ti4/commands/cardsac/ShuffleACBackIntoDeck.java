@@ -18,7 +18,7 @@ public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-        
+
         OptionMapping option = event.getOption(Constants.ACTION_CARD_ID);
         if (option == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Please select what Action Card to draw from discard pile");
@@ -45,7 +45,7 @@ public class ShuffleACBackIntoDeck extends ACCardsSubcommandData {
         sb.append("Game: ").append(activeMap.getName()).append(" ");
         sb.append("Player: ").append(getUser().getName()).append("\n");
         sb.append("Card shuffled back into deck from discards: ");
-        sb.append(Mapper.getActionCard(acID)).append("\n");
+        sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
     }
 }

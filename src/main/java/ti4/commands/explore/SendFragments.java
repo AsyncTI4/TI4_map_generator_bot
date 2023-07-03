@@ -1,22 +1,19 @@
 package ti4.commands.explore;
 
-import java.io.File;
 import java.util.ArrayList;
 
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.player.SendTG;
-import ti4.generator.GenerateMap;
+
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -48,8 +45,12 @@ public class SendFragments extends ExploreSubcommandData {
         int count = 1;
         if (countOption != null) {
         	count = countOption.getAsInt();
-        } 
-        
+        }
+		sendFrags(event, sender, receiver, trait, count, activeMap);
+
+	}
+	public void sendFrags(GenericInteractionCreateEvent event, Player sender, Player receiver, String trait, int count, Map activeMap) {
+
         ArrayList<String> fragments = new ArrayList<>();
         for (String cardID : sender.getFragments()) {
         	String[] card = Mapper.getExplore(cardID).split(";");
@@ -57,7 +58,7 @@ public class SendFragments extends ExploreSubcommandData {
         		fragments.add(cardID);
         	}
         }
-        
+
         if (fragments.size() >= count) {
         	for (int i=0; i<count; i++) {
         		String fragID = fragments.get(i);
@@ -74,20 +75,20 @@ public class SendFragments extends ExploreSubcommandData {
 			case "hazardous" -> "HFrag";
 			case "industrial" -> "IFrag";
 			case "frontier" -> "UFrag";
-			default -> "";	
+			default -> "";
 		};
 
-		String p1 = Helper.getPlayerRepresentation(event, sender);
-		String p2 = Helper.getPlayerRepresentation(event, receiver);
+		String p1 = Helper.getPlayerRepresentation(sender, activeMap);
+		String p2 = Helper.getPlayerRepresentation(receiver, activeMap);
 		String fragString = count + " " + trait + " " + Helper.getEmojiFromDiscord(emojiName) + " relic fragments";
 		String message =  p1 + " sent " + fragString + " to " + p2;
-		sendMessage(message);
+		MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
 
 		if (activeMap.isFoWMode()) {
 			String fail = "User for faction not found. Report to ADMIN";
 			String success = "The other player has been notified";
 			MessageHelper.sendPrivateMessageToPlayer(receiver, activeMap, event, message, fail, success);
-                
+
 			// Add extra message for transaction visibility
 			FoWHelper.pingPlayersTransaction(activeMap, event, sender, receiver, fragString, null);
 		}

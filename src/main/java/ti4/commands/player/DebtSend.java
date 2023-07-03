@@ -11,7 +11,6 @@ import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class DebtSend extends PlayerSubcommandData {
     public DebtSend() {
@@ -48,7 +47,7 @@ public class DebtSend extends PlayerSubcommandData {
             targetTG += sendTG;
             player_.setTg(targetTG);
 
-            sendMessage(Helper.getPlayerRepresentation(event, player) + " sent " + sendTG + Emojis.tg + " trade goods to " + Helper.getPlayerRepresentation(event, player_));
+            sendMessage(Helper.getPlayerRepresentation(player, activeMap) + " sent " + sendTG + Emojis.tg + " trade goods to " + Helper.getPlayerRepresentation(player_, activeMap));
         }
     }
 

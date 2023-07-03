@@ -7,9 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class ExhaustRelic extends GenericRelicAction {
 
@@ -31,7 +29,7 @@ public class ExhaustRelic extends GenericRelicAction {
             return;
         }
         String relicId = option.getAsString();
-        if (player.getRelics().contains(relicId)) {
+        if (player.hasRelic(relicId)) {
 			subAction(player, event, relicId);
 		} else {
             sendMessage("Invalid relic or player does not have specified relic");

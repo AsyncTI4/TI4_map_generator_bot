@@ -15,7 +15,7 @@ public class ArchiveOldThreads extends BothelperSubcommandData {
         super(Constants.ARCHIVE_OLD_THREADS, "Archive a number of the oldest active threads");
         addOptions(new OptionData(OptionType.INTEGER, Constants.THREAD_COUNT, "Number of threads to archive (1 to 1000)").setRequired(true));
     }
-    
+
     public void execute(SlashCommandInteractionEvent event) {
         Integer threadCount = event.getOption(Constants.THREAD_COUNT).getAsInt();
         if (threadCount < 1 || threadCount > 1000) {

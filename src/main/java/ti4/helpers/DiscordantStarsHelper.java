@@ -7,10 +7,10 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 
 public class DiscordantStarsHelper {
-    public static void checkGardenWorlds(Map map) {
-        for (Player player : map.getPlayers().values()) {
-            if (player.getFactionAbilities().contains(Constants.GARDEN_WORLDS)) {
-                for (Tile tile : map.getTileMap().values()) {
+    public static void checkGardenWorlds(Map activeMap) {
+        for (Player player : activeMap.getPlayers().values()) {
+            if (player.hasAbility(Constants.GARDEN_WORLDS)) {
+                for (Tile tile : activeMap.getTileMap().values()) {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                         if (unitHolder != null && unitHolder instanceof Planet) {
                             Planet planet = (Planet) unitHolder;
@@ -22,6 +22,19 @@ public class DiscordantStarsHelper {
                                 }
                             }
                         }
+                    }
+                }
+            }
+        }
+    }
+    public static void checkSigil(Map activeMap) { //Edyn Mech adds Sigil tokens under them
+        for (Player player : activeMap.getPlayers().values()) {
+            if ("edyn".equals(player.getFaction())) {
+                for (Tile tile : activeMap.getTileMap().values()) {
+                    if (Helper.playerHasMechInSystem(tile, activeMap, player)) {
+                        tile.addToken(Constants.SIGIL, Constants.SPACE);
+                    } else {
+                        tile.removeToken(Constants.SIGIL, Constants.SPACE);
                     }
                 }
             }

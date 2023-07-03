@@ -13,6 +13,10 @@ import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
+import ti4.model.DeckModel;
+import ti4.model.PromissoryNoteModel;
+import ti4.model.PublicObjectiveModel;
+import ti4.model.TechnologyModel;
 
 import java.io.File;
 import java.util.*;
@@ -24,12 +28,10 @@ import org.apache.commons.lang3.StringUtils;
 
 public class AutoCompleteProvider {
 
-    private static ArrayList<String> leaders = new ArrayList<>();
-
     public static void autoCompleteListener(CommandAutoCompleteInteractionEvent event) {
         String optionName = event.getFocusedOption().getName();
         String userID = event.getUser().getId();
-        MessageListener.setActiveGame(event.getMessageChannel(), userID, event.getName());
+        MessageListener.setActiveGame(event.getMessageChannel(), userID, event.getName(), event.getSubcommandName());
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         Player player = null;
         if (activeMap != null) {
@@ -53,7 +55,7 @@ public class AutoCompleteProvider {
             case Constants.FACTION -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 HashMap<String, String> factions = Mapper.getFactionRepresentations();
-                if (activeMap.isDiscordantStarsMode()) {
+                if (activeMap != null && activeMap.isDiscordantStarsMode()) {
                     List<Command.Choice> options = factions.entrySet().stream()
                             .filter(token -> token.getValue().toLowerCase().contains(enteredValue))
                             .limit(25)
@@ -71,7 +73,10 @@ public class AutoCompleteProvider {
                 }
             }
             case Constants.FACTION_COLOR, Constants.FACTION_COLOR_1, Constants.FACTION_COLOR_2 -> {
-                if (activeMap == null) event.replyChoiceStrings("No game found in this channel").queue();
+                if (activeMap == null) {
+                    event.replyChoiceStrings("No game found in this channel").queue();
+                    break;
+                }
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 if (activeMap.isFoWMode()) {
                     List<String> factionColors = new ArrayList<>(Mapper.getFactions());
@@ -141,7 +146,7 @@ public class AutoCompleteProvider {
             case Constants.RELIC -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 HashMap<String, String> relics = Mapper.getRelics();
-                if (activeMap.isAbsolMode()){
+                if (activeMap != null && activeMap.isAbsolMode()){
                     List<Command.Choice> options = relics.entrySet().stream()
                             .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                             .filter(value -> value.getKey().startsWith("absol_") || value.getKey().equals("enigmaticdevice"))
@@ -159,20 +164,20 @@ public class AutoCompleteProvider {
                     event.replyChoices(options).queue();
                 }
             }
-            case Constants.KELERES_HS -> {
+            case Constants.PO_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> keleres = Constants.KELERES_CHOICES;
-                List<Command.Choice> options = keleres.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                java.util.Map<String, PublicObjectiveModel> publicObjectives = Mapper.getPublicObjectives();
+                List<Command.Choice> options = publicObjectives.entrySet().stream()
+                        .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue))
                         .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
             case Constants.SO_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> secretObjectives = Mapper.getSecretObjectivesJustNames();
-                List<Command.Choice> options = secretObjectives.entrySet().stream()
+                HashMap<String, String> actionCards = Mapper.getSecretObjectivesJustNamesAndSource();
+                List<Command.Choice> options = actionCards.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getValue(), value.getKey()))
@@ -181,8 +186,8 @@ public class AutoCompleteProvider {
             }
             case Constants.AGENDA_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> secretObjectives = Mapper.getAgendaJustNames();
-                List<Command.Choice> options = secretObjectives.entrySet().stream()
+                HashMap<String, String> agendas = Mapper.getAgendaJustNames();
+                List<Command.Choice> options = agendas.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getValue(), value.getKey()))
@@ -191,28 +196,37 @@ public class AutoCompleteProvider {
             }
             case Constants.AC_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> secretObjectives = Mapper.getACJustNames();
-                List<Command.Choice> options = secretObjectives.entrySet().stream()
+                HashMap<String, String> actionCards = Mapper.getACJustNames();
+                List<Command.Choice> options = actionCards.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value.getValue(), value.getKey()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
-            case Constants.LEADER -> {
+            case Constants.PROMISSORY_NOTE_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                if (leaders.isEmpty()) {
-                    leaders = new ArrayList<>(Constants.leaderList);
-                    HashMap<String, HashMap<String, ArrayList<String>>> leadersInfo = Mapper.getLeadersInfo();
-                    for (HashMap<String, ArrayList<String>> value : leadersInfo.values()) {
-                        for (ArrayList<String> leaderNames : value.values()) {
-                            if (!leaderNames.isEmpty()) {
-                                leaders.addAll(leaderNames);
-                            }
-                        }
+                HashMap<String, PromissoryNoteModel> PNs = Mapper.getPromissoryNotes();
+                List<Command.Choice> options = PNs.values().stream()
+                        .filter(pn -> (pn.getAlias() + " " + pn.getName() + " " + pn.getOwner()).toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(pn -> new Command.Choice(pn.getAlias() + " " + pn.getName() + " " + pn.getOwner(), pn.getAlias()))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.LEADER, Constants.LEADER_1, Constants.LEADER_2, Constants.LEADER_3, Constants.LEADER_4 -> {
+                List<String> leaderIDs = new ArrayList<>();
+                if (activeMap == null || activeMap.isFoWMode() || Constants.LEADER_ADD.equals(event.getSubcommandName())) {
+                    leaderIDs.addAll(Mapper.getLeaderRepresentations().keySet());
+                } else {      
+                    leaderIDs.addAll(List.of("agent", "commander", "hero"));
+                    for (Player player_ : activeMap.getPlayers().values()) {
+                        leaderIDs.addAll(player_.getLeaderIDs());
                     }
                 }
-                List<Command.Choice> options = leaders.stream()
+                
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                List<Command.Choice> options = leaderIDs.stream()
                         .filter(value -> value.toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(value -> new Command.Choice(value, value))
@@ -225,29 +239,29 @@ public class AutoCompleteProvider {
             }
             case Constants.TECH, Constants.TECH2, Constants.TECH3, Constants.TECH4 -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> techs = Mapper.getTechs();
-                if (activeMap.isDiscordantStarsMode()) {
+                HashMap<String, TechnologyModel> techs = Mapper.getTechs();
+                if (activeMap != null && activeMap.isDiscordantStarsMode()) {
                     List<Command.Choice> options = techs.entrySet().stream()
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                        .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue))
                         .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
                 } else {
                     List<Command.Choice> options = techs.entrySet().stream()
                         .filter(Predicate.not(value -> value.getKey().toLowerCase().startsWith("ds") && !value.getKey().equals("ds")))
-                        .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
+                        .filter(value -> value.getValue().getName().toLowerCase().contains(enteredValue))
                         .limit(25)
-                        .map(value -> new Command.Choice(value.getValue(), value.getKey()))
+                        .map(value -> new Command.Choice(value.getValue().getName(), value.getKey()))
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
                 }
             }
             case Constants.PLANET, Constants.PLANET2, Constants.PLANET3, Constants.PLANET4, Constants.PLANET5, Constants.PLANET6 -> {
-                MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName());
+                MessageListener.setActiveGame(event.getMessageChannel(), event.getUser().getId(), event.getName(), event.getSubcommandName());
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 Set<String> planetIDs;
-                HashMap<String, String> planets = Mapper.getPlanetRepresentations();
+                java.util.Map<String, String> planets = Mapper.getPlanetRepresentations();
                 if (activeMap != null && !activeMap.isFoWMode()) {
                     planetIDs = activeMap.getPlanets();
                     List<Command.Choice> options = planets.entrySet().stream()
@@ -287,7 +301,7 @@ public class AutoCompleteProvider {
             case Constants.TTPG_FILE_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 String dir = Storage.getTTPGExportDirectory().getPath();
-                
+
                 Set<String> fileSet = Stream.of(new File(dir).listFiles())
                     .filter(file -> !file.isDirectory())
                     .map(File::getName)
@@ -367,23 +381,32 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.CREUSS_TOKEN_NAME -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of("alpha", "beta", "gamma")
+                        .filter(value -> value.contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, "creuss" + value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
             case Constants.ABILITY, Constants.ABILITY_1, Constants.ABILITY_2, Constants.ABILITY_3, Constants.ABILITY_4, Constants.ABILITY_5 -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
 
                 HashMap<String, String> abilities = new HashMap<>();
                 try {
                     if (player != null && event.getSubcommandName().equals(Constants.ABILITY_REMOVE)) {
-                        for (String abilityID : player.getFactionAbilities()) {
+                        for (String abilityID : player.getAbilities()) {
                             abilities.put(abilityID, Mapper.getFactionAbilities().get(abilityID));
                         }
                     } else if (player != null && event.getSubcommandName().equals(Constants.ABILITY_ADD)) {
                         abilities = Mapper.getFactionAbilities();
-                        for (String abilityID : player.getFactionAbilities()) {
+                        for (String abilityID : player.getAbilities()) {
                             abilities.remove(abilityID);
                         }
                     } else {
                         abilities = Mapper.getFactionAbilities();
-                    }   
+                    }
                 } catch (Exception e) {
                     BotLogger.log(event, "Ability Autocomplete Setup Error", e);
                     abilities = Mapper.getFactionAbilities();
@@ -396,14 +419,14 @@ public class AutoCompleteProvider {
                     factionName = Mapper.getFactionRepresentations().get(factionName);
                     return factionName + " - " + abilityName;
                 });
-                
+
                 List<Command.Choice> options = abilities.entrySet().stream()
                     .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                     .limit(25)
                     .map(value -> new Command.Choice(value.getValue(), value.getKey()))
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
-                
+
             }
             case Constants.LATEST_COMMAND -> {
                 if (activeMap == null) {
@@ -412,13 +435,13 @@ public class AutoCompleteProvider {
                 }
                 String latestCommand = "";
                 if (activeMap.isFoWMode()) { //!event.getUser().getID().equals(activeMap.getGMID()); //TODO: Validate that the user running the command is the FoW GM, if so, display command.
-                    latestCommand = "Game is Fog of War mode - last command is hidden."; 
+                    latestCommand = "Game is Fog of War mode - last command is hidden.";
                 } else {
                     latestCommand = StringUtils.left(activeMap.getLatestCommand(), 100);
                 }
                 event.replyChoice(latestCommand, Constants.LATEST_COMMAND).queue();
             }
-            case Constants.TILE_NAME, Constants.TILE_NAME_TO, Constants.HS_TILE_POSITION -> {
+            case Constants.TILE_NAME, Constants.TILE_NAME_FROM, Constants.TILE_NAME_TO, Constants.HS_TILE_POSITION -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
                 if (activeMap == null) {
                     event.replyChoiceStrings("No Active Map for this Channel").queue();
@@ -432,7 +455,7 @@ public class AutoCompleteProvider {
                         .map(value -> new Command.Choice(value, value))
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
-                } else {                    
+                } else {
                     List<Command.Choice> options = activeMap.getTileNameAutocompleteOptionsCache().stream()
                         .filter(value -> value.getKey().toLowerCase().contains(enteredValue))
                         .limit(25)
@@ -440,6 +463,16 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                     event.replyChoices(options).queue();
                 }
+            }
+            case Constants.DECK_NAME -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, DeckModel> decks = Mapper.getDecks();
+                List<Command.Choice> options = decks.values().stream()
+                    .filter(value -> value.getAlias().contains(enteredValue))
+                    .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
+                    .limit(25)
+                    .collect(Collectors.toList());
+                event.replyChoices(options).queue();
             }
             case Constants.VERBOSITY -> {
                 event.replyChoiceStrings(Constants.VERBOSITY_OPTIONS).queue();

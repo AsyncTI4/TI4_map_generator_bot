@@ -10,7 +10,6 @@ import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.MapGenerator;
 import ti4.commands.Command;
 import ti4.commands.cardsac.ACInfo;
-import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.generator.Mapper;
@@ -93,8 +92,17 @@ public class CardsInfo implements Command {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
-        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        PNInfo.checkAndAddPNs(activeMap, player);
+        sendCardsInfo(activeMap, player, event);
+    }
+
+    public static void sendCardsInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
+        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
+        sendCardsInfo(activeMap, player);
+    }
+
+    public static void sendCardsInfo(Map activeMap, Player player) {
         SOInfo.sendSecretObjectiveInfo(activeMap, player);
         ACInfo.sendActionCardInfo(activeMap, player);
         PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
@@ -114,5 +122,5 @@ public class CardsInfo implements Command {
                 .addOptions(new OptionData(OptionType.BOOLEAN, Constants.DM_CARD_INFO, "Set TRUE to get card info as direct message also").setRequired(false))
         );
     }
-    
+
 }

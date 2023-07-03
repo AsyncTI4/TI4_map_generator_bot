@@ -11,7 +11,6 @@ import ti4.map.Player;
 public class ResetLeader extends LeaderSubcommandData {
     public ResetLeader() {
         super(Constants.RESET, "Reset all leaders");
-        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
 
@@ -26,6 +25,6 @@ public class ResetLeader extends LeaderSubcommandData {
             return;
         }
         player.initLeaders();
-        sendMessage("Leaders were reset");
+        sendMessage("Leaders were reset: " + player.getLeaderIDs());
     }
 }

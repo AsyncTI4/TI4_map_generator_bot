@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 import ti4.commands.Command;
 import ti4.helpers.Constants;
 import ti4.map.Map;
@@ -41,14 +40,21 @@ public class GenericButtonCommand implements Command {
         }
         return false;
     }
-    
+
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        String message = event.getOption(Constants.BUTTON_TEXT, "Button", OptionMapping::getAsString);
-        Button button = Button.secondary(Constants.GENERIC_BUTTON_ID_PREFIX + event.getId(), message);
-        for (MessageCreateData messageCreateData : MessageHelper.getMessageCreateDataObjects(null, Collections.singletonList(button))) {
-            event.getMessageChannel().sendMessage(messageCreateData).queue();
+        String buttonText = event.getOption(Constants.BUTTON_TEXT, "Button", OptionMapping::getAsString);
+        String message = null;
+
+        // Max button text is 80, so if higher, post a separate message and just ask to record responses
+        if (buttonText.length() > 80) {
+            message = buttonText;
+            buttonText = "Record Response";
         }
+
+        Button button = Button.secondary(Constants.GENERIC_BUTTON_ID_PREFIX + event.getId(), buttonText);
+
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, Collections.singletonList(button));
     }
 
     protected String getActionDescription() {
@@ -61,7 +67,7 @@ public class GenericButtonCommand implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                .addOptions(new OptionData(OptionType.STRING, Constants.BUTTON_TEXT, "The text/prompt that will appear on the button itself").setRequired(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.BUTTON_TEXT, "The text/prompt that will appear on the button itself. Max 80 characters.").setRequired(true))
         );
     }
 }

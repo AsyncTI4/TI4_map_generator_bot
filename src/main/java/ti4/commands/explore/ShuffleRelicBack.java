@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class ShuffleRelicBack extends GenericRelicAction {
 
@@ -25,7 +24,7 @@ public class ShuffleRelicBack extends GenericRelicAction {
             return;
         }
         String relicId = option.getAsString();
-        if (player.getRelics().contains(relicId)) {
+        if (player.hasRelic(relicId)) {
             player.removeRelic(relicId);
             player.removeExhaustedRelic(relicId);
             boolean success = getActiveMap().shuffleRelicBack(relicId);

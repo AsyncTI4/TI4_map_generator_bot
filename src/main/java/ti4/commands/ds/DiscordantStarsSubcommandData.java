@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.sc.SCCommand;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.message.MessageHelper;
@@ -19,7 +18,7 @@ public abstract class DiscordantStarsSubcommandData extends SubcommandData {
         return getName();
     }
 
-   public DiscordantStarsSubcommandData(@NotNull String name, @NotNull String description) {
+    public DiscordantStarsSubcommandData(@NotNull String name, @NotNull String description) {
         super(name, description);
     }
 

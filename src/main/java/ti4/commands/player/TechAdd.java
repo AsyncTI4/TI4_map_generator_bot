@@ -1,5 +1,6 @@
 package ti4.commands.player;
 
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Player;
@@ -12,6 +13,10 @@ public class TechAdd extends TechAddRemove {
     @Override
     public void doAction(Player player, String techID) {
         player.addTech(techID);
-        sendMessage(Helper.getPlayerRepresentation(getEvent(), player) + " added tech: " + Helper.getTechRepresentation(techID));
+        String message = Helper.getPlayerRepresentation(player, getActiveMap()) + " added tech: " + Helper.getTechRepresentation(techID);
+        if(AliasHandler.resolveTech(techID).equalsIgnoreCase("iihq")){
+            message = message + "\n Automatically added the Custodia Vigilia planet";
+        }
+        sendMessage(message);
     }
 }

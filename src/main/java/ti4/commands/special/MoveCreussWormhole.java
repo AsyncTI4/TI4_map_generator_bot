@@ -8,7 +8,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.tokens.RemoveToken;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -17,14 +16,13 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.map.Tile;
-import ti4.message.MessageHelper;
 
 public class MoveCreussWormhole extends SpecialSubcommandData {
 
     public MoveCreussWormhole() {
-        super(Constants.MOVE_CREUSS_WORMHOLE, "Moves a creuss wormhole token.");
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TOKEN, "Token Name").setRequired(true).setAutoComplete(true));
+        super(Constants.MOVE_CREUSS_WORMHOLE, "Adds or moves a creuss wormhole token to the target system.");
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Target System/Tile name").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.CREUSS_TOKEN_NAME, "Token Name").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -50,14 +48,14 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
             return;
         }
 
-        String tokenName = event.getOption(Constants.TOKEN, null, OptionMapping::getAsString);
+        String tokenName = event.getOption(Constants.CREUSS_TOKEN_NAME, null, OptionMapping::getAsString);
         tokenName = AliasHandler.resolveToken(tokenName);
         if (!isValidCreussWormhole(tokenName)) {
             sendMessage("Token Name: " + tokenName + " is not a valid Creuss Wormhole Token.");
             return;
         }
 
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(event, player));
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap));
         tile.addToken(Mapper.getTokenID(tokenName), Constants.SPACE);
         sb.append(" moved " + Helper.getEmojiFromDiscord(tokenName) + " to " + tile.getRepresentation());
         for (Tile tile_ : activeMap.getTileMap().values()) {
@@ -70,8 +68,9 @@ public class MoveCreussWormhole extends SpecialSubcommandData {
     }
 
     private boolean isValidCreussWormhole(String tokenName) {
+        if (tokenName == null) return false;
         List<String> validNames = List.of("creussalpha", "creussbeta", "creussgamma");
         return validNames.contains(tokenName);
     }
-    
+
 }

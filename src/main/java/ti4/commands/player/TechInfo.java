@@ -15,6 +15,7 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.TechnologyModel;
 
 public class TechInfo extends PlayerSubcommandData {
     public TechInfo() {
@@ -35,7 +36,7 @@ public class TechInfo extends PlayerSubcommandData {
     }
 
     public static void sendTechInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendTechInfo(activeMap, player);
     }
@@ -54,7 +55,7 @@ public class TechInfo extends PlayerSubcommandData {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
         }
-    } 
+    }
 
     private static List<Button> getTechButtons(Map activeMap, Player player) {
         return null;
@@ -68,7 +69,7 @@ public class TechInfo extends PlayerSubcommandData {
             return sb.toString();
         }
 
-        HashMap<String, String[]> techInfo = Mapper.getTechsInfo();
+        HashMap<String, TechnologyModel> techInfo = Mapper.getTechs();
         java.util.Map<String, List<String>> techsFiltered = new HashMap<>();
         for (String tech : playerTechs) {
             String techType = Mapper.getTechType(tech);
@@ -84,12 +85,12 @@ public class TechInfo extends PlayerSubcommandData {
             list.sort(new Comparator<String>() {
                 @Override
                 public int compare(String tech1, String tech2) {
-                    String[] tech1Info = techInfo.get(tech1);
-                    String[] tech2Info = techInfo.get(tech2);
+                    TechnologyModel tech1Info = techInfo.get(tech1);
+                    TechnologyModel tech2Info = techInfo.get(tech2);
                     try {
-                        int t1 = tech1Info.length >= 3 ? tech1Info[2].length() : 0;
-                        int t2 = tech2Info.length >= 3 ? tech2Info[2].length() : 0;
-                        return (t1 < t2) ? -1 : ((t1 == t2) ? (tech1Info[0].compareTo(tech2Info[0])) : 1);
+                        int t1 = tech1Info.getRequirements().length();
+                        int t2 = tech2Info.getRequirements().length();
+                        return (t1 < t2) ? -1 : ((t1 == t2) ? (tech1Info.getName().compareTo(tech2Info.getName())) : 1);
                     } catch (Exception e) {
                         //do nothing
                     }
@@ -103,7 +104,7 @@ public class TechInfo extends PlayerSubcommandData {
                 sb.append(Helper.getTechRepresentationLong(techID));
             }
         }
-        
+
         return sb.toString();
     }
 }

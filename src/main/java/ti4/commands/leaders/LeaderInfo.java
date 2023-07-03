@@ -1,11 +1,9 @@
 package ti4.commands.leaders;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -20,9 +18,6 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 
 public class LeaderInfo extends LeaderSubcommandData {
-    public static final String CARDS_INFO = Constants.CARDS_INFO_THREAD_PREFIX;
-    private static HashMap<Map, TextChannel> threadTextChannels = new HashMap<>();
-    
     public LeaderInfo() {
         super(Constants.INFO, "Send Leader info to your Cards-Info thread");
     }
@@ -41,7 +36,7 @@ public class LeaderInfo extends LeaderSubcommandData {
 
         if (event != null) {
             OptionMapping option = event.getOption(Constants.DM_CARD_INFO);
-            if (option != null && option.getAsBoolean()) { 
+            if (option != null && option.getAsBoolean()) {
                 MessageHelper.sendMessageToUser(leaderInfo, user);
             }
         }
@@ -49,11 +44,11 @@ public class LeaderInfo extends LeaderSubcommandData {
     }
 
     public static void sendLeadersInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(event, player) + " used `" + event.getCommandString() + "`";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendLeadersInfo(activeMap, player);
     }
-    
+
     public static void sendLeadersInfo(Map activeMap, Player player) {
         //LEADERS INFO
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getLeaderInfo(activeMap, player));
@@ -68,7 +63,7 @@ public class LeaderInfo extends LeaderSubcommandData {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
         }
-    } 
+    }
 
     private static List<Button> getLeaderButtons(Map activeMap, Player player) {
         return null;
@@ -81,16 +76,16 @@ public class LeaderInfo extends LeaderSubcommandData {
         leaderSB.append("**Leaders Information:**").append("\n");
         for (Leader leader : player.getLeaders()) {
             if (leader.isLocked()) {
-                leaderSB.append("LOCKED: ").append(Helper.getLeaderLockedRepresentation(player, leader)).append("\n");
+                leaderSB.append("LOCKED: ").append(Helper.getLeaderLockedRepresentation(leader)).append("\n");
             } else if (leader.isExhausted()) {
-                leaderSB.append("EXHAUSTED: ").append("~~").append(Helper.getLeaderFullRepresentation(player, leader)).append("~~\n");
+                leaderSB.append("EXHAUSTED: ").append("~~").append(Helper.getLeaderFullRepresentation(leader)).append("~~\n");
             } else if (leader.isActive()) {
-                leaderSB.append("ACTIVE: ").append(Helper.getLeaderFullRepresentation(player, leader)).append("\nActive Hero will be purged during `/status cleanup`\n");
+                leaderSB.append("ACTIVE: ").append(Helper.getLeaderFullRepresentation(leader)).append("\nActive Hero will be purged during `/status cleanup`\n");
             } else {
-                leaderSB.append(Helper.getLeaderFullRepresentation(player, leader)).append("\n");
+                leaderSB.append(Helper.getLeaderFullRepresentation(leader)).append("\n");
             }
         }
-        
+
         //PROMISSORY NOTES
         LinkedHashMap<String, Integer> promissoryNotes = player.getPromissoryNotes();
         List<String> promissoryNotesInPlayArea = player.getPromissoryNotesInPlayArea();
@@ -109,9 +104,9 @@ public class LeaderInfo extends LeaderSubcommandData {
                                 if (playerLeader == null) continue;
                                 leaderSB.append("ALLIANCE: ");
                                 if (playerLeader.isLocked()) {
-                                    leaderSB.append("(LOCKED) ").append(Helper.getLeaderLockedRepresentation(player_, playerLeader)).append("\n");
+                                    leaderSB.append("(LOCKED) ").append(Helper.getLeaderLockedRepresentation(playerLeader)).append("\n");
                                 } else {
-                                    leaderSB.append(Helper.getLeaderFullRepresentation(player_, playerLeader)).append("\n");
+                                    leaderSB.append(Helper.getLeaderFullRepresentation(playerLeader)).append("\n");
                                 }
                             }
                         }
@@ -121,7 +116,7 @@ public class LeaderInfo extends LeaderSubcommandData {
         }
 
         //ADD YSSARIL AGENT REFERENCE
-        if (player.getFaction().equals("yssaril")) { //TODO: If player.getLeaders().contains("yssarilagent")
+        if (player.hasLeader("yssarilagent")) {
             leaderSB.append("_ _\n");
             leaderSB.append("**Other Faction's Agents:**").append("\n");
             for (Player player_ : activeMap.getPlayers().values()) {
@@ -130,16 +125,16 @@ public class LeaderInfo extends LeaderSubcommandData {
                     Leader otherPlayerAgent = player_.getLeader(Constants.AGENT);
                     if (otherPlayerAgent == null) continue;
                     if (playerLeader.isExhausted()) {
-                        leaderSB.append("EXHAUSTED: ").append(Helper.getLeaderFullRepresentation(player_, otherPlayerAgent)).append("\n");
+                        leaderSB.append("EXHAUSTED: ").append(Helper.getLeaderFullRepresentation(otherPlayerAgent)).append("\n");
                     } else {
-                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, otherPlayerAgent)).append("\n");
+                        leaderSB.append(Helper.getLeaderFullRepresentation(otherPlayerAgent)).append("\n");
                     }
                 }
             }
         }
 
         //ADD MAHACT IMPERIA REFERENCE
-        if (player.getFaction().equals("mahact")) {
+        if (player.hasAbility("imperia")) {
             leaderSB.append("_ _\n");
             leaderSB.append("**Imperia Commanders:**").append("\n");
             for (Player player_ : activeMap.getPlayers().values()) {
@@ -147,12 +142,12 @@ public class LeaderInfo extends LeaderSubcommandData {
                     if (player.getMahactCC().contains(player_.getColor())) {
                         Leader leader = player_.getLeader(Constants.COMMANDER);
                         if (leader == null) continue;
-                        leaderSB.append(Helper.getLeaderFullRepresentation(player_, leader)).append("\n");
+                        leaderSB.append(Helper.getLeaderFullRepresentation(leader)).append("\n");
                     }
                 }
             }
         }
-    
+
         return leaderSB.toString();
     }
 }

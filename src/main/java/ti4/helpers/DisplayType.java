@@ -4,7 +4,8 @@ public enum DisplayType {
     all("all"),
     map("map"),
     stats("stats"),
-    split("split");
+    split("split"),
+    system("system");
 
     public final String value;
 

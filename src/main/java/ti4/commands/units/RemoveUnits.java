@@ -17,7 +17,7 @@ public class RemoveUnits extends AddRemoveUnits {
 
     @Override
     protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color) {
-        
+
     }
 
 
@@ -31,6 +31,9 @@ public class RemoveUnits extends AddRemoveUnits {
                 priorityDmg = false;
             }
         }
+        removeStuff(event, tile, count, planetName, unitID, color, priorityDmg);
+    }
+    public void removeStuff(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, boolean priorityDmg) {
 
         int countToRemove = 0;
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
@@ -68,7 +71,6 @@ public class RemoveUnits extends AddRemoveUnits {
                 Integer unitDamageCountInSystem = unitHolder.getUnitDamage().get(unitID);
                 if (unitDamageCountInSystem != null) {
                     countToRemove = unitDamageCountInSystem - (unitCountInSystem - count);
-
                 }
             }
         } else {
@@ -94,7 +96,7 @@ public class RemoveUnits extends AddRemoveUnits {
             }
         }
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(),null);
         }
     }
 
@@ -104,10 +106,10 @@ public class RemoveUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map) {
-        super.actionAfterAll(event, tile, color, map);
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map activeMap) {
+        super.actionAfterAll(event, tile, color, activeMap);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeMap);
         }
     }
 

@@ -12,6 +12,6 @@ public class TechRefresh extends TechAddRemove {
     @Override
     public void doAction(Player player, String techID) {
         player.refreshTech(techID);
-        sendMessage(Helper.getPlayerRepresentation(getEvent(), player) + " readied tech: " + Helper.getTechRepresentation(techID));
+        sendMessage(Helper.getPlayerRepresentation(player, getActiveMap()) + " readied tech: " + Helper.getTechRepresentation(techID));
     }
 }

@@ -27,24 +27,30 @@ import ti4.commands.fow.FOWCommand;
 import ti4.commands.franken.FrankenCommand;
 import ti4.commands.game.GameCommand;
 import ti4.commands.help.*;
+import ti4.commands.installation.InstallationCommand;
 import ti4.commands.leaders.LeaderCommand;
 import ti4.commands.map.*;
 import ti4.commands.milty.MiltyCommand;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.special.SpecialCommand;
+import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
 import ti4.commands.tokens.*;
 import ti4.commands.units.*;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.GlobalSettings;
 import ti4.helpers.Storage;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.BotLogger;
+import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
 
 import javax.security.auth.login.LoginException;
 
@@ -76,7 +82,7 @@ public class MapGenerator {
                 .setMemberCachePolicy(MemberCachePolicy.ALL)
                 .setChunkingFilter(ChunkingFilter.ALL)
                 .build();
-	    
+
         jda.addEventListener(new MessageListener(), new ButtonListener());
         try {
             jda.awaitReady();
@@ -85,6 +91,10 @@ public class MapGenerator {
         }
 
         userID = args[1];
+        guildPrimary = jda.getGuildById(args[2]);
+        MessageHelper.sendMessageToBotLogWebhook("BOT IS STARTING UP");
+
+        TileHelper.init();
         PositionMapper.init();
         Mapper.init();
         AliasHandler.init();
@@ -97,21 +107,23 @@ public class MapGenerator {
         adminRoles.add(jda.getRoleById("1062804021385105500")); // FoW Server
         adminRoles.add(jda.getRoleById("1067866210865250445")); // PrisonerOne's Test Server
         adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
-        adminRoles.removeIf(r -> r == null);
+        adminRoles.add(jda.getRoleById("1109657180170371182")); // Jazz's Server
+        adminRoles.add(jda.getRoleById("1100120742093406319")); // Moo's Server
+        adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
         developerRoles.addAll(adminRoles); //admins can also execute developer commands
         developerRoles.add(jda.getRoleById("947648366056185897")); // Async TI4 Server (Hub)
         developerRoles.add(jda.getRoleById("1090958278479052820")); // Async Secondary
         developerRoles.add(jda.getRoleById("1088532767773564928")); // FoW Server
-        developerRoles.removeIf(r -> r == null);
+        developerRoles.removeIf(Objects::isNull);
 
         //BOTHELPER ROLES
         bothelperRoles.addAll(developerRoles); //admins and developers can also execute bothelper commands
         bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server (Hub)
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
-        bothelperRoles.removeIf(r -> r == null);
+        bothelperRoles.removeIf(Objects::isNull);
 
 
 
@@ -121,7 +133,6 @@ public class MapGenerator {
         commandManager.addCommand(new AddUnits());
         commandManager.addCommand(new RemoveUnits());
         commandManager.addCommand(new RemoveAllUnits());
-        commandManager.addCommand(new CreateGame());
         commandManager.addCommand(new AllInfo());
         commandManager.addCommand(new CardsInfo());
         commandManager.addCommand(new SetGame());
@@ -157,13 +168,14 @@ public class MapGenerator {
         commandManager.addCommand(new LeaderCommand());
         commandManager.addCommand(new CustomCommand());
         commandManager.addCommand(new FOWCommand());
+        commandManager.addCommand(new InstallationCommand());
         commandManager.addCommand(new MiltyCommand());
         commandManager.addCommand(new FrankenCommand());
         commandManager.addCommand(new CaptureCommand());
         commandManager.addCommand(new GenericButtonCommand());
         commandManager.addCommand(new DiscordantStarsCommand());
+        commandManager.addCommand(new StatisticsCommand());
 
-        guildPrimary = jda.getGuildById(args[2]);
 
         CommandListUpdateAction commands = guildPrimary.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
@@ -208,5 +220,26 @@ public class MapGenerator {
         readyToReceiveCommands = true;
         BotLogger.log("BOT HAS FINISHED LOADING MAPS");
 
+
+        // Shutdown hook to run when SIGTERM is recieved from docker stop
+        Thread mainThread = Thread.currentThread();
+        Runtime.getRuntime().addShutdownHook(new Thread() {
+            @Override
+            public void run() {
+                try {
+                    MessageHelper.sendMessageToBotLogWebhook("SHUTDOWN PROCESS STARTED");
+                    MapGenerator.readyToReceiveCommands = false;
+                    MessageHelper.sendMessageToBotLogWebhook("BOT IS NO LONGER ACCEPTING COMMANDS");
+                    TimeUnit.SECONDS.sleep(5);
+                    MapSaveLoadManager.saveMaps();
+                    MessageHelper.sendMessageToBotLogWebhook("MAPS HAVE BEEN SAVED");
+                    MessageHelper.sendMessageToBotLogWebhook("SHUTDOWN PROCESS COMPLETE");
+                    mainThread.join();
+                    //
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 }

@@ -18,5 +18,5 @@ public class MapPairKeySerializer extends JsonSerializer<Pair<String, Integer>> 
         String serializedPair = value.getLeft() + ";" + value.getRight();
         gen.writeFieldName(serializedPair);
     }
-    
+
 }

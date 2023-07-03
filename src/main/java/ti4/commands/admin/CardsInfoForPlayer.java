@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cardsac.ACInfo_Legacy;
+import ti4.commands.cards.CardsInfo;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapSaveLoadManager;
@@ -25,9 +25,9 @@ public class CardsInfoForPlayer extends AdminSubcommandData {
         if (playerOption != null) {
             User user = playerOption.getAsUser();
             Player player = activeMap.getPlayer(user.getId());
-            ACInfo_Legacy.sentUserCardInfo(event, activeMap, player);
+            CardsInfo.sendCardsInfo(activeMap, player, event);
         }
         MapSaveLoadManager.saveMap(activeMap, event);
-        sendMessage("Info sent");
+        sendMessage("Cards Info sent");
     }
 }

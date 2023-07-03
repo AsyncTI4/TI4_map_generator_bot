@@ -6,6 +6,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
@@ -20,7 +22,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.MapGenerator;
-import ti4.commands.map.CreateGame;
+import ti4.commands.game.GameCreate;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -34,7 +36,6 @@ public class CreateGameChannels extends BothelperSubcommandData {
     public CreateGameChannels(){
         super(Constants.CREATE_GAME_CHANNELS, "Create Role and Game Channels for a New Game");
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_FUN_NAME, "Fun Name for the Channel - e.g. pbd###-fun-name-goes-here").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.CATEGORY, "Category #category-name - only select a category").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER1, "Player1 @playerName - this will be the game owner, who will complete /game setup").setRequired(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER2, "Player2 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER3, "Player3 @playerName"));
@@ -44,6 +45,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER7, "Player7 @playerName"));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER8, "Player8 @playerName"));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_NAME, "Override default game/role name (next pbd###)"));
+        addOptions(new OptionData(OptionType.STRING, Constants.CATEGORY, "Override default Category #category-name (PBD #XYZ-ZYX)").setAutoComplete(true));
         // addOptions(new OptionData(OptionType.STRING, Constants.SERVER, "Server to create the channels on (Primary or Secondary) - default is smart selection").setAutoComplete(true));
     }
 
@@ -86,20 +88,37 @@ public class CreateGameChannels extends BothelperSubcommandData {
         } else {
             gameName = getNextGameName();
         }
-        
-        //CHECK CATEGORY IS VALID
-        String categoryChannelName = event.getOption(Constants.CATEGORY).getAsString();
+
+        //CHECK IF GIVEN CATEGORY IS VALID
+        String categoryChannelName = event.getOption(Constants.CATEGORY, null, OptionMapping::getAsString);
         Category categoryChannel = null;
         if (categoryChannelName != null && !categoryChannelName.isEmpty()) {
-            List<Category> categories = MapGenerator.jda.getCategoriesByName(categoryChannelName, false);
-            if (categories.size() > 1) {
+            List<Category> categoriesWithName = MapGenerator.jda.getCategoriesByName(categoryChannelName, false);
+            if (categoriesWithName.size() > 1) {
                 sendMessage("Too many categories with this name!!");
                 return;
-            } else if (categories.isEmpty()) {
+            } else if (categoriesWithName.isEmpty()) {
                 sendMessage("Category not found");
                 return;
             } else {
                 categoryChannel = MapGenerator.jda.getCategoriesByName(categoryChannelName, false).get(0);
+            }
+        } else { //CATEGORY WAS NOT PROVIDED, FIND ONE
+            categoryChannelName = getCategoryNameForGame(gameName);
+            if (categoryChannelName == null) {
+                sendMessage("Please provide a category name for this game");
+                return;
+            }
+            List<Category> categories = getAllAvailablePBDCategories();
+            for (Category category : categories) {
+                if (category.getName().toUpperCase().startsWith(categoryChannelName)) {
+                    categoryChannel = category;
+                    break;
+                }
+            }
+            if (categoryChannel == null) {
+                sendMessage("Could not automatically find a category that begins with **" + categoryChannelName + "** - Please create this category.");
+                return;
             }
         }
 
@@ -117,17 +136,23 @@ public class CreateGameChannels extends BothelperSubcommandData {
             sendMessage("Server **" + guild.getName() + "** can not host a new game - please contact @Admin to resolve.");
             return;
         }
-        
+
         //CHECK IF CATEGORY HAS ROOM
         Category category = categoryChannel;
         if (category.getChannels().size() > 48) {
             sendMessage("Category: **" + category.getName() + "** is full on server **" + guild.getName() + "**. Create a new category then try again.");
             return;
         } else if (category.getChannels().size() > 45) {
-            BotLogger.log(event, "Warning: Category: **" + category.getName() + "** is almost full on server **" + guild.getName() + "**.");
+            String message = "Warning: Category: **" + category.getName() + "** is almost full on server **" + guild.getName() + "**.";
+            TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
+            if (bothelperLoungeChannel != null) {
+                MessageHelper.sendMessageToChannel(bothelperLoungeChannel, message);
+            } else {
+                BotLogger.log(event, message);
+            }
         }
 
-        
+
         //PLAYERS
         ArrayList<Member> members = new ArrayList<>();
         Member gameOwner = null;
@@ -151,27 +176,30 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
         if (sendInviteLink) {
-            //guild.retrieveInvites().complete().get(0).getUrl();
-            sendMessage("https://discord.gg/zkMP2VbEsA"); //invite link to secondary server, #landing-pad channel, unlimited uses, no expiration date
+            sendMessage(Helper.getGuildInviteURL(guild));
             return;
         }
-        
+
         //CREATE ROLE
         Role role = guild.createRole()
         .setName(gameName)
         .setMentionable(true)
         .complete();
 
-        
+
         //ADD PLAYERS TO ROLE
         for (Member member : members) {
             guild.addRoleToMember(member, role).complete();
         }
 
         //CREATE GAME
-        CreateGame createGame = new CreateGame();
-        Map map = createGame.createNewGame(event, gameName, gameOwner);
-        
+        Map newMap = GameCreate.createNewGame(event, gameName, gameOwner);
+
+        //ADD PLAYERS
+        for (Member member : members) {
+            newMap.addPlayer(member.getId(), member.getEffectiveName());
+        }
+
         //CREATE CHANNELS
         String gameFunName = event.getOption(Constants.GAME_FUN_NAME).getAsString().replaceAll(" ", "-");
         String newChatChannelName = gameName + "-" + gameFunName;
@@ -179,38 +207,37 @@ public class CreateGameChannels extends BothelperSubcommandData {
         String newBotThreadName = gameName + Constants.BOT_CHANNEL_SUFFIX;
         long gameRoleID = role.getIdLong();
         long permission = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue();
-        
+
         // CREATE TABLETALK CHANNEL
         TextChannel chatChannel = guild.createTextChannel(newChatChannelName, category)
         .syncPermissionOverrides()
         .addRolePermissionOverride(gameRoleID, permission, 0)
         .complete();
         MessageHelper.sendMessageToChannel((MessageChannel) chatChannel, role.getAsMention()+ " - table talk channel");
-        map.setTableTalkChannelID(chatChannel.getId());
-        
+        newMap.setTableTalkChannelID(chatChannel.getId());
+
         // CREATE ACTIONS CHANNEL
         TextChannel actionsChannel = guild.createTextChannel(newActionsChannelName, category)
         .syncPermissionOverrides()
         .addRolePermissionOverride(gameRoleID, permission, 0)
         .complete();
         MessageHelper.sendMessageToChannel((MessageChannel) actionsChannel, role.getAsMention() + " - actions channel");
-        map.setMainGameChannelID(actionsChannel.getId());
-        
+        newMap.setMainGameChannelID(actionsChannel.getId());
+
         // CREATE BOT/MAP THREAD
         ThreadChannel botThread = actionsChannel.createThreadChannel(newBotThreadName)
         .setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_WEEK)
         .complete();
-        map.setBotMapUpdatesThreadID(botThread.getId());
-        
+        newMap.setBotMapUpdatesThreadID(botThread.getId());
+
         StringBuilder botGetStartedMessage = new StringBuilder(role.getAsMention()).append(" - bot/map channel\n");
         botGetStartedMessage.append("__Use the following commands to get started:__\n");
         botGetStartedMessage.append("> `/game setup` to set player count and additional options\n");
-        botGetStartedMessage.append("> `/add_tile_list {mapString}`, replacing {mapString} with the actual map string\n");
-        botGetStartedMessage.append("> `/game add` to add players to the game - do this in speaker order (starting at top of map going clockwise)\n");
-        botGetStartedMessage.append("> `/game set_order` to fix the order if incorrect\n");
+        botGetStartedMessage.append("> `/add_tile_list {mapString}`, replacing {mapString} with a TTPG map string\n");
+        botGetStartedMessage.append("> `/game set_order` to set the starting speaker order\n");
         botGetStartedMessage.append("> `/player setup` to set player faction and colour\n");
-        botGetStartedMessage.append("> `/add_frontier_tokens` to place frontier tokens\n");
         botGetStartedMessage.append("> `/player tech_add` for factions who need to add tech\n");
+        botGetStartedMessage.append("> `/add_frontier_tokens` to place frontier tokens on empty spaces\n");
         botGetStartedMessage.append("> `/so deal_to_all (count:2)` to deal two" + Emojis.SecretObjective + " to all players\n");
         botGetStartedMessage.append("\n");
         botGetStartedMessage.append("__Other helpful commands:__\n");
@@ -219,7 +246,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         botGetStartedMessage.append("> `/role add` to add the game role to any replacing players\n");
         // botGetStartedMessage.append("> `/status po_reveal_stage1` to reveal the first" + Emojis.Public1 + "Stage 1 Public Objective\n");
         MessageHelper.sendMessageToChannelAndPin((MessageChannel) botThread, botGetStartedMessage.toString());
-        MessageHelper.sendMessageToChannelAndPin((MessageChannel) botThread, "Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
+        MessageHelper.sendMessageToChannelAndPin((MessageChannel) botThread, "Website Live Map: https://ti4.westaddisonheavyindustries.com/game/" + gameName);
 
         StringBuilder message = new StringBuilder("Role and Channels have been set up:\n");
         message.append("> " + role.getName() + "\n");
@@ -227,11 +254,15 @@ public class CreateGameChannels extends BothelperSubcommandData {
         message.append("> " + actionsChannel.getAsMention()).append("\n");
         message.append("> " + botThread.getAsMention()).append("\n");
         sendMessage(message.toString());
-        
-        MapSaveLoadManager.saveMap(map, event);
+
+        MapSaveLoadManager.saveMap(newMap, event);
     }
 
     private static String getNextGameName() {
+        ArrayList<Integer> existingNums = getAllExistingPBDNumbers();
+        if (existingNums.size() == 0) {
+            return "pbd1";
+        }
         int nextPBDNumber = Collections.max(getAllExistingPBDNumbers()) + 1;
         return "pbd" + nextPBDNumber;
     }
@@ -246,8 +277,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
             for (Role role : guild.getRoles()) {
                 gameAndRoleNames.add(role.getName());
             }
-        }           
-        
+        }
+
         // GET ALL EXISTING PBD MAP NAMES
         HashSet<String> mapNames = new HashSet<>(MapManager.getInstance().getMapList().keySet());
         gameAndRoleNames.addAll(mapNames);
@@ -278,8 +309,8 @@ public class CreateGameChannels extends BothelperSubcommandData {
                     pbdNumbers.add(Integer.parseInt(pbdNum));
                 }
             }
-        }           
-        
+        }
+
         // GET ALL EXISTING PBD MAP NAMES
         List<String> mapNames = MapManager.getInstance().getMapList().keySet().stream()
             .filter(mapName -> mapName.startsWith("pbd"))
@@ -300,15 +331,14 @@ public class CreateGameChannels extends BothelperSubcommandData {
             return MapGenerator.guildSecondary;
         } else {
             return null;
-        }        
+        }
     }
 
     private static boolean serverCanHostNewGame(Guild guild) {
         if (guild != null   && serverHasRoomForNewRole(guild)
-                            && serverHasRoomForNewChannels(guild))
-                            {
+                            && serverHasRoomForNewChannels(guild)) {
             return true;
-        }         
+        }
         return false;
     }
 
@@ -332,7 +362,21 @@ public class CreateGameChannels extends BothelperSubcommandData {
         return true;
     }
 
-    private static Category getNextAvailableCategory(Guild guild) {
-        return null;
+    private static String getCategoryNameForGame(String gameName) {
+        if (!gameName.startsWith("pbd")) return null;
+        String gameNumber = StringUtils.substringAfter(gameName, "pbd");
+        if (!Helper.isInteger(gameNumber)) return null;
+        int gameNum = Integer.parseInt(gameNumber);
+        int lowerBound = gameNum - gameNum % 25 + 1;
+        int upperBound = lowerBound + 24;
+        return "PBD #" + lowerBound + "-" + upperBound;
+    }
+    
+    public static List<Category> getAllAvailablePBDCategories() {
+        List<Category> categories = MapGenerator.jda.getCategories().stream()
+            .filter(category -> category.getName().toUpperCase().startsWith("PBD #"))
+            .toList();
+
+        return categories;
     }
 }

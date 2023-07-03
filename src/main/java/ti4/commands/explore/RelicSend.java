@@ -3,6 +3,8 @@ package ti4.commands.explore;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.commons.lang3.StringUtils;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -40,7 +42,7 @@ public class RelicSend extends GenericRelicAction {
                 }
             }
         }
-                
+
         //resolve player2
         Player player2 = null; //Player to send to
         if (targetFaction != null) {
@@ -56,7 +58,7 @@ public class RelicSend extends GenericRelicAction {
         if (player2 == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
-        }       
+        }
 
         if (player1.equals(player2)) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "The two players provided are the same player");
@@ -73,22 +75,32 @@ public class RelicSend extends GenericRelicAction {
         player2.addRelic(relicID);
 
         //HANDLE SHARD OF THE THRONE
-        if (relicID.equals("shard")) {
-            Integer shardPublicObjectiveID = activeMap.getCustomPublicVP().get("Shard of the Throne");
-            if (shardPublicObjectiveID != null) {
-                activeMap.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
-                activeMap.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
+        String shardCustomPOName = null;
+        Integer shardPublicObjectiveID = null;
+        switch (relicID) {
+            case "shard" -> {
+                shardCustomPOName = "Shard of the Throne";
+                shardPublicObjectiveID = activeMap.getCustomPublicVP().get(shardCustomPOName);
+            }
+            case "absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3" -> {
+                int absolShardNum = Integer.parseInt(StringUtils.right(relicID, 1));
+                shardCustomPOName = "Shard of the Throne (" + absolShardNum + ")";
+                shardPublicObjectiveID = activeMap.getCustomPublicVP().get(shardCustomPOName);
             }
         }
+        if (shardCustomPOName != null && shardPublicObjectiveID != null && activeMap.getCustomPublicVP().containsKey(shardCustomPOName) && activeMap.getCustomPublicVP().containsValue(shardPublicObjectiveID)) {
+            activeMap.unscorePublicObjective(player1.getUserID(), shardPublicObjectiveID);
+            activeMap.scorePublicObjective(player2.getUserID(), shardPublicObjectiveID);
+        }
 
-        if (player1.getRelics().contains(relicID) || !player2.getRelics().contains(relicID)) {
+        if (player1.hasRelic(relicID) || !player2.hasRelic(relicID)) {
             sendMessage("Something may have gone wrong - please check your relics and ping Bothelper if there is a problem.");
             return;
         }
 
         StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(event, player1, false));
-        sb.append(" sent a relic to ").append(Helper.getPlayerRepresentation(event, player2, false));
+        sb.append(Helper.getPlayerRepresentation(player1, activeMap));
+        sb.append(" sent a relic to ").append(Helper.getPlayerRepresentation(player2, activeMap));
         sb.append("\n").append(Helper.getRelicRepresentation(relicID));
         sendMessage(sb.toString());
     }

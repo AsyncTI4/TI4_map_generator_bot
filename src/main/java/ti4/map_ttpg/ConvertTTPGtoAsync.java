@@ -13,8 +13,6 @@ import java.util.Map.Entry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang3.exception.ExceptionUtils;
-
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.DeserializationFeature;
@@ -141,8 +139,8 @@ public class ConvertTTPGtoAsync {
                 BotLogger.log("TTPG Import Failed:\n> filename: " + filename + " is not valid TTPG export JSON format");
                 return false;
             }
-            Map map = ConvertTTPGMaptoAsyncMap(ttpgMap, gamename);
-            MapSaveLoadManager.saveMap(map);
+            Map activeMap = ConvertTTPGMaptoAsyncMap(ttpgMap, gamename);
+            MapSaveLoadManager.saveMap(activeMap);
             MapSaveLoadManager.loadMaps();
         } catch (Exception e) {
             BotLogger.log("TTPG Import Failed: " + gamename + "    filename: " + filename, e);
@@ -163,7 +161,7 @@ public class ConvertTTPGtoAsync {
                 setName(gameName);
             }
         };
-        
+
         //ADD STAGE 1 PUBLIC OBJECTIVES
         for (String objective : ttpgMap.getObjectives().getPublicObjectivesI()) {
             asyncMap.addSpecificStage1(AliasHandler.resolveObjective(objective));
@@ -236,7 +234,7 @@ public class ConvertTTPGtoAsync {
                             asyncPlayer.removeSecret(secretObjective.getValue());
                         }
                     }
-                    
+
                 } else if (asyncMap.getRevealedPublicObjectives().containsKey(asyncScoredObjective)) {
                     for (Entry<String, Integer> revealedObjective : asyncMap.getRevealedPublicObjectives().entrySet()) {
                         if (asyncScoredObjective.equalsIgnoreCase(revealedObjective.getKey())) {
@@ -279,19 +277,19 @@ public class ConvertTTPGtoAsync {
             } else if (asyncPlayer.getFaction().equals("keleres")) {
                 String subFaction = ttpgPlayer.getFactionShort().toLowerCase();
                 switch (subFaction) {
-                    case "keleres - argent" : 
+                    case "keleres - argent" :
                         System.out.println(subFaction);
                         asyncPlayer.getLeader("kuuasi").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
                         asyncPlayer.removeLeader("odlynn");
                         asyncPlayer.removeLeader("harka");
                         break;
-                    case "keleres - xxcha" : 
+                    case "keleres - xxcha" :
                         System.out.println(subFaction);
                         asyncPlayer.getLeader("odlynn").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
                         asyncPlayer.removeLeader("kuuasi");
                         asyncPlayer.removeLeader("harka");
                         break;
-                    case "keleres - mentak" : 
+                    case "keleres - mentak" :
                         System.out.println(subFaction);
                         asyncPlayer.getLeader("harka").setLocked(ttpgPlayer.getLeaders().getHero().equals("unlocked") ? false : true);
                         asyncPlayer.removeLeader("kuuasi");
@@ -320,7 +318,7 @@ public class ConvertTTPGtoAsync {
             for (String technology : ttpgPlayer.getTechnologies()) {
                 asyncPlayer.addTech(AliasHandler.resolveTech(technology.toLowerCase()));
             }
-            
+
             //PLAYER RELICS
             for (String relic : ttpgPlayer.getRelicCards()) {
                 asyncPlayer.addRelic(AliasHandler.resolveRelic(relic));
@@ -454,7 +452,7 @@ public class ConvertTTPGtoAsync {
         Collections.shuffle(exploreCards);
         asyncMap.setExploreDeck(exploreCards);
 
-        // EXPLORATION DISCARD        
+        // EXPLORATION DISCARD
         ArrayList<String> ttpgExploreCulturalDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationCultural().getDiscard();
         ArrayList<String> ttpgExploreHazardousDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationHazardous().getDiscard();
         ArrayList<String> ttpgExploreIndustrialDiscards = (ArrayList<String>) ttpgMap.getDecks().getCardExplorationIndustrial().getDiscard();
@@ -511,9 +509,9 @@ public class ConvertTTPGtoAsync {
 
         return asyncMap;
     }
-   
+
     private static String determineCardType(String card) {
-        if (Mapper.getPromissoryNotes().contains(AliasHandler.resolvePromissory(card))) {
+        if (Mapper.getAllPromissoryNoteIDs().contains(AliasHandler.resolvePromissory(card))) {
             return "promissory";
         } else if (Mapper.getActionCards().containsKey(AliasHandler.resolveActionCard(card))) {
             return "action";
@@ -538,8 +536,8 @@ public class ConvertTTPGtoAsync {
         // TILE +-X +-Y SPACE ; PLANET1 ; PLANET2 ; ...
         Pattern firstRegionPattern = Pattern.compile("^([0-9AB]+)([-+][0-9]+)([-+][0-9]+)(.*)?$");
         Pattern rotPattern = Pattern.compile("^(\\d+)([AB])(\\d)$"); //ignore hyperlanes for now
-        Pattern regionAttachmentsPattern = Pattern.compile("^(.*)\\*(.*)$");  
-        
+        Pattern regionAttachmentsPattern = Pattern.compile("^(.*)\\*(.*)$");
+
         Matcher matcher = firstRegionPattern.matcher(ttpgHex);
         if (matcher.find()) {
             // System.out.println("     Matches!");
@@ -548,12 +546,12 @@ public class ConvertTTPGtoAsync {
             System.out.println("     X:" + matcher.group(2));
             System.out.println("     Y:" + matcher.group(3));
             // System.out.println("       group(4):" + matcher.group(4));
-            
+
         } else {
             System.out.println("     No Match");
             return null;
         }
-        
+
         Tile tile = null;
         String tileID = AliasHandler.resolveTile(matcher.group(1));
         String ttpgXPosition = matcher.group(2);
@@ -587,7 +585,7 @@ public class ConvertTTPGtoAsync {
             System.out.println("    Could not map: " + ttpgPosition);
             return tile;
         }
-        
+
         //PER REGION/PLANET/UNITHOLDER
         tile = new Tile(tileID, asyncPosition);
         String tileContents = matcher.group(4);
@@ -607,7 +605,7 @@ public class ConvertTTPGtoAsync {
                 System.out.println("     planet: " + planetAlias + ": " + planet);
                 System.out.println("         contents: " + regionContents);
             }
-            
+
             //Find attachments, and split off region
             Matcher matcherAttachments = regionAttachmentsPattern.matcher(regionContents);
             Boolean hasAttachments = matcherAttachments.find();
@@ -621,7 +619,7 @@ public class ConvertTTPGtoAsync {
                         String attachment_proper = Character.toString(attachment) + (Character.isUpperCase(attachment) ? "_cap" : ""); //bypass AliasHandler's toLowercase'ing
                         String attachmentResolved = AliasHandler.resolveTTPGAttachment(attachment_proper);
                         System.out.println("          - " + attachment + ": " + attachmentResolved);
-                        
+
                         String attachmentFileName = Mapper.getAttachmentID(attachmentResolved);
                         String tokenFileName = Mapper.getTokenID(attachmentResolved);
 
@@ -677,17 +675,17 @@ public class ConvertTTPGtoAsync {
                         } else { // is a unit
                             System.out.println("                unit:  " + AliasHandler.resolveTTPGUnit(str));
                             String unit = AliasHandler.resolveTTPGUnit(str);
-                            
-                            
+
+
                             String unitID = Mapper.getUnitID(unit, colour);
                             String unitCount = String.valueOf(regionCount);
-                            
+
                             if (regionIsSpace) {
                                 tile.addUnit("space", unitID, unitCount);
                             } else if (regionIsPlanet) {
                                 tile.addUnit(AliasHandler.resolvePlanet(planetAlias), unitID, unitCount);
                             }
-                            
+
                         }
                     }
 
@@ -704,12 +702,12 @@ public class ConvertTTPGtoAsync {
 
             index++; //next Region/Planet/UnitHolder
         }
-    
+
         return tile;
     }
 
     public static String currentDateTime() {
-        return ZonedDateTime.now().format(DateTimeFormatter.ofPattern( "uuuuMMddHHmmss" ));   
+        return ZonedDateTime.now().format(DateTimeFormatter.ofPattern( "uuuuMMddHHmmss" ));
     }
 
     public static TTPGMap getTTPGMapFromJsonFile(String filePath) throws Exception {
@@ -786,7 +784,7 @@ public class ConvertTTPGtoAsync {
     public static String generateString(JsonNode node, Boolean prettyPrint) throws JsonProcessingException {
         ObjectWriter objectWriter = objectMapper.writer();
         if (prettyPrint)
-            objectWriter = objectWriter.with(SerializationFeature.INDENT_OUTPUT);     
+            objectWriter = objectWriter.with(SerializationFeature.INDENT_OUTPUT);
         return objectWriter.writeValueAsString(node);
     }
 }

@@ -40,7 +40,7 @@ public class BothelperCommand implements Command {
                     }
                 }
                 MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have the @Bothelper role.");
-                return false;                
+                return false;
             }
         }
         return false;
@@ -99,6 +99,8 @@ public class BothelperCommand implements Command {
         subcommands.add(new FixGameChannelPermissions());
         subcommands.add(new ListCategoryChannelCounts());
         subcommands.add(new BeginVideoGeneration());
+        subcommands.add(new CreatePlanet());
+        subcommands.add(new CreateTile());
         return subcommands;
     }
 

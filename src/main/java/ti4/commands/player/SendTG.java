@@ -4,6 +4,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -43,13 +44,18 @@ public class SendTG extends PlayerSubcommandData {
 			sendTG = Math.min(sendTG, tg);
 			tg -= sendTG;
 			player.setTg(tg);
+			ButtonHelper.pillageCheck(player, activeMap);
 
 			int targetTG = player_.getTg();
 			targetTG += sendTG;
 			player_.setTg(targetTG);
+			ButtonHelper.pillageCheck(player_, activeMap);
 
-			String p1 = Helper.getPlayerRepresentation(event, player);
-			String p2 = Helper.getPlayerRepresentation(event, player_);
+			String p1 = Helper.getPlayerRepresentation(player, activeMap);
+			String p2 = Helper.getPlayerRepresentation(player_, activeMap);
+			if(player_.getLeaderIDs().contains("hacancommander") && !player_.hasLeaderUnlocked("hacancommander")){
+				ButtonHelper.commanderUnlockCheck(player_, activeMap, "hacan", event);
+			}
 			String tgString = sendTG + " " + Emojis.tg + " trade goods";
 			String message =  p1 + " sent " + tgString + " to " + p2;
 			sendMessage(message);

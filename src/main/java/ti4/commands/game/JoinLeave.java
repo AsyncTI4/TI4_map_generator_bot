@@ -27,17 +27,17 @@ abstract public class JoinLeave extends GameSubcommandData {
         }
 
         MapManager mapManager = MapManager.getInstance();
-        Map map = mapManager.getMap(mapName);
-        if (!map.isMapOpen()) {
+        Map activeMap = mapManager.getMap(mapName);
+        if (!activeMap.isMapOpen()) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Game is not open. Can join/leave only open game.");
             return;
         }
         User user = event.getUser();
-        action(map, user);
-        MapSaveLoadManager.saveMap(map, event);
-        MessageHelper.replyToMessage(event, getResponseMessage(map, user));
+        action(activeMap, user);
+        MapSaveLoadManager.saveMap(activeMap, event);
+        MessageHelper.replyToMessage(event, getResponseMessage(activeMap, user));
     }
-    abstract protected String getResponseMessage(Map map, User user);
+    abstract protected String getResponseMessage(Map activeMap, User user);
 
-    abstract protected void action(Map map, User user);
+    abstract protected void action(Map activeMap, User user);
 }

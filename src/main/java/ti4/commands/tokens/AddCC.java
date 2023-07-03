@@ -1,5 +1,7 @@
 package ti4.commands.tokens;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -40,34 +42,47 @@ public class AddCC extends AddRemoveToken {
         }
     }
 
-    public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile) 
-    {
+    public static void addCC(GenericInteractionCreateEvent event, String color, Tile tile) {
+        addCC(event, color, tile, true);
+    }
+    public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile) {
         addCC(event, color, tile, true);
     }
 
 
 
+    public static void addCC(GenericInteractionCreateEvent event, String color, Tile tile, boolean ping) {
+        Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
+        String ccID = Mapper.getCCID(color);
+        String ccPath = tile.getCCPath(ccID);
+        if (ccPath == null) {
+            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+        }
+        if (activeMap.isFoWMode() && ping) {
+            String colorMention = Helper.getColourAsMention(event.getGuild(), color);
+            FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has placed a token in the system");
+        }
+        tile.addCC(ccID);
+    }
     public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile, boolean ping) {
         Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
-
         if (activeMap.isFoWMode() && ping) {
             String colorMention = Helper.getColourAsMention(event.getGuild(), color);
             FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has placed a token in the system");
         }
-
         tile.addCC(ccID);
     }
 
-    public static boolean hasCC(@Nullable SlashCommandInteractionEvent event, String color, Tile tile) {
+    public static boolean hasCC(@Nullable GenericInteractionCreateEvent event, String color, Tile tile) {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null && event != null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         return tile.hasCC(ccID);
     }

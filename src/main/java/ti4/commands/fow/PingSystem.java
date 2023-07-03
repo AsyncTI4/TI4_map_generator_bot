@@ -1,5 +1,6 @@
 package ti4.commands.fow;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -38,7 +39,7 @@ public class PingSystem extends FOWSubcommandData {
             MessageHelper.replyToMessage(event, "Specify position");
             return;
         }
-        
+
         OptionMapping messageMapping = event.getOption(Constants.MESSAGE);
         String message = messageMapping == null ? "" : messageMapping.getAsString();
 
@@ -49,18 +50,25 @@ public class PingSystem extends FOWSubcommandData {
         }
 
         //get players adjacent
-        List<Player> players = FoWHelper.getAdjacentPlayers(activeMap, position);
+        List<Player> players = FoWHelper.getAdjacentPlayers(activeMap, position, true);
+        List<Player> failList = new ArrayList<>();
         int successfulCount = 0;
         for (Player player_ : players) {
-            String playerMessage = Helper.getPlayerRepresentation(event, player_, true) + " - System " + position + " has been pinged:\n> " + message;
+            String playerMessage = Helper.getPlayerRepresentation(player_, activeMap, event.getGuild(), true) + " - System " + position + " has been pinged:\n> " + message;
             boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
             if (success) {
                 successfulCount++;
+            } else {
+                failList.add(player_);
             }
         }
 
-        if(successfulCount < players.size()) {
+        if (successfulCount < players.size()) {
             MessageHelper.replyToMessage(event, "One or more pings failed to send. Please follow up with game's GM.");
+            StringBuilder sb = new StringBuilder();
+            for (Player p : failList) {
+                sb.append(p.getUserName()).append(" ");
+            }
         } else {
             MessageHelper.replyToMessage(event, "Successfully sent all pings.");
         }
