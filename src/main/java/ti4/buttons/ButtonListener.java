@@ -1257,16 +1257,19 @@ public class ButtonListener extends ListenerAdapter {
 
                 String playerRep = Helper.getPlayerRepresentation(player, activeMap);
                 String finalCCs = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
+                String editedMessage = event.getMessage().getContentRaw();
+                String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                shortCCs = shortCCs.replace("CCs have gone from ", "");
+                shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
                 if (event.getMessage().getContentRaw().contains("Net gain")) {
-                    String editedMessage = event.getMessage().getContentRaw();
-                    int netGain = Integer.parseInt(
-                            editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()));
+                    
+                    int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                     finalCCs = finalCCs + ". Net CC gain was " + netGain;
                 }
                 if (!activeMap.isFoWMode()) {
                     if (buttonLabel.equalsIgnoreCase("Done Redistributing CCs")) {
                         MessageHelper.sendMessageToChannel(actionsChannel,
-                                playerRep + " Final CC Allocation Is " + finalCCs);
+                                playerRep + " Initial CCs were "+shortCCs+". Final CC Allocation Is " + finalCCs);
                     } else {
                         if (buttonID.equalsIgnoreCase("leadership")) {
                             String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-leadership";
@@ -1274,7 +1277,7 @@ public class ButtonListener extends ListenerAdapter {
                             for (ThreadChannel threadChannel_ : threadChannels) {
                                 if (threadChannel_.getName().equals(threadName)) {
                                     MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_,
-                                            playerRep + " Final CC Allocation Is " + finalCCs);
+                                            playerRep + " Initial CCs were "+shortCCs+". Final CC Allocation Is " + finalCCs);
                                 }
                             }
 
@@ -2938,9 +2941,10 @@ public class ButtonListener extends ListenerAdapter {
                                 "CCs have gone from " + originalCCs + " -> " + Helper.getPlayerCCs(player)
                                         + ". Net gain of: 1");
                     } else {
-                        int netGain = Integer.parseInt(
-                                editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()))
-                                + 1;
+                        String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                        shortCCs = shortCCs.replace("CCs have gone from ", "");
+                        shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
+                        int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                         editedMessage = editedMessage.substring(0, editedMessage.indexOf("->") + 3)
                                 + Helper.getPlayerCCs(player) + ". Net gain of: " + netGain;
                     }
@@ -2956,9 +2960,11 @@ public class ButtonListener extends ListenerAdapter {
                                 "CCs have gone from " + originalCCs + " -> " + Helper.getPlayerCCs(player)
                                         + ". Net gain of: 1");
                     } else {
-                        int netGain = Integer.parseInt(
-                                editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()))
-                                + 1;
+                        
+                        String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                        shortCCs = shortCCs.replace("CCs have gone from ", "");
+                        shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
+                        int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                         editedMessage = editedMessage.substring(0, editedMessage.indexOf("->") + 3)
                                 + Helper.getPlayerCCs(player) + ". Net gain of: " + netGain;
                     }
@@ -2974,9 +2980,10 @@ public class ButtonListener extends ListenerAdapter {
                                 "CCs have gone from " + originalCCs + " -> " + Helper.getPlayerCCs(player)
                                         + ". Net gain of: 1");
                     } else {
-                        int netGain = Integer.parseInt(
-                                editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()))
-                                + 1;
+                        String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                        shortCCs = shortCCs.replace("CCs have gone from ", "");
+                        shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
+                        int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                         editedMessage = editedMessage.substring(0, editedMessage.indexOf("->") + 3)
                                 + Helper.getPlayerCCs(player) + ". Net gain of: " + netGain;
                     }
@@ -2992,9 +2999,10 @@ public class ButtonListener extends ListenerAdapter {
                                 "CCs have gone from " + originalCCs + " -> " + Helper.getPlayerCCs(player)
                                         + ". Net gain of: -1");
                     } else {
-                        int netGain = Integer.parseInt(
-                                editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()))
-                                - 1;
+                        String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                        shortCCs = shortCCs.replace("CCs have gone from ", "");
+                        shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
+                        int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                         editedMessage = editedMessage.substring(0, editedMessage.indexOf("->") + 3)
                                 + Helper.getPlayerCCs(player) + ". Net gain of: " + netGain;
                     }
@@ -3010,9 +3018,10 @@ public class ButtonListener extends ListenerAdapter {
                                 "CCs have gone from " + originalCCs + " -> " + Helper.getPlayerCCs(player)
                                         + ". Net gain of: -1");
                     } else {
-                        int netGain = Integer.parseInt(
-                                editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()))
-                                - 1;
+                        String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                        shortCCs = shortCCs.replace("CCs have gone from ", "");
+                        shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
+                        int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                         editedMessage = editedMessage.substring(0, editedMessage.indexOf("->") + 3)
                                 + Helper.getPlayerCCs(player) + ". Net gain of: " + netGain;
                     }
@@ -3028,9 +3037,10 @@ public class ButtonListener extends ListenerAdapter {
                                 "CCs have gone from " + originalCCs + " -> " + Helper.getPlayerCCs(player)
                                         + ". Net gain of: -1");
                     } else {
-                        int netGain = Integer.parseInt(
-                                editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()))
-                                - 1;
+                        String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                        shortCCs = shortCCs.replace("CCs have gone from ", "");
+                        shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
+                        int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                         editedMessage = editedMessage.substring(0, editedMessage.indexOf("->") + 3)
                                 + Helper.getPlayerCCs(player) + ". Net gain of: " + netGain;
                     }
