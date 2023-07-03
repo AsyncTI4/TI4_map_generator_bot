@@ -670,6 +670,18 @@ public class ButtonHelper {
 
     }
 
+    public static int checkNetGain(Player player, String ccs) {
+        int netgain = 0;
+        int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
+        ccs = ccs.substring(ccs.indexOf("/")+1, ccs.length());
+        int oldFleet = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
+        ccs = ccs.substring(ccs.indexOf("/")+1, ccs.length());
+        int oldStrat = Integer.parseInt(ccs.substring(0, ccs.length()));
+
+        netgain = (player.getTacticalCC()-oldTactic) + (player.getFleetCC()-oldFleet) + (player.getStrategicCC() - oldStrat);
+        return netgain;
+    }
+
 
     public static List<Button> getButtonsToRemoveYourCC(Player player, Map activeMap, GenericInteractionCreateEvent event, String whatIsItFor) {
         List<Button> buttonsToRemoveCC = new ArrayList<>();
@@ -1120,6 +1132,9 @@ public class ButtonHelper {
         for(String unit :displacedUnits.keySet()){
             int amount = displacedUnits.get(unit);
             String[] combo = unit.split("_");
+            if(combo.length < 1){
+                continue;
+            }
             combo[1] = combo[1].toLowerCase().replace(" ", "");
             combo[1] = combo[1].replace("'", "");
             if(combo[0].contains("damaged")){
