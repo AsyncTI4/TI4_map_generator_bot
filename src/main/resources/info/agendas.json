@@ -859,7 +859,7 @@
     "name": "Prophecy of Ixth",
     "type": "Law",
     "target": "Elect Player",
-    "text1": "The elected player gains this card. The owner of this card applies +1 to the results of their fighter\"s combat rolls. Hits produced by their fighter must be applied to non-fighter ships, if possible. When the other of this card uses produciton, they discard this card unless they produced 2 or more fighters.",
+    "text1": "The elected player gains this card. The owner of this card applies +1 to the results of their fighter\"s combat rolls. Hits produced by their fighter must be applied to non-fighter ships, if possible. When the owner of this card uses production, they discard this card unless they produced 2 or more fighters.",
     "text2": "",
     "source": "absol"
   },
