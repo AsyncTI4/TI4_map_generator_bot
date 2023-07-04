@@ -1497,8 +1497,8 @@ public class GenerateMap {
                 AffineTransform originalTransform = g2.getTransform();
                 g2.rotate(Math.toRadians(-90));
                 g2.setFont(Storage.getFont20());
-                g2.drawString(Mapper.getPlanet(planetName).getName().toUpperCase(),
-                        (y+145)*-1, //See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
+                g2.drawString(Mapper.getPlanet(planetName).getName().toUpperCase().substring(0, 7),
+                        (y+146)*-1, //See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
                         x + 6 + g2.getFontMetrics().getHeight()/2);
                 g2.setTransform(originalTransform);
             }
