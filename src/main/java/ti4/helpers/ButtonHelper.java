@@ -1226,7 +1226,7 @@ public class ButtonHelper {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
 
-        java.util.Map<String, String> unitRepresentation = Mapper.getUnits();
+        java.util.Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
         java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
         String cID = Mapper.getColorID(player.getColor());
         for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
