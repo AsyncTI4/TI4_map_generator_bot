@@ -46,20 +46,4 @@ public class UnitModel implements ModelInterface {
     public String getAlias() {
         return getId();
     }
-
-    public String getId() {
-        return this.id;
-    }
-    
-    public String getUpgradesFromUnitId() {
-        return this.upgradesFromUnitId;
-    }
-
-    public String getUpgradesToUnitId() {
-        return this.upgradesFromUnitId;
-    }
-
-    public String getRequiredTechID() {
-        return this.requiredTechId;
-    }
 }
