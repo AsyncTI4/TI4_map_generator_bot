@@ -17,6 +17,7 @@ import ti4.model.DeckModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.PublicObjectiveModel;
 import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 
 import java.io.File;
 import java.util.*;
@@ -211,6 +212,16 @@ public class AutoCompleteProvider {
                         .filter(pn -> (pn.getAlias() + " " + pn.getName() + " " + pn.getOwner()).toLowerCase().contains(enteredValue))
                         .limit(25)
                         .map(pn -> new Command.Choice(pn.getAlias() + " " + pn.getName() + " " + pn.getOwner(), pn.getAlias()))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.UNIT_ID, Constants.UNIT_ID_1, Constants.UNIT_ID_2, Constants.UNIT_ID_3, Constants.UNIT_ID_4, Constants.UNIT_ID_5 -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                java.util.Map<String, UnitModel> units = Mapper.getUnits();
+                List<Command.Choice> options = units.values().stream()
+                        .filter(unit -> (unit.getId() + " " + unit.getName()).toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(unit -> new Command.Choice(unit.getId() + " (" + unit.getName() +")", unit.getId()))
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }

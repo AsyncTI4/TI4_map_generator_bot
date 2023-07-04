@@ -792,4 +792,12 @@ public class Constants {
     public static final String TOP_LIMIT = "top_limit";
     public static final String MINIMUM_NUMBER_OF_TURNS = "minimum_number_of_turns";
     public static final String UNITS_OWNED = "units_owned";
+    public static final String UNIT_ID = "unit_id";
+    public static final String UNIT_ID_1 = "unit_id_1";
+    public static final String UNIT_ID_2 = "unit_id_2";
+    public static final String UNIT_ID_3 = "unit_id_3";
+    public static final String UNIT_ID_4 = "unit_id_4";
+    public static final String UNIT_ID_5 = "unit_id_5";
+    public static final String UNIT_REMOVE = "unit_remove";
+    public static final String UNIT_ADD = "unit_add";
 }
