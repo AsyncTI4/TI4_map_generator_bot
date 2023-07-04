@@ -238,6 +238,7 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Relics: ").append(player.getRelics()).append("\n");
 		sb.append("> Leaders: ").append(player.getLeaderIDs()).append("\n");
 		sb.append("> Owned PNs: ").append(player.getPromissoryNotesOwned()).append("\n");
+		sb.append("> Owned Units: ").append(player.getUnitsOwned()).append("\n");
 		sb.append("\n");
 
 		return sb.toString();

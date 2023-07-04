@@ -527,6 +527,10 @@ public class MapSaveLoadManager {
 
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
             writer.write(System.lineSeparator());
+
+            writer.write(Constants.UNITS_OWNED + " " + String.join(",", player.getUnitsOwned()));
+            writer.write(System.lineSeparator());
+
             writeCards(player.getTrapCards(), writer, Constants.LIZHO_TRAP_CARDS);
             writeCardsStrings(player.getTrapCardsPlanets(), writer, Constants.LIZHO_TRAP_PLANETS);
 
@@ -1566,7 +1570,8 @@ public class MapSaveLoadManager {
                 }
                 case Constants.PROMISSORY_NOTES_OWNED -> player.setPromissoryNotesOwned(new HashSet<String>(Helper.getSetFromCSV(tokenizer.nextToken())));
                 case Constants.PROMISSORY_NOTES_PLAY_AREA ->
-                        player.setPromissoryNotesInPlayArea(getCardList(tokenizer.nextToken()));
+                player.setPromissoryNotesInPlayArea(getCardList(tokenizer.nextToken()));
+                case Constants.UNITS_OWNED -> player.setUnitsOwned(new HashSet<String>(Helper.getSetFromCSV(tokenizer.nextToken())));
                 case Constants.PLANETS -> player.setPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_EXHAUSTED -> player.setExhaustedPlanets(getCardList(tokenizer.nextToken()));
                 case Constants.PLANETS_ABILITY_EXHAUSTED ->

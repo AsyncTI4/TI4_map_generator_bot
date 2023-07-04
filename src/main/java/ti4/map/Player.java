@@ -64,6 +64,7 @@ public class Player {
     private HashSet<String> abilities = new HashSet<>();
     private HashSet<String> exhaustedAbilities = new HashSet<>();
     private HashSet<String> promissoryNotesOwned = new HashSet<>();
+    private HashSet<String> unitsOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
     private List<String> exhaustedTechs = new ArrayList<>();
@@ -400,6 +401,26 @@ public class Player {
 
     public List<String> getPromissoryNotesInPlayArea() {
         return promissoryNotesInPlayArea;
+    }
+
+    public HashSet<String> getUnitsOwned() {
+        return unitsOwned;
+    }
+
+    public void setUnitsOwned(HashSet<String> unitsOwned) {
+        this.unitsOwned = unitsOwned;
+    }
+
+    public boolean ownsUnit(String unitID) {
+        return unitsOwned.contains(unitID);
+    }
+
+    public boolean removeOwnedUnitByID(String unitID) {
+        return unitsOwned.remove(unitID);
+    }
+
+    public boolean addOwnedUnitByID(String unitID) {
+        return unitsOwned.add(unitID);
     }
 
     public void setActionCard(String id) {
