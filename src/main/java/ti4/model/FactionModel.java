@@ -15,6 +15,7 @@ public class FactionModel implements ModelInterface {
     private List<String> abilities;
     private List<String> leaders;
     private List<String> promissoryNotes;
+    private List<String> units;
 
     public FactionModel() {}
 
@@ -28,7 +29,8 @@ public class FactionModel implements ModelInterface {
             && homePlanets != null
             && abilities != null
             && leaders != null
-            && promissoryNotes != null;
+            && promissoryNotes != null
+            && units != null;
     }
 
     public String getAlias() {
@@ -73,5 +75,9 @@ public class FactionModel implements ModelInterface {
 
     public List<String> getPromissoryNotes() {
         return new ArrayList<String>(promissoryNotes);
+    }
+
+    public List<String> getUnits() {
+        return new ArrayList<String>(units);
     }
 }

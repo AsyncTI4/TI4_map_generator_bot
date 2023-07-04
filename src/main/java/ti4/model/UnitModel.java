@@ -9,6 +9,7 @@ public class UnitModel implements ModelInterface {
     private String asyncId;
     private String imageFileSuffix;
     private String name;
+    private String upgradesFromUnitId;
     private String upgradesToUnitId;
     private String requiredTechId;
     private String source;
@@ -48,5 +49,17 @@ public class UnitModel implements ModelInterface {
 
     public String getId() {
         return this.id;
+    }
+    
+    public String getUpgradesFromUnitId() {
+        return this.upgradesFromUnitId;
+    }
+
+    public String getUpgradesToUnitId() {
+        return this.upgradesFromUnitId;
+    }
+
+    public String getRequiredTechID() {
+        return this.requiredTechId;
     }
 }

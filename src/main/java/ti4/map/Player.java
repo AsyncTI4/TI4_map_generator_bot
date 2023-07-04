@@ -14,6 +14,8 @@ import ti4.helpers.Constants;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -1132,11 +1134,32 @@ public class Player {
         this.exhaustedTechs = exhaustedTechs;
     }
 
-    public void addTech(String tech) {
-        if (!techs.contains(tech)) {
-            techs.add(tech);
-            if(tech.equalsIgnoreCase("iihq")){
-                addPlanet("custodiavigilia");
+    public void addTech(String techID) {
+        if (techs.contains(techID)) {
+            return;
+        }
+        techs.add(techID);
+
+        doAdditionalThingsWhenAddingTech(techID);
+    }
+
+    private void doAdditionalThingsWhenAddingTech(String techID) {
+        // Add Custodia Vigilia when researching IIHQ
+        if(techID.equalsIgnoreCase("iihq")){
+            addPlanet("custodiavigilia");
+        }
+
+        // Update Owned Units when Researching a Unit Upgrade
+        TechnologyModel techModel = Mapper.getTech(techID);
+        if (techID == null) return;
+
+        if (Constants.UNIT_UPGRADE.equalsIgnoreCase(techModel.getType())) {
+            UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
+            if (unitModel != null && unitModel.getUpgradesFromUnitId() != null) {
+                if (getUnitsOwned().contains(unitModel.getUpgradesFromUnitId())) {
+                    removeOwnedUnitByID(unitModel.getUpgradesFromUnitId());
+                    addOwnedUnitByID(unitModel.getId());
+                }
             }
         }
     }
@@ -1156,6 +1179,7 @@ public class Player {
         boolean isRemoved = techs.remove(tech);
         if (isRemoved) removeTech(tech);
         refreshTech(tech);
+        //TODO: Remove unitupgrade -> fix owned units
     }
 
     public void addPlanet(String planet) {

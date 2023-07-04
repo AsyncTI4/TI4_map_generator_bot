@@ -245,6 +245,13 @@ public class Mapper {
         return units.get(unitID);
     }
 
+    public static UnitModel getUnitModelByTechUpgrade(String techID) {
+        return units.values().stream()
+                .filter(unitModel -> techID.equals(unitModel.getRequiredTechID()))
+                .findFirst()
+                .orElse(null);
+    }
+
     public static Map<String, String> getColorToId() {
         Map<String, String> unitMap = new HashMap<>();
         for (Map.Entry<Object, Object> entry : colors.entrySet()) {
@@ -582,6 +589,10 @@ public class Mapper {
 
     public static HashMap<String, TechnologyModel> getTechs() {
         return technologies;
+    }
+
+    public static TechnologyModel getTech(String id) {
+        return technologies.get(id);
     }
 
     public static boolean isValidTech(String id) {
