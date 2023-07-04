@@ -425,6 +425,18 @@ public class Player {
         return unitsOwned.add(unitID);
     }
 
+    public UnitModel getUnitByType(String unitType) {
+        return getUnitsOwned().stream()
+                .map(unitID -> Mapper.getUnit(unitID))
+                .filter(unit -> unitType.equalsIgnoreCase(unit.getBaseType()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public UnitModel getUnitByID(String unitID) {
+        return Mapper.getUnit(unitID);
+    }
+
     public void setActionCard(String id) {
         Collection<Integer> values = actionCards.values();
         int identifier = new Random().nextInt(1000);
