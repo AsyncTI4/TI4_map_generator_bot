@@ -1252,12 +1252,13 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("deleteButtons")) {
             buttonID = buttonID.replace("deleteButtons_", "");
-            if (buttonLabel.equalsIgnoreCase("Done Gaining CCs")
-                    || buttonLabel.equalsIgnoreCase("Done Redistributing CCs")) {
+            String editedMessage = event.getMessage().getContentRaw();
+
+            if ((buttonLabel.equalsIgnoreCase("Done Gaining CCs")
+                    || buttonLabel.equalsIgnoreCase("Done Redistributing CCs")) && editedMessage.contains("CCs have gone from") ) {
 
                 String playerRep = Helper.getPlayerRepresentation(player, activeMap);
                 String finalCCs = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
-                String editedMessage = event.getMessage().getContentRaw();
                 String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
                 shortCCs = shortCCs.replace("CCs have gone from ", "");
                 shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
@@ -1297,7 +1298,7 @@ public class ButtonListener extends ListenerAdapter {
             if ((buttonLabel.equalsIgnoreCase("Done Exhausting Planets")
                     || buttonLabel.equalsIgnoreCase("Done Producing Units"))
                     && !event.getMessage().getContentRaw().contains("Click the names of the planets you wish")) {
-                String editedMessage = event.getMessage().getContentRaw();
+                
                 if (activeMap.isFoWMode()) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), editedMessage);
                 } else {
@@ -1379,7 +1380,7 @@ public class ButtonListener extends ListenerAdapter {
             }
 
             if (buttonID.equalsIgnoreCase("diplomacy")) {
-                String editedMessage = event.getMessage().getContentRaw();
+                
 
                 if (!activeMap.isFoWMode()) {
                     String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-diplomacy";

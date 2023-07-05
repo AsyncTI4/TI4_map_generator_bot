@@ -1132,7 +1132,7 @@ public class ButtonHelper {
         for(String unit :displacedUnits.keySet()){
             int amount = displacedUnits.get(unit);
             String[] combo = unit.split("_");
-            if(combo.length < 1){
+            if(combo.length < 2){
                 continue;
             }
             combo[1] = combo[1].toLowerCase().replace(" ", "");
