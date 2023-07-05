@@ -31,7 +31,13 @@ public class WormholeModel {
         PHI,
         CHI,
         PSI,
-        OMEGA;
+        OMEGA,
+
+        WHEPSILON,
+        WHNARROWS,
+        WHPROBABILITY,
+        WHCHAMPION,
+        WHVOYAGE;
 
         @Override
         public String toString() {
