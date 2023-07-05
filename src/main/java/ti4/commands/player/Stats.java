@@ -55,8 +55,12 @@ public class Stats extends PlayerSubcommandData {
 
 		List<OptionMapping> optionMappings = event.getOptions();
 		//NO OPTIONS SELECTED, JUST DISPLAY STATS
-		if (optionMappings.isEmpty() && !activeMap.isFoWMode()) {
-			sendMessage(getPlayersCurrentStatsText(player, activeMap));
+		if (optionMappings.isEmpty()) {
+			if (activeMap.isFoWMode()) {
+				MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getPlayersCurrentStatsText(player, activeMap));
+			} else {
+				sendMessage(getPlayersCurrentStatsText(player, activeMap));
+			}
 			return;
 		}
 
