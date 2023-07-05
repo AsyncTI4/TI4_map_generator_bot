@@ -123,7 +123,7 @@ public class ResourceHelper {
         if (tokenPath != null) {
             return tokenPath;
         }
-        String token = getResourceFromFolder("attachment_token/", name, "Could not find attachment token file");
+        String token = getResourceFromFolder("attachment_token/", name, "Could not find attachment token file: " + name);
         attachmentCache.put(name, token);
         return token;
     }

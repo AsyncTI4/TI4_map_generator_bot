@@ -81,6 +81,7 @@ public class Constants {
     public static String DELTA = "delta";
     public static String EPSILON = "whepsilon";
     public static String NARROWS = "whnarrows";
+    public static String PROBABILITY = "whprobability";
     public static String CHAMPION = "whchampion";
     public static String VOYAGE = "whvoyage";
     public static String ZETA = "whzeta";
