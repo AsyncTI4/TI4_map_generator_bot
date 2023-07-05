@@ -601,6 +601,7 @@ public class Helper {
     
     public static List<Button> getPlaceUnitButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, Tile tile, String warfareNOtherstuff, String placePrefix) {
         List<Button> unitButtons = new ArrayList<>();
+        boolean regulated = activeMap.getLaws().containsKey("conscription") ||  activeMap.getLaws().containsKey("absol_conscription");
         HashMap<String, UnitHolder> unitHolders = tile.getUnitHolders();
         String tp = tile.getPosition();
         if(!warfareNOtherstuff.equalsIgnoreCase("muaatagent"))
@@ -629,7 +630,7 @@ public class Helper {
         Button ff1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_fighter_"+tp, "Produce 1 Fighter" );
         ff1Button = ff1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
         unitButtons.add(ff1Button);
-        if(!warfareNOtherstuff.equalsIgnoreCase("freelancers") && !warfareNOtherstuff.equalsIgnoreCase("sling")&& !warfareNOtherstuff.equalsIgnoreCase("chaosM")){
+        if(!warfareNOtherstuff.equalsIgnoreCase("freelancers") && !regulated && !warfareNOtherstuff.equalsIgnoreCase("sling")&& !warfareNOtherstuff.equalsIgnoreCase("chaosM")){
             Button ff2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2ff_"+tp, "Produce 2 Fighters" );
             ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
             unitButtons.add(ff2Button);
@@ -655,7 +656,7 @@ public class Helper {
                 Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_"+pp, "Produce 1 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap));
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
                 unitButtons.add(inf1Button);
-                if(!warfareNOtherstuff.equalsIgnoreCase("freelancers") && !warfareNOtherstuff.equalsIgnoreCase("chaosM")){
+                if(!warfareNOtherstuff.equalsIgnoreCase("freelancers") && !regulated && !warfareNOtherstuff.equalsIgnoreCase("chaosM")){
                     Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_"+pp, "Produce 2 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap) );
                     inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
                     unitButtons.add(inf2Button);

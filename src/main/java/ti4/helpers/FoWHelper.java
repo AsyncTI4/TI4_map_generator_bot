@@ -384,7 +384,7 @@ public class FoWHelper {
 			}
 		}
 
-		if ((player != null && "ghost".equals(player.getFaction())) || wh_recon || absol_recon) {
+		if ((player != null && player.hasAbility("quantum_entanglement")) || wh_recon || absol_recon) {
 			if (wormholeIDs.contains(Constants.ALPHA)) {
 				wormholeIDs.add(Constants.BETA);
 			} else if (wormholeIDs.contains(Constants.BETA)) {
