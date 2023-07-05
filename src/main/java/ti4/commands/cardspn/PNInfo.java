@@ -154,7 +154,11 @@ public class PNInfo extends PNCardsSubcommandData {
         if (!Mapper.isColorValid(playerColor) || !Mapper.isFaction(playerFaction)) {
             return;
         }
+
+        // All PNs a Player brought to the game (owns)
         List<String> promissoryNotes = new ArrayList<>(player.getPromissoryNotesOwned());
+
+        // Remove PNs in other players' hands and player areas and purged PNs
         for (Player player_ : activeMap.getPlayers().values()) {
             promissoryNotes.removeAll(player_.getPromissoryNotes().keySet());
             promissoryNotes.removeAll(player_.getPromissoryNotesInPlayArea());
@@ -163,6 +167,7 @@ public class PNInfo extends PNCardsSubcommandData {
         promissoryNotes.removeAll(player.getPromissoryNotesInPlayArea());
         promissoryNotes.removeAll(activeMap.getPurgedPN());
         
+        // Any remaining PNs are missing from the game and can be re-added to the player's hand
         if (!promissoryNotes.isEmpty()) {
             for (String promissoryNote : promissoryNotes) {
                 player.setPromissoryNote(promissoryNote);

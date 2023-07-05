@@ -2231,12 +2231,14 @@ public class Map {
             allOwnedPromissoryNotes.addAll(player.getPromissoryNotesOwned());
         }
 
+        // Find duplicate PNs - PNs that are in multiple players' hands or play areas
         if (Helper.findDuplicateInList(allPlayerHandPromissoryNotes).size() > 0) {
             BotLogger.log("`" + getName() + "`: there are duplicate promissory notes in the game:\n> `" + Helper.findDuplicateInList(allPlayerHandPromissoryNotes) + "`");
         }
 
         allPromissoryNotes.addAll(getPurgedPN());
 
+        // Find PNs that are extra - players have them but nobody "owns" them
         List<String> unOwnedPromissoryNotes = new ArrayList<>(allPromissoryNotes);
         unOwnedPromissoryNotes.removeAll(allOwnedPromissoryNotes);
         if (unOwnedPromissoryNotes.size() > 0) {
@@ -2244,6 +2246,17 @@ public class Map {
             getPurgedPN().removeAll(unOwnedPromissoryNotes);
         }
 
+        // Remove unowned PNs from all players hands
+        for (Player player : getPlayers().values()) {
+            for (String pnID : player.getPromissoryNotes().keySet()) {
+                if (unOwnedPromissoryNotes.contains(pnID)) {
+                    player.removePromissoryNote(pnID);
+                    BotLogger.log("`" + getName() + "`: removed promissory note `" + pnID + "` from player `" + player.getUserName() + "` because nobody 'owned' it");
+                }
+            }
+        }
+
+        // Report PNs that are missing from the game
         List<String> missingPromissoryNotes = new ArrayList<>(allOwnedPromissoryNotes);
         missingPromissoryNotes.removeAll(allPromissoryNotes);
         if (missingPromissoryNotes.size() > 0) {
