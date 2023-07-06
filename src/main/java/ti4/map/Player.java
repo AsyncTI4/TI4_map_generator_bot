@@ -1116,6 +1116,7 @@ public class Player {
             techs.add(tech);
             if(tech.equalsIgnoreCase("iihq")){
                 addPlanet("custodiavigilia");
+                exhaustPlanet("custodiavigilia");
             }
         }
     }
