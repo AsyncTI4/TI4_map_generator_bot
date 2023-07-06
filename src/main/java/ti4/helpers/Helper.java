@@ -482,6 +482,9 @@ public class Helper {
         planet = planet.replace("-", "");
         UnitHolder unitHolder = activeMap.getPlanetsInfo().get(AliasHandler.resolvePlanet(planet));
         Planet planet2 = (Planet) unitHolder;
+        if(planet2 == null || unitHolder == null){
+            return planet + " bot error. Tell fin";
+        }
         String planetProper = Mapper.getPlanetRepresentations().get(AliasHandler.resolvePlanet(planet)) + " (" +planet2.getResources() + "/"+planet2.getInfluence()+")";
 
         return (Objects.isNull(planetProper) ? planet : planetProper);

@@ -8,7 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-
+import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.commands.units.MoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -52,7 +52,10 @@ public class AddCC extends AddRemoveToken {
 
 
     public static void addCC(GenericInteractionCreateEvent event, String color, Tile tile, boolean ping) {
-        Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
+        String gameName = event.getChannel().getName();
+        gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+        gameName = gameName.substring(0, gameName.indexOf("-"));
+        Map activeMap = MapManager.getInstance().getMap(gameName);
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {

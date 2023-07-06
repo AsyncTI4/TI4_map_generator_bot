@@ -2248,7 +2248,9 @@ public class Map {
 
         // Remove unowned PNs from all players hands
         for (Player player : getPlayers().values()) {
-            for (String pnID : player.getPromissoryNotes().keySet()) {
+            List<String> pns = new ArrayList<String>();
+            pns.addAll(player.getPromissoryNotes().keySet());
+            for (String pnID : pns) {
                 if (unOwnedPromissoryNotes.contains(pnID)) {
                     player.removePromissoryNote(pnID);
                     BotLogger.log("`" + getName() + "`: removed promissory note `" + pnID + "` from player `" + player.getUserName() + "` because nobody 'owned' it");
