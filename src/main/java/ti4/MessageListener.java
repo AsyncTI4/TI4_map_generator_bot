@@ -275,7 +275,7 @@ public class MessageListener extends ListenerAdapter {
         || msg.getContentRaw().toLowerCase().startsWith("tolightgray") || msg.getContentRaw().toLowerCase().startsWith("toteal") || msg.getContentRaw().toLowerCase().startsWith("toforest")
         || msg.getContentRaw().toLowerCase().startsWith("torose") || msg.getContentRaw().toLowerCase().startsWith("toturquoise")
         || msg.getContentRaw().toLowerCase().startsWith("tolime") || msg.getContentRaw().toLowerCase().startsWith("toemerald") || msg.getContentRaw().toLowerCase().startsWith("topetrol")
-        || msg.getContentRaw().toLowerCase().startsWith("tobrown") || msg.getContentRaw().toLowerCase().startsWith("totan")
+        || msg.getContentRaw().toLowerCase().startsWith("tobrown") || msg.getContentRaw().toLowerCase().startsWith("totan") || msg.getContentRaw().toLowerCase().startsWith("torainbow")
         || msg.getContentRaw().toLowerCase().startsWith("toblack") || msg.getContentRaw().toLowerCase().startsWith("topink")||msg.getContentRaw().toLowerCase().startsWith("tolavender")) {
 
             String gameName = event.getChannel().getName();
