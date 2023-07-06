@@ -401,11 +401,8 @@ public class ButtonHelper {
         if(player.hasLeader("nomadhero")){
             Leader playerLeader = player.getLeader("nomadhero");
             if(playerLeader.isActive()){
-                String colorID = Mapper.getColorID(player.getColor());
-                String fsKey = colorID + "_fs.png";
-                if(tile.getUnitHolders().get("space").getUnits().containsKey(fsKey)){
-                    return true;
-                }
+                return true;
+                
             }
         }
 
