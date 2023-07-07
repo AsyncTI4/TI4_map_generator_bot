@@ -655,7 +655,7 @@ public class GenerateMap {
                 for (Tile tile : activeMap.getTileMap().values()) {
                     for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
                         if (unitHolder.getTokenList().stream().anyMatch(token -> token.contains(tokenID))) {
-                            drawPlanetImage(x + deltaX + 17, y, "pc_planetname_" + unitHolder.getName() + "_rdy.png");
+                            drawPlanetImage(x + deltaX + 17, y, "pc_planetname_" + unitHolder.getName() + "_rdy.png", unitHolder.getName());
                             break found;
                         }
                     }
@@ -1210,7 +1210,7 @@ public class GenerateMap {
 
                 if (unitHolder.getTokenList().contains(Constants.ATTACHMENT_TITANSPN_PNG)) {
                     String planetTypeName = "pc_attribute_titanspn.png";
-                    drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName);
+                    drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
                 } else {
                     String originalPlanetType = planetHolder.getOriginalPlanetType();
                     if (originalPlanetType.equals("none") && planet.equals("mr"))
@@ -1231,7 +1231,7 @@ public class GenerateMap {
                         }
 
                         String planetTypeName = "pc_attribute_" + originalPlanetType + ".png";
-                        drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName);
+                        drawPlanetImage(x + deltaX + 2, y + 2, planetTypeName, planet);
                     }
                 }
 
@@ -1249,24 +1249,24 @@ public class GenerateMap {
                 boolean hasAttachment = planetHolder.hasAttachment();
                 if (hasAttachment) {
                     String planetTypeName = "pc_upgrade.png";
-                    drawPlanetImage(x + deltaX + 26, y + 40, planetTypeName);
+                    drawPlanetImage(x + deltaX + 26, y + 40, planetTypeName, planet);
                 }
 
                 if (planetHolder.getTokenList().contains(Constants.GARDEN_WORLDS_PNG)) {
                     String khraskGardenWorlds = "pc_ds_khraskbonus.png";
-                    drawPlanetImage(x + deltaX, y, khraskGardenWorlds);
+                    drawPlanetImage(x + deltaX, y, khraskGardenWorlds, planet);
                 }
 
                 boolean hasAbility = planetHolder.isHasAbility() || planetHolder.getTokenList().stream().anyMatch(token -> token.contains("nanoforge") || token.contains("legendary"));
                 if (hasAbility) {
                     String statusOfAbility = exhaustedPlanetsAbilities.contains(planet) ? "_exh" : "_rdy";
                     String planetTypeName = "pc_legendary" + statusOfAbility + ".png";
-                    drawPlanetImage(x + deltaX + 26, y + 60, planetTypeName);
+                    drawPlanetImage(x + deltaX + 26, y + 60, planetTypeName, planet);
                 }
                 String originalTechSpeciality = planetHolder.getOriginalTechSpeciality();
                 if (!originalTechSpeciality.isEmpty()) {
                     String planetTypeName = "pc_tech_" + originalTechSpeciality + statusOfPlanet + ".png";
-                    drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName);
+                    drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName, planet);
                 } else {
                     ArrayList<String> techSpeciality = planetHolder.getTechSpeciality();
                     for (String techSpec : techSpeciality) {
@@ -1274,15 +1274,13 @@ public class GenerateMap {
                             continue;
                         }
                         String planetTypeName = "pc_tech_" + techSpec + statusOfPlanet + ".png";
-                        drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName);
+                        drawPlanetImage(x + deltaX + 26, y + 82, planetTypeName, planet);
                     }
                 }
 
-
-                drawPlanetImage(x + deltaX + 26, y + 103, resFileName);
-                drawPlanetImage(x + deltaX + 26, y + 125, infFileName);
-                drawPlanetImage(x + deltaX, y, planetFileName);
-
+                drawPlanetImage(x + deltaX + 26, y + 103, resFileName, planet);
+                drawPlanetImage(x + deltaX + 26, y + 125, infFileName, planet);
+                drawPlanetImage(x + deltaX, y, planetFileName, planet);
 
                 deltaX += 56;
             } catch (Exception e) {
@@ -1486,12 +1484,25 @@ public class GenerateMap {
         }
     }
 
-    private void drawPlanetImage(int x, int y, String resourceName) {
+    private void drawPlanetImage(int x, int y, String resourceName, String planetName) {
         try {
             String resourcePath = ResourceHelper.getInstance().getPlanetResource(resourceName);
-            @SuppressWarnings("ConstantConditions")
-            BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
-            graphics.drawImage(resourceBufferedImage, x, y, null);
+            if(Optional.ofNullable(resourcePath).isPresent()) {
+                @SuppressWarnings("ConstantConditions")
+                BufferedImage resourceBufferedImage = ImageIO.read(new File(resourcePath));
+                graphics.drawImage(resourceBufferedImage, x, y, null);
+            }
+            else {
+                Graphics2D g2 = (Graphics2D) graphics;
+                AffineTransform originalTransform = g2.getTransform();
+                g2.rotate(Math.toRadians(-90));
+                g2.setFont(Storage.getFont20());
+                g2.drawString(Mapper.getPlanet(planetName).getName().toUpperCase().substring(0, 7),
+                        (y+146)*-1, //See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
+                        x + 6 + g2.getFontMetrics().getHeight()/2);
+                g2.setTransform(originalTransform);
+            }
+
         } catch (Exception e) {
             BotLogger.log("Could not display planet: " + resourceName, e);
         }
