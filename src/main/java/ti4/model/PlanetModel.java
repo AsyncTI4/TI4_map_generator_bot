@@ -13,6 +13,7 @@ public class PlanetModel {
     private String id;
     private String tileId;
     private String name;
+    private String shortName;
     private List<String> aliases;
     private Point positionInTile;
     private int resources;

@@ -33,11 +33,12 @@ public class CreatePlanet extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.PLANET_POSITION_Y, "The y-coordinate of the planet's position in the tile image").setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.PLANET_RESOURCES, "The planet's resource value").setRequired(true));
         addOptions(new OptionData(OptionType.INTEGER, Constants.PLANET_INFLUENCE, "The planet's influence value").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET_TYPE, "Planet type - valid values are Hazardous, Industrial, Cultural, None.").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET_TECH_SKIPS, "Comma-separated list of skips (Biotic, Cybernetic, Propulsion, Warfare, Unitskip, Nonunitskip)").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET_TYPE, "Planet type - valid values are Hazardous, Industrial, Cultural, None.").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET_TECH_SKIPS, "Comma-separated list of skips (Biotic, Cybernetic, Propulsion, Warfare, Unitskip, Nonunitskip)").setRequired(false).setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_LEGENDARY_NAME, "If the planet has a legendary ability, this is its name. An ability must have both a name and text.").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_LEGENDARY_TEXT, "If the planet has a legendary ability, this is its text. An ability must have both a name and text.").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_FACTION_HOMEWORLD, "If this planet is in a faction's home system, put that faction's ID here").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET_SHORT_NAME, "A shortened name to display on the planet \"card\". MAX 8 CHARACTERS, INCLUDING SPACES").setRequired(false));
     }
 
     @Override
@@ -47,6 +48,7 @@ public class CreatePlanet extends BothelperSubcommandData {
         String legendaryName = Optional.ofNullable(event.getOption(Constants.PLANET_LEGENDARY_NAME)).isPresent() ? event.getOption(Constants.PLANET_LEGENDARY_NAME).getAsString() : null;
         String legendaryAbility = Optional.ofNullable(event.getOption(Constants.PLANET_LEGENDARY_TEXT)).isPresent() ? event.getOption(Constants.PLANET_LEGENDARY_TEXT).getAsString() : null;
         String factionHomeworld = Optional.ofNullable(event.getOption(Constants.PLANET_FACTION_HOMEWORLD)).isPresent() ? event.getOption(Constants.PLANET_FACTION_HOMEWORLD).getAsString() : null;
+        String shortName = Optional.ofNullable(event.getOption(Constants.PLANET_SHORT_NAME)).isPresent() ? event.getOption(Constants.PLANET_SHORT_NAME).getAsString() : null;
         PlanetModel planet = null;
         try {
             planet = createPlanetModel(event.getOption(Constants.PLANET_ID).getAsString(),
@@ -61,7 +63,8 @@ public class CreatePlanet extends BothelperSubcommandData {
                     techString,
                     legendaryName,
                     legendaryAbility,
-                    factionHomeworld
+                    factionHomeworld,
+                    shortName
             );
         } catch (Exception e) {
             BotLogger.log("Something went wrong creating the planet! "
@@ -98,7 +101,8 @@ public class CreatePlanet extends BothelperSubcommandData {
                                                 String skips,
                                                 String legendaryName,
                                                 String legendaryText,
-                                                String factionHomeworld) {
+                                                String factionHomeworld,
+                                                String shortName) {
         PlanetTypeModel typeModel = new PlanetTypeModel();
 
         PlanetModel planet = new PlanetModel();
@@ -112,12 +116,14 @@ public class CreatePlanet extends BothelperSubcommandData {
         planet.setPlanetType(typeModel.getPlanetTypeFromString(planetType));
         if(Optional.ofNullable(skips).isPresent())
             planet.setTechSpecialties(getTechSpecialtiesFromString(skips));
+        if(Optional.ofNullable(factionHomeworld).isPresent())
+            planet.setFactionHomeworld(factionHomeworld);
+        if(Optional.ofNullable(shortName).isPresent())
+            planet.setShortName(shortName);
         if(Optional.ofNullable(legendaryName).isPresent()) {
             planet.setLegendaryAbilityName(legendaryName);
             planet.setLegendaryAbilityText(legendaryText);
         }
-        if(Optional.ofNullable(factionHomeworld).isPresent())
-            planet.setFactionHomeworld(factionHomeworld);
         planet.setUnitPositions(createDefaultUnitTokenPosition(planet));
 
         return planet;

@@ -44,6 +44,7 @@ public class Constants {
     public static final String PLANET_LEGENDARY_NAME = "planet_legendary_name";
     public static final String PLANET_LEGENDARY_TEXT = "planet_legendary_text";
     public static final String PLANET_FACTION_HOMEWORLD = "planet_faction_homeworld";
+    public static final String PLANET_SHORT_NAME = "planet_short_name";
     public static final String TILE_ID = "tile_id";
     public static final String TILE_NAME = "tile_name";
     public static final String TILE_ALIASES = "tile_aliases";
@@ -655,6 +656,7 @@ public class Constants {
     public static final String ARCHIVE_OLD_THREADS = "archive_old_threads";
     public static final String CREATE_TILE = "create_tile";
     public static final String CREATE_PLANET = "create_planet";
+    public static final String RE_EXPORT_TILES = "re_export_tiles";
     public static final String THREAD_COUNT = "thread_count";
     public static final String LIST_OLD_CHANNELS = "list_old_channels";
     public static final String LIST_OLD_THREADS = "list_old_threads";

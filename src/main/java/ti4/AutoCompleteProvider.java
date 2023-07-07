@@ -13,10 +13,7 @@ import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.Player;
 import ti4.message.BotLogger;
-import ti4.model.DeckModel;
-import ti4.model.PromissoryNoteModel;
-import ti4.model.PublicObjectiveModel;
-import ti4.model.TechnologyModel;
+import ti4.model.*;
 
 import java.io.File;
 import java.util.*;
@@ -479,6 +476,31 @@ public class AutoCompleteProvider {
             }
             case Constants.AUTO_ARCHIVE_DURATION -> {
                 event.replyChoiceStrings("1_HOUR", "24_HOURS", "3_DAYS", "1_WEEK").queue();
+            }
+            case Constants.PLANET_TYPE -> {
+                List<String> allPlanetTypes = Arrays.stream(PlanetTypeModel.PlanetType.values())
+                        .map(PlanetTypeModel.PlanetType::toString)
+                        .toList();
+                event.replyChoiceStrings(allPlanetTypes).queue();
+            }
+            case Constants.PLANET_TECH_SKIPS -> {
+                List<String> allTechSkips = Arrays.stream(TechSpecialtyModel.TechSpecialty.values())
+                        .map(TechSpecialtyModel.TechSpecialty::toString)
+                        .toList();
+                event.replyChoiceStrings(allTechSkips).queue();
+            }
+            case Constants.TILE_TYPE -> {
+                List<String> allTileTypes = Arrays.stream(ShipPositionModel.ShipPosition.values())
+                        .map(ShipPositionModel.ShipPosition::getTypeString)
+                        .toList();
+                event.replyChoiceStrings(allTileTypes).queue();
+            }
+            case Constants.TILE_WORMHOLES -> {
+                List<String> allWormholeTypes = Arrays.stream(WormholeModel.Wormhole.values())
+                        .limit(25)
+                        .map(WormholeModel.Wormhole::toString)
+                        .toList();
+                event.replyChoiceStrings(allWormholeTypes).queue();
             }
         }
     }
