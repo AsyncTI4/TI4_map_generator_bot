@@ -33,6 +33,11 @@ public class WormholeModel {
         PSI,
         OMEGA,
 
+        CUSTOM_ERONOUS_WHEPSILON,
+        CUSTOM_ERONOUS_WHETA,
+        CUSTOM_ERONOUS_WHIOTA,
+        CUSTOM_ERONOUS_WHTHETA,
+        CUSTOM_ERONOUS_WHZETA,
         WHEPSILON,
         WHNARROWS,
         WHPROBABILITY,
