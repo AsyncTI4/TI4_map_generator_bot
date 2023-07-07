@@ -571,7 +571,7 @@
     "abilities": ["the_lady_and_the_lord", "rule_of_two"],
     "leaders": ["gheminaagent", "gheminacommander", "gheminaherolord", "gheminaherolady"],
     "promissoryNotes": ["dspnghem"],
-    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "ghemina_flagship", "infantry", "ghemina_mech", "pds", "spacedock"]
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "ghemina_flagship_lord", "ghemina_flagship_lady", "infantry", "ghemina_mech", "pds", "spacedock"]
   },
   {
     "alias": "ghoti",
