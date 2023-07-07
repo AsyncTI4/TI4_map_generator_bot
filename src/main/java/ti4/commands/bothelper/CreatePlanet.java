@@ -38,7 +38,7 @@ public class CreatePlanet extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_LEGENDARY_NAME, "If the planet has a legendary ability, this is its name. An ability must have both a name and text.").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_LEGENDARY_TEXT, "If the planet has a legendary ability, this is its text. An ability must have both a name and text.").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET_FACTION_HOMEWORLD, "If this planet is in a faction's home system, put that faction's ID here").setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.PLANET_SHORT_NAME, "A shortened name to display on the planet \"card\". MAX 8 CHARACTERS, INCLUDING SPACES").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET_SHORT_NAME, "A shortened name to display on the planet \"card\". MAX 10 CHARACTERS, INCLUDING SPACES").setRequired(false));
     }
 
     @Override
