@@ -46,4 +46,49 @@ public class UnitModel implements ModelInterface {
     public String getAlias() {
         return getId();
     }
+
+    public String getCardText() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getAFBText());
+        sb.append(getBombardText());
+        sb.append(getSpaceCannonText());
+        sb.append(getPlanetaryShieldText());
+        sb.append(getSustainDamageText());
+        return sb.toString();
+    }
+
+    public String getAFBText() {
+        if (getAfbDieCount() > 0) {
+            return "Anti-Fighter Barrage " + getAfbHitsOn() + " (x" + getAfbDieCount() + ")\n";
+        }
+        return "";
+    }
+
+    public String getBombardText() {
+        if (getBombardDieCount() > 0) {
+            return "Bombard " + getBombardHitsOn() + " (x" + getBombardDieCount() + ")\n";
+        }
+        return "";
+    }
+
+    public String getSpaceCannonText() {
+        if (getSpaceCannonDieCount() > 0) {
+            return ((getDeepSpaceCannon() != null && getDeepSpaceCannon()) ? "Deep " : "") + "Space Cannon " + getSpaceCannonHitsOn() + " (x" + getSpaceCannonDieCount() + ")\n";
+        }
+        return "";
+    }
+
+    public String getPlanetaryShieldText() {
+        if (getPlanetaryShield() != null && getPlanetaryShield()) {
+            return "Planetary Shield\n";
+        }
+        return "";
+    }
+
+    public String getSustainDamageText() {
+        if (getSustainDamage() != null && getSustainDamage()) {
+            return "Sustain Damage\n";
+        }
+        return "";
+    }
 }
