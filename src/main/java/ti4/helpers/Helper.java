@@ -773,7 +773,6 @@ public class Helper {
      * @return the name of the emoji including ID
      */
     public static String getEmojiFromDiscord(String emojiName) {
-        if (emojiName == null) return "";
         return switch (emojiName.toLowerCase()) {
             //EXPLORATION
             case "hfrag" -> Emojis.HFrag;

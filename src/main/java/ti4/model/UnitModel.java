@@ -4,6 +4,8 @@ import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
+import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
 @Data
@@ -62,9 +64,8 @@ public class UnitModel implements ModelInterface {
 
     public MessageEmbed getUnitRepresentationEmbed() {
         
-        String faction = getFaction();
-        String factionEmoji = Helper.getEmojiFromDiscord(faction);
-        String unitEmoji = Helper.getEmojiFromDiscord(getBaseType());
+        String factionEmoji = getFaction() == null ? "" : Helper.getFactionIconFromDiscord(getFaction().toLowerCase());
+        String unitEmoji = getBaseType() == null ? "" : Helper.getEmojiFromDiscord(getBaseType());
 
         EmbedBuilder eb = new EmbedBuilder();
         /*
@@ -72,7 +73,8 @@ public class UnitModel implements ModelInterface {
             1. Arg: title as string
             2. Arg: URL as string or could also be null
         */
-        eb.setTitle(factionEmoji + " " + getName(), null);
+        String name = getName() == null ? "" : getName();
+        eb.setTitle(unitEmoji + factionEmoji + " __" + name + "__", null);
 
         /*
             Set the color
@@ -85,7 +87,7 @@ public class UnitModel implements ModelInterface {
             Set the text of the Embed:
             Arg: text as string
         */
-        eb.setDescription(unitEmoji + " " + getBaseType());
+        // eb.setDescription(getId());
 
         // String afbText = unit.getAfbHitsOn() + 
 
@@ -97,9 +99,10 @@ public class UnitModel implements ModelInterface {
         */
         // eb.addField("Title of field", "test of field", false);
         // eb.addField("Title of field", "test of field", false);
-        eb.addField("Abilities:", getDiceText(), true);
-        eb.addField("Title of inline field", "test of inline field", true);
-        eb.addField("Title of inline field", "test of inline field", true);
+        if (!getValuesText().isEmpty()) eb.addField("Values:", getValuesText(), true);
+        if (!getDiceText().isEmpty()) eb.addField("Dice Rolls:", getDiceText(), true);
+        if (!getOtherText().isEmpty()) eb.addField("Traits:", getOtherText(), true);
+        if (getAbility() != null) eb.addField("Ability:", getAbility(), false);
 
         /*
             Add spacer like field
@@ -121,6 +124,7 @@ public class UnitModel implements ModelInterface {
             2. icon url as string (can be null)
         */
         // eb.setFooter("Text", "https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/zekroBot_Logo_-_round_small.png");
+        eb.setFooter(getId());
 
         /*
             Set image:
@@ -137,49 +141,89 @@ public class UnitModel implements ModelInterface {
         return eb.build();
     }
 
-    public String getDiceText() {
+    private String getValuesText() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getPlanetaryShieldText());
-        sb.append(getSustainDamageText());
+        sb.append(getCostText());
+        sb.append(getMoveText());
+        sb.append(getProductionText());
+        sb.append(getCapacityText());
+        return sb.toString();
+    }
+
+    private String getDiceText() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(getAFBText());
+        sb.append(getBombardText());
+        sb.append(getSpaceCannonText());
         return sb.toString();
     }
     
-    public String getOtherText() {
+    private String getOtherText() {
         StringBuilder sb = new StringBuilder();
         sb.append(getPlanetaryShieldText());
         sb.append(getSustainDamageText());
         return sb.toString();
     }
 
-    public String getAFBText() {
+    private String getCostText() {
+        if (getCost() >= 1) {
+            return "Cost: " + Helper.getResourceEmoji(Math.round(getCost())) + "\n";
+        } else if (getCost() == 0.5) {
+            return "Cost: " + Emojis.Resources_1 + " (for 2 " + Helper.getEmojiFromDiscord(getBaseType()) + ")\n";
+        }
+        return "";
+    }
+
+    private String getMoveText() {
+        if (getMoveValue() > 0) {
+            return "Move: " + getMoveValue() + "\n";
+        }
+        return "";
+    }
+
+    private String getProductionText() {
+        if (getProductionValue() > 0) {
+            return "Production: " + getProductionValue() + "\n";
+        }
+        return "";
+    }
+
+    private String getCapacityText() {
+        if (getCapacityValue() > 0) {
+            return "Capacity: " + getCapacityValue() + "\n";
+        }
+        return "";
+    }
+
+    private String getAFBText() {
         if (getAfbDieCount() > 0) {
             return "Anti-Fighter Barrage " + getAfbHitsOn() + " (x" + getAfbDieCount() + ")\n";
         }
         return "";
     }
 
-    public String getBombardText() {
+    private String getBombardText() {
         if (getBombardDieCount() > 0) {
             return "Bombard " + getBombardHitsOn() + " (x" + getBombardDieCount() + ")\n";
         }
         return "";
     }
 
-    public String getSpaceCannonText() {
+    private String getSpaceCannonText() {
         if (getSpaceCannonDieCount() > 0) {
             return ((getDeepSpaceCannon() != null && getDeepSpaceCannon()) ? "Deep " : "") + "Space Cannon " + getSpaceCannonHitsOn() + " (x" + getSpaceCannonDieCount() + ")\n";
         }
         return "";
     }
 
-    public String getPlanetaryShieldText() {
+    private String getPlanetaryShieldText() {
         if (getPlanetaryShield() != null && getPlanetaryShield()) {
             return "Planetary Shield\n";
         }
         return "";
     }
 
-    public String getSustainDamageText() {
+    private String getSustainDamageText() {
         if (getSustainDamage() != null && getSustainDamage()) {
             return "Sustain Damage\n";
         }
