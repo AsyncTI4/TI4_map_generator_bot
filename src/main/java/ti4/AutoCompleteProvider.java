@@ -211,6 +211,16 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.UNIT_ID, Constants.UNIT_ID_1, Constants.UNIT_ID_2, Constants.UNIT_ID_3, Constants.UNIT_ID_4, Constants.UNIT_ID_5 -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                java.util.Map<String, UnitModel> units = Mapper.getUnits();
+                List<Command.Choice> options = units.values().stream()
+                        .filter(unit -> (unit.getId() + " " + unit.getName()).toLowerCase().contains(enteredValue))
+                        .limit(25)
+                        .map(unit -> new Command.Choice(unit.getId() + " (" + unit.getName() +")", unit.getId()))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
             case Constants.LEADER, Constants.LEADER_1, Constants.LEADER_2, Constants.LEADER_3, Constants.LEADER_4 -> {
                 List<String> leaderIDs = new ArrayList<>();
                 if (activeMap == null || activeMap.isFoWMode() || Constants.LEADER_ADD.equals(event.getSubcommandName())) {

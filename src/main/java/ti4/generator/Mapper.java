@@ -24,7 +24,7 @@ import java.util.stream.Stream;
 
 public class Mapper {
     private static final Properties tiles = new Properties();
-    private static final Properties units = new Properties();
+    private static final Properties unitImageSuffixes = new Properties();
     private static final Properties colors = new Properties();
     private static final Properties cc_tokens = new Properties();
     private static final Properties attachment_tokens = new Properties();
@@ -54,9 +54,10 @@ public class Mapper {
     private static final HashMap<String, SecretObjectiveModel> secretObjectives = new HashMap<>();
     private static final HashMap<String, PromissoryNoteModel> promissoryNotes = new HashMap<>();
     private static final HashMap<String, TechnologyModel> technologies = new HashMap<>();
+    private static final HashMap<String, UnitModel> units = new HashMap<>();
 
     public static void init() {
-        readData("units.properties", units, "Could not read unit name file");
+        readData("unit_image_suffixes.properties", unitImageSuffixes, "Could not read unit image suffix file");
         readData("color.properties", colors, "Could not read color name file");
         readData("cc_tokens.properties", cc_tokens, "Could not read cc token name file");
         readData("attachments.properties", attachment_tokens, "Could not read attachment token name file");
@@ -83,7 +84,8 @@ public class Mapper {
         readData("agenda_representation.properties", agendaRepresentation, "Could not read agenda representaion file");
         readData("hyperlanes.properties", hyperlaneAdjacencies, "Could not read hyperlanes file");
         readData("DS_handcards.properties", ds_handcards, "Could not read ds_handcards file");
-        importJsonObjects("decks.json", decks, DeckModel.class, "couild not read decks file");
+        importJsonObjects("decks.json", decks, DeckModel.class, "could not read decks file");
+        importJsonObjects("units.json", units, UnitModel.class, "could not read units file");
     }
 
     private static void readData(String propertyFileName, Properties properties, String s) {
@@ -112,7 +114,7 @@ public class Mapper {
                 BotLogger.log(e.getMessage());
             }
         }
-        
+
         allObjects.forEach(obj -> {
             if (obj.isValid()) {
                 objectMap.put(obj.getAlias(), obj);
@@ -228,13 +230,28 @@ public class Mapper {
         return general.getProperty(id);
     }
 
-    public static Map<String, String> getUnits() {
+    public static Map<String, String> getUnitImageSuffixes() {
         Map<String, String> unitMap = new HashMap<>();
-        for (Map.Entry<Object, Object> entry : units.entrySet()) {
+        for (Map.Entry<Object, Object> entry : unitImageSuffixes.entrySet()) {
             String representation = (String) unit_representation.get(entry.getKey());
             unitMap.put((String) entry.getValue(), representation);
         }
         return unitMap;
+    }
+
+    public static Map<String, UnitModel> getUnits() {
+        return units;
+    }
+
+    public static UnitModel getUnit(String unitID) {
+        return units.get(unitID);
+    }
+
+    public static UnitModel getUnitModelByTechUpgrade(String techID) {
+        return units.values().stream()
+                .filter(unitModel -> techID.equals(unitModel.getRequiredTechId()))
+                .findFirst()
+                .orElse(null);
     }
 
     public static Map<String, String> getColorToId() {
@@ -254,11 +271,11 @@ public class Mapper {
 
     public static String getUnitID(String unitID, String color) {
         String property = colors.getProperty(color);
-        return property + units.getProperty(unitID);
+        return property + unitImageSuffixes.getProperty(unitID);
     }
 
     public static List<String> getUnitIDList() {
-        return units.keySet().stream().filter(unit -> unit instanceof String)
+        return unitImageSuffixes.keySet().stream().filter(unit -> unit instanceof String)
                 .map(unit -> (String) unit)
                 .sorted()
                 .collect(Collectors.toList());
@@ -574,6 +591,10 @@ public class Mapper {
 
     public static HashMap<String, TechnologyModel> getTechs() {
         return technologies;
+    }
+
+    public static TechnologyModel getTech(String id) {
+        return technologies.get(id);
     }
 
     public static boolean isValidTech(String id) {

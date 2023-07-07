@@ -14,6 +14,8 @@ import ti4.helpers.Constants;
 import ti4.message.BotLogger;
 import ti4.model.FactionModel;
 import ti4.model.PublicObjectiveModel;
+import ti4.model.TechnologyModel;
+import ti4.model.UnitModel;
 
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -64,6 +66,7 @@ public class Player {
     private HashSet<String> abilities = new HashSet<>();
     private HashSet<String> exhaustedAbilities = new HashSet<>();
     private HashSet<String> promissoryNotesOwned = new HashSet<>();
+    private HashSet<String> unitsOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
     private List<String> exhaustedTechs = new ArrayList<>();
@@ -400,6 +403,38 @@ public class Player {
 
     public List<String> getPromissoryNotesInPlayArea() {
         return promissoryNotesInPlayArea;
+    }
+
+    public HashSet<String> getUnitsOwned() {
+        return unitsOwned;
+    }
+
+    public void setUnitsOwned(HashSet<String> unitsOwned) {
+        this.unitsOwned = unitsOwned;
+    }
+
+    public boolean ownsUnit(String unitID) {
+        return unitsOwned.contains(unitID);
+    }
+
+    public boolean removeOwnedUnitByID(String unitID) {
+        return unitsOwned.remove(unitID);
+    }
+
+    public boolean addOwnedUnitByID(String unitID) {
+        return unitsOwned.add(unitID);
+    }
+
+    public UnitModel getUnitByType(String unitType) {
+        return getUnitsOwned().stream()
+                .map(unitID -> Mapper.getUnit(unitID))
+                .filter(unit -> unitType.equalsIgnoreCase(unit.getBaseType()))
+                .findFirst()
+                .orElse(null);
+    }
+
+    public UnitModel getUnitByID(String unitID) {
+        return Mapper.getUnit(unitID);
     }
 
     public void setActionCard(String id) {
@@ -1111,12 +1146,33 @@ public class Player {
         this.exhaustedTechs = exhaustedTechs;
     }
 
-    public void addTech(String tech) {
-        if (!techs.contains(tech)) {
-            techs.add(tech);
-            if(tech.equalsIgnoreCase("iihq")){
-                addPlanet("custodiavigilia");
-                exhaustPlanet("custodiavigilia");
+    public void addTech(String techID) {
+        if (techs.contains(techID)) {
+            return;
+        }
+        techs.add(techID);
+
+        doAdditionalThingsWhenAddingTech(techID);
+    }
+
+    private void doAdditionalThingsWhenAddingTech(String techID) {
+        // Add Custodia Vigilia when researching IIHQ
+        if(techID.equalsIgnoreCase("iihq")){
+            addPlanet("custodiavigilia");
+            exhaustPlanet("custodiavigilia");
+        }
+
+        // Update Owned Units when Researching a Unit Upgrade
+        TechnologyModel techModel = Mapper.getTech(techID);
+        if (techID == null) return;
+
+        if (Constants.UNIT_UPGRADE.equalsIgnoreCase(techModel.getType())) {
+            UnitModel unitModel = Mapper.getUnitModelByTechUpgrade(techID);
+            if (unitModel != null && unitModel.getUpgradesFromUnitId() != null) {
+                if (getUnitsOwned().contains(unitModel.getUpgradesFromUnitId())) {
+                    removeOwnedUnitByID(unitModel.getUpgradesFromUnitId());
+                    addOwnedUnitByID(unitModel.getId());
+                }
             }
         }
     }
@@ -1136,6 +1192,7 @@ public class Player {
         boolean isRemoved = techs.remove(tech);
         if (isRemoved) removeTech(tech);
         refreshTech(tech);
+        //TODO: Remove unitupgrade -> fix owned units
     }
 
     public void addPlanet(String planet) {

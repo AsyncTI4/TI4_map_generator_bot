@@ -421,6 +421,22 @@ public class MessageHelper {
         }
     }
 
+	public static void sendMessageEmbedsToThread(MessageChannelUnion channel, String threadName, List<MessageEmbed> embeds) {
+		if (channel == null || threadName == null || embeds == null || threadName.isEmpty() || embeds.isEmpty()) return;
+		if (channel instanceof TextChannel) {
+            channel.asTextChannel().createThreadChannel(threadName).setAutoArchiveDuration(AutoArchiveDuration.TIME_1_HOUR)
+				.queueAfter(500, TimeUnit.MILLISECONDS, t -> {
+					for (List<MessageEmbed> messageEmbeds_ : ListUtils.partition(embeds, 10)) { //max 10 embeds per message
+					t.sendMessageEmbeds(messageEmbeds_).queue();
+					}
+				});
+        } else if (channel instanceof ThreadChannel) {
+            for (List<MessageEmbed> messageEmbeds_ : ListUtils.partition(embeds, 10)) { //max 10 embeds per message
+					channel.sendMessageEmbeds(messageEmbeds_).queue();
+				};
+        }
+	}
+
     public static void sendMessageToBotLogWebhook(String message) {
         if (!MapGenerator.guildPrimary.getId().equals("943410040369479690")) return; //Only run in Prod
         DiscordWebhook webhook = new DiscordWebhook("https://discord.com/api/webhooks/1106562763708432444/AK5E_Nx3Jg_JaTvy7ZSY7MRAJBoIyJG8UKZ5SpQKizYsXr57h_VIF3YJlmeNAtuKFe5v");
