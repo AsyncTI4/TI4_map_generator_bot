@@ -23,7 +23,7 @@ public class AverageTurnTime extends StatisticsSubcommandData {
     public AverageTurnTime() {
         super(Constants.AVERAGE_TURN_TIME, "Average turn time accross all games for all players");
         addOptions(new OptionData(OptionType.INTEGER, Constants.TOP_LIMIT, "How many players to show (Default = 50)").setRequired(false));
-        addOptions(new OptionData(OptionType.INTEGER, Constants.MINIMUM_NUMBER_OF_TURNS, "Minimum number of turns").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.MINIMUM_NUMBER_OF_TURNS, "Minimum number of turns to show (Default = 1)").setRequired(false));
     }
 
     @Override
@@ -61,7 +61,7 @@ public class AverageTurnTime extends StatisticsSubcommandData {
         };
 
         int topLimit = event.getOption(Constants.TOP_LIMIT, 50, OptionMapping::getAsInt);
-        int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 20, OptionMapping::getAsInt);
+        int minimumTurnsToShow = event.getOption(Constants.MINIMUM_NUMBER_OF_TURNS, 1, OptionMapping::getAsInt);
         for (Entry<String, Entry<Integer, Long>> userTurnCountTotalTime : playerTurnTimes.entrySet().stream().filter(o -> o.getValue().getValue() != 0 && o.getValue().getKey() > minimumTurnsToShow).sorted(comparator).limit(topLimit).collect(Collectors.toList())) {
             User user = MapGenerator.jda.getUserById(userTurnCountTotalTime.getKey());
             int turnCount = userTurnCountTotalTime.getValue().getKey();

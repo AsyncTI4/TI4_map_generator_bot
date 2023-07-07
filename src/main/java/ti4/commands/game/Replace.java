@@ -73,6 +73,11 @@ public class Replace extends GameSubcommandData {
                 guild.removeRoleFromMember(removedMember, roles.get(0)).queue();
             }
 
+            Member addedMember = guild.getMemberById(addedUser.getId());
+            if (addedUser != null && roles != null && roles.size() == 1) {
+                guild.addRoleToMember(addedMember, roles.get(0)).queue();
+            }
+
             if (players.stream().anyMatch(player -> player.getUserID().equals(removedPlayer.getUserID())) &&
             players.stream().noneMatch(player -> player.getUserID().equals(addedUser.getId()))) {
                 message = Helper.getGamePing(event, activeMap) + " Player: " + removedPlayer.getUserName() + " replaced by player: " + addedUser.getName();

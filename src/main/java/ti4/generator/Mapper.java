@@ -207,6 +207,7 @@ public class Mapper {
 
     public static Set<String> getWormholes(String tileID) {
         return TileHelper.getAllTiles().get(tileID).getWormholes().stream()
+                .filter(wormhole -> wormhole != null)
                 .map(WormholeModel.Wormhole::toString)
                 .collect(Collectors.toSet());
     }
@@ -215,6 +216,7 @@ public class Mapper {
         WormholeModel wormholeModel = new WormholeModel();
         WormholeModel.Wormhole wormhole = wormholeModel.getWormholeFromString(wormholeID);
         return TileHelper.getAllTiles().values().stream()
+                .filter(tileModel -> tileModel.getWormholes() != null)
                 .filter(tileModel -> tileModel.getWormholes().contains(wormhole))
                 .map(TileModel::getId)
                 .collect(Collectors.toSet());

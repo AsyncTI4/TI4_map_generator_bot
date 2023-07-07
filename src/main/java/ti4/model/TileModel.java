@@ -13,9 +13,7 @@ public class TileModel {
     private String name;
     private List<String> aliases;
     private String imagePath;
-
     private List<String> planetIds;
-
     private ShipPositionModel.ShipPosition shipPositionsType;
     private List<Point> spaceTokenLocations;
     private Set<WormholeModel.Wormhole> wormholes;
@@ -23,11 +21,9 @@ public class TileModel {
     public String getNameNullSafe() {
         return Optional.ofNullable(name).orElse("");
     }
-
     public List<String> getPlanets() {
         return planetIds;
     }
-
     public void setPlanets(List<String> planetIds) {
         this.planetIds = planetIds;
     }

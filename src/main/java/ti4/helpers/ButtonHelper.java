@@ -401,11 +401,8 @@ public class ButtonHelper {
         if(player.hasLeader("nomadhero")){
             Leader playerLeader = player.getLeader("nomadhero");
             if(playerLeader.isActive()){
-                String colorID = Mapper.getColorID(player.getColor());
-                String fsKey = colorID + "_fs.png";
-                if(tile.getUnitHolders().get("space").getUnits().containsKey(fsKey)){
-                    return true;
-                }
+                return true;
+                
             }
         }
 
@@ -670,6 +667,18 @@ public class ButtonHelper {
 
     }
 
+    public static int checkNetGain(Player player, String ccs) {
+        int netgain = 0;
+        int oldTactic = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
+        ccs = ccs.substring(ccs.indexOf("/")+1, ccs.length());
+        int oldFleet = Integer.parseInt(ccs.substring(0, ccs.indexOf("/")));
+        ccs = ccs.substring(ccs.indexOf("/")+1, ccs.length());
+        int oldStrat = Integer.parseInt(ccs.substring(0, ccs.length()));
+
+        netgain = (player.getTacticalCC()-oldTactic) + (player.getFleetCC()-oldFleet) + (player.getStrategicCC() - oldStrat);
+        return netgain;
+    }
+
 
     public static List<Button> getButtonsToRemoveYourCC(Player player, Map activeMap, GenericInteractionCreateEvent event, String whatIsItFor) {
         List<Button> buttonsToRemoveCC = new ArrayList<>();
@@ -681,6 +690,9 @@ public class ButtonHelper {
     }
 
     public static void pillageCheck(Player player, Map activeMap) {
+        if(player.getPromissoryNotesInPlayArea().contains("pop")){
+            return;
+        }
         if(Helper.getPlayerFromAbility(activeMap, "pillage") != null && !Helper.getPlayerFromAbility(activeMap, "pillage").getFaction().equalsIgnoreCase(player.getFaction())){
              
             Player pillager = Helper.getPlayerFromAbility(activeMap, "pillage");
@@ -797,6 +809,9 @@ public class ButtonHelper {
         Button rex = Button.success(finChecker+"ringTile_000", centerTile.getRepresentationForButtons(activeMap, player));
         ringButtons.add(rex);
         int rings = activeMap.getRingCount();
+        if(rings == 8){
+            rings = 10;
+        }
         for(int x = 1; x < rings+1; x++)
         {
             Button ringX = Button.success(finChecker+"ring_"+x, "Ring #"+x);
@@ -916,7 +931,7 @@ public class ButtonHelper {
             }
             Planet planetReal =  (Planet) planetUnit;
             String planet = planetReal.getName();    
-            if (planetReal != null && planetReal.getOriginalPlanetType() != null && player.getPlanets().contains(planet) && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous"))) {
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && player.getPlanets().contains(planet) && !planetReal.getUnits().isEmpty() && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous"))) {
                 String drawColor = planetReal.getOriginalPlanetType();
                 Button resolveExplore2 = Button.success("movedNExplored_filler_"+planet+"_"+drawColor, "Explore "+Helper.getPlanetRepresentation(planet, activeMap));
                 buttons.add(resolveExplore2);
@@ -1120,6 +1135,9 @@ public class ButtonHelper {
         for(String unit :displacedUnits.keySet()){
             int amount = displacedUnits.get(unit);
             String[] combo = unit.split("_");
+            if(combo.length < 2){
+                continue;
+            }
             combo[1] = combo[1].toLowerCase().replace(" ", "");
             combo[1] = combo[1].replace("'", "");
             if(combo[0].contains("damaged")){
@@ -1494,6 +1512,9 @@ public class ButtonHelper {
                
                 for(String pnShortHand : p1.getPromissoryNotes().keySet())
                 {
+                    if(p1.getPromissoryNotesInPlayArea().contains(pnShortHand)){
+                        continue;
+                    }
                     PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
                     Button transact = Button.success(finChecker+"send_PNs_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName());
                     stuffToTransButtons.add(transact);

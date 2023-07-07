@@ -1159,6 +1159,7 @@ public class Player {
         // Add Custodia Vigilia when researching IIHQ
         if(techID.equalsIgnoreCase("iihq")){
             addPlanet("custodiavigilia");
+            exhaustPlanet("custodiavigilia");
         }
 
         // Update Owned Units when Researching a Unit Upgrade

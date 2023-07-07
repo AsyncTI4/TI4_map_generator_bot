@@ -1198,7 +1198,7 @@ public class ButtonListener extends ListenerAdapter {
             int[] voteArray = AgendaHelper.getVoteTotal(event, player, activeMap);
 
             int minvote = 1;
-            if (player.getFaction().equalsIgnoreCase("argent")) {
+            if (player.hasAbility("zeal")) {
                 int numPlayers = 0;
                 for (Player player_ : activeMap.getPlayers().values()) {
                     if (player_.isRealPlayer())
@@ -1247,26 +1247,31 @@ public class ButtonListener extends ListenerAdapter {
             if (result.equalsIgnoreCase("manual")) {
                 String resMessage3 = "Please select the winner.";
                 List<Button> deadlyActionRow3 = AgendaHelper.getAgendaButtons(null, activeMap, "agendaResolution");
+                deadlyActionRow3.add(Button.danger("deleteButtons", "Resolve with no result"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), resMessage3, deadlyActionRow3);
             }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("deleteButtons")) {
             buttonID = buttonID.replace("deleteButtons_", "");
-            if (buttonLabel.equalsIgnoreCase("Done Gaining CCs")
-                    || buttonLabel.equalsIgnoreCase("Done Redistributing CCs")) {
+            String editedMessage = event.getMessage().getContentRaw();
+
+            if ((buttonLabel.equalsIgnoreCase("Done Gaining CCs")
+                    || buttonLabel.equalsIgnoreCase("Done Redistributing CCs")) && editedMessage.contains("CCs have gone from") ) {
 
                 String playerRep = Helper.getPlayerRepresentation(player, activeMap);
                 String finalCCs = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
+                String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                shortCCs = shortCCs.replace("CCs have gone from ", "");
+                shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
                 if (event.getMessage().getContentRaw().contains("Net gain")) {
-                    String editedMessage = event.getMessage().getContentRaw();
-                    int netGain = Integer.parseInt(
-                            editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()));
+                    
+                    int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                     finalCCs = finalCCs + ". Net CC gain was " + netGain;
                 }
                 if (!activeMap.isFoWMode()) {
                     if (buttonLabel.equalsIgnoreCase("Done Redistributing CCs")) {
                         MessageHelper.sendMessageToChannel(actionsChannel,
-                                playerRep + " Final CC Allocation Is " + finalCCs);
+                                playerRep + " Initial CCs were "+shortCCs+". Final CC Allocation Is " + finalCCs);
                     } else {
                         if (buttonID.equalsIgnoreCase("leadership")) {
                             String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-leadership";
@@ -1274,7 +1279,7 @@ public class ButtonListener extends ListenerAdapter {
                             for (ThreadChannel threadChannel_ : threadChannels) {
                                 if (threadChannel_.getName().equals(threadName)) {
                                     MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_,
-                                            playerRep + " Final CC Allocation Is " + finalCCs);
+                                            playerRep + " Initial CCs were "+shortCCs+". Final CC Allocation Is " + finalCCs);
                                 }
                             }
 
@@ -1294,7 +1299,7 @@ public class ButtonListener extends ListenerAdapter {
             if ((buttonLabel.equalsIgnoreCase("Done Exhausting Planets")
                     || buttonLabel.equalsIgnoreCase("Done Producing Units"))
                     && !event.getMessage().getContentRaw().contains("Click the names of the planets you wish")) {
-                String editedMessage = event.getMessage().getContentRaw();
+                
                 if (activeMap.isFoWMode()) {
                     MessageHelper.sendMessageToChannel(event.getChannel(), editedMessage);
                 } else {
@@ -1376,7 +1381,7 @@ public class ButtonListener extends ListenerAdapter {
             }
 
             if (buttonID.equalsIgnoreCase("diplomacy")) {
-                String editedMessage = event.getMessage().getContentRaw();
+                
 
                 if (!activeMap.isFoWMode()) {
                     String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-diplomacy";
@@ -2335,6 +2340,37 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
             } else {
+                 LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
+                String agID ="";
+                for (java.util.Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
+                    if (agendas.getValue().equals(aID)) {
+                        agID = agendas.getKey();
+                        break;
+                    }
+                }
+                
+                if(agID.equalsIgnoreCase("mutiny")){
+                    List<Player> winOrLose = null;
+                    StringBuilder message = new StringBuilder("");
+                    Integer poIndex = 5;
+                    if (winner.equalsIgnoreCase("for")) {
+                        winOrLose = AgendaHelper.getWinningVoters(winner, activeMap);
+                        poIndex = activeMap.addCustomPO("Mutiny", 1);
+
+                    }else{
+                        winOrLose = AgendaHelper.getLosingVoters(winner, activeMap);
+                        poIndex = activeMap.addCustomPO("Mutiny", -1);
+                    }
+                    message.append("Custom PO 'Mutiny' has been added.\n");
+                    for(Player playerWL : winOrLose){
+                        activeMap.scorePublicObjective(playerWL.getUserID(), poIndex);
+                        message.append(Helper.getPlayerRepresentation(playerWL, activeMap)).append(" scored 'Mutiny'\n");
+                    }
+                    MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message.toString());
+                        
+                        
+                       
+                }
                 if (activeMap.getCurrentAgendaInfo().contains("Law")) {
                     // Figure out law
                 }
@@ -2938,9 +2974,10 @@ public class ButtonListener extends ListenerAdapter {
                                 "CCs have gone from " + originalCCs + " -> " + Helper.getPlayerCCs(player)
                                         + ". Net gain of: 1");
                     } else {
-                        int netGain = Integer.parseInt(
-                                editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()))
-                                + 1;
+                        String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                        shortCCs = shortCCs.replace("CCs have gone from ", "");
+                        shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
+                        int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                         editedMessage = editedMessage.substring(0, editedMessage.indexOf("->") + 3)
                                 + Helper.getPlayerCCs(player) + ". Net gain of: " + netGain;
                     }
@@ -2956,9 +2993,11 @@ public class ButtonListener extends ListenerAdapter {
                                 "CCs have gone from " + originalCCs + " -> " + Helper.getPlayerCCs(player)
                                         + ". Net gain of: 1");
                     } else {
-                        int netGain = Integer.parseInt(
-                                editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()))
-                                + 1;
+                        
+                        String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                        shortCCs = shortCCs.replace("CCs have gone from ", "");
+                        shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
+                        int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                         editedMessage = editedMessage.substring(0, editedMessage.indexOf("->") + 3)
                                 + Helper.getPlayerCCs(player) + ". Net gain of: " + netGain;
                     }
@@ -2974,9 +3013,10 @@ public class ButtonListener extends ListenerAdapter {
                                 "CCs have gone from " + originalCCs + " -> " + Helper.getPlayerCCs(player)
                                         + ". Net gain of: 1");
                     } else {
-                        int netGain = Integer.parseInt(
-                                editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()))
-                                + 1;
+                        String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                        shortCCs = shortCCs.replace("CCs have gone from ", "");
+                        shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
+                        int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                         editedMessage = editedMessage.substring(0, editedMessage.indexOf("->") + 3)
                                 + Helper.getPlayerCCs(player) + ". Net gain of: " + netGain;
                     }
@@ -2992,9 +3032,10 @@ public class ButtonListener extends ListenerAdapter {
                                 "CCs have gone from " + originalCCs + " -> " + Helper.getPlayerCCs(player)
                                         + ". Net gain of: -1");
                     } else {
-                        int netGain = Integer.parseInt(
-                                editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()))
-                                - 1;
+                        String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                        shortCCs = shortCCs.replace("CCs have gone from ", "");
+                        shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
+                        int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                         editedMessage = editedMessage.substring(0, editedMessage.indexOf("->") + 3)
                                 + Helper.getPlayerCCs(player) + ". Net gain of: " + netGain;
                     }
@@ -3010,9 +3051,10 @@ public class ButtonListener extends ListenerAdapter {
                                 "CCs have gone from " + originalCCs + " -> " + Helper.getPlayerCCs(player)
                                         + ". Net gain of: -1");
                     } else {
-                        int netGain = Integer.parseInt(
-                                editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()))
-                                - 1;
+                        String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                        shortCCs = shortCCs.replace("CCs have gone from ", "");
+                        shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
+                        int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                         editedMessage = editedMessage.substring(0, editedMessage.indexOf("->") + 3)
                                 + Helper.getPlayerCCs(player) + ". Net gain of: " + netGain;
                     }
@@ -3028,9 +3070,10 @@ public class ButtonListener extends ListenerAdapter {
                                 "CCs have gone from " + originalCCs + " -> " + Helper.getPlayerCCs(player)
                                         + ". Net gain of: -1");
                     } else {
-                        int netGain = Integer.parseInt(
-                                editedMessage.substring(editedMessage.lastIndexOf(":") + 2, editedMessage.length()))
-                                - 1;
+                        String shortCCs = editedMessage.substring(editedMessage.indexOf("CCs have gone from "), editedMessage.length());
+                        shortCCs = shortCCs.replace("CCs have gone from ", "");
+                        shortCCs = shortCCs.substring(0,shortCCs.indexOf(" "));
+                        int netGain = ButtonHelper.checkNetGain(player, shortCCs);
                         editedMessage = editedMessage.substring(0, editedMessage.indexOf("->") + 3)
                                 + Helper.getPlayerCCs(player) + ". Net gain of: " + netGain;
                     }

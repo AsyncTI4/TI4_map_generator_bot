@@ -9,6 +9,7 @@ import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 
 import ti4.buttons.ButtonListener;
+import ti4.commands.agenda.ListVoteCount;
 import ti4.generator.Mapper;
 import ti4.map.Leader;
 import ti4.map.Map;
@@ -428,6 +429,52 @@ public class AgendaHelper {
         }
         return losers;
     }
+    public static List<Player> getWinningVoters(String winner, Map activeMap) {
+        List<Player> losers = new ArrayList<Player>();
+        HashMap<String, String> outcomes = activeMap.getCurrentAgendaVotes();
+
+        for (String outcome : outcomes.keySet()) {
+            if (outcome.equalsIgnoreCase(winner)) {
+                StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
+
+                while (vote_info.hasMoreTokens()) {
+                    String specificVote = vote_info.nextToken();
+                    String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                    Player loser = Helper.getPlayerFromColorOrFaction(activeMap, faction.toLowerCase());
+                    if (loser != null && !specificVote.contains("Rider")&& !specificVote.contains("Sanction")) {
+                        if (!losers.contains(loser)) {
+                            losers.add(loser);
+                        }
+
+                    }
+                }
+            }
+        }
+        return losers;
+    }
+    public static List<Player> getLosingVoters(String winner, Map activeMap) {
+        List<Player> losers = new ArrayList<Player>();
+        HashMap<String, String> outcomes = activeMap.getCurrentAgendaVotes();
+
+        for (String outcome : outcomes.keySet()) {
+            if (!outcome.equalsIgnoreCase(winner)) {
+                StringTokenizer vote_info = new StringTokenizer(outcomes.get(outcome), ";");
+
+                while (vote_info.hasMoreTokens()) {
+                    String specificVote = vote_info.nextToken();
+                    String faction = specificVote.substring(0, specificVote.indexOf("_"));
+                    Player loser = Helper.getPlayerFromColorOrFaction(activeMap, faction.toLowerCase());
+                    if (loser != null) {
+                        if (!losers.contains(loser) && !specificVote.contains("Rider")&& !specificVote.contains("Sanction")) {
+                            losers.add(loser);
+                        }
+
+                    }
+                }
+            }
+        }
+        return losers;
+    }
 
     public static int[] getVoteTotal(GenericInteractionCreateEvent event, Player player, Map activeMap) {
 
@@ -443,85 +490,26 @@ public class AgendaHelper {
         influenceCount += influenceCountFromPlanets;
 
 
-        if (player.hasAbility("imperia")) {
-            Player xxcha = Helper.getPlayerFromColorOrFaction(activeMap, "xxcha");
-            if (xxcha != null) {
-                if (player.getMahactCC().contains(xxcha.getColor())) {
-                    Leader leader = xxcha.getLeader(Constants.COMMANDER);
-                    if (leader != null && !leader.isLocked()) {
-                        influenceCount += planets.size();
-                        hasXxchaAlliance = 1;
-                    }
-                }
-            }
-
+        if (activeMap.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
+            influenceCount += planets.size();
+            hasXxchaAlliance = 1;
         }
 
-
-
-        if ("xxcha".equals(player.getFaction())) {
-            Leader leader = player.getLeader(Constants.COMMANDER);
-            if (leader != null && !leader.isLocked()) {
-                influenceCount += planets.size();
-                hasXxchaAlliance = 1;
-            }
-            leader = player.getLeader(Constants.HERO);
-            if (leader != null && !leader.isLocked()) {
+        if (player.hasLeaderUnlocked("xxchahero")) {
+           
                 int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
                         .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
                 influenceCount += influenceCountFromPlanetsRes;
                 hasXxchaHero = 1;
-            }
-        } else if (!player.getPromissoryNotesInPlayArea().isEmpty()) {
-            for (String pn : player.getPromissoryNotesInPlayArea()) {
-                String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(pn);
-                for (Player player_ : activeMap.getPlayers().values()) {
-                    if (player_ != player) {
-                        String playerColor = player_.getColor();
-                        String playerFaction = player_.getFaction();
-                        boolean isCorrectPlayer = playerColor != null && playerColor.equals(promissoryNoteOwner) ||
-                                playerFaction.equals(promissoryNoteOwner);
-                        if ("xxcha".equals(playerFaction) && pn.endsWith("_an")) {
-                            if (isCorrectPlayer) {
-                                Leader leader = player_.getLeader(Constants.COMMANDER);
-                                if (leader != null && !leader.isLocked()) {
-                                    influenceCount += planets.size();
-                                    hasXxchaAlliance = 1;
-                                    break;
-                                }
-                            }
-                        }
-                        if ("empyrean".equals(playerFaction) && "blood_pact".equals(pn)) {
-                            if (isCorrectPlayer && influenceCount > 0) {
-                                influenceCount += 4;
-                            }
-                        }
-                    }
-                }
-            }
-        }
+            
+        } 
+        influenceCount = ListVoteCount.getTotalVoteCount(activeMap, player);
 
 
-        if ("argent".equals(player.getFaction())) {
-            int numPlayers = 0;
-            for (Player player_ : activeMap.getPlayers().values()) {
-                if (player_.isRealPlayer()) numPlayers++;
-            }
-            if (influenceCount > 0) {
-                influenceCount += numPlayers;
-            }
 
-        }
-        //Predictive Intelligence
-        if (player.hasTechReady("pi")) {
-            if (influenceCount > 0) {
-                influenceCount += 3;
-            }
-        }
         if (activeMap.getLaws() != null && (activeMap.getLaws().keySet().contains("rep_govt") || activeMap.getLaws().keySet().contains("absol_government"))) {
             influenceCount = 1;
         }
-
 
         if (player.getFaction().equals("nekro") && hasXxchaAlliance == 0) {
             influenceCount = 0;
@@ -627,7 +615,7 @@ public class AgendaHelper {
                 planetButtons.add(button);
             }
         }
-        if (player.getFaction().equalsIgnoreCase("argent")) {
+        if (player.hasAbility("zeal")) {
             int numPlayers = 0;
             for (Player player_ : activeMap.getPlayers().values()) {
                 if (player_.isRealPlayer()) numPlayers++;

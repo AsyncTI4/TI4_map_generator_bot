@@ -101,6 +101,7 @@ public class BothelperCommand implements Command {
         subcommands.add(new BeginVideoGeneration());
         subcommands.add(new CreatePlanet());
         subcommands.add(new CreateTile());
+        subcommands.add(new ReExportAllTiles());
         return subcommands;
     }
 

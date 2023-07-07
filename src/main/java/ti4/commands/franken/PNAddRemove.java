@@ -42,6 +42,7 @@ public abstract class PNAddRemove extends FrankenSubcommandData {
         }
 
         doAction(player, pnIDs);
+        activeMap.checkPromissoryNotes();
         PNInfo.checkAndAddPNs(getActiveMap(), player);
         PNInfo.sendPromissoryNoteInfo(activeMap, player, false, event);
     }
