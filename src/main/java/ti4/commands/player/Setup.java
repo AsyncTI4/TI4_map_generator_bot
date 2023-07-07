@@ -210,6 +210,10 @@ public class Setup extends PlayerSubcommandData {
         HashSet<String> playerPNs = new HashSet<>(player.getPromissoryNotes().keySet());
         player.setPromissoryNotesOwned(playerPNs);
 
+        //STARTING OWNED UNITS
+        HashSet<String> playerOwnedUnits = new HashSet<>(setupInfo.getUnits());
+        player.setUnitsOwned(playerOwnedUnits);
+
         //SEND STUFF
         AbilityInfo.sendAbilityInfo(activeMap, player, event);
         TechInfo.sendTechInfo(activeMap, player, event);

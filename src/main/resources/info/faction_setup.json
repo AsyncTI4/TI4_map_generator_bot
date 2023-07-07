@@ -1,5 +1,19 @@
 [
   {
+    "alias": "blank_franken_1",
+    "factionName": "Franken 1",
+    "homeSystem": "",
+    "startingFleet": "",
+    "commodities": 0,
+    "factionTech": [],
+    "startingTech": [],
+    "homePlanets": [],
+    "abilities": [],
+    "leaders": [],
+    "promissoryNotes": [],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
+  },
+  {
     "alias": "arborec",
     "factionName": "The Arborec",
     "homeSystem": "05",
@@ -10,7 +24,8 @@
     "homePlanets": ["Nestphar"],
     "abilities": ["mitosis"],
     "leaders": ["arborecagent", "arboreccommander", "arborechero"],
-    "promissoryNotes": ["stymie"]
+    "promissoryNotes": ["stymie"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "arborec_flagship", "arborec_infantry", "arborec_mech", "pds", "spacedock"]
   },
   {
     "alias": "argent",
@@ -23,7 +38,8 @@
     "homePlanets": ["Valk", "Ylir", "Avar"],
     "abilities": ["zeal", "raid_formation"],
     "leaders": ["argentagent", "argentcommander", "argenthero"],
-    "promissoryNotes": ["ambuscade"]
+    "promissoryNotes": ["ambuscade"],
+    "units": ["fighter", "argent_destroyer", "cruiser", "carrier", "dreadnought", "argent_flagship", "infantry", "argent_mech", "pds", "spacedock"]
   },
   {
     "alias": "cabal",
@@ -36,7 +52,8 @@
     "homePlanets": ["Acheron"],
     "abilities": ["devour", "amalgamation", "riftmeld"],
     "leaders": ["cabalagent", "cabalcommander", "cabalhero"],
-    "promissoryNotes": ["crucible"]
+    "promissoryNotes": ["crucible"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "cabal_flagship", "infantry", "cabal_mech", "pds", "cabal_spacedock"]
   },
   {
     "alias": "ghost",
@@ -49,7 +66,8 @@
     "homePlanets": ["Creuss"],
     "abilities": ["quantum_entanglement", "slipstream", "creuss_gate"],
     "leaders": ["ghostagent", "ghostcommander", "ghosthero"],
-    "promissoryNotes": ["iff"]
+    "promissoryNotes": ["iff"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "ghost_flagship", "infantry", "ghost_mech", "pds", "spacedock"]
   },
   {
     "alias": "empyrean",
@@ -62,7 +80,8 @@
     "homePlanets": ["TheDark"],
     "abilities": ["voidborn", "aetherpassage", "dark_whispers"],
     "leaders": ["empyreanagent", "empyreancommander", "empyreanhero"],
-    "promissoryNotes": ["dark_pact"]
+    "promissoryNotes": ["dark_pact"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "empyrean_flagship", "infantry", "empyrean_mech", "pds", "spacedock"]
   },
   {
     "alias": "hacan",
@@ -75,7 +94,8 @@
     "homePlanets": ["Arretze", "Hercant", "Kamdorn"],
     "abilities": ["master_of_trade", "guild_ships", "arbiters"],
     "leaders": ["hacanagent", "hacancommander", "hacanhero"],
-    "promissoryNotes": ["convoys"]
+    "promissoryNotes": ["convoys"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "hacan_flagship", "infantry", "hacan_mech", "pds", "spacedock"]
   },
   {
     "alias": "jolnar",
@@ -88,7 +108,8 @@
     "homePlanets": ["Jol", "Nar"],
     "abilities": ["fragile", "brilliant", "analytical"],
     "leaders": ["jolnaragent", "jolnarcommander", "jolnarhero"],
-    "promissoryNotes": ["ra"]
+    "promissoryNotes": ["ra"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "jolnar_flagship", "infantry", "jolnar_mech", "pds", "spacedock"]
   },
   {
     "alias": "l1z1x",
@@ -101,7 +122,8 @@
     "homePlanets": ["[0.0.0]"],
     "abilities": ["assimilate", "harrow"],
     "leaders": ["l1z1xagent", "l1z1xcommander", "l1z1xhero"],
-    "promissoryNotes": ["ce"]
+    "promissoryNotes": ["ce"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "l1z1x_dreadnought", "l1z1x_flagship", "infantry", "l1z1x_mech", "pds", "spacedock"]
   },
   {
     "alias": "letnev",
@@ -114,7 +136,8 @@
     "homePlanets": ["ArcPrime", "WrenTerra"],
     "abilities": ["munitions", "armada"],
     "leaders": ["letnevagent", "letnevcommander", "letnevhero"],
-    "promissoryNotes": ["war_funding"]
+    "promissoryNotes": ["war_funding"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "letnev_flagship", "infantry", "letnev_mech", "pds", "spacedock"]
   },
   {
     "alias": "mahact",
@@ -127,7 +150,8 @@
     "homePlanets": ["Ixth"],
     "abilities": ["edict", "imperia", "hubris"],
     "leaders": ["mahactagent", "mahactcommander", "mahacthero"],
-    "promissoryNotes": ["scepter"]
+    "promissoryNotes": ["scepter"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "mahact_flagship", "mahact_infantry", "mahact_mech", "pds", "spacedock"]
   },
   {
     "alias": "mentak",
@@ -140,7 +164,8 @@
     "homePlanets": ["MollPrimus"],
     "abilities": ["ambush", "pillage"],
     "leaders": ["mentakagent", "mentakcommander", "mentakhero"],
-    "promissoryNotes": ["pop"]
+    "promissoryNotes": ["pop"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "mentak_flagship", "infantry", "mentak_mech", "pds", "spacedock"]
   },
   {
     "alias": "muaat",
@@ -153,7 +178,8 @@
     "homePlanets": ["Muaat"],
     "abilities": ["star_forge", "gashlai_physiology"],
     "leaders": ["muaatagent", "muaatcommander", "muaathero"],
-    "promissoryNotes": ["fires"]
+    "promissoryNotes": ["fires"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "muaat_flagship", "muaat_warsun", "muaat_infantry", "mech", "pds", "spacedock"]
   },
   {
     "alias": "naalu",
@@ -166,7 +192,8 @@
     "homePlanets": ["Maaluk", "Druaa"],
     "abilities": ["telepathic", "foresight"],
     "leaders": ["naaluagent", "naalucommander", "naaluhero"],
-    "promissoryNotes": ["gift"]
+    "promissoryNotes": ["gift"],
+    "units": ["naalu_fighter", "destroyer", "cruiser", "carrier", "dreadnought", "naalu_flagship", "infantry", "naalu_mech", "pds", "spacedock"]
   },
   {
     "alias": "nekro",
@@ -179,7 +206,8 @@
     "homePlanets": ["MordaiII"],
     "abilities": ["galactic_threat", "technological_singularity", "propagation"],
     "leaders": ["nekroagent", "nekrocommander", "nekrohero"],
-    "promissoryNotes": ["antivirus"]
+    "promissoryNotes": ["antivirus"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "nekro_flagship", "infantry", "nekro_mech", "pds", "spacedock"]
   },
   {
     "alias": "nomad",
@@ -192,7 +220,8 @@
     "homePlanets": ["Arcturus"],
     "abilities": ["the_company", "future_sight"],
     "leaders": ["nomadagentmercer", "nomadagentthundarian", "nomadagentartuno", "nomadcommander", "nomadhero"],
-    "promissoryNotes": ["cavalry"]
+    "promissoryNotes": ["cavalry"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "nomad_flagship", "infantry", "nomad_mech", "pds", "spacedock"]
   },
   {
     "alias": "naaz",
@@ -205,7 +234,8 @@
     "homePlanets": ["Naazir", "Rokha"],
     "abilities": ["distant_suns", "fabrication"],
     "leaders": ["naazagent", "naazcommander", "naazhero"],
-    "promissoryNotes": ["bmf"]
+    "promissoryNotes": ["bmf"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "naaz_flagship", "infantry", "naaz_mech", "naaz_mech_space", "pds", "spacedock"]
   },
   {
     "alias": "saar",
@@ -218,7 +248,8 @@
     "homePlanets": ["Ragh", "LisisII"],
     "abilities": ["scavenge", "nomadic"],
     "leaders": ["saaragent", "saarcommander", "saarhero"],
-    "promissoryNotes": ["ragh"]
+    "promissoryNotes": ["ragh"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "saar_flagship", "infantry", "saar_mech", "pds", "saar_spacedock"]
   },
   {
     "alias": "sardakk",
@@ -231,7 +262,8 @@
     "homePlanets": ["Quinarra", "Trenlak"],
     "abilities": ["unrelenting"],
     "leaders": ["sardakkagent", "sardakkcommander", "sardakkhero"],
-    "promissoryNotes": ["tekklar"]
+    "promissoryNotes": ["tekklar"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "sardakk_dreadnought", "sardakk_flagship", "infantry", "sardakk_mech", "pds", "spacedock"]
   },
   {
     "alias": "sol",
@@ -244,7 +276,8 @@
     "homePlanets": ["Jord"],
     "abilities": ["orbital_drop", "versatile"],
     "leaders": ["solagent", "solcommander", "solhero"],
-    "promissoryNotes": ["ms"]
+    "promissoryNotes": ["ms"],
+    "units": ["fighter", "destroyer", "cruiser", "sol_carrier", "dreadnought", "sol_flagship", "sol_infantry", "sol_mech", "pds", "spacedock"]
   },
   {
     "alias": "titans",
@@ -257,7 +290,8 @@
     "homePlanets": ["Elysium"],
     "abilities": ["terragenesis", "awaken", "coalescence"],
     "leaders": ["titansagent", "titanscommander", "titanshero"],
-    "promissoryNotes": ["terraform"]
+    "promissoryNotes": ["terraform"],
+    "units": ["fighter", "destroyer", "titans_cruiser", "carrier", "dreadnought", "titans_flagship", "infantry", "titans_mech", "titans_pds", "spacedock"]
   },
   {
     "alias": "winnu",
@@ -270,7 +304,8 @@
     "homePlanets": ["Winnu"],
     "abilities": ["blood_ties", "reclamation"],
     "leaders": ["winnuagent", "winnucommander", "winnuhero"],
-    "promissoryNotes": ["acq"]
+    "promissoryNotes": ["acq"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "winnu_flagship", "infantry", "winnu_mech", "pds", "spacedock"]
   },
   {
     "alias": "xxcha",
@@ -283,7 +318,8 @@
     "homePlanets": ["ArchonRen", "ArchonTau"],
     "abilities": ["peace_accords", "quash"],
     "leaders": ["xxchaagent", "xxchacommander", "xxchahero"],
-    "promissoryNotes": ["favor"]
+    "promissoryNotes": ["favor"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "xxcha_flagship", "infantry", "xxcha_mech", "pds", "spacedock"]
   },
   {
     "alias": "yin",
@@ -296,7 +332,8 @@
     "homePlanets": ["Darien"],
     "abilities": ["indoctrination", "devotion"],
     "leaders": ["yinagent", "yincommander", "yinhero"],
-    "promissoryNotes": ["greyfire"]
+    "promissoryNotes": ["greyfire"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "yin_flagship", "infantry", "yin_mech", "pds", "spacedock"]
   },
   {
     "alias": "yssaril",
@@ -309,7 +346,8 @@
     "homePlanets": ["Retillion", "Shalloq"],
     "abilities": ["stall_tactics", "scheming", "crafty"],
     "leaders": ["yssarilagent", "yssarilcommander", "yssarilhero"],
-    "promissoryNotes": ["spynet"]
+    "promissoryNotes": ["spynet"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "yssaril_flagship", "infantry", "yssaril_mech", "pds", "spacedock"]
   },
   {
     "alias": "keleresm",
@@ -322,7 +360,8 @@
     "homePlanets": ["MollPrimusk"],
     "abilities": ["the_tribuni", "council_patronage", "laws_order"],
     "leaders": ["keleresagent", "kelerescommander", "keleresheroharka"],
-    "promissoryNotes": ["riderm"]
+    "promissoryNotes": ["riderm"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleresm_flagship", "infantry", "keleresm_mech", "pds", "spacedock"]
   },
   {
     "alias": "keleresx",
@@ -335,7 +374,8 @@
     "homePlanets": ["ArchonRenk", "ArchonTauk"],
     "abilities": ["the_tribuni", "council_patronage", "laws_order"],
     "leaders": ["keleresagent", "kelerescommander", "keleresheroodlynn"],
-    "promissoryNotes": ["riderx"]
+    "promissoryNotes": ["riderx"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleresx_flagship", "infantry", "keleresx_mech", "pds", "spacedock"]
   },
   {
     "alias": "keleresa",
@@ -348,7 +388,8 @@
     "homePlanets": ["Valkk", "Ylirk", "Avark"],
     "abilities": ["the_tribuni", "council_patronage", "laws_order"],
     "leaders": ["keleresagent", "kelerescommander", "keleresherokuuasi"],
-    "promissoryNotes": ["ridera"]
+    "promissoryNotes": ["ridera"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleresa_flagship", "infantry", "keleresa_mech", "pds", "spacedock"]
   },
   {
     "alias": "admins",
@@ -361,7 +402,8 @@
     "homePlanets": ["Somna", "Tera", "Hospoona"],
     "abilities": [],
     "leaders": ["adminsagent", "adminscommander", "adminshero"],
-    "promissoryNotes": ["adminspn"]
+    "promissoryNotes": ["adminspn"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "admins_flagship", "infantry", "admins_mech", "pds", "admins_spacedock"]
   },
   {
     "alias": "augers",
@@ -374,7 +416,8 @@
     "homePlanets": ["chrion", "demis"],
     "abilities": ["oracle_ai", "limited_vision", "probability_algorithms"],
     "leaders": ["augersagent", "augerscommander", "augershero"],
-    "promissoryNotes": ["dspnauge"]
+    "promissoryNotes": ["dspnauge"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "augers_flagship", "infantry", "augers_mech", "pds", "spacedock"]
   },
   {
     "alias": "axis",
@@ -387,7 +430,8 @@
     "homePlanets": ["axis"],
     "abilities": ["military_industrial_complex", "arms_dealers"],
     "leaders": ["axisagent", "axiscommander", "axishero"],
-    "promissoryNotes": ["dspnaxis"]
+    "promissoryNotes": ["dspnaxis"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "axis_flagship", "infantry", "axis_mech", "pds", "spacedock"]
   },
   {
     "alias": "bentor",
@@ -400,7 +444,8 @@
     "homePlanets": ["benc", "hau"],
     "abilities": ["secret_maps", "ancient_blueprints", "fortune_seekers"],
     "leaders": ["bentoragent", "bentorcommander", "bentorhero"],
-    "promissoryNotes": ["dspnbent"]
+    "promissoryNotes": ["dspnbent"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "bentor_flagship", "infantry", "bentor_mech", "pds", "spacedock"]
   },
   {
     "alias": "blex",
@@ -413,7 +458,8 @@
     "homePlanets": ["avicenna"],
     "abilities": ["blight", "contagion_blex", "plague_reservoir_blex"],
     "leaders": ["blexagent", "blexcommander", "blexhero"],
-    "promissoryNotes": ["dspnblex"]
+    "promissoryNotes": ["dspnblex"],
+    "units": ["blex_fighter", "destroyer", "cruiser", "carrier", "dreadnought", "blex_flagship", "infantry", "blex_mech", "pds", "spacedock"]
   },
   {
     "alias": "celdauri",
@@ -426,7 +472,8 @@
     "homePlanets": ["louk", "auldane"],
     "abilities": ["projection_of_power", "industrialists"],
     "leaders": ["celdauriagent", "celdauricommander", "celdaurihero"],
-    "promissoryNotes": ["dspnceld"]
+    "promissoryNotes": ["dspnceld"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "celdauri_flagship", "infantry", "celdauri_mech", "pds", "celdauri_spacedock"]
   },
   {
     "alias": "cheiran",
@@ -439,7 +486,8 @@
     "homePlanets": ["arche", "gghurntheta"],
     "abilities": ["teeming", "moult", "byssus"],
     "leaders": ["cheiranagent", "cheirancommander", "cheiranhero"],
-    "promissoryNotes": ["dspnchei"]
+    "promissoryNotes": ["dspnchei"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "cheiran_dreadnought", "cheiran_flagship", "infantry", "cheiran_mech", "pds", "spacedock"]
   },
   {
     "alias": "cymiae",
@@ -452,7 +500,8 @@
     "homePlanets": ["cymiae"],
     "abilities": ["autonetic_memory", "cybernetic_madness"],
     "leaders": ["cymiaeagent", "cymiaecommander", "cymiaehero"],
-    "promissoryNotes": ["dspncymi"]
+    "promissoryNotes": ["dspncymi"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "cymiae_flagship", "cymiae_infantry", "cymiae_mech", "pds", "spacedock"]
   },
   {
     "alias": "dihmohn",
@@ -465,7 +514,8 @@
     "homePlanets": ["abyssus"],
     "abilities": ["capital_fleet", "migrant_fleet", "flotilla"],
     "leaders": ["dihmohnagent", "dihmohncommander", "dihmohnhero"],
-    "promissoryNotes": ["dspndihm"]
+    "promissoryNotes": ["dspndihm"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dihmohn_dreadnought", "dihmohn_flagship", "infantry", "dihmohn_mech", "pds", "spacedock"]
   },
   {
     "alias": "edyn",
@@ -478,7 +528,8 @@
     "homePlanets": ["edyn", "ekko", "okke"],
     "abilities": ["grace", "decree", "radiance"],
     "leaders": ["edynagent", "edyncommander", "edynhero"],
-    "promissoryNotes": ["dspnedyn"]
+    "promissoryNotes": ["dspnedyn"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "edyn_flagship", "infantry", "edyn_mech", "pds", "spacedock"]
   },
   {
     "alias": "florzen",
@@ -491,7 +542,8 @@
     "homePlanets": ["delmor", "kyd"],
     "abilities": ["mercenaries", "data_leak", "black_markets"],
     "leaders": ["florzenagent", "florzencommander", "florzenhero"],
-    "promissoryNotes": ["dspnflor"]
+    "promissoryNotes": ["dspnflor"],
+    "units": ["florzen_fighter", "destroyer", "cruiser", "carrier", "dreadnought", "florzen_flagship", "infantry", "florzen_mech", "pds", "spacedock"]
   },
   {
     "alias": "freesystems",
@@ -504,7 +556,8 @@
     "homePlanets": ["idyn", "kroll", "cyrra"],
     "abilities": ["rally_to_the_cause", "diplomats", "free_people"],
     "leaders": ["freesystemsagent", "freesystemscommander", "freesystemshero"],
-    "promissoryNotes": ["dspnfree"]
+    "promissoryNotes": ["dspnfree"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "freesystems_flagship", "infantry", "freesystems_mech", "pds", "spacedock"]
   },
   {
     "alias": "ghemina",
@@ -517,7 +570,8 @@
     "homePlanets": ["drah", "trykk"],
     "abilities": ["the_lady_and_the_lord", "rule_of_two"],
     "leaders": ["gheminaagent", "gheminacommander", "gheminaherolord", "gheminaherolady"],
-    "promissoryNotes": ["dspnghem"]
+    "promissoryNotes": ["dspnghem"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "ghemina_flagship_lord", "ghemina_flagship_lady", "infantry", "ghemina_mech", "pds", "spacedock"]
   },
   {
     "alias": "ghoti",
@@ -530,7 +584,8 @@
     "homePlanets": ["ghoti"],
     "abilities": ["mobile_command", "spawning_grounds"],
     "leaders": ["ghotiagent", "ghoticommander", "ghotihero"],
-    "promissoryNotes": ["dspnghot"]
+    "promissoryNotes": ["dspnghot"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "ghoti_flagship", "infantry", "ghoti_mech", "pds", "spacedock"]
   },
   {
     "alias": "gledge",
@@ -543,7 +598,8 @@
     "homePlanets": ["laststop"],
     "abilities": ["mantle_cracking", "celestial_reclamation", "deep_mining"],
     "leaders": ["gledgeagent", "gledgecommander", "gledgehero"],
-    "promissoryNotes": ["dspngled"]
+    "promissoryNotes": ["dspngled"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "gledge_flagship", "infantry", "gledge_mech", "gledge_pds", "spacedock"]
   },
   {
     "alias": "khrask",
@@ -556,7 +612,8 @@
     "homePlanets": ["bohlduhr"],
     "abilities": ["lithoids", "garden_worlds", "meteor_slings"],
     "leaders": ["khraskagent", "khraskcommander", "khraskhero"],
-    "promissoryNotes": ["dspnkhra"]
+    "promissoryNotes": ["dspnkhra"],
+    "units": ["fighter", "destroyer", "khrask_cruiser", "carrier", "dreadnought", "khrask_flagship", "infantry", "khrask_mech", "pds", "spacedock"]
   },
   {
     "alias": "kjalengard",
@@ -569,7 +626,8 @@
     "homePlanets": ["kjalengard", "hulgade"],
     "abilities": ["heroic_tales", "for_glory", "military_engineers"],
     "leaders": ["kjalengardagent", "kjalengardcommander", "kjalengardhero"],
-    "promissoryNotes": ["dspnkjal"]
+    "promissoryNotes": ["dspnkjal"],
+    "units": ["fighter", "destroyer", "cruiser", "kjalengard_carrier", "dreadnought", "kjalengard_flagship", "infantry", "kjalengard_mech", "pds", "spacedock"]
   },
   {
     "alias": "kollecc",
@@ -582,7 +640,8 @@
     "homePlanets": ["susuros"],
     "abilities": ["cloaked_fleets", "shroud_of_lith", "treasure_hunters"],
     "leaders": ["kolleccagent", "kollecccommander", "kollecchero"],
-    "promissoryNotes": ["dspnkoll"]
+    "promissoryNotes": ["dspnkoll"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "kollecc_flagship", "infantry", "kollecc_mech", "pds", "spacedock"]
   },
   {
     "alias": "kolume",
@@ -595,7 +654,8 @@
     "homePlanets": ["alesna", "azle"],
     "abilities": ["starfall_gunnery", "deliberate_action", "meditation"],
     "leaders": ["kolumeagent", "kolumecommander", "kolumehero"],
-    "promissoryNotes": ["dspnkolu"]
+    "promissoryNotes": ["dspnkolu"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "kolume_flagship", "infantry", "kolume_mech", "pds", "spacedock"]
   },
   {
     "alias": "kortali",
@@ -608,7 +668,8 @@
     "homePlanets": ["ogdun", "brthkul"],
     "abilities": ["fervor", "ruthless"],
     "leaders": ["kortaliagent", "kortalicommander", "kortalihero"],
-    "promissoryNotes": ["dspnkort"]
+    "promissoryNotes": ["dspnkort"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "kortali_flagship", "infantry", "kortali_mech", "pds", "spacedock"]
   },
   {
     "alias": "kyro",
@@ -621,7 +682,8 @@
     "homePlanets": ["avicenna"],
     "abilities": ["contagion", "plague_reservoir"],
     "leaders": ["kyroagent", "kyrocommander", "kyrohero"],
-    "promissoryNotes": ["dspnkyro"]
+    "promissoryNotes": ["dspnkyro"],
+    "units": ["kyro_fighter", "destroyer", "cruiser", "carrier", "dreadnought", "kyro_flagship", "infantry", "kyro_mech", "pds", "spacedock"]
   },
   {
     "alias": "lanefir",
@@ -634,7 +696,8 @@
     "homePlanets": ["aysisrest", "solitude"],
     "abilities": ["a_new_edifice", "iconoclasm", "war_stories"],
     "leaders": ["lanefiragent", "lanefircommander", "lanefirhero"],
-    "promissoryNotes": ["dspnlane"]
+    "promissoryNotes": ["dspnlane"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "lanefir_flagship", "infantry", "lanefir_mech", "pds", "spacedock"]
   },
   {
     "alias": "lizho",
@@ -647,7 +710,8 @@
     "homePlanets": ["pax", "vess", "kyr"],
     "abilities": ["cunning", "subterfuge"],
     "leaders": ["lizhoagent", "lizhocommander", "lizhohero"],
-    "promissoryNotes": ["dspnlizh"]
+    "promissoryNotes": ["dspnlizh"],
+    "units": ["lizho_fighter", "destroyer", "cruiser", "carrier", "dreadnought", "lizho_flagship", "infantry", "lizho_mech", "pds", "spacedock"]
   },
   {
     "alias": "mirveda",
@@ -660,7 +724,8 @@
     "homePlanets": ["aldra", "beata"],
     "abilities": ["privileged_citizenry", "combat_drones"],
     "leaders": ["mirvedaagent", "mirvedacommander", "mirvedahero"],
-    "promissoryNotes": ["dspnmirv"]
+    "promissoryNotes": ["dspnmirv"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "mirveda_flagship", "infantry", "mirveda_mech", "mirveda_pds", "spacedock"]
   },
   {
     "alias": "mortheus",
@@ -673,7 +738,8 @@
     "homePlanets": ["blaheo", "empero"],
     "abilities": ["facsimile", "illusory_presence"],
     "leaders": ["mortheusagent", "mortheuscommander", "mortheushero"],
-    "promissoryNotes": ["dspnmort"]
+    "promissoryNotes": ["dspnmort"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "mortheus_flagship", "infantry", "mortheus_mech", "pds", "spacedock"]
   },
   {
     "alias": "mykomentori",
@@ -686,7 +752,8 @@
     "homePlanets": ["shihalaum"],
     "abilities": ["prescient_memories", "divination", "necrophage"],
     "leaders": ["mykomentoriagent", "mykomentoricommander", "mykomentorihero"],
-    "promissoryNotes": ["dspnmyko"]
+    "promissoryNotes": ["dspnmyko"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "mykomentori_flagship", "infantry", "mykomentori_mech", "pds", "mykomentori_spacedock"]
   },
   {
     "alias": "nivyn",
@@ -699,7 +766,8 @@
     "homePlanets": ["ellas"],
     "abilities": ["celestial_guides", "singularity_point", "voidsailors"],
     "leaders": ["nivynagent", "nivyncommander", "nivynhero"],
-    "promissoryNotes": ["dspnnivy"]
+    "promissoryNotes": ["dspnnivy"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "nivyn_flagship", "infantry", "nivyn_mech", "pds", "spacedock"]
   },
   {
     "alias": "nokar",
@@ -712,7 +780,8 @@
     "homePlanets": ["zarr", "nokk"],
     "abilities": ["hired_guns", "private_fleet", "desperados"],
     "leaders": ["nokaragent", "nokarcommander", "nokarhero"],
-    "promissoryNotes": ["dspnnoka"]
+    "promissoryNotes": ["dspnnoka"],
+    "units": ["fighter", "nokar_destroyer", "cruiser", "carrier", "dreadnought", "nokar_flagship", "infantry", "nokar_mech", "pds", "spacedock"]
   },
   {
     "alias": "olradin",
@@ -725,7 +794,8 @@
     "homePlanets": ["sanctuary"],
     "abilities": ["policies"],
     "leaders": ["olradinagent", "olradincommander", "olradinhero"],
-    "promissoryNotes": ["dspnolra"]
+    "promissoryNotes": ["dspnolra"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "olradin_flagship", "infantry", "olradin_mech", "pds", "spacedock"]
   },
   {
     "alias": "rohdhna",
@@ -738,7 +808,8 @@
     "homePlanets": ["prind"],
     "abilities": ["industrious", "recycled_materials", "orbital_foundries"],
     "leaders": ["rohdhnaagent", "rohdhnacommander", "rohdhnahero"],
-    "promissoryNotes": ["dspnrohd"]
+    "promissoryNotes": ["dspnrohd"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "rohdhna_flagship", "rohdhna_warsun", "infantry", "rohdhna_mech", "pds", "spacedock"]
   },
   {
     "alias": "tnelis",
@@ -751,7 +822,8 @@
     "homePlanets": ["discordia"],
     "abilities": ["plausible_deniability", "information_brokers", "stealth_insertion"],
     "leaders": ["tnelisagent", "tneliscommander", "tnelishero"],
-    "promissoryNotes": ["dspntnel"]
+    "promissoryNotes": ["dspntnel"],
+    "units": ["fighter", "tnelis_destroyer", "cruiser", "carrier", "dreadnought", "tnelis_flagship", "infantry", "tnelis_mech", "pds", "spacedock"]
   },
   {
     "alias": "vaden",
@@ -764,7 +836,8 @@
     "homePlanets": ["vadarian", "norvus"],
     "abilities": ["fine_print", "collateralized_loans", "binding_debts"],
     "leaders": ["vadenagent", "vadencommander", "vadenhero"],
-    "promissoryNotes": ["dspnvade"]
+    "promissoryNotes": ["dspnvade"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "vaden_flagship", "infantry", "vaden_mech", "pds", "spacedock"]
   },
   {
     "alias": "vaylerian",
@@ -777,7 +850,8 @@
     "homePlanets": ["vaylar"],
     "abilities": ["cargo_raiders", "scour", "raze"],
     "leaders": ["vaylerianagent", "vayleriancommander", "vaylerianhero"],
-    "promissoryNotes": ["dspnvayl"]
+    "promissoryNotes": ["dspnvayl"],
+    "units": ["fighter", "destroyer", "vaylerian_cruiser", "carrier", "dreadnought", "vaylerian_flagship", "infantry", "vaylerian_mech", "pds", "spacedock"]
   },
   {
     "alias": "veldyr",
@@ -790,7 +864,8 @@
     "homePlanets": ["rhune"],
     "abilities": ["corporate_entity", "holding_company", "targeted_acquisition"],
     "leaders": ["veldyragent", "veldyrcommander", "veldyrhero"],
-    "promissoryNotes": ["dspnveld1", "dspnveld2", "dspnveld3", "dspnveld4"]
+    "promissoryNotes": ["dspnveld1", "dspnveld2", "dspnveld3", "dspnveld4"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "veldyr_dreadnought", "veldyr_flagship", "infantry", "veldyr_mech", "pds", "spacedock"]
   },
   {
     "alias": "zealots",
@@ -803,7 +878,8 @@
     "homePlanets": ["poh", "orad"],
     "abilities": ["conspirators", "ancient_knowledge"],
     "leaders": ["zealotsagent", "zealotscommander", "zealotshero"],
-    "promissoryNotes": ["dspnrhod"]
+    "promissoryNotes": ["dspnrhod"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "zealots_flagship", "infantry", "zealots_mech", "pds", "spacedock"]
   },
   {
     "alias": "zelian",
@@ -816,6 +892,7 @@
     "homePlanets": ["zelian", "gen"],
     "abilities": ["obsessive_designs", "biophobic", "paranoia"],
     "leaders": ["zelianagent", "zeliancommander", "zelianhero"],
-    "promissoryNotes": ["dspnzeli"]
+    "promissoryNotes": ["dspnzeli"],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "zelian_flagship", "zelian_infantry", "zelian_mech", "pds", "spacedock"]
   }
 ]
