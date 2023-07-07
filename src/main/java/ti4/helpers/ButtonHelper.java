@@ -1512,6 +1512,9 @@ public class ButtonHelper {
                
                 for(String pnShortHand : p1.getPromissoryNotes().keySet())
                 {
+                    if(p1.getPromissoryNotesInPlayArea().contains(pnShortHand)){
+                        continue;
+                    }
                     PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
                     Button transact = Button.success(finChecker+"send_PNs_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName());
                     stuffToTransButtons.add(transact);

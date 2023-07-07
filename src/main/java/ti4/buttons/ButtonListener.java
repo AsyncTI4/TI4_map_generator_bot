@@ -1198,7 +1198,7 @@ public class ButtonListener extends ListenerAdapter {
             int[] voteArray = AgendaHelper.getVoteTotal(event, player, activeMap);
 
             int minvote = 1;
-            if (player.getFaction().equalsIgnoreCase("argent")) {
+            if (player.hasAbility("zeal")) {
                 int numPlayers = 0;
                 for (Player player_ : activeMap.getPlayers().values()) {
                     if (player_.isRealPlayer())
@@ -1247,6 +1247,7 @@ public class ButtonListener extends ListenerAdapter {
             if (result.equalsIgnoreCase("manual")) {
                 String resMessage3 = "Please select the winner.";
                 List<Button> deadlyActionRow3 = AgendaHelper.getAgendaButtons(null, activeMap, "agendaResolution");
+                deadlyActionRow3.add(Button.danger("deleteButtons", "Resolve with no result"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), resMessage3, deadlyActionRow3);
             }
             event.getMessage().delete().queue();
@@ -2339,6 +2340,37 @@ public class ButtonListener extends ListenerAdapter {
                     }
                 }
             } else {
+                 LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
+                String agID ="";
+                for (java.util.Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
+                    if (agendas.getValue().equals(aID)) {
+                        agID = agendas.getKey();
+                        break;
+                    }
+                }
+                
+                if(agID.equalsIgnoreCase("mutiny")){
+                    List<Player> winOrLose = null;
+                    StringBuilder message = new StringBuilder("");
+                    Integer poIndex = 5;
+                    if (winner.equalsIgnoreCase("for")) {
+                        winOrLose = AgendaHelper.getWinningVoters(winner, activeMap);
+                        poIndex = activeMap.addCustomPO("Mutiny", 1);
+
+                    }else{
+                        winOrLose = AgendaHelper.getLosingVoters(winner, activeMap);
+                        poIndex = activeMap.addCustomPO("Mutiny", -1);
+                    }
+                    message.append("Custom PO 'Mutiny' has been added.\n");
+                    for(Player playerWL : winOrLose){
+                        activeMap.scorePublicObjective(playerWL.getUserID(), poIndex);
+                        message.append(Helper.getPlayerRepresentation(playerWL, activeMap)).append(" scored 'Mutiny'\n");
+                    }
+                    MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message.toString());
+                        
+                        
+                       
+                }
                 if (activeMap.getCurrentAgendaInfo().contains("Law")) {
                     // Figure out law
                 }
