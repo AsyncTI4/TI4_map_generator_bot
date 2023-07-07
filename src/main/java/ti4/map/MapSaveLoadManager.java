@@ -530,7 +530,7 @@ public class MapSaveLoadManager {
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
             writer.write(System.lineSeparator());
 
-            //MIGRATION CODE - remove after the first save/load of all maps
+            //MIGRATION CODE - TODO: remove after the first save/load of all maps
             if (player.getUnitsOwned().isEmpty()) {
                 String playerFaction = player.getFaction();
                 if (playerFaction != null) {
