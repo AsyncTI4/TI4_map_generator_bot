@@ -1500,7 +1500,7 @@ public class GenerateMap {
                 String name = Optional.ofNullable(Mapper.getPlanet(planetName).getShortName()).isPresent() ?
                         Mapper.getPlanet(planetName).getShortName() :
                         Mapper.getPlanet(planetName).getName();
-                g2.drawString(name.substring(0, Math.min(name.length(), 8)).toUpperCase(),
+                g2.drawString(name.substring(0, Math.min(name.length(), 10)).toUpperCase(),
                         (y+146)*-1, //See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
                         x + 6 + g2.getFontMetrics().getHeight()/2);
                 g2.setTransform(originalTransform);
