@@ -3,8 +3,6 @@ package ti4.model;
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import ti4.generator.Mapper;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
@@ -45,9 +43,9 @@ public class UnitModel implements ModelInterface {
 
     @Override
     public boolean isValid() {
-        return true;
+        return this.id != null && !this.id.isEmpty();
     }
-
+    
     @Override
     public String getAlias() {
         return getId();
