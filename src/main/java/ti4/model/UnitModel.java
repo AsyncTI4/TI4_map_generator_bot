@@ -44,6 +44,10 @@ public class UnitModel implements ModelInterface {
     private Boolean isShip;
     private String ability;
 
+    //Source: units.json - source of json: https://docs.google.com/spreadsheets/d/1nbHylJyn4VURCRKX8ePmOrLa6dAsc504ww0BPZXIRxU/edit?usp=sharing
+    //Google Sheet to JSON script: https://gist.githubusercontent.com/pamelafox/1878143/raw/6c23f71231ce1fa09be2d515f317ffe70e4b19aa/exportjson.js?utm_source=thenewstack&utm_medium=website&utm_content=inline-mention&utm_campaign=platform
+    //From: https://thenewstack.io/how-to-convert-google-spreadsheet-to-json-formatted-text/
+
     @Override
     public boolean isValid() {
         return this.id != null && !this.id.isEmpty();
