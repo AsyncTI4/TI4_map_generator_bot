@@ -1,6 +1,10 @@
 package ti4.model;
 
 import lombok.Data;
+import net.dv8tion.jda.api.EmbedBuilder;
+import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.generator.Mapper;
+import ti4.helpers.Helper;
 
 @Data
 public class UnitModel implements ModelInterface {
@@ -47,11 +51,101 @@ public class UnitModel implements ModelInterface {
         return getId();
     }
 
-    public String getCardText() {
+    public String getUnitRepresentation() {
+        String faction = getFaction();
+        String factionEmoji = Helper.getEmojiFromDiscord(faction);
+        String unitEmoji = Helper.getEmojiFromDiscord(getBaseType());
+
+        String representation = unitEmoji + " " + getName() + factionEmoji + ": " + getAbility();
+        return representation;
+    }
+
+    public MessageEmbed getUnitRepresentationEmbed() {
+        
+        String faction = getFaction();
+        String factionEmoji = Helper.getEmojiFromDiscord(faction);
+        String unitEmoji = Helper.getEmojiFromDiscord(getBaseType());
+
+        EmbedBuilder eb = new EmbedBuilder();
+        /*
+            Set the title:
+            1. Arg: title as string
+            2. Arg: URL as string or could also be null
+        */
+        eb.setTitle(factionEmoji + " " + getName(), null);
+
+        /*
+            Set the color
+        */
+        // eb.setColor(Color.red);
+        // eb.setColor(new Color(0xF40C0C));
+        // eb.setColor(new Color(255, 0, 54));
+
+        /*
+            Set the text of the Embed:
+            Arg: text as string
+        */
+        eb.setDescription(unitEmoji + " " + getBaseType());
+
+        // String afbText = unit.getAfbHitsOn() + 
+
+        /*
+            Add fields to embed:
+            1. Arg: title as string
+            2. Arg: text as string
+            3. Arg: inline mode true / false
+        */
+        // eb.addField("Title of field", "test of field", false);
+        // eb.addField("Title of field", "test of field", false);
+        eb.addField("Abilities:", getDiceText(), true);
+        eb.addField("Title of inline field", "test of inline field", true);
+        eb.addField("Title of inline field", "test of inline field", true);
+
+        /*
+            Add spacer like field
+            Arg: inline mode true / false
+        */
+        // eb.addBlankField(false);
+
+        /*
+            Add embed author:
+            1. Arg: name as string
+            2. Arg: url as string (can be null)
+            3. Arg: icon url as string (can be null)
+        */
+        // eb.setAuthor("name", null, "https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/zekroBot_Logo_-_round_small.png");
+
+        /*
+            Set footer:
+            1. Arg: text as string
+            2. icon url as string (can be null)
+        */
+        // eb.setFooter("Text", "https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/zekroBot_Logo_-_round_small.png");
+
+        /*
+            Set image:
+            Arg: image url as string
+        */
+        // eb.setImage("https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/logo%20-%20title.png");
+
+        /*
+            Set thumbnail image:
+            Arg: image url as string
+        */
+        // eb.setThumbnail("https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/logo%20-%20title.png");
+
+        return eb.build();
+    }
+
+    public String getDiceText() {
         StringBuilder sb = new StringBuilder();
-        sb.append(getAFBText());
-        sb.append(getBombardText());
-        sb.append(getSpaceCannonText());
+        sb.append(getPlanetaryShieldText());
+        sb.append(getSustainDamageText());
+        return sb.toString();
+    }
+    
+    public String getOtherText() {
+        StringBuilder sb = new StringBuilder();
         sb.append(getPlanetaryShieldText());
         sb.append(getSustainDamageText());
         return sb.toString();
