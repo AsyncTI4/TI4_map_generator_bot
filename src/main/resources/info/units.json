@@ -22,6 +22,7 @@
         "id": "admins_mech",
         "baseType": "mech",
         "asyncId": "mf",
+        "name": "Admins Mech",
         "source": "async",
         "faction": "Admins",
         "capacityUsed": 1,
@@ -35,6 +36,7 @@
         "id": "admins_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
+        "name": "Admins Flagship",
         "source": "async",
         "faction": "Admins",
         "moveValue": 1,
@@ -47,7 +49,7 @@
     {
         "id": "arborec_infantry",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "name": "Letani Warrior I",
         "upgradesToUnitId": "arborec_infantry",
         "source": "base",
@@ -62,7 +64,7 @@
     {
         "id": "arborec_infantry2",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "name": "Letani Warrior II",
         "upgradesFromUnitId": "arborec_infantry",
         "requiredTechId": "lw2",
@@ -210,6 +212,16 @@
         "ability": "This system is a gravity rift; your ships do not roll for this gravity rift. Place a dimensional tear token beneath this unit as a reminder. Up to 6 fighters in this system do not count against your ships' capacity."
     },
     {
+        "id": "kyro_fighter2",
+        "baseType": "fighter",
+        "asyncId": "ff",
+        "name": "Vector II",
+        "upgradesFromUnitId": "kyro_fighter",
+        "requiredTechId": "dsblexff",
+        "source": "ds",
+        "faction": "Blex"
+    },
+    {
         "id": "cabal_spacedock2",
         "baseType": "spacedock",
         "asyncId": "sd",
@@ -302,7 +314,7 @@
     {
         "id": "cymiae_infantry",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "name": "Unholy Abomination I",
         "upgradesToUnitId": "cymiae_infantry2",
         "source": "ds",
@@ -312,7 +324,7 @@
     {
         "id": "cymiae_infantry2",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "name": "Unholy Abomination II",
         "upgradesFromUnitId": "cymiae_infantry",
         "requiredTechId": "dscymiinf",
@@ -642,6 +654,7 @@
         "id": "lazax_mech",
         "baseType": "mech",
         "asyncId": "mf",
+        "name": "Lazax Mech",
         "source": "homebrew",
         "faction": "Lazax",
         "capacityUsed": 1,
@@ -655,6 +668,7 @@
         "id": "lazax_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
+        "name": "Lazax Flagship",
         "source": "homebrew",
         "faction": "Lazax",
         "moveValue": 1,
@@ -715,7 +729,7 @@
     {
         "id": "mahact_infantry",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "name": "Crimson Legionnaire I",
         "upgradesToUnitId": "mahact_infantry2",
         "source": "pok",
@@ -730,7 +744,7 @@
     {
         "id": "mahact_infantry2",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "name": "Crimson Legionnaire II",
         "upgradesFromUnitId": "mahact_infantry",
         "requiredTechId": "cl2",
@@ -1273,7 +1287,7 @@
     {
         "id": "sol_infantry",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "name": "Spec Ops I",
         "upgradesToUnitId": "sol_infantry2",
         "source": "base",
@@ -1287,7 +1301,7 @@
     {
         "id": "sol_infantry2",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "name": "Spec Ops II",
         "upgradesFromUnitId": "sol_infantry",
         "requiredTechId": "so2",
@@ -1590,7 +1604,7 @@
     {
         "id": "zelian_infantry",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "name": "Impactor I",
         "upgradesToUnitId": "zelian_infantry2",
         "source": "ds",
@@ -1600,7 +1614,7 @@
     {
         "id": "zelian_infantry2",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "name": "Impactor II",
         "upgradesFromUnitId": "zelian_infantry",
         "requiredTechId": "dszeliinf",
@@ -1852,7 +1866,7 @@
     {
         "id": "infantry",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "imageFileSuffix": "_tkn_inf.png",
         "name": "Infantry I",
         "upgradesToUnitId": "infantry2",
@@ -1866,7 +1880,7 @@
     {
         "id": "infantry2",
         "baseType": "infantry",
-        "asyncId": "inf",
+        "asyncId": "gf",
         "imageFileSuffix": "_tkn_inf.png",
         "name": "Infantry II",
         "upgradesFromUnitId": "infantry",
@@ -2442,7 +2456,17 @@
         "isShip": true
     },
     {
-        "id": "ghemina_flagship",
+        "id": "ghemina_flagship_lord",
+        "baseType": "flagship",
+        "asyncId": "fs",
+        "source": "ds",
+        "cost": 8,
+        "sustainDamage": true,
+        "canBeDirectHit": true,
+        "isShip": true
+    },
+    {
+        "id": "ghemina_flagship_lady",
         "baseType": "flagship",
         "asyncId": "fs",
         "source": "ds",
