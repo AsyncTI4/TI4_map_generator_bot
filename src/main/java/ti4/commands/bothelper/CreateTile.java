@@ -30,8 +30,8 @@ public class CreateTile extends BothelperSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_ALIASES, "A comma-separated list of any aliases you want to set for the tile.").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_IMAGE, "The name of the tile's image file. Someone with access will need to add this to the bot").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_PLANET_IDS, "A comma-separated list of the IDs of the planets that are in the tile. Make sure to make the planets").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_TYPE, "The tile's layout type. If you don't know what this is, ask.").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_WORMHOLES, "Comma-separated list of what wormholes are in the tile. Supports all greek letters through omega.").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_TYPE, "The tile's layout type. If you don't know what this is, ask.").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_WORMHOLES, "Comma-separated list of what wormholes are in the tile. Supports all greek letters through omega.").setRequired(false).setAutoComplete(true));
         //addOptions(new OptionData(OptionType.STRING, Constants.TILE_TOKEN_LOCATIONS, "The location of space tokens in the tile. Use only to override").setRequired(false));
     }
 
