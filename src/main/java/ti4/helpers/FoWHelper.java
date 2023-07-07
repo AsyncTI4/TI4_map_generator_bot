@@ -377,6 +377,16 @@ public class FoWHelper {
 					wormholeIDs.add(Constants.ZETA);
 				} else if (token.contains(Constants.ETA)) {
 					wormholeIDs.add(Constants.ETA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHEPSILON)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHEPSILON);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHIOTA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHIOTA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHTHETA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHTHETA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHZETA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHZETA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHETA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHETA);
 				}
 			}
 			if (ghostFlagship != null && unitHolder.getUnits().getOrDefault(ghostFlagship, 0) > 0) {
