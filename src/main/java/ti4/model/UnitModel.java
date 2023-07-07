@@ -1,8 +1,11 @@
 package ti4.model;
 
+import java.util.Map;
+
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 
@@ -45,7 +48,7 @@ public class UnitModel implements ModelInterface {
     public boolean isValid() {
         return this.id != null && !this.id.isEmpty();
     }
-    
+
     @Override
     public String getAlias() {
         return getId();
@@ -122,7 +125,7 @@ public class UnitModel implements ModelInterface {
             2. icon url as string (can be null)
         */
         // eb.setFooter("Text", "https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/zekroBot_Logo_-_round_small.png");
-        eb.setFooter(getId());
+        eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases());
 
         /*
             Set image:
@@ -137,6 +140,12 @@ public class UnitModel implements ModelInterface {
         // eb.setThumbnail("https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/logo%20-%20title.png");
 
         return eb.build();
+    }
+
+    private String getAsyncIDAliases() {
+        String aliases = AliasHandler.getUnitListForHelp().getOrDefault(asyncId, asyncId);
+        return getAsyncId() + "=" + aliases;
+
     }
 
     private String getValuesText() {
