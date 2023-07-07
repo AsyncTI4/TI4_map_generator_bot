@@ -237,7 +237,7 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.LATEST_OUTCOME_VOTED_FOR + " " + activeMap.getLatestOutcomeVotedFor());
         writer.write(System.lineSeparator());
-        writer.write(Constants.LATEST_AFTER_MSG + " " + activeMap.getLatestWhenMsg());
+        writer.write(Constants.LATEST_AFTER_MSG + " " + activeMap.getLatestAfterMsg());
         writer.write(System.lineSeparator());
         writer.write(Constants.LATEST_WHEN_MSG + " " + activeMap.getLatestWhenMsg());
         writer.write(System.lineSeparator());
