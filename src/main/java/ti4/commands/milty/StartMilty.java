@@ -1,19 +1,28 @@
 package ti4.commands.milty;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.ActionRow;
+import net.dv8tion.jda.api.interactions.components.ItemComponent;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.ResourceHelper;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
-import ti4.map.*;
 import ti4.map.Map;
+import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.TileModel;
+import ti4.model.WormholeModel;
 
 import javax.imageio.IIOImage;
 import javax.imageio.ImageIO;
@@ -25,13 +34,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 public class StartMilty extends MiltySubcommandData {
 
     public static final int SLICE_GENERATION_CYCLES = 100;
-    private static List<String> sliceNames = Arrays.asList("A", "B", "C", "D", "E", "F", "G", "H", "I");
 
     private boolean anomalies_can_touch = false;
 
@@ -71,10 +79,10 @@ public class StartMilty extends MiltySubcommandData {
             anomalies_can_touch = anomaliesCanTouchOption.getAsBoolean();
         }
 
-        HashMap<String, String> miltyDraftTiles = Mapper.getMiltyDraftTiles();
         MiltyDraftManager draftManager = activeMap.getMiltyDraftManager();
+        draftManager.setFactionDraft(factionDraft);
         draftManager.clear();
-        initDraftTiles(miltyDraftTiles, draftManager);
+        initDraftTiles(draftManager);
 
 
         boolean slicesCreated = generateSlices(sliceCount, draftManager);
@@ -82,16 +90,67 @@ public class StartMilty extends MiltySubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Did not find correct slices, check settings");
         } else {
             File file = generateImage(draftManager);
-
             MessageHelper.sendFileToChannel(event.getChannel(), file);
-
             StringBuilder factionMsg = new StringBuilder();
-            for (String faction : factionDraft) {
-                factionMsg.append(Helper.getFactionIconFromDiscord(faction)).append(" ");
-            }
 
-            MessageHelper.sendMessageToChannel(event.getChannel(), factionMsg.toString());
+            String message = "Slices:\n\n";
+            MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
+            List<ActionRow> actionRow = null;
+            List<Button> sliceButtons = new ArrayList<>(getMiltySliceButtons(activeMap));
+            if (!sliceButtons.isEmpty()) actionRow = makeActionRows(sliceButtons);
+            if (actionRow != null) baseMessageObject.addComponents(actionRow);
+
+            MessageChannel eventChannel = event.getChannel();
+            MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? eventChannel : activeMap.getMainGameChannel();
+            mainGameChannel.sendMessage(baseMessageObject.build()).queue();
+
+            List<Button> factionButtons = new ArrayList<>(getMiltyFactionButtons(activeMap));
+            if (!factionButtons.isEmpty()) actionRow = makeActionRows(factionButtons);
+            if (actionRow != null) baseMessageObject.addComponents(actionRow);
+            mainGameChannel.sendMessage(baseMessageObject.build()).queue();
         }
+    }
+
+    private List<ActionRow> makeActionRows(List<Button> buttons)
+    {
+        List<ActionRow> actionRow = new ArrayList<>();
+        List<Button> tempActionRow = new ArrayList<>();
+        int index = 0;
+        for (Button button : buttons) {
+            if (index > 4){
+                actionRow.add(ActionRow.of(tempActionRow));
+                tempActionRow = new ArrayList<>();
+                index = 0;
+            }
+            tempActionRow.add(button);
+            index++;
+       }
+        actionRow.add(ActionRow.of(tempActionRow));
+        return actionRow;
+    }
+
+
+    private List<Button> getMiltySliceButtons(Map activeMap) {
+        MiltyDraftManager miltyDraftManager = activeMap.getMiltyDraftManager();
+        List<Button> sliceButtons = new ArrayList<>();
+        for (MiltyDraftSlice slice : miltyDraftManager.getSlices()) {
+            Button sliceButton = Button.success("milty_slice_" + slice.getName(), "Slice No.: " + slice.getName());
+            sliceButtons.add(sliceButton);
+        }
+        return sliceButtons;
+    }
+
+    private List<net.dv8tion.jda.api.interactions.components.buttons.Button> getMiltyFactionButtons(Map activeMap) {
+        List<net.dv8tion.jda.api.interactions.components.buttons.Button> factionChoose = new ArrayList<>();
+        for (String faction : activeMap.getMiltyDraftManager().getFactionDraft()) {
+            if (faction != null && Mapper.isFaction(faction)) {
+                net.dv8tion.jda.api.interactions.components.buttons.Button button = Button.secondary("milty_faction_" + faction, " ");
+                String factionEmojiString = Helper.getFactionIconFromDiscord(faction);
+                button = button.withEmoji(Emoji.fromFormatted(factionEmojiString));
+                factionChoose.add(button);
+            }
+        }
+        return factionChoose;
     }
 
     private List<String> createFactionDraft(int factionCount, List<String> factions) {
@@ -159,7 +218,7 @@ public class StartMilty extends MiltySubcommandData {
 
                 graphics.setColor(Color.WHITE);
                 graphics.setFont(Storage.getFont64());
-                graphics.drawString(slice.getName(), hs.x + 150 , hs.y + 60);
+                graphics.drawString(slice.getName(), hs.x + 150, hs.y + 60);
 
                 graphics.setFont(Storage.getFont50());
                 int resources = leftSlice.getResources() + rightSlice.getResources() + equadistantSlice.getResources() + farFrontSlice.getResources() + frontSlice.getResources();
@@ -167,20 +226,11 @@ public class StartMilty extends MiltySubcommandData {
                 double resourcesMilty = leftSlice.getMilty_resources() + rightSlice.getMilty_resources() + equadistantSlice.getMilty_resources() + farFrontSlice.getMilty_resources() + frontSlice.getMilty_resources();
                 double influenceMilty = leftSlice.getMilty_influence() + rightSlice.getMilty_influence() + equadistantSlice.getMilty_influence() + farFrontSlice.getMilty_influence() + frontSlice.getMilty_influence();
 
-                graphics.drawString(resources + "/" +influence, hs.x + 130 , hs.y + 130);
-                graphics.drawString("("+resourcesMilty + "/" +influenceMilty+")", hs.x + 70 , hs.y + 190);
-
-
+                graphics.drawString(resources + "/" + influence, hs.x + 130, hs.y + 130);
+                graphics.drawString("(" + resourcesMilty + "/" + influenceMilty + ")", hs.x + 70, hs.y + 190);
 
                 BufferedImage resizedSlice = GenerateMap.resizeImage(sliceImage, scale);
-
-
                 graphicsMain.drawImage(resizedSlice, deltaX, deltaY, null);
-
-//                graphics.setFont(Storage.getFont32());
-//                graphics.setColor(Color.WHITE);
-//                String timeStamp = getTimeStamp();
-//                graphics.drawString(map.getName() + " " + timeStamp, 0, 34);
                 index++;
 
                 int heightSlice = resizedSlice.getHeight();
@@ -287,7 +337,7 @@ public class StartMilty extends MiltySubcommandData {
                 miltyDraftSlice.setFarFront(tiles.remove(0));
 
                 //CHECK IF SLICES ARE OK HERE -------------------------------
-                miltyDraftSlice.setName(sliceNames.get(j));
+                miltyDraftSlice.setName(Integer.toString(j));
                 draftManager.addSlice(miltyDraftSlice);
             }
 
@@ -300,27 +350,26 @@ public class StartMilty extends MiltySubcommandData {
         return slicesCreated;
     }
 
-    private void initDraftTiles(HashMap<String, String> miltyDraftTiles, MiltyDraftManager draftManager) {
-        for (java.util.Map.Entry<String, String> entry : miltyDraftTiles.entrySet()) {
-            String tileID = entry.getKey();
-            String[] values = entry.getValue().split(",");
-            String tierList = values[0];
-
-
+    private void initDraftTiles(MiltyDraftManager draftManager) {
+        java.util.Map<String, TileModel> allTiles = TileHelper.getAllTiles();
+        for (TileModel tileModel : new ArrayList<>(allTiles.values())) {
+            String tileID = tileModel.getId();
+            if (isValid(tileModel, tileID)) {
+                continue;
+            }
+            Set<WormholeModel.Wormhole> wormholes = tileModel.getWormholes();
             MiltyDraftTile draftTile = new MiltyDraftTile();
-            draftTile.setTierList(TierList.valueOf(tierList));
-
-            if (values.length > 1) {
-                String additionalInfo = values[1];
-                if ("alpha".equals(additionalInfo)) {
-                    draftTile.setHasAlphaWH(true);
-                } else if ("beta".equals(additionalInfo)) {
-                    draftTile.setHasBetaWH(true);
-                } else if ("legendary".equals(additionalInfo)){
-                    draftTile.setLegendary(true);
+            if (wormholes != null) {
+                for (WormholeModel.Wormhole wormhole : wormholes) {
+                    if (WormholeModel.Wormhole.ALPHA.equals(wormhole)) {
+                        draftTile.setHasAlphaWH(true);
+                    } else if (WormholeModel.Wormhole.BETA.equals(wormhole)) {
+                        draftTile.setHasBetaWH(true);
+                    } else {
+                        draftTile.setHasOtherWH(true);
+                    }
                 }
             }
-
             Tile tile = new Tile(tileID, "none");
             draftTile.setTile(tile);
 
@@ -338,12 +387,47 @@ public class StartMilty extends MiltySubcommandData {
                         draftTile.addMilty_influence(influence);
                     }
                     if (resources == influence) {
-                        draftTile.addMilty_resources((double)resources / 2);
-                        draftTile.addMilty_influence((double)influence / 2);
+                        draftTile.addMilty_resources((double) resources / 2);
+                        draftTile.addMilty_influence((double) influence / 2);
+                    }
+
+                    if (planet.isHasAbility()) {
+                        draftTile.setLegendary(true);
                     }
                 }
             }
+            int resources = draftTile.getResources();
+            int influence = draftTile.getInfluence();
+            int combinedResources = resources + influence;
+            if (combinedResources == 0) {
+                draftTile.setTierList(TierList.red);
+            } else if (combinedResources < 4) {
+                draftTile.setTierList(TierList.low);
+            } else if (combinedResources < 8) {
+                draftTile.setTierList(TierList.mid);
+            } else {
+                draftTile.setTierList(TierList.high);
+            }
+
+            String tileName = tileModel.getName();
+            tileName = tileName == null ? tileModel.getImagePath() : tileName.toLowerCase();
+            if (tileName.contains("asteroid") || tileName.contains("nova") || tileName.contains("gravity") || tileName.contains("nebula")) {
+                draftTile.setTierList(TierList.anomaly);
+            }
+
             draftManager.addDraftTile(draftTile);
         }
+    }
+
+    private static boolean isValid(TileModel tileModel, String tileID) {
+        return tileID.contains("corner") || tileModel.getImagePath().contains("corner") ||
+                tileID.contains("lane") || tileModel.getImagePath().contains("lane") ||
+                tileID.contains("mecatol") || tileModel.getImagePath().contains("mecatol") ||
+                tileID.contains("red") || tileModel.getImagePath().contains("red") ||
+                tileID.contains("blue") || tileModel.getImagePath().contains("blue") ||
+                tileID.contains("green") || tileModel.getImagePath().contains("green") ||
+                tileID.contains("gray") || tileModel.getImagePath().contains("gray") ||
+                tileID.contains("gate") || tileModel.getImagePath().contains("gate") ||
+                tileID.contains("setup") || tileModel.getImagePath().contains("setup");
     }
 }
