@@ -1,6 +1,7 @@
 package ti4.helpers;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -87,7 +88,11 @@ public class ButtonHelper {
         if(messageId == null || messageId.equalsIgnoreCase("")){
             return playersWhoAreMissed;
         }
-        Message mainMessage = activeMap.getMainGameChannel().retrieveMessageById(messageId).completeAfter(500,
+        TextChannel mainGameChannel = activeMap.getMainGameChannel();
+        if (mainGameChannel == null){
+            return playersWhoAreMissed;
+        }
+        Message mainMessage = mainGameChannel.retrieveMessageById(messageId).completeAfter(500,
                 TimeUnit.MILLISECONDS);
         for (Player player : activeMap.getPlayers().values()) {
             if (!player.isRealPlayer()) {

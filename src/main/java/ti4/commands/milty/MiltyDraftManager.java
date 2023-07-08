@@ -12,6 +12,8 @@ public class MiltyDraftManager {
 
     private List<MiltyDraftSlice> slices = new ArrayList<>();
 
+    private List<String> factionDraft = new ArrayList<>();
+
     public void addDraftTile(MiltyDraftTile draftTile) {
         TierList draftTileTier = draftTile.getTierList();
         if (draftTileTier == TierList.high) {
@@ -29,6 +31,14 @@ public class MiltyDraftManager {
 
     public List<MiltyDraftTile> getHigh() {
         return new ArrayList<>(high);
+    }
+
+    public List<String> getFactionDraft() {
+        return factionDraft;
+    }
+
+    public void setFactionDraft(List<String> factionDraft) {
+        this.factionDraft = factionDraft;
     }
 
     public List<MiltyDraftTile> getMid() {
