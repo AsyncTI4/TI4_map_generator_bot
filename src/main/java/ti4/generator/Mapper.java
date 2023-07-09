@@ -176,7 +176,7 @@ public class Mapper {
     }
 
     public static List<String> getFrontierTileIds() {
-        final List<String> exclusionList = List.of("Hyperlane", "");
+        final List<String> exclusionList = List.of("Hyperlane", "", "Mallice (Locked)");
         return TileHelper.getAllTiles().values().stream()
                 .filter(tileModel -> !exclusionList.contains(tileModel.getNameNullSafe()))
                 .filter(tileModel -> tileModel.getPlanetIds().size() == 0)

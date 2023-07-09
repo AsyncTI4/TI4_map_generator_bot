@@ -30,6 +30,7 @@ import ti4.map.UnitHolder;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowAllAC;
 import ti4.commands.cardspn.ShowAllPN;
+import ti4.commands.cardsso.DealSOToAll;
 import ti4.commands.cardsso.DiscardSO;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
@@ -2686,37 +2687,7 @@ public class ButtonListener extends ListenerAdapter {
                         player_.cleanExhaustedPlanets(false);
                     }
                     MessageHelper.sendMessageToChannel(event.getChannel(), "Agenda cleanup run!");
-                    if(activeMap.isFoWMode()){
-                        MessageHelper.sendMessageToChannel(event.getChannel(), "Pinged speaker to pick SC.");
-                    }
-                    Player speaker = null;
-                    if (activeMap.getPlayer(activeMap.getSpeaker()) != null) {
-                        speaker = activeMap.getPlayers().get(activeMap.getSpeaker());
-                    } else {
-                        speaker = null;
-                    }
-                    String message = Helper.getPlayerRepresentation(speaker, activeMap, event.getGuild(), true)
-                            + " UP TO PICK SC\n";
-                    activeMap.updateActivePlayer(speaker);
-                    activeMap.setCurrentPhase("strategy");
-                    ButtonHelper.giveKeleresCommsNTg(activeMap, event);
-                    if (activeMap.isFoWMode()) {
-
-                        if (!activeMap.isHomeBrewSCMode()) {
-                            MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(),
-                                    message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
-                        } else {
-                            MessageHelper.sendPrivateMessageToPlayer(speaker, activeMap, message);
-                        }
-                    } else {
-                        if (!activeMap.isHomeBrewSCMode()) {
-                            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                                    message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
-                        } else {
-                            MessageHelper.sendMessageToChannel(event.getChannel(), message);
-                        }
-
-                    }
+                    ButtonHelper.startStrategyPhase(event, activeMap);
                     event.getMessage().delete().queue();
 
                 }
@@ -2850,6 +2821,31 @@ public class ButtonListener extends ListenerAdapter {
                     String message = activeMap.isFoWMode() ? "No whens (locked in)" : null;
                     activeMap.addPlayersWhoHitPersistentNoWhen(player.getFaction());
                     addReaction(event, false, false, message, "");
+                }
+                case "deal2SOToAll" -> {
+                    new DealSOToAll().dealSOToAll(event, 2, activeMap);
+                    event.getMessage().delete().queue();
+
+                }
+                case "startOfGameObjReveal" -> {
+                     Player speaker = null;
+                    if (activeMap.getPlayer(activeMap.getSpeaker()) != null) {
+                        speaker = activeMap.getPlayers().get(activeMap.getSpeaker());
+                    } 
+                    for(Player p :activeMap.getRealPlayers()){
+                        if(p.getSecrets().size() > 1){
+                             MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please ensure everyone has discarded secrets before hitting this button. ");
+                            return;
+                        }
+                    }
+                    if(speaker == null){
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please assign speaker before hitting this button (command is /player stats speaker:y)");
+                        return;
+                    }
+                    new RevealStage1().revealS1(event, event.getChannel());
+                    new RevealStage1().revealS1(event, event.getChannel());
+                    ButtonHelper.startStrategyPhase(event, activeMap);
+                    event.getMessage().delete().queue();
                 }
                 case "gain_2_comms" -> {
                     String message = "";
