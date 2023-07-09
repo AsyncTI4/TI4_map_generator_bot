@@ -1,5 +1,6 @@
 package ti4.commands.tokens;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -33,7 +34,7 @@ public class AddToken extends AddRemoveToken {
         }
     }
 
-    public static void addToken(SlashCommandInteractionEvent event, Tile tile, String tokenName, Map activeMap) {
+    public static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenName, Map activeMap) {
         String tokenFileName = Mapper.getAttachmentID(tokenName);
         String tokenPath = tile.getAttachmentPath(tokenFileName);
         if (tokenFileName != null && tokenPath != null) {
@@ -44,17 +45,21 @@ public class AddToken extends AddRemoveToken {
             tokenPath = tile.getTokenPath(tokenFileName);
 
             if (tokenPath == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Token: " + tokenName + " is not valid");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Token: " + tokenName + " is not valid");
                 return;
             }
             addToken(event, tile, tokenFileName, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName), activeMap);
         }
     }
 
-    private static void addToken(SlashCommandInteractionEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet, Map activeMap) {
+    private static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet, Map activeMap) {
         String unitHolder = Constants.SPACE;
         if (needSpecifyPlanet) {
-            OptionMapping option = event.getOption(Constants.PLANET);
+            OptionMapping option = null;
+            if(event instanceof SlashCommandInteractionEvent){
+                option = ((SlashCommandInteractionEvent) event).getOption(Constants.PLANET);
+            }
+            
             if (option != null) {
                 unitHolder = option.getAsString().toLowerCase();
             } else {
@@ -68,7 +73,7 @@ public class AddToken extends AddRemoveToken {
                     if (unitHolderIDs.size() == 1) {
                         message = "No planets present in system.";
                     }
-                    MessageHelper.sendMessageToChannel(event.getChannel(), message);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                     return;
                 }
             }
@@ -80,7 +85,7 @@ public class AddToken extends AddRemoveToken {
             String planet = planetTokenizer.nextToken();
             planet = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planet));
             if (!tile.isSpaceHolderValid(planet)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planet + " is not valid and not supported.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet: " + planet + " is not valid and not supported.");
                 continue;
             }
             if (tokenID.contains("dmz")){

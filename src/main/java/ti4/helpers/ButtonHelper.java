@@ -922,6 +922,22 @@ public class ButtonHelper {
             new ExpFrontier().expFront(event, tile, activeMap, player);
         }
     }
+
+    public static boolean doesPlanetHaveAttachmentTechSkip(Tile tile, String planet){
+        UnitHolder unitHolder = tile.getUnitHolders().get(planet);
+        if(unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.WARFARE)) ||
+            unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.CYBERNETIC)) ||
+            unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.BIOTIC)) ||
+            unitHolder.getTokenList().contains(Mapper.getAttachmentID(Constants.PROPULSION)))
+        {
+            return true;
+        }else{
+            return false;
+        }
+        
+
+        
+    }
     public static List<Button> scanlinkResolution(Player player, Map activeMap, ButtonInteractionEvent event) {
         Tile tile =  activeMap.getTileByPosition(activeMap.getActiveSystem());
         List<Button> buttons = new ArrayList<Button>();
@@ -982,7 +998,7 @@ public class ButtonHelper {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
         for (java.util.Map.Entry<String, Tile> tileEntry : new HashMap<>(activeMap.getTileMap()).entrySet()) {
-			if (FoWHelper.playerHasUnitsInSystem(player, tileEntry.getValue()) && (!AddCC.hasCC(event, player.getColor(), tileEntry.getValue())) || ButtonHelper.NomadHeroCheck(player, activeMap, tileEntry.getValue())) {
+			if (FoWHelper.playerHasUnitsInSystem(player, tileEntry.getValue()) && (!AddCC.hasCC(event, player.getColor(), tileEntry.getValue()) || ButtonHelper.NomadHeroCheck(player, activeMap, tileEntry.getValue()))) {
                 Tile tile = tileEntry.getValue();
                 Button validTile = Button.success(finChecker+"tacticalMoveFrom_"+tileEntry.getKey(), tile.getRepresentationForButtons(activeMap, player));
                 buttons.add(validTile);
@@ -1404,7 +1420,37 @@ public class ButtonHelper {
 
     //playerHasUnitsInSystem(player, tile);
 
-
+    public static void startStrategyPhase(ButtonInteractionEvent event, Map activeMap) {
+        if(activeMap.isFoWMode()){
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Pinged speaker to pick SC.");
+        }
+        Player speaker = null;
+        if (activeMap.getPlayer(activeMap.getSpeaker()) != null) {
+            speaker = activeMap.getPlayers().get(activeMap.getSpeaker());
+        } else {
+            speaker = null;
+        }
+        String message = Helper.getPlayerRepresentation(speaker, activeMap, event.getGuild(), true)
+                + " UP TO PICK SC\n";
+        activeMap.updateActivePlayer(speaker);
+        activeMap.setCurrentPhase("strategy");
+        ButtonHelper.giveKeleresCommsNTg(activeMap, event);
+        if (activeMap.isFoWMode()) {
+            if (!activeMap.isHomeBrewSCMode()) {
+                MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(),
+                        message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+            } else {
+                MessageHelper.sendPrivateMessageToPlayer(speaker, activeMap, message);
+            }
+        } else {
+            if (!activeMap.isHomeBrewSCMode()) {
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
+                        message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+            } else {
+                MessageHelper.sendMessageToChannel(event.getChannel(), message);
+            }
+        }
+    }
 
 
     public static List<Button> getPlayersToTransact(Map activeMap, Player p) {
