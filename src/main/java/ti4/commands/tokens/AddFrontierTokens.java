@@ -48,7 +48,7 @@ public class AddFrontierTokens implements Command {
         if(activeMap.getRound() == 1){
             List<Button> buttons = new ArrayList<Button>();
             buttons.add(Button.success("deal2SOToAll" , "Deal 2 SO To All"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Press this button after every player is setup", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), "Press this button after every player is setup", buttons);
         }
     }
 
