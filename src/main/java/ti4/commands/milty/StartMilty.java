@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
-import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import ti4.ResourceHelper;
@@ -36,6 +35,7 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class StartMilty extends MiltySubcommandData {
 
@@ -83,6 +83,7 @@ public class StartMilty extends MiltySubcommandData {
         draftManager.setFactionDraft(factionDraft);
         draftManager.clear();
         initDraftTiles(draftManager);
+        initDraftOrder(draftManager, activeMap);
 
 
         boolean slicesCreated = generateSlices(sliceCount, draftManager);
@@ -91,7 +92,6 @@ public class StartMilty extends MiltySubcommandData {
         } else {
             File file = generateImage(draftManager);
             MessageHelper.sendFileToChannel(event.getChannel(), file);
-            StringBuilder factionMsg = new StringBuilder();
 
             String message = "Slices:\n\n";
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
@@ -104,27 +104,70 @@ public class StartMilty extends MiltySubcommandData {
             MessageChannel mainGameChannel = activeMap.getMainGameChannel() == null ? eventChannel : activeMap.getMainGameChannel();
             mainGameChannel.sendMessage(baseMessageObject.build()).queue();
 
+            message = "Factions:\n\n";
+            baseMessageObject = new MessageCreateBuilder().addContent(message);
             List<Button> factionButtons = new ArrayList<>(getMiltyFactionButtons(activeMap));
             if (!factionButtons.isEmpty()) actionRow = makeActionRows(factionButtons);
             if (actionRow != null) baseMessageObject.addComponents(actionRow);
             mainGameChannel.sendMessage(baseMessageObject.build()).queue();
+
+            message = "Order:\n\n";
+            baseMessageObject = new MessageCreateBuilder().addContent(message);
+            List<Button> orderButtons = new ArrayList<>(getMiltyOrderButtons(activeMap));
+            if (!orderButtons.isEmpty()) actionRow = makeActionRows(orderButtons);
+            if (actionRow != null) baseMessageObject.addComponents(actionRow);
+            mainGameChannel.sendMessage(baseMessageObject.build()).queue();
+
+            message = "\n\nDraftOrder:\n\n";
+            StringBuilder draftOrder = new StringBuilder();
+            List<Player> draftRandomOrder = draftManager.getDraftRandomOrder();
+            for (int index = 0; index < draftRandomOrder.size(); index++) {
+                Player player = draftRandomOrder.get(index);
+                String playerPing = Helper.getPlayerPing(player);
+                String userName = player.getUserName();
+                draftOrder.append(index + 1).append(". ").append(userName).append("\n");
+            }
+
+            message += draftOrder.toString();
+            baseMessageObject = new MessageCreateBuilder().addContent(message);
+            mainGameChannel.sendMessage(baseMessageObject.build()).queue();
+
+            String playerPing = Helper.getPlayerPing(draftManager.getDraftOrderPlayer());
+            mainGameChannel.sendMessage(draftManager.getDraftOrderPlayer().getUserName() + " is up!").queue();
+
+
         }
     }
 
-    private List<ActionRow> makeActionRows(List<Button> buttons)
-    {
+    private void initDraftOrder(MiltyDraftManager draftManager, Map activeMap) {
+        List<Player> players = activeMap.getPlayers().values().stream().filter(Player::isRealPlayer).collect(Collectors.toList());
+        Collections.shuffle(players);
+        Collections.shuffle(players);
+
+        List<Player> playersReversed = new ArrayList<>(players);
+        Collections.reverse(playersReversed);
+
+        List<Player> draftOrder = new ArrayList<>(players);
+        draftOrder.addAll(playersReversed);
+        draftOrder.addAll(players);
+
+        draftManager.setDraftOrder(draftOrder);
+        draftManager.setDraftRandomOrder(players);
+    }
+
+    private List<ActionRow> makeActionRows(List<Button> buttons) {
         List<ActionRow> actionRow = new ArrayList<>();
         List<Button> tempActionRow = new ArrayList<>();
         int index = 0;
         for (Button button : buttons) {
-            if (index > 4){
+            if (index > 4) {
                 actionRow.add(ActionRow.of(tempActionRow));
                 tempActionRow = new ArrayList<>();
                 index = 0;
             }
             tempActionRow.add(button);
             index++;
-       }
+        }
         actionRow.add(ActionRow.of(tempActionRow));
         return actionRow;
     }
@@ -138,6 +181,16 @@ public class StartMilty extends MiltySubcommandData {
             sliceButtons.add(sliceButton);
         }
         return sliceButtons;
+    }
+
+    private List<Button> getMiltyOrderButtons(Map activeMap) {
+        List<Button> orderButtons = new ArrayList<>();
+        for (int i = 0; i < activeMap.getPlayerCountForMap(); i++) {
+            int order = i + 1;
+            Button sliceButton = Button.success("milty_order_" + order, "Order No.: " + order);
+            orderButtons.add(sliceButton);
+        }
+        return orderButtons;
     }
 
     private List<net.dv8tion.jda.api.interactions.components.buttons.Button> getMiltyFactionButtons(Map activeMap) {
@@ -423,6 +476,19 @@ public class StartMilty extends MiltySubcommandData {
         return tileID.contains("corner") || tileModel.getImagePath().contains("corner") ||
                 tileID.contains("lane") || tileModel.getImagePath().contains("lane") ||
                 tileID.contains("mecatol") || tileModel.getImagePath().contains("mecatol") ||
+                tileID.contains("blank") || tileModel.getImagePath().contains("blank") ||
+                tileID.contains("border") || tileModel.getImagePath().contains("border") ||
+                tileID.contains("FOW") || tileModel.getImagePath().contains("FOW") ||
+                tileID.contains("anomaly") || tileModel.getImagePath().contains("anomaly") ||
+                tileID.contains("DeltaWH") || tileModel.getImagePath().contains("DeltaWH") ||
+                tileID.contains("Seed") || tileModel.getImagePath().contains("Seed") ||
+                tileID.contains("MR") || tileModel.getImagePath().contains("MR") ||
+                tileID.contains("Mallice") || tileModel.getImagePath().contains("Mallice") ||
+                tileID.contains("Ethan") || tileModel.getImagePath().contains("Ethan") ||
+                tileID.contains("prison") || tileModel.getImagePath().contains("prison") ||
+                tileID.contains("Kwon") || tileModel.getImagePath().contains("Kwon") ||
+                tileID.contains("home") || tileModel.getImagePath().contains("home") ||
+                tileID.contains("hs") || tileModel.getImagePath().contains("hs") ||
                 tileID.contains("red") || tileModel.getImagePath().contains("red") ||
                 tileID.contains("blue") || tileModel.getImagePath().contains("blue") ||
                 tileID.contains("green") || tileModel.getImagePath().contains("green") ||

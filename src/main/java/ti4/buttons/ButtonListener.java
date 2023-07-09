@@ -1870,6 +1870,9 @@ public class ButtonListener extends ListenerAdapter {
                 event.getMessage().delete().queue();
             }
 
+        } else if (buttonID.startsWith("milty_")) {
+
+//            System.out.println("MILTY");
         } else if (buttonID.startsWith("ring_")) {
             List<Button> ringButtons = ButtonHelper.getTileInARing(player, activeMap, buttonID, event);
             String num = buttonID.replace("ring_", "");
