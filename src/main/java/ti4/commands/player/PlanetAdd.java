@@ -3,8 +3,11 @@ package ti4.commands.player;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+
 import ti4.commands.status.ScorePublic;
+import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
+import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -103,14 +106,21 @@ public class PlanetAdd extends PlanetAddRemove {
         if(player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")){
             ButtonHelper.commanderUnlockCheck(player, activeMap, "sol", event);
         }
+        if(player.getLeaderIDs().contains("winnucommander") && !player.hasLeaderUnlocked("winnucommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "winnu", event);
+        }
         if(player.getLeaderIDs().contains("xxchacommander") && !player.hasLeaderUnlocked("xxchacommander")){
             ButtonHelper.commanderUnlockCheck(player, activeMap, "xxcha", event);
         }
         if(player.getLeaderIDs().contains("sardakkcommander") && !player.hasLeaderUnlocked("sardakkcommander")){
             ButtonHelper.commanderUnlockCheck(player, activeMap, "sardakk", event);
         }
-        if(player.getLeaderIDs().contains("winnucommander") && !player.hasLeaderUnlocked("winnucommander") && player.getPlanets().contains("mr")){
+        if(planet.equalsIgnoreCase("mr")&&player.getLeaderIDs().contains("winnucommander") && !player.hasLeaderUnlocked("winnucommander") && player.getPlanets().contains("mr")){
             ButtonHelper.commanderUnlockCheck(player, activeMap, "winnu", event);
+        }
+        if(planet.equalsIgnoreCase("mr")&& player.hasAbility("reclamation")){
+             new AddUnits().unitParsing(event, player.getColor(),
+                            activeMap.getTile(AliasHandler.resolveTile(planet)), "sd " + planet + ", pds "+planet, activeMap);
         }
     }
 }

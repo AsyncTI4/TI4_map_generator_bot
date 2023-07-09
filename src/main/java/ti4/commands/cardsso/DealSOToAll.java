@@ -40,7 +40,7 @@ public class DealSOToAll extends SOCardsSubcommandData {
         if(activeMap.getRound() == 1){
             List<Button> buttons = new ArrayList<Button>();
             buttons.add(Button.success("startOfGameObjReveal" , "Reveal Objectives and Start Strategy Phase"));
-            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Press this button after everyone has discarded", buttons);
+            MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), "Press this button after everyone has discarded", buttons);
         }
     }
 }

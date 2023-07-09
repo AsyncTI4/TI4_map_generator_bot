@@ -1352,6 +1352,10 @@ public class ButtonListener extends ListenerAdapter {
                     String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
 
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
+                    if (player.hasTechReady("sar")) {
+                        Button sar = Button.danger("exhaustTech_sar", "Exhaust Self Assembly Routines");
+                        buttons.add(sar);
+                    }
                     if (player.hasTechReady("aida")) {
                         Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
                         buttons.add(aiDEVButton);
@@ -2842,8 +2846,8 @@ public class ButtonListener extends ListenerAdapter {
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Please assign speaker before hitting this button (command is /player stats speaker:y)");
                         return;
                     }
-                    new RevealStage1().revealS1(event, event.getChannel());
-                    new RevealStage1().revealS1(event, event.getChannel());
+                    new RevealStage1().revealS1(event, activeMap.getMainGameChannel());
+                    new RevealStage1().revealS1(event, activeMap.getMainGameChannel());
                     ButtonHelper.startStrategyPhase(event, activeMap);
                     event.getMessage().delete().queue();
                 }

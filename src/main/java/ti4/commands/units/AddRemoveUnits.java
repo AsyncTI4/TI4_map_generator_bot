@@ -350,7 +350,7 @@ abstract public class AddRemoveUnits implements Command {
         return color;
     }
 
-    public void unitParsing(ButtonInteractionEvent event, String color, Tile tile, String unitList, Map activeMap) {
+    public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Map activeMap) {
         unitList = unitList.replace(", ", ",");
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
         while (unitListTokenizer.hasMoreTokens()) {
@@ -359,7 +359,7 @@ abstract public class AddRemoveUnits implements Command {
 
             int tokenCount = unitInfoTokenizer.countTokens();
             if (tokenCount > 3) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Warning: Unit list should have a maximum of 3 parts `{count} {unit} {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may be errors.");
             }
 
             int count = 1;
@@ -381,7 +381,7 @@ abstract public class AddRemoveUnits implements Command {
             String unitID = Mapper.getUnitID(unit, color);
             String unitPath = Tile.getUnitPath(unitID);
             if (unitPath == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Unit `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Unit `" + unit + "` is not valid and not supported. Please redo this part: `" + unitListToken + "`");
                 continue;
             }
             if (unitInfoTokenizer.hasMoreTokens()) {
