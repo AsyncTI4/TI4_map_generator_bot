@@ -106,9 +106,6 @@ public class PlanetAdd extends PlanetAddRemove {
         if(player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")){
             ButtonHelper.commanderUnlockCheck(player, activeMap, "sol", event);
         }
-        if(player.getLeaderIDs().contains("winnucommander") && !player.hasLeaderUnlocked("winnucommander")){
-            ButtonHelper.commanderUnlockCheck(player, activeMap, "winnu", event);
-        }
         if(player.getLeaderIDs().contains("xxchacommander") && !player.hasLeaderUnlocked("xxchacommander")){
             ButtonHelper.commanderUnlockCheck(player, activeMap, "xxcha", event);
         }
