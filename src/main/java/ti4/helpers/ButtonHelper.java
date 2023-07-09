@@ -1449,10 +1449,10 @@ public class ButtonHelper {
             }
         } else {
             if (!activeMap.isHomeBrewSCMode()) {
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
+                MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(),
                         message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
             } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), message);
+                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
             }
         }
     }

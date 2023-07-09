@@ -61,7 +61,7 @@ public abstract class TechAddRemove extends PlayerSubcommandData{
         if (techOption != null) {
             String techID = AliasHandler.resolveTech(techOption.getAsString());
             if (Mapper.isValidTech(techID)) {
-                doAction(player, techID);
+                doAction(player, techID, event);
             } else {
                 HashMap<String, TechnologyModel> techs = Mapper.getTechs();
                 List<String> possibleTechs = techs.entrySet().stream().filter(value -> value.getValue().getName().toLowerCase().contains(techID))
@@ -73,10 +73,10 @@ public abstract class TechAddRemove extends PlayerSubcommandData{
                     sendMessage("More that one matching Tech found");
                     return;
                 }
-                doAction(player, possibleTechs.get(0));
+                doAction(player, possibleTechs.get(0), event);
             }
         }
     }
 
-    public abstract void doAction(Player player, String techID);
+    public abstract void doAction(Player player, String techID, SlashCommandInteractionEvent event);
 }
