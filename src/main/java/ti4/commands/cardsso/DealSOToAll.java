@@ -1,13 +1,19 @@
 package ti4.commands.cardsso;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.map.Map;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class DealSOToAll extends SOCardsSubcommandData {
     public DealSOToAll() {
@@ -31,5 +37,19 @@ public class DealSOToAll extends SOCardsSubcommandData {
                 SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
         }
         sendMessage(count + Emojis.SecretObjective + " dealt to all players. Check your Cards-Info threads.");
+    }
+    public void dealSOToAll(GenericInteractionCreateEvent event, int count, Map activeMap){
+        for (Player player : activeMap.getRealPlayers()) {
+                for (int i = 0; i < count; i++) {
+                    activeMap.drawSecretObjective(player.getUserID());
+                }
+                SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
+        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), count + Emojis.SecretObjective + " dealt to all players. Check your Cards-Info threads.");
+        if(activeMap.getRound() == 1){
+            List<Button> buttons = new ArrayList<Button>();
+            buttons.add(Button.success("startOfGameObjReveal" , "Reveal Objectives and Start Strategy Phase"));
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Press this button after everyone has discarded", buttons);
+        }
     }
 }
