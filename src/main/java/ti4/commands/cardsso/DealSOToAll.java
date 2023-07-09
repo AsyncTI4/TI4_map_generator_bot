@@ -25,25 +25,16 @@ public class DealSOToAll extends SOCardsSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         int count = event.getOption(Constants.COUNT, 1, OptionMapping::getAsInt);
-        if (count < 1) {
-            sendMessage("`count` option must be greater than 0");
-            return;
-        }
-
-        for (Player player : activeMap.getRealPlayers()) {
-                for (int i = 0; i < count; i++) {
-                    activeMap.drawSecretObjective(player.getUserID());
-                }
-                SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
-        }
-        sendMessage(count + Emojis.SecretObjective + " dealt to all players. Check your Cards-Info threads.");
+        dealSOToAll(event, count, activeMap);
     }
     public void dealSOToAll(GenericInteractionCreateEvent event, int count, Map activeMap){
-        for (Player player : activeMap.getRealPlayers()) {
-                for (int i = 0; i < count; i++) {
-                    activeMap.drawSecretObjective(player.getUserID());
-                }
-                SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
+        if(count > 0){
+            for (Player player : activeMap.getRealPlayers()) {
+                    for (int i = 0; i < count; i++) {
+                        activeMap.drawSecretObjective(player.getUserID());
+                    }
+                    SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
+            }
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), count + Emojis.SecretObjective + " dealt to all players. Check your Cards-Info threads.");
         if(activeMap.getRound() == 1){
