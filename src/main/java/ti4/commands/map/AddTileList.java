@@ -8,6 +8,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.ResourceHelper;
 import ti4.commands.Command;
+import ti4.commands.tokens.AddFrontierTokens;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -84,10 +85,13 @@ public class AddTileList implements Command {
             BotLogger.log("Could not add setup and Mallice tiles", e);
         }
 
+        new AddFrontierTokens().parsingForTile(event, userActiveMap);
+        
         MapSaveLoadManager.saveMap(userActiveMap, event);
 
         File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
         MessageHelper.replyToMessage(event, file);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added frontier tokens");
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")
