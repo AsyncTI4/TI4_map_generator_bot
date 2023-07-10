@@ -963,10 +963,8 @@ public class ButtonHelper {
         }else{
             return false;
         }
-        
-
-        
     }
+
     public static List<Button> scanlinkResolution(Player player, Map activeMap, ButtonInteractionEvent event) {
         Tile tile =  activeMap.getTileByPosition(activeMap.getActiveSystem());
         List<Button> buttons = new ArrayList<Button>();
@@ -976,14 +974,42 @@ public class ButtonHelper {
             }
             Planet planetReal =  (Planet) planetUnit;
             String planet = planetReal.getName();    
-            if (planetReal != null && planetReal.getOriginalPlanetType() != null && player.getPlanets().contains(planet) && !planetReal.getUnits().isEmpty() && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous"))) {
-                String drawColor = planetReal.getOriginalPlanetType();
-                Button resolveExplore2 = Button.success("movedNExplored_filler_"+planet+"_"+drawColor, "Explore "+Helper.getPlanetRepresentation(planet, activeMap));
-                buttons.add(resolveExplore2);
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && player.getPlanets().contains(planet) && !planetReal.getUnits().isEmpty()) {
+                List<Button> planetButtons = getPlanetExplorationButtons(activeMap, planetReal);
+                buttons.addAll(planetButtons);
             }
         }
         return buttons;
-       
+    }
+
+    public static List<Button> getPlanetExplorationButtons(Map activeMap, Planet planet) {
+        if (planet == null || activeMap == null) return null;
+
+        String planetType = planet.getOriginalPlanetType();
+        String planetId = planet.getName();
+        String planetRepresentation = Helper.getPlanetRepresentation(planetId, activeMap);
+        List<Button> buttons = new ArrayList<>();
+        Set<String> explorationTraits = new HashSet<>();
+        if (planetType != null && (planetType.equalsIgnoreCase("industrial") || planetType.equalsIgnoreCase("cultural") || planetType.equalsIgnoreCase("hazardous"))) {
+            explorationTraits.add(planetType);
+        }
+        if (planet.getTokenList().contains("attachment_titanspn.png")) {
+            explorationTraits.add("cultural");
+            explorationTraits.add("industrial");
+            explorationTraits.add("hazardous");
+        }
+        if (planet.getTokenList().contains("attachment_industrialboom.png")) {
+            explorationTraits.add("industrial");
+        }
+        
+        for (String trait : explorationTraits) {
+            String buttonId = "movedNExplored_filler_" + planetId + "_" + trait;
+            String buttonMessage = "Explore " + planetRepresentation + (explorationTraits.size() > 1 ? " as " + trait : "");
+            Emoji emoji = Emoji.fromFormatted(Helper.getEmojiFromDiscord(trait));
+            Button button = Button.secondary(buttonId, buttonMessage).withEmoji(emoji);
+            buttons.add(button);
+        }
+        return buttons;
     }
 
     public static List<Tile> getTilesWithShipsInTheSystem(Player player, Map activeMap) {
