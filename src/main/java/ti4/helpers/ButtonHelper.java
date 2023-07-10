@@ -63,6 +63,15 @@ public class ButtonHelper {
                 Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
                 buttons.add(lost3TG);
             }
+            if (player.hasLeader("keleresagent")&&player.getCommodities() > 0) {
+                Button lost1C = Button.danger("reduceComm_1", "Spend 1 comm");
+                buttons.add(lost1C);
+            }
+            if (player.hasLeader("keleresagent")&&player.getCommodities() > 1) {
+                Button lost2C = Button.danger("reduceComm_2", "Spend 2 comms");
+                buttons.add(lost2C);
+            }
+            
             return buttons;
     }
      public static void giveKeleresCommsNTg(Map activeMap, GenericInteractionCreateEvent event){
@@ -157,8 +166,23 @@ public class ButtonHelper {
 
         return canBuildGFInSpace;
     }
+    public static void resolveTACheck(Map activeMap, Player player, GenericInteractionCreateEvent event) {
+        for(Player p2 : activeMap.getRealPlayers()){
+            if(p2.getFaction().equalsIgnoreCase(player.getFaction())){
+                continue;
+            }
+            if(p2.getPromissoryNotes().containsKey(player.getColor()+"_ta")){
+                List<Button> buttons = new ArrayList<Button>();
+                buttons.add(Button.success("useTA_"+player.getColor(), "Use TA"));
+                buttons.add(Button.danger("deleteButtons", "Decline to use TA"));
+                String message = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) +" a player who's TA you hold has refreshed their comms, would you like to play the TA?";
+                MessageHelper.sendMessageToChannelWithButtons(p2.getPrivateChannel(), message, buttons);
+            }
+        }
+    }
 
     public static void resolveMinisterOfCommerceCheck(Map activeMap, Player player, GenericInteractionCreateEvent event) {
+        resolveTACheck(activeMap, player, event);
         for(String law : activeMap.getLaws().keySet()){
             if(law.equalsIgnoreCase("minister_commrece") || law.equalsIgnoreCase("absol_minscomm")){
                 if(activeMap.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction())){
@@ -2344,11 +2368,13 @@ public class ButtonHelper {
             pnText = Mapper.getPromissoryNote(id, longPNDisplay);
         }
         sb.append(pnText).append("\n");
-
+        Player owner = Helper.getPlayerFromColorOrFaction(activeMap, pnOwner); 
         //TERRAFORM TIP
         if (id.equalsIgnoreCase("terraform")) {
             ButtonHelper.offerTerraformButtons(player, activeMap, event);
         }
+       
+       
 
         //Fog of war ping
         if (activeMap.isFoWMode()) {
@@ -2356,6 +2382,30 @@ public class ButtonHelper {
             FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, sb.toString());
         }
         MessageHelper.sendMessageToChannel(event.getMessageChannel(),sb.toString());
+         if (id.equalsIgnoreCase("fires")) {
+            player.addTech("ws");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true ) + " acquired Warsun tech");
+            owner.setFleetCC(owner.getFleetCC()-1);
+            String reducedMsg = Helper.getPlayerRepresentation(owner, activeMap, activeMap.getGuild(), true ) + " reduced your fleet cc by 1";
+            if(activeMap.isFoWMode()){
+                MessageHelper.sendMessageToChannel(owner.getPrivateChannel(), reducedMsg);
+            }else{
+                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), reducedMsg);
+            }
+        }
+        if (id.endsWith("_ta")) {
+            owner.setCommodities(0);
+            String reducedMsg = Helper.getPlayerRepresentation(owner, activeMap, activeMap.getGuild(), true ) + " your TA was played.";
+            String reducedMsg2 = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true ) + " you gained tgs equal to the value of the played TA ("+player.getTg()+"->"+(player.getTg()+owner.getCommoditiesTotal())+")";
+            player.setTg(player.getTg()+owner.getCommoditiesTotal());
+            if(activeMap.isFoWMode()){
+                MessageHelper.sendMessageToChannel(owner.getPrivateChannel(), reducedMsg);
+                MessageHelper.sendMessageToChannel(player.getPrivateChannel(), reducedMsg2);
+            }else{
+                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), reducedMsg2);
+                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), reducedMsg);
+            }
+        }
         PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
     }
 
