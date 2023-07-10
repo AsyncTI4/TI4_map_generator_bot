@@ -67,7 +67,7 @@ public class UnitModel implements ModelInterface {
         return representation;
     }
     
-    public MessageEmbed getUnitRepresentationEmbed() {
+    public MessageEmbed getUnitRepresentationEmbed(boolean includeAliases) {
         
         String factionEmoji = getFaction() == null ? "" : Helper.getFactionIconFromDiscord(getFaction().toLowerCase());
         String unitEmoji = getBaseType() == null ? "" : Helper.getEmojiFromDiscord(getBaseType());
@@ -129,7 +129,7 @@ public class UnitModel implements ModelInterface {
             2. icon url as string (can be null)
         */
         // eb.setFooter("Text", "https://github.com/zekroTJA/DiscordBot/blob/master/.websrc/zekroBot_Logo_-_round_small.png");
-        eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
+        if (includeAliases) eb.setFooter("UnitID: " + getId() + "\nAliases: " + getAsyncIDAliases() + "\nSource: " + getSource());
 
         /*
             Set image:
