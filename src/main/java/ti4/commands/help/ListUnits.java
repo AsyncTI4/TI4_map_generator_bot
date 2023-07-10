@@ -20,18 +20,18 @@ public class ListUnits extends HelpSubcommandData {
     public ListUnits() {
         super(Constants.LIST_UNITS, "List all units");
         addOptions(new OptionData(OptionType.STRING, Constants.SEARCH, "Searches the text and limits results to those containing this string."));
-        // addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "Set to true to also include common aliases, the ID, and source of the unit."));
+        addOptions(new OptionData(OptionType.BOOLEAN, Constants.INCLUDE_ALIASES, "Set to true to also include common aliases, the ID, and source of the unit."));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
-        // boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
+        boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
         List<MessageEmbed> messageEmbeds = new ArrayList<MessageEmbed>();
 
         for (UnitModel unitModel : Mapper.getUnits().values()) {
-            MessageEmbed unitRepresentationEmbed = unitModel.getUnitRepresentationEmbed();
-            if (searchString == null || unitRepresentationEmbed.getFooter().getText().toLowerCase().contains(searchString.toLowerCase())) {
+            MessageEmbed unitRepresentationEmbed = unitModel.getUnitRepresentationEmbed(includeAliases);
+            if (searchString == null || unitRepresentationEmbed.getTitle().toLowerCase().contains(searchString.toLowerCase())) {
                 messageEmbeds.add(unitRepresentationEmbed);
             }
         }
