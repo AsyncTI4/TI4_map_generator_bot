@@ -1,5 +1,6 @@
 package ti4.commands.player;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
@@ -49,8 +50,17 @@ public class PlanetAdd extends PlanetAddRemove {
             } else if (unitHolder.getTokenList().contains(Constants.CUSTODIAN_TOKEN_PNG)) {
                 unitHolder.removeToken(Constants.CUSTODIAN_TOKEN_PNG);
                 activeMap.scorePublicObjective(player.getUserID(), 0);
-                if (event != null && event instanceof SlashCommandInteractionEvent) {
-                    ScorePublic.informAboutScoring(event, ((SlashCommandInteractionEvent) event).getChannel(), activeMap, player, 0);
+                MessageChannel channel = activeMap.getMainGameChannel();
+                if(activeMap.isFoWMode()){
+                    channel = player.getPrivateChannel();
+                }
+                MessageHelper.sendMessageToChannel(channel, "You scored custodians!");
+                String message2 = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " Click the names of the planets you wish to exhaust to spend 6i.";
+                List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
+                Button DoneExhausting =  Button.danger("deleteButtons", "Done Exhausting Planets");
+                buttons.add(DoneExhausting);
+                if(!player.hasAbility("reclamation")){
+                    MessageHelper.sendMessageToChannelWithButtons(channel, message2, buttons);
                 }
             }
         }
