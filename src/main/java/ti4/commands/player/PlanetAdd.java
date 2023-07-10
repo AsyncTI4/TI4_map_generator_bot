@@ -89,18 +89,11 @@ public class PlanetAdd extends PlanetAddRemove {
         }
         if (!alreadyOwned && !activeMap.isAllianceMode() && (!planet.equals("mirage"))&& !activeMap.isBaseGameMode()) {
             Planet planetReal = (Planet) unitHolder;
-            boolean oneOfThree = false;
-            if (planetReal != null && planetReal.getOriginalPlanetType() != null && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous"))) {
-                oneOfThree = true;
-            }
-            if ( oneOfThree) {
-                String message = "Click Button To Explore";
-                String drawColor = planetReal.getOriginalPlanetType();
-                Button resolveExplore2 = Button.success("movedNExplored_filler_"+planet+"_"+drawColor, "Explore "+Helper.getPlanetRepresentation(planet, activeMap));
-                List<Button> buttons = List.of(resolveExplore2);
-                if(event!=null){
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-                }
+            List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeMap, planetReal);
+            
+            if (event != null && buttons != null) {
+                String message = "Click button to explore " + Helper.getPlanetRepresentation(planet, activeMap);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }
         }
         if(player.getLeaderIDs().contains("solcommander") && !player.hasLeaderUnlocked("solcommander")){
