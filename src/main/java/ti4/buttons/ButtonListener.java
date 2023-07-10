@@ -759,6 +759,39 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().editMessage(editedMessage).queue();
 
             // MessageHelper.sendMessageToChannel(event.getChannel(), message);
+        } else if (buttonID.startsWith("reduceComm_")) {
+
+            int tgLoss = Integer.parseInt(buttonID.replace("reduceComm_", ""));
+            String message = ident + " reduced comms by " + tgLoss + " (" + player.getCommodities() + "->"
+                    + (player.getCommodities() - tgLoss) + ")";
+
+            if (tgLoss > player.getCommodities()) {
+                message = "You dont have " + tgLoss + " comms. No change made.";
+            } else {
+                player.setCommodities(player.getCommodities() - tgLoss);
+            }
+            String editedMessage = event.getMessage().getContentRaw() + " " + message;
+
+            if (editedMessage.contains("Click the names")) {
+                editedMessage = message;
+            }
+            Leader playerLeader = player.getLeader("keleresagent");
+		
+		
+                
+            if(!playerLeader.isExhausted() ){
+                playerLeader.setExhausted(true);
+                StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
+                        .append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
+                if(activeMap.isFoWMode()){
+                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), messageText.toString());
+                }else{
+                    MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), messageText.toString());
+                }
+            }
+                    event.getMessage().editMessage(editedMessage).queue();
+
+            // MessageHelper.sendMessageToChannel(event.getChannel(), message);
          } else if (buttonID.startsWith("pillage_")) {
             buttonID = buttonID.replace("pillage_", "");
             String colorPlayer = buttonID.split("_")[0];
@@ -1697,14 +1730,48 @@ public class ButtonListener extends ListenerAdapter {
                         }
                     }
                 }
-                String message = playerRep + " Would you like to put a cc from reinforcements in the same system?";
-                Button placeCCInSystem = Button.success(
-                        finsFactionCheckerPrefix + "reinforcements_cc_placement_" + planetName,
-                        "Place A CC From Reinforcements In The System.");
-                Button NoDontWantTo = Button.primary(finsFactionCheckerPrefix + "deleteButtons",
-                        "Don't Place A CC In The System.");
-                List<Button> buttons = List.of(placeCCInSystem, NoDontWantTo);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                if(player.hasLeader("mahactagent")){
+                    String message = playerRep + " Would you like to put a cc from reinforcements in the same system?";
+                    Button placeCCInSystem = Button.success(
+                            finsFactionCheckerPrefix + "reinforcements_cc_placement_" + planetName,
+                            "Place A CC From Reinforcements In The System.");
+                    Button NoDontWantTo = Button.primary(finsFactionCheckerPrefix + "deleteButtons",
+                            "Don't Place A CC In The System.");
+                    List<Button> buttons = List.of(placeCCInSystem, NoDontWantTo);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                }else{
+                    if(!player.getSCs().contains(Integer.parseInt("4"))){
+                        String color = player.getColor();
+                        String tileID = AliasHandler.resolveTile(planetName.toLowerCase());
+                        Tile tile = activeMap.getTile(tileID);
+                        if (tile == null) {
+                            tile = activeMap.getTileByPosition(tileID);
+                        }
+                        if (Mapper.isColorValid(color)) {
+                            AddCC.addCC(event, color, tile);
+                        }
+
+                        if (activeMap.isFoWMode()) {
+                            MessageHelper.sendMessageToChannel(event.getChannel(),
+                                    playerRep + " Placed A CC From Reinforcements In The "
+                                            + Helper.getPlanetRepresentation(planetName, activeMap) + " system");
+                        } else {
+                            List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+                            if (threadChannels == null)
+                                return;
+                            String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-construction";
+                            // SEARCH FOR EXISTING OPEN THREAD
+                            for (ThreadChannel threadChannel_ : threadChannels) {
+                                if (threadChannel_.getName().equals(threadName)) {
+                                    MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_,
+                                            playerRep + " Placed A CC From Reinforcements In The "
+                                                    + Helper.getPlanetRepresentation(planetName, activeMap) + " system");
+                                }
+                            }
+                        }
+                    }
+                }
+                
                 event.getMessage().delete().queue();
 
             } else {
@@ -2265,6 +2332,10 @@ public class ButtonListener extends ListenerAdapter {
         } else if (buttonID.startsWith("mahactCommander")) {
             List<Button> buttons = ButtonHelper.getButtonsToRemoveYourCC(player, activeMap, event, "mahactCommander");
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons to remove token.", buttons);
+            event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("useTA_")) {
+            String ta = buttonID.replace("useTA_", "") + "_ta";
+            ButtonHelper.resolvePNPlay(ta,  player,  activeMap,  event);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("removeCCFromBoard_")) {
             ButtonHelper.resolveRemovingYourCC(player, activeMap, event, buttonID);
