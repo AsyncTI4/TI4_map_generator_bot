@@ -979,7 +979,7 @@ public class ButtonHelper {
         }
         
         for (String trait : explorationTraits) {
-            String buttonId = "movedNExplored_filler_" + planet + "_" + trait;
+            String buttonId = "movedNExplored_filler_" + planetId + "_" + trait;
             String buttonMessage = "Explore " + planetRepresentation + (explorationTraits.size() > 1 ? " as " + trait : "");
             Emoji emoji = Emoji.fromFormatted(Helper.getEmojiFromDiscord(trait));
             Button button = Button.secondary(buttonId, buttonMessage).withEmoji(emoji);
