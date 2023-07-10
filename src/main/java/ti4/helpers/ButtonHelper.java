@@ -949,8 +949,11 @@ public class ButtonHelper {
                 continue;
             }
             Planet planetReal =  (Planet) planetUnit;
-            List<Button> planetButtons = getPlanetExplorationButtons(activeMap, planetReal);
-            buttons.addAll(planetButtons);
+            String planet = planetReal.getName();    
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && player.getPlanets().contains(planet) && !planetReal.getUnits().isEmpty()) {
+                List<Button> planetButtons = getPlanetExplorationButtons(activeMap, planetReal);
+                buttons.addAll(planetButtons);
+            }
         }
         return buttons;
     }
