@@ -114,9 +114,11 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, Emojis.noafters,activeMap, afterButtons,"after");
 
         ListVoteCount.turnOrder(event, activeMap, channel);
-        Button proceed = Button.danger( "proceedToVoting", "Proceed to voting without waiting for everyone to react");
+        Button proceed = Button.danger( "proceedToVoting", "Proceed to voting without waiting");
         List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
-        MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters", proceedButtons);
+        Button transaction = Button.primary("transaction", "Transaction");
+        proceedButtons.add(transaction);
+        MessageHelper.sendMessageToChannelWithButtons(channel, "Press this button if the last person forgot to react, but verbally said no whens/afters. Also a transaction button", proceedButtons);
 
     }
 }
