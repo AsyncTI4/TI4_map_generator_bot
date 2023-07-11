@@ -32,8 +32,8 @@ public class PositionMapper {
     //    private static final Properties adjacentTiles = new Properties();
     private static final Properties adjacent8RingTiles = new Properties();
 
-    private static final Properties migrate = new Properties();
-    private static final Properties migrate8rings = new Properties();
+    // private static final Properties migrate = new Properties();
+    // private static final Properties migrate8rings = new Properties();
 
 
     public static void init() {
@@ -48,8 +48,8 @@ public class PositionMapper {
 //        readData("adjacent.properties", adjacentTiles, "Could not read adjacent tiles file");
         readData("adjacent8ring.properties", adjacent8RingTiles, "Could not read adjacent tiles file");
 
-        readData("migrate.properties", migrate, "Could not read wormholes file");
-        readData("migrate8rings.properties", migrate8rings, "Could not read wormholes file");
+        // readData("migrate.properties", migrate, "Could not read wormholes file");
+        // readData("migrate8rings.properties", migrate8rings, "Could not read wormholes file");
     }
 
     private static void readData(String fileName, Properties positionMap, String errorMessage) {
@@ -63,13 +63,13 @@ public class PositionMapper {
         }
     }
 
-    public static String getMigratePosition(String position) {
-        return migrate.getProperty(position);
-    }
+    // public static String getMigratePosition(String position) {
+    //     return migrate.getProperty(position);
+    // }
 
-    public static String getMigrate8RingsPosition(String position) {
-        return migrate8rings.getProperty(position);
-    }
+    // public static String getMigrate8RingsPosition(String position) {
+    //     return migrate8rings.getProperty(position);
+    // }
 
     public static java.util.Map<String, Point> getTilePlanetPositions(String tileID) {
         if (tileID.equals("nombox")) {

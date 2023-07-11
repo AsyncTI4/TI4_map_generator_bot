@@ -1047,11 +1047,11 @@ public class MapSaveLoadManager {
                     LinkedHashMap<String, List<String>> adjacentTilesMigrated = new LinkedHashMap<>();
                     for (java.util.Map.Entry<String, List<String>> entry : adjacentTiles.entrySet()) {
                         String key = entry.getKey();
-                        key = migratePosition(activeMap, key);
+                        // key = migratePosition(activeMap, key);
 
                         List<String> migrated = new ArrayList<>();
                         for (String value : entry.getValue()) {
-                            value = migratePosition(activeMap, value);
+                            // value = migratePosition(activeMap, value);
                             migrated.add(value);
                         }
                         adjacentTilesMigrated.put(key, migrated);
@@ -1157,18 +1157,6 @@ public class MapSaveLoadManager {
                         }
                     } catch (Exception e) {
                         activeMap.setPlayerCountForMap(6);
-                    }
-                }
-                case Constants.RING_COUNT_FOR_MAP -> {
-                    try {
-                        int ringCount = Integer.parseInt(info);
-                        if (ringCount >= 3 && ringCount <= 8) {
-                            activeMap.setRingCount(ringCount);
-                        } else {
-                            activeMap.setRingCount(3);
-                        }
-                    } catch (Exception e) {
-                        activeMap.setRingCount(3);
                     }
                 }
                 case Constants.ACTIVATION_COUNT -> {
@@ -1491,8 +1479,8 @@ public class MapSaveLoadManager {
             String direction = overrideInfo[1];
             String secondaryTile = overrideInfo[2];
 
-            primaryTile = migratePosition(activeMap, primaryTile);
-            secondaryTile = migratePosition(activeMap, secondaryTile);
+            // primaryTile = migratePosition(activeMap, primaryTile);
+            // secondaryTile = migratePosition(activeMap, secondaryTile);
 
             Pair<String, Integer> primary = new ImmutablePair<String, Integer>(primaryTile, Integer.parseInt(direction));
             overrides.put(primary, secondaryTile);
@@ -1500,16 +1488,16 @@ public class MapSaveLoadManager {
         return overrides;
     }
 
-    private static String migratePosition(Map activeMap, String primaryTile) {
-        if (!PositionMapper.isTilePositionValid(primaryTile)) {
-            if (activeMap.getRingCount() == 8) {
-                primaryTile = PositionMapper.getMigrate8RingsPosition(primaryTile);
-            } else {
-                primaryTile = PositionMapper.getMigratePosition(primaryTile);
-            }
-        }
-        return primaryTile;
-    }
+    // private static String migratePosition(Map activeMap, String primaryTile) {
+    //     if (!PositionMapper.isTilePositionValid(primaryTile)) {
+    //         if (activeMap.getRingCount() == 8) {
+    //             primaryTile = PositionMapper.getMigrate8RingsPosition(primaryTile);
+    //         } else {
+    //             primaryTile = PositionMapper.getMigratePosition(primaryTile);
+    //         }
+    //     }
+    //     return primaryTile;
+    // }
 
     private static void readPlayerInfo(Player player, String data, Map activeMap) {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
@@ -1617,7 +1605,8 @@ public class MapSaveLoadManager {
                         StringTokenizer fow_systems = new StringTokenizer(tokenizer.nextToken(), ";");
                         while (fow_systems.hasMoreTokens()) {
                             String[] system = fow_systems.nextToken().split(",");
-                            String position = migratePosition(activeMap, system[0]);
+                            // String position = migratePosition(activeMap, system[0]);
+                            String position = system[0];
                             String tileID = system[1];
                             String label = system[2];
                             if (label != null) label = label.replaceAll("—", " "); //replace em dash with spaces
