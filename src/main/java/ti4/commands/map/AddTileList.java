@@ -12,6 +12,7 @@ import ti4.commands.Command;
 import ti4.commands.tokens.AddFrontierTokens;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
+import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.*;
@@ -19,7 +20,9 @@ import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class AddTileList implements Command {
 
@@ -56,6 +59,7 @@ public class AddTileList implements Command {
             return;
         }
 
+        List<String> badTiles = new ArrayList<>();
         userActiveMap.clearTileMap();
         for (java.util.Map.Entry<String, String> entry : mappedTilesToPosition.entrySet()) {
             String tileID = entry.getValue();
@@ -64,6 +68,10 @@ public class AddTileList implements Command {
             }
             if (tileID.equals("0")) {
                 tileID = "0g";
+            }
+            if (!TileHelper.getAllTiles().containsKey(tileID)) {
+                badTiles.add(tileID);
+                tileID = "0r";
             }
             String tileName = Mapper.getTileID(tileID);
             String position = entry.getKey();
@@ -76,6 +84,8 @@ public class AddTileList implements Command {
             AddTile.addCustodianToken(tile);
             userActiveMap.setTile(tile);
         }
+
+        if (!badTiles.isEmpty()) MessageHelper.sendMessageToChannel(event.getChannel(), "There were some bad tiles that were replaced with red tiles: " + badTiles.toString() + "\n");
 
         try {
             Tile tile;
