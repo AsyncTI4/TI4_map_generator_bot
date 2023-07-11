@@ -14,6 +14,7 @@ public class Setup extends GameSubcommandData {
     public Setup() {
         super(Constants.SETUP, "Game Setup");
         addOptions(new OptionData(OptionType.INTEGER, Constants.PLAYER_COUNT_FOR_MAP, "Specify player map size between 2 or 30. Default 6").setRequired(false));
+        addOptions(new OptionData(OptionType.INTEGER, Constants.RING_COUNT_FOR_MAP, "Specify ring count for map: Default between: 3 use standard map, 8 - for max map size. Default 4").setRequired(false));
         addOptions(new OptionData(OptionType.INTEGER, Constants.VP_COUNT, "Specify game VP count").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.GAME_CUSTOM_NAME, "Add Custom description to game").setRequired(false));
         addOptions(new OptionData(OptionType.BOOLEAN, Constants.TIGL_GAME, "Mark the game as TIGL"));
@@ -43,6 +44,16 @@ public class Setup extends GameSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify between 2 or 30 players.");
             } else {
                 activeMap.setPlayerCountForMap(count);
+            }
+        }
+
+        OptionMapping ringCount = event.getOption(Constants.RING_COUNT_FOR_MAP);
+        if (ringCount != null) {
+            int count = ringCount.getAsInt();
+            if (count < 3 || count > 8) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify between 3 and 8 rings.");
+            } else {
+                activeMap.setRingCount(count);
             }
         }
 
