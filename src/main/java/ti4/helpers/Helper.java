@@ -1166,14 +1166,13 @@ public class Helper {
             String position = "" + ringCount + (tileCount < 10 ? "0" + tileCount : tileCount);
             tilePositions.add(position);
             tileCount++;
-            if (tileCount > ringCount * 6){
+            if (tileCount > ringCount * 6) {
                 tileCount = 1;
                 ringCount++;
             }
         }
 
-        List<String> sortedTilePositions = tilePositions.stream().sorted().collect(Collectors.toList());
-
+        List<String> sortedTilePositions = tilePositions.stream().sorted(Comparator.comparingInt(Integer::parseInt)).collect(Collectors.toList());
         HashMap<String, Tile> tileMap = new HashMap<>(activeMap.getTileMap());
         StringBuilder sb = new StringBuilder();
         for (String position : sortedTilePositions) {

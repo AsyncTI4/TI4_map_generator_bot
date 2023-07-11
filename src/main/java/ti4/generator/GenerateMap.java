@@ -40,6 +40,7 @@ public class GenerateMap {
     public static final int DELTA_X = 8;
     public static final int DELTA_Y = 24;
     public static final int RING_MAX_COUNT = 8;
+    public static final int RING_MIN_COUNT = 3;
     public static final int PLAYER_STATS_HEIGHT = 650;
     public static final int TILE_PADDING = 100;
 
@@ -110,8 +111,10 @@ public class GenerateMap {
             int lawsY = (activeMap.getLaws().keySet().size() / 2 + 1) * 115;
             heightStats = playerY + lawsY + objectivesY + 600;
             
-            mapHeight = (activeMap.getRingCount() + 1) * 600 + extraY * 2;
-            mapWidth = (activeMap.getRingCount() + 1) * 520 + extraX * 2;
+            int ringCount = activeMap.getRingCount();
+            ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
+            mapHeight = (ringCount + 1) * 600 + extraY * 2;
+            mapWidth = (ringCount + 1) * 520 + extraX * 2;
             extraRow = false;
             if ((mapHeight - extraY) < (playerCountForMap / 2 * PLAYER_STATS_HEIGHT + extraY)) {
                 mapWidth += extraX;
@@ -202,6 +205,7 @@ public class GenerateMap {
                 if (setup != null) {
                     if (tileMap.get(setup).getTileID().equals("setup")) {
                         int ringCount = activeMap.getRingCount();
+                        ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
                         minX = 10000;
                         minY = 10000;
                         maxX = -1;
@@ -1693,6 +1697,7 @@ public class GenerateMap {
 
         int playerCount = activeMap.getPlayerCountForMap();
         int ringCount = activeMap.getRingCount();
+        ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
 
         boolean inverted = false;
         int index = 0;
@@ -2657,6 +2662,7 @@ public class GenerateMap {
 
     private static Point getTilePosition(Map activeMap, String position, int x, int y) {
         int ringCount = activeMap.getRingCount();
+        ringCount = Math.max(Math.min(ringCount, RING_MAX_COUNT), RING_MIN_COUNT);
         if (ringCount < RING_MAX_COUNT) {
             int lower = RING_MAX_COUNT - ringCount;
 
