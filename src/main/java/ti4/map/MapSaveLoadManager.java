@@ -1689,17 +1689,16 @@ public class MapSaveLoadManager {
         }
         String tempPosition = position;
         if (!PositionMapper.isTilePositionValid(position)) {
-            if (activeMap.getRingCount() == 8) {
-                position = PositionMapper.getMigrate8RingsPosition(position);
-            } else {
-                position = PositionMapper.getMigratePosition(position);
-            }
-            if (position == null) {
-                System.out.println(tempPosition + " " + activeMap.getName());
-            }
+            // if (activeMap.getRingCount() == 8) {
+            //     position = PositionMapper.getMigrate8RingsPosition(position);
+            // } else {
+            //     position = PositionMapper.getMigratePosition(position);
+            // }
+            BotLogger.log("Invalid tilePosition `" + tileData + "` found in save file for map `" + activeMap.getName() + "`");
         }
         if (tileID.equalsIgnoreCase("setup6") || tileID.equalsIgnoreCase("setup8")) {
             tileID = "setup";
+            BotLogger.log("Old setup6 or setup8 tile detected in map: " + activeMap.getName());
         }
         return new Tile(tileID, position);
     }
