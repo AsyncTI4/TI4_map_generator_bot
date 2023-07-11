@@ -219,7 +219,7 @@
         "imageFileSuffix": "_fs.png",
         "name": "Nemsys",
         "source": "ds",
-        "faction": "Augurs",
+        "faction": "Augers",
         "moveValue": 1,
         "capacityValue": 3,
         "capacityUsed": 1,
@@ -238,7 +238,7 @@
         "imageFileSuffix": "_mf.png",
         "name": "Iledrith",
         "source": "ds",
-        "faction": "Augurs",
+        "faction": "Augers",
         "capacityUsed": 1,
         "cost": 2,
         "combatHitsOn": 6,
@@ -305,7 +305,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Apply +1 to the results of this ship’s combat and ability rolls for each Fragment token on your faction sheet."
+        "ability": "Apply +1 to the results of this ship's combat and ability rolls for each Fragment token on your faction sheet."
     },
     {
         "id": "bentor_mech",
@@ -406,7 +406,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "You may use the PRODUCTION ability of other player’s space docks in this system to produce ships."
+        "ability": "You may use the PRODUCTION ability of other player's space docks in this system to produce ships."
     },
     {
         "id": "celdauri_mech",
@@ -477,7 +477,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When this unit is destroyed, you may place 1 fighter from your reinforcements in this system’s space area."
+        "ability": "When this unit is destroyed, you may place 1 fighter from your reinforcements in this system's space area."
     },
     {
         "id": "cheiran_dreadnought2",
@@ -499,7 +499,7 @@
         "bombardDieCount": 1,
         "sustainDamage": true,
         "isShip": true,
-        "ability": "When this unit is destroyed, you may place 1 fighter or 1 destroyer from your reinforcements in this system’s space area."
+        "ability": "When this unit is destroyed, you may place 1 fighter or 1 destroyer from your reinforcements in this system's space area."
     },
     {
         "id": "cheiran_flagship",
@@ -555,7 +555,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "After you win a combat in this system, you may take 1 of your opponent’s action cards, at random."
+        "ability": "After you win a combat in this system, you may take 1 of your opponent's action cards, at random."
     },
     {
         "id": "cymiae_infantry",
@@ -770,7 +770,7 @@
         "combatDieCount": 1,
         "afbHitsOn": 9,
         "afbDieCount": 1,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships’ capacity count against your fleet pool."
+        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
     },
     {
         "id": "florzen_fighter2",
@@ -789,14 +789,14 @@
         "combatDieCount": 1,
         "afbHitsOn": 8,
         "afbDieCount": 1,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships’ capacity count against your fleet pool."
+        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
     },
     {
         "id": "florzen_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
         "imageFileSuffix": "_fs.png",
-        "name": "Man O’ War",
+        "name": "Man O' War",
         "source": "ds",
         "faction": "Florzen",
         "moveValue": 1,
@@ -880,7 +880,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "When another player’s structure in this system is destroyed, gain 2 trade goods."
+        "ability": "When another player's structure in this system is destroyed, gain 2 trade goods."
     },
     {
         "id": "ghemina_flagship_lady",
@@ -985,7 +985,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "This unit can be blockaded. When producing ships in your home system, place up to 1 of those units in this system’s space area if it is not blockaded."
+        "ability": "This unit can be blockaded. When producing ships in your home system, place up to 1 of those units in this system's space area if it is not blockaded."
     },
     {
         "id": "gledge_flagship",
@@ -1037,7 +1037,7 @@
         "spaceCannonDieCount": 1,
         "planetaryShield": true,
         "isStructure": true,
-        "ability": "When this unit makes a SPACE CANNON roll against another player’s units, if it rolls at least 1 result of 9 or 10, explore this planet."
+        "ability": "When this unit makes a SPACE CANNON roll against another player's units, if it rolls at least 1 result of 9 or 10, explore this planet."
     },
     {
         "id": "gledge_pds2",
@@ -1053,7 +1053,7 @@
         "spaceCannonDieCount": 1,
         "planetaryShield": true,
         "isStructure": true,
-        "ability": "When this unit produces 1 or more hits against another player’s units, explore this planet. You may use this unit’s SPACE CANNON against ships that are adjacent to this unit's system."
+        "ability": "When this unit produces 1 or more hits against another player's units, explore this planet. You may use this unit's SPACE CANNON against ships that are adjacent to this unit's system."
     },
     {
         "id": "hacan_flagship",
@@ -1097,7 +1097,7 @@
         "imageFileSuffix": "_fs.png",
         "name": "J.N.S. Hylarim",
         "source": "base",
-        "faction": "Jol-Nar",
+        "faction": "jolnar",
         "moveValue": 1,
         "capacityValue": 3,
         "capacityUsed": 1,
@@ -1116,7 +1116,7 @@
         "imageFileSuffix": "_mf.png",
         "name": "Shield Paling",
         "source": "pok",
-        "faction": "Jol-Nar",
+        "faction": "jolnar",
         "capacityUsed": 1,
         "cost": 2,
         "combatHitsOn": 6,
@@ -1276,7 +1276,7 @@
         "baseType": "flagship",
         "asyncId": "fs",
         "imageFileSuffix": "_fs.png",
-        "name": "Hulgade’s Hammer",
+        "name": "Hulgade's Hammer",
         "source": "ds",
         "faction": "Kjalengard",
         "moveValue": 1,
@@ -2291,7 +2291,7 @@
         "afbHitsOn": 9,
         "afbDieCount": 2,
         "isShip": true,
-        "ability": "After this unit is destroyed during combat, roll a die, on a result of 9 or 10, produce up to 1 hit against ships against your opponent’s ships."
+        "ability": "After this unit is destroyed during combat, roll a die, on a result of 9 or 10, produce up to 1 hit against ships against your opponent's ships."
     },
     {
         "id": "nokar_destroyer2",
@@ -2311,7 +2311,7 @@
         "afbHitsOn": 6,
         "afbDieCount": 3,
         "isShip": true,
-        "ability": "After this unit is destroyed during combat, roll a die, on a result equal to or greater than 7, produce up to 1 hit against your opponent’s ships."
+        "ability": "After this unit is destroyed during combat, roll a die, on a result equal to or greater than 7, produce up to 1 hit against your opponent's ships."
     },
     {
         "id": "nokar_flagship",
@@ -2330,7 +2330,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Apply +1 to the results of this unit’s combat rolls for every 2 destroyers you control."
+        "ability": "Apply +1 to the results of this unit's combat rolls for every 2 destroyers you control."
     },
     {
         "id": "nokar_mech",
@@ -2500,16 +2500,16 @@
         "disablesPlanetaryShield": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "Other player’s units in this system lose PLANETARY SHIELD. This unit produces only 1 fighter or infantry for their cost instead of 2."
+        "ability": "Other player's units in this system lose PLANETARY SHIELD. This unit produces only 1 fighter or infantry for their cost instead of 2."
     },
     {
         "id": "rohdhna_flagship",
         "baseType": "flagship",
         "asyncId": "fs",
         "imageFileSuffix": "_fs.png",
-        "name": "Ky’vir",
+        "name": "Ky'vir",
         "source": "ds",
-        "faction": "Rohdna",
+        "faction": "Rohdhna",
         "moveValue": 1,
         "capacityValue": 3,
         "capacityUsed": 1,
@@ -2989,7 +2989,7 @@
         "combatDieCount": 1,
         "sustainDamage": true,
         "isGroundForce": true,
-        "ability": "At the end of a round of ground combat, you may remove 1 of your opponent’s control tokens from your faction sheet to place 1 infantry unit from your reinforcements on this planet."
+        "ability": "At the end of a round of ground combat, you may remove 1 of your opponent's control tokens from your faction sheet to place 1 infantry unit from your reinforcements on this planet."
     },
     {
         "id": "vaylerian_cruiser",
@@ -3305,7 +3305,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "For each unit upgrade technology your opponent owns, apply +1 to the results of this unit’s combat rolls."
+        "ability": "For each unit upgrade technology your opponent owns, apply +1 to the results of this unit's combat rolls."
     },
     {
         "id": "zealots_mech",
