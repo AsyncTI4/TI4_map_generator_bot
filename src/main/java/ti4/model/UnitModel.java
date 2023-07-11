@@ -164,6 +164,7 @@ public class UnitModel implements ModelInterface {
 
     private String getDiceText() {
         StringBuilder sb = new StringBuilder();
+        sb.append(getCombatText());
         sb.append(getAFBText());
         sb.append(getBombardText());
         sb.append(getSpaceCannonText());
@@ -203,6 +204,13 @@ public class UnitModel implements ModelInterface {
     private String getCapacityText() {
         if (getCapacityValue() > 0) {
             return "Capacity: " + getCapacityValue() + "\n";
+        }
+        return "";
+    }
+
+    private String getCombatText() {
+        if (getCombatDieCount() > 0) {
+            return "Combat: " + getCombatHitsOn() + " (x" + getCombatDieCount() + ")\n";
         }
         return "";
     }
