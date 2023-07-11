@@ -147,12 +147,12 @@ public class AliasHandler {
 
     public static void addNewPlanetAliases(PlanetModel planetModel) {
         Optional.ofNullable(planetModel.getAliases()).orElse(new ArrayList<>())
-                .forEach(alias -> allPlanetAliases.put(alias, planetModel.getId()));
+                .forEach(alias -> allPlanetAliases.put(alias.toLowerCase(), planetModel.getId()));
     }
 
     public static void addNewTileAliases(TileModel tileModel) {
         Optional.ofNullable(tileModel.getAliases()).orElse(new ArrayList<>())
-                .forEach(alias -> allTileAliases.put(alias, tileModel.getId()));
+                .forEach(alias -> allTileAliases.put(alias.toLowerCase(), tileModel.getId()));
     }
 
     public static String resolveTile(String name) {
