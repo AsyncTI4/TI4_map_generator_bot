@@ -240,6 +240,7 @@ public class Stats extends PlayerSubcommandData {
 		sb.append("> Planets: ").append(player.getPlanets()).append("\n");
 		sb.append("> Techs: ").append(player.getTechs()).append("\n");
 		sb.append("> Relics: ").append(player.getRelics()).append("\n");
+		sb.append("> Mahact CC: ").append(player.getMahactCC()).append("\n");
 		sb.append("> Leaders: ").append(player.getLeaderIDs()).append("\n");
 		sb.append("> Owned PNs: ").append(player.getPromissoryNotesOwned()).append("\n");
 		sb.append("> Owned Units: ").append(player.getUnitsOwned()).append("\n");

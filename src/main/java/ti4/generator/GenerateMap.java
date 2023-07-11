@@ -471,8 +471,11 @@ public class GenerateMap {
                 String ccCount = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
                 x += 120;
                 graphics.drawString(ccCount, x + 40, y + deltaY + 40);
-                if (!player.getMahactCC().isEmpty()) {
-                    graphics.drawString("+" + player.getMahactCC().size() + " FS", x + 40, y + deltaY + 70);
+                if (!player.getMahactCC().isEmpty() || player.hasAbility("armada")) {
+                    int additionalFleetSupply = 0;
+                    if (player.hasAbility("edict")) additionalFleetSupply += player.getMahactCC().size();
+                    if (player.hasAbility("armada")) additionalFleetSupply += 2;
+                    graphics.drawString("+" + additionalFleetSupply + " FS", x + 40, y + deltaY + 70);
                 }
                 graphics.drawString("T/F/S", x + 40, y + deltaY);
 
@@ -1896,7 +1899,7 @@ public class GenerateMap {
         }
     }
 
-    private void drawCCOfPlayer(String ccID, int x, int y, int ccCount, boolean isLetnev, Player player, Map activeMap) {
+    private void drawCCOfPlayer(String ccID, int x, int y, int ccCount, boolean hasArmada, Player player, Map activeMap) {
         String ccPath = Mapper.getCCPath(ccID);
         try {
             String faction = getFactionByControlMarker(activeMap.getPlayers().values(), ccID);
@@ -1910,62 +1913,57 @@ public class GenerateMap {
 
             BufferedImage ccImage = ImageIO.read(new File(ccPath));
             int delta = 20;
-            if (isLetnev) {
-                String armadaCCID = Mapper.getCCID(player.getColor());
+            int lastCCPosition = -1;
+            if (hasArmada) {
+                String armadaLowerCCID = Mapper.getCCID(player.getColor());
+                String armadaLowerCCPath = Mapper.getCCPath(armadaLowerCCID);
+                BufferedImage armadaLowerCCImage = ImageIO.read(new File(armadaLowerCCPath));
+                String armadaCCID = "fleet_armada.png";
                 String armadaCCPath = Mapper.getCCPath(armadaCCID);
                 BufferedImage armadaCCImage = ImageIO.read(new File(armadaCCPath));
-                String armadaFaction = player.getFaction();
-                BufferedImage armadaFactionImage = null;
-                if (armadaFaction != null) {
-                    String armadaFactionImagePath = Mapper.getCCPath("control_faction_" + armadaFaction + ".png");
-                    if (armadaFactionImagePath != null) {
-                        armadaFactionImage = ImageIO.read(new File(armadaFactionImagePath));
-                    }
-                }
 
                 for (int i = 0; i < 2; i++) {
+                    graphics.drawImage(armadaLowerCCImage, x + (delta * i), y, null);
                     graphics.drawImage(armadaCCImage, x + (delta * i), y, null);
-                    if (armadaFactionImage != null) {
-                        graphics.drawImage(armadaFactionImage, x + (delta * i) + DELTA_X, y + DELTA_Y, null);
-                    }
                 }
-                x += 20;
+                x += 30;
                 for (int i = 2; i < ccCount + 2; i++) {
                     graphics.drawImage(ccImage, x + (delta * i), y, null);
                     if (factionImage != null) {
                         graphics.drawImage(factionImage, x + (delta * i) + DELTA_X, y + DELTA_Y, null);
                     }
+                    lastCCPosition = i;
                 }
             } else {
-                int lastCCPosition = -1;
                 for (int i = 0; i < ccCount; i++) {
                     graphics.drawImage(ccImage, x + (delta * i), y, null);
                     graphics.drawImage(factionImage, x + (delta * i) + DELTA_X, y + DELTA_Y, null);
                     lastCCPosition = i;
                 }
-                List<String> mahactCC = player.getMahactCC();
-                if (!mahactCC.isEmpty()) {
-                    for (String ccColor : mahactCC) {
-                        lastCCPosition++;
-                        String fleetCCID = Mapper.getCCPath(Mapper.getFleetCCID(ccColor));
+            }
+            List<String> mahactCC = player.getMahactCC();
+            if (!mahactCC.isEmpty() && player.hasAbility("edict")) {
+                x += 10;
+                for (String ccColor : mahactCC) {
+                    lastCCPosition++;
+                    String fleetCCID = Mapper.getCCPath(Mapper.getFleetCCID(ccColor));
 
-                        faction = getFactionByControlMarker(activeMap.getPlayers().values(), fleetCCID);
-                        factionImage = null;
-                        if (faction != null) {
-                            boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(activeMap, player, fowPlayer);
-                            if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
-                                String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
-                                if (factionImagePath != null) {
-                                    factionImage = ImageIO.read(new File(factionImagePath));
-                                }
+                    faction = getFactionByControlMarker(activeMap.getPlayers().values(), fleetCCID);
+                    factionImage = null;
+                    if (faction != null) {
+                        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(activeMap, player, fowPlayer);
+                        if (!convertToGeneric || fowPlayer != null && fowPlayer.getFaction().equals(faction)) {
+                            String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
+                            if (factionImagePath != null) {
+                                factionImage = ImageIO.read(new File(factionImagePath));
                             }
                         }
+                    }
 
-                        BufferedImage ccImageExtra = resizeImage(ImageIO.read(new File(fleetCCID)), 1.0f);
-                        graphics.drawImage(ccImageExtra, x + (delta * lastCCPosition), y, null);
-                        if (factionImage != null) {
-                            graphics.drawImage(factionImage, x + (delta * lastCCPosition) + DELTA_X, y + DELTA_Y, null);
-                        }
+                    BufferedImage ccImageExtra = resizeImage(ImageIO.read(new File(fleetCCID)), 1.0f);
+                    graphics.drawImage(ccImageExtra, x + (delta * lastCCPosition), y, null);
+                    if (factionImage != null) {
+                        graphics.drawImage(factionImage, x + (delta * lastCCPosition) + DELTA_X, y + DELTA_Y, null);
                     }
                 }
             }
