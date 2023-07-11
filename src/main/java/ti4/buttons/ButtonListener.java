@@ -370,7 +370,9 @@ public class ButtonListener extends ListenerAdapter {
                 if (player2.getRelics() != null && player2.hasRelic("emphidia")) {
                     for (String pl : player2.getPlanets()) {
                         Tile tile = activeMap.getTile(AliasHandler.resolveTile(pl));
-
+                        if(tile == null){
+                            continue;
+                        }
                         UnitHolder unitHolder = tile.getUnitHolders().get(pl);
                         if (unitHolder.getTokenList() != null
                                 && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
@@ -2068,6 +2070,8 @@ public class ButtonListener extends ListenerAdapter {
 
         else if (buttonID.startsWith("unitTactical")) {
             String remove = "Move";
+             HashMap<String, Integer> currentSystem = activeMap.getCurrentMovedUnitsFrom1System();
+            HashMap<String, Integer> currentActivation = activeMap.getMovedUnitsFromCurrentActivation();
             String rest = "";
             if(buttonID.contains("Remove")){
                 remove = "Remove";
@@ -2076,7 +2080,167 @@ public class ButtonListener extends ListenerAdapter {
                 rest = buttonID.replace("unitTacticalMove_", "");
             }
             String pos = rest.substring(0, rest.indexOf("_"));
+            Tile tile = activeMap.getTileByPosition(pos);
             rest = rest.replace(pos + "_", "");
+
+            if(rest.contains("All")){
+               
+                if(rest.contains("reverse"))
+                {
+                    for(String unit : currentSystem.keySet()){
+                        
+                        String unitkey = "";
+                        String planet = "";
+                        String origUnit = unit;
+                        String damagedMsg = "";
+                        int amount = currentSystem.get(unit);
+                        if(unit.contains("_"))
+                        {
+                            unitkey =unit.split("_")[0];
+                            planet =unit.split("_")[1];
+                        }else{
+                            unitkey = unit;
+                        }
+                        if (currentActivation.containsKey(unitkey)) {
+                            activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitkey,
+                                    currentActivation.get(unitkey) - amount);
+                        }
+                        if(unitkey.contains("damaged")){
+                            unitkey = unitkey.replace("damaged", "");
+                            damagedMsg = " damaged ";
+                        }
+                        new AddUnits().unitParsing(event, player.getColor(),
+                        activeMap.getTileByPosition(pos), (amount) + " " + unitkey + " " + planet, activeMap);
+                        if(damagedMsg.contains("damaged")){
+                            if (planet.equalsIgnoreCase("")) {
+                                planet = "space";
+                            }
+                            String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitkey), player.getColor());
+                            activeMap.getTileByPosition(pos).addUnitDamage(planet, unitID, (amount));
+                        }
+                    }
+                   
+                    activeMap.resetCurrentMovedUnitsFrom1System();
+                }else{
+                    java.util.Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
+                    java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+                    String cID = Mapper.getColorID(player.getColor());
+                    for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+                        String name = entry.getKey();
+                        String representation = planetRepresentations.get(name);
+                        if (representation == null){
+                            representation = name;
+                        }
+                        UnitHolder unitHolder = entry.getValue();
+                        HashMap<String, Integer> units1 = unitHolder.getUnits();
+                        HashMap<String, Integer> units = new HashMap<String, Integer>();
+                        units.putAll(units1);
+                    
+                        if (unitHolder instanceof Planet planet) {
+                            for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                                String key = unitEntry.getKey();
+                                if ((key.endsWith("gf.png") || key.endsWith("mf.png")) &&key.contains(cID)) {
+                                    String unitKey = key.replace(cID+"_", "");
+                                    unitKey = unitKey.replace(".png", "");
+                                    unitKey = ButtonHelper.getUnitName(unitKey);
+                                    int amount = unitEntry.getValue();
+                                    rest = unitKey+"_"+unitHolder.getName();
+                                    if (currentSystem.containsKey(rest)) {
+                                        activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
+                                    } else {
+                                        activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
+                                    }
+                                    if (currentActivation.containsKey(unitKey)) {
+                                        activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitKey,
+                                                currentActivation.get(unitKey) + amount);
+                                    } else {
+                                        activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitKey, amount);
+                                    }
+                                    String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
+
+                                    new RemoveUnits().removeStuff(event, activeMap.getTileByPosition(pos), unitEntry.getValue(), unitHolder.getName(), unitID, player.getColor(), false);
+
+                                  //  validTile2 = Button.danger(finChecker+"unitTactical"+moveOrRemove+"_"+tile.getPosition()+"_"+x+unitKey+"_"+representation, moveOrRemove+" "+x+" Infantry from "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeMap)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                                }
+                            }
+                        }
+                        else{
+                            for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+
+                                String key = unitEntry.getKey();
+                                for (String unitRepresentationKey : unitRepresentation.keySet()) {
+                                    if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {
+                                        
+                                        String unitKey = key.replace(cID+"_", "");
+                                        
+                                        int totalUnits = unitEntry.getValue();
+                                        int amount = unitEntry.getValue();
+                                        unitKey  = unitKey.replace(".png", "");
+                                        unitKey = ButtonHelper.getUnitName(unitKey);
+                                        int damagedUnits = 0;
+                                        if(unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null){
+                                            damagedUnits = unitHolder.getUnitDamage().get(key);
+                                        }
+                                        String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
+
+                                        new RemoveUnits().removeStuff(event, activeMap.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false);
+                                        if(damagedUnits > 0){
+                                            rest = unitKey+"damaged";
+                                            amount = damagedUnits;
+                                            if (currentSystem.containsKey(rest)) {
+                                                activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
+                                            } else {
+                                                activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
+                                            }
+                                            if (currentActivation.containsKey(unitKey)) {
+                                                activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitKey,
+                                                        currentActivation.get(unitKey) + amount);
+                                            } else {
+                                                activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitKey, amount);
+                                            }
+                                        }
+                                        rest = unitKey;
+                                        amount = totalUnits - damagedUnits;
+                                        if(amount > 0){
+                                            if (currentSystem.containsKey(rest)) {
+                                                activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
+                                            } else {
+                                                activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
+                                            }
+                                            if (currentActivation.containsKey(unitKey)) {
+                                                activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitKey,
+                                                        currentActivation.get(unitKey) + amount);
+                                            } else {
+                                                activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitKey, amount);
+                                            }
+                                        }
+                                        
+                                        
+                                    }
+                                }
+                            }
+                        }             
+                    }
+                }
+                // if (currentSystem.containsKey(rest)) {
+                //     activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
+                // } else {
+                //     activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
+                // }
+                // 
+                // if (currentActivation.containsKey(unitkey)) {
+                //     activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitkey,
+                //             currentActivation.get(unitkey) + amount);
+                // } else {
+                //     activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitkey, amount);
+                // }
+                String message = ButtonHelper.buildMessageFromDisplacedUnits(activeMap, false, player, remove);
+                List<Button> systemButtons = ButtonHelper.getButtonsForAllUnitsInSystem(player, activeMap,
+                        activeMap.getTileByPosition(pos), remove);
+                event.getMessage().editMessage(message)
+                        .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+                return;
+            }
             int amount = Integer.parseInt(rest.charAt(0) + "");
             if (rest.contains("_reverse")) {
                 amount = amount * -1;
@@ -2130,7 +2294,6 @@ public class ButtonListener extends ListenerAdapter {
                 unitkey = unitkey + "damaged";
                 rest = rest+"damaged";
             }
-            HashMap<String, Integer> currentSystem = activeMap.getCurrentMovedUnitsFrom1System();
             if (currentSystem.containsKey(rest)) {
                 activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
             } else {
@@ -2139,7 +2302,6 @@ public class ButtonListener extends ListenerAdapter {
             if(currentSystem.get(rest) == 0){
                 currentSystem.remove(rest);
             }
-            HashMap<String, Integer> currentActivation = activeMap.getMovedUnitsFromCurrentActivation();
             if (currentActivation.containsKey(unitkey)) {
                 activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitkey,
                         currentActivation.get(unitkey) + amount);
@@ -2268,7 +2430,13 @@ public class ButtonListener extends ListenerAdapter {
             planetReal.addToken(Constants.ATTACHMENT_TITANSPN_PNG);
             MessageHelper.sendMessageToChannel(event.getChannel(), "Attached terraform to "+Helper.getPlanetRepresentation(planet, activeMap));
             event.getMessage().delete().queue();
-
+         } else if (buttonID.startsWith("nanoforgePlanet_")) {
+            String planet = buttonID.replace("nanoforgePlanet_","");
+            UnitHolder unitHolder = activeMap.getPlanetsInfo().get(planet);
+            Planet planetReal = (Planet) unitHolder;
+            planetReal.addToken("attachment_nanoforge.png");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Attached nanoforge to "+Helper.getPlanetRepresentation(planet, activeMap));
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("resolvePNPlay_")) {
             String pnID = buttonID.replace("resolvePNPlay_", "");
             ButtonHelper.resolvePNPlay(pnID, player, activeMap, event);

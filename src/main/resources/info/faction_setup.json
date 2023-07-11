@@ -609,7 +609,7 @@
     "commodities": 2,
     "factionTech": ["dskhrag", "dskhracr"],
     "startingTech": ["ps", "sdn"],
-    "homePlanets": ["bohlduhr"],
+    "homePlanets": ["bohldhur"],
     "abilities": ["lithoids", "garden_worlds", "meteor_slings"],
     "leaders": ["khraskagent", "khraskcommander", "khraskhero"],
     "promissoryNotes": ["dspnkhra"],
