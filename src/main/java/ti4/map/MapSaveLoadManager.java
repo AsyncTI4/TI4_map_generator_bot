@@ -954,10 +954,12 @@ public class MapSaveLoadManager {
                                 tmpData = null;
                                 if (UNITS.equals(data)) {
                                     spaceHolder = myReader.nextLine();
-                                    if (Constants.MIRAGE.equals(spaceHolder)) {
-                                        Helper.addMirageToTile(tile);
-                                    } else if (!tile.isSpaceHolderValid(spaceHolder)) {
-                                        BotLogger.log(activeMap.getName() + ": Not valid space holder detected: " + spaceHolder);
+                                    if (tile != null) {
+                                        if (Constants.MIRAGE.equals(spaceHolder)) {
+                                            Helper.addMirageToTile(tile);
+                                        } else if (!tile.isSpaceHolderValid(spaceHolder)) {
+                                            BotLogger.log(activeMap.getName() + ": Not valid space holder detected: " + spaceHolder);
+                                        }
                                     }
                                     continue;
                                 }
@@ -1047,11 +1049,8 @@ public class MapSaveLoadManager {
                     LinkedHashMap<String, List<String>> adjacentTilesMigrated = new LinkedHashMap<>();
                     for (java.util.Map.Entry<String, List<String>> entry : adjacentTiles.entrySet()) {
                         String key = entry.getKey();
-                        // key = migratePosition(activeMap, key);
-
                         List<String> migrated = new ArrayList<>();
                         for (String value : entry.getValue()) {
-                            // value = migratePosition(activeMap, value);
                             migrated.add(value);
                         }
                         adjacentTilesMigrated.put(key, migrated);
@@ -1479,25 +1478,11 @@ public class MapSaveLoadManager {
             String direction = overrideInfo[1];
             String secondaryTile = overrideInfo[2];
 
-            // primaryTile = migratePosition(activeMap, primaryTile);
-            // secondaryTile = migratePosition(activeMap, secondaryTile);
-
             Pair<String, Integer> primary = new ImmutablePair<String, Integer>(primaryTile, Integer.parseInt(direction));
             overrides.put(primary, secondaryTile);
         }
         return overrides;
     }
-
-    // private static String migratePosition(Map activeMap, String primaryTile) {
-    //     if (!PositionMapper.isTilePositionValid(primaryTile)) {
-    //         if (activeMap.getRingCount() == 8) {
-    //             primaryTile = PositionMapper.getMigrate8RingsPosition(primaryTile);
-    //         } else {
-    //             primaryTile = PositionMapper.getMigratePosition(primaryTile);
-    //         }
-    //     }
-    //     return primaryTile;
-    // }
 
     private static void readPlayerInfo(Player player, String data, Map activeMap) {
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
@@ -1605,7 +1590,6 @@ public class MapSaveLoadManager {
                         StringTokenizer fow_systems = new StringTokenizer(tokenizer.nextToken(), ";");
                         while (fow_systems.hasMoreTokens()) {
                             String[] system = fow_systems.nextToken().split(",");
-                            // String position = migratePosition(activeMap, system[0]);
                             String position = system[0];
                             String tileID = system[1];
                             String label = system[2];
@@ -1673,22 +1657,7 @@ public class MapSaveLoadManager {
         StringTokenizer tokenizer = new StringTokenizer(tileData, " ");
         String tileID = tokenizer.nextToken();
         String position = tokenizer.nextToken();
-        if (position.equals("mr")) {
-            position = "0a";
-        }
-        String tempPosition = position;
-        if (!PositionMapper.isTilePositionValid(position)) {
-            // if (activeMap.getRingCount() == 8) {
-            //     position = PositionMapper.getMigrate8RingsPosition(position);
-            // } else {
-            //     position = PositionMapper.getMigratePosition(position);
-            // }
-            BotLogger.log("Invalid tilePosition `" + tileData + "` found in save file for map `" + activeMap.getName() + "`");
-        }
-        if (tileID.equalsIgnoreCase("setup6") || tileID.equalsIgnoreCase("setup8")) {
-            tileID = "setup";
-            BotLogger.log("Old setup6 or setup8 tile detected in map: " + activeMap.getName());
-        }
+        if (!PositionMapper.isTilePositionValid(position)) return null;
         return new Tile(tileID, position);
     }
 

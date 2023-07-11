@@ -705,6 +705,7 @@ public class Map {
     }
 
     public int getRingCount() {
+        if (getTileMap().isEmpty()) return 0;
         HashMap<String, Tile> tileMap = new HashMap<>(getTileMap());
         String highestPosition = tileMap.keySet().stream().filter(pos -> Helper.isInteger(pos)).max(Comparator.comparingInt(Integer::parseInt)).get();
         int ringCount = Integer.parseInt(StringUtils.left(highestPosition, highestPosition.length() - 2));
