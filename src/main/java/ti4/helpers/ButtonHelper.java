@@ -838,9 +838,6 @@ public class ButtonHelper {
         Button rex = Button.success(finChecker+"ringTile_000", centerTile.getRepresentationForButtons(activeMap, player));
         ringButtons.add(rex);
         int rings = activeMap.getRingCount();
-        if(rings == 8){
-            rings = 10;
-        }
         for(int x = 1; x < rings+1; x++)
         {
             Button ringX = Button.success(finChecker+"ring_"+x, "Ring #"+x);
