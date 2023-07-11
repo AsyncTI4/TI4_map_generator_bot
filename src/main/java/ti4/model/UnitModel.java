@@ -79,7 +79,7 @@ public class UnitModel implements ModelInterface {
             2. Arg: URL as string or could also be null
         */
         String name = getName() == null ? "" : getName();
-        eb.setTitle(unitEmoji + factionEmoji + " __" + name + "__", null);
+        eb.setTitle(factionEmoji + unitEmoji + " __" + name + "__", null);
 
         /*
             Set the color

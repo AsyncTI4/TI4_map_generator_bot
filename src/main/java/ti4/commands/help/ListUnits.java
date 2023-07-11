@@ -1,9 +1,8 @@
 package ti4.commands.help;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
-
-import org.apache.commons.collections4.ListUtils;
 
 import net.dv8tion.jda.api.entities.MessageEmbed;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -29,13 +28,17 @@ public class ListUnits extends HelpSubcommandData {
         boolean includeAliases = event.getOption(Constants.INCLUDE_ALIASES, false, OptionMapping::getAsBoolean);
         List<MessageEmbed> messageEmbeds = new ArrayList<MessageEmbed>();
 
-        for (UnitModel unitModel : Mapper.getUnits().values()) {
+        for (UnitModel unitModel : Mapper.getUnits().values().stream().sorted(Comparator.comparing(UnitModel::getId)).toList()) {
             MessageEmbed unitRepresentationEmbed = unitModel.getUnitRepresentationEmbed(includeAliases);
             if (searchString == null || unitRepresentationEmbed.getTitle().toLowerCase().contains(searchString.toLowerCase())) {
                 messageEmbeds.add(unitRepresentationEmbed);
             }
         }
-        String threadName = "/help list_units" + (searchString == null ? "" : " search: " + searchString);
-        MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
+        if (messageEmbeds.size() > 5) {
+            String threadName = "/help list_units" + (searchString == null ? "" : " search: " + searchString);
+            MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
+        } else {
+            event.getChannel().sendMessageEmbeds(messageEmbeds).queue();
+        }
     }
 }
