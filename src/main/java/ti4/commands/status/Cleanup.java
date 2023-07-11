@@ -9,8 +9,10 @@ import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Set;
 
 public class Cleanup extends StatusSubcommandData {
@@ -60,8 +62,9 @@ public class Cleanup extends StatusSubcommandData {
             player.cleanExhaustedPlanets(true);
             player.cleanExhaustedRelics();
             player.clearExhaustedAbilities();
-
-            for (Leader leader : player.getLeaders()) {
+            List<Leader> leads = new ArrayList<Leader>();
+            leads.addAll(player.getLeaders());
+            for (Leader leader : leads) {
                 if (!leader.isLocked()){
                     if (leader.isActive()){
                         player.removeLeader(leader.getId());

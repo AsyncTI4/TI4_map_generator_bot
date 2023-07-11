@@ -1394,11 +1394,15 @@ public class ButtonHelper {
             
         }
         Button concludeMove = null;
+        Button doAll = null;
         if(moveOrRemove.equalsIgnoreCase("Remove")){
+            doAll = Button.secondary(finChecker+"unitTactical"+moveOrRemove+"_"+tile.getPosition()+"_removeAll", "Remove all units");
             concludeMove = Button.primary(finChecker+"doneRemoving", "Done removing units");
         }else{
+            doAll = Button.secondary(finChecker+"unitTactical"+moveOrRemove+"_"+tile.getPosition()+"_moveAll", "Move all units");
             concludeMove = Button.primary(finChecker+"doneWithOneSystem_"+tile.getPosition(), "Done moving units from this system");
         }
+        buttons.add(doAll);
         buttons.add(concludeMove);
         HashMap<String, Integer> displacedUnits = activeMap.getCurrentMovedUnitsFrom1System();
         for(String unit :displacedUnits.keySet())
@@ -1432,6 +1436,10 @@ public class ButtonHelper {
                 Button validTile2 = Button.success(finChecker+"unitTactical"+moveOrRemove+"_"+tile.getPosition()+"_"+x+unit+damagedMsg.replace(" ","")+"_reverse",blabel).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitkey.toLowerCase().replace(" ", ""))));
                 buttons.add(validTile2);
             }
+        }
+        if(displacedUnits.keySet().size() > 0){
+            Button validTile2 = Button.success(finChecker+"unitTactical"+moveOrRemove+"_"+tile.getPosition()+"_reverseAll","Undo all");
+            buttons.add(validTile2);
         }
         return buttons;
     }
@@ -2161,6 +2169,9 @@ public class ButtonHelper {
                         buttons.add(getTech);
                         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use Button to get a tech", buttons);
                     }
+                    if(relicName.contains("Nanoforge")){      
+                        ButtonHelper.offerNanoforgeButtons(player, activeMap, event);
+                    }
                 } else {
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Invalid relic or player does not have specified relic");
                 }
@@ -2333,6 +2344,22 @@ public class ButtonHelper {
             }
         }
         String message = "Use buttons to select which planet to terraform";
+        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+    }
+     public static void offerNanoforgeButtons(Player player, Map activeMap, GenericInteractionCreateEvent event) {
+        List<Button> buttons = new ArrayList<Button>();
+        for(String planet : player.getPlanets()){
+            UnitHolder unitHolder = activeMap.getPlanetsInfo().get(planet);
+            Planet planetReal = (Planet) unitHolder;
+            boolean oneOfThree = false;
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous"))) {
+                oneOfThree = true;
+            }
+            if (oneOfThree && !planetReal.isHasAbility()) {
+                buttons.add(Button.success("nanoforgePlanet_"+planet, Helper.getPlanetRepresentation(planet, activeMap)));
+            }
+        }
+        String message = "Use buttons to select which planet to nanoforge";
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
     }
 
