@@ -707,6 +707,10 @@ public class Map {
     }
 
     public int getRingCount() {
+        HashMap<String, Tile> tileMap = new HashMap<>(getTileMap());
+        String highestPosition = tileMap.keySet().stream().filter(pos -> Helper.isInteger(pos)).max(Comparator.comparingInt(Integer::parseInt)).get();
+        int ringCount = Integer.parseInt(StringUtils.left(highestPosition, highestPosition.length() - 2));
+        setRingCount(ringCount);
         return ringCount;
     }
 
@@ -716,15 +720,13 @@ public class Map {
 
     public boolean getNaaluAgent() {
         return naaluAgent;
-    }
-
-    
+    }  
 
     public boolean getComponentAction() {
         return componentAction;
     }
 
-    public void setRingCount(int ringCount) {
+    private void setRingCount(int ringCount) {
         this.ringCount = ringCount;
     }
 
