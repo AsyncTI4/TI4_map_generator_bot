@@ -209,7 +209,9 @@ public class UnitModel implements ModelInterface {
     }
 
     private String getCombatText() {
-        if (getCombatDieCount() > 0) {
+        if (getCombatDieCount() == 0) {
+            return "Combat: " + getCombatHitsOn() + "\n";
+        } else if (getCombatDieCount() > 0) {
             return "Combat: " + getCombatHitsOn() + " (x" + getCombatDieCount() + ")\n";
         }
         return "";
@@ -223,8 +225,10 @@ public class UnitModel implements ModelInterface {
     }
 
     private String getBombardText() {
-        if (getBombardDieCount() > 0) {
-            return "Bombard " + getBombardHitsOn() + " (x" + getBombardDieCount() + ")\n";
+        if (getBombardDieCount() == 1) {
+            return "Bombardment: " + getBombardHitsOn() + "\n";
+        } else if (getBombardDieCount() > 0) {
+            return "Bombardment: " + getBombardHitsOn() + " (x" + getBombardDieCount() + ")\n";
         }
         return "";
     }
