@@ -471,10 +471,11 @@ public class GenerateMap {
                 String ccCount = player.getTacticalCC() + "/" + player.getFleetCC() + "/" + player.getStrategicCC();
                 x += 120;
                 graphics.drawString(ccCount, x + 40, y + deltaY + 40);
-                if (!player.getMahactCC().isEmpty() || player.hasAbility("armada")) {
-                    int additionalFleetSupply = 0;
-                    if (player.hasAbility("edict")) additionalFleetSupply += player.getMahactCC().size();
-                    if (player.hasAbility("armada")) additionalFleetSupply += 2;
+                
+                int additionalFleetSupply = 0;
+                if (player.hasAbility("edict")) additionalFleetSupply += player.getMahactCC().size();
+                if (player.hasAbility("armada")) additionalFleetSupply += 2;
+                if (additionalFleetSupply > 0) {
                     graphics.drawString("+" + additionalFleetSupply + " FS", x + 40, y + deltaY + 70);
                 }
                 graphics.drawString("T/F/S", x + 40, y + deltaY);
