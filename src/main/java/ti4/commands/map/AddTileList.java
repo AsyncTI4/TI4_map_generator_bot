@@ -2,6 +2,7 @@ package ti4.commands.map;
 
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -47,7 +48,8 @@ public class AddTileList implements Command {
             return;
         }
         
-        String tileList = event.getOptions().get(0).getAsString().toLowerCase();
+        String tileList = event.getOption(Constants.TILE_LIST, "", OptionMapping::getAsString);
+        tileList = tileList.replaceAll(",", "");
         HashMap<String, String> mappedTilesToPosition = MapStringMapper.getMappedTilesToPosition(tileList, userActiveMap);
         if (mappedTilesToPosition.isEmpty()) {
             MessageHelper.replyToMessage(event, "Could not map all tiles to map positions");
@@ -57,8 +59,11 @@ public class AddTileList implements Command {
         userActiveMap.clearTileMap();
         for (java.util.Map.Entry<String, String> entry : mappedTilesToPosition.entrySet()) {
             String tileID = entry.getValue();
-            if (tileID.equals("0")) {
+            if (tileID.equals("-1")) {
                 continue;
+            }
+            if (tileID.equals("0")) {
+                tileID = "0g";
             }
             String tileName = Mapper.getTileID(tileID);
             String position = entry.getKey();
