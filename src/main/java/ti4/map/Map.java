@@ -68,8 +68,6 @@ public class Map {
     private int playerCountForMap = 6;
 
     @ExportableField
-    private int ringCount = 3;
-    @ExportableField
     private int activationCount = 0;
     @ExportableField
     private int vp = 10;
@@ -707,6 +705,9 @@ public class Map {
     }
 
     public int getRingCount() {
+        HashMap<String, Tile> tileMap = new HashMap<>(getTileMap());
+        String highestPosition = tileMap.keySet().stream().filter(pos -> Helper.isInteger(pos)).max(Comparator.comparingInt(Integer::parseInt)).get();
+        int ringCount = Integer.parseInt(StringUtils.left(highestPosition, highestPosition.length() - 2));
         return ringCount;
     }
 
@@ -716,16 +717,10 @@ public class Map {
 
     public boolean getNaaluAgent() {
         return naaluAgent;
-    }
-
-    
+    }  
 
     public boolean getComponentAction() {
         return componentAction;
-    }
-
-    public void setRingCount(int ringCount) {
-        this.ringCount = ringCount;
     }
 
     public void setNaaluAgent(boolean onStatus) {
