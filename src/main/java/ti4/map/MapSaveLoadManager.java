@@ -1159,6 +1159,18 @@ public class MapSaveLoadManager {
                         activeMap.setPlayerCountForMap(6);
                     }
                 }
+                case Constants.RING_COUNT_FOR_MAP -> {
+                    try {
+                        int ringCount = Integer.parseInt(info);
+                        if (ringCount >= 3 && ringCount <= 8) {
+                            activeMap.setRingCount(ringCount);
+                        } else {
+                            activeMap.setRingCount(3);
+                        }
+                    } catch (Exception e) {
+                        activeMap.setRingCount(3);
+                    }
+                }
                 case Constants.ACTIVATION_COUNT -> {
                     try {
                         int activationCount = Integer.parseInt(info);
