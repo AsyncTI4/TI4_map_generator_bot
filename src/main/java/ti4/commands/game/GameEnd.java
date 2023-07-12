@@ -168,17 +168,17 @@ public class GameEnd extends GameSubcommandData {
         HashMap<String, Player> players = activeMap.getPlayers();
         int index = 1;
         for (Player player : players.values()) {
-            if (player.getFaction() != null && !player.isDummy()) {
-                int playerVP = player.getTotalVictoryPoints(activeMap);
-                sb.append("> `").append(index).append(".` ");
-                sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
-                sb.append(Helper.getColourAsMention(MapGenerator.guildPrimary, player.getColor()));
-                sb.append(event.getJDA().getUserById(player.getUserID()).getAsMention());
-                sb.append(" - *").append(playerVP).append("VP* ");
-                if (playerVP >= activeMap.getVp()) sb.append(" - **WINNER**");
-                sb.append("\n");
-                index++;
-            }
+            if (player.getFaction() == null || player.isDummy()) continue;
+            
+            int playerVP = player.getTotalVictoryPoints(activeMap);
+            sb.append("> `").append(index).append(".` ");
+            sb.append(Helper.getFactionIconFromDiscord(player.getFaction()));
+            sb.append(Helper.getColourAsMention(MapGenerator.guildPrimary, player.getColor()));
+            sb.append(event.getJDA().getUserById(player.getUserID()).getAsMention());
+            sb.append(" - *").append(playerVP).append("VP* ");
+            if (playerVP >= activeMap.getVp()) sb.append(" - **WINNER**");
+            sb.append("\n");
+            index++;
         }
 
         sb.append("\n");

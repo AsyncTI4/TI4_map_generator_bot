@@ -67,12 +67,12 @@ public class Info extends GameSubcommandData{
             int index = 1;
             ArrayList<Player> players = new ArrayList<>(mapPlayers.values());
             for (Player player : players) {
-                if (player.getFaction() != null) {
-                    sb.append("> `").append(index).append(".` ").append(player.getUserName()).append(Helper.getFactionIconFromDiscord(player.getFaction())).append(Helper.getColourAsMention(event.getGuild(), player.getColor()));
-                    sb.append(" - *").append(player.getTotalVictoryPoints(activeMap)).append("VP* ");
-                    sb.append(NEW_LINE);
-                    index++;
-                }
+                if (player.getFaction() == null) continue;
+                
+                sb.append("> `").append(index).append(".` ").append(player.getUserName()).append(Helper.getFactionIconFromDiscord(player.getFaction())).append(Helper.getColourAsMention(event.getGuild(), player.getColor()));
+                sb.append(" - *").append(player.getTotalVictoryPoints(activeMap)).append("VP* ");
+                sb.append(NEW_LINE);
+                index++;
             }
         } else {
             sb.append("Players: Cannot show players for private games").append(NEW_LINE);

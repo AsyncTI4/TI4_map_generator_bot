@@ -401,7 +401,7 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 for (String pn : player2.getPromissoryNotes().keySet()) {
 
-                    if (!player2.getFaction().equalsIgnoreCase("l1z1x") && pn.equalsIgnoreCase("ce")) {
+                    if (!player2.ownsPromissoryNote("ce") && pn.equalsIgnoreCase("ce")) {
                         String cyberMessage = Helper.getPlayerRepresentation(player2, activeMap, event.getGuild(), true)
                                 + " reminder to use cybernetic enhancements!";
                         MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
@@ -1543,12 +1543,12 @@ public class ButtonListener extends ListenerAdapter {
             String successMessage = "";
             String playerRep = Helper.getPlayerRepresentation(player, activeMap);
             if (unit.equalsIgnoreCase("sd")) {
-                if (player.getFaction().equalsIgnoreCase("saar")) {
+                if (player.ownsUnit("saar_spacedock") || player.ownsUnit("saar_spacedock2")) {
                     new AddUnits().unitParsing(event, player.getColor(),
                             activeMap.getTile(AliasHandler.resolveTile(planetName)), unit, activeMap);
                     successMessage = "Placed a space dock in the space area of the "
                             + Helper.getPlanetRepresentation(planetName, activeMap) + " system.";
-                } else if (player.getFaction().equalsIgnoreCase("cabal")) {
+                } else if (player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2")) {
                     new AddUnits().unitParsing(event, player.getColor(),
                             activeMap.getTile(AliasHandler.resolveTile(planetName)), "csd " + planetName, activeMap);
                     successMessage = "Placed a cabal space dock on "
@@ -1644,12 +1644,12 @@ public class ButtonListener extends ListenerAdapter {
             String successMessage = "";
             String playerRep = Helper.getPlayerRepresentation(player, activeMap);
             if (unit.equalsIgnoreCase("sd")) {
-                if (player.getFaction().equalsIgnoreCase("saar")) {
+                if (player.ownsUnit("saar_spacedock") || player.ownsUnit("saar_spacedock2")) {
                     new AddUnits().unitParsing(event, player.getColor(),
                             activeMap.getTile(AliasHandler.resolveTile(planetName)), unit, activeMap);
                     successMessage = "Placed a space dock in the space area of the "
                             + Helper.getPlanetRepresentation(planetName, activeMap) + " system.";
-                } else if (player.getFaction().equalsIgnoreCase("cabal")) {
+                } else if (player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2")) {
                     new AddUnits().unitParsing(event, player.getColor(),
                             activeMap.getTile(AliasHandler.resolveTile(planetName)), "csd " + planetName, activeMap);
                     successMessage = "Placed a cabal space dock on "

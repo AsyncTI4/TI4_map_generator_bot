@@ -344,7 +344,7 @@ public class FoWHelper {
 
 		String ghostFlagship = null;
 		for (Player p : activeMap.getPlayers().values()) {
-			if ("ghost".equals(p.getFaction())) {
+			if (p.ownsUnit("ghost_flagship")) {
 				ghostFlagship = Mapper.getUnitID("fs", p.getColor());
 				break;
 			}
