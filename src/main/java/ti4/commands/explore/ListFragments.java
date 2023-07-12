@@ -5,7 +5,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class ListFragments extends ExploreSubcommandData {
 
@@ -19,7 +18,7 @@ public class ListFragments extends ExploreSubcommandData {
 		Player player = activeMap.getPlayer(getUser().getId());
 		player = Helper.getGamePlayer(activeMap, player, event, null);
 
-		MessageHelper.replyToMessage(event, player.getFragments().toString());
+		sendMessage(player.getFragments().toString());
 	}
-	
+
 }

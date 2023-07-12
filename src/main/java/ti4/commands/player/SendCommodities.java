@@ -4,12 +4,12 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 
@@ -27,15 +27,15 @@ public class SendCommodities extends PlayerSubcommandData {
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
         Player player_ = Helper.getPlayer(activeMap, player, event);
         if (player_ == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player to send TG/Commodities could not be found");
+            sendMessage("Player to send TG/Commodities could not be found");
             return;
         }
-        
+
         OptionMapping optionComms = event.getOption(Constants.COMMODITIES);
         if (optionComms != null) {
             int sendCommodities = optionComms.getAsInt();
@@ -48,22 +48,24 @@ public class SendCommodities extends PlayerSubcommandData {
             targetTG += sendCommodities;
             player_.setTg(targetTG);
 
-            String message = Helper.getPlayerRepresentation(event, player) + " sent " + sendCommodities + Emojis.comm + " commodities to " + Helper.getPlayerRepresentation(event, player_);
+
+			String p1 = Helper.getPlayerRepresentation(player, activeMap);
+			String p2 = Helper.getPlayerRepresentation(player_, activeMap);
+			String commString = sendCommodities + " " + Emojis.comm + " commodities";
+			String message =  p1 + " sent " + commString + " to " + p2;
+			sendMessage(message);
+            ButtonHelper.pillageCheck(player_, activeMap);
+            ButtonHelper.pillageCheck(player, activeMap);
+            ButtonHelper.resolveDarkPactCheck(activeMap, player, player_, sendCommodities, event);
+
             if (activeMap.isFoWMode()) {
-                String fail = "Could not notify recieving player.";
-                String success = message + "\nThe other player has been notified";
+                String fail = "Could not notify receiving player.";
+                String success = "The other player has been notified";
                 MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, event.getChannel(), message, fail, success);
-            } else {
-                MessageHelper.sendMessageToChannel(event.getChannel(), message);
+
+				// Add extra message for transaction visibility
+				FoWHelper.pingPlayersTransaction(activeMap, event, player, player_, commString, null);
             }
         }
-    }
-
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
-        MessageHelper.replyToMessageTI4Logo(event);
     }
 }

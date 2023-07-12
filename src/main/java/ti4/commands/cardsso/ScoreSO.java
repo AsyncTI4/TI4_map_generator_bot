@@ -1,25 +1,24 @@
 package ti4.commands.cardsso;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
-import ti4.commands.cards.CardsInfo;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
+import ti4.model.SecretObjectiveModel;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import kotlin.OverloadResolutionByLambdaReturnType;
 
 public class ScoreSO extends SOCardsSubcommandData {
     public ScoreSO() {
@@ -43,10 +42,10 @@ public class ScoreSO extends SOCardsSubcommandData {
         }
 
         int soID = option.getAsInt();
-        scoreSO(event, activeMap, player, soID, event.getChannel(), null);
+        scoreSO(event, activeMap, player, soID, event.getChannel());
     }
 
-    public void scoreSO(SlashCommandInteractionEvent event, Map activeMap, Player player, int soID, MessageChannel channel, ButtonInteractionEvent buttonInteractionEvent) {
+    public static void scoreSO(GenericInteractionCreateEvent event, Map activeMap, Player player, int soID, MessageChannel channel) {
         Set<String> alreadyScoredSO = new HashSet<>(player.getSecretsScored().keySet());
         boolean scored = activeMap.scoreSecretObjective(player.getUserID(), soID, activeMap);
         if (!scored) {
@@ -54,22 +53,30 @@ public class ScoreSO extends SOCardsSubcommandData {
             return;
         }
 
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player) + " scored " + Emojis.SecretObjectiveAlt + " ");
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " scored " + Emojis.SecretObjectiveAlt + " ");
         for (java.util.Map.Entry<String, Integer> entry : player.getSecretsScored().entrySet()) {
             if (alreadyScoredSO.contains(entry.getKey())) {
                 continue;
             }
-            String[] soText = Mapper.getSecretObjective(entry.getKey()).split(";");
-            String soName = soText[0];
-            String soPhase = soText[1];
-            String soDescription = soText[2];
-            message.append("__**" + soName + "**__").append(" *(").append(soPhase).append(" Phase)*: ").append(soDescription).append("\n");
+            message.append(SOInfo.getSecretObjectiveRepresentation(entry.getKey())).append("\n");
         }
         if (event != null && channel.getName().equalsIgnoreCase(event.getChannel().getName())) {
-            sendMessage(message.toString());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message.toString());
         } else {
             MessageHelper.sendMessageToChannel(channel, message.toString());
         }
-        CardsInfo.sentUserCardInfo(event, activeMap, player, buttonInteractionEvent);
+
+        // FoW logic, specific for players with visilibty, generic for the rest
+        if (activeMap.isFoWMode()) {
+            FoWHelper.pingPlayersDifferentMessages(activeMap, event, player, message.toString(), "Scores changed");
+            MessageHelper.sendMessageToChannel(channel, "All players notified");
+        }
+        String headerText = Helper.getPlayerRepresentation(player, activeMap);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
+        SOInfo.sendSecretObjectiveInfo(activeMap, player);
+        Helper.checkIfHeroUnlocked(event, activeMap, player);
+        if(player.getLeaderIDs().contains("nomadcommander") && !player.hasLeaderUnlocked("nomadcommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "nomad", event);
+        }
     }
 }

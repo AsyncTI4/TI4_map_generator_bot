@@ -9,8 +9,11 @@ import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Set;
 
 public class Cleanup extends StatusSubcommandData {
     public Cleanup() {
@@ -19,14 +22,19 @@ public class Cleanup extends StatusSubcommandData {
     }
 
     @Override
+
     public void execute(SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.CONFIRM);
         if (option == null || !"YES".equals(option.getAsString())){
             MessageHelper.replyToMessage(event, "Must confirm with YES");
             return;
         }
-
         Map activeMap = getActiveMap();
+        runStatusCleanup(activeMap);
+    }
+
+    public void runStatusCleanup(Map activeMap) {
+
         HashMap<String, Tile> tileMap = activeMap.getTileMap();
         for (Tile tile : tileMap.values()) {
             tile.removeAllCC();
@@ -44,19 +52,24 @@ public class Cleanup extends StatusSubcommandData {
 
         for (Player player : players.values()) {
             player.setPassed(false);
-            int sc = player.getSC();
-            activeMap.setScTradeGood(sc, 0);
-            player.setSC(0);
+            Set<Integer> SCs = player.getSCs();
+            for (int sc : SCs) {
+                activeMap.setScTradeGood(sc, 0);
+            }
+            player.clearSCs();
+            player.clearFollowedSCs();
             player.cleanExhaustedTechs();
-            player.cleanExhaustedPlanets();
+            player.cleanExhaustedPlanets(true);
             player.cleanExhaustedRelics();
-
-            for (Leader leader : player.getLeaders()) {
+            player.clearExhaustedAbilities();
+            List<Leader> leads = new ArrayList<Leader>();
+            leads.addAll(player.getLeaders());
+            for (Leader leader : leads) {
                 if (!leader.isLocked()){
                     if (leader.isActive()){
                         player.removeLeader(leader.getId());
                     } else {
-                        RefreshLeader.refreshLeader(player, leader);
+                        RefreshLeader.refreshLeader(player, leader, activeMap);
                     }
                 }
             }

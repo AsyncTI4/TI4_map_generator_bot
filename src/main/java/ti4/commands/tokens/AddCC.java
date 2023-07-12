@@ -1,12 +1,14 @@
 package ti4.commands.tokens;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-
+import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.commands.units.MoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
@@ -40,27 +42,50 @@ public class AddCC extends AddRemoveToken {
         }
     }
 
+    public static void addCC(GenericInteractionCreateEvent event, String color, Tile tile) {
+        addCC(event, color, tile, true);
+    }
     public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile) {
+        addCC(event, color, tile, true);
+    }
+
+
+
+    public static void addCC(GenericInteractionCreateEvent event, String color, Tile tile, boolean ping) {
+        String gameName = event.getChannel().getName();
+        gameName = gameName.replace(ACInfo_Legacy.CARDS_INFO, "");
+        gameName = gameName.substring(0, gameName.indexOf("-"));
+        Map activeMap = MapManager.getInstance().getMap(gameName);
+        String ccID = Mapper.getCCID(color);
+        String ccPath = tile.getCCPath(ccID);
+        if (ccPath == null) {
+            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+        }
+        if (activeMap.isFoWMode() && ping) {
+            String colorMention = Helper.getColourAsMention(event.getGuild(), color);
+            FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has placed a token in the system");
+        }
+        tile.addCC(ccID);
+    }
+    public static void addCC(SlashCommandInteractionEvent event, String color, Tile tile, boolean ping) {
         Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
-
-        if (activeMap.isFoWMode()) {
-            String colorMention = Helper.getColourAsMention(color);
+        if (activeMap.isFoWMode() && ping) {
+            String colorMention = Helper.getColourAsMention(event.getGuild(), color);
             FoWHelper.pingSystem(activeMap, event, tile.getPosition(), colorMention + " has placed a token in the system");
         }
-
         tile.addCC(ccID);
     }
 
-    public static boolean hasCC(@Nullable SlashCommandInteractionEvent event, String color, Tile tile) {
+    public static boolean hasCC(@Nullable GenericInteractionCreateEvent event, String color, Tile tile) {
         String ccID = Mapper.getCCID(color);
         String ccPath = tile.getCCPath(ccID);
         if (ccPath == null && event != null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Command Counter: " + color + " is not valid and not supported.");
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Command Counter: " + color + " is not valid and not supported.");
         }
         return tile.hasCC(ccID);
     }
@@ -80,7 +105,7 @@ public class AddCC extends AddRemoveToken {
         // Moderation commands with required options
         commands.addCommands(
             Commands.slash(getActionID(), getActionDescription())
-                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true))
+                .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type tactics or t, retreat, reinforcements or r").setAutoComplete(true))
                 .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true))
         );

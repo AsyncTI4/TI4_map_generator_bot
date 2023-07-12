@@ -13,45 +13,35 @@ public abstract class LeaderSubcommandData extends SubcommandData {
     private SlashCommandInteractionEvent event;
     private Map activeMap;
     private User user;
-    private boolean replyHasBeenEdited;
-    
+
     public String getActionID() {
         return getName();
     }
-    
+
     public LeaderSubcommandData(@NotNull String name, @NotNull String description) {
         super(name, description);
     }
-    
+
     public Map getActiveMap() {
         return activeMap;
     }
-    
+
     public User getUser() {
         return user;
     }
-    
+
     /**
-     * Edits the original message after submitting a slash command
+     * Send a message to the event's channel, handles large text
      * @param messageText new message
      */
     public void sendMessage(String messageText) {
-        if (this.replyHasBeenEdited) {
-            MessageHelper.sendMessageToChannel(this.event.getChannel(), messageText);
-        } else if (messageText.length() >= 2000) {
-            this.event.getHook().editOriginal("_ _").queue();
-            MessageHelper.sendMessageToChannel(this.event.getChannel(), messageText);
-        } else {
-            this.event.getHook().editOriginal(messageText).queue();
-            this.replyHasBeenEdited = true;
-        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);
     }
 
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void preExecute(SlashCommandInteractionEvent event) {
         this.event = event;
-        replyHasBeenEdited = false;
         user = event.getUser();
         activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
     }

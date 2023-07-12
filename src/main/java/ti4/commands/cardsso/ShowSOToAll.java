@@ -4,13 +4,11 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cards.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class ShowSOToAll extends SOCardsSubcommandData {
     public ShowSOToAll() {
@@ -62,10 +60,10 @@ public class ShowSOToAll extends SOCardsSubcommandData {
         sb.append("Player: ").append(player.getUserName()).append("\n");
         if (scored){
             sb.append("Showed Scored Secret Objectives:").append("\n");
-        }else {
+        } else {
             sb.append("Showed Secret Objectives:").append("\n");
         }
-        sb.append(Mapper.getSecretObjective(soID)).append("\n");
+        sb.append(SOInfo.getSecretObjectiveRepresentation(soID)).append("\n");
         if (!scored) {
             player.setSecret(soID);
         }

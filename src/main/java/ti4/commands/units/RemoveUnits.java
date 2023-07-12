@@ -10,10 +10,16 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import java.util.Objects;
 
 public class RemoveUnits extends AddRemoveUnits {
+
+    @Override
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color) {
+
+    }
+
 
     @Override
     protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color) {
@@ -25,6 +31,9 @@ public class RemoveUnits extends AddRemoveUnits {
                 priorityDmg = false;
             }
         }
+        removeStuff(event, tile, count, planetName, unitID, color, priorityDmg);
+    }
+    public void removeStuff(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color, boolean priorityDmg) {
 
         int countToRemove = 0;
         UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
@@ -62,7 +71,6 @@ public class RemoveUnits extends AddRemoveUnits {
                 Integer unitDamageCountInSystem = unitHolder.getUnitDamage().get(unitID);
                 if (unitDamageCountInSystem != null) {
                     countToRemove = unitDamageCountInSystem - (unitCountInSystem - count);
-
                 }
             }
         } else {
@@ -88,7 +96,7 @@ public class RemoveUnits extends AddRemoveUnits {
             }
         }
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(),null);
         }
     }
 
@@ -98,10 +106,10 @@ public class RemoveUnits extends AddRemoveUnits {
     }
 
     @Override
-    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map map) {
-        super.actionAfterAll(event, tile, color, map);
+    protected void actionAfterAll(SlashCommandInteractionEvent event, Tile tile, String color, Map activeMap) {
+        super.actionAfterAll(event, tile, color, activeMap);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeMap);
         }
     }
 
@@ -116,12 +124,9 @@ public class RemoveUnits extends AddRemoveUnits {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                                .setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns").setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units. Type in yes or y"))
                         .addOptions(new OptionData(OptionType.STRING, Constants.NO_MAPGEN, "'True' to not generate a map update with this command").setAutoComplete(true))
         );

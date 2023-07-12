@@ -1,38 +1,43 @@
 package ti4.map;
 
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import ti4.ResourceHelper;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
 import ti4.helpers.Constants;
+import ti4.helpers.FoWHelper;
 import ti4.message.BotLogger;
 
 import java.awt.*;
-import java.util.Collections;
-import java.util.HashMap;
+import java.util.*;
 import java.util.List;
-import java.util.StringTokenizer;
 
 public class Tile {
     private final String tileID;
     private String position;
     private HashMap<String, UnitHolder> unitHolders = new HashMap<>();
-    
-    private Boolean fog = false;
-    private String fogLabel = "";
 
-    public Tile(String tileID, String position) {
+    private HashMap<Player,Boolean> fog = new HashMap<>();
+    private HashMap<Player,String> fogLabel = new HashMap<>();
+
+    public Tile(@JsonProperty("tileID") String tileID, @JsonProperty("position") String position) {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
         initPlanetsAndSpace(tileID);
     }
 
-    public Tile(String tileID, String position, Boolean fog_, String fogLabel_) {
+    public Tile(String tileID, String position, Player player, Boolean fog_, String fogLabel_) {
         this.tileID = tileID;
         this.position = position != null ? position.toLowerCase() : null;
-        this.fog = fog_;
-        this.fogLabel = fogLabel_;
+        if (player != null) {
+            fog.put(player, fog_);
+            fogLabel.put(player, fogLabel_);
+        }
         initPlanetsAndSpace(tileID);
     }
 
@@ -44,27 +49,16 @@ public class Tile {
     }
 
     private void initPlanetsAndSpace(String tileID) {
-
         Space space = new Space(Constants.SPACE, Constants.SPACE_CENTER_POSITION);
         unitHolders.put(Constants.SPACE, space);
-        String tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
-        if (tilePlanetPositions != null) {
-            StringTokenizer tokenizer = new StringTokenizer(tilePlanetPositions, ";");
-            while (tokenizer.hasMoreTokens()) {
-                String planetInfo = tokenizer.nextToken();
-                if (planetInfo.length() > 4) {
-                    StringTokenizer planetTokenizer = new StringTokenizer(planetInfo, " ");
-                    String planetName = planetTokenizer.nextToken().toLowerCase();
-                    Point planetPosition = PositionMapper.getPoint(planetTokenizer.nextToken());
-                    Planet planet = new Planet(planetName, planetPosition);
-                    unitHolders.put(planetName, planet);
-                }
-            }
-        }
+        java.util.Map<String, Point> tilePlanetPositions = PositionMapper.getTilePlanetPositions(tileID);
+
+        if(Optional.ofNullable(tilePlanetPositions).isPresent())
+            tilePlanetPositions.forEach((planetName, position) -> unitHolders.put(planetName, new Planet(planetName, position)));
     }
 
     @Nullable
-    public String getUnitPath(String unitID) {
+    public static String getUnitPath(String unitID) {
         String unitPath = ResourceHelper.getInstance().getUnitFile(unitID);
         if (unitPath == null) {
             BotLogger.log("Could not find unit: " + unitID);
@@ -152,11 +146,12 @@ public class Tile {
             unitHolder.addToken(tokenID);
         }
     }
-    public void removeToken(String tokenID, String spaceHolder) {
+    public boolean removeToken(String tokenID, String spaceHolder) {
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
-            unitHolder.removeToken(tokenID);
+            if (unitHolder.removeToken(tokenID)) return true;
         }
+        return false;
     }
 
     public void removeCC(String ccID) {
@@ -164,6 +159,7 @@ public class Tile {
         if (unitHolder != null) {
             unitHolder.removeCC(ccID);
         }
+
     }
 
     public void removeAllCC() {
@@ -174,6 +170,7 @@ public class Tile {
     }
 
     public void removeUnit(String spaceHolder, String unitID, Integer count) {
+        
         UnitHolder unitHolder = unitHolders.get(spaceHolder);
         if (unitHolder != null) {
             unitHolder.removeUnit(unitID, count);
@@ -205,7 +202,7 @@ public class Tile {
             int unitCount = Integer.parseInt(count);
             addUnit(spaceHolder, unitID, unitCount);
         } catch (Exception e) {
-            BotLogger.log("Could not parse unit count");
+            BotLogger.log("Could not parse unit count", e);
         }
     }
 
@@ -214,10 +211,11 @@ public class Tile {
             int unitCount = Integer.parseInt(count);
             addUnitDamage(spaceHolder, unitID, unitCount);
         } catch (Exception e) {
-            BotLogger.log("Could not parse unit count");
+            BotLogger.log("Could not parse unit count", e);
         }
     }
 
+    @JsonIgnore
     public List<Boolean> getHyperlaneData(Integer sourceDirection) {
         List<List<Boolean>> fullHyperlaneData = Mapper.getHyperlaneData(this.tileID);
         if (fullHyperlaneData == null || fullHyperlaneData.size() == 0) {
@@ -240,6 +238,7 @@ public class Tile {
         this.position = position;
     }
 
+    @JsonIgnore
     public String getTilePath() {
         String tileName = Mapper.getTileID(tileID);
         String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
@@ -249,31 +248,34 @@ public class Tile {
         return tilePath;
     }
 
-    public boolean hasFog() {
-        return fog;
+    public boolean hasFog(Player player) {
+        Boolean hasFog = fog.get(player);
+        //default all tiles to being foggy to prevent unintended info leaks
+        return hasFog == null || hasFog;
     }
 
-    public void setFogOfWar(Boolean fog_) {
-        fog = fog_;
+    public void setTileFog(@NotNull Player player, Boolean fog_) {
+        fog.put(player, fog_);
     }
 
-    public String getFogLabel() {
-        return fogLabel;
+    public String getFogLabel(Player player) {
+        return fogLabel.get(player);
     }
 
-    public void setFogLabel(String fogLabel_) {
-        this.fogLabel = fogLabel_;
+    public void setFogLabel(@NotNull Player player, String fogLabel_) {
+        fogLabel.put(player, fogLabel_);
     }
 
+    @JsonIgnore
     public String getFowTilePath(Player player) {
         String fogTileColor = player == null ? "default" : player.getFogFilter();
         String fogTileColorSuffix = "_" + fogTileColor;
         String fowTileID = "fow" + fogTileColorSuffix;
-        
-        if(this.tileID.equals("82b") || this.tileID.equals("51")) { //mallice || creuss
+
+        if (this.tileID.equals("82b") || this.tileID.equals("51")) { //mallice || creuss
             fowTileID = "fowb" + fogTileColorSuffix;
         }
-        if(this.tileID.equals("82a")) { //mallicelocked
+        if (this.tileID.equals("82a")) { //mallicelocked
             fowTileID = "fowc" + fogTileColorSuffix;
         }
 
@@ -289,4 +291,44 @@ public class Tile {
         return unitHolders;
     }
 
+    @JsonIgnore
+    public String getRepresentation() {
+        try {
+            return Mapper.getTileRepresentations().get(getTileID());
+        } catch (Exception e) {
+            // TODO: handle exception
+        }
+        return null;
+    }
+    public String getRepresentationForButtons(Map activeMap, Player player) {
+        try {
+            if(activeMap.isFoWMode())
+            {
+                Set<String> tilesToShow = FoWHelper.getTilePositionsToShow(activeMap, player);
+                if(tilesToShow.contains(getPosition()))
+                {
+                    return getPosition() + " (" + getRepresentation() + ")";
+                }
+                else
+                {
+                    return getPosition();
+                }
+            }
+            else {
+                return getPosition() + " (" + getRepresentation() + ")";
+            }
+            
+        } catch (Exception e) {
+            return getTileID();
+        }
+    }
+
+    @JsonIgnore
+    public String getRepresentationForAutoComplete() {
+        try {
+            return getPosition() + " (" + getRepresentation() + ")";
+        } catch (Exception e) {
+            return getTileID();
+        }
+    }
 }

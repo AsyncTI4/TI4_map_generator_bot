@@ -6,11 +6,9 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import org.jetbrains.annotations.NotNull;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
@@ -71,7 +69,7 @@ public class GameCommand implements Command {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
         if (!undoCommand) {
-            MapSaveLoadManager.saveMap(activeMap);
+            MapSaveLoadManager.saveMap(activeMap, event);
         }
         File file = GenerateMap.getInstance().saveImage(activeMap, event);
         if (!subcommandName.equalsIgnoreCase(Constants.GAME_END) && !subcommandName.equalsIgnoreCase(Constants.PING)) {
@@ -86,11 +84,11 @@ public class GameCommand implements Command {
     private Collection<GameSubcommandData> getSubcommands() {
         Collection<GameSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new Info());
-        subcommands.add(new SetStatus());
+        //subcommands.add(new SetStatus());
         subcommands.add(new Join());
         subcommands.add(new Leave());
         subcommands.add(new Add());
-        subcommands.add(new Remove());
+        subcommands.add(new Eliminate());
         subcommands.add(new SetOrder());
         subcommands.add(new Undo());
         subcommands.add(new SCCount());
@@ -99,6 +97,10 @@ public class GameCommand implements Command {
         subcommands.add(new SetupGameChannels());
         subcommands.add(new GameEnd());
         subcommands.add(new Ping());
+        subcommands.add(new SetUnitCap());
+        subcommands.add(new ChangeToBaseGame());
+        subcommands.add(new SetDeck());
+        subcommands.add(new GameCreate());
         return subcommands;
     }
 

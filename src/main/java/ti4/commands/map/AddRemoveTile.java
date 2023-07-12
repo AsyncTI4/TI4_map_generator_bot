@@ -41,7 +41,7 @@ abstract public class AddRemoveTile implements Command {
         } else {
             Map userActiveMap = tileParsing(event, userID, mapManager);
             if (userActiveMap == null) return;
-            MapSaveLoadManager.saveMap(userActiveMap);
+            MapSaveLoadManager.saveMap(userActiveMap, event);
             File file = GenerateMap.getInstance().saveImage(userActiveMap, event);
             MessageHelper.replyToMessage(event, file);
         }
@@ -50,7 +50,7 @@ abstract public class AddRemoveTile implements Command {
     protected Map tileParsing(SlashCommandInteractionEvent event, String userID, MapManager mapManager) {
         String planetTileName = AliasHandler.resolveTile(event.getOptions().get(0).getAsString().toLowerCase());
         String position = event.getOptions().get(1).getAsString();
-        if (!PositionMapper.isTilePositionValid(position, mapManager.getUserActiveMap(userID))) {
+        if (!PositionMapper.isTilePositionValid(position)) {
             MessageHelper.replyToMessage(event, "Position tile not allowed");
             return null;
         }
@@ -81,6 +81,7 @@ abstract public class AddRemoveTile implements Command {
         }
 
         tileAction(tile, position, userActiveMap);
+        userActiveMap.rebuildTilePositionAutoCompleteList();
         return userActiveMap;
     }
 
@@ -92,11 +93,8 @@ abstract public class AddRemoveTile implements Command {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map")
-                                .setRequired(true))
-
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "Tile name").setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.POSITION, "Tile position on map").setRequired(true))
         );
     }
 

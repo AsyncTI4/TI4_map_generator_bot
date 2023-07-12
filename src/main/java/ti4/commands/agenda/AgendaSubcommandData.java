@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
-import ti4.commands.status.StatusCommand;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.message.MessageHelper;
@@ -14,7 +13,6 @@ public abstract class AgendaSubcommandData extends SubcommandData {
     private SlashCommandInteractionEvent event;
     private Map activeMap;
     private User user;
-    private boolean replyHasBeenEdited;
 
     public String getActionID() {
         return getName();
@@ -33,26 +31,17 @@ public abstract class AgendaSubcommandData extends SubcommandData {
     }
 
     /**
-     * Edits the original message after submitting a slash command
+     * Send a message to the event's channel, handles large text
      * @param messageText new message
      */
     public void sendMessage(String messageText) {
-        if (this.replyHasBeenEdited) {
-            MessageHelper.sendMessageToChannel(this.event.getChannel(), messageText);
-        } else if (messageText.length() >= 2000) {
-            this.event.getHook().editOriginal("_ _").queue();
-            MessageHelper.sendMessageToChannel(this.event.getChannel(), messageText);
-        } else {
-            this.event.getHook().editOriginal(messageText).queue();
-            this.replyHasBeenEdited = true;
-        }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), messageText);
     }
-    
+
     abstract public void execute(SlashCommandInteractionEvent event);
 
     public void preExecute(SlashCommandInteractionEvent event) {
         this.event = event;
-        replyHasBeenEdited = false;
         user = event.getUser();
         activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
     }

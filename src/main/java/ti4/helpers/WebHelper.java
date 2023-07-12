@@ -1,12 +1,15 @@
 package ti4.helpers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import software.amazon.awssdk.core.exception.SdkClientException;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.s3.S3Client;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import ti4.ResourceHelper;
 import ti4.map.Map;
+import ti4.map.Player;
 import ti4.message.BotLogger;
 
 import javax.imageio.IIOImage;
@@ -37,16 +40,16 @@ public class WebHelper {
         try (InputStream input = new FileInputStream(Objects.requireNonNull(ResourceHelper.getInstance().getWebFile("web.properties")))) {
             webProperties.load(input);
         } catch (IOException e) {
-            BotLogger.log("Could not load web properties.");
+            BotLogger.log("Could not load web properties.", e);
         }
 
     }
 
-    public static void putData(String gameId, Map map) {
+    public static void putData(String gameId, Map activeMap) {
 
         ObjectMapper mapper = new ObjectMapper();
         try {
-            HashMap<String, String> exportableFieldMap = map.getExportableFieldMap();
+            HashMap<String, Object> exportableFieldMap = activeMap.getExportableFieldMap();
             String json = mapper.writeValueAsString( exportableFieldMap );
 
             HttpClient client = HttpClient.newHttpClient();
@@ -59,18 +62,29 @@ public class WebHelper {
                     HttpResponse.BodyHandlers.ofString());
 
         } catch (IOException | InterruptedException e) {
-            BotLogger.log("Could not put data to web server");
+            BotLogger.log("Could not put data to web server", e);
         }
 
 
     }
 
+
     public static void putMap(String gameId, BufferedImage img) {
+        putMap(gameId, img, false, null);
+    }
+
+    public static void putMap(String gameId, BufferedImage img, Boolean frog, Player player) {
         try {
             Region region = Region.US_EAST_1;
             S3Client s3 = S3Client.builder()
                     .region(region)
                     .build();
+            String mapPathFormat;
+            if (frog != null && frog && player != null) {
+                mapPathFormat = "fogmap/" + player.getUserID() + "/%s/%s.png";
+            } else {
+                mapPathFormat = "map/%s/%s.png";
+            }
 
             LocalDateTime date = LocalDateTime.now();
             String dtstamp = date.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
@@ -78,7 +92,7 @@ public class WebHelper {
             ByteArrayOutputStream out = new ByteArrayOutputStream();
             PutObjectRequest request = PutObjectRequest.builder()
                     .bucket(webProperties.getProperty("bucket"))
-                    .key(String.format("map/%s/%s.png", gameId, dtstamp))
+                    .key(String.format(mapPathFormat, gameId, dtstamp))
                     .contentType("image/png")
                     .build();
 
@@ -93,13 +107,15 @@ public class WebHelper {
             try {
                 imageWriter.write(null, new IIOImage(img, null, null), defaultWriteParam);
             } catch (IOException e) {
-                BotLogger.log("Could not write image to web server");
+                BotLogger.log("Could not write image to web server", e);
                 throw new RuntimeException(e);
             }
 
             s3.putObject(request, RequestBody.fromBytes(out.toByteArray()));
+        } catch (SdkClientException e) {
+            // BotLogger.log("Could not add image to web server. Likely invalid credentials.", e);
         } catch (Exception e) {
-            BotLogger.log("Could not add image to web server");
+            BotLogger.log("Could not add image to web server", e);
         }
     }
 }

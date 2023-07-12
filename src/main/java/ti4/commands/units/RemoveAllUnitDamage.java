@@ -12,7 +12,7 @@ import ti4.map.Tile;
 public class RemoveAllUnitDamage extends RemoveAllUnits {
 
     @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map map) {
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
         tile.removeAllUnitDamage(color);
     }
 
@@ -27,10 +27,8 @@ public class RemoveAllUnitDamage extends RemoveAllUnits {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), "Remove all unit damage from map")
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                                .setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
         );
     }
 

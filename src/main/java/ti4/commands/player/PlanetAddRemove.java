@@ -12,7 +12,6 @@ import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.BotLogger;
-import ti4.message.MessageHelper;
 
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
@@ -20,6 +19,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
 public abstract class PlanetAddRemove extends PlayerSubcommandData{
@@ -43,10 +43,10 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
-        
+
         ArrayList<OptionMapping> planetOptions = new ArrayList<>();
         planetOptions.add(event.getOption(Constants.PLANET));
         planetOptions.add(event.getOption(Constants.PLANET2));
@@ -55,34 +55,34 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
         planetOptions.add(event.getOption(Constants.PLANET5));
         planetOptions.add(event.getOption(Constants.PLANET6));
 
-        LinkedHashSet<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(p -> AliasHandler.resolvePlanet(p.getAsString())).toList());
+        LinkedHashSet<String> planetIDs = new LinkedHashSet<>(planetOptions.stream().filter(Objects::nonNull).map(p -> p.getAsString()).map(s -> AliasHandler.resolvePlanet(StringUtils.substringBefore(s, " (").replace(" ", ""))).toList());
 
-        MessageHelper.sendMessageToChannel(event.getChannel(), getActionHeaderMessage(event, player) + resolveSpendAs(event, planetIDs) + ":");
+        sendMessage(getActionHeaderMessage(activeMap, player) + resolveSpendAs(event, planetIDs) + ":");
 
         for (String planetID : planetIDs) {
             parseParameter(event, player, planetID, activeMap);
         }
     }
 
-    private void parseParameter(SlashCommandInteractionEvent event, Player player, String planetID, Map map) {
+    private void parseParameter(SlashCommandInteractionEvent event, Player player, String planetID, Map activeMap) {
         try {
             if (Mapper.isValidPlanet(planetID)) {
-                doAction(player, planetID, map);
-                MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planetID));
+                doAction(player, planetID, activeMap);
+                sendMessage("> " + resolvePlanetMessage(planetID));
             } else {
-                Set<String> planets = map.getPlanets();
+                Set<String> planets = activeMap.getPlanets();
                 List<String> possiblePlanets = planets.stream().filter(value -> value.toLowerCase().contains(planetID)).toList();
                 if (possiblePlanets.isEmpty()){
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "> No matching Planet '" + planetID + "'' found - please try again.");
+                    sendMessage("> No matching Planet '" + planetID + "'' found - please try again.");
                     return;
                 } else if (possiblePlanets.size() > 1) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
+                    sendMessage("> More than one Planet matching '" + planetID + "'' found: " + possiblePlanets + " - please try again.");
                     return;
                 }
                 String planet = possiblePlanets.get(0);
                 BotLogger.log(event, "`PlanetAddRemove.parseParameter - " + getActionID() + " - isValidPlanet(" + planetID + ") = false` - attempting to use planet: " + planet);
-                doAction(player, planet, map);
-                MessageHelper.sendMessageToChannel(event.getChannel(), "> " + resolvePlanetMessage(planet));
+                doAction(player, planet, activeMap);
+                sendMessage("> " + resolvePlanetMessage(planet));
             }
         } catch (Exception e) {
             BotLogger.log(event, "Error parsing planet: " + planetID);
@@ -90,15 +90,15 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
         }
     }
 
-    public abstract void doAction(Player player, String techID, Map map);
-    
+    public abstract void doAction(Player player, String techID, Map activeMap);
+
     /** Customize the initial header response depending on ActionID (which /player planet_* action is used)
-     * @param event
+     * @param activeMap
      * @param player
      * @return
      */
-    private String getActionHeaderMessage(SlashCommandInteractionEvent event, Player player) {
-        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player)).append(" ");
+    private String getActionHeaderMessage(Map activeMap, Player player) {
+        StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap)).append(" ");
         return switch (getActionID()) {
             case Constants.PLANET_ADD -> message.append(" added planet(s)").toString();
             case Constants.PLANET_REMOVE -> message.append(" removed planet(s)").toString();
@@ -148,22 +148,22 @@ public abstract class PlanetAddRemove extends PlayerSubcommandData{
             String spendAs = option.getAsString();
             int sum = 0;
             switch (spendAs.toLowerCase()) {
-                case "resources" -> {
+                case "r", "resources" -> {
                     for (String planetID : planetIDs) {
                         sum += Helper.getPlanetResources(planetID, getActiveMap());
                     }
                     message.append(Helper.getResourceEmoji(sum) + " resources").toString();
                 }
-                case "influence" -> {
+                case "i", "influence" -> {
                     for (String planetID : planetIDs) {
                         sum += Helper.getPlanetInfluence(planetID, getActiveMap());
                     }
                     message.append(Helper.getInfluenceEmoji(sum) + " influence").toString();
                 }
-                case "votes" -> {
+                case "v", "votes" -> {
                     message.append(" votes").toString();
                 }
-                case "techskip" -> message.append(" a tech skip").toString();
+                case "t", "techskip" -> message.append(" a tech skip").toString();
                 case "toes" -> { //For HolyT
                     for (String planetID : planetIDs) {
                         sum += Helper.getPlanetInfluence(planetID, getActiveMap());

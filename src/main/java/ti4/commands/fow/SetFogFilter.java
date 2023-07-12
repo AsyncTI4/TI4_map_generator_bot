@@ -36,15 +36,21 @@ public class SetFogFilter extends FOWSubcommandData {
 
         String color_suffix = null;
         switch (fogColorMapping.getAsString()) {
-            case Constants.FOW_FILTER_DARK_GREY -> color_suffix = "default";
-            case Constants.FOW_FILTER_SEPIA -> color_suffix = "sepia";
-            case Constants.FOW_FILTER_WHITE -> color_suffix = "white";
-            case Constants.FOW_FILTER_PINK -> color_suffix = "pink";
-            case Constants.FOW_FILTER_PURPLE -> color_suffix = "purple";
-            case Constants.FOW_FILTER_FROG -> color_suffix = "frog";
+            case Constants.FOW_FILTER_DARK_GREY, "default", "darkgrey", "grey", "gray" ->
+                color_suffix = "default";
+            case Constants.FOW_FILTER_SEPIA, "sepia" ->
+                color_suffix = "sepia";
+            case Constants.FOW_FILTER_WHITE, "white" ->
+                color_suffix = "white";
+            case Constants.FOW_FILTER_PINK, "pink" ->
+                color_suffix = "pink";
+            case Constants.FOW_FILTER_PURPLE, "purple" ->
+                color_suffix = "purple";
+            case Constants.FOW_FILTER_FROG, "frog" ->
+                color_suffix = "frog";
         }
 
         player.setFogFilter(color_suffix);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
     }
 }

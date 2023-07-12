@@ -11,7 +11,6 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
-import ti4.message.MessageHelper;
 
 public class UseExplore extends ExploreSubcommandData {
 
@@ -47,16 +46,16 @@ public class UseExplore extends ExploreSubcommandData {
                     }
                 }
                 if (tile == null) {
-                    MessageHelper.replyToMessage(event, "System not found that contains planet");
+                    sendMessage("System not found that contains planet");
                     return;
                 }
             }
             Player player = activeMap.getPlayer(event.getUser().getId());
             player = Helper.getGamePlayer(activeMap, player, event, null);
             String messageText = "Used card: " + id + " by player: " + player.getUserName();
-            resolveExplore(event, id, tile, planetName, messageText, ExpFrontier.checkIfEngimaticDevice(player, id));
+            resolveExplore(event, id, tile, planetName, messageText, ExpFrontier.checkIfEngimaticDevice(player, id), player, activeMap);
         } else {
-            MessageHelper.replyToMessage(event, "Invalid card ID");
+            sendMessage("Invalid card ID");
         }
     }
 

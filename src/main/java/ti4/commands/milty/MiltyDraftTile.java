@@ -11,6 +11,7 @@ public class MiltyDraftTile {
     private double milty_influence = 0.0;
     private boolean hasAlphaWH = false;
     private boolean hasBetaWH = false;
+    private boolean hasOtherWH = false;
     private boolean isLegendary = false;
 
     public Tile getTile() {
@@ -75,6 +76,10 @@ public class MiltyDraftTile {
 
     public void setHasBetaWH(boolean hasBetaWH) {
         this.hasBetaWH = hasBetaWH;
+    }
+
+    public void setHasOtherWH(boolean hasOtherWH) {
+        this.hasOtherWH = hasOtherWH;
     }
 
     public boolean isLegendary() {

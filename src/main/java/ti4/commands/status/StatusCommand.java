@@ -6,7 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands.cards.CardsCommand;
+import ti4.commands.cardsac.ACCardsCommand;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.map.Map;
@@ -31,7 +31,7 @@ public class StatusCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return CardsCommand.acceptEvent(event, getActionID());
+        return ACCardsCommand.acceptEvent(event, getActionID());
     }
 
     @Override
@@ -84,7 +84,7 @@ public class StatusCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event, String message) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
 
         File file = GenerateMap.getInstance().saveImage(activeMap, event);
         MessageHelper.replyToMessage(event, file, false, message, message != null);
@@ -107,6 +107,7 @@ public class StatusCommand implements Command {
         subcommands.add(new RemoveCustomPO());
         subcommands.add(new SCTradeGoods());
         subcommands.add(new ListTurnOrder());
+        subcommands.add(new ListTurnStats());
         return subcommands;
     }
 

@@ -7,14 +7,12 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -68,8 +66,6 @@ public class PlayerCommand implements Command {
     private String getOptionValue(OptionMapping option) {
         if (option.getName().equals(Constants.PLAYER)){
             return option.getAsUser().getName();
-        } else if (option.getName().equals(Constants.TECH)){
-            return Mapper.getTechs().get(option.getAsString());
         }
         return option.getAsString();
     }
@@ -96,10 +92,9 @@ public class PlayerCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
 
-        File file = GenerateMap.getInstance().saveImage(activeMap, event);
-        MessageHelper.replyToMessage(event, file);
+        GenerateMap.getInstance().saveImage(activeMap, event);
     }
 
 
@@ -110,7 +105,7 @@ public class PlayerCommand implements Command {
     private Collection<PlayerSubcommandData> getSubcommands() {
         Collection<PlayerSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new Stats());
-        subcommands.add(new Planets());
+        // subcommands.add(new Planets());
         subcommands.add(new Setup());
         subcommands.add(new SCPlay());
         subcommands.add(new Pass());
@@ -118,8 +113,11 @@ public class PlayerCommand implements Command {
         subcommands.add(new TechRemove());
         subcommands.add(new TechExhaust());
         subcommands.add(new TechRefresh());
+        subcommands.add(new TechInfo());
+        subcommands.add(new AbilityInfo());
         subcommands.add(new Turn());
         subcommands.add(new SCPick());
+        subcommands.add(new SCUnpick());
         subcommands.add(new PlanetAdd());
         subcommands.add(new PlanetRemove());
         subcommands.add(new PlanetExhaust());
@@ -131,7 +129,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new Speaker());
         subcommands.add(new SendTG());
         subcommands.add(new SendCommodities());
-        subcommands.add(new SCFollow());
+        subcommands.add(new ChangeColor());
         return subcommands;
     }
 

@@ -12,7 +12,6 @@ import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
-import ti4.message.MessageHelper;
 
 public class ServerLimitStats extends BothelperSubcommandData {
     public ServerLimitStats(){
@@ -21,24 +20,25 @@ public class ServerLimitStats extends BothelperSubcommandData {
 
     public void execute(SlashCommandInteractionEvent event) {
         Guild guild = event.getGuild();
-        
+
         int memberCount = guild.getMemberCount();
         int memberMax = guild.getMaxMembers();
         int boostCount = guild.getBoostCount();
         int roleCount = guild.getRoles().size(); //250
-        
+
         //CHANNELS
         List<GuildChannel> channels = guild.getChannels();
         int channelCount = channels.size(); //500
         long pbdChannelCount = channels.stream().filter(c -> c.getName().startsWith("pbd")).count();
         long categoryChannelCount = channels.stream().filter(c -> c.getType() == ChannelType.CATEGORY).count();
-        
+
         //THREADS
-        List<ThreadChannel> threadChannels = guild.getThreadChannels();
+        List<ThreadChannel> threadChannels = guild.getThreadChannels().stream().filter(c -> !c.isArchived()).toList();
         int threadCount = threadChannels.size(); //1000
-        long cardsInfoThreadCount = threadChannels.stream().filter(t -> t.getName().startsWith("Cards Info")).count();
-        long botThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-bot-")).count();
-        long mapThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-map-")).count();
+        List<ThreadChannel> threadChannelsArchived = guild.getThreadChannels().stream().filter(c -> c.isArchived()).toList();
+        int threadArchivedCount = threadChannelsArchived.size();
+        long cardsInfoThreadCount = threadChannels.stream().filter(t -> t.getName().startsWith(Constants.CARDS_INFO_THREAD_PREFIX)).count();
+        long botThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-bot-map-")).count();
         long scThreadCount = threadChannels.stream().filter(t -> t.getName().contains("-round-")).count();
         long privateThreadCount = threadChannels.stream().filter(t -> !t.isPublic()).count();
         long publicThreadCount = threadChannels.stream().filter(t -> t.isPublic()).count();
@@ -49,12 +49,12 @@ public class ServerLimitStats extends BothelperSubcommandData {
         long inLimboChannelCount = inLimboChannels.size();
         long inLimboThreadCount = 0;
         for (GuildChannel channel : inLimboChannels) {
-            if(channel.getType() == ChannelType.TEXT) {
+            if (channel.getType() == ChannelType.TEXT) {
                 inLimboThreadCount += ((TextChannel) channel).getThreadChannels().size();
             }
         }
-        
-        
+
+
 
         int emojiCount = guild.getEmojis().size();
         int emojiMax = guild.getMaxEmojis();
@@ -68,10 +68,11 @@ public class ServerLimitStats extends BothelperSubcommandData {
         sb.append("     - ").append(pbdChannelCount).append("   " + getPercentage(pbdChannelCount, channelCount) + "  'pbd' channels").append("\n");
         sb.append("     - ").append(categoryChannelCount).append("   " + getPercentage(categoryChannelCount, channelCount) + "  categories").append("\n");
         sb.append("**").append(threadCount).append(" / 1000" + getPercentage(threadCount, 1000) + " - threads**").append("\n");
+        sb.append("     - ").append(threadArchivedCount).append("   " + threadArchivedCount + " - loaded archived threads").append("\n");
         sb.append("     - ").append(privateThreadCount).append("   " + getPercentage(privateThreadCount, threadCount) + "  private threads").append("\n");
         sb.append("     - ").append(cardsInfoThreadCount).append("   " + getPercentage(cardsInfoThreadCount, threadCount) + "  'Cards Info' threads (/ac info)").append("\n");
         sb.append("     - ").append(publicThreadCount).append("   " + getPercentage(publicThreadCount, threadCount) + "  public threads").append("\n");
-        sb.append("     - ").append(botThreadCount + mapThreadCount).append("   " + getPercentage(botThreadCount + mapThreadCount, threadCount) + "  '-bot-' and '-map-' threads").append("\n");
+        sb.append("     - ").append(botThreadCount).append("   " + getPercentage(botThreadCount, threadCount) + "  '-bot-map-' threads").append("\n");
         sb.append("     - ").append(scThreadCount).append("   " + getPercentage(scThreadCount, threadCount) + "  '-round-' threads (/sc play)").append("\n");
         if (inLimboArchive != null) {
             sb.append("**In Limbo:** ").append(inLimboArchive.getAsMention()).append("\n");

@@ -32,6 +32,5 @@ public class SetupTemplatesAction extends HelpSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Could not find setup templates file");
         }
-        MessageHelper.replyToMessageTI4Logo(event);
     }
 }

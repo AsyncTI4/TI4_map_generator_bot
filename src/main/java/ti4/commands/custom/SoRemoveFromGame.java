@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 public class SoRemoveFromGame extends CustomSubcommandData {
     public SoRemoveFromGame() {
-        super(Constants.SO_REMOVE_FROM_GAME, "SO remove from game");
+        super(Constants.REMOVE_SO_FROM_GAME, "SO remove from game");
         addOptions(new OptionData(OptionType.STRING, Constants.SO_ID, "Secret ID").setRequired(true).setAutoComplete(true));
     }
 

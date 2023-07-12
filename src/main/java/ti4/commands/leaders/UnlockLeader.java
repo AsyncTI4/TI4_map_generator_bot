@@ -1,11 +1,14 @@
 package ti4.commands.leaders;
 
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public class UnlockLeader extends LeaderAction {
     public UnlockLeader() {
@@ -13,20 +16,27 @@ public class UnlockLeader extends LeaderAction {
     }
 
     @Override
-    void action(SlashCommandInteractionEvent event, String leader, Map activeMap, Player player) {
-        Leader playerLeader = player.getLeader(leader);
+    void action(SlashCommandInteractionEvent event, String leaderID, Map activeMap, Player player) {
+        unlockLeader(event, leaderID, activeMap, player);
+    }
+
+    public void unlockLeader(GenericInteractionCreateEvent event, String leaderID, Map activeMap, Player player) {
+        Leader playerLeader = player.getLeader(leaderID);
+        MessageChannel channel = activeMap.getMainGameChannel();
+        if (activeMap.isFoWMode()) channel = player.getPrivateChannel();
+
         if (playerLeader != null){
             playerLeader.setLocked(false);
-            sendMessage(Helper.getFactionLeaderEmoji(player, playerLeader));
-            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(event, player))
+            MessageHelper.sendMessageToChannel(channel, Helper.getFactionLeaderEmoji(playerLeader));
+            StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
                     .append(" unlocked ")
-                    .append(Helper.getLeaderFullRepresentation(player, playerLeader));
-            sendMessage(message.toString());
+                    .append(Helper.getLeaderFullRepresentation(playerLeader));
+            MessageHelper.sendMessageToChannel(channel, message.toString());
             if (playerLeader.isExhausted()){
-                sendMessage("Leader is also exhausted");
+                MessageHelper.sendMessageToChannel(channel, "Leader is also exhausted");
             }
         } else {
-            sendMessage("Leader not found");
+            MessageHelper.sendMessageToChannel(channel, "Leader not found");
         }
     }
 }

@@ -49,8 +49,8 @@ public class DeleteGame implements Command {
             return;
         }
         String mapName = event.getOptions().get(0).getAsString().toLowerCase();
-        Map map = MapManager.getInstance().getMap(mapName);
-        if (map == null) {
+        Map mapToDelete = MapManager.getInstance().getMap(mapName);
+        if (mapToDelete == null) {
             MessageHelper.replyToMessage(event, "Map: " + mapName + " was not found.");
             return;
         }
@@ -58,11 +58,13 @@ public class DeleteGame implements Command {
         boolean isAdmin = false;
         if (member_ != null) {
             java.util.List<Role> roles = member_.getRoles();
-            if (roles.contains(MapGenerator.adminRole)) {
-                isAdmin = true;
+            for (Role role : MapGenerator.adminRoles) {
+                if (roles.contains(role)) {
+                    isAdmin = true;
+                }
             }
         }
-        if (!map.getOwnerID().equals(member.getId()) && !isAdmin){
+        if (!mapToDelete.getOwnerID().equals(member.getId()) && !isAdmin){
             MessageHelper.replyToMessage(event, "Map: " + mapName + " can be deleted by it's creator or admin.");
             return;
         }

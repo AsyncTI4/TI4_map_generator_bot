@@ -1,0 +1,26 @@
+on: workflow_dispatch
+name: ForceSaveFileBackup
+concurrency:
+  group: "Start Bot"
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@master
+        env:
+          AWS_KEY: ${{ secrets.IMG_AWS_KEY }}
+          AWS_SECRET: ${{ secrets.IMG_AWS_SECRET }}
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: root
+          password: ${{ secrets.SSH_PASSWORD }}
+          port: 22
+          script_stop: true
+          envs: AWS_KEY, AWS_SECRET
+          script: |
+            cd /root/ti4bot
+            echo "FORCING BACKUP OF SAVE FILES"
+            ./scheduled_upload.sh
+            echo "DONE!"

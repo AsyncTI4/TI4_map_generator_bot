@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class DrawSpecificRelic extends GenericRelicAction {
     public void doAction(Player player, SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.RELIC);
         if (option == null) {
-            MessageHelper.replyToMessage(event, "Specify relic");
+            sendMessage("Specify relic");
             return;
         }
         String relicId = option.getAsString();
@@ -35,9 +34,9 @@ public class DrawSpecificRelic extends GenericRelicAction {
             player.addRelic(relicId);
             String[] relicData = Mapper.getRelic(relicId).split(";");
             String relicString = "Relic: " + relicData[0] + " - " + relicData[1];
-            MessageHelper.replyToMessage(event, relicString);
+            sendMessage(relicString);
         } else {
-            MessageHelper.replyToMessage(event, "Invalid relic or relic not present in deck");
+            sendMessage("Invalid relic or relic not present in deck");
         }
     }
 }

@@ -1,13 +1,11 @@
 package ti4.commands.cardsso;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
-import ti4.commands.cards.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 import java.util.*;
 
@@ -38,20 +36,20 @@ public class ShowAllSOToAll extends SOCardsSubcommandData {
             scoredSecretObjective.remove(id);
         }
 
-        sb.append(Helper.getPlayerRepresentation(event, player));
+        sb.append(Helper.getPlayerRepresentation(player, activeMap));
         sb.append("\n");
         sb.append("**Secret Objectives:**").append("\n");
         int index = 1;
         if (secretObjectives != null) {
             for (String so : secretObjectives) {
-                sb.append(index).append(" - ").append(Mapper.getSecretObjective(so)).append("\n");
+                sb.append(index).append(" - ").append(SOInfo.getSecretObjectiveRepresentation(so)).append("\n");
                 player.setSecret(so);
                 index++;
             }
         }
         sb.append("\n").append("**Scored Secret Objectives:**").append("\n");
         for (java.util.Map.Entry<String, Integer> so : scoredSecretObjective.entrySet()) {
-            sb.append(index).append(". (").append(so.getValue()).append(") - ").append(Mapper.getSecretObjective(so.getKey())).append("\n");
+            sb.append(index).append(". (").append(so.getValue()).append(") - ").append(SOInfo.getSecretObjectiveRepresentation(so.getKey())).append("\n");
             index++;
         }
         sendMessage(sb.toString());

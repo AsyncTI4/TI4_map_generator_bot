@@ -16,7 +16,7 @@ import ti4.message.MessageHelper;
 public class DiploSystem extends SpecialSubcommandData {
     public DiploSystem() {
         super(Constants.DIPLO_SYSTEM, "Diplomacy a system");
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats").setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for which you set stats").setAutoComplete(true));
     }
@@ -40,7 +40,7 @@ public class DiploSystem extends SpecialSubcommandData {
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
         Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
         if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 

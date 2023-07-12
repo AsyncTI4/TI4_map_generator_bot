@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
-import ti4.message.MessageHelper;
 
 public class RemoveExplore extends ExploreSubcommandData {
 
@@ -29,6 +28,6 @@ public class RemoveExplore extends ExploreSubcommandData {
                 sb.append("Removed id without matching card: ").append(id).append(System.lineSeparator());
             }
         }
-        MessageHelper.replyToMessage(event, sb.toString());
+        sendMessage(sb.toString());
     }
 }

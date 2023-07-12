@@ -47,8 +47,10 @@ public class SOCardsCommand implements Command {
             Member member = event.getMember();
             if (member != null) {
                 java.util.List<Role> roles = member.getRoles();
-                if (roles.contains(MapGenerator.adminRole)) {
-                    return true;
+                for (Role role : MapGenerator.adminRoles) {
+                    if (roles.contains(role)) {
+                        return true;
+                    }
                 }
             }
             Map userActiveMap = mapManager.getUserActiveMap(userID);
@@ -109,7 +111,7 @@ public class SOCardsCommand implements Command {
         }
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
         // MessageHelper.replyToMessage(event, "Card action executed: " + (subCommandExecuted != null ? subCommandExecuted.getName() : ""));
     }
 
@@ -122,7 +124,7 @@ public class SOCardsCommand implements Command {
         Collection<SOCardsSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new DrawSO());
         subcommands.add(new DiscardSO());
-        subcommands.add(new CardsInfo());
+        subcommands.add(new SOInfo());
         subcommands.add(new ShowSO());
         subcommands.add(new ShowSOToAll());
         subcommands.add(new ScoreSO());
@@ -131,6 +133,8 @@ public class SOCardsCommand implements Command {
         subcommands.add(new ShowAllSO());
         subcommands.add(new ShowAllSOToAll());
         subcommands.add(new DealSOToAll());
+        subcommands.add(new DrawSpecificSO());
+        subcommands.add(new ShowUnScoredSOs());
         return subcommands;
     }
 

@@ -22,7 +22,7 @@ public class SwapSC extends SpecialSubcommandData {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-        
+
         //resolve player1
         Player player1 = null; //OG player
         OptionMapping player1option = event.getOption(Constants.FACTION_COLOR_2);
@@ -47,7 +47,7 @@ public class SwapSC extends SpecialSubcommandData {
                 return;
             }
         }
-        
+
         //resolve player2
         Player player2 = null; //Player to swap with
         OptionMapping player2option = event.getOption(Constants.FACTION_COLOR);
@@ -63,7 +63,7 @@ public class SwapSC extends SpecialSubcommandData {
             if (player2 == null) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
                 return;
-            }       
+            }
         }
 
         if (player1.equals(player2)) {
@@ -71,23 +71,29 @@ public class SwapSC extends SpecialSubcommandData {
             return;
         }
 
-        Integer player1SC = player1.getSC();
-        Integer player2SC = player2.getSC();
+        if (player1.getSCs().size() > 1 || player2.getSCs().size() > 1) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot swap SCs because One or more players have multiple SCs. Command not yet implemented for this scenario");
+            return;
+        }
+
+        Integer player1SC = player1.getSCs().stream().findFirst().get();
+        Integer player2SC = player2.getSCs().stream().findFirst().get();
 
         if (player1SC == 0 || player2SC == 0) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot swap SCs because One or more players have no selected an SC yet");
             return;
         }
 
-        player1.setSC(0);
-        player2.setSC(0);
-        player1.setSC(player2SC);
-        player2.setSC(player1SC);
+        player1.addSC(player2SC);
+        player1.removeSC(player1SC);
+
+        player2.addSC(player1SC);
+        player2.removeSC(player2SC);
 
         StringBuilder sb = new StringBuilder();
-        sb.append(Helper.getPlayerRepresentation(event, player1)).append(" swapped SC with ").append(Helper.getPlayerRepresentation(event, player2)).append("\n");
-        sb.append("> ").append(Helper.getPlayerRepresentation(event, player2)).append(Helper.getSCEmojiFromInteger(player2SC)).append(" ").append(":arrow_right:").append(" ").append(Helper.getSCEmojiFromInteger(player1SC)).append("\n");
-        sb.append("> ").append(Helper.getPlayerRepresentation(event, player1)).append(Helper.getSCEmojiFromInteger(player1SC)).append(" ").append(":arrow_right:").append(" ").append(Helper.getSCEmojiFromInteger(player2SC)).append("\n");
+        sb.append(Helper.getPlayerRepresentation(player1, activeMap)).append(" swapped SC with ").append(Helper.getPlayerRepresentation(player2, activeMap)).append("\n");
+        sb.append("> ").append(Helper.getPlayerRepresentation(player2, activeMap)).append(Helper.getSCEmojiFromInteger(player2SC)).append(" ").append(":arrow_right:").append(" ").append(Helper.getSCEmojiFromInteger(player1SC)).append("\n");
+        sb.append("> ").append(Helper.getPlayerRepresentation(player1, activeMap)).append(Helper.getSCEmojiFromInteger(player1SC)).append(" ").append(":arrow_right:").append(" ").append(Helper.getSCEmojiFromInteger(player2SC)).append("\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
         // ListTurnOrder.turnOrder(event, activeMap);
     }

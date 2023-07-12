@@ -41,4 +41,8 @@ public interface Command {
     default boolean isChannelCommand() {
         return true;
     }
+
+    default void postExecute(SlashCommandInteractionEvent event) {
+        event.getHook().deleteOriginal().submit();
+    }
 }

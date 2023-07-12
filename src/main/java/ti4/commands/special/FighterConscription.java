@@ -65,13 +65,13 @@ public class FighterConscription extends SpecialSubcommandData {
                             }
                             // Titans, Saturn Engine 2, Cruiser 2
                             if (unitType.startsWith("ca")) {
-                                if ("titans".equals(player.getFaction()) || player.getTechs().contains("se2") || player.getTechs().contains("cr2")) {
+                                if (player.ownsUnit("titans_cruiser") || player.ownsUnit("titans_cruiser2") || player.hasTech("se2") || player.hasTech("cr2")) {
                                     hasCap = true;
                                 }
                             }
                             // Argent, Strike Wing Alpha 2
                             if (unitType.startsWith("dd")) {
-                                if ("argent".equals(player.getFaction()) || player.getTechs().contains("swa2")) {
+                                if (player.ownsUnit("argent_destroyer") || player.ownsUnit("argent_destroyer2") || player.hasTech("swa2")) {
                                     hasCap = true;
                                 }
                             }
@@ -106,7 +106,7 @@ public class FighterConscription extends SpecialSubcommandData {
                 msg += ", **" + tile.getPosition() + "**";
             }
         }
-        MessageHelper.sendMessageToChannel(event, msg);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
     }
 
     @Override

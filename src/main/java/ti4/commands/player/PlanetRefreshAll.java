@@ -7,7 +7,6 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class PlanetRefreshAll extends PlayerSubcommandData {
     public PlanetRefreshAll() {
@@ -24,12 +23,13 @@ public class PlanetRefreshAll extends PlayerSubcommandData {
         player = Helper.getPlayer(activeMap, player, event);
 
         if (player == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
+            sendMessage("Player could not be found");
             return;
         }
 
         for (String planet : player.getPlanets()) {
             player.refreshPlanet(planet);
         }
+        sendMessage(Helper.getPlayerRepresentation(player, activeMap) + " readied all planets.");
     }
 }

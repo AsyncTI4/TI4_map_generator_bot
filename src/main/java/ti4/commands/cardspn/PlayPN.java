@@ -4,13 +4,14 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cards.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
+import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
+import ti4.model.PromissoryNoteModel;
 
 public class PlayPN extends PNCardsSubcommandData {
     public PlayPN() {
@@ -40,13 +41,13 @@ public class PlayPN extends PNCardsSubcommandData {
         }
 
         String value = option.getAsString().toLowerCase();
-        String id = null;
+        String pnID = null;
         int pnIndex;
         try {
             pnIndex = Integer.parseInt(value);
-            for (java.util.Map.Entry<String, Integer> so : player.getPromissoryNotes().entrySet()) {
-                if (so.getValue().equals(pnIndex)) {
-                    id = so.getKey();
+            for (java.util.Map.Entry<String, Integer> pn : player.getPromissoryNotes().entrySet()) {
+                if (pn.getValue().equals(pnIndex)) {
+                    pnID = pn.getKey();
                 }
             }
         } catch (Exception e) {
@@ -61,7 +62,7 @@ public class PlayPN extends PNCardsSubcommandData {
                             sendMessage("Multiple cards with similar name founds, please use ID");
                             return;
                         }
-                        id = pn.getKey();
+                        pnID = pn.getKey();
                         foundSimilarName = true;
                         cardName = pnName;
                     }
@@ -69,47 +70,50 @@ public class PlayPN extends PNCardsSubcommandData {
             }
         }
 
-        if (id == null) {
+        if (pnID == null) {
             sendMessage("No such Promissory Note ID found, please retry");
             return;
         }
 
-        String promissoryNote = Mapper.getPromissoryNote(id, true);
-        String[] pn = promissoryNote.split(";");
-        String pnOwner = Mapper.getPromissoryNoteOwner(id);
-        if (pn.length > 3 && pn[3].equals("playarea")) {
-            player.setPromissoryNotesInPlayArea(id);
-        } else {
-            player.removePromissoryNote(id);
+        PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnID);
+        String pnName = promissoryNote.getName();
+        String pnOwner = Mapper.getPromissoryNoteOwner(pnID);
+        if (promissoryNote.getPlayArea()) {
+            player.setPromissoryNotesInPlayArea(pnID);
+        } else { //return to owner
+            player.removePromissoryNote(pnID);
             for (Player player_ : activeMap.getPlayers().values()) {
-                String playerColor = player_.getColor();
-                String playerFaction = player_.getFaction();
-                if (playerColor != null && playerColor.equals(pnOwner) || playerFaction != null && playerFaction.equals(pnOwner)) {
-                    player_.setPromissoryNote(id);
-                    CardsInfo.sentUserCardInfo(event, activeMap, player_);
+                if (player_.getPromissoryNotesOwned().contains(pnID)) {
+                    player_.setPromissoryNote(pnID);
+                    PNInfo.sendPromissoryNoteInfo(activeMap, player_, false, event);
+                    pnOwner = player_.getFaction();
                     break;
                 }
             }
         }
+        
+       
 
-        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(event, player) + " played promissory note:\n");
-        sb.append(Helper.getFactionIconFromDiscord(pnOwner) + Emojis.PN);
+        String emojiToUse = activeMap.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
+        StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " played promissory note: "+pnName+"\n");
+        sb.append(emojiToUse + Emojis.PN);
         String pnText = "";
 
-        //Handle AbsolMode Political Secret
-        if (activeMap.isAbsolMode() && id.endsWith("_ps")) {
-            pnText = "Political Secret" + Emojis.Absol + ":  *When you cast votes:* You may exhaust up to 3 of the {colour} player's planets and cast additional votes equal to the combined influence value of the exhausted planets. Then return this card to the {colour} player.";
-        } else {
-            pnText = Mapper.getPromissoryNote(id, longPNDisplay);
-        }
+        pnText = Mapper.getPromissoryNote(pnID, longPNDisplay);
         sb.append(pnText).append("\n");
-        
+
         //TERRAFORM TIP
-        if (id.equalsIgnoreCase("terraform")) {
+        if (pnID.equalsIgnoreCase("terraform")) {
             sb.append("`/add_token token:titanspn`\n");
         }
 
+        //Fog of war ping
+		if (activeMap.isFoWMode()) {
+            // Add extra message for visibility
+			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, sb.toString());
+		}
+
         sendMessage(sb.toString());
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
     }
 }
