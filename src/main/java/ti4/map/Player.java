@@ -433,8 +433,34 @@ public class Player {
                 .orElse(null);
     }
 
+    public UnitModel getUnitByAsyncID(String asyncID) {
+        return getUnitsOwned().stream()
+                .map(unitID -> Mapper.getUnit(unitID))
+                .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
+                .findFirst()
+                .orElse(null);
+    }
+
     public UnitModel getUnitByID(String unitID) {
         return Mapper.getUnit(unitID);
+    }
+
+    public void checkUnitsOwned() {
+        for (int count : getUnitsOwnedByBaseType().values()) {
+            if (count > 1) {
+                BotLogger.log("Player: " + getUserName() + " has more than one of the same unit type.\n> Unit Counts: `" + getUnitsOwnedByBaseType() + "`\n> Units Owned: `" + getUnitsOwned() + "`");
+                break;
+            }
+        }
+    }
+
+    public Map<String, Integer> getUnitsOwnedByBaseType() {
+        Map<String, Integer> unitCount = new HashMap<>();
+        for (String unitID : getUnitsOwned()) {
+            UnitModel unitModel = Mapper.getUnit(unitID);
+            unitCount.merge(unitModel.getBaseType(), 1, (oldValue, newValue) -> oldValue + 1);
+        }
+        return unitCount;
     }
 
     public void setActionCard(String id) {
