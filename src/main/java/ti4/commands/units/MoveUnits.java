@@ -1,12 +1,13 @@
 package ti4.commands.units;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import org.jetbrains.annotations.Nullable;
 import ti4.ResourceHelper;
 import ti4.commands.tokens.AddCC;
 import ti4.generator.Mapper;
@@ -17,7 +18,11 @@ import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.stream.Collectors;
+
+import org.apache.commons.lang3.StringUtils;
 
 public class MoveUnits extends AddRemoveUnits {
 
@@ -26,7 +31,7 @@ public class MoveUnits extends AddRemoveUnits {
     private boolean priorityDmg = true;
 
     @Override
-    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map map) {
+    protected void unitParsingForTile(SlashCommandInteractionEvent event, String color, Tile tile, Map activeMap) {
         unitsDamage = new HashMap<>();
         toAction = false;
         OptionMapping optionDmg = event.getOption(Constants.PRIORITY_NO_DAMAGE);
@@ -39,16 +44,21 @@ public class MoveUnits extends AddRemoveUnits {
         }
 
         String unitList = event.getOption(Constants.UNIT_NAMES).getAsString().toLowerCase();
-        unitParsing(event, color, tile, unitList, map);
+        unitParsing(event, color, tile, unitList, activeMap);
 
-        String userID = event.getUser().getId();
-        MapManager mapManager = MapManager.getInstance();
+        String tileID = null;
+        String tileOption = event.getOption(Constants.TILE_NAME_TO, null, OptionMapping::getAsString);
+        if (tileOption != null) { //get TILE_TO
+            tileOption = StringUtils.substringBefore(event.getOption(Constants.TILE_NAME_TO, null, OptionMapping::getAsString).toLowerCase(), " ");
+            tileID = AliasHandler.resolveTile(tileOption);
+            tile = getTile(event, tileID, activeMap);
+        } else { //USE TILE_FROM
+            tileID = tile.getTileID();
+            tile = getTile(event, tileID, activeMap);
+        }
 
-        String tileID = AliasHandler.resolveTile(event.getOption(Constants.TILE_NAME_TO).getAsString().toLowerCase());
-        Map activeMap = mapManager.getUserActiveMap(userID);
-        tile = getTile(event, tileID, activeMap);
         if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile: " + tileID + " not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile: " + tileID + " not found. Please try a different name or just use position coordinate");
             return;
         }
 
@@ -59,15 +69,36 @@ public class MoveUnits extends AddRemoveUnits {
         }
 
         toAction = true;
-        unitList = event.getOption(Constants.UNIT_NAMES_TO).getAsString().toLowerCase();
+        String unitListTo = event.getOption(Constants.UNIT_NAMES_TO, null, OptionMapping::getAsString);
+        if (unitListTo != null) { //PROCEED AS NORMAL
+            unitList = unitListTo.toLowerCase();
+        } else { //USE UNIT_NAMES_FROM LIST
+            //CLEAN PLANETS FROM THE UNITLIST
+            System.out.println(unitList);
+            unitList = Arrays.asList(StringUtils.splitPreserveAllTokens(unitList, ","))
+                        .stream().map(String::trim).map(s -> {
+                            if (Arrays.asList(s.split(" ", -1)).size() > 2) {
+                                return StringUtils.substringBeforeLast(s, " ");
+                            }
+                            return s;
+                        })
+                        .collect(Collectors.joining(", "));
+            System.out.println(unitList);
+        }
+
+        //IF NO UNIT_LIST_TO AND TILE_NAME_TO THEN STOP, NO CHANGES HAPPEN
+        if (unitListTo == null && tileOption == null) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "No change in tile or unit list. Please use either the `tile_name_to` option, the `unit_names_to` option, or both");
+            return;
+        }
+
         switch (unitList) {
-            case "0":
-            case "none":
+            case "0", "none" -> {
                 //Do nothing, as no unit was moved to
-                break;
-            default:
-                unitParsing(event, color, tile, unitList, map);
-                break;
+            }
+            default -> {
+                unitParsing(event, color, tile, unitList, activeMap);
+            }
         }
 
         OptionMapping optionCC = event.getOption(Constants.CC_USE);
@@ -85,10 +116,10 @@ public class MoveUnits extends AddRemoveUnits {
             removeTacticsCC(event, color, tile, activeMap);
         }
 
-        AddCC.addCC(event, color, tile);
+        AddCC.addCC(event, color, tile, false);
         Helper.isCCCountCorrect(event, activeMap, color);
         for (UnitHolder unitHolder_ : tile.getUnitHolders().values()) {
-            addPlanetToPlayArea(event, tile, unitHolder_.getName());
+            addPlanetToPlayArea(event, tile, unitHolder_.getName(), activeMap);
         }
     }
 
@@ -99,7 +130,28 @@ public class MoveUnits extends AddRemoveUnits {
 
 
             String planetTileName = AliasHandler.resolveTile("82b");
-            if (!PositionMapper.isTilePositionValid(position, activeMap)) {
+            if (!PositionMapper.isTilePositionValid(position)) {
+                MessageHelper.replyToMessage(event, "Position tile not allowed");
+                return null;
+            }
+
+            String tileName = Mapper.getTileID(planetTileName);
+            String tilePath = ResourceHelper.getInstance().getTileFile(tileName);
+            if (tilePath == null) {
+                MessageHelper.replyToMessage(event, "Could not find tile: " + planetTileName);
+                return null;
+            }
+            tile = new Tile(planetTileName, position);
+            activeMap.setTile(tile);
+        }
+        return tile;
+    }
+    public static Tile flipMallice(ButtonInteractionEvent event, Tile tile, Map activeMap) {
+        if ("82a".equals(tile.getTileID())){
+            String position = tile.getPosition();
+            activeMap.removeTile(position);
+            String planetTileName = AliasHandler.resolveTile("82b");
+            if (!PositionMapper.isTilePositionValid(position)) {
                 MessageHelper.replyToMessage(event, "Position tile not allowed");
                 return null;
             }
@@ -133,42 +185,53 @@ public class MoveUnits extends AddRemoveUnits {
     }
 
     @Override
+    protected void unitAction(GenericInteractionCreateEvent event, Tile tile, int count, String planetName, String unitID, String color) {
+
+    }
+
+
+    @Override
     protected void unitAction(SlashCommandInteractionEvent event, Tile tile, int count, String planetName, String unitID, String color) {
         if (toAction) {
             tile.addUnit(planetName, unitID, count);
             tile.addUnitDamage(planetName, unitID, unitsDamage.get(unitID));
         } else {
-            
+
             int countToRemove = 0;
             UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
-            
-            
+
+
             // Check for space unit holder when only single stack of unit is present anywhere on the tile
             // This allows for removes like "2 infantry" when they are the only infantry on a planet
             long nonEmptyUnitHolders = tile.getUnitHolders().values().stream()
                            .filter(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID,0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID,0) > 0)
                            .count();
-            
+
             // These calcluations will let us know if we are in a scenario where we can remove all of a particular unit from
             // the hex
             // This allows for moves like "2 infantry" when there's a hex with 0 in space and 1 infantry on each of 2 planets
             long totalUnitsOnHex = tile.getUnitHolders().values().stream()
                            .mapToInt(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID,0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID,0))
                            .sum();
-            
+
             boolean otherUnitHoldersContainUnit = tile.getUnitHolders().values().stream()
                     .filter(planetTemp -> !planetTemp.getName().equals(planetName)).anyMatch(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID, 0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID, 0) > 0);
-            
-            if(nonEmptyUnitHolders == 1) {
+
+            if (nonEmptyUnitHolders == 1) {
                    unitHolder = tile.getUnitHolders().values().stream()
                            .filter(unitHolderTemp -> unitHolderTemp.getUnits().getOrDefault(unitID,0) + unitHolderTemp.getUnitDamage().getOrDefault(unitID,0) > 0).findFirst().get();
-                   
+
             }
 
             if (!priorityDmg) {
                 Integer unitCountInSystem = unitHolder.getUnits().get(unitID);
                 if (unitCountInSystem != null) {
-                    Integer unitDamageCountInSystem = unitHolder.getUnitDamage().get(unitID);
+                    Integer unitDamageCountInSystem =null;
+                    if(unitHolder != null && unitHolder.getUnitDamage()!= null)
+                    {
+                        unitDamageCountInSystem=unitHolder.getUnitDamage().get(unitID);
+                    }
+                   
                     if (unitDamageCountInSystem != null) {
                         countToRemove = unitDamageCountInSystem - (unitCountInSystem - count);
                         unitsDamage.put(unitID, countToRemove);
@@ -176,26 +239,30 @@ public class MoveUnits extends AddRemoveUnits {
                 }
             } else {
                 countToRemove = count;
-                Integer unitDamageCountInSystem = unitHolder.getUnitDamage().get(unitID);
+                Integer unitDamageCountInSystem =null;
+                if(unitHolder != null && unitHolder.getUnitDamage()!= null)
+                {
+                    unitDamageCountInSystem=unitHolder.getUnitDamage().get(unitID);
+                }
                 if (unitDamageCountInSystem != null) {
                     unitsDamage.put(unitID, Math.min(unitDamageCountInSystem, countToRemove));
                 }
 
             }
-            
+
             tile.removeUnit(unitHolder.getName(), unitID, count);
             tile.removeUnitDamage(unitHolder.getName(), unitID, countToRemove);
-            
+
             // Check to see if we should remove from other unitHolders
-            if((totalUnitsOnHex == count) && otherUnitHoldersContainUnit) {
-                   for(String unitHolderName : tile.getUnitHolders().keySet()) {
-                           if(!unitHolderName.equals(planetName)) {
+            if ((totalUnitsOnHex == count) && otherUnitHoldersContainUnit) {
+                   for (String unitHolderName : tile.getUnitHolders().keySet()) {
+                           if (!unitHolderName.equals(planetName)) {
                                    int tempCount = tile.getUnitHolders().get(unitHolderName).getUnits().getOrDefault(unitID,0);
-                                   if(tempCount != 0) {
+                                   if (tempCount != 0) {
                                        tile.removeUnit(unitHolderName, unitID, tempCount);
                                    }
                                    tempCount = tile.getUnitHolders().get(unitHolderName).getUnitDamage().getOrDefault(unitID,0);
-                                   if(tempCount != 0) {
+                                   if (tempCount != 0) {
                                        tile.removeUnitDamage(unitHolderName, unitID, tempCount);
                                    }
                            }
@@ -220,16 +287,11 @@ public class MoveUnits extends AddRemoveUnits {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "From System/Tile name")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Unit name/s. Example: Dread, 2 Warsuns")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "To System/Tile name")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Unit name/s. Example: Dread, 2 Warsuns")
-                                .setRequired(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit")
-                                .setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile to move units from").setRequired(true).setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES, "Comma separated list of '{count} unit {planet}' Example: Dread, 2 Warsuns, 4 Infantry Sem-lore").setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile to move units to - Default: same tile in tile_name option (e.g. to land units)").setAutoComplete(true).setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.UNIT_NAMES_TO, "Comma separated list of '{count} unit {planet}' - Default: same units list in unit_names option").setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color for unit").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.CC_USE, "Type no or n to not add CC, r or retreat to add a CC without taking it from tactics").setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PRIORITY_NO_DAMAGE, "Priority for not damaged units. Type in yes or y"))
                         .addOptions(new OptionData(OptionType.STRING, Constants.NO_MAPGEN, "'True' to not generate a map update with this command").setAutoComplete(true))

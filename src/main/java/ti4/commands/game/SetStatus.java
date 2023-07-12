@@ -1,13 +1,11 @@
 package ti4.commands.game;
 
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.MapGenerator;
+
 import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
@@ -31,7 +29,7 @@ public class SetStatus extends GameSubcommandData{
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exists, use /list_games");
                 return;
             }
-        }else {
+        } else {
             Map userActiveMap = MapManager.getInstance().getUserActiveMap(callerUser.getId());
             if (userActiveMap == null){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Specify game or set active Game");
@@ -50,20 +48,6 @@ public class SetStatus extends GameSubcommandData{
         MapManager mapManager = MapManager.getInstance();
         Map mapToChangeStatusFor = mapManager.getMap(mapName);
 
-        Map map = mapManager.getMap(mapName);
-        Member member = event.getMember();
-        boolean isAdmin = false;
-        if (member != null) {
-            java.util.List<Role> roles = member.getRoles();
-            if (roles.contains(MapGenerator.adminRole)) {
-                isAdmin = true;
-            }
-        }
-        if (!map.getOwnerID().equals(event.getUser().getId()) && !isAdmin){
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Just Game/Map owner can add/remove players.");
-//            return;
-        }
-
         try {
             MapStatus mapStatus = MapStatus.valueOf(status);
             if (mapStatus == MapStatus.open) {
@@ -75,7 +59,7 @@ public class SetStatus extends GameSubcommandData{
             MessageHelper.replyToMessage(event, "Map: " + mapName + " status was not changed, as invalid status entered.");
             return;
         }
-        MapSaveLoadManager.saveMap(mapToChangeStatusFor);
+        MapSaveLoadManager.saveMap(mapToChangeStatusFor, event);
         MessageHelper.replyToMessage(event, "Map: "+ mapName +" status changed to: " + mapToChangeStatusFor.getMapStatus());
     }
 }

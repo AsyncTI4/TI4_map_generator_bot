@@ -40,7 +40,7 @@ public class SetOrder extends GameSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Game with such name does not exists, use /list_games");
                 return;
             }
-        }else {
+        } else {
             Map userActiveMap = MapManager.getInstance().getUserActiveMap(callerUser.getId());
             if (userActiveMap == null){
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Specify game or set active Game");
@@ -50,11 +50,11 @@ public class SetOrder extends GameSubcommandData {
         }
 
         MapManager mapManager = MapManager.getInstance();
-        Map map = mapManager.getMap(mapName);
+        Map activeMap = mapManager.getMap(mapName);
 
         LinkedHashMap<String, Player> newPlayerOrder = new LinkedHashMap<>();
-        LinkedHashMap<String, Player> players = new LinkedHashMap<>(map.getPlayers());
-        LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(map.getPlayers());
+        LinkedHashMap<String, Player> players = new LinkedHashMap<>(activeMap.getPlayers());
+        LinkedHashMap<String, Player> playersBackup = new LinkedHashMap<>(activeMap.getPlayers());
         try {
             setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER1));
             setPlayerOrder(newPlayerOrder, players, event.getOption(Constants.PLAYER2));
@@ -67,12 +67,12 @@ public class SetOrder extends GameSubcommandData {
             if (!players.isEmpty()) {
                 newPlayerOrder.putAll(players);
             }
-            map.setPlayers(newPlayerOrder);
+            activeMap.setPlayers(newPlayerOrder);
         } catch (Exception e){
-            map.setPlayers(playersBackup);
+            activeMap.setPlayers(playersBackup);
         }
-        MapSaveLoadManager.saveMap(map);
-        MessageHelper.replyToMessage(event, "Player order set for game:\n" + Info.getGameInfo(gameOption, MapManager.getInstance(), map, null));
+        MapSaveLoadManager.saveMap(activeMap, event);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Player order set.");
     }
 
     private void setPlayerOrder(LinkedHashMap<String, Player> newPlayerOrder, LinkedHashMap<String, Player> players, OptionMapping option1) {

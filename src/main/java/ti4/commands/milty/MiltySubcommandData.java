@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.build.SubcommandData;
 import org.jetbrains.annotations.NotNull;
 import ti4.map.Map;
 import ti4.map.MapManager;
-import ti4.message.MessageHelper;
 
 public abstract class MiltySubcommandData extends SubcommandData {
 
@@ -37,6 +36,6 @@ public abstract class MiltySubcommandData extends SubcommandData {
     }
 
     public void reply(SlashCommandInteractionEvent event) {
-        MessageHelper.replyToMessageTI4Logo(event);
+
     }
 }

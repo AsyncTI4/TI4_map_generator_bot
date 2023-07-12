@@ -11,14 +11,13 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 import ti4.generator.Mapper;
 
 public class PurgeFragments extends ExploreSubcommandData {
 
 	public PurgeFragments() {
 		super(Constants.PURGE_FRAGMENTS, "Purge a number of relic fragments (for example, to gain a relic. Can use unknown fragments)");
-		addOptions(typeOption.setRequired(true), 
+		addOptions(typeOption.setRequired(true),
 				new OptionData(OptionType.INTEGER, Constants.COUNT, "Number of fragments to purge (default 3, use this for NRA or black market forgery)"));
 		addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color").setAutoComplete(true));
 		addOptions(new OptionData(OptionType.BOOLEAN, Constants.ALSO_DRAW_RELIC, "'true' to also draw a relic"));
@@ -31,7 +30,7 @@ public class PurgeFragments extends ExploreSubcommandData {
 		activePlayer = Helper.getGamePlayer(activeMap, activePlayer, event, null);
 		activePlayer = Helper.getPlayer(activeMap, activePlayer, event);
 		if (activePlayer == null){
-			MessageHelper.replyToMessage(event, "Player not found in game.");
+			sendMessage("Player not found in game.");
 			return;
 		}
 		String color = event.getOption(Constants.TRAIT).getAsString();
@@ -51,25 +50,25 @@ public class PurgeFragments extends ExploreSubcommandData {
 				unknowns.add(id);
 			}
 		}
-		
+
 		while (fragmentsToPurge.size() > count) {
 			fragmentsToPurge.remove(0);
 		}
-		
+
 		while (fragmentsToPurge.size() < count) {
 			if (unknowns.size() == 0) {
-				MessageHelper.replyToMessage(event, "Not enough fragments");
+				sendMessage("Not enough fragments");
 				return;
 			}
 			fragmentsToPurge.add(unknowns.remove(0));
 		}
-		
+
 		for (String id : fragmentsToPurge) {
 			activePlayer.removeFragment(id);
 		}
 
-		String message = Helper.getPlayerRepresentation(event, activePlayer) + " purged fragments: " + fragmentsToPurge.toString();
-		MessageHelper.replyToMessage(event, message);
+		String message = Helper.getPlayerRepresentation(activePlayer, activeMap) + " purged fragments: " + fragmentsToPurge.toString();
+		sendMessage(message);
 
 		OptionMapping drawRelicOption = event.getOption(Constants.ALSO_DRAW_RELIC);
 		if (drawRelicOption != null) {
@@ -78,5 +77,5 @@ public class PurgeFragments extends ExploreSubcommandData {
 			}
 		}
 	}
-	
+
 }

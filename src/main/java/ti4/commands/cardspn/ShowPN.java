@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.MapGenerator;
-import ti4.commands.cards.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -76,8 +75,5 @@ public class ShowPN extends PNCardsSubcommandData {
         }
         MessageHelper.sendMessageToUser(sb.toString(), user);
         sendMessage("PN shown");
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
-
-
     }
 }

@@ -3,11 +3,27 @@ package ti4.map;
 import ti4.generator.Mapper;
 
 import java.awt.*;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
+
+@JsonIgnoreProperties(ignoreUnknown = true)
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, include = JsonTypeInfo.As.PROPERTY, property = "type")
+@JsonSubTypes({
+    @JsonSubTypes.Type(value = Space.class, name = "space"),
+    @JsonSubTypes.Type(value = Planet.class, name = "planet")
+})
 abstract public class UnitHolder {
+    private final String name;
+
+    private final Point holderCenterPosition;
+
     //ID, Count
     private final HashMap<String, Integer> units = new HashMap<>();
     //ID, Count
@@ -15,22 +31,20 @@ abstract public class UnitHolder {
     private final HashSet<String> ccList = new HashSet<>();
     private final HashSet<String> controlList = new HashSet<>();
     protected final HashSet<String> tokenList = new HashSet<>();
-    private final Point holderCenterPosition;
-
-    private final String name;
-
 
     public String getName() {
         return name;
     }
 
-    protected UnitHolder(String name, Point holderCenterPosition) {
+    @JsonCreator
+    public UnitHolder(@JsonProperty("name") String name,
+                         @JsonProperty("holderCenterPosition") Point holderCenterPosition) {
         this.name = name;
         this.holderCenterPosition = holderCenterPosition;
     }
 
     public void addUnit(String unit, Integer count) {
-        if (count > 0 && count < 100) {
+        if (count != null && count > 0 && count < 100) {
             Integer unitCount = units.get(unit);
             if (unitCount != null) {
                 unitCount += count;
@@ -79,7 +93,7 @@ abstract public class UnitHolder {
     }
 
     public void removeUnit(String unit, Integer count) {
-        if (count > 0) {
+        if (count != null && count > 0) {
             Integer unitCount = units.get(unit);
             if (unitCount != null) {
                 unitCount -= count;
@@ -93,7 +107,7 @@ abstract public class UnitHolder {
     }
 
     public void addUnitDamage(String unit, Integer count) {
-        if (count > 0 && count < 100) {
+        if (count != null && count > 0 && count < 100) {
             Integer unitCount = unitsDamage.get(unit);
             if (unitCount != null) {
                 unitCount += count;
@@ -105,7 +119,7 @@ abstract public class UnitHolder {
     }
 
     public void removeUnitDamage(String unit, Integer count) {
-        if (count > 0) {
+        if (count != null && count > 0) {
             Integer unitCount = unitsDamage.get(unit);
             if (unitCount != null) {
                 unitCount -= count;
@@ -120,6 +134,7 @@ abstract public class UnitHolder {
 
     public void removeAllUnitDamage(String color) {
         String colorID = Mapper.getColorID(color);
+        if (colorID == null) return;
         unitsDamage.keySet().removeIf(key -> key.startsWith(colorID));
     }
 
@@ -130,11 +145,17 @@ abstract public class UnitHolder {
 
     public void removeAllUnits(String color) {
         String colorID = Mapper.getColorID(color);
+        if (colorID == null) return;
         units.keySet().removeIf(key -> key.startsWith(colorID));
     }
 
     public HashMap<String, Integer> getUnits() {
         return units;
+    }
+
+    @JsonIgnore
+    public boolean hasUnits() {
+        return !getUnits().isEmpty();
     }
 
     public HashMap<String, Integer> getUnitDamage() {

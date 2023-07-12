@@ -5,8 +5,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -16,6 +16,8 @@ import ti4.map.MapManager;
 import ti4.message.MessageHelper;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ShowGame implements Command {
 
@@ -49,14 +51,14 @@ public class ShowGame implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
 
-        Map map;
+        Map activeMap;
         OptionMapping option = event.getOption(Constants.GAME_NAME);
         MapManager mapManager = MapManager.getInstance();
         if (option != null) {
             String mapName = option.getAsString().toLowerCase();
-            map = mapManager.getMap(mapName);
+            activeMap = mapManager.getMap(mapName);
         } else {
-            map = mapManager.getUserActiveMap(event.getUser().getId());
+            activeMap = mapManager.getUserActiveMap(event.getUser().getId());
         }
         DisplayType displayType = null;
         OptionMapping statsOption = event.getOption(Constants.DISPLAY_TYPE);
@@ -69,16 +71,24 @@ public class ShowGame implements Command {
             } else if (temp.equals(DisplayType.stats.getValue())) {
                 displayType = DisplayType.stats;
             } else if (temp.equals(DisplayType.split.getValue())) {
-                displayType = DisplayType.stats;
-                File stats_file = GenerateMap.getInstance().saveImage(map, displayType, event);
-                MessageHelper.sendFileToChannel(event.getChannel(), stats_file);
-                
                 displayType = DisplayType.map;
+                File stats_file = GenerateMap.getInstance().saveImage(activeMap, displayType, event);
+                MessageHelper.sendFileToChannel(event.getChannel(), stats_file);
+
+                displayType = DisplayType.stats;
+            } else if (temp.equals(DisplayType.system.getValue())) {
+                displayType = DisplayType.system;
             }
         }
-        File file = GenerateMap.getInstance().saveImage(map, displayType, event);
-        FileUpload fileUpload = FileUpload.fromData(file);
-        event.getHook().editOriginalAttachments(fileUpload).queue();
+        File file = GenerateMap.getInstance().saveImage(activeMap, displayType, event);
+        if(activeMap.isFoWMode()){
+            MessageHelper.sendFileToChannel(event.getChannel(), file);
+        }else{
+            List<Button> buttonsWeb = new ArrayList<Button>();
+            Button linkToWebsite = Button.link("https://ti4.westaddisonheavyindustries.com/game/"+activeMap.getName(),"Website View");
+            buttonsWeb.add(linkToWebsite);
+            MessageHelper.sendFileToChannelWithButtonsAfter(event.getChannel(), file, "",buttonsWeb);
+        }
     }
 
     @SuppressWarnings("ResultOfMethodCallIgnored")

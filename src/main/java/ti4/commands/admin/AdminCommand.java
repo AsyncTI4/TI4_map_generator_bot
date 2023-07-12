@@ -9,7 +9,6 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.MapGenerator;
 import ti4.commands.Command;
-import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -35,12 +34,13 @@ public class AdminCommand implements Command {
             Member member = event.getMember();
             if (member != null) {
                 java.util.List<Role> roles = member.getRoles();
-                if (roles.contains(MapGenerator.adminRole)) {
-                    return true;
-                } else {
-                    MessageHelper.replyToMessage(event, "Not Authorized command attempt");
-                    return false;
+                for (Role role : MapGenerator.adminRoles) {
+                    if (roles.contains(role)) {
+                        return true;
+                    }
                 }
+                MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have the @Admin role.");
+                return false;
             }
         }
         return false;
@@ -72,13 +72,11 @@ public class AdminCommand implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        AdminSubcommandData subCommandExecuted = null;
         String subcommandName = event.getInteraction().getSubcommandName();
         for (AdminSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
                 subcommand.preExecute(event);
                 subcommand.execute(event);
-                subCommandExecuted = subcommand;
                 break;
             }
         }
@@ -98,6 +96,8 @@ public class AdminCommand implements Command {
         subcommands.add(new CardsInfoForPlayer());
         subcommands.add(new DrawSpecificSOForPlayer());
         subcommands.add(new Statistics());
+        subcommands.add(new SetGlobalSetting());
+        subcommands.add(new UpdateThreadArchiveTime());
         return subcommands;
     }
 

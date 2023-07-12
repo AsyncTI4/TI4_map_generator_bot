@@ -1,10 +1,13 @@
 package ti4.commands.special;
 
+import java.io.File;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.units.AddRemoveUnits;
+import ti4.generator.GenerateMap;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.map.*;
@@ -14,13 +17,13 @@ public class IonFlip extends SpecialSubcommandData {
 
     public IonFlip() {
         super(Constants.ION_TOKEN_FLIP, "Flip ION Storm Token");
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-        
+
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
         if (tileOption == null){
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify a tile");
@@ -29,7 +32,7 @@ public class IonFlip extends SpecialSubcommandData {
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
         Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
         if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
         UnitHolder spaceUnitHolder = tile.getUnitHolders().get(Constants.SPACE);
@@ -44,5 +47,7 @@ public class IonFlip extends SpecialSubcommandData {
             tile.removeToken(Constants.TOKEN_ION_BETA_PNG, spaceUnitHolder.getName());
             tile.addToken(Constants.TOKEN_ION_ALPHA_PNG, spaceUnitHolder.getName());
         }
+        File file = GenerateMap.getInstance().saveImage(activeMap, event);
+        MessageHelper.replyToMessage(event, file);
     }
 }

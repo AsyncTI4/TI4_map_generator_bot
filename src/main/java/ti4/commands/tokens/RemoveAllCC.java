@@ -7,9 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
-import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
-import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
@@ -18,12 +16,11 @@ import ti4.message.MessageHelper;
 
 import java.io.File;
 import java.util.Collection;
-import java.util.HashMap;
 
 public class RemoveAllCC implements Command {
 
-    void parsingForTile(SlashCommandInteractionEvent event, Map map) {
-        Collection<Tile> tileList = map.getTileMap().values();
+    void parsingForTile(SlashCommandInteractionEvent event, Map activeMap) {
+        Collection<Tile> tileList = activeMap.getTileMap().values();
         for (Tile tile : tileList) {
             tile.removeAllCC();
         }
@@ -42,7 +39,7 @@ public class RemoveAllCC implements Command {
         } else {
             Map activeMap = mapManager.getUserActiveMap(userID);
             parsingForTile(event, activeMap);
-            MapSaveLoadManager.saveMap(activeMap);
+            MapSaveLoadManager.saveMap(activeMap, event);
             File file = GenerateMap.getInstance().saveImage(activeMap, event);
             MessageHelper.replyToMessage(event, file);
         }

@@ -34,12 +34,13 @@ public class BothelperCommand implements Command {
             Member member = event.getMember();
             if (member != null) {
                 java.util.List<Role> roles = member.getRoles();
-                if (roles.contains(MapGenerator.adminRole) || roles.contains(MapGenerator.developerRole) || roles.contains(MapGenerator.bothelperRole)) {
-                    return true;
-                } else {
-                    MessageHelper.replyToMessage(event, "Not Authorized command attempt");
-                    return false;
+                for (Role role : MapGenerator.bothelperRoles) {
+                    if (roles.contains(role)) {
+                        return true;
+                    }
                 }
+                MessageHelper.replyToMessage(event, "You are not authorized to use this command. You must have the @Bothelper role.");
+                return false;
             }
         }
         return false;
@@ -93,7 +94,14 @@ public class BothelperCommand implements Command {
         subcommands.add(new CreateGameChannels());
         subcommands.add(new ServerLimitStats());
         subcommands.add(new ListOldChannels());
+        subcommands.add(new ListOldThreads());
         subcommands.add(new ArchiveOldThreads());
+        subcommands.add(new FixGameChannelPermissions());
+        subcommands.add(new ListCategoryChannelCounts());
+        subcommands.add(new BeginVideoGeneration());
+        subcommands.add(new CreatePlanet());
+        subcommands.add(new CreateTile());
+        subcommands.add(new ReExportAllTiles());
         return subcommands;
     }
 

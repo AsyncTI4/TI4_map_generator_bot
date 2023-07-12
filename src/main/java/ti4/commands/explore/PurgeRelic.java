@@ -7,9 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
-import ti4.helpers.Helper;
 import ti4.map.Player;
-import ti4.message.MessageHelper;
 
 public class PurgeRelic extends GenericRelicAction {
 
@@ -23,17 +21,17 @@ public class PurgeRelic extends GenericRelicAction {
     public void doAction(Player player, SlashCommandInteractionEvent event) {
         OptionMapping option = event.getOption(Constants.RELIC);
         if (option == null) {
-            MessageHelper.replyToMessage(event, "Specify relic");
+            sendMessage("Specify relic");
             return;
         }
         String relicId = option.getAsString();
-        if (player.getRelics().contains(relicId)) {
+        if (player.hasRelic(relicId)) {
             player.removeRelic(relicId);
             player.removeExhaustedRelic(relicId);
             String relicName = Mapper.getRelic(relicId).split(";")[0];
-            MessageHelper.replyToMessage(event, "Purged " + Emojis.Relic + " relic: " + relicName);
+            sendMessage("Purged " + Emojis.Relic + " relic: " + relicName);
         } else {
-            MessageHelper.replyToMessage(event, "Invalid relic or player does not have specified relic");
+            sendMessage("Invalid relic or player does not have specified relic");
         }
     }
 }

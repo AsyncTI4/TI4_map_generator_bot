@@ -6,7 +6,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.MapGenerator;
-import ti4.commands.cards.CardsInfo;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -44,6 +43,6 @@ public class DealSO extends SOCardsSubcommandData {
             activeMap.drawSecretObjective(player_.getUserID());
         }
         sendMessage(count + " SO Dealt");
-        CardsInfo.sentUserCardInfo(event, activeMap, player_);
+        SOInfo.sendSecretObjectiveInfo(activeMap, player_, event);
     }
 }

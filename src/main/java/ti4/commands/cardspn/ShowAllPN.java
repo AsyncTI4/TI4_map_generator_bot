@@ -4,7 +4,6 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.cards.CardsInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -30,6 +29,11 @@ public class ShowAllPN extends PNCardsSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
+        Player targetPlayer = Helper.getPlayer(activeMap, null, event);
+        if (targetPlayer == null) {
+            sendMessage("Target player not found");
+            return;
+        }
 
         OptionMapping longPNOption = event.getOption(Constants.LONG_PN_DISPLAY);
         boolean longPNDisplay = false;
@@ -37,26 +41,26 @@ public class ShowAllPN extends PNCardsSubcommandData {
             longPNDisplay = longPNOption.getAsString().equalsIgnoreCase("y") || longPNOption.getAsString().equalsIgnoreCase("yes");
         }
 
-
-        Player targetPlayer = Helper.getPlayer(activeMap, null, event);
-        if (targetPlayer == null) {
-            sendMessage("Target player not found");
-            return;
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeMap.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Promissory Notes:").append("\n");
-        List<String> promissoryNotes = new ArrayList<>(player.getPromissoryNotes().keySet());
-        Collections.shuffle(promissoryNotes);
-        int index = 1;
-        for (String id : promissoryNotes) {
-            sb.append(index).append(". ").append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
-            index++;
-        }
-
-        MessageHelper.sendPrivateMessageToPlayer(targetPlayer, activeMap, sb.toString());
-        sendMessage("all PNs shown");
-        CardsInfo.sentUserCardInfo(event, activeMap, player);
+        showAll(player, targetPlayer, activeMap, longPNDisplay);
+        
+        
     }
+     public void showAll(Player player, Player targetPlayer, Map activeMap, boolean longPNDisplay) {
+            StringBuilder sb = new StringBuilder();
+            sb.append("Game: ").append(activeMap.getName()).append("\n");
+            sb.append("Player: ").append(player.getUserName()).append("\n");
+            sb.append("Showed Promissory Notes:").append("\n");
+            List<String> promissoryNotes = new ArrayList<>(player.getPromissoryNotes().keySet());
+            Collections.shuffle(promissoryNotes);
+            int index = 1;
+            for (String id : promissoryNotes) {
+                sb.append(index).append(". ").append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
+                index++;
+            }
+
+            MessageHelper.sendPrivateMessageToPlayer(targetPlayer, activeMap, sb.toString());
+            MessageHelper.sendPrivateMessageToPlayer(player, activeMap, "All PNs shown to player");
+
+
+     }
 }

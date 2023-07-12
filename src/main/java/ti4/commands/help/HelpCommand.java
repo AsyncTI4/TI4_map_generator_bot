@@ -5,16 +5,13 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
+
 import ti4.commands.Command;
-import ti4.generator.GenerateMap;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -54,8 +51,6 @@ public class HelpCommand implements Command {
     private String getOptionValue(OptionMapping option) {
         if (option.getName().equals(Constants.PLAYER)){
             return option.getAsUser().getName();
-        } else if (option.getName().equals(Constants.TECH)){
-            return Mapper.getTechs().get(option.getAsString());
         }
         return option.getAsString();
     }
@@ -80,12 +75,7 @@ public class HelpCommand implements Command {
     }
 
     public static void reply(SlashCommandInteractionEvent event) {
-//        String userID = event.getUser().getId();
-//        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-//        MapSaveLoadManager.saveMap(activeMap);
-//
-//        File file = GenerateMap.getInstance().saveImage(activeMap);
-//        MessageHelper.replyToMessage(event, file);
+        return;
     }
 
 
@@ -97,10 +87,20 @@ public class HelpCommand implements Command {
         Collection<HelpSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new HelpAction());
         subcommands.add(new SetupTemplatesAction());
+        subcommands.add(new ListAbilities());
         subcommands.add(new ListGames());
         subcommands.add(new ListPlanets());
         subcommands.add(new ListTiles());
         subcommands.add(new ListUnits());
+        subcommands.add(new ListCommands());
+        subcommands.add(new ListMyGames());
+        subcommands.add(new ListAgendas());
+        subcommands.add(new ListSecretObjectives());
+        subcommands.add(new ListPublicObjectives());
+        subcommands.add(new ListRelics());
+        subcommands.add(new ListActionCards());
+        subcommands.add(new ListTechs());
+        subcommands.add(new ListLeaders());
 
         return subcommands;
     }

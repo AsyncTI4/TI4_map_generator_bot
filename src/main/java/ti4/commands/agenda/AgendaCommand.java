@@ -6,15 +6,13 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.commands.cards.CardsCommand;
-import ti4.generator.GenerateMap;
+import ti4.commands.cardsac.ACCardsCommand;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.message.MessageHelper;
 
-import java.io.File;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Objects;
@@ -31,7 +29,7 @@ public class AgendaCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        return CardsCommand.acceptEvent(event, getActionID());
+        return ACCardsCommand.acceptEvent(event, getActionID());
     }
 
     @Override
@@ -71,17 +69,16 @@ public class AgendaCommand implements Command {
             }
         }
 
-        Map map = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
-        if (map != null) {
-            MapSaveLoadManager.saveMap(map);
+        Map activeMap = MapManager.getInstance().getUserActiveMap(event.getUser().getId());
+        if (activeMap != null) {
+            MapSaveLoadManager.saveMap(activeMap, event);
         }
         if (executedCommand != null) {
-            MessageHelper.replyToMessage(event, "Executed action: " +executedCommand.getActionID());
+            // MessageHelper.replyToMessage(event, "Executed action: " + executedCommand.getActionID());
         } else {
             MessageHelper.replyToMessage(event, "No Action executed");
         }
     }
-
 
     protected String getActionDescription() {
         return "Agenda handling";
@@ -103,7 +100,7 @@ public class AgendaCommand implements Command {
         subcommands.add(new ResetAgendas());
         subcommands.add(new Cleanup());
         subcommands.add(new ResetDrawStateAgendas());
-        subcommands.add(new ShuffleDiscardBackIntoDeckAgendas());
+        subcommands.add(new PutDiscardBackIntoDeckAgendas());
         return subcommands;
     }
 

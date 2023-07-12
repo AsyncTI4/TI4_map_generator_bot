@@ -7,6 +7,7 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.MapGenerator;
 import ti4.commands.Command;
+import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -26,7 +27,7 @@ public class PNCardsCommand implements Command {
 
     @Override
     public String getActionID() {
-        return Constants.PN;
+        return Constants.CARDS_PN;
     }
 
     @Override
@@ -108,7 +109,8 @@ public class PNCardsCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
+        GenerateMap.getInstance().saveImage(activeMap, event);
     }
 
     protected String getActionDescription() {
@@ -121,8 +123,10 @@ public class PNCardsCommand implements Command {
         subcommands.add(new ShowAllPN());
         subcommands.add(new ShowPNToAll());
         subcommands.add(new PlayPN());
-        subcommands.add(new SentPN());
+        subcommands.add(new SendPN());
         subcommands.add(new PurgePN());
+        subcommands.add(new PNInfo());
+        subcommands.add(new PNReset());
         return subcommands;
     }
 

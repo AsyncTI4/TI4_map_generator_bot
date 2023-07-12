@@ -32,12 +32,12 @@ public class Statistics extends AdminSubcommandData {
         Graphics graphics = fakeImage.getGraphics();
 
         HashMap<String, Map> mapList = MapManager.getInstance().getMapList();
-        for (Map map : mapList.values()) {
-            if (map.getName().startsWith("pbd")) {
-                int vp = map.getVp();
+        for (Map activeMap : mapList.values()) {
+            if (activeMap.getName().startsWith("pbd")) {
+                int vp = activeMap.getVp();
                 HashMap<Player, Integer> userVPs = new HashMap<>();
-                GenerateMap.getInstance().objectives(map, 0, graphics, userVPs, false);
-                for (Player player : map.getPlayers().values()) {
+                GenerateMap.getInstance().objectives(activeMap, 0, graphics, userVPs, false);
+                for (Player player : activeMap.getPlayers().values()) {
                     String color = player.getColor();
                     String faction = player.getFaction();
                     if (faction != null && color != null && !faction.isEmpty() && !faction.equals("null")) {
@@ -65,7 +65,7 @@ public class Statistics extends AdminSubcommandData {
                     }
                 }
                 if (findWinner) {
-                    Date date = new Date(map.getLastModifiedDate());
+                    Date date = new Date(activeMap.getLastModifiedDate());
                     Date currentDate = new Date();
                     long time_difference = currentDate.getTime() - date.getTime();
                     // Calculate time difference in days
@@ -93,7 +93,6 @@ public class Statistics extends AdminSubcommandData {
             }
         }
 
-        MessageHelper.replyToMessageTI4Logo(event);
 
         sendStatistics(event, factionCount, "Faction played:");
         sendStatisticsColor(event, colorCount, "Color played:");
@@ -108,7 +107,7 @@ public class Statistics extends AdminSubcommandData {
         factionCount.entrySet().stream()
                 .sorted(java.util.Map.Entry.comparingByValue())
                 .forEach(entry -> sb.append(Helper.getFactionIconFromDiscord(entry.getKey())).append(" - ").append(entry.getValue()).append("\n"));
-        MessageHelper.sendMessageToChannel(event, sb.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
     private static void sendStatisticsColor(SlashCommandInteractionEvent event, HashMap<String, Integer> factionCount, String text) {
@@ -117,7 +116,7 @@ public class Statistics extends AdminSubcommandData {
         factionCount.entrySet().stream()
                 .sorted(java.util.Map.Entry.comparingByValue())
                 .forEach(entry -> sb.append(entry.getKey()).append(" - ").append(entry.getValue()).append("\n"));
-        MessageHelper.sendMessageToChannel(event, sb.toString());
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
     }
 
     private class Stats {

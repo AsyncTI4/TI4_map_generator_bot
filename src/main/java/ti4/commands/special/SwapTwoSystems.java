@@ -13,8 +13,8 @@ import ti4.message.MessageHelper;
 public class SwapTwoSystems extends SpecialSubcommandData {
     public SwapTwoSystems() {
         super(Constants.SWAP_SYSTEMS, "Swap two systems with there places");
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to").setRequired(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name to swap from").setRequired(true).setAutoComplete(true));
+        addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME_TO, "System/Tile name to swap to").setRequired(true).setAutoComplete(true));
     }
 
     @Override
@@ -34,14 +34,14 @@ public class SwapTwoSystems extends SpecialSubcommandData {
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
         Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
         if (tile == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileID:  `" + tileID + "`. Tile not found");
             return;
         }
 
         String tileIDTo = AliasHandler.resolveTile(tileOptionTo.getAsString().toLowerCase());
         Tile tileTo = AddRemoveUnits.getTile(event, tileIDTo, activeMap);
         if (tileTo == null) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile not found");
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Could not resolve tileIDTo:  `" + tileID + "`. Tile not found");
             return;
         }
 
@@ -51,5 +51,6 @@ public class SwapTwoSystems extends SpecialSubcommandData {
         tileTo.setPosition(position);
         activeMap.setTile(tile);
         activeMap.setTile(tileTo);
+        activeMap.rebuildTilePositionAutoCompleteList();
     }
 }

@@ -28,22 +28,24 @@ public class SetGame implements Command {
         }
         String mapName = event.getOptions().get(0).getAsString();
         if (!MapManager.getInstance().getMapList().containsKey(mapName)) {
-            MessageHelper.replyToMessage(event, "Game with such name: "+mapName+ " does not exists, use /list_games");
+            MessageHelper.replyToMessage(event, "Game with such name: " + mapName + " does not exist.");
             return false;
         }
         String userID = event.getUser().getId();
-        Map map = MapManager.getInstance().getMap(mapName);
-        if (map.isMapOpen()){
+        Map activeMap = MapManager.getInstance().getMap(mapName);
+        if (activeMap.isMapOpen()){
             return true;
         }
         Member member = event.getMember();
         if (member != null) {
             java.util.List<Role> roles = member.getRoles();
-            if (roles.contains(MapGenerator.adminRole)) {
-                return true;
+            for (Role role : MapGenerator.adminRoles) {
+                if (roles.contains(role)) {
+                    return true;
+                }
             }
         }
-        if (!map.getPlayerIDs().contains(userID) && !userID.equals(map.getOwnerID())){
+        if (!activeMap.getPlayerIDs().contains(userID) && !userID.equals(activeMap.getOwnerID())){
             MessageHelper.replyToMessage(event, "Your are not a player of selected map.");
             return false;
         }

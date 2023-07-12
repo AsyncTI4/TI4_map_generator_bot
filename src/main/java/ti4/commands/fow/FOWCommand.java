@@ -7,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -68,8 +67,6 @@ public class FOWCommand implements Command {
     private String getOptionValue(OptionMapping option) {
         if (option.getName().equals(Constants.PLAYER)){
             return option.getAsUser().getName();
-        } else if (option.getName().equals(Constants.TECH)){
-            return Mapper.getTechs().get(option.getAsString());
         }
         return option.getAsString();
     }
@@ -96,7 +93,7 @@ public class FOWCommand implements Command {
     public static void reply(SlashCommandInteractionEvent event) {
         String userID = event.getUser().getId();
         Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap);
+        MapSaveLoadManager.saveMap(activeMap, event);
         MessageHelper.replyToMessage(event, "Executed command. Use /show_game to check map");
     }
 
@@ -108,13 +105,19 @@ public class FOWCommand implements Command {
     private Collection<FOWSubcommandData> getSubcommands() {
         Collection<FOWSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new AddCustomAdjacentTile());
+        subcommands.add(new AddAdjacencyOverride());
         subcommands.add(new AddFogTile());
+        subcommands.add(new CheckChannels());
+        subcommands.add(new PingActivePlayer());
         subcommands.add(new PingSystem());
+        subcommands.add(new RemoveAdjacencyOverride());
+        subcommands.add(new RemoveAllAdjacencyOverrides());
         subcommands.add(new RemoveFogTile());
         subcommands.add(new RemoveCustomAdjacentTile());
         subcommands.add(new RemoveAllCustomAdjacentTiles());
         subcommands.add(new SetFogFilter());
-
+        subcommands.add(new Whisper());
+        subcommands.add(new Announce());
         return subcommands;
     }
 

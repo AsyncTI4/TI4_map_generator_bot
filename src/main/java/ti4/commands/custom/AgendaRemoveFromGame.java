@@ -10,7 +10,7 @@ import ti4.message.MessageHelper;
 
 public class AgendaRemoveFromGame extends CustomSubcommandData {
     public AgendaRemoveFromGame() {
-        super(Constants.AGENDA_REMOVE_FROM_GAME, "Aegnda remove from game");
+        super(Constants.REMOVE_AGENDA_FROM_GAME, "Agenda remove from game");
         addOptions(new OptionData(OptionType.STRING, Constants.AGENDA_ID, "Agenda ID").setRequired(true).setAutoComplete(true));
     }
 
@@ -18,7 +18,7 @@ public class AgendaRemoveFromGame extends CustomSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
 
-        OptionMapping soOption = event.getOption(Constants.AEGNDA_ID);
+        OptionMapping soOption = event.getOption(Constants.AGENDA_ID);
         if (soOption == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Specify Agenda");
             return;

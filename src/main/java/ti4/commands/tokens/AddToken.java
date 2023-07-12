@@ -1,12 +1,13 @@
 package ti4.commands.tokens;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.commands.player.PlanetRemove;
+
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
@@ -28,13 +29,12 @@ public class AddToken extends AddRemoveToken {
             tokenName = AliasHandler.resolveAttachment(tokenName);
             addToken(event, tile, tokenName, activeMap);
             activeMap.clearPlanetsCache();
-        }
-        else {
+        } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Token not specified.");
         }
     }
 
-    public static void addToken(SlashCommandInteractionEvent event, Tile tile, String tokenName, Map activeMap) {
+    public static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenName, Map activeMap) {
         String tokenFileName = Mapper.getAttachmentID(tokenName);
         String tokenPath = tile.getAttachmentPath(tokenFileName);
         if (tokenFileName != null && tokenPath != null) {
@@ -45,17 +45,21 @@ public class AddToken extends AddRemoveToken {
             tokenPath = tile.getTokenPath(tokenFileName);
 
             if (tokenPath == null) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Token: " + tokenName + " is not valid");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Token: " + tokenName + " is not valid");
                 return;
             }
             addToken(event, tile, tokenFileName, Mapper.getSpecialCaseValues(Constants.PLANET).contains(tokenName), activeMap);
         }
     }
 
-    private static void addToken(SlashCommandInteractionEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet, Map activeMap) {
+    private static void addToken(GenericInteractionCreateEvent event, Tile tile, String tokenID, boolean needSpecifyPlanet, Map activeMap) {
         String unitHolder = Constants.SPACE;
         if (needSpecifyPlanet) {
-            OptionMapping option = event.getOption(Constants.PLANET);
+            OptionMapping option = null;
+            if(event instanceof SlashCommandInteractionEvent){
+                option = ((SlashCommandInteractionEvent) event).getOption(Constants.PLANET);
+            }
+            
             if (option != null) {
                 unitHolder = option.getAsString().toLowerCase();
             } else {
@@ -69,7 +73,7 @@ public class AddToken extends AddRemoveToken {
                     if (unitHolderIDs.size() == 1) {
                         message = "No planets present in system.";
                     }
-                    MessageHelper.sendMessageToChannel(event.getChannel(), message);
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
                     return;
                 }
             }
@@ -81,7 +85,7 @@ public class AddToken extends AddRemoveToken {
             String planet = planetTokenizer.nextToken();
             planet = AddRemoveUnits.getPlanet(event, tile, AliasHandler.resolvePlanet(planet));
             if (!tile.isSpaceHolderValid(planet)) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: " + planet + " is not valid and not supported.");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Planet: " + planet + " is not valid and not supported.");
                 continue;
             }
             if (tokenID.contains("dmz")){
@@ -135,10 +139,8 @@ public class AddToken extends AddRemoveToken {
         // Moderation commands with required options
         commands.addCommands(
                 Commands.slash(getActionID(), getActionDescription())
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TOKEN, "Token name")
-                                .setRequired(true).setAutoComplete(true))
-                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name")
-                                .setRequired(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TOKEN, "Token name").setRequired(true).setAutoComplete(true))
+                        .addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true).setAutoComplete(true))
                         .addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet name").setAutoComplete(true))
 
         );
