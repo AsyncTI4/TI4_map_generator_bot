@@ -3,13 +3,13 @@ package ti4.commands.tech;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
 import ti4.commands.Command;
+import ti4.helpers.Constants;
 
 public class TechCommand implements Command {
 
     @Override
     public String getActionID() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getActionID'");
+        return Constants.TECH;
     }
 
     @Override
