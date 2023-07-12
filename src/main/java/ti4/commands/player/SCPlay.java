@@ -200,11 +200,11 @@ public class SCPlay extends PlayerSubcommandData {
 
 
 
-        if (player.getFaction().equalsIgnoreCase("winnu")&& scToPlay != 1) {
+        if (player.ownsPromissoryNote("acq") && scToPlay != 1) {
             for (Player player2 :activeMap.getPlayers().values()) {
                 if (!player2.getPromissoryNotes().isEmpty()) {
                     for (String pn : player2.getPromissoryNotes().keySet()) {
-                        if (!player2.getFaction().equalsIgnoreCase("winnu") && pn.equalsIgnoreCase("acq")) {
+                        if (!player2.ownsPromissoryNote("acq") && pn.equalsIgnoreCase("acq")) {
                             String acqMessage = Helper.getPlayerRepresentation(player2, activeMap, event.getGuild(), true) + " reminder you can use Winnu's PN!";
                             if (activeMap.isFoWMode()) {
                                 MessageHelper.sendMessageToChannel(player2.getPrivateChannel(), acqMessage);

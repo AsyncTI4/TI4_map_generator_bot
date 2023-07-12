@@ -852,12 +852,12 @@ public class GenerateMap {
 
             Integer count = unitCount.get(unitColorID);
             if (unitID.equals("csd")) {
-                if (!player.getFaction().equals("cabal")) {
+                if (!(player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2"))) {
                     continue;
                 }
                 unitColorID = Mapper.getUnitID("sd", playerColor);
             }
-            if (player.getFaction().equals("cabal") && unitID.equals("sd")) {
+            if ((player.ownsUnit("cabal_spacedock") || player.ownsUnit("cabal_spacedock2")) && unitID.equals("sd")) {
                 continue;
             }
 
@@ -1434,17 +1434,22 @@ public class GenerateMap {
 
     private int techFieldUnit(int x, int y, List<String> techs, List<String> exhaustedTechs, HashMap<String, TechnologyModel> techInfo, int deltaX, Player player, Map activeMap) {
         String outline = "pa_tech_unitsnew_outlines_generic.png";
-        if ("nomad".equals(player.getFaction())) {
+
+        //Custom UnitTech Outline for Nomad
+        if (player.ownsUnit("nomad_flagship") || player.ownsUnit("nomad_flagship2")) {
             outline = "pa_tech_unitsnew_outlines_nomad.png";
         }
-        if ("nekro".equals(player.getFaction())) {
+
+        //Use Nomad Outline for Nekro abilties if Nomad is in game
+        if (player.hasAbility("technological_singularity") || player.hasAbility("galactic_threat")) {
             for (Player player_ : activeMap.getPlayers().values()) {
-                if ("nomad".equals(player_.getFaction())) {
+                if (player_.ownsUnit("nomad_flagship") || player_.ownsUnit("nomad_flagship2")) {
                     outline = "pa_tech_unitsnew_outlines_nomad.png";
                     break;
                 }
             }
         }
+
         drawPAImage(x + deltaX, y, outline);
         if (techs == null) {
             graphics.setColor(Color.WHITE);

@@ -54,7 +54,7 @@ public class ACInfo extends ACCardsSubcommandData {
     }
 
     private static void sendTrapCardInfo(Map activeMap, Player player) {
-        if (player.getFaction().equals(Constants.LIZHO)) {
+        if (player.hasAbility("cunning") || player.hasAbility("subterfuge")) { //Lih-zo trap abilities
             MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, getTrapCardInfo(activeMap, player));
         }
     }
