@@ -20,7 +20,7 @@ public class SCUnpick extends PlayerSubcommandData {
     public SCUnpick() {
         super(Constants.SC_UNPICK, "Unpick an SC");
         addOptions(new OptionData(OptionType.INTEGER, Constants.STRATEGY_CARD, "Strategy Card #").setRequired(true));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,"Faction or Color for which you set stats").setAutoComplete(true));
+        // addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,"Faction or Color for which you set stats").setAutoComplete(true));
     }
 
     @Override
