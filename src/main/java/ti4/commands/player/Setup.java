@@ -220,6 +220,7 @@ public class Setup extends PlayerSubcommandData {
         AbilityInfo.sendAbilityInfo(activeMap, player, event);
         TechInfo.sendTechInfo(activeMap, player, event);
         LeaderInfo.sendLeadersInfo(activeMap, player, event);
+        UnitInfo.sendUnitInfo(activeMap, player, event);
         PNInfo.sendPromissoryNoteInfo(activeMap, player, false, event);
     }
 
