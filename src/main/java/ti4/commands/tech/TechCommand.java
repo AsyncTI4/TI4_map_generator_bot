@@ -68,12 +68,16 @@ public class TechCommand implements Command {
     }
 
     protected String getActionDescription() {
-        return "Planets";
+        return "Add/remove/exhaust/ready Technologies";
     }
 
     private Collection<TechSubcommandData> getSubcommands() {
         Collection<TechSubcommandData> subcommands = new HashSet<>();
-        // subcommands.add(new TechInfo());
+        subcommands.add(new TechAdd());
+        subcommands.add(new TechRemove());
+        subcommands.add(new TechExhaust());
+        subcommands.add(new TechRefresh());
+        subcommands.add(new TechInfo());
 
         return subcommands;
     }
