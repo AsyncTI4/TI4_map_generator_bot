@@ -329,7 +329,7 @@ public class Emojis {
     public static final String Absol = "<:Absol:1079473959248068701>";
     public static final String DiscordantStars = "<:DS:1081308924084506706>";
     public static final String AsyncTI4Logo = "<:asyncti4:959703535258333264>";
-    public static final String TIGL = "<:TIGL:1038913368360222752>";
+    public static final String TIGL = "<:TIGL:1111086048974475305>";
 
     // LIST OF SYMBOLS FOR FOG STUFF
     public static List<String> symbols =

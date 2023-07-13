@@ -2915,12 +2915,14 @@ public class GenerateMap {
                     scale = 0.6f;
                 } else if (tokenPath.contains(Constants.WORLD_DESTROYED)) {
                     scale = 0.8f;
+                }else if (tokenPath.contains(Constants.CUSTODIAN_TOKEN)) {
+                    scale = 0.5f; // didnt previous get changed for custodians
                 }
                 try {
                     tokenImage = resizeImage(ImageIO.read(new File(tokenPath)), scale);
                     Point position = new Point(centerPosition.x - (tokenImage.getWidth() / 2), centerPosition.y - (tokenImage.getHeight() / 2));
                     if (tokenID.contains(Constants.CUSTODIAN_TOKEN)) {
-                        position = new Point(70, 45);
+                        position = new Point(125, 115); // 70, 45
                     } else if (tokenID.contains(Constants.SLEEPER) && containsDMZ) {
                         position = new Point(position.x + 10, position.y + 10);
                     }
