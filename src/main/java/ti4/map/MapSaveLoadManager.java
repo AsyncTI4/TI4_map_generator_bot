@@ -938,6 +938,8 @@ public class MapSaveLoadManager {
                         Tile tile = readTile(tileData, activeMap);
                         if (tile != null) {
                             tileMap.put(tile.getPosition(), tile);
+                        } else {
+                            BotLogger.log("Error loading Map: `" + activeMap.getName() + "` -> Tile is null: `" + tileData + "` - tile will be skipped - check save file");
                         }
 
                         while (myReader.hasNextLine()) {
@@ -1662,16 +1664,19 @@ public class MapSaveLoadManager {
     }
 
     private static void readUnit(Tile tile, String data, String spaceHolder) {
+        if (tile == null) return;
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         tile.addUnit(spaceHolder, tokenizer.nextToken(), tokenizer.nextToken());
     }
 
     private static void readUnitDamage(Tile tile, String data, String spaceHolder) {
+        if (tile == null) return;
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         tile.addUnitDamage(spaceHolder, tokenizer.nextToken(), tokenizer.nextToken());
     }
 
     private static void readPlanetTokens(Tile tile, String data, String unitHolderName) {
+        if (tile == null) return;
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
         if (tokenizer.hasMoreTokens()) {
             String token = tokenizer.nextToken();
@@ -1686,6 +1691,7 @@ public class MapSaveLoadManager {
     }
 
     private static void readTokens(Tile tile, String data) {
+        if (tile == null) return;
         StringTokenizer tokenizer = new StringTokenizer(data, " ");
 //        tile.setUnit(tokenizer.nextToken(), tokenizer.nextToken());
         //todo implement token read

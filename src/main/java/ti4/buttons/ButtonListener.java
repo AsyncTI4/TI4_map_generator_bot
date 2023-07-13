@@ -1988,7 +1988,7 @@ public class ButtonListener extends ListenerAdapter {
                     List<Button> buttons = new ArrayList<Button>();
                     buttons.add(Button.success(finsFactionCheckerPrefix+"doActivation_"+pos, "Confirm"));
                     buttons.add(Button.danger(finsFactionCheckerPrefix+"deleteButtons", "This activation was a mistake"));
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ident+" You are about to automatically trigger some abilities by activating this system, are you should you want to proceed?", buttons);
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ident+" You are about to automatically trigger some abilities by activating this system, are you sure you want to proceed?", buttons);
                 }
             }else{
                  List<Player> playersAdj = FoWHelper.getAdjacentPlayers(activeMap, pos, true);
@@ -2422,6 +2422,21 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("componentActionRes_")) {
             ButtonHelper.resolvePressedCompButton(activeMap, player, event, buttonID);
+            event.getMessage().delete().queue();
+         } else if (buttonID.startsWith("addIonStorm_")) {
+            String pos = buttonID.substring(buttonID.lastIndexOf("_")+1, buttonID.length());
+            Tile tile = activeMap.getTileByPosition(pos);
+            if(buttonID.contains("alpha")){
+                String tokenFilename = Mapper.getTokenID("ionalpha");
+                tile.addToken(tokenFilename, Constants.SPACE);
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Added ionstorm alpha to "+tile.getRepresentation());
+
+            }else{
+                String tokenFilename = Mapper.getTokenID("ionbeta");
+                tile.addToken(tokenFilename, Constants.SPACE);
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Added ionstorm beta to "+tile.getRepresentation());
+            }
+
             event.getMessage().delete().queue();
          } else if (buttonID.startsWith("terraformPlanet_")) {
             String planet = buttonID.replace("terraformPlanet_","");

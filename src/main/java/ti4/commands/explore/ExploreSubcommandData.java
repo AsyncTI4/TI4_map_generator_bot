@@ -170,8 +170,17 @@ public abstract class ExploreSubcommandData extends SubcommandData {
             String token = cardInfo[5];
             String tokenFilename = Mapper.getTokenID(token);
             if (tokenFilename != null && tile != null) {
-                tile.addToken(tokenFilename, Constants.SPACE);
-                message = "Token added to map";
+                if("ionalpha".equalsIgnoreCase("token")){
+                    message = "Use buttons to decide to place either an alpha or a beta ionstorm";
+                    List<Button> buttonIon = new ArrayList<Button>();
+                    buttonIon.add(Button.success("addIonStorm_beta_"+tile.getPosition(), "Put down a beta"));
+                     buttonIon.add(Button.secondary("addIonStorm_alpha_"+tile.getPosition(), "Put down an alpha"));
+                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use buttons", buttonIon);
+                }else{
+                    tile.addToken(tokenFilename, Constants.SPACE);
+                    message = "Token added to map";
+                }
+                
                 if (Constants.MIRAGE.equalsIgnoreCase(token)) {
                     Helper.addMirageToTile(tile);
                     activeMap.clearPlanetsCache();
