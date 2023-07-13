@@ -1,4 +1,4 @@
-package ti4.commands.player;
+package ti4.commands.tech;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -17,9 +17,9 @@ import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.TechnologyModel;
 
-public class TechInfo extends PlayerSubcommandData {
+public class TechInfo extends TechSubcommandData {
     public TechInfo() {
-		super(Constants.TECH_INFO, "Send tech information to your Cards Info channel");
+		super(Constants.INFO, "Send tech information to your Cards Info channel");
 	}
 
     @Override
