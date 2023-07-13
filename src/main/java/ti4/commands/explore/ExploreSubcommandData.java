@@ -18,8 +18,8 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
-import ti4.commands.player.PlanetAdd;
-import ti4.commands.player.PlanetRefresh;
+import ti4.commands.planet.PlanetAdd;
+import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
