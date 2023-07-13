@@ -191,7 +191,7 @@ public class ButtonHelper {
                         channel = player.getPrivateChannel();
                     }
                     int numOfNeighbors = Helper.getNeighbourCount(activeMap,player);
-                    String message = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Minister of Commerce triggerd, your tgs have increased due to your "+numOfNeighbors+" neighbors ("+player.getTg()+"->"+(player.getTg()+numOfNeighbors)+")";
+                    String message = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Minister of Commerce triggered, your tgs have increased due to your "+numOfNeighbors+" neighbors ("+player.getTg()+"->"+(player.getTg()+numOfNeighbors)+")";
                     player.setTg(numOfNeighbors+player.getTg());
                     MessageHelper.sendMessageToChannel(channel, message);
                     ButtonHelper.pillageCheck(player, activeMap);
@@ -209,10 +209,10 @@ public class ButtonHelper {
                     if(activeMap.isFoWMode()){
                         channel = sender.getPrivateChannel();
                     }
-                    String message =  Helper.getPlayerRepresentation(sender, activeMap, activeMap.getGuild(), true)+" Dark Pact triggerd, your tgs have increased by 1 ("+sender.getTg()+"->"+(sender.getTg()+1)+")";
+                    String message =  Helper.getPlayerRepresentation(sender, activeMap, activeMap.getGuild(), true)+" Dark Pact triggered, your tgs have increased by 1 ("+sender.getTg()+"->"+(sender.getTg()+1)+")";
                     sender.setTg(sender.getTg()+1);
                     MessageHelper.sendMessageToChannel(channel, message);
-                    message =  Helper.getPlayerRepresentation(receiver, activeMap, activeMap.getGuild(), true)+" Dark Pact triggerd, your tgs have increased by 1 ("+receiver.getTg()+"->"+(receiver.getTg()+1)+")";
+                    message =  Helper.getPlayerRepresentation(receiver, activeMap, activeMap.getGuild(), true)+" Dark Pact triggered, your tgs have increased by 1 ("+receiver.getTg()+"->"+(receiver.getTg()+1)+")";
                     receiver.setTg(receiver.getTg()+1);
                     if(activeMap.isFoWMode()){
                         channel = receiver.getPrivateChannel();
@@ -1975,12 +1975,6 @@ public class ButtonHelper {
         return isNextTo;
     }
 
-    public static List<Button> getPurgeFragsButtons(Map activeMap, Player p1, String unit)
-    {
-        List<Button> buttons = new ArrayList<Button>();
-
-        return buttons;
-    }
     public static String getListOfStuffAvailableToSpend(Player player, Map activeMap){
         String youCanSpend = "You have available to you to spend: ";
         List<String> planets = new ArrayList<>(player.getPlanets());
@@ -2251,7 +2245,7 @@ public class ButtonHelper {
                 }
                 if(p1.getCrf() > numToBeat)
                 {
-                    for(int x = numToBeat+1; x < p1.getCrf()+1; x++)
+                    for(int x = numToBeat+1; (x < p1.getCrf()+1 && x < 4); x++)
                     {
                         Button transact = Button.primary(finChecker+"purge_Frags_CRF_"+x, "Cultural Fragments ("+x+")");
                         purgeFragButtons.add(transact);
@@ -2259,7 +2253,7 @@ public class ButtonHelper {
                 }
                 if(p1.getIrf()> numToBeat)
                 {
-                    for(int x = numToBeat+1; x < p1.getIrf()+1; x++)
+                    for(int x = numToBeat+1; (x < p1.getIrf()+1&& x < 4); x++)
                     {
                         Button transact = Button.success(finChecker+"purge_Frags_IRF_"+x, "Industrial Fragments ("+x+")");
                         purgeFragButtons.add(transact);
@@ -2267,7 +2261,7 @@ public class ButtonHelper {
                 }
                 if(p1.getHrf() > numToBeat)
                 {
-                    for(int x = numToBeat+1; x < p1.getHrf()+1; x++)
+                    for(int x = numToBeat+1; (x < p1.getHrf()+1&& x < 4); x++)
                     {
                         Button transact = Button.danger(finChecker+"purge_Frags_HRF_"+x, "Hazardous Fragments ("+x+")");
                         purgeFragButtons.add(transact);
