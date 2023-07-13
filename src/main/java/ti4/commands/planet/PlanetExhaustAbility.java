@@ -1,4 +1,4 @@
-package ti4.commands.player;
+package ti4.commands.planet;
 
 import java.util.ArrayList;
 import java.util.List;

@@ -1,9 +1,10 @@
-package ti4.commands.player;
+package ti4.commands.planet;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.player.PlayerSubcommandData;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
@@ -22,7 +23,7 @@ import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.exception.ExceptionUtils;
 
-public abstract class PlanetAddRemove extends PlayerSubcommandData{
+public abstract class PlanetAddRemove extends PlanetSubcommandData {
     public PlanetAddRemove(String id, String description) {
         super(id, description);
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET, "Planet").setRequired(true).setAutoComplete(true));

@@ -53,7 +53,11 @@ public class Stats extends PlayerSubcommandData {
 			return;
 		}
 
+		OptionMapping playerOption = event.getOption(Constants.PLAYER);
+		OptionMapping factionColorOption = event.getOption(Constants.FACTION_COLOR);
 		List<OptionMapping> optionMappings = event.getOptions();
+		optionMappings.remove(playerOption);
+		optionMappings.remove(factionColorOption);
 		//NO OPTIONS SELECTED, JUST DISPLAY STATS
 		if (optionMappings.isEmpty()) {
 			if (activeMap.isFoWMode()) {
