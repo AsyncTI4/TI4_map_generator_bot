@@ -12,6 +12,7 @@ import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
+import ti4.message.MessageHelper;
 
 public class PlanetCommand implements Command {
 
@@ -24,8 +25,21 @@ public class PlanetCommand implements Command {
 
     @Override
     public boolean accept(SlashCommandInteractionEvent event) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'accept'");
+        if (event.getName().equals(getActionID())) {
+            String userID = event.getUser().getId();
+            MapManager mapManager = MapManager.getInstance();
+            if (!mapManager.isUserWithActiveMap(userID)) {
+                MessageHelper.replyToMessage(event, "Set your active game using: /set_game gameName");
+                return false;
+            }
+            Map userActiveMap = mapManager.getUserActiveMap(userID);
+            if (!userActiveMap.getPlayerIDs().contains(userID) && !userActiveMap.isCommunityMode()) {
+                MessageHelper.replyToMessage(event, "You're not a player of the game, please call function /join gameName");
+                return false;
+            }
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -53,15 +67,13 @@ public class PlanetCommand implements Command {
         MapSaveLoadManager.saveMap(activeMap, event);
     }
 
-
     protected String getActionDescription() {
         return "Planets";
     }
 
     private Collection<PlanetSubcommandData> getSubcommands() {
         Collection<PlanetSubcommandData> subcommands = new HashSet<>();
-        // subcommands.add(new LeaderInfo());
-
+        // subcommands.add(new PlanetInfo());
 
         return subcommands;
     }
