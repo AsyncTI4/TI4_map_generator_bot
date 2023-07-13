@@ -6,6 +6,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
+import ti4.commands.planet.PlanetAdd;
 import ti4.commands.tech.TechInfo;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;

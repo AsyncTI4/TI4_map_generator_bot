@@ -68,12 +68,19 @@ public class PlanetCommand implements Command {
     }
 
     protected String getActionDescription() {
-        return "Planets";
+        return "Add/remove/exhaust/ready/spend planets";
     }
 
     private Collection<PlanetSubcommandData> getSubcommands() {
         Collection<PlanetSubcommandData> subcommands = new HashSet<>();
-        // subcommands.add(new PlanetInfo());
+        subcommands.add(new PlanetAdd());
+        subcommands.add(new PlanetRemove());
+        subcommands.add(new PlanetExhaust());
+        subcommands.add(new PlanetRefresh());
+        subcommands.add(new PlanetExhaustAbility());
+        subcommands.add(new PlanetRefreshAbility());
+        subcommands.add(new PlanetRefreshAll());
+        subcommands.add(new PlanetExhaustAll());
 
         return subcommands;
     }

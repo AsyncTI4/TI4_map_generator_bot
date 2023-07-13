@@ -18,7 +18,7 @@ import net.dv8tion.jda.internal.utils.tuple.ImmutablePair;
 import net.dv8tion.jda.internal.utils.tuple.Pair;
 import ti4.MapGenerator;
 import ti4.commands.milty.MiltyDraftManager;
-import ti4.commands.player.PlanetRemove;
+import ti4.commands.planet.PlanetRemove;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
