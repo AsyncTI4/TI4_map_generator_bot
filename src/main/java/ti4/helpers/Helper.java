@@ -414,11 +414,14 @@ public class Helper {
             case "winnu" -> Emojis.Winnu;
             case "xxcha" -> Emojis.Xxcha;
             case "yin" -> Emojis.Yin;
+
             case "lazax" -> Emojis.Lazax;
+
             case "keleres" -> Emojis.Keleres;
             case "keleresa" -> Emojis.Keleres;
             case "keleresm" -> Emojis.Keleres;
             case "keleresx" -> Emojis.Keleres;
+
             case "augers" -> Emojis.augers;
             case "axis" -> Emojis.axis;
             case "bentor" -> Emojis.bentor;
@@ -454,7 +457,18 @@ public class Helper {
             case "veldyr" -> Emojis.veldyr;
             case "zealots" -> Emojis.zealots;
             case "zelian" -> Emojis.zelian;
+
             case "admins" -> Emojis.AdminsFaction;
+
+            case "franken_1" -> Emojis.OneToe;
+            case "franken_2" -> Emojis.TwoToes;
+            case "franken_3" -> Emojis.ThreeToes;
+            case "franken_4" -> Emojis.FourToes;
+            case "franken_5" -> Emojis.FiveToes;
+            case "franken_6" -> Emojis.SixToes;
+            case "franken_7" -> Emojis.SevenToes;
+            case "franken_8" -> Emojis.EightToes;
+            
             default -> getRandomizedEmoji(0, null);
         };
     }
