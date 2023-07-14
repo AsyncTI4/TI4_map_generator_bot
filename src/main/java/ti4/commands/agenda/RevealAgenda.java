@@ -114,7 +114,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, Emojis.noafters,activeMap, afterButtons,"after");
 
         ListVoteCount.turnOrder(event, activeMap, channel);
-        Button proceed = Button.danger( "proceedToVoting", "Proceed to voting without waiting");
+        Button proceed = Button.danger( "proceedToVoting", "Skip waiting and start the voting for everyone");
         List<Button> proceedButtons = new ArrayList<>(List.of(proceed));
         Button transaction = Button.primary("transaction", "Transaction");
         proceedButtons.add(transaction);

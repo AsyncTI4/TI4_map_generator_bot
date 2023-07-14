@@ -945,14 +945,10 @@ public class ButtonListener extends ListenerAdapter {
                     if (player != null) {
                         pfaction2 = player.getFaction();
                     }
-                    if (pfaction2 != null && buttonLabel.toLowerCase().contains(pfaction2)) {
+                    if (pfaction2 != null) {
                         addReaction(event, true, true, "Abstained.", "");
                         event.getMessage().delete().queue();
-                    } else {
-                        MessageHelper.sendMessageToChannel(event.getChannel(),
-                                "You are not the faction who is supposed to press this button.");
-                        return;
-                    }
+                    } 
 
                 } else {
                     String identifier = "";
@@ -3567,7 +3563,7 @@ public class ButtonListener extends ListenerAdapter {
                     if (player != null) {
                         pfaction2 = player.getFaction();
                     }
-                    if (pfaction2 != null && buttonLabel.toLowerCase().contains(pfaction2)) {
+                    if (pfaction2 != null) {
                         String voteMessage = "Chose to Vote. Click buttons for which outcome to vote for.";
                         String agendaDetails = activeMap.getCurrentAgendaInfo();
                         agendaDetails = agendaDetails.substring(agendaDetails.indexOf("_") + 1,
@@ -3592,9 +3588,6 @@ public class ButtonListener extends ListenerAdapter {
                         event.getMessage().delete().queue();
                         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage,
                                 outcomeActionRow);
-                    } else {
-                        MessageHelper.sendMessageToChannel(event.getChannel(),
-                                "You are not the faction who is supposed to press this button.");
                     }
                 }
                 case "planet_ready" -> {
