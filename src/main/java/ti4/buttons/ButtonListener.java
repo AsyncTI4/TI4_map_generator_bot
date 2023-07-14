@@ -79,7 +79,6 @@ import java.io.File;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-import ti4.generator.GenerateMap;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 
@@ -89,6 +88,11 @@ public class ButtonListener extends ListenerAdapter {
 
     @Override
     public void onButtonInteraction(ButtonInteractionEvent event) {
+        if (!MapGenerator.readyToReceiveCommands) {
+            event.reply("Failed to press button. Please try again in a moment. The bot is rebooting.").setEphemeral(true).queue();
+            return;
+        }
+
         event.deferEdit().queue();
         String id = event.getUser().getId();
         MessageListener.setActiveGame(event.getMessageChannel(), id, "button", "no sub command");
