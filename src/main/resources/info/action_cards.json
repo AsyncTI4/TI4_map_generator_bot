@@ -1908,7 +1908,7 @@
     "source": "ds"
   },
   {
-    "alias": "freedom_fighters",
+    "alias": "freedom_fighters_ds",
     "name": "Freedom Fighters",
     "phase": "Action",
     "window": "At the start of ground combat:",
@@ -1979,7 +1979,7 @@
     "source": "ds"
   },
   {
-    "alias": "safety_overrides",
+    "alias": "safety_overrides_ds",
     "name": "Safety Overrides",
     "phase": "Action",
     "window": "After a mech you control is destroyed during ground combat:",
@@ -2015,7 +2015,7 @@
     "source": "ds"
   },
   {
-    "alias": "hostile_world",
+    "alias": "hostile_world_ds",
     "name": "Hostile World",
     "phase": "Action",
     "window": "After a player commits ground forces to land on a planet you control:",
@@ -2033,7 +2033,7 @@
     "source": "ds"
   },
   {
-    "alias": "illusory_duplication",
+    "alias": "illusory_duplication_ds",
     "name": "Illusory Duplication",
     "phase": "Action",
     "window": "At the start of space combat:",
@@ -2051,7 +2051,7 @@
     "source": "ds"
   },
   {
-    "alias": "singularity_charge",
+    "alias": "singularity_charge_ds",
     "name": "Singularity Charge",
     "phase": "Action",
     "window": "At the start of a round of combat:",
@@ -2132,7 +2132,7 @@
     "source": "ds"
   },
   {
-    "alias": "micrometeoroid_storm",
+    "alias": "micrometeoroid_storm_ds",
     "name": "Micrometeoroid Storm",
     "phase": "Action",
     "window": "ACTION:",
