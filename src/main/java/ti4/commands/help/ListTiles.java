@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.requests.restaction.MessageCreateAction;
 import net.dv8tion.jda.api.utils.FileUpload;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
+import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.TileModel;
 
@@ -58,8 +59,12 @@ public class ListTiles extends HelpSubcommandData {
 
             for (Entry<TileModel, MessageEmbed> entry : entries) {
                 messageEmbeds.add(entry.getValue());
-                File file = new File(entry.getKey().getTilePath());
-                fileUploads.add(FileUpload.fromData(file, entry.getKey().getImagePath()));
+                try {
+                    File file = new File(entry.getKey().getTilePath());
+                    fileUploads.add(FileUpload.fromData(file, entry.getKey().getImagePath()));
+                } catch (Exception e) {
+                    BotLogger.log("Error finding image file for tile: " + entry.getKey().getImagePath(), e);
+                }
             }
 
             messageCreateActions.add(event.getMessageChannel().sendMessageEmbeds(messageEmbeds).addFiles(fileUploads));
