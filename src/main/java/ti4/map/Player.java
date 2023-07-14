@@ -445,13 +445,15 @@ public class Player {
         return Mapper.getUnit(unitID);
     }
 
-    public void checkUnitsOwned() {
+    public String checkUnitsOwned() {
         for (int count : getUnitsOwnedByBaseType().values()) {
             if (count > 1) {
-                BotLogger.log("Player: " + getUserName() + " has more than one of the same unit type.\n> Unit Counts: `" + getUnitsOwnedByBaseType() + "`\n> Units Owned: `" + getUnitsOwned() + "`");
-                break;
+                String message = "> Warning - Player: " + getUserName() + " has more than one of the same unit type.\n> Unit Counts: `" + getUnitsOwnedByBaseType() + "`\n> Units Owned: `" + getUnitsOwned() + "`";
+                BotLogger.log(message);
+                return message;
             }
         }
+        return null;
     }
 
     public Map<String, Integer> getUnitsOwnedByBaseType() {
