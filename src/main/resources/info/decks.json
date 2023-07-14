@@ -64,6 +64,19 @@
             "codex","dominusorb","dynamiscore","emelpar","emphidia","mawofworlds","nanoforge","obsidian","prophetstears","shard","stellarconverter","thalnos","titanprototype"
         ]
     },
+    
+    
+    {
+        "alias": "relics_ds",
+        "name": "Discordant Stars Relics",
+        "type": "relic",
+        "description": "All Relics in a 'vanilla' PoK game plus Discordant Stars Relics - see: https://docs.google.com/document/d/1__dcZuELlmiMme6zqqqvx6jkmf250n5S/edit",
+        "cardIDs": [
+            "codex","dominusorb","dynamiscore","emelpar","emphidia","mawofworlds","nanoforge","obsidian","prophetstears","shard","stellarconverter","thalnos","titanprototype",
+            "boon_of_the_cerulean_god","decrypted_cartoglyph","e6-g0_network","eye_of_vogul","starfall_array","throne_of_the_false_emperor","twilight_mirror"
+        ]
+    },
+    
     {
         "alias": "explores_pok",
         "name": "PoK Explore Cards",
@@ -75,9 +88,9 @@
     },
     {
         "alias": "explores_DS",
-        "name": "Discordant Stars Exploration Cards - see: https://docs.google.com/document/d/1__dcZuELlmiMme6zqqqvx6jkmf250n5S/edit",
+        "name": "Discordant Stars Exploration Cards",
         "type": "explore",
-        "description": "All explore cards in a 'vanilla' PoK game plus additional DS cards",
+        "description": "All explore cards in a 'vanilla' PoK game plus additional DS cards - see: https://docs.google.com/document/d/1__dcZuELlmiMme6zqqqvx6jkmf250n5S/edit",
         "cardIDs": [
             "aw1","aw2","aw3","aw4","biotic","cm1","cm2","cm3","crf1","crf2","crf3","crf4","crf5","crf6","crf7","crf8","crf9","cybernetic","dmz","ds","dv1","dv2","dw","ed1","ed2","ent","exp1","exp2","exp3","fb1","fb2","fb3","fb4","frln1","frln2","frln3","gamma","gw","hrf1","hrf2","hrf3","hrf4","hrf5","hrf6","hrf7","ion","irf1","irf2","irf3","irf4","irf5","kel1","kel2","lc1","lc2","lf1","lf2","lf3","lf4","ls","majent","minent","mirage","mo1","mo2","mo3","ms1","ms2","mw","propulsion","pw","rw","toe","urf1","urf2","urf3","vfs1","vfs2","vfs3","warfare",
             "star_chart_cultural","star_chart_hazardous","star_chart_industrial","star_chart_frontier","forgotten_trade_port","distinguished_admiral","council_preserve","survey_drone_hub","war_forge_ruins","arcane_shield_emitter","hidden_laboratory","ancient_shipyard","orbital_foundries","folder_space","suspicious_wreckage","dark_visions"
