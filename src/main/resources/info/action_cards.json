@@ -1836,7 +1836,7 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "fulfillment_protocols",
+    "alias": "fulfillment_protocols_ds",
     "name": "Fulfillment Protocols",
     "phase": "Action",
     "window": "After a player activates a system that contains 1 or more of your ships:",
