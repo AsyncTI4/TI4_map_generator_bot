@@ -1,14 +1,15 @@
-package ti4.commands.player;
+package ti4.commands.planet;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.player.PlayerSubcommandData;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
 
-public class PlanetExhaustAll extends PlayerSubcommandData {
+public class PlanetExhaustAll extends PlanetSubcommandData {
     public PlanetExhaustAll() {
         super(Constants.PLANET_EXHAUST_ALL, "Exhaust All Planets");
         addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "Player for which you set stats"));

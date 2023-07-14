@@ -25,7 +25,7 @@ import ti4.commands.cardspn.PNInfo;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.SendFragments;
 import ti4.commands.leaders.UnlockLeader;
-import ti4.commands.player.PlanetRefresh;
+import ti4.commands.planet.PlanetRefresh;
 import ti4.commands.special.KeleresHeroMentak;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.tokens.RemoveCC;

@@ -1,4 +1,4 @@
-package ti4.commands.player;
+package ti4.commands.planet;
 
 import ti4.helpers.Constants;
 import ti4.map.Map;

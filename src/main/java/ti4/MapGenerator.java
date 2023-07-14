@@ -31,10 +31,12 @@ import ti4.commands.installation.InstallationCommand;
 import ti4.commands.leaders.LeaderCommand;
 import ti4.commands.map.*;
 import ti4.commands.milty.MiltyCommand;
+import ti4.commands.planet.PlanetCommand;
 import ti4.commands.player.PlayerCommand;
 import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
+import ti4.commands.tech.TechCommand;
 import ti4.commands.tokens.*;
 import ti4.commands.units.*;
 import ti4.generator.Mapper;
@@ -175,6 +177,8 @@ public class MapGenerator {
         commandManager.addCommand(new GenericButtonCommand());
         commandManager.addCommand(new DiscordantStarsCommand());
         commandManager.addCommand(new StatisticsCommand());
+        commandManager.addCommand(new TechCommand());
+        commandManager.addCommand(new PlanetCommand());
 
 
         CommandListUpdateAction commands = guildPrimary.updateCommands();

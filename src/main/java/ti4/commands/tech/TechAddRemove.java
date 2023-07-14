@@ -1,9 +1,10 @@
-package ti4.commands.player;
+package ti4.commands.tech;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.commands.player.PlayerSubcommandData;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -16,7 +17,7 @@ import ti4.model.TechnologyModel;
 import java.util.HashMap;
 import java.util.List;
 
-public abstract class TechAddRemove extends PlayerSubcommandData{
+public abstract class TechAddRemove extends TechSubcommandData {
     public TechAddRemove(String id, String description) {
         super(id, description);
         addOptions(new OptionData(OptionType.STRING, Constants.TECH, "Tech").setRequired(true).setAutoComplete(true));
