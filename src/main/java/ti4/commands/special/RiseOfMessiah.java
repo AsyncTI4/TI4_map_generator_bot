@@ -1,5 +1,6 @@
 package ti4.commands.special;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
@@ -29,7 +30,11 @@ public class RiseOfMessiah extends SpecialSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player could not be found");
             return;
         }
+        doRise(player, event, activeMap);
+        
+    }
 
+    public void doRise(Player player, GenericInteractionCreateEvent event, Map activeMap){
         List<String> planets = player.getPlanets();
         for (Tile tile : activeMap.getTileMap().values()) {
             for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
@@ -49,6 +54,7 @@ public class RiseOfMessiah extends SpecialSubcommandData {
                 }
             }
         }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added 1 infantry to each planet for "+ player.getColor());
     }
 
     @Override
