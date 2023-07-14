@@ -1841,7 +1841,7 @@
     "phase": "Action",
     "window": "After a player activates a system that contains 1 or more of your ships:",
     "text": "Spend 2 trade goods to place 1 cruiser and 1 destroyer in that system.",
-    "flavourText": "The Shipwrights were never late, though they had a habit of straining the meaning of “just in time” fulfillment.",
+    "flavorText": "The Shipwrights were never late, though they had a habit of straining the meaning of “just in time” fulfillment.",
     "source": "ds"
   },
   {
@@ -1850,7 +1850,7 @@
     "phase": "Action",
     "window": "ACTION:",
     "text": "Purge any 3 of your relic fragments to gain 1 relic.",
-    "flavourText": "C.O.O. Ranc laughed, packing up the artifacts. “Always a pleasure doing business.”",
+    "flavorText": "C.O.O. Ranc laughed, packing up the artifacts. “Always a pleasure doing business.”",
     "source": "ds"
   },
   {
@@ -1859,7 +1859,7 @@
     "phase": "Action",
     "window": "ACTION:",
     "text": "For each planet trait, if any of your units are adjacent to a planet of that trait which you do not control, you may gain 2 commodities or convert up to 2 of your commodities to trade goods.",
-    "flavourText": "Celdauri trade ports were a sight to behold, boasting goods from across the known galaxy.",
+    "flavorText": "Celdauri trade ports were a sight to behold, boasting goods from across the known galaxy.",
     "source": "ds"
   },
   {
@@ -1868,7 +1868,7 @@
     "phase": "Action",
     "window": "After your opponent produces 1 or more hits during ground combat:",
     "text": "Cancel up to 3 of those hits.",
-    "flavourText": "Phquaiset clicked delightedly as the plating fell away, it was time for a counterattack.",
+    "flavorText": "Phquaiset clicked delightedly as the plating fell away, it was time for a counterattack.",
     "source": "ds"
   },
   {
@@ -1877,7 +1877,7 @@
     "phase": "Action",
     "window": "ACTION:",
     "text": "Choose 1 player with the most victory points. Look at up to 1 of their unscored secret objectives, at random.",
-    "flavourText": "The Cymiaen locked eyes with the diplomat. It didn’t move again until the screams had stopped.",
+    "flavorText": "The Cymiaen locked eyes with the diplomat. It didn’t move again until the screams had stopped.",
     "source": "ds"
   },
   {
@@ -1886,7 +1886,7 @@
     "phase": "Action",
     "window": "Before you assign hits to your ships during a space combat:",
     "text": "Cancel up to 2 hits.",
-    "flavourText": "Jgin let out a cold, hard laugh as the attack intensified, enemy munitions rocking the ship but unable to penetrate their hull.",
+    "flavorText": "Jgin let out a cold, hard laugh as the attack intensified, enemy munitions rocking the ship but unable to penetrate their hull.",
     "source": "ds"
   },
   {
@@ -1895,7 +1895,7 @@
     "phase": "Agenda",
     "window": "After an agenda is revealed:",
     "text": "Each player must vote on this agenda, if able.",
-    "flavourText": "“What is it that you seek?” Kadryn asked the Council. “You yourselves cannot even say.”",
+    "flavorText": "“What is it that you seek?” Kadryn asked the Council. “You yourselves cannot even say.”",
     "source": "ds"
   },
   {
@@ -1904,7 +1904,7 @@
     "phase": "Agenda",
     "window": "When an agenda is revealed:",
     "text": "Choose another player; that player must give you 1 promissory note from their hand.",
-    "flavourText": "“There are more pressing matters for the session ahead.” The Florzen pulsed. “Much more pressing.”",
+    "flavorText": "“There are more pressing matters for the session ahead.” The Florzen pulsed. “Much more pressing.”",
     "source": "ds"
   },
   {
@@ -1913,7 +1913,7 @@
     "phase": "Action",
     "window": "At the start of ground combat:",
     "text": "You may roll 1 die for up to 2 of your ground forces on that planet. For each result equal to or greater than that unit’s combat value, produce and assign 1 hit to 1 of your opponent’s ground forces on that planet.",
-    "flavourText": "Otto's Outlaws were among the galaxy's most feared guerilla groups.",
+    "flavorText": "Otto's Outlaws were among the galaxy's most feared guerilla groups.",
     "source": "ds"
   },
   {
@@ -1922,7 +1922,7 @@
     "phase": "Action",
     "window": "At the start of a combat round:",
     "text": "Apply +1 to the result of each of your unit's combat rolls during this combat round.",
-    "flavourText": "“Drink deep, be hearty! Tomorrow we die!” —Ghemina war song",
+    "flavorText": "“Drink deep, be hearty! Tomorrow we die!” —Ghemina war song",
     "source": "ds"
   },
   {
@@ -1931,7 +1931,7 @@
     "phase": "Action",
     "window": "After you activate a system:",
     "text": "Choose any 2 systems that do not contain planets; those systems are adjacent to until the end of this tactical action.",
-    "flavourText": "The calls of the Ghoti all-mother have left many unsuspecting captains lost in the void.",
+    "flavorText": "The calls of the Ghoti all-mother have left many unsuspecting captains lost in the void.",
     "source": "ds"
   },
   {
@@ -1940,7 +1940,7 @@
     "phase": "Action",
     "window": "ACTION:",
     "text": "Choose 1 non-home planet you control other than Mecatol Rex. Reveal cards from that planet’s corresponding exploration deck until you reveal an attachment; attach that attachment to that planet and discard the rest.",
-    "flavourText": "Gledge dig deep, and certainly greedily, but they’re the best at it.",
+    "flavorText": "Gledge dig deep, and certainly greedily, but they’re the best at it.",
     "source": "ds"
   },
   {
@@ -1949,7 +1949,7 @@
     "phase": "Action",
     "window": "When you pass:",
     "text": "Return up to 1 of your unscored secret objectives to the secret objective deck, shuffle that deck, and draw 1 secret objective.",
-    "flavourText": "The predictive algorithms of the Ilyxum are magnificent, but at times infuriatingly cryptic.",
+    "flavorText": "The predictive algorithms of the Ilyxum are magnificent, but at times infuriatingly cryptic.",
     "source": "ds"
   },
   {
@@ -1958,7 +1958,7 @@
     "phase": "Action",
     "window": "After another player's ship uses SUSTAIN DAMAGE to cancel a hit produced by your units or abilities:",
     "text": "Destroy that ship.",
-    "flavourText": "Sdallari Tvungovot admired the wreckage as they prepared to leave. They had outdone themselves this time.",
+    "flavorText": "Sdallari Tvungovot admired the wreckage as they prepared to leave. They had outdone themselves this time.",
     "source": "ds"
   },
   {
@@ -1967,7 +1967,7 @@
     "phase": "Any",
     "window": "When a player purges a component:",
     "text": "Gain 2 trade goods.",
-    "flavourText": "Kado checked his firearm. “Yeah, I know what we did with it, but they don’t. They brought the money, let’s make this quick.”",
+    "flavorText": "Kado checked his firearm. “Yeah, I know what we did with it, but they don’t. They brought the money, let’s make this quick.”",
     "source": "ds"
   },
   {
@@ -1984,7 +1984,7 @@
     "phase": "Action",
     "window": "After a mech you control is destroyed during ground combat:",
     "text": "Your opponent must choose and destroy 2 of their own units on that planet.",
-    "flavourText": "Surrounded by his flaming exosuit, Sir Chulran made one last charge into fire, into death.",
+    "flavorText": "Surrounded by his flaming exosuit, Sir Chulran made one last charge into fire, into death.",
     "source": "ds"
   },
   {
@@ -1993,7 +1993,7 @@
     "phase": "Action",
     "window": "After you destroy 1 or more of another player’s infantry on a planet:",
     "text": "Destroy half of that player's infantry on that planet, rounded up.",
-    "flavourText": "The Soladity’s Blight has many strains, some more virulent than others.",
+    "flavorText": "The Soladity’s Blight has many strains, some more virulent than others.",
     "source": "ds"
   },
   {
@@ -2002,7 +2002,7 @@
     "phase": "Action",
     "window": "ACTION:",
     "text": "Purge any number of your relic fragments to draw an equal number of action cards.",
-    "flavourText": "Vassa Hagi wasn’t entirely certain what would happen next, but the relics would be lost forever, and that was enough.",
+    "flavorText": "Vassa Hagi wasn’t entirely certain what would happen next, but the relics would be lost forever, and that was enough.",
     "source": "ds"
   },
   {
@@ -2011,7 +2011,7 @@
     "phase": "Any",
     "window": "When another player plays an action card other than Sabotage: ",
     "text": "Cancel that action card.",
-    "flavourText": "The best laid plans are Li-Zho plans, but the second-best are those they choose not to interfere with.",
+    "flavorText": "The best laid plans are Li-Zho plans, but the second-best are those they choose not to interfere with.",
     "source": "ds"
   },
   {
@@ -2020,7 +2020,7 @@
     "phase": "Action",
     "window": "After a player commits ground forces to land on a planet you control:",
     "text": "Roll 2 dice. For each result equal to or less than either that planet’s resource or influence value, choose and destroy up to 1 of those ground forces.",
-    "flavourText": "“Y’ever fought the Khrask before, lad?” The commander cackled over the roar of the dropship’s engines. “We’re touching down on a world that wants us dead.”",
+    "flavorText": "“Y’ever fought the Khrask before, lad?” The commander cackled over the roar of the dropship’s engines. “We’re touching down on a world that wants us dead.”",
     "source": "ds"
   },
   {
@@ -2029,7 +2029,7 @@
     "phase": "Action",
     "window": "At the start of invasion:",
     "text": "Choose 1 of your units in the active system; that unit gains PLANETARY SHIELD until the end of this tactical action.",
-    "flavourText": "The admiral swore as a shimmering veil spread to envelope the planet’s critical infrastructure.",
+    "flavorText": "The admiral swore as a shimmering veil spread to envelope the planet’s critical infrastructure.",
     "source": "ds"
   },
   {
@@ -2038,7 +2038,7 @@
     "phase": "Action",
     "window": "At the start of space combat:",
     "text": "Choose 1 of your non-fighter ships in the active system that does not have SUSTAIN DAMAGE; that unit gains SUSTAIN DAMAGE until the end of the combat.",
-    "flavourText": "Sensors indicated only one Mortheus ship; it remained unclear which of the visible dozen it actually was.",
+    "flavorText": "Sensors indicated only one Mortheus ship; it remained unclear which of the visible dozen it actually was.",
     "source": "ds"
   },
   {
@@ -2047,7 +2047,7 @@
     "phase": "Any",
     "window": "After a die is rolled:",
     "text": "Apply +3 or -3 to the result before resolving the effects of that roll.",
-    "flavourText": "“No no no. That can’t be right…” the ancient Myko-Mentori sighed, “Ah! Yes, now I remember.”",
+    "flavorText": "“No no no. That can’t be right…” the ancient Myko-Mentori sighed, “Ah! Yes, now I remember.”",
     "source": "ds"
   },
   {
@@ -2056,7 +2056,7 @@
     "phase": "Action",
     "window": "At the start of a round of combat:",
     "text": "Each unit with SUSTAIN DAMAGE in the active system becomes damaged, if able.",
-    "flavourText": "Mosk Graezon knew the time had come, if he couldn’t have the system, he’d take as many down with him as he could.",
+    "flavorText": "Mosk Graezon knew the time had come, if he couldn’t have the system, he’d take as many down with him as he could.",
     "source": "ds"
   },
   {
@@ -2065,7 +2065,7 @@
     "phase": "Action",
     "window": "At the start of a combat round:",
     "text": "Move all of your ships from the active system into an adjacent system that does not contain another player's ships; the space combat ends in a draw. Then, place a command token from your reinforcements in that system.",
-    "flavourText": "Jack Hallard hadn’t been captured yet, and today would not be the day he was.",
+    "flavorText": "Jack Hallard hadn’t been captured yet, and today would not be the day he was.",
     "source": "ds"
   },
   {
@@ -2074,7 +2074,7 @@
     "phase": "Any",
     "window": "After a player resolves the effect of 1 of your faction promissory notes:",
     "text": "That player must give you 1 promissory note from their hand, if able.",
-    "flavourText": "“You made a deal with the old government.” Rapdr Ironclaw sneered. “If you want a deal, comrade, start talking.”",
+    "flavorText": "“You made a deal with the old government.” Rapdr Ironclaw sneered. “If you want a deal, comrade, start talking.”",
     "source": "ds"
   },
   {
@@ -2083,7 +2083,7 @@
     "phase": "Any",
     "window": "When you research a technology that is not a unit upgrade technology:",
     "text": "You may ignore 1 of that technology’s prerequisites.",
-    "flavourText": "The Zealots knew many secrets long forgotten.",
+    "flavorText": "The Zealots knew many secrets long forgotten.",
     "source": "ds"
   },
   {
@@ -2092,7 +2092,7 @@
     "phase": "Any",
     "window": "When 1 or more of your units use PRODUCTION:",
     "text": "Apply +4 to the total PRODUCTION value of your units and reduce the combined cost of the produced units by 1.",
-    "flavourText": "The Mechatronics machinery whirred into a frenzy, assembling a new vessel in record time.",
+    "flavorText": "The Mechatronics machinery whirred into a frenzy, assembling a new vessel in record time.",
     "source": "ds"
   },
   {
@@ -2101,7 +2101,7 @@
     "phase": "Status",
     "window": "At the start of the status phase:",
     "text": "Choose 1 revealed public objective; during this status phase, when a player scores that objective, gain 1 trade good.",
-    "flavourText": "Turra closed the case and rose from the table. \"It's been a pleasure.\"",
+    "flavorText": "Turra closed the case and rose from the table. \"It's been a pleasure.\"",
     "source": "ds"
   },
   {
@@ -2110,7 +2110,7 @@
     "phase": "Action",
     "window": "After you activate a system:",
     "text": "Apply +1 to the move value of each of your ships during this tactical action.",
-    "flavourText": "\"The minimum fee has been paid.\" The Vaden said. \"Don't squander the opportunity.\"",
+    "flavorText": "\"The minimum fee has been paid.\" The Vaden said. \"Don't squander the opportunity.\"",
     "source": "ds"
   },
   {
@@ -2119,7 +2119,7 @@
     "phase": "Action",
     "window": "Before you assign hits produced by another player's SPACE CANNON roll:",
     "text": "Cancel 1 hit.",
-    "flavourText": "The Vaylerian cruisers entered the system too fast, overwhelming the planetary defense network.",
+    "flavorText": "The Vaylerian cruisers entered the system too fast, overwhelming the planetary defense network.",
     "source": "ds"
   },
   {
@@ -2128,7 +2128,7 @@
     "phase": "Action",
     "window": "When you pass:",
     "text": "Gain 4 commodities; for each commodity you would gain in excess of your commodity value, gain 1 trade good instead.",
-    "flavourText": "The Sovereignty’s Corporations have mastered the art of using money to make money.",
+    "flavorText": "The Sovereignty’s Corporations have mastered the art of using money to make money.",
     "source": "ds"
   },
   {
@@ -2137,7 +2137,7 @@
     "phase": "Action",
     "window": "ACTION:",
     "text": "Choose 1 system that contains another player’s ships. Roll 1 die for each fighter in that system. For each result of 6 or greater, destroy 1 of those units.",
-    "flavourText": "“Invaders. Destruction. Pain.” The stone churned angrily. “Hatred. Judgment. Fear.”",
+    "flavorText": "“Invaders. Destruction. Pain.” The stone churned angrily. “Hatred. Judgment. Fear.”",
     "source": "ds"
   },
   {
@@ -2146,7 +2146,7 @@
     "phase": "Any",
     "window": "At any time:",
     "text": "Look at the top card of each exploration deck, and the relic deck.",
-    "flavourText": "What they lack in passion, they make up for in well-paid efficiency.",
+    "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
     "source": "ds"
   },
   {
@@ -2155,7 +2155,7 @@
     "phase": "Agenda",
     "window": "At the start of the agenda phase:",
     "text": "Shuffle all discarded agendas into the agenda deck and look at the top 3 cards of that deck. Place each of those cards on the top or bottom of that deck in any order.",
-    "flavourText": "Given the palpable Edyn interest, the next council session was sure to be an interesting one.",
+    "flavorText": "Given the palpable Edyn interest, the next council session was sure to be an interesting one.",
     "source": "ds"
   },
   {
@@ -2164,7 +2164,7 @@
     "phase": "Any",
     "window": "When another player would resolve your “Trade Agreement” promissory note:",
     "text": "You do not give that player your commodities; that player returns your Trade Agreement promissory note.",
-    "flavourText": "“What do you mean?” The Vaden smiled, baring rows upon rows of teeth. “You read the contract, right?”",
+    "flavorText": "“What do you mean?” The Vaden smiled, baring rows upon rows of teeth. “You read the contract, right?”",
     "source": "ds"
   },
   {
@@ -2173,7 +2173,7 @@
     "phase": "Action",
     "window": "ACTION:",
     "text": "Ready your agent or spend 1 command token from your strategy pool to unlock your commander.",
-    "flavourText": "\"Come,\" Allant's voice softly carried like distant thunder, \"you have been chosen.\"",
+    "flavorText": "\"Come,\" Allant's voice softly carried like distant thunder, \"you have been chosen.\"",
     "source": "ds"
   },
   {
@@ -2182,7 +2182,7 @@
     "phase": "Action",
     "window": "ACTION:",
     "text": "Draw 1 action card.",
-    "flavourText": "The choice was an illusion, the game decided from the first move.",
+    "flavorText": "The choice was an illusion, the game decided from the first move.",
     "source": "ds"
   },
   {
@@ -2191,7 +2191,7 @@
     "phase": "Action",
     "window": "Before 1 or more of your units would make a roll for a unit ability:",
     "text": "Hits produced by that roll cannot be canceled.",
-    "flavourText": "Dr. Morden stood still, in awe. “They’re… beautiful.”",
+    "flavorText": "Dr. Morden stood still, in awe. “They’re… beautiful.”",
     "source": "ds"
   }
 ]
