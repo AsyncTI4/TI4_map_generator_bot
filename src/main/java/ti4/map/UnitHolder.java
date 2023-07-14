@@ -44,7 +44,7 @@ abstract public class UnitHolder {
     }
 
     public void addUnit(String unit, Integer count) {
-        if (count != null && count > 0 && count < 100) {
+        if (count != null && count > 0) {
             Integer unitCount = units.get(unit);
             if (unitCount != null) {
                 unitCount += count;
@@ -107,7 +107,7 @@ abstract public class UnitHolder {
     }
 
     public void addUnitDamage(String unit, Integer count) {
-        if (count != null && count > 0 && count < 100) {
+        if (count != null && count > 0) {
             Integer unitCount = unitsDamage.get(unit);
             if (unitCount != null) {
                 unitCount += count;
