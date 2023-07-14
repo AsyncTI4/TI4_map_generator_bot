@@ -129,6 +129,7 @@ public class ACInfo extends ACCardsSubcommandData {
         String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
         List<Button> acButtons = getPlayActionCardButtons(activeMap, player);
         if (acButtons != null && !acButtons.isEmpty()) {
+            
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
             ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
             for (MessageCreateData message : messageList) {
@@ -178,6 +179,7 @@ public class ACInfo extends ACCardsSubcommandData {
                     acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
+            acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
         }
         return acButtons;
     }
@@ -198,16 +200,20 @@ public class ACInfo extends ACCardsSubcommandData {
         }
         return acButtons;
     }
-    public static List<Button> getDiscardActionCardButtons(Map activeMap, Player player) {
+    public static List<Button> getDiscardActionCardButtons(Map activeMap, Player player, boolean doingAction) {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+        String stall = "";
+        if(doingAction){
+            stall = "stall";
+        }
         if (actionCards != null && !actionCards.isEmpty()) {
             for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
                 if (ac_name != null) {
-                    acButtons.add(Button.primary("ac_discard_from_hand_" + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                    acButtons.add(Button.primary("ac_discard_from_hand_" + value + stall, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }
