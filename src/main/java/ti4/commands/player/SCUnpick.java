@@ -25,17 +25,17 @@ public class SCUnpick extends PlayerSubcommandData {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
+		Map activeMap = getActiveMap();
+		Player player = activeMap.getPlayer(getUser().getId());
+		player = Helper.getGamePlayer(activeMap, player, event, null);
+		player = Helper.getPlayer(activeMap, player, event);
+		if (player == null) {
+			sendMessage("Player could not be found");
+			return;
+		}
 
         Boolean privateGame = FoWHelper.isPrivateGame(activeMap, event);
         boolean isFowPrivateGame = (privateGame != null && privateGame);
-
-        if (player == null) {
-            sendMessage("You're not a player of this game");
-            return;
-        }
 
         Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
                 .filter(player_ -> player_.getFaction() != null && !player_.getFaction().isEmpty() && !player_.getColor().equals("null"))
