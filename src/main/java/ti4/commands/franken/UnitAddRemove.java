@@ -46,6 +46,7 @@ public abstract class UnitAddRemove extends FrankenSubcommandData {
         }
 
         doAction(player, unitIDs);
+        player.checkUnitsOwned();
     }
 
     public abstract void doAction(Player player, List<String> unitIDs);
