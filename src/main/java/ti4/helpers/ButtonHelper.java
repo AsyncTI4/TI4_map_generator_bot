@@ -385,7 +385,7 @@ public class ButtonHelper {
             }
             String ident = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
             MessageHelper.sendMessageToChannel(channel, ident+ " you are exceeding the AC hand limit of "+limit+". Please discard down to the limit. Check your cards info thread for the blue discard buttons. ");
-            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeMap), ident+" use buttons to discard", ACInfo.getDiscardActionCardButtons(activeMap, player));
+            MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeMap), ident+" use buttons to discard", ACInfo.getDiscardActionCardButtons(activeMap, player, false));
         }
     }
     public static void updateMap(Map activeMap, GenericInteractionCreateEvent event) {
@@ -2218,8 +2218,8 @@ public class ButtonHelper {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),message, purgeFragButtons);
 
                 }else if(buttonID.equalsIgnoreCase("stallTactics")){
-                    String secretScoreMsg = "_ _\nClick a button below to discard an Action Card";
-                    List<Button> acButtons = ACInfo.getDiscardActionCardButtons(activeMap, p1);
+                    String secretScoreMsg = "_ _\n"+ Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" Click a button below to discard an Action Card";
+                    List<Button> acButtons = ACInfo.getDiscardActionCardButtons(activeMap, p1, true);
                     if (acButtons != null && !acButtons.isEmpty()) {
                         List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
                         ThreadChannel cardsInfoThreadChannel = p1.getCardsInfoThread(activeMap);
