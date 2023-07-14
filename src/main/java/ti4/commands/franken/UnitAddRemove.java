@@ -14,6 +14,7 @@ import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
+import ti4.message.MessageHelper;
 
 public abstract class UnitAddRemove extends FrankenSubcommandData {
     public UnitAddRemove(String name, String description) {
@@ -46,6 +47,7 @@ public abstract class UnitAddRemove extends FrankenSubcommandData {
         }
 
         doAction(player, unitIDs);
+        MessageHelper.sendMessageToChannel(event.getChannel(), player.checkUnitsOwned());
     }
 
     public abstract void doAction(Player player, List<String> unitIDs);
