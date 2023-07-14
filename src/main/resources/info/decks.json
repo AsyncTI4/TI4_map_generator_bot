@@ -29,6 +29,16 @@
         ]
     },
     {
+        "alias": "action_cards_ds",
+        "name": "Dicordant Stars Action Cards",
+        "type": "action_card",
+        "description": "All action cards in a 'vanilla' PoK game, plus additional DS Action Cards - see: https://docs.google.com/document/d/1__dcZuELlmiMme6zqqqvx6jkmf250n5S/edit",
+        "cardIDs": [
+            "abs","arch_expedition","assassin","blitz","bribery","bunker","confounding","confusing","const_rider","counterstroke","coup","courageous","cripple","deadly_plot","decoy","dh1","dh2","dh3","dh4","diplo_rider","disable","disgrace","distinguished","divert_funding","dp1","dp2","dp3","dp4","economic_initiative","emergency","experimental","f_conscription","f_deployment","f_prototype","f_researched","fire_team","fs1","fs2","fs3","fs4","fsb","ghost_ship","ghost_squad","hack","harness","imp_rider","impersonation","industrial_initiative","infiltrate","insider","insub","intercept","investments","jamming","lead_rider","lost_star","lucky","master_plan","mb1","mb2","mb3","mb4","meltdown","messiah","mining_initiative","mjets1","mjets2","mjets3","mjets4","nav_suite","parley","plagiarize","plague","politic_rider","probe","rally","refit","reflective","reparations","repeal","reveal_prototype","reverse_engineer","rout","s_retreat1","s_retreat2","s_retreat3","s_retreat4","sabo1","sabo2","sabo3","sabo4","salvage","sanction","scramble","scuttle","seize","sh1","sh2","sh3","sh4","silence_space","solar_flare","spy","stability","summit","tactical","tech_rider","trade_rider","unexpected","unstable","upgrade","uprising","veto","war_effort","war_machine1","war_machine2","war_machine3","war_machine4","war_rider","waylay",
+            "fulfillment_protocols","secured_trove","free_trade_network","carapace_plating","psionic_hammer","shields_holding_ds","special_session","diplomatic_pressure_ds","freedom_fighters","morale_boost_ds","abyssal_starpaths","planetary_rigs","ai_augury","direct_hit_ds","aggressive_broker","meditative_firing_cycles","safety_overrides","contagion","remnant_collection","sabotage_ds","hostile_world","echo_shielding","illusory_duplication","confused_sage","singularity_charge","skilled_retreat_ds","renegotiation","forbidden_knowledge","war_machine_ds","bounty_contracts","flank_speed_ds","maneuvering_jets_ds","arbitrage","micrometeoroid_storm","professional_archeologists","emergency_meeting","escape_clause","personnel_writ","preparation","classified_weapons"
+        ]
+    },
+    {
         "alias": "secret_objectives_pok",
         "name": "PoK Secret Objectives",
         "type": "secret_objective",
@@ -64,6 +74,19 @@
             "codex","dominusorb","dynamiscore","emelpar","emphidia","mawofworlds","nanoforge","obsidian","prophetstears","shard","stellarconverter","thalnos","titanprototype"
         ]
     },
+    
+    
+    {
+        "alias": "relics_ds",
+        "name": "Discordant Stars Relics",
+        "type": "relic",
+        "description": "All Relics in a 'vanilla' PoK game plus Discordant Stars Relics - see: https://docs.google.com/document/d/1__dcZuELlmiMme6zqqqvx6jkmf250n5S/edit",
+        "cardIDs": [
+            "codex","dominusorb","dynamiscore","emelpar","emphidia","mawofworlds","nanoforge","obsidian","prophetstears","shard","stellarconverter","thalnos","titanprototype",
+            "boon_of_the_cerulean_god","decrypted_cartoglyph","e6-g0_network","eye_of_vogul","starfall_array","throne_of_the_false_emperor","twilight_mirror"
+        ]
+    },
+    
     {
         "alias": "explores_pok",
         "name": "PoK Explore Cards",
@@ -71,6 +94,16 @@
         "description": "All explore cards in a 'vanilla' PoK game",
         "cardIDs": [
             "aw1","aw2","aw3","aw4","biotic","cm1","cm2","cm3","crf1","crf2","crf3","crf4","crf5","crf6","crf7","crf8","crf9","cybernetic","dmz","ds","dv1","dv2","dw","ed1","ed2","ent","exp1","exp2","exp3","fb1","fb2","fb3","fb4","frln1","frln2","frln3","gamma","gw","hrf1","hrf2","hrf3","hrf4","hrf5","hrf6","hrf7","ion","irf1","irf2","irf3","irf4","irf5","kel1","kel2","lc1","lc2","lf1","lf2","lf3","lf4","ls","majent","minent","mirage","mo1","mo2","mo3","ms1","ms2","mw","propulsion","pw","rw","toe","urf1","urf2","urf3","vfs1","vfs2","vfs3","warfare"
+        ]
+    },
+    {
+        "alias": "explores_DS",
+        "name": "Discordant Stars Exploration Cards",
+        "type": "explore",
+        "description": "All explore cards in a 'vanilla' PoK game plus additional DS cards - see: https://docs.google.com/document/d/1__dcZuELlmiMme6zqqqvx6jkmf250n5S/edit",
+        "cardIDs": [
+            "aw1","aw2","aw3","aw4","biotic","cm1","cm2","cm3","crf1","crf2","crf3","crf4","crf5","crf6","crf7","crf8","crf9","cybernetic","dmz","ds","dv1","dv2","dw","ed1","ed2","ent","exp1","exp2","exp3","fb1","fb2","fb3","fb4","frln1","frln2","frln3","gamma","gw","hrf1","hrf2","hrf3","hrf4","hrf5","hrf6","hrf7","ion","irf1","irf2","irf3","irf4","irf5","kel1","kel2","lc1","lc2","lf1","lf2","lf3","lf4","ls","majent","minent","mirage","mo1","mo2","mo3","ms1","ms2","mw","propulsion","pw","rw","toe","urf1","urf2","urf3","vfs1","vfs2","vfs3","warfare",
+            "star_chart_cultural","star_chart_hazardous","star_chart_industrial","star_chart_frontier","forgotten_trade_port","distinguished_admiral","council_preserve","survey_drone_hub","war_forge_ruins","arcane_shield_emitter","hidden_laboratory","ancient_shipyard","orbital_foundries","folder_space","suspicious_wreckage","dark_visions"
         ]
     },
 

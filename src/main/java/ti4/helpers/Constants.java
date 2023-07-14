@@ -561,7 +561,6 @@ public class Constants {
     public static final String TECH_REMOVE = "tech_remove";
     public static final String TECH_EXHAUST = "tech_exhaust";
     public static final String TECH_REFRESH = "tech_ready";
-    public static final String TECH_INFO = "tech_info";
 
     public static final String PLANET_ADD = "planet_add";
     public static final String PLANET_REMOVE = "planet_remove";
@@ -809,4 +808,5 @@ public class Constants {
     public static final String UNIT_ID_5 = "unit_id_5";
     public static final String UNIT_REMOVE = "unit_remove";
     public static final String UNIT_ADD = "unit_add";
+    public static final String UNIT_INFO = "unit_info";
 }

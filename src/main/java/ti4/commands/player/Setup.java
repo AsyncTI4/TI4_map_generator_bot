@@ -6,6 +6,8 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.leaders.LeaderInfo;
+import ti4.commands.planet.PlanetAdd;
+import ti4.commands.tech.TechInfo;
 import ti4.commands.units.AddRemoveUnits;
 import ti4.generator.Mapper;
 import ti4.generator.PositionMapper;
@@ -218,6 +220,7 @@ public class Setup extends PlayerSubcommandData {
         AbilityInfo.sendAbilityInfo(activeMap, player, event);
         TechInfo.sendTechInfo(activeMap, player, event);
         LeaderInfo.sendLeadersInfo(activeMap, player, event);
+        UnitInfo.sendUnitInfo(activeMap, player, event);
         PNInfo.sendPromissoryNoteInfo(activeMap, player, false, event);
     }
 

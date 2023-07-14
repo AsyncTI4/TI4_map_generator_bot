@@ -209,9 +209,9 @@ public class UnitModel implements ModelInterface {
     }
 
     private String getCombatText() {
-        if (getCombatDieCount() == 0) {
+        if (getCombatDieCount() == 1) {
             return "Combat: " + getCombatHitsOn() + "\n";
-        } else if (getCombatDieCount() > 0) {
+        } else if (getCombatDieCount() > 1) {
             return "Combat: " + getCombatHitsOn() + " (x" + getCombatDieCount() + ")\n";
         }
         return "";

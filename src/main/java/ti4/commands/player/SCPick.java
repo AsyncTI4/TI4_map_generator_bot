@@ -27,18 +27,20 @@ public class SCPick extends PlayerSubcommandData {
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC4, "4th"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC5, "5th"));
         addOptions(new OptionData(OptionType.INTEGER, Constants.SC6, "6th"));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR,"Faction or Color for which you set stats").setAutoComplete(true));
 
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        if (player == null) {
-            sendMessage("You're not a player of this game");
-            return;
-        }
+		Map activeMap = getActiveMap();
+		Player player = activeMap.getPlayer(getUser().getId());
+		player = Helper.getGamePlayer(activeMap, player, event, null);
+		player = Helper.getPlayer(activeMap, player, event);
+		if (player == null) {
+			sendMessage("Player could not be found");
+			return;
+		}
 
         Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
                 .filter(player_ -> player_.isRealPlayer())

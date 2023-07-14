@@ -15,7 +15,7 @@ import ti4.commands.cardsso.SOInfo;
 import ti4.commands.explore.RelicInfo;
 import ti4.commands.leaders.LeaderInfo;
 import ti4.commands.player.AbilityInfo;
-import ti4.commands.player.TechInfo;
+import ti4.commands.tech.TechInfo;
 import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;

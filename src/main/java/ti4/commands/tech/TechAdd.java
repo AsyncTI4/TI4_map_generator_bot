@@ -1,4 +1,4 @@
-package ti4.commands.player;
+package ti4.commands.tech;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.AliasHandler;
