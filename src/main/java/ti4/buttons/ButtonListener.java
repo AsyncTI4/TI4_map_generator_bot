@@ -669,17 +669,16 @@ public class ButtonListener extends ListenerAdapter {
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }
-            String totalVotesSoFar = event.getMessage().getContentRaw();
-            if (!totalVotesSoFar.contains("Click the names")) {
-                totalVotesSoFar = totalVotesSoFar + ", exhausted "
+            String exhaustedMessage = event.getMessage().getContentRaw();
+            if (!exhaustedMessage.contains("Click the names")) {
+                exhaustedMessage = exhaustedMessage + ", exhausted "
                         + Helper.getPlanetRepresentation(planetName, activeMap);
             } else {
-                totalVotesSoFar = ident + " exhausted "
+                exhaustedMessage = ident + " exhausted "
                         + Helper.getPlanetRepresentation(planetName, activeMap);
             }
-            event.getMessage().editMessage(totalVotesSoFar).setComponents(actionRow2).queue();
-            // MessageHelper.sendMessageToChannel(event.getChannel(), ident+" Exhausted
-            // "+Helper.getPlanetRepresentation(planetName, activeMap));
+            event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+           
 
         } else if (buttonID.startsWith("finishTransaction_")) {
             String player2Color = buttonID.split("_")[1];
@@ -1152,11 +1151,27 @@ public class ButtonListener extends ListenerAdapter {
                 if(tech.equals("bs")){
                     ButtonHelper.sendAllTechsNTechSkipPlanetsToReady(activeMap, event, player);
                 }
-                if(tech.equals("aida")){
+                if(tech.equals("aida") || tech.equals("sar")){
                     if(!activeMap.isFoWMode() && event.getMessageChannel() != activeMap.getActionsChannel()){
-                        MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(),
-                        (Helper.getPlayerRepresentation(player, activeMap) + " exhausted tech: "
-                                + Helper.getTechRepresentation(tech)));
+                       String msg = (Helper.getPlayerRepresentation(player, activeMap) + " exhausted tech: " +Helper.getTechRepresentation(tech)); 
+                        String exhaustedMessage = event.getMessage().getContentRaw();
+                        List<ActionRow> actionRow2 = new ArrayList<>();
+                        for (ActionRow row : event.getMessage().getActionRows()) {
+                            List<ItemComponent> buttonRow = row.getComponents();
+                            int buttonIndex = buttonRow.indexOf(event.getButton());
+                            if (buttonIndex > -1) {
+                                buttonRow.remove(buttonIndex);
+                            }
+                            if (buttonRow.size() > 0) {
+                                actionRow2.add(ActionRow.of(buttonRow));
+                            }
+                        }
+                        if (!exhaustedMessage.contains("Click the names")) {
+                            exhaustedMessage = exhaustedMessage + ", "+msg;
+                        } else {
+                            exhaustedMessage = ident + msg;
+                        }
+                        event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
                     }
                 }
                 player.exhaustTech(tech);
@@ -1172,9 +1187,26 @@ public class ButtonListener extends ListenerAdapter {
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), false) +" use buttons to redistribute", redistributeButton);
                 }
             } else {
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(),
-                        (Helper.getPlayerRepresentation(player, activeMap) + " used tech: "
-                                + Helper.getTechRepresentation(tech)));
+                String msg = (Helper.getPlayerRepresentation(player, activeMap) + " used tech: "
+                                + Helper.getTechRepresentation(tech));
+                    String exhaustedMessage = event.getMessage().getContentRaw();
+                     List<ActionRow> actionRow2 = new ArrayList<>();
+                    for (ActionRow row : event.getMessage().getActionRows()) {
+                        List<ItemComponent> buttonRow = row.getComponents();
+                        int buttonIndex = buttonRow.indexOf(event.getButton());
+                        if (buttonIndex > -1) {
+                            buttonRow.remove(buttonIndex);
+                        }
+                        if (buttonRow.size() > 0) {
+                            actionRow2.add(ActionRow.of(buttonRow));
+                        }
+                    }
+                    if (!exhaustedMessage.contains("Click the names")) {
+                        exhaustedMessage = exhaustedMessage + ", "+msg;
+                    } else {
+                        exhaustedMessage = ident + msg;
+                    }
+                    event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
             }
         } else if (buttonID.startsWith("planetOutcomes_")) {
             String factionOrColor = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
@@ -1975,7 +2007,7 @@ public class ButtonListener extends ListenerAdapter {
             activeMap.setActiveSystem(pos);
             MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity + " activated "
                     + activeMap.getTileByPosition(pos).getRepresentationForButtons(activeMap, player));
-            activeMap.resetCurrentMovedUnitsFrom1TacticalAction();
+            
             List<Player> playersWithPds2 = new ArrayList<Player>();
             if(!activeMap.isFoWMode()){
                 playersWithPds2 = ButtonHelper.tileHasPDS2Cover(player, activeMap, pos);
@@ -2218,18 +2250,6 @@ public class ButtonListener extends ListenerAdapter {
                         }             
                     }
                 }
-                // if (currentSystem.containsKey(rest)) {
-                //     activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
-                // } else {
-                //     activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
-                // }
-                // 
-                // if (currentActivation.containsKey(unitkey)) {
-                //     activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitkey,
-                //             currentActivation.get(unitkey) + amount);
-                // } else {
-                //     activeMap.setSpecificCurrentMovedUnitsFrom1TacticalAction(unitkey, amount);
-                // }
                 String message = ButtonHelper.buildMessageFromDisplacedUnits(activeMap, false, player, remove);
                 List<Button> systemButtons = ButtonHelper.getButtonsForAllUnitsInSystem(player, activeMap,
                         activeMap.getTileByPosition(pos), remove);
@@ -2754,6 +2774,30 @@ public class ButtonListener extends ListenerAdapter {
                 case "no_sabotage" -> {
                     String message = activeMap.isFoWMode() ? "No sabotage" : null;
                     addReaction(event, false, false, message, "");
+                }
+                case "titansCommander" -> {
+                    int cTG = player.getTg();
+                    int fTG = cTG+1;
+                    player.setTg(fTG);
+                    String msg = " used Titans commander to gain a tg ("+cTG+"->"+fTG+"). ";
+                    String exhaustedMessage = event.getMessage().getContentRaw();
+                     List<ActionRow> actionRow2 = new ArrayList<>();
+                    for (ActionRow row : event.getMessage().getActionRows()) {
+                        List<ItemComponent> buttonRow = row.getComponents();
+                        int buttonIndex = buttonRow.indexOf(event.getButton());
+                        if (buttonIndex > -1) {
+                            buttonRow.remove(buttonIndex);
+                        }
+                        if (buttonRow.size() > 0) {
+                            actionRow2.add(ActionRow.of(buttonRow));
+                        }
+                    }
+                    if (!exhaustedMessage.contains("Click the names")) {
+                        exhaustedMessage = exhaustedMessage + ", "+msg;
+                    } else {
+                        exhaustedMessage = ident + msg;
+                    }
+                    event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
                 }
                 case "passForRound" -> {
                     player.setPassed(true);
@@ -3438,6 +3482,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "tacticalAction" -> {
                     String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex.";
                     List<Button> ringButtons = ButtonHelper.getPossibleRings(player, activeMap);
+                    activeMap.resetCurrentMovedUnitsFrom1TacticalAction();
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
                 }
                 case "ChooseDifferentDestination" -> {
@@ -4025,7 +4070,7 @@ public class ButtonListener extends ListenerAdapter {
                 // Cleanup");
                 List<Button> buttons = List.of(drawStage1, drawStage2);
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
-                event.getMessage().delete().queue();
+                event.getMessage().delete().queueAfter(20, TimeUnit.SECONDS);
             }
             case "pass_on_abilities" -> {
                 if (activeMap.isCustodiansScored()) {
