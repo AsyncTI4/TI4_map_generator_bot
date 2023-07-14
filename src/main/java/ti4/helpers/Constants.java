@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class Constants {
     public static final String SHOW_GAME = "show_game";
+    public static final String SWORDS_TO_PLOWSHARES = "swords_to_plowshares";
     public static final String ELIMINATE = "eliminate";
     public static final String FIX_SO_DECK = "fix_so_deck";
     public static final String SET_THREAD_NAME = "set_thread_name";
