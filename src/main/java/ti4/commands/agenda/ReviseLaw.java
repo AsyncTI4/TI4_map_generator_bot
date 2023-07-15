@@ -35,19 +35,21 @@ public class ReviseLaw extends AgendaSubcommandData {
 
         String optionText = null;
         boolean playerWasElected = !StringUtils.isNullOrEmpty(event.getOption(Constants.FACTION_COLOR, null, OptionMapping::getAsString));
+        String message = "Law revised";
         if (playerWasElected) {
             optionText = player.getFaction();
+            message = message + " with "+player.getColor() +" as the elected color";
         } else {
             optionText = event.getOption(Constants.ELECTED, null, OptionMapping::getAsString);
         }
-        
+    
         Player electedPlayer = Helper.getPlayerFromColorOrFaction(activeMap, optionText);
         if (electedPlayer != null) {
             optionText = electedPlayer.getFaction();
         }
         boolean success = activeMap.reviseLaw(option.getAsInt(), optionText);
         if (success) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Law revised");
+            MessageHelper.sendMessageToChannel(event.getChannel(), message);
         } else {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Law ID not found");
         }
