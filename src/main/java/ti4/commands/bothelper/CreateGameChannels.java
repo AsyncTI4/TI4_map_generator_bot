@@ -266,6 +266,14 @@ public class CreateGameChannels extends BothelperSubcommandData {
         int nextPBDNumber = Collections.max(getAllExistingPBDNumbers()) + 1;
         return "pbd" + nextPBDNumber;
     }
+    private static String getNextFOWGameName() {
+        ArrayList<Integer> existingNums = getAllExistingFOWNumbers();
+        if (existingNums.size() == 0) {
+            return "fow1";
+        }
+        int nextPBDNumber = Collections.max(getAllExistingFOWNumbers()) + 1;
+        return "fow" + nextPBDNumber;
+    }
 
     private static boolean gameOrRoleAlreadyExists(String name) {
         List<Guild> guilds = MapGenerator.jda.getGuilds();
@@ -317,6 +325,38 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .toList();
         for (String mapName : mapNames) {
             String pbdNum = mapName.replace("pbd", "");
+            if (Helper.isInteger(pbdNum)) {
+                pbdNumbers.add(Integer.parseInt(pbdNum));
+            }
+        }
+        return pbdNumbers;
+    }
+    private static ArrayList<Integer> getAllExistingFOWNumbers() {
+        List<Guild> guilds = MapGenerator.jda.getGuilds();
+        ArrayList<Integer> pbdNumbers = new ArrayList<>();
+
+        // GET ALL PBD ROLES FROM ALL GUILDS
+        for (Guild guild : guilds) {
+            System.out.println(guild.getName());
+            List<Role> pbdRoles = guild.getRoles().stream()
+                .filter(r -> r.getName().startsWith("fow"))
+                .toList();
+
+            //EXISTING ROLE NAMES
+            for (Role role : pbdRoles) {
+                String pbdNum = role.getName().replace("fow", "");
+                if (Helper.isInteger(pbdNum)) {
+                    pbdNumbers.add(Integer.parseInt(pbdNum));
+                }
+            }
+        }
+
+        // GET ALL EXISTING PBD MAP NAMES
+        List<String> mapNames = MapManager.getInstance().getMapList().keySet().stream()
+            .filter(mapName -> mapName.startsWith("fow"))
+            .toList();
+        for (String mapName : mapNames) {
+            String pbdNum = mapName.replace("fow", "");
             if (Helper.isInteger(pbdNum)) {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }
