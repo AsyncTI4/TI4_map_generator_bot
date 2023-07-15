@@ -69,8 +69,6 @@ public class ShowAC extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
             return;
         }
-        
-        ACInfo.sendActionCardInfo(activeMap, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeMap, sb.toString());
+        MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, sb.toString());
     }
 }
