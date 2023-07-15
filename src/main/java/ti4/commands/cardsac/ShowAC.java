@@ -52,8 +52,7 @@ public class ShowAC extends ACCardsSubcommandData {
         StringBuilder sb = new StringBuilder();
         sb.append("---------\n");
         sb.append("Game: ").append(activeMap.getName()).append("\n");
-        sb.append("Player: ").append(Helper.getPlayerRepresentation(player, activeMap));
-        sb.append("\n");
+        sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Showed Action Cards:").append("\n");
         sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
         sb.append("---------\n");
@@ -69,6 +68,8 @@ public class ShowAC extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "User for faction not found. Report to ADMIN");
             return;
         }
-        MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, sb.toString());
+        
+        ACInfo.sendActionCardInfo(activeMap, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeMap, sb.toString());
     }
 }

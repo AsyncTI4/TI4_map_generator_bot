@@ -99,7 +99,7 @@ public class PlanetAdd extends PlanetAddRemove {
             Planet planetReal = (Planet) unitHolder;
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeMap, planetReal);
             
-            if (event != null && buttons != null) {
+            if (event != null && buttons != null && !buttons.isEmpty()) {
                 String message = "Click button to explore " + Helper.getPlanetRepresentation(planet, activeMap);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
             }

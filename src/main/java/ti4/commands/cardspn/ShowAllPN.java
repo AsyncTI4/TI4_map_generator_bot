@@ -42,25 +42,22 @@ public class ShowAllPN extends PNCardsSubcommandData {
         }
 
         showAll(player, targetPlayer, activeMap, longPNDisplay);
-        
-        
     }
-     public void showAll(Player player, Player targetPlayer, Map activeMap, boolean longPNDisplay) {
-            StringBuilder sb = new StringBuilder();
-            sb.append("Game: ").append(activeMap.getName()).append("\n");
-            sb.append("Player: ").append(player.getUserName()).append("\n");
-            sb.append("Showed Promissory Notes:").append("\n");
-            List<String> promissoryNotes = new ArrayList<>(player.getPromissoryNotes().keySet());
-            Collections.shuffle(promissoryNotes);
-            int index = 1;
-            for (String id : promissoryNotes) {
-                sb.append(index).append(". ").append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
-                index++;
-            }
 
-            MessageHelper.sendPrivateMessageToPlayer(targetPlayer, activeMap, sb.toString());
-            MessageHelper.sendPrivateMessageToPlayer(player, activeMap, "All PNs shown to player");
+    public void showAll(Player player, Player targetPlayer, Map activeMap, boolean longPNDisplay) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Game: ").append(activeMap.getName()).append("\n");
+        sb.append("Player: ").append(player.getUserName()).append("\n");
+        sb.append("Showed Promissory Notes:").append("\n");
+        List<String> promissoryNotes = new ArrayList<>(player.getPromissoryNotes().keySet());
+        Collections.shuffle(promissoryNotes);
+        int index = 1;
+        for (String id : promissoryNotes) {
+            sb.append(index).append(". ").append(Mapper.getPromissoryNote(id, longPNDisplay)).append("\n");
+            index++;
+        }
 
-
-     }
+        MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, activeMap, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, "All PNs shown to player");
+    }
 }
