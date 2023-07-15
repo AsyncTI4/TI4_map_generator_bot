@@ -27,29 +27,26 @@ public class ShowAllSO extends SOCardsSubcommandData {
             sendMessage("Player could not be found");
             return;
         }
-         Player player_ = Helper.getPlayer(activeMap, null, event);
+        
+        Player player_ = Helper.getPlayer(activeMap, null, event);
         if (player_ == null) {
             sendMessage("Player not found");
             return;
         }
         showAll(player, player_, activeMap);
     }
-    public void showAll(Player player, Player player_, Map activeMap ){
+
+    public void showAll(Player player, Player player_, Map activeMap ) {
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(activeMap.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
         sb.append("Showed Secret Objectives:").append("\n");
         List<String> secrets = new ArrayList<>(player.getSecrets().keySet());
-        LinkedHashMap<String, Integer> secretsScored = player.getSecretsScored();
         Collections.shuffle(secrets);
         for (String id : secrets) {
             sb.append(SOInfo.getSecretObjectiveRepresentation(id)).append("\n");
-            if (!secretsScored.containsKey(id)) {
-                player.setSecret(id);
-            }
         }
-        MessageHelper.sendPrivateMessageToPlayer(player, activeMap, "All SOs shown to player");
-        MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeMap, sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, "All SOs shown to player");
     }
-
 }

@@ -1976,6 +1976,7 @@
     "phase": "Any",
     "window": "At any time:",
     "text": "You may use the SPACE CANNON ability of 1 of your units in any system against another player’s ship in or adjacent to that system.",
+    "flavorText": "",
     "source": "ds"
   },
   {
