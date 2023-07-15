@@ -17,6 +17,7 @@ import ti4.model.*;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -106,7 +107,12 @@ public class CreateTile extends BothelperSubcommandData {
 
     private static Set<WormholeModel.Wormhole> getWormholesFromString(String wormholeString) {
         WormholeModel wormholeModel = new WormholeModel();
-        return Stream.of(wormholeString.replace(" ", "").toLowerCase().split(",")).map(wormholeModel::getWormholeFromString).collect(Collectors.toSet());
+        return Stream.of(wormholeString
+                .replace(" ", "").
+                toLowerCase().split(","))
+                .filter(Objects::nonNull)
+                .map(wormholeModel::getWormholeFromString)
+                .collect(Collectors.toSet());
     }
 
     private static void exportTileModelToJson(TileModel tileModel) {
