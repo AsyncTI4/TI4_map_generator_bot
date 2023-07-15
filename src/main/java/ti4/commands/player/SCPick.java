@@ -153,6 +153,10 @@ public class SCPick extends PlayerSubcommandData {
                 }
             }
 
+            for (int sc : scPickedList) {
+                activeMap.setScTradeGood(sc, 0);
+            }
+
             Player nextPlayer = null;
             int lowestSC = 100;
             for (Player player_ : activePlayers) {

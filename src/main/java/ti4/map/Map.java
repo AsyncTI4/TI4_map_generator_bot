@@ -913,13 +913,14 @@ public class Map {
         sentAgendas.put(id, identifier);
     }
 
-    public void addDiscardAgenda(String id) {
+    public int addDiscardAgenda(String id) {
         Collection<Integer> values = discardAgendas.values();
         int identifier = new Random().nextInt(1000);
         while (values.contains(identifier)) {
             identifier = new Random().nextInt(1000);
         }
         discardAgendas.put(id, identifier);
+        return identifier;
     }
 
     public void addRevealedPublicObjective(String id) {
@@ -1373,6 +1374,42 @@ public class Map {
         }
         if (!id.isEmpty()) {
 
+            Collection<Integer> values = laws.values();
+            int identifier = new Random().nextInt(1000);
+            while (values.contains(identifier)) {
+                identifier = new Random().nextInt(1000);
+            }
+            discardAgendas.remove(id);
+            laws.put(id, identifier);
+            if (optionalText != null) {
+                lawsInfo.put(id, optionalText);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean reviseLaw(Integer idNumber, String optionalText) {
+
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> ac : laws.entrySet()) {
+            if (ac.getValue().equals(idNumber)) {
+                id = ac.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            laws.remove(id);
+            lawsInfo.remove(id);
+            idNumber=addDiscardAgenda(id);
+        }
+        for (java.util.Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
+            if (agendas.getValue().equals(idNumber)) {
+                id = agendas.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
             Collection<Integer> values = laws.values();
             int identifier = new Random().nextInt(1000);
             while (values.contains(identifier)) {
