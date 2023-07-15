@@ -118,8 +118,9 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
             sendMessage(Helper.getGuildInviteURL(guild));
             return;
         }
+        Role everyone = guild.getRolesByName("@everyone",true).get(0);
         long permission2 = Permission.MESSAGE_MANAGE.getRawValue() | Permission.VIEW_CHANNEL.getRawValue() | Permission.MANAGE_PERMISSIONS.getRawValue() | Permission.MANAGE_THREADS.getRawValue();
-        Category category =  guild.createCategory(gameName).addMemberPermissionOverride(gameOwner.getIdLong(), permission2, 0 ).complete();
+        Category category =  guild.createCategory(gameName).addRolePermissionOverride(everyone.getIdLong(), 0, permission2).addMemberPermissionOverride(gameOwner.getIdLong(), permission2, 0 ).complete();
         
         //CREATE ROLE
         Role role = guild.createRole()
