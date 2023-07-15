@@ -1038,7 +1038,7 @@ public class ButtonHelper {
         List<Button> buttons = new ArrayList<>();
         Button buildButton = Button.success(finChecker+"genericBuild_"+tile.getPosition(), "Build in "+tile.getRepresentationForButtons(activeMap, player));
         buttons.add(buildButton);
-        Button remove = Button.danger(finChecker+"genericRemove_"+tile.getPosition(), "Remove units in "+tile.getRepresentationForButtons(activeMap, player));
+        Button remove = Button.danger(finChecker+"getDamageButtons_"+tile.getPosition(), "Remove or damage units in "+tile.getRepresentationForButtons(activeMap, player));
         buttons.add(remove);
         Button validTile2 = Button.secondary(finChecker+"deleteButtons", "Delete these buttons");
         buttons.add(validTile2);
@@ -1082,7 +1082,7 @@ public class ButtonHelper {
             AddCC.addCC(event, player.getColor(), tile, true);
         }
         for(String unit :displacedUnits.keySet()){
-            
+            System.out.println(unit);
             int amount = displacedUnits.get(unit);
             if(unit.contains("damaged")){
                 unit = unit.replace("damaged", "");
@@ -1299,6 +1299,7 @@ public class ButtonHelper {
             case "gf"-> name = "Infantry";
             case "mf"-> name = "Mech";
             case "sd"-> name = "Spacedock";
+            case "csd"-> name = "Spacedock";
             case "pd"-> name = "pds";
             case "ff"-> name = "fighter";
             case "ca"-> name = "cruiser";
@@ -1373,8 +1374,8 @@ public class ButtonHelper {
                                 }
                                 Button validTile2 = Button.danger(finChecker+"unitTactical"+moveOrRemove+"_"+tile.getPosition()+"_"+x+unitKey+"damaged", moveOrRemove+" "+x+" damaged "+unitRepresentation.get(unitRepresentationKey)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
                                 buttons.add(validTile2);
-                                totalUnits = totalUnits-1;
                             }
+                            totalUnits = totalUnits-damagedUnits;
                             for(int x = 1; x < totalUnits +1; x++){
                                 if(x > 2){
                                     break;
@@ -1440,6 +1441,104 @@ public class ButtonHelper {
         }
         return buttons;
     }
+
+
+public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, Map activeMap, Tile tile) {
+        String finChecker = "FFCC_"+player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        java.util.Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
+        java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+        String cID = Mapper.getColorID(player.getColor());
+        for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+            String name = entry.getKey();
+            String representation = planetRepresentations.get(name);
+            if (representation == null){
+                representation = name;
+            }
+            UnitHolder unitHolder = entry.getValue();
+            HashMap<String, Integer> units = unitHolder.getUnits();
+            if (unitHolder instanceof Planet planet) {
+                for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                    String key = unitEntry.getKey();
+                   for (String unitRepresentationKey : unitRepresentation.keySet()) {
+                        if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {
+                            String unitKey = key.replace(cID+"_", "");
+                            unitKey = unitKey.replace(".png", "");
+                            unitKey = ButtonHelper.getUnitName(unitKey);
+                            int damagedUnits = 0;
+                            if(unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null){
+                                damagedUnits = unitHolder.getUnitDamage().get(key);
+                            }
+                            int totalUnits = unitEntry.getValue() - damagedUnits;
+                            for(int x = 1; x < totalUnits +1; x++){
+                                if(x > 2){
+                                    break;
+                                }
+                                Button validTile2 = Button.danger(finChecker+"assignHits_"+tile.getPosition()+"_"+x+unitKey+"_"+representation, "Remove "+x+" "+unitRepresentation.get(unitRepresentationKey) +" from "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeMap)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
+                                buttons.add(validTile2);
+                                if(key.contains("mf")){
+                                    Button validTile3 = Button.secondary(finChecker+"assignDamage_"+tile.getPosition()+"_"+x+unitKey+"_"+representation, "Sustain "+x+" "+unitRepresentation.get(unitRepresentationKey) +
+                                    "from "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeMap)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
+                                    buttons.add(validTile3);
+                                }
+                            }
+                            for(int x = 1; x < damagedUnits +1; x++){
+                                if(x > 2){
+                                    break;
+                                }
+                                Button validTile2 = Button.danger(finChecker+"assignHits_"+tile.getPosition()+"_"+x+unitKey+"_"+representation+"damaged", "Remove "+x+" damaged "+
+                                    unitRepresentation.get(unitRepresentationKey) + " from "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeMap)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
+                                buttons.add(validTile2);
+                            }
+                        }
+                    }
+                }
+            }
+            else{
+                for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
+                    String key = unitEntry.getKey();
+                    for (String unitRepresentationKey : unitRepresentation.keySet()) {
+                        if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {
+                            String unitKey = key.replace(cID+"_", "");
+                            int totalUnits = unitEntry.getValue();
+                            unitKey  = unitKey.replace(".png", "");
+                            unitKey = ButtonHelper.getUnitName(unitKey);
+                            int damagedUnits = 0;
+                            if(unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null){
+                                damagedUnits = unitHolder.getUnitDamage().get(key);
+                            }
+                            totalUnits = totalUnits-damagedUnits;
+                            for(int x = 1; x < damagedUnits +1; x++){
+                                if(x > 2){
+                                    break;
+                                }
+                                Button validTile2 = Button.danger(finChecker+"assignHits_"+tile.getPosition()+"_"+x+unitKey+"damaged", "Remove "+x+" damaged "+
+                                    unitRepresentation.get(unitRepresentationKey)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
+                                buttons.add(validTile2);
+                            }
+                            for(int x = 1; x < totalUnits +1; x++){
+                                if(x > 2){
+                                    break;
+                                }
+                                Button validTile2 = Button.danger(finChecker+"assignHits_"+tile.getPosition()+"_"+x+unitKey, "Remove "+x+" "+unitRepresentation.get(unitRepresentationKey)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
+                                buttons.add(validTile2);
+                            }
+                            if((unitKey.equalsIgnoreCase("dreadnought") || unitKey.equalsIgnoreCase("warsun") || unitKey.equalsIgnoreCase("flagship") || (unitKey.equalsIgnoreCase("cruiser") && player.hasTech("se2"))) && totalUnits > 0){
+                                Button validTile2 = Button.secondary(finChecker+"assignDamage_"+tile.getPosition()+"_"+1+unitKey, "Sustain "+1+" "+unitRepresentation.get(unitRepresentationKey)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
+                                buttons.add(validTile2);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        Button doAll = Button.secondary(finChecker+"assignHits_"+tile.getPosition()+"_All", "Remove all units");
+        Button concludeMove = Button.primary("deleteButtons", "Done removing/sustaining units");
+        buttons.add(doAll);
+        buttons.add(concludeMove);
+        return buttons;
+    }
+
     public static List<Player> tileHasPDS2Cover(Player player, Map activeMap, String tilePos) {
         
         Set<String> adjTiles = FoWHelper.getAdjacentTiles(activeMap, tilePos, player, false);
