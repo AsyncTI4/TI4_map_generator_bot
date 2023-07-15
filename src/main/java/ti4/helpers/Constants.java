@@ -5,6 +5,8 @@ import java.util.ArrayList;
 
 public class Constants {
     public static final String SHOW_GAME = "show_game";
+    public static final String FOWGM = "fowgm";
+    public static final String FOW_CATEGORY = "fow_category";
     public static final String SWORDS_TO_PLOWSHARES = "swords_to_plowshares";
     public static final String ELIMINATE = "eliminate";
     public static final String FIX_SO_DECK = "fix_so_deck";
@@ -651,6 +653,7 @@ public class Constants {
     public static final String KELERES_HERO_MENTAK = "keleres_hero_mentak";
     public static final String BOTHELPER = "bothelper";
     public static final String CREATE_GAME_CHANNELS = "create_game_channels";
+    public static final String CREATE_FOW_GAME_CHANNELS = "create_fow_game_channels";
     public static final String IMPORT_TTPG = "import_ttpg";
     public static final String TTPG_FILE_NAME = "ttpg_file_name";
     public static final String GAME_FUN_NAME = "game_fun_name";

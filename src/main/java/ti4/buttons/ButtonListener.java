@@ -819,8 +819,8 @@ public class ButtonListener extends ListenerAdapter {
             }
             player2.removeActionCard(acNum);
             player.setActionCard(acID);
-            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeMap), "Acquired " + acID);
-            MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(activeMap), "Lost " + acID);
+            MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + "Acquired " + acID);
+            MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+" Lost " + acID +" to mageon");
             ACInfo.sendActionCardInfo(activeMap, player2);
             ACInfo.sendActionCardInfo(activeMap, player);
 
