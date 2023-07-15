@@ -60,9 +60,13 @@ public class ShowSO extends SOCardsSubcommandData {
             sendMessage("Player not found");
             return;
         }
-        
-        sendMessage("SO shown to player");
-        SOInfo.sendSecretObjectiveInfo(activeMap, player);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeMap, sb.toString());
+        User user = MapGenerator.jda.getUserById(player_.getUserID());
+        if (user == null) {
+            sendMessage("User for faction not found. Report to ADMIN");
+            return;
+        }
+
+        sendMessage("SO shown to player - check DMs");
+        MessageHelper.sendMessageToUser(sb.toString(), user);
     }
 }

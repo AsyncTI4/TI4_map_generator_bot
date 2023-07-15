@@ -68,9 +68,12 @@ public class ShowPN extends PNCardsSubcommandData {
         sb.append(Mapper.getPromissoryNote(acID, longPNDisplay)).append("\n");
         sb.append("---------\n");
         player.setPromissoryNote(acID);
-        
+        User user = MapGenerator.jda.getUserById(targetPlayer.getUserID());
+        if (user == null) {
+            sendMessage("User for faction not found. Report to ADMIN");
+            return;
+        }
+        MessageHelper.sendMessageToUser(sb.toString(), user);
         sendMessage("PN shown");
-        PNInfo.sendPromissoryNoteInfo(activeMap, player, longPNDisplay);
-        MessageHelper.sendMessageToPlayerCardsInfoThread(targetPlayer, activeMap, sb.toString());
     }
 }
