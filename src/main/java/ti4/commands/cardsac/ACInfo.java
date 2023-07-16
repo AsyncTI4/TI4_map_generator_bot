@@ -180,6 +180,14 @@ public class ACInfo extends ACCardsSubcommandData {
                 }
             }
             acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
+            if (player.hasLeader("nekroagent")&&!player.getLeaderByID("nekroagent").isExhausted()) {
+                Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro")));
+                acButtons.add(nekroButton);
+            }
+            if (player.hasLeader("hacanagent")&&!player.getLeaderByID("hacanagent").isExhausted()) {
+                Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+                acButtons.add(nekroButton);
+            }
         }
         return acButtons;
     }

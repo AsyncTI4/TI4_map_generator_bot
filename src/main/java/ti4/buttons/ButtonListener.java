@@ -316,7 +316,20 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
             }
-
+        } else if (buttonID.startsWith("hacanAgentRefresh_")) {
+            String faction = buttonID.replace("hacanAgentRefresh_", "");
+            Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, faction);
+            String message = "";
+            if(p2.hasLeader("hacanagent")){
+                p2.setCommodities(p2.getCommodities()+2);
+                message = trueIdentity+"Increased your commodities by two";
+            }else{
+                p2.setCommodities(p2.getCommoditiesTotal());
+                ButtonHelper.resolveMinisterOfCommerceCheck(activeMap, p2, event);
+                message = "Refreshed " +p2.getColor()+ "'s commodities";
+            }
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("exhaustAgent_")) {
             String agent = buttonID.replace("exhaustAgent_","");
             String rest = agent;
@@ -325,14 +338,47 @@ public class ButtonListener extends ListenerAdapter {
                 agent = agent.substring(0, agent.indexOf("_"));
             }
             Leader playerLeader = player.getLeader(agent);
+            MessageChannel channel2 =activeMap.getMainGameChannel();
+            if(activeMap.isFoWMode()){
+                channel2 = player.getPrivateChannel();
+            }
             playerLeader.setExhausted(true);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),Helper.getFactionLeaderEmoji(playerLeader));
-                    StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
-                            .append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),messageText.toString());
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),Helper.getFactionLeaderEmoji(playerLeader));
+            StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
+                    .append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
+            MessageHelper.sendMessageToChannel(channel2,messageText.toString());
             if(agent.equalsIgnoreCase("naazagent")){
                 List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeMap);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),"Use buttons to explore", buttons);
+            }
+            if(agent.equalsIgnoreCase("empyreanagent")){
+                Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+                Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+                Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+                Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+                List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+                String message2 = trueIdentity + "! Your current CCs are "+Helper.getPlayerCCs(player)+". Use buttons to gain a CC";
+                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+            }
+            if(agent.equalsIgnoreCase("nekroagent")){
+                player.setTg(player.getTg()+2);
+                ButtonHelper.pillageCheck(player, activeMap);
+                String message = trueIdentity+" increased your tgs by 2 ("+(player.getTg()-2)+"->"+player.getTg()+"). Use buttons in your cards info thread to discard an AC";
+                MessageHelper.sendMessageToChannel(channel2, message);
+                MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeMap), trueIdentity+" use buttons to discard", ACInfo.getDiscardActionCardButtons(activeMap, player, false));
+            }
+            if(agent.equalsIgnoreCase("hacanagent")){
+               
+                String message = trueIdentity+" select faction you wish to use your agent on";
+                List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, "hacanAgentRefresh", null);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, message, buttons);
+            }
+            if(agent.equalsIgnoreCase("xxchaagent")){
+                String faction = rest.replace("xxchaagent_","");
+                Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, faction);
+                String message = "Use buttons to ready a planet";
+                List<Button> ringButtons = ButtonHelper.getXxchaAgentReadyButtons(activeMap, p2);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+ message, ringButtons);
             }
             if(agent.equalsIgnoreCase("yinagent")){
                 String posNFaction = rest.replace("yinagent_","");
@@ -1691,6 +1737,10 @@ public class ButtonListener extends ListenerAdapter {
                     if (player.hasTechReady("st")&&!buttonID.equalsIgnoreCase("muaatagent")) {
                         Button sarweenButton = Button.danger("exhaustTech_st", "Use Sarween");
                         buttons.add(sarweenButton);
+                    }
+                    if (player.hasLeader("winnuagent")&&!player.getLeaderByID("winnuagent").isExhausted()&&!buttonID.equalsIgnoreCase("muaatagent")) {
+                        Button winnuButton = Button.danger("exhaustAgent_winnuagent", "Use Winnu Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("winnu")));
+                        buttons.add(winnuButton);
                     }
                     Button DoneExhausting = null;
                     if (!buttonID.contains("deleteButtons")) {
@@ -3693,8 +3743,18 @@ public class ButtonListener extends ListenerAdapter {
                         systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
                         systemButtons = ButtonHelper.landAndGetBuildButtons(player, activeMap, event);
                     } else {
+                        ButtonHelper.resolveEmpyCommanderCheck(player, activeMap, tile, event);
+                        List<Button> empyButtons = new ArrayList<Button>();
+                        if ((tile.getUnitHolders().values().size() == 1) && player.hasLeader("empyreanagent")&&!player.getLeaderByID("empyreanagent").isExhausted()) {
+                            Button empyButton = Button.secondary("exhaustAgent_empyreanagent", "Use Empyrean Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("empyrean")));
+                            empyButtons.add(empyButton);
+                            empyButtons.add(Button.danger("deleteButtons", "Decline"));
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity+" use button to exhaust Empy agent", empyButtons);
+                        }
+
                         systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
                         List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeMap, tile);
+                        
                         if(players.size() > 0){
                             Player player2 = players.get(0);
                             String messageCombat = "Resolve space combat.";
