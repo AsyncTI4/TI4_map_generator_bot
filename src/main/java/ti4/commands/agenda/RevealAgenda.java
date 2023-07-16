@@ -53,7 +53,7 @@ public class RevealAgenda extends AgendaSubcommandData {
 
         if(agendaName.equalsIgnoreCase("Emergency Session"))
         {
-            MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeMap.getGuild(), activeMap)+" Emergency Session revealed, flipping next agenda");
+            MessageHelper.sendMessageToChannel(channel, "# "+Helper.getGamePing(activeMap.getGuild(), activeMap)+" Emergency Session revealed. This agenda phase will have an additional agenda compared to normal. Flipping next agenda");
             revealAgenda(event, revealFromBottom, activeMap, channel);
             return;
         }

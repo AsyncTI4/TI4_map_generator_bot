@@ -63,11 +63,11 @@ public class ButtonHelper {
                 Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
                 buttons.add(lost3TG);
             }
-            if (player.hasLeader("keleresagent")&&player.getCommodities() > 0) {
+            if (player.hasLeader("keleresagent")&&!player.getLeader("keleresagent").isExhausted()&&player.getCommodities() > 0) {
                 Button lost1C = Button.danger("reduceComm_1", "Spend 1 comm");
                 buttons.add(lost1C);
             }
-            if (player.hasLeader("keleresagent")&&player.getCommodities() > 1) {
+            if (player.hasLeader("keleresagent")&&!player.getLeader("keleresagent").isExhausted()&&player.getCommodities() > 1) {
                 Button lost2C = Button.danger("reduceComm_2", "Spend 2 comms");
                 buttons.add(lost2C);
             }
@@ -176,7 +176,7 @@ public class ButtonHelper {
                 buttons.add(Button.success("useTA_"+player.getColor(), "Use TA"));
                 buttons.add(Button.danger("deleteButtons", "Decline to use TA"));
                 String message = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) +" a player who's TA you hold has refreshed their comms, would you like to play the TA?";
-                MessageHelper.sendMessageToChannelWithButtons(p2.getPrivateChannel(), message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeMap), message, buttons);
             }
         }
     }
@@ -742,6 +742,19 @@ public class ButtonHelper {
         }
 
     }
+    public static List<Button> getButtonsToExploreAllPlanets(Player player, Map activeMap){
+         String finChecker = "FFCC_"+player.getFaction() + "_";
+        List<Button> buttons = new ArrayList<>();
+        for(String plan : player.getPlanets()){
+            UnitHolder planetUnit = activeMap.getPlanetsInfo().get(plan);
+            Planet planetReal =  (Planet) planetUnit;    
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null) {
+                List<Button> planetButtons = getPlanetExplorationButtons(activeMap, planetReal);
+                buttons.addAll(planetButtons);
+            }
+        }
+        return buttons;
+    }
     public static List<Button> getEndOfTurnAbilities(Player player, Map activeMap) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> endButtons = new ArrayList<>();
@@ -771,6 +784,10 @@ public class ButtonHelper {
         if(player.getTechs().contains("bs") && !player.getExhaustedTechs().contains("bs")){
             endButtons.add(Button.success(finChecker+"exhaustTech_bs", "Exhaust Bio-Stims"));
         }
+        if(player.hasLeader("naazagent")&& !player.getLeader("naazagent").isExhausted()){
+            endButtons.add(Button.success(finChecker+"exhaustAgent_naazagent", "Use NRA Agent"));
+        }
+
         endButtons.add(Button.danger("deleteButtons", "Delete these buttons"));
         return endButtons;
     }
@@ -1224,7 +1241,7 @@ public class ButtonHelper {
         activeMap.resetCurrentMovedUnitsFrom1System();
         Button buildButton = Button.success(finChecker+"tacticalActionBuild_"+activeMap.getActiveSystem(), "Build in this system");
         buttons.add(buildButton);
-        Button concludeMove = Button.danger(finChecker+"doneWithTacticalAction", "Conclude tactical action");
+        Button concludeMove = Button.danger(finChecker+"doneWithTacticalAction", "Conclude tactical action (will auto DET explore)");
         buttons.add(concludeMove);
         return buttons;
     }
