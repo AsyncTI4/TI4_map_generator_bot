@@ -346,6 +346,14 @@ public class ButtonHelper {
         }
         return techPresent;
     }
+     public static  List<Button> getXxchaAgentReadyButtons(Map activeMap, Player player) {
+        List<Button> buttons = new ArrayList<Button>();
+        for(String planet : player.getExhaustedPlanets()){
+            buttons.add(Button.success("refresh_"+planet, "Ready "+Helper.getPlanetRepresentation(planet, activeMap)));
+        }
+        buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
+        return buttons;
+     }
     public static void sendAllTechsNTechSkipPlanetsToReady(Map activeMap, GenericInteractionCreateEvent event, Player player) {
         List<Button> buttons = new ArrayList<Button>();
         for(String tech : player.getExhaustedTechs()){
@@ -779,6 +787,11 @@ public class ButtonHelper {
             String finChecker = "FFCC_"+letnev.getFaction() + "_";
             buttons.add(Button.secondary(finChecker+"exhaustAgent_letnevagent", "Use Letnev Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("letnev"))));
         }
+        Player nomad = Helper.getPlayerFromUnlockedLeader(activeMap, "nomadagentthundarian");
+        if(nomad != null && !nomad.getLeaderByID("nomadagentthundarian").isExhausted()){
+            String finChecker = "FFCC_"+nomad.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"exhaustAgent_nomadagentthundarian", "Use Thundarian").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nomad"))));
+        }
         Player yin = Helper.getPlayerFromUnlockedLeader(activeMap, "yinagent");
         if(yin != null && !yin.getLeaderByID("yinagent").isExhausted()){
             String finChecker = "FFCC_"+yin.getFaction() + "_";
@@ -1077,6 +1090,20 @@ public class ButtonHelper {
         }
         return buttons;
     }
+    public static void resolveEmpyCommanderCheck(Player player, Map activeMap, Tile tile, GenericInteractionCreateEvent event) {
+
+        for(Player p2 : activeMap.getRealPlayers()){
+            if(p2 != player && AddCC.hasCC(event, p2.getColor(), tile) && activeMap.playerHasLeaderUnlockedOrAlliance(player, "empyreancommander")){
+                MessageChannel channel = activeMap.getMainGameChannel();
+                if(activeMap.isFoWMode()){
+                    channel = p2.getPrivateChannel();
+                }
+                RemoveCC.removeCC(event, p2.getColor(), tile, activeMap);
+                String message = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+ " due to having the empyrean commander, the cc you had in the active system has been removed. Reminder that this is optional but was done automatically";
+                MessageHelper.sendMessageToChannel(channel, message);
+            }
+        }
+    }
 
     public static List<Tile> getTilesWithShipsInTheSystem(Player player, Map activeMap) {
         List<Tile> buttons = new ArrayList<>();
@@ -1125,6 +1152,14 @@ public class ButtonHelper {
                 buttons.add(validTile);
 			}
 		}
+        if (player.hasLeader("saaragent")&&!player.getLeaderByID("saaragent").isExhausted()) {
+            Button saarButton = Button.secondary("exhaustAgent_saaragent", "Use Saar Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("saar")));
+            buttons.add(saarButton);
+        }
+        if (player.hasLeader("ghostagent")&&!player.getLeaderByID("ghostagent").isExhausted() && FoWHelper.doesTileHaveWHs(activeMap, activeMap.getActiveSystem(), player)) {
+            Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Ghost Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("ghost")));
+            buttons.add(ghostButton);
+        }
         Button validTile = Button.danger(finChecker+"concludeMove", "Done moving");
         buttons.add(validTile);
         Button validTile2 = Button.primary(finChecker+"ChooseDifferentDestination", "Activate a different system");
@@ -2252,7 +2287,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 Leader playerLeader = p1.getLeader(buttonID);
 		
                 if(buttonID.contains("agent")){
-                    if(!buttonID.equalsIgnoreCase("naaluagent") && !buttonID.equalsIgnoreCase("muaatagent")){
+                    if(!buttonID.equalsIgnoreCase("naaluagent") && !buttonID.equalsIgnoreCase("muaatagent") && !buttonID.equalsIgnoreCase("xxchaagent")){
                         playerLeader.setExhausted(true);
                         MessageHelper.sendMessageToChannel(event.getMessageChannel(),Helper.getFactionLeaderEmoji(playerLeader));
                         StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(p1, activeMap))

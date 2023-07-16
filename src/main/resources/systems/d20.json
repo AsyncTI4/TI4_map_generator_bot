@@ -1,1 +1,1 @@
-{"id":"d20","name":"Drah","aliases":["d20","drah","trykk","tryk","dra","ghemina","raiders","em","DS_ghemina"],"imagePath":"D20_Drah.png","shipPositionsType":"TYPE02","spaceTokenLocations":[{"x":180.0,"y":0.0},{"x":220.0,"y":60.0},{"x":45.0,"y":120.0},{"x":95.0,"y":170.0}],"wormholes":[],"planets":["drah","trykk"]}
+{"id":"d20","name":"Drah","aliases":["d20","drah","trykk","tryk","dra","ghemina","raiders","em","DS_ghemina"],"imagePath":"D20_Drah.png","shipPositionsType":"TYPE02","spaceTokenLocations":[],"wormholes":[],"planets":["drah","trykk"]}
