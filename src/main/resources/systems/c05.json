@@ -1,1 +1,1 @@
-{"id":"c05","name":"Horace","aliases":["c05","horace"],"imagePath":"C05_Horace.png","shipPositionsType":"TYPE14","spaceTokenLocations":[],"wormholes":["BETA"],"planets":["horace"]}
+{"id":"c05","name":"Horace","aliases":["c05","horace"],"imagePath":"C05_Horace.png","shipPositionsType":"TYPE14","spaceTokenLocations":[{"x":195.0,"y":10.0},{"x":225.0,"y":75.0},{"x":225.0,"y":155.0},{"x":145.0,"y":205.0}],"wormholes":["BETA"],"planets":["horace"]}
