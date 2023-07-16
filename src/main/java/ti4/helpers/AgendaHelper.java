@@ -2,6 +2,7 @@ package ti4.helpers;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
+import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.*;
@@ -10,6 +11,9 @@ import org.apache.commons.lang3.StringUtils;
 
 import ti4.buttons.ButtonListener;
 import ti4.commands.agenda.ListVoteCount;
+import ti4.commands.cardsso.SOInfo;
+import ti4.commands.special.RiseOfMessiah;
+import ti4.commands.special.SwordsToPlowsharesTGGain;
 import ti4.generator.Mapper;
 import ti4.map.Leader;
 import ti4.map.Map;
@@ -18,9 +22,202 @@ import ti4.map.Player;
 import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.AgendaModel;
 
 
 public class AgendaHelper {
+
+    public static void resolveAgenda(Map activeMap, String buttonID, ButtonInteractionEvent event, MessageChannel actionsChannel) {
+        String winner = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
+            String agendaid = activeMap.getCurrentAgendaInfo().substring(
+                    activeMap.getCurrentAgendaInfo().lastIndexOf("_") + 1, activeMap.getCurrentAgendaInfo().length());
+            int aID = 0;
+            if (agendaid.equalsIgnoreCase("CL")) {
+                String id2 = activeMap.revealAgenda(false);
+                LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
+                AgendaModel agendaDetails = Mapper.getAgenda(id2);
+                String agendaName = agendaDetails.getName();
+                MessageHelper.sendMessageToChannel(actionsChannel, "The hidden agenda was " + agendaName
+                        + "! You can find it added as a law or in the discard.");
+                Integer uniqueID = discardAgendas.get(id2);
+                aID = uniqueID;
+            } else {
+                aID = Integer.parseInt(agendaid);
+            }
+            LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
+                String agID ="";
+                for (java.util.Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
+                    if (agendas.getValue().equals(aID)) {
+                        agID = agendas.getKey();
+                        break;
+                    }
+                }
+
+            if (activeMap.getCurrentAgendaInfo().startsWith("Law")) {
+                if (activeMap.getCurrentAgendaInfo().contains("Player")) {
+                    Player player2 = Helper.getPlayerFromColorOrFaction(activeMap, winner);
+                    if (player2 != null) {
+                        activeMap.addLaw(aID, winner);
+                    }
+                    MessageHelper.sendMessageToChannel(event.getChannel(),
+                            "Added Law with " + winner + " as the elected!");
+                } else {
+                    if (winner.equalsIgnoreCase("for")) {
+                        activeMap.addLaw(aID, null);
+                        MessageHelper.sendMessageToChannel(event.getChannel(), Helper.getGamePing(activeMap.getGuild(), activeMap)+" Added law to map!");
+                    }
+                    if(agID.equalsIgnoreCase("regulations")){
+                        if (winner.equalsIgnoreCase("for")) {
+                            for(Player playerB : activeMap.getRealPlayers()){
+                            if(playerB.getFleetCC() > 4){
+                                    playerB.setFleetCC(4);
+                            }
+                            }
+                            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), Helper.getGamePing(activeMap.getGuild(), activeMap)+" Reduced people's fleets to 4 if they had more than that");
+                        }else{
+                            for(Player playerB : activeMap.getRealPlayers()){
+                                playerB.setFleetCC(playerB.getFleetCC()+1);
+                            }
+                            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), Helper.getGamePing(activeMap.getGuild(), activeMap)+" Gave everyone 1 extra fleet CC");
+
+                        }   
+                    }
+                    if (activeMap.getCurrentAgendaInfo().contains("Secret")) {
+                        activeMap.addLaw(aID, winner);
+                        int soID = 0;
+                        String soName = winner;
+                        Player playerWithSO = null;
+
+                        for (java.util.Map.Entry<String, Player> playerEntry : activeMap.getPlayers().entrySet()) {
+                            Player player_ = playerEntry.getValue();
+                            LinkedHashMap<String, Integer> secretsScored = new LinkedHashMap<>(
+                                    player_.getSecretsScored());
+                            for (java.util.Map.Entry<String, Integer> soEntry : secretsScored.entrySet()) {
+                                if (soEntry.getKey().equals(soName)) {
+                                    soID = soEntry.getValue();
+                                    playerWithSO = player_;
+                                    break;
+                                }
+                            }
+                        }
+
+                        if (playerWithSO == null) {
+                            MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
+                            return;
+                        }
+                        if (soName.isEmpty()) {
+                            MessageHelper.sendMessageToChannel(event.getChannel(), "Can make just Scored SO to Public");
+                            return;
+                        }
+                        activeMap.addToSoToPoList(soName);
+                        Integer poIndex = activeMap.addCustomPO(soName, 1);
+                        activeMap.scorePublicObjective(playerWithSO.getUserID(), poIndex);
+
+                        String sb = "**Public Objective added from Secret:**" + "\n" +
+                                "(" + poIndex + ") " + "\n" +
+                                Mapper.getSecretObjectivesJustNames().get(soName) + "\n";
+                        MessageHelper.sendMessageToChannel(event.getChannel(), sb);
+
+                        SOInfo.sendSecretObjectiveInfo(activeMap, playerWithSO, event);
+
+                    }
+                }
+            } else {
+                 
+                
+                if(agID.equalsIgnoreCase("mutiny")){
+                    List<Player> winOrLose = null;
+                    StringBuilder message = new StringBuilder("");
+                    Integer poIndex = 5;
+                    if (winner.equalsIgnoreCase("for")) {
+                        winOrLose = AgendaHelper.getWinningVoters(winner, activeMap);
+                        poIndex = activeMap.addCustomPO("Mutiny", 1);
+
+                    }else{
+                        winOrLose = AgendaHelper.getLosingVoters(winner, activeMap);
+                        poIndex = activeMap.addCustomPO("Mutiny", -1);
+                    }
+                    message.append("Custom PO 'Mutiny' has been added.\n");
+                    for(Player playerWL : winOrLose){
+                        activeMap.scorePublicObjective(playerWL.getUserID(), poIndex);
+                        message.append(Helper.getPlayerRepresentation(playerWL, activeMap)).append(" scored 'Mutiny'\n");
+                    }
+                    MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message.toString());     
+                }
+                if(agID.equalsIgnoreCase("plowshares")){
+                    if (winner.equalsIgnoreCase("for")) {
+                        for(Player playerB : activeMap.getRealPlayers()){
+                            new SwordsToPlowsharesTGGain().doSwords(playerB, event, activeMap);
+                        }
+                    }else{
+                        for(Player playerB : activeMap.getRealPlayers()){
+                            new RiseOfMessiah().doRise(playerB, event, activeMap);
+                        }
+                    }   
+                }
+                if(agID.equalsIgnoreCase("economic_equality")){
+                    int tg = 0;
+                    if (winner.equalsIgnoreCase("for")) {
+                        for(Player playerB : activeMap.getRealPlayers()){
+                            playerB.setTg(5);
+                            ButtonHelper.pillageCheck(playerB, activeMap);
+                        }
+                        tg = 5;
+                    }else{
+                         for(Player playerB : activeMap.getRealPlayers()){
+                             playerB.setTg(0);
+                        }
+                    }   
+                    MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), Helper.getGamePing(activeMap.getGuild(), activeMap)+" Set everyone's tgs to "+tg);
+                }
+                
+                if (activeMap.getCurrentAgendaInfo().contains("Law")) {
+                    // Figure out law
+                }
+            }
+            String summary = AgendaHelper.getSummaryOfVotes(activeMap, false);
+            List<Player> riders = AgendaHelper.getWinningRiders(summary, winner, activeMap);
+            String ridSum = " has a rider to resolve.";
+            for (Player rid : riders) {
+                String rep = Helper.getPlayerRepresentation(rid, activeMap, event.getGuild(), true);
+                if (rid != null) {
+                    String message = "";
+                    if (rid.hasAbility("future_sight")) {
+                        message = rep
+                                + "You have a rider to resolve or you voted for the correct outcome. Either way a tg has been added to your total due to your future sight ability. ("
+                                + rid.getTg() + "-->" + (rid.getTg() + 1) + ")";
+                        rid.setTg(rid.getTg() + 1);
+                        ButtonHelper.pillageCheck(rid, activeMap);
+                    } else {
+                        message = rep + "You have a rider to resolve";
+                    }
+                    if (activeMap.isFoWMode()) {
+                        MessageHelper.sendPrivateMessageToPlayer(rid, activeMap, message);
+                    } else {
+                        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
+                    }
+                }
+            }
+            if (activeMap.isFoWMode()) {
+                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(),
+                        "Sent pings to all those who ridered");
+            } else {
+                if (riders.size() > 0) {
+                    MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), ridSum);
+                }
+
+            }
+            String voteMessage = "Resolving vote for " + StringUtils.capitalize(winner)
+                    + ". Click the buttons for next steps after you're done resolving riders.";
+
+            Button flipNextAgenda = Button.primary("flip_agenda", "Flip Agenda");
+            Button proceedToStrategyPhase = Button.success("proceed_to_strategy",
+                    "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)");
+            List<Button> resActionRow = List.of(flipNextAgenda, proceedToStrategyPhase);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
+
+            event.getMessage().delete().queue();
+    }
 
      public static void pingMissingPlayers(Map activeMap) {
         List<Player> missingPlayersWhens = ButtonHelper.getPlayersWhoHaventReacted(activeMap.getLatestWhenMsg(), activeMap);
