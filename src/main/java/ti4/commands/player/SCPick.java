@@ -195,7 +195,7 @@ public class SCPick extends PlayerSubcommandData {
             
             if(!allPicked)
             {
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, privatePlayer));
             }
             else{
                    
@@ -213,7 +213,7 @@ public class SCPick extends PlayerSubcommandData {
                 if(!allPicked && !activeMap.isHomeBrewSCMode())
                 {
                     activeMap.updateActivePlayer(privatePlayer);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra+"\nUse Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra+"\nUse Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, privatePlayer));
                 }
                 else{
                     if(allPicked)

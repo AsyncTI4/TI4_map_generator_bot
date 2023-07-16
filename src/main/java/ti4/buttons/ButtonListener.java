@@ -320,6 +320,12 @@ public class ButtonListener extends ListenerAdapter {
                 List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeMap);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),"Use buttons to explore", buttons);
             }
+            if(agent.contains("yinagent")){
+                String pos = agent.replace("yinagent_","");
+                List<Button> buttons = ButtonHelper.getButtonsToExploreAllPlanets(player, activeMap);
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),"Use buttons to explore", buttons);
+            }
+
             String exhaustedMessage = event.getMessage().getContentRaw();
                      List<ActionRow> actionRow2 = new ArrayList<>();
                     for (ActionRow row : event.getMessage().getActionRows()) {
@@ -644,9 +650,7 @@ public class ButtonListener extends ListenerAdapter {
                 
                 File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, 0, pos, event);
                 MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
-                List<Button> buttons = new ArrayList<Button>();
-                buttons.add(Button.danger("getDamageButtons_"+pos, "Assign Hits"));
-                buttons.add(Button.primary("refreshViewOfSystem_"+pos, "Refresh Picture"));
+                List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeMap,  pos);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
             } else if (buttonID.startsWith("getDamageButtons_")) {
                 String pos = buttonID.replace("getDamageButtons_", "");
@@ -3631,9 +3635,7 @@ public class ButtonListener extends ListenerAdapter {
                                                     }
                                                     File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, context, tile.getPosition(), event);
                                                     MessageHelper.sendMessageWithFile((MessageChannel) threadChannel_, systemWithContext, "Picture of system", false);
-                                                    List<Button> buttons = new ArrayList<Button>();
-                                                    buttons.add(Button.danger("getDamageButtons_"+tile.getPosition(), "Assign Hits"));
-                                                    buttons.add(Button.primary("refreshViewOfSystem_"+tile.getPosition(), "Refresh Picture"));
+                                                    List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeMap,  tile.getPosition());
                                                     MessageHelper.sendMessageToChannelWithButtons((MessageChannel) threadChannel_, "", buttons);
                                                     if (playersWithPds2.size() > 0) {
                                                         String pdsMessage = "The following players have pds2 cover in the region:";
@@ -4171,7 +4173,7 @@ public class ButtonListener extends ListenerAdapter {
                         // MessageHelper.sendPrivateMessageToPlayer(speaker, activeMap, message);
                         if (!activeMap.isHomeBrewSCMode()) {
                             MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(),
-                                    message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                                    message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, speaker));
                         } else {
                             MessageHelper.sendPrivateMessageToPlayer(speaker, activeMap, message);
                         }
@@ -4179,7 +4181,7 @@ public class ButtonListener extends ListenerAdapter {
                         // MessageHelper.sendMessageToChannel(event.getChannel(), message);
                         if (!activeMap.isHomeBrewSCMode()) {
                             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),
-                                    message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                                    message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, speaker));
                         } else {
                             MessageHelper.sendMessageToChannel(event.getChannel(), message);
                         }
