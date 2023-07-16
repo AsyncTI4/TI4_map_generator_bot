@@ -755,6 +755,10 @@ public class ButtonHelper {
         }
         return buttons;
     }
+    public static List<Button> getButtonsForAgentSelection(Map activeMap, String agent){
+        List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, "exhaustAgent_"+agent, null);
+        return buttons;
+    }
     public static List<Button> getButtonsForPictureCombats(Map activeMap, String pos){
         
         List<Button> buttons = new ArrayList<>();
@@ -778,8 +782,29 @@ public class ButtonHelper {
         Player yin = Helper.getPlayerFromUnlockedLeader(activeMap, "yinagent");
         if(yin != null && !yin.getLeaderByID("yinagent").isExhausted()){
             String finChecker = "FFCC_"+yin.getFaction() + "_";
-            buttons.add(Button.secondary(finChecker+"exhaustAgent_yinagent_"+pos, "Use Yin Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("yin"))));
+            buttons.add(Button.secondary(finChecker+"yinagent_"+pos, "Use Yin Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("yin"))));
         }
+        return buttons;
+    }
+    public static List<Button> getYinAgentButtons(Player player, Map activeMap, String pos) {
+        List<Button> buttons = new ArrayList<>();
+        Tile tile = activeMap.getTileByPosition(pos);
+        String placePrefix = "placeOneNDone_skipbuild";
+        String tp = tile.getPosition();
+        Button ff2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2ff_"+tp, "Place 2 Fighters" );
+        ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
+        buttons.add(ff2Button);
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            if (unitHolder instanceof Planet planet){
+                String pp = planet.getName();
+                Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_"+pp, "Place 2 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap) );
+                inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                buttons.add(inf2Button);
+            }
+        }
+
+
+
         return buttons;
     }
     public static List<Button> getEndOfTurnAbilities(Player player, Map activeMap) {
@@ -1120,7 +1145,7 @@ public class ButtonHelper {
         }
         int cc = player.getTacticalCC();
         
-        if (!AddCC.hasCC(event, player.getColor(), tile)) {
+        if (!activeMap.getNaaluAgent()&&!AddCC.hasCC(event, player.getColor(), tile)) {
             cc -= 1;
             player.setTacticalCC(cc);
             AddCC.addCC(event, player.getColor(), tile, true);
@@ -1268,7 +1293,7 @@ public class ButtonHelper {
         activeMap.resetCurrentMovedUnitsFrom1System();
         Button buildButton = Button.success(finChecker+"tacticalActionBuild_"+activeMap.getActiveSystem(), "Build in this system");
         buttons.add(buildButton);
-        Button concludeMove = Button.danger(finChecker+"doneWithTacticalAction", "Conclude tactical action (will auto DET explore)");
+        Button concludeMove = Button.danger(finChecker+"doneWithTacticalAction", "Conclude tactical action (will auto DET explore if applicable)");
         buttons.add(concludeMove);
         return buttons;
     }
@@ -2227,14 +2252,18 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 Leader playerLeader = p1.getLeader(buttonID);
 		
                 if(buttonID.contains("agent")){
-                    playerLeader.setExhausted(true);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),Helper.getFactionLeaderEmoji(playerLeader));
-                    StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(p1, activeMap))
-                            .append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),messageText.toString());
-                    List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, buttonID, null);
-                    String message = "Use buttons to select the user of the agent";
-                    //MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                    if(!buttonID.equalsIgnoreCase("naaluagent") && !buttonID.equalsIgnoreCase("muaatagent")){
+                        playerLeader.setExhausted(true);
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),Helper.getFactionLeaderEmoji(playerLeader));
+                        StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(p1, activeMap))
+                                .append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),messageText.toString());
+                    }else{
+                        List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(activeMap, buttonID);
+                        String message = Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" Use buttons to select the user of the agent";
+                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                    }
+                    
                 }
                 else {
                     StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(p1, activeMap)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
@@ -2454,7 +2483,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             int old = player.getTg();
             int newTg = player.getTg()+1;
             player.setTg(player.getTg()+1);
-            String mMessage = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Since you have muaat commander unlocked, 1tg has been added automatically ("+old+"->"+newTg+")";
+            String mMessage = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Since you have Muaat commander unlocked, 1tg has been added automatically ("+old+"->"+newTg+")";
             if(activeMap.isFoWMode())
             {
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(),mMessage);
@@ -2462,6 +2491,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             else{
                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
             }
+            ButtonHelper.pillageCheck(player, activeMap);
         }
     }
     public static void offerTerraformButtons(Player player, Map activeMap, GenericInteractionCreateEvent event) {
