@@ -669,7 +669,16 @@ public class Helper {
                         continue;
                     }
                 }
+                
                 String pp = planet.getName();
+                if (warfareNOtherstuff.equalsIgnoreCase("genericBuild")) {
+                    Button sdButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_sd_"+pp, "Place 1 Space Dock on "+Helper.getPlanetRepresentation(pp, activeMap));
+                    sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
+                    unitButtons.add(sdButton);
+                    Button pdsButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_pds_"+pp, "Place 1 PDS on "+Helper.getPlanetRepresentation(pp, activeMap));
+                    pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("pds")));
+                    unitButtons.add(pdsButton);
+                }
                 Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_"+pp, "Produce 1 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap));
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
                 unitButtons.add(inf1Button);
