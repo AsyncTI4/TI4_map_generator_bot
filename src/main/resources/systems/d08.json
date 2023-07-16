@@ -1,1 +1,1 @@
-{"id":"d08","name":"Arche","aliases":["d08","arche","gghurn","theta","gghurntheta","cheiran","hordes","DS_cheiran"],"imagePath":"D08_Arche.png","shipPositionsType":"TYPE02","spaceTokenLocations":[],"wormholes":[],"planets":["arche","gghurntheta"]}
+{"id":"d08","name":"Arche","aliases":["d08","arche","gghurn","theta","gghurntheta","cheiran","hordes","DS_cheiran"],"imagePath":"D08_Arche.png","shipPositionsType":"TYPE02","spaceTokenLocations":[{"x":180.0,"y":0.0},{"x":220.0,"y":60.0},{"x":45.0,"y":120.0},{"x":95.0,"y":170.0}],"wormholes":[],"planets":["arche","gghurntheta"]}
