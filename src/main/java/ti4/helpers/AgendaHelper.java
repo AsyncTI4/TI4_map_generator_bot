@@ -561,7 +561,7 @@ public class AgendaHelper {
                     String faction = specificVote.substring(0, specificVote.indexOf("_"));
                     Player winningR = Helper.getPlayerFromColorOrFaction(activeMap, faction.toLowerCase());
 
-                    if (winningR != null && (specificVote.contains("Rider") || winningR.getFaction().equalsIgnoreCase("nomad"))) {
+                    if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight"))) {
 
                         if(!winningRs.contains(winningR))
                         {
