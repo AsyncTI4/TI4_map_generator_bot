@@ -254,7 +254,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         message.append("> " + actionsChannel.getAsMention()).append("\n");
         message.append("> " + botThread.getAsMention()).append("\n");
         sendMessage(message.toString());
-
+        
         MapSaveLoadManager.saveMap(newMap, event);
     }
 
