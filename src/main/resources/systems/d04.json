@@ -1,1 +1,1 @@
-{"id":"d04","name":"Zarr","aliases":["d04","zarr","nokk","nokar","sellships","sellship","DS_nokar"],"imagePath":"D04_Zarr.png","shipPositionsType":"TYPE02","spaceTokenLocations":[],"wormholes":[],"planets":["zarr","nokk"]}
+{"id":"d04","name":"Zarr","aliases":["d04","zarr","nokk","nokar","sellships","sellship","DS_nokar"],"imagePath":"D04_Zarr.png","shipPositionsType":"TYPE02","spaceTokenLocations":[{"x":180.0,"y":0.0},{"x":220.0,"y":60.0},{"x":45.0,"y":120.0},{"x":95.0,"y":170.0}],"wormholes":[],"planets":["zarr","nokk"]}
