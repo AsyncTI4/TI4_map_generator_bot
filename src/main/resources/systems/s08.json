@@ -1,1 +1,1 @@
-{"id":"s08","name":"Phaeton","aliases":["s08","phaeton","phaetonrift","phaeton_rift","cormundclone"],"imagePath":"S08_Phaeton.png","shipPositionsType":"TYPE11","spaceTokenLocations":[],"wormholes":[],"planets":["phaeton"]}
+{"id":"s08","name":"Phaeton","aliases":["s08","phaeton","phaetonrift","phaeton_rift","cormundclone"],"imagePath":"S08_Phaeton.png","shipPositionsType":"TYPE11","spaceTokenLocations":[{"x":250.0,"y":90.0},{"x":80.0,"y":10.0},{"x":135.0,"y":105.0},{"x":80.0,"y":185.0}],"wormholes":[],"planets":["phaeton"]}
