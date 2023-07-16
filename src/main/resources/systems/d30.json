@@ -1,1 +1,1 @@
-{"id":"d30","name":"Cymiae","aliases":["d30","cymiae","cymae","cymia","savages","savage","DS_cymiae"],"imagePath":"D30_Cymiae.png","shipPositionsType":"TYPE01","spaceTokenLocations":[],"wormholes":[],"planets":["cymiae"]}
+{"id":"d30","name":"Cymiae","aliases":["d30","cymiae","cymae","cymia","savages","savage","DS_cymiae"],"imagePath":"D30_Cymiae.png","shipPositionsType":"TYPE01","spaceTokenLocations":[{"x":195.0,"y":10.0},{"x":225.0,"y":75.0},{"x":225.0,"y":155.0},{"x":145.0,"y":205.0}],"wormholes":[],"planets":["cymiae"]}
