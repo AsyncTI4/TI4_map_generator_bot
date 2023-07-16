@@ -1,1 +1,1 @@
-{"id":"c02","name":"Locke/Bentham","aliases":["c02","locke","lock","bentham","bent"],"imagePath":"C02_Locke.png","shipPositionsType":"TYPE05","spaceTokenLocations":[{"x":180.0,"y":0.0},{"x":220.0,"y":60.0},{"x":45.0,"y":120.0},{"x":95.0,"y":170.0}],"wormholes":["BETA","ALPHA"],"planets":["locke","bentham"]}
+{"id":"c02","name":"Locke/Bentham","aliases":["c02","locke","lock","bentham","bent"],"imagePath":"C02_Locke.png","shipPositionsType":"TYPE05","spaceTokenLocations":[],"wormholes":["BETA","ALPHA"],"planets":["locke","bentham"]}
