@@ -175,7 +175,7 @@ public class ButtonHelper {
                 List<Button> buttons = new ArrayList<Button>();
                 buttons.add(Button.success("useTA_"+player.getColor(), "Use TA"));
                 buttons.add(Button.danger("deleteButtons", "Decline to use TA"));
-                String message = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) +" a player who's TA you hold has refreshed their comms, would you like to play the TA?";
+                String message = Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true) +" a player who's TA you hold has refreshed their comms, would you like to play the TA?";
                 MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeMap), message, buttons);
             }
         }
@@ -755,6 +755,33 @@ public class ButtonHelper {
         }
         return buttons;
     }
+    public static List<Button> getButtonsForPictureCombats(Map activeMap, String pos){
+        
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.danger("getDamageButtons_"+pos, "Assign Hits"));
+        buttons.add(Button.primary("refreshViewOfSystem_"+pos, "Refresh Picture"));
+        Player titans = Helper.getPlayerFromUnlockedLeader(activeMap, "titansagent");
+        if(titans != null && !titans.getLeaderByID("titansagent").isExhausted()){
+            String finChecker = "FFCC_"+titans.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"exhaustAgent_titansagent", "Use Titans Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("titans"))));
+        }
+        Player sol = Helper.getPlayerFromUnlockedLeader(activeMap, "solagent");
+        if(sol != null && !sol.getLeaderByID("solagent").isExhausted()){
+            String finChecker = "FFCC_"+sol.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"exhaustAgent_solagent", "Use Sol Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sol"))));
+        }
+        Player letnev = Helper.getPlayerFromUnlockedLeader(activeMap, "letnevagent");
+        if(letnev != null && !letnev.getLeaderByID("letnevagent").isExhausted()){
+            String finChecker = "FFCC_"+letnev.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"exhaustAgent_letnevagent", "Use Letnev Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("letnev"))));
+        }
+        Player yin = Helper.getPlayerFromUnlockedLeader(activeMap, "yinagent");
+        if(yin != null && !yin.getLeaderByID("yinagent").isExhausted()){
+            String finChecker = "FFCC_"+yin.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"exhaustAgent_yinagent_"+pos, "Use Yin Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("yin"))));
+        }
+        return buttons;
+    }
     public static List<Button> getEndOfTurnAbilities(Player player, Map activeMap) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> endButtons = new ArrayList<>();
@@ -785,7 +812,7 @@ public class ButtonHelper {
             endButtons.add(Button.success(finChecker+"exhaustTech_bs", "Exhaust Bio-Stims"));
         }
         if(player.hasLeader("naazagent")&& !player.getLeader("naazagent").isExhausted()){
-            endButtons.add(Button.success(finChecker+"exhaustAgent_naazagent", "Use NRA Agent"));
+            endButtons.add(Button.success(finChecker+"exhaustAgent_naazagent", "Use NRA Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("naaz"))));
         }
 
         endButtons.add(Button.danger("deleteButtons", "Delete these buttons"));
@@ -1614,14 +1641,14 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         if (activeMap.isFoWMode()) {
             if (!activeMap.isHomeBrewSCMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(),
-                        message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                        message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, speaker));
             } else {
                 MessageHelper.sendPrivateMessageToPlayer(speaker, activeMap, message);
             }
         } else {
             if (!activeMap.isHomeBrewSCMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(),
-                        message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                        message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, speaker));
             } else {
                 MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
             }

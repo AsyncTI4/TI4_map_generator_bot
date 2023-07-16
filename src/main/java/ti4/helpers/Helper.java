@@ -558,7 +558,7 @@ public class Helper {
         return ident;
     }
     
-    public static List<Button> getRemainingSCButtons(GenericInteractionCreateEvent event, Map activeMap) {
+    public static List<Button> getRemainingSCButtons(GenericInteractionCreateEvent event, Map activeMap, Player playerPicker) {
         List<Button> scButtons = new ArrayList<>();
 
         for (Integer sc : activeMap.getSCList()) {
@@ -577,9 +577,9 @@ public class Helper {
             Emoji scEmoji = Emoji.fromFormatted(getSCBackEmojiFromInteger(sc));
             Button button;
             if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
-                button = Button.secondary("scPick_" + sc, " ").withEmoji(scEmoji);
+                button = Button.secondary("FFCC_"+playerPicker.getFaction()+"scPick_" + sc, " ").withEmoji(scEmoji);
             } else {
-                button = Button.secondary("scPick_" + sc, "" + sc);
+                button = Button.secondary("FFCC_"+playerPicker.getFaction()+"scPick_" + sc, "" + sc);
             }
             scButtons.add(button);
         }

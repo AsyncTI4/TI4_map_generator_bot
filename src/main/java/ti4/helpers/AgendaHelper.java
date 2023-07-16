@@ -69,9 +69,9 @@ public class AgendaHelper {
                     if(agID.equalsIgnoreCase("regulations")){
                         if (winner.equalsIgnoreCase("for")) {
                             for(Player playerB : activeMap.getRealPlayers()){
-                            if(playerB.getFleetCC() > 4){
-                                    playerB.setFleetCC(4);
-                            }
+                                if(playerB.getFleetCC() > 4){
+                                        playerB.setFleetCC(4);
+                                }
                             }
                             MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), Helper.getGamePing(activeMap.getGuild(), activeMap)+" Reduced people's fleets to 4 if they had more than that");
                         }else{
@@ -177,7 +177,7 @@ public class AgendaHelper {
             }
             String summary = AgendaHelper.getSummaryOfVotes(activeMap, false);
             List<Player> riders = AgendaHelper.getWinningRiders(summary, winner, activeMap);
-            String ridSum = " has a rider to resolve.";
+            String ridSum = "People had riders to resolve.";
             for (Player rid : riders) {
                 String rep = Helper.getPlayerRepresentation(rid, activeMap, event.getGuild(), true);
                 if (rid != null) {
