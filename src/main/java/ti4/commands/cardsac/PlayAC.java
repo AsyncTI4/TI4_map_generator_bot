@@ -176,6 +176,15 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannelWithPersistentReacts(mainGameChannel, "Please indicate no whens again.", activeMap, whenButtons, "when");
 
             }
+            if(actionCardWindow.equalsIgnoreCase("Action")){
+                String message = "Use buttons to end turn or do another action.";
+                List<Button> systemButtons = ButtonHelper.getStartOfTurnButtons(player, activeMap, true, event);
+                MessageChannel channel2 = activeMap.getMainGameChannel();
+                if(activeMap.isFoWMode()){
+                    channel2 = player.getPrivateChannel();
+                }
+                MessageHelper.sendMessageToChannelWithButtons(channel2, message, systemButtons);
+            }
         }
 
         //Fog of war ping
