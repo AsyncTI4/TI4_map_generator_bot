@@ -577,9 +577,9 @@ public class Helper {
             Emoji scEmoji = Emoji.fromFormatted(getSCBackEmojiFromInteger(sc));
             Button button;
             if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
-                button = Button.secondary("FFCC_"+playerPicker.getFaction()+"scPick_" + sc, " ").withEmoji(scEmoji);
+                button = Button.secondary("FFCC_"+playerPicker.getFaction()+"_scPick_" + sc, " ").withEmoji(scEmoji);
             } else {
-                button = Button.secondary("FFCC_"+playerPicker.getFaction()+"scPick_" + sc, "" + sc);
+                button = Button.secondary("FFCC_"+playerPicker.getFaction()+"_scPick_" + sc, "" + sc);
             }
             scButtons.add(button);
         }
