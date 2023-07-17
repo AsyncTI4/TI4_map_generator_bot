@@ -16,6 +16,7 @@ import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -114,7 +115,7 @@ public class PlayAC extends ACCardsSubcommandData {
         Button sabotageButton = Button.danger("sabotage_ac_"+actionCardTitle, "Cancel AC With Sabotage").withEmoji(Emoji.fromFormatted(Emojis.Sabotage));
         buttons.add(sabotageButton);
         Player empy = Helper.getPlayerFromColorOrFaction(activeMap, "empyrean");
-        if (empy != null && ButtonHelper.isNextToEmpyMechs(activeMap, player, empy)) {
+        if (empy != null && ButtonHelperFactionSpecific.isNextToEmpyMechs(activeMap, player, empy)) {
             Player player2 = empy;
             Button empyButton = Button.secondary("sabotage_empy_"+actionCardTitle, "Cancel "+actionCardTitle+" With Empyrean Mech ").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("mech")));
             List<Button> empyButtons = new ArrayList<Button>();

@@ -2,6 +2,7 @@ package ti4.commands.leaders;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
@@ -44,7 +45,7 @@ public class RefreshLeader extends LeaderAction {
             int tg = player.getTg();
             tg += tgCount;
             player.setTg(tg);
-            ButtonHelper.pillageCheck(player, activeMap);
+            ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
             playerLeader.setTgCount(0);
         }
     }
