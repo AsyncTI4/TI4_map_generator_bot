@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.generator.PlanetHelper;
 import ti4.generator.TileHelper;
 import ti4.generator.UnitTokenPosition;
 import ti4.helpers.AliasHandler;

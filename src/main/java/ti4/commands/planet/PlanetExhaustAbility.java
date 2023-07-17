@@ -6,12 +6,10 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 public class PlanetExhaustAbility extends PlanetAddRemove {
