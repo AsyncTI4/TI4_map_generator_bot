@@ -52,7 +52,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 if(activeMap.isFoWMode()){
                     channel = player.getPrivateChannel();
                 }
-                MessageHelper.sendMessageToChannel(channel, "You scored custodians!");
+                MessageHelper.sendMessageToChannel(channel, Helper.getPlayerRepresentation(player, activeMap)+" scored custodians!");
                 String message2 = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " Click the names of the planets you wish to exhaust to spend 6i.";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
                 Button DoneExhausting =  Button.danger("deleteButtons", "Done Exhausting Planets");
