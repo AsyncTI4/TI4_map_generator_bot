@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -54,9 +55,9 @@ public class SendCommodities extends PlayerSubcommandData {
 			String commString = sendCommodities + " " + Emojis.comm + " commodities";
 			String message =  p1 + " sent " + commString + " to " + p2;
 			sendMessage(message);
-            ButtonHelper.pillageCheck(player_, activeMap);
-            ButtonHelper.pillageCheck(player, activeMap);
-            ButtonHelper.resolveDarkPactCheck(activeMap, player, player_, sendCommodities, event);
+            ButtonHelperFactionSpecific.pillageCheck(player_, activeMap);
+            ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+            ButtonHelperFactionSpecific.resolveDarkPactCheck(activeMap, player, player_, sendCommodities, event);
 
             if (activeMap.isFoWMode()) {
                 String fail = "Could not notify receiving player.";
