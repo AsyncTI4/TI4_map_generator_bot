@@ -33,15 +33,17 @@ public class WormholeModel {
         PSI,
         OMEGA,
 
-        CUSTOM_ERONOUS_WHEPSILON,
-        CUSTOM_ERONOUS_WHETA,
-        CUSTOM_ERONOUS_WHIOTA,
-        CUSTOM_ERONOUS_WHTHETA,
-        CUSTOM_ERONOUS_WHZETA,
+        CUSTOM_ERONOUS_WHEEPSILON,
+        CUSTOM_ERONOUS_WHEETA,
+        CUSTOM_ERONOUS_WHEIOTA,
+        CUSTOM_ERONOUS_WHETHETA,
+        CUSTOM_ERONOUS_WHEZETA,
         WHEPSILON,
         WHNARROWS,
         WHPROBABILITY,
         WHCHAMPION,
+        WHETA,
+        WHZETA,
         WHVOYAGE;
 
         @Override

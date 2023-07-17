@@ -375,16 +375,16 @@ public class FoWHelper {
 					wormholeIDs.add(Constants.ZETA);
 				} else if (token.contains(Constants.ETA)) {
 					wormholeIDs.add(Constants.ETA);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHEPSILON)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHEPSILON);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHIOTA)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHIOTA);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHTHETA)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHTHETA);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHZETA)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHZETA);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHETA)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHETA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHEEPSILON)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHEEPSILON);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHEIOTA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHEIOTA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHETHETA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHETHETA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHEZETA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHEZETA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHEETA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHEETA);
 				}
 			}
 			if (ghostFlagship != null && unitHolder.getUnits().getOrDefault(ghostFlagship, 0) > 0) {
@@ -454,16 +454,16 @@ public class FoWHelper {
 					wormholeIDs.add(Constants.ZETA);
 				} else if (token.contains(Constants.ETA)) {
 					wormholeIDs.add(Constants.ETA);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHEPSILON)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHEPSILON);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHIOTA)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHIOTA);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHTHETA)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHTHETA);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHZETA)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHZETA);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHETA)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHETA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHEEPSILON)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHEEPSILON);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHEIOTA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHEIOTA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHETHETA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHETHETA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHEZETA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHEZETA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHEETA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHEETA);
 				}
 			}
 			if (ghostFlagship != null && unitHolder.getUnits().getOrDefault(ghostFlagship, 0) > 0) {
@@ -487,6 +487,7 @@ public class FoWHelper {
 		for (String wormholeID : wormholeIDs) {
 			wormholeTiles.addAll(Mapper.getWormholesTiles(wormholeID));
 		}
+		
 
 		for (Tile tile_ : allTiles) {
 			String position_ = tile_.getPosition();

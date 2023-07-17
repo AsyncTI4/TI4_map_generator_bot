@@ -215,9 +215,13 @@ public class Mapper {
     public static Set<String> getWormholesTiles(String wormholeID) {
         WormholeModel wormholeModel = new WormholeModel();
         WormholeModel.Wormhole wormhole = wormholeModel.getWormholeFromString(wormholeID);
+        if(wormhole == null){
+            Set<String> empty = new HashSet<String>();
+            return empty;
+        }
+
         return TileHelper.getAllTiles().values().stream()
-                .filter(tileModel -> tileModel.getWormholes() != null)
-                .filter(tileModel -> tileModel.getWormholes().contains(wormhole))
+                .filter(tileModel -> tileModel.getWormholes() != null && tileModel.getWormholes().contains(wormhole))
                 .map(TileModel::getId)
                 .collect(Collectors.toSet());
     }

@@ -91,11 +91,11 @@ public class Constants {
     public static String VOYAGE = "whvoyage";
     public static String ZETA = "whzeta";
     public static String ETA = "wheta";
-    public static String CUSTOM_ERONOUS_WHEPSILON = "custom_eronous_whepsilon";
-    public static String CUSTOM_ERONOUS_WHETA = "custom_eronous_wheta";
-    public static String CUSTOM_ERONOUS_WHIOTA = "custom_eronous_whiota";
-    public static String CUSTOM_ERONOUS_WHTHETA= "custom_eronous_whtheta";
-    public static String CUSTOM_ERONOUS_WHZETA = "custom_eronous_whzeta";
+    public static String CUSTOM_ERONOUS_WHEEPSILON = "custom_eronous_wheepsilon";
+    public static String CUSTOM_ERONOUS_WHEETA = "custom_eronous_wheeta";
+    public static String CUSTOM_ERONOUS_WHEIOTA = "custom_eronous_wheiota";
+    public static String CUSTOM_ERONOUS_WHETHETA= "custom_eronous_whetheta";
+    public static String CUSTOM_ERONOUS_WHEZETA = "custom_eronous_whezeta";
 
     public static final String DRAW_SPECIFIC_SO_FOR_PLAYER = "draw_specific_so_for_player";
     public static final String DRAW_SPECIFIC_SO = "draw_specific_so";
