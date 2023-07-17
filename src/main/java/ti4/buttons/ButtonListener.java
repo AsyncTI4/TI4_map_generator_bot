@@ -29,15 +29,12 @@ import ti4.commands.cardsac.ACInfo_Legacy;
 import ti4.map.UnitHolder;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowAllAC;
-import ti4.commands.cardspn.ShowAllPN;
 import ti4.commands.cardsso.DealSOToAll;
 import ti4.commands.cardsso.DiscardSO;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.cardsso.ScoreSO;
-import ti4.commands.cardsso.ShowAllSO;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpPlanet;
-import ti4.commands.fow.PingSystem;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetRefresh;
@@ -47,16 +44,11 @@ import ti4.commands.status.RevealStage2;
 import ti4.commands.status.ScorePublic;
 import ti4.commands.tokens.AddCC;
 import ti4.commands.units.AddUnits;
-import ti4.commands.units.RemoveUnits;
 import ti4.commands.player.Stats;
 import ti4.commands.player.SCPick;
 import ti4.commands.player.SCPlay;
 import ti4.commands.player.Turn;
-import ti4.commands.special.RiseOfMessiah;
-import ti4.commands.special.SleeperToken;
-import ti4.commands.special.SwordsToPlowsharesTGGain;
 import ti4.helpers.Constants;
-import ti4.helpers.DisplayType;
 import ti4.helpers.AgendaHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
@@ -73,7 +65,6 @@ import ti4.map.Planet;
 import ti4.map.Player;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
-import ti4.model.AgendaModel;
 import ti4.model.TechnologyModel;
 import ti4.map.Tile;
 
@@ -381,7 +372,7 @@ public class ButtonListener extends ListenerAdapter {
                 String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex.";
                 List<Button> ringButtons = ButtonHelper.getPossibleRings(p2, activeMap);
                 activeMap.resetCurrentMovedUnitsFrom1TacticalAction();
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true)+" Use buttons to resolve tactical action from Naalu agent. Reminder it is not legal to do a tactical action in a home system.\n" + message, ringButtons);
+                MessageHelper.sendMessageToChannelWithButtons(channel,Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true)+" Use buttons to resolve tactical action from Naalu agent. Reminder it is not legal to do a tactical action in a home system.\n" + message, ringButtons);
             }
             if(agent.equalsIgnoreCase("muaatagent")){
                 String faction = rest.replace("muaatagent_","");
@@ -405,7 +396,7 @@ public class ButtonListener extends ListenerAdapter {
                     Button starTile = Button.success("umbatTile_"+tile.getPosition(), tile.getRepresentationForButtons(activeMap, p2));
                     buttons.add(starTile);
                 }
-                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true) + message, buttons);
+                MessageHelper.sendMessageToChannelWithButtons(channel,Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true) + message, buttons);
             }
             String exhaustedMessage = event.getMessage().getContentRaw();
             List<ActionRow> actionRow2 = new ArrayList<>();
@@ -1334,7 +1325,7 @@ public class ButtonListener extends ListenerAdapter {
                  List<Player> playersAdj = FoWHelper.getAdjacentPlayers(activeMap, pos, true);
                 for (Player player_ : playersAdj) {
                     String playerMessage = Helper.getPlayerRepresentation(player_, activeMap, event.getGuild(), true) + " - System " + pos + " has been activated ";
-                    boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
+                    MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
                 }
                 ButtonHelper.resolveOnActivationEnemyAbilities(activeMap, activeMap.getTileByPosition(pos), player, false);
             }

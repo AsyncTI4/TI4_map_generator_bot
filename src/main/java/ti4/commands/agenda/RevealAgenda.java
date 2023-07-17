@@ -1,7 +1,6 @@
 package ti4.commands.agenda;
 
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
-import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -71,7 +70,7 @@ public class RevealAgenda extends AgendaSubcommandData {
             {
                 if(agendaName.equalsIgnoreCase("Emergency Session"))
                 {
-                    String id3 = activeMap.revealAgenda(revealFromBottom);
+                    activeMap.revealAgenda(revealFromBottom);
                     MessageHelper.sendMessageToChannel(channel, Helper.getGamePing(activeMap.getGuild(), activeMap)+" Emergency Session revealed underneath Covert Legislation, discarding it.");
                 }
                 String id2 = activeMap.getNextAgenda(revealFromBottom);

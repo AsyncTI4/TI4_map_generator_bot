@@ -1,6 +1,5 @@
 package ti4.model;
 
-import java.util.Map;
 
 import lombok.Data;
 import net.dv8tion.jda.api.EmbedBuilder;
