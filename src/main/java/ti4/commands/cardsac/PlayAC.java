@@ -148,7 +148,13 @@ public class PlayAC extends ACCardsSubcommandData {
         if (acID.contains("sabo")) {
             MessageHelper.sendMessageToChannel(mainGameChannel, sb.toString());
         } else {
-            MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, sb.toString(), activeMap, player, buttons);
+            if(Helper.isSaboAllowed(activeMap, player)){
+                MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel, sb.toString(), activeMap, player, buttons);
+            }else{
+                MessageHelper.sendMessageToChannel(mainGameChannel, sb.toString());
+                MessageHelper.sendMessageToChannel(mainGameChannel, "Either all sabos were in the discard or active player had Transparasteel Plating and everyone was passed. Instinct training and watcher mechs may still be viable, who knows. ");
+            }
+            
 
             if (actionCardWindow.contains("After an agenda is revealed")) {
                 
