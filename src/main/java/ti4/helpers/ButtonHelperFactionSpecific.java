@@ -1,4 +1,5 @@
 package ti4.helpers;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
@@ -7,9 +8,11 @@ import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
 import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
+import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
+import net.dv8tion.jda.api.utils.messages.MessageCreateBuilder;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
 
-
+import java.io.File;
 import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
@@ -21,6 +24,7 @@ import ti4.commands.cardsso.ShowAllSO;
 import ti4.commands.explore.ExpPlanet;
 import ti4.commands.special.SleeperToken;
 import ti4.commands.units.AddUnits;
+import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
 import ti4.map.Map;
 import ti4.map.Planet;
@@ -60,6 +64,75 @@ public class ButtonHelperFactionSpecific {
             buttons.add(tileButton);
         }
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select which tile you would like to chaos map in.", buttons);
+    }
+
+    
+    public static void lastStepOfYinHero(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String trueIdentity){
+        String planetNInf = buttonID.replace("yinHeroInfantry_", "");
+        String planet = planetNInf.split("_")[0];
+        String amount = planetNInf.split("_")[1];
+        MessageChannel mainGameChannel = activeMap.getMainGameChannel();
+        Tile tile = activeMap.getTile(AliasHandler.resolveTile(planet));
+        
+        new AddUnits().unitParsing(event, player.getColor(),
+                        activeMap.getTile(AliasHandler.resolveTile(planet)), amount +" inf " + planet,
+                        activeMap);
+        MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity+" Chose to land "+amount+" infantry on "+Helper.getPlanetRepresentation(planet, activeMap));
+        UnitHolder unitHolder = tile.getUnitHolders().get(planet);
+        for(Player player2 : activeMap.getRealPlayers()){
+            if(player2 == player){
+                continue;
+            }
+            String colorID = Mapper.getColorID(player2.getColor());
+            String mechKey = colorID + "_mf.png";
+            String infKey = colorID + "_gf.png";
+            int numMechs = 0;
+            int numInf = 0;
+            if (unitHolder.getUnits() != null) {
+                if (unitHolder.getUnits().get(mechKey) != null) {
+                    numMechs = unitHolder.getUnits().get(mechKey);
+                }
+                if (unitHolder.getUnits().get(infKey) != null) {
+                    numInf = unitHolder.getUnits().get(infKey);
+                }
+            }
+            
+            if(numInf > 0 || numMechs > 0){
+                String messageCombat = "Resolve ground combat.";
+                 
+                if(!activeMap.isFoWMode()){
+                    MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(messageCombat);
+                    TextChannel textChannel = (TextChannel)mainGameChannel;
+                    String threadName =  activeMap.getName() + "-yinHero-" + activeMap.getRound() + "-planet-" + planet+"-"+player.getFaction()+"-vs-"+player2.getFaction();
+                    Player p1 = player;
+                    mainGameChannel.sendMessage(baseMessageObject.build()).queue(message_ -> {
+                        ThreadChannelAction threadChannel = textChannel.createThreadChannel(threadName, message_.getId());
+                        threadChannel = threadChannel.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_1_HOUR);
+                        threadChannel.queue(m5 -> {
+                            List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+                            if (threadChannels != null) {
+                                for (ThreadChannel threadChannel_ : threadChannels) {
+                                    if (threadChannel_.getName().equals(threadName)) {
+                                        MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_, Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true) + Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true) + " Please resolve the interaction here. Reminder that Yin Hero skips pds fire.");
+                                        int context = 0;
+                                        File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, context, tile.getPosition(), event);
+                                        MessageHelper.sendMessageWithFile((MessageChannel) threadChannel_, systemWithContext, "Picture of system", false);
+                                        List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeMap,  tile.getPosition());
+                                        MessageHelper.sendMessageToChannelWithButtons((MessageChannel) threadChannel_, "", buttons);
+                                        
+                                    }
+                                }
+                            }
+                        });
+                    });
+                }
+                break;
+            }
+            
+        }
+        
+        
+        event.getMessage().delete().queue();
     }
     public static void putSleeperOn(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
         buttonID = buttonID.replace("putSleeperOnPlanet_", "");
