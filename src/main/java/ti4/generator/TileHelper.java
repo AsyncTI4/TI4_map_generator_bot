@@ -1,11 +1,7 @@
 package ti4.generator;
-
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.commons.collections4.CollectionUtils;
-import ti4.ResourceHelper;
 import ti4.helpers.Storage;
-import ti4.message.BotLogger;
 import ti4.model.PlanetModel;
 import ti4.model.TileModel;
 

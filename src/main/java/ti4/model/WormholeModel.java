@@ -1,7 +1,6 @@
 package ti4.model;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -33,11 +32,11 @@ public class WormholeModel {
         PSI,
         OMEGA,
 
-        CUSTOM_ERONOUS_WHEEPSILON,
-        CUSTOM_ERONOUS_WHEETA,
-        CUSTOM_ERONOUS_WHEIOTA,
-        CUSTOM_ERONOUS_WHETHETA,
-        CUSTOM_ERONOUS_WHEZETA,
+        CUSTOM_ERONOUS_WHEPSILON,
+        CUSTOM_ERONOUS_WHETA,
+        CUSTOM_ERONOUS_WHIOTA,
+        CUSTOM_ERONOUS_WHTHETA,
+        CUSTOM_ERONOUS_WHZETA,
         WHEPSILON,
         WHNARROWS,
         WHPROBABILITY,

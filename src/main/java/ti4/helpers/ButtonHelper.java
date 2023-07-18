@@ -20,7 +20,6 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import ti4.buttons.ButtonListener;
@@ -37,8 +36,6 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.UnitTokenPosition;
 import ti4.map.Leader;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -532,7 +529,7 @@ public class ButtonHelper {
         }
     }
     public static List<String> getPlanetsWithSleeperTokens(Player player, Map activeMap, Tile tile) {
-        List<String> planetsWithSleepers = new ArrayList();
+        List<String> planetsWithSleepers = new ArrayList<String>();
         for(UnitHolder unitHolder :tile.getUnitHolders().values()){
             if(unitHolder instanceof Planet planet){
                 if(planet.getTokenList().contains(Constants.TOKEN_SLEEPER_PNG)){
@@ -559,7 +556,7 @@ public class ButtonHelper {
     
     
     public static List<String> getPlanetsWithSpecificUnit(Player player, Map activeMap, Tile tile,String unit) {
-        List<String> planetsWithUnit = new ArrayList();
+        List<String> planetsWithUnit = new ArrayList<String>();
         for(UnitHolder unitHolder :tile.getUnitHolders().values()){
             if(unitHolder instanceof Planet planet){
                 if(planet.getUnits().keySet().contains(Mapper.getUnitID(AliasHandler.resolveUnit(unit), player.getColor()))){
@@ -570,7 +567,7 @@ public class ButtonHelper {
         return planetsWithUnit;
     }
     public static List<String> getAllPlanetsWithSleeperTokens(Player player, Map activeMap) {
-        List<String> planetsWithSleepers = new ArrayList();
+        List<String> planetsWithSleepers = new ArrayList<String>();
         for(Tile tile :activeMap.getTileMap().values()){
             planetsWithSleepers.addAll(getPlanetsWithSleeperTokens(player, activeMap, tile));
         }
@@ -580,7 +577,7 @@ public class ButtonHelper {
          String finChecker = "FFCC_"+player.getFaction() + "_";
        
         for(String planet : ButtonHelper.getPlanetsWithSleeperTokens(player, activeMap, tile)){
-            List<Button> planetsWithSleepers = new ArrayList();
+            List<Button> planetsWithSleepers = new ArrayList<Button>();
             planetsWithSleepers.add(Button.success(finChecker+"replaceSleeperWith_pds_"+planet, "Replace sleeper on "+planet+ " with a pds."));
             if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, player, "mech") < 4){
                 planetsWithSleepers.add(Button.success(finChecker+"replaceSleeperWith_mech_"+planet, "Replace sleeper on "+planet+ " with a mech and an infantry."));
@@ -593,7 +590,7 @@ public class ButtonHelper {
     }
     public static List<Button> getButtonsForTurningPDSIntoFS(Player player, Map activeMap, Tile tile) {
          String finChecker = "FFCC_"+player.getFaction() + "_";
-        List<Button> planetsWithPDS = new ArrayList();
+        List<Button> planetsWithPDS = new ArrayList<Button>();
         for(String planet : ButtonHelper.getPlanetsWithSpecificUnit(player, activeMap, tile, "pds")){
             planetsWithPDS.add(Button.success(finChecker+"replacePDSWithFS_"+planet, "Replace pds on "+planet+ " with your flagship."));
         }
@@ -602,7 +599,7 @@ public class ButtonHelper {
     }
     public static List<Button> getButtonsForRemovingASleeper(Player player, Map activeMap) {
          String finChecker = "FFCC_"+player.getFaction() + "_";
-        List<Button> planetsWithSleepers = new ArrayList();
+        List<Button> planetsWithSleepers = new ArrayList<Button>();
         for(String planet : ButtonHelper.getAllPlanetsWithSleeperTokens(player, activeMap)){
             planetsWithSleepers.add(Button.success(finChecker+"removeSleeperFromPlanet_"+planet, "Remove the sleeper on "+planet+ "."));
         }
@@ -694,8 +691,7 @@ public class ButtonHelper {
 
     
     public static List<Button> getButtonsToExploreAllPlanets(Player player, Map activeMap){
-         String finChecker = "FFCC_"+player.getFaction() + "_";
-        List<Button> buttons = new ArrayList<>();
+        List<Button> buttons = new ArrayList<Button>();
         for(String plan : player.getPlanets()){
             UnitHolder planetUnit = activeMap.getPlanetsInfo().get(plan);
             Planet planetReal =  (Planet) planetUnit;    

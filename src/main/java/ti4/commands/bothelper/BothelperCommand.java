@@ -72,7 +72,7 @@ public class BothelperCommand implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        BothelperSubcommandData subCommandExecuted = null;
+        BothelperSubcommandData subCommandExecuted;
         String subcommandName = event.getInteraction().getSubcommandName();
         for (BothelperSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {

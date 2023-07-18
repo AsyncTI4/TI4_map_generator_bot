@@ -1,16 +1,14 @@
 package ti4.generator;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
-import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.model.*;
 
