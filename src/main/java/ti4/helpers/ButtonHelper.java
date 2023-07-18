@@ -1032,13 +1032,13 @@ public class ButtonHelper {
     public static void resolveEmpyCommanderCheck(Player player, Map activeMap, Tile tile, GenericInteractionCreateEvent event) {
 
         for(Player p2 : activeMap.getRealPlayers()){
-            if(p2 != player && AddCC.hasCC(event, p2.getColor(), tile) && activeMap.playerHasLeaderUnlockedOrAlliance(player, "empyreancommander")){
+            if(p2 != player && AddCC.hasCC(event, p2.getColor(), tile) && activeMap.playerHasLeaderUnlockedOrAlliance(p2, "empyreancommander")){
                 MessageChannel channel = activeMap.getMainGameChannel();
                 if(activeMap.isFoWMode()){
                     channel = p2.getPrivateChannel();
                 }
                 RemoveCC.removeCC(event, p2.getColor(), tile, activeMap);
-                String message = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+ " due to having the empyrean commander, the cc you had in the active system has been removed. Reminder that this is optional but was done automatically";
+                String message = Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true)+ " due to having the empyrean commander, the cc you had in the active system has been removed. Reminder that this is optional but was done automatically";
                 MessageHelper.sendMessageToChannel(channel, message);
             }
         }
