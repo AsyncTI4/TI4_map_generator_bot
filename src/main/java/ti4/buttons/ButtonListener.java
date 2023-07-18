@@ -301,6 +301,29 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
             }
+        } else if (buttonID.startsWith("yinHeroInfantry_")) {
+            ButtonHelperFactionSpecific.lastStepOfYinHero(buttonID, event, activeMap, player, ident);
+        } else if (buttonID.startsWith("yinHeroPlanet_")) {
+            String planet = buttonID.replace("yinHeroPlanet_", "");
+            MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity+" Chose to invade "+Helper.getPlanetRepresentation(planet, activeMap));
+            List<Button> buttons = new ArrayList<Button>();
+            for(int x = 1; x < 4; x++){
+                buttons.add(Button.success(finsFactionCheckerPrefix+"yinHeroInfantry_"+planet+"_"+x, "Land "+x+" infantry").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry"))));
+            }
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select how many infantry you'd like to land on the planet", buttons);
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("yinHeroTarget_")) {
+            String faction = buttonID.replace("yinHeroTarget_", "");
+            List<Button> buttons = new ArrayList<Button>();
+            Player target = Helper.getPlayerFromColorOrFaction(activeMap, faction);
+            for(String planet : target.getPlanets()){
+                buttons.add(Button.success(finsFactionCheckerPrefix+"yinHeroPlanet_"+planet, Helper.getPlanetRepresentation(planet, activeMap)));
+            }
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select which planet to invade", buttons);
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("yinHeroStart")) {
+            List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, "yinHeroTarget",null);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select which player owns the planet you want to land on", buttons);
         } else if (buttonID.startsWith("hacanAgentRefresh_")) {
             ButtonHelperFactionSpecific.hacanAgentRefresh(buttonID, event, activeMap, player, ident, trueIdentity);
         } else if (buttonID.startsWith("exhaustAgent_")) {
@@ -349,7 +372,7 @@ public class ButtonListener extends ListenerAdapter {
             if(agent.equalsIgnoreCase("xxchaagent")){
                 String faction = rest.replace("xxchaagent_","");
                 Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, faction);
-                String message = "Use buttons to ready a planet";
+                String message = "Use buttons to ready a planet. Removing the infantry is not automated but is an option for you to do.";
                 List<Button> ringButtons = ButtonHelper.getXxchaAgentReadyButtons(activeMap, p2);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(),Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+ message, ringButtons);
             }
@@ -410,7 +433,7 @@ public class ButtonListener extends ListenerAdapter {
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }
-            if(actionRow2.size() > 0){
+            if(actionRow2.size() > 0 && !exhaustedMessage.contains("select the user of the agent")){
                  event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
             }else{
                 event.getMessage().delete().queue();
@@ -1171,6 +1194,9 @@ public class ButtonListener extends ListenerAdapter {
                 } else {
                     MessageHelper.sendMessageToChannel(event.getChannel(), editedMessage);
                 }
+            }
+            if (buttonID.equalsIgnoreCase("spitItOut")) {
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap, event), editedMessage);
             }
             event.getMessage().delete().queue();
         }else if (buttonID.startsWith("reverse_")) {
@@ -2402,7 +2428,7 @@ public class ButtonListener extends ListenerAdapter {
                         if ((tile.getUnitHolders().values().size() == 1) && player.hasLeader("empyreanagent")&&!player.getLeaderByID("empyreanagent").isExhausted()) {
                             Button empyButton = Button.secondary("exhaustAgent_empyreanagent", "Use Empyrean Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("empyrean")));
                             empyButtons.add(empyButton);
-                            empyButtons.add(Button.danger("deleteButtons", "Decline"));
+                            empyButtons.add(Button.danger("deleteButtons", "Delete These Buttons"));
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity+" use button to exhaust Empy agent", empyButtons);
                         }
 
