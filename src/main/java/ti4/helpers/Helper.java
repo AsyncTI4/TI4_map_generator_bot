@@ -162,8 +162,8 @@ public class Helper {
         if(activeMap.getDiscardActionCards().containsKey("sabo1") && activeMap.getDiscardActionCards().containsKey("sabo2") && activeMap.getDiscardActionCards().containsKey("sabo3") && activeMap.getDiscardActionCards().containsKey("sabo4")){
             return false;
         }
-        if(player.hasTech("tp") && activeMap.getActivePlayer() != null && activeMap.getActivePlayer() == player){
-            for(Player p2 : activeMap.getActivePlayer()){
+        if(player.hasTech("tp") && activeMap.getActivePlayer() != null && activeMap.getActivePlayer().equalsIgnoreCase(player.getUserID())){
+            for(Player p2 : activeMap.getRealPlayers()){
                 if(p2 == player){
                     continue;
                 }
