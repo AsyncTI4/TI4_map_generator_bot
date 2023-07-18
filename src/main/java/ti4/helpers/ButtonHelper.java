@@ -314,7 +314,7 @@ public class ButtonHelper {
         for(String planet : player.getExhaustedPlanets()){
             buttons.add(Button.success("refresh_"+planet, "Ready "+Helper.getPlanetRepresentation(planet, activeMap)));
         }
-        buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
+        buttons.add(Button.danger("deleteButtons_spitItOut", "Delete These Buttons"));
         return buttons;
      }
     public static void sendAllTechsNTechSkipPlanetsToReady(Map activeMap, GenericInteractionCreateEvent event, Player player) {
@@ -1132,7 +1132,6 @@ public class ButtonHelper {
             AddCC.addCC(event, player.getColor(), tile, true);
         }
         for(String unit :displacedUnits.keySet()){
-            System.out.println(unit);
             int amount = displacedUnits.get(unit);
             if(unit.contains("damaged")){
                 unit = unit.replace("damaged", "");
@@ -2310,8 +2309,18 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                             }
                         }
                         if ("solhero".equals(playerLeader.getId())) {
-                            
-                            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Removed every one of your ccs from the board");
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" removed all of your ccs from the board");
+                            for(Tile t : activeMap.getTileMap().values()){
+                                if (AddCC.hasCC(event, p1.getColor(), t)) {
+                                    RemoveCC.removeCC(event, p1.getColor(), t, activeMap);
+                                }
+                            }   
+                        }
+                        if ("yinhero".equals(playerLeader.getId())) {
+                            List<Button> buttons = new ArrayList<Button>();
+                            buttons.add(Button.primary(finChecker+"yinHeroStart", "Invade a planet with Yin Hero"));
+                            buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.", buttons);
                             for(Tile t : activeMap.getTileMap().values()){
                                 if (AddCC.hasCC(event, p1.getColor(), t)) {
                                     RemoveCC.removeCC(event, p1.getColor(), t, activeMap);
