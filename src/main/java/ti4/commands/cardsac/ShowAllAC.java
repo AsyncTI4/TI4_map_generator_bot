@@ -49,7 +49,6 @@ public class ShowAllAC extends ACCardsSubcommandData {
             sb.append(index).append(". ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
             index++;
         }
-
         MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeMap, sb.toString());
     }
 }

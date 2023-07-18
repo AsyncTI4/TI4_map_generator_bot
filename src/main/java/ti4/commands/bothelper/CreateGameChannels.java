@@ -266,14 +266,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         int nextPBDNumber = Collections.max(getAllExistingPBDNumbers()) + 1;
         return "pbd" + nextPBDNumber;
     }
-    private static String getNextFOWGameName() {
-        ArrayList<Integer> existingNums = getAllExistingFOWNumbers();
-        if (existingNums.size() == 0) {
-            return "fow1";
-        }
-        int nextPBDNumber = Collections.max(getAllExistingFOWNumbers()) + 1;
-        return "fow" + nextPBDNumber;
-    }
+    
 
     private static boolean gameOrRoleAlreadyExists(String name) {
         List<Guild> guilds = MapGenerator.jda.getGuilds();
