@@ -92,7 +92,8 @@ public class CreateTile extends BothelperSubcommandData {
         tile.setPlanetIds(getPlanetListFromString(planetIds));
         tile.setShipPositionsType(shipPositionModel.getTypeFromString(type));
         tile.setSpaceTokenLocations(tile.getShipPositionsType().getSpaceTokenLayout());
-        tile.setWormholes(getWormholesFromString(wormholes));
+        if(!wormholes.equals(""))
+            tile.setWormholes(getWormholesFromString(wormholes));
 
         return tile;
     }
@@ -111,6 +112,7 @@ public class CreateTile extends BothelperSubcommandData {
                 .replace(" ", "").
                 toLowerCase().split(","))
                 .filter(Objects::nonNull)
+                .filter(s -> !s.isBlank())
                 .map(wormholeModel::getWormholeFromString)
                 .collect(Collectors.toSet());
     }
