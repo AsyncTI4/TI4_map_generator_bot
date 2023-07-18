@@ -151,6 +151,40 @@ public class Helper {
         }
         return player;
     }
+    public static boolean isAllianceModeAndPreviouslyOwnedCheck(Map activeMap, String planet) {
+        return (activeMap.isAllianceMode() && doesAnyoneOwnPlanet(activeMap, planet));
+    }
+     public static boolean isSaboAllowed(Map activeMap, Player player) {
+       
+        if(activeMap.getName().equalsIgnoreCase("pbd100")){
+            return true;
+        }
+        if(activeMap.getDiscardActionCards().containsKey("sabo1") && activeMap.getDiscardActionCards().containsKey("sabo2") && activeMap.getDiscardActionCards().containsKey("sabo3") && activeMap.getDiscardActionCards().containsKey("sabo4")){
+            return false;
+        }
+        if(player.hasTech("tp") && activeMap.getActivePlayer() != null && activeMap.getActivePlayer() == player){
+            for(Player p2 : activeMap.getActivePlayer()){
+                if(p2 == player){
+                    continue;
+                }
+                if(!p2.isPassed()){
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    
+    }
+
+    public static boolean doesAnyoneOwnPlanet(Map activeMap, String planet) {
+        for(Player player : activeMap.getRealPlayers()){
+            if(player.getPlanets().contains(planet)){
+                return true;
+            }
+        }
+        return false;
+    }
     public static Player getPlayerFromAbility(Map activeMap, String ability) {
         Player player = null;
         if (ability != null) {
