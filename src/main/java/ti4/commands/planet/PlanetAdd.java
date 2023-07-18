@@ -96,10 +96,9 @@ public class PlanetAdd extends PlanetAddRemove {
             player.setTg(player.getTg()+1);
             ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
         }
-        if (!alreadyOwned && !activeMap.isAllianceMode() && (!planet.equals("mirage"))&& !activeMap.isBaseGameMode()) {
+        if (!alreadyOwned && !Helper.isAllianceModeAndPreviouslyOwnedCheck(activeMap, planet) && (!planet.equals("mirage"))&& !activeMap.isBaseGameMode()) {
             Planet planetReal = (Planet) unitHolder;
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeMap, planetReal);
-            
             if (event != null && buttons != null && !buttons.isEmpty()) {
                 String message = "Click button to explore " + Helper.getPlanetRepresentation(planet, activeMap);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
