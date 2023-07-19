@@ -1,4 +1,4 @@
-package ti4.commands.custom;
+package ti4.commands.bothelper;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import ti4.MapGenerator;
@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-public class JazzCommand extends CustomSubcommandData {
+public class JazzCommand extends BothelperSubcommandData {
     public JazzCommand() {
         super("jazz_command", "Jazz's custom command");
     }
