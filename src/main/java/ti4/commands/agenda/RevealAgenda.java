@@ -98,7 +98,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         activeMap.setLatestOutcomeVotedFor("");
         activeMap.setLatestWhenMsg("");
         activeMap.setLatestAfterMsg("");
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getAgendaRepresentation(id, uniqueID));
+        MessageHelper.sendMessageToChannel(channel, Helper.getAgendaRepresentation(id, uniqueID));
         String text = Helper.getGamePing(event, activeMap) + " Please indicate whether you abstain from playing whens/afters by pressing the buttons below. If you have an action card with those windows, you can simply play it.";
 
         
@@ -107,7 +107,7 @@ public class RevealAgenda extends AgendaSubcommandData {
         List<Button> whenButtons = AgendaHelper.getWhenButtons(activeMap);
         List<Button> afterButtons = AgendaHelper.getAfterButtons(activeMap);
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), text);
+        MessageHelper.sendMessageToChannel(channel, text);
 
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, Emojis.nowhens, activeMap, whenButtons, "when");
         MessageHelper.sendMessageToChannelWithPersistentReacts(channel, Emojis.noafters,activeMap, afterButtons,"after");
