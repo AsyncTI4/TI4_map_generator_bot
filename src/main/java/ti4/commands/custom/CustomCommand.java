@@ -110,6 +110,7 @@ public class CustomCommand implements Command {
         subcommands.add(new PoRemoveFromGame());
         subcommands.add(new DiscardSpecificAgenda());
         subcommands.add(new FixSODeck());
+        subcommands.add(new JazzCommand());
         subcommands.add(new SetThreadName());
         return subcommands;
     }
