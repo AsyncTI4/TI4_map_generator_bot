@@ -1480,7 +1480,7 @@ public class ButtonHelper {
                 {
                     blabel = blabel + " from "+Helper.getPlanetRepresentation(planet.toLowerCase(), activeMap);
                 }
-                Button validTile2 = Button.success(finChecker+"unitTactical"+moveOrRemove+"_"+tile.getPosition()+"_"+x+unit+damagedMsg.replace(" ","")+"_reverse",blabel).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitkey.toLowerCase().replace(" ", ""))));
+                Button validTile2 = Button.success(finChecker+"unitTactical"+moveOrRemove+"_"+tile.getPosition()+"_"+x+unit.toLowerCase().replace(" ", "").replace("'","")+damagedMsg.replace(" ","")+"_reverse",blabel).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitkey.toLowerCase().replace(" ", ""))));
                 buttons.add(validTile2);
             }
         }
@@ -1527,7 +1527,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                                 buttons.add(validTile2);
                                 if(key.contains("mf")){
                                     Button validTile3 = Button.secondary(finChecker+"assignDamage_"+tile.getPosition()+"_"+x+unitKey+"_"+representation, "Sustain "+x+" "+unitRepresentation.get(unitRepresentationKey) +
-                                    "from "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeMap)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
+                                    " from "+Helper.getPlanetRepresentation(representation.toLowerCase(), activeMap)).withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord(unitRepresentation.get(unitRepresentationKey).toLowerCase().replace(" ", ""))));
                                     buttons.add(validTile3);
                                 }
                             }
@@ -2554,7 +2554,8 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             pnText = Mapper.getPromissoryNote(id, longPNDisplay);
         }
         sb.append(pnText).append("\n");
-        Player owner = Helper.getPlayerFromColorOrFaction(activeMap, pnOwner); 
+        Player owner = activeMap.getPNOwner(id);
+        
         //TERRAFORM TIP
         if (id.equalsIgnoreCase("terraform")) {
             ButtonHelperFactionSpecific.offerTerraformButtons(player, activeMap, event);
