@@ -51,8 +51,8 @@ public class Turn extends PlayerSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(),Helper.getPlayerRepresentation(mainPlayer, activeMap)+ " ended turn");
         }
-        String nextMessage = pingNextPlayer(event, activeMap, mainPlayer);
-        if (!nextMessage.isEmpty()) sendMessage(nextMessage);
+        pingNextPlayer(event, activeMap, mainPlayer);
+        //if (!nextMessage.isEmpty()) sendMessage(nextMessage); Sending message in ping next Player
     }
 
     public void execute(GenericInteractionCreateEvent event, Player mainPlayer, Map activeMap) {
@@ -200,6 +200,7 @@ public class Turn extends PlayerSubcommandData {
                 }
             }
         }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Next player not found");
         return "Next Player not found";
     }
 
