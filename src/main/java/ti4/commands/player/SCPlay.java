@@ -171,21 +171,24 @@ public class SCPlay extends PlayerSubcommandData {
             });
 
         //POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
+       
         if (!activeMap.isFoWMode() && scToPlay == 3) {
             String assignSpeakerMessage = Helper.getPlayerRepresentation(player, activeMap) + ", please click a faction below to assign Speaker " + Emojis.SpeakerToken;
-            String assignSpeakerMessage2 = Helper.getPlayerRepresentation(player, activeMap) + " after assigning speaker, check your cards info for a button with which to draw agendas. It is green, maybe scroll a bit.";
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(activeMap);
             MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), assignSpeakerMessage, assignSpeakerActionRow);
-            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), assignSpeakerMessage2);
+            
 
         }
 
         if (scToPlay == 3 && !activeMap.isHomeBrewSCMode()) {
+             String assignSpeakerMessage2 = Helper.getPlayerRepresentation(player, activeMap) + " after assigning speaker, Use this button to draw agendas into your cards info thread.";
+            
             List<Button> drawAgendaButton = new ArrayList<Button>();
             Button draw2Agenda = Button.success("FFCC_"+player.getFaction()+"_"+"drawAgenda_2", "Draw 2 agendas");
             drawAgendaButton.add(draw2Agenda);
-            MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), false)+" click this after assigning speaker.", drawAgendaButton);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap, event), assignSpeakerMessage2, drawAgendaButton);
+
         }
 
         List<Button> conclusionButtons = new ArrayList<Button>();

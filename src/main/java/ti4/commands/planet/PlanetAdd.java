@@ -8,6 +8,7 @@ import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -52,7 +53,7 @@ public class PlanetAdd extends PlanetAddRemove {
                 if(activeMap.isFoWMode()){
                     channel = player.getPrivateChannel();
                 }
-                MessageHelper.sendMessageToChannel(channel, "You scored custodians!");
+                MessageHelper.sendMessageToChannel(channel, Helper.getPlayerRepresentation(player, activeMap)+" scored custodians!");
                 String message2 = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " Click the names of the planets you wish to exhaust to spend 6i.";
                 List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
                 Button DoneExhausting =  Button.danger("deleteButtons", "Done Exhausting Planets");
@@ -93,12 +94,11 @@ public class PlanetAdd extends PlanetAddRemove {
             
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Scavenge ("+player.getTg()+"->"+(player.getTg()+1)+"). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring." );
             player.setTg(player.getTg()+1);
-            ButtonHelper.pillageCheck(player, activeMap);
+            ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
         }
-        if (!alreadyOwned && !activeMap.isAllianceMode() && (!planet.equals("mirage"))&& !activeMap.isBaseGameMode()) {
+        if (!alreadyOwned && !Helper.isAllianceModeAndPreviouslyOwnedCheck(activeMap, planet) && (!planet.equals("mirage"))&& !activeMap.isBaseGameMode()) {
             Planet planetReal = (Planet) unitHolder;
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeMap, planetReal);
-            
             if (event != null && buttons != null && !buttons.isEmpty()) {
                 String message = "Click button to explore " + Helper.getPlanetRepresentation(planet, activeMap);
                 MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);

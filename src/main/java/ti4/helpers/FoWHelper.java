@@ -334,6 +334,83 @@ public class FoWHelper {
 		return tiles;
 	}
 
+
+
+	public static boolean doesTileHaveWHs(Map activeMap, String position, Player player) {
+		Set<String> adjacentPositions = new HashSet<>();
+		Set<Tile> allTiles = new HashSet<Tile>(activeMap.getTileMap().values());
+		Tile tile = activeMap.getTileByPosition(position);
+
+		String ghostFlagship = null;
+		for (Player p : activeMap.getPlayers().values()) {
+			if (p.ownsUnit("ghost_flagship")) {
+				ghostFlagship = Mapper.getUnitID("fs", p.getColor());
+				break;
+			}
+		}
+
+		boolean wh_recon = activeMap.getLaws().keySet().contains("wormhole_recon");
+		boolean absol_recon = activeMap.getLaws().keySet().contains("absol_recon");
+
+		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
+		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+			HashSet<String> tokenList = unitHolder.getTokenList();
+			for (String token : tokenList) {
+				if (token.contains(Constants.ALPHA)) {
+					wormholeIDs.add(Constants.ALPHA);
+				} else if (token.contains(Constants.BETA)) {
+					wormholeIDs.add(Constants.BETA);
+				} else if (token.contains(Constants.GAMMA)) {
+					wormholeIDs.add(Constants.GAMMA);
+				} else if (token.contains(Constants.DELTA)) {
+					wormholeIDs.add(Constants.DELTA);
+				} else if (token.contains(Constants.EPSILON)) {
+					wormholeIDs.add(Constants.EPSILON);
+				} else if (token.contains(Constants.VOYAGE)) {
+					wormholeIDs.add(Constants.VOYAGE);
+				} else if (token.contains(Constants.CHAMPION)) {
+					wormholeIDs.add(Constants.CHAMPION);
+				} else if (token.contains(Constants.NARROWS)) {
+					wormholeIDs.add(Constants.NARROWS);
+				} else if (token.contains(Constants.ZETA)) {
+					wormholeIDs.add(Constants.ZETA);
+				} else if (token.contains(Constants.ETA)) {
+					wormholeIDs.add(Constants.ETA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHEPSILON)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHEPSILON);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHIOTA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHIOTA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHTHETA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHTHETA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHZETA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHZETA);
+				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHETA)) {
+					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHETA);
+				}
+			}
+			if (ghostFlagship != null && unitHolder.getUnits().getOrDefault(ghostFlagship, 0) > 0) {
+				wormholeIDs.add(Constants.DELTA);
+			}
+		}
+
+		if ((player != null && player.hasAbility("quantum_entanglement")) || wh_recon || absol_recon) {
+			if (wormholeIDs.contains(Constants.ALPHA)) {
+				wormholeIDs.add(Constants.BETA);
+			} else if (wormholeIDs.contains(Constants.BETA)) {
+				wormholeIDs.add(Constants.ALPHA);
+			}
+		}
+
+		if (wormholeIDs.isEmpty()) {
+			return false;
+		}else{
+			return true;
+		}
+	}
+
+
+
+
 	/** Check the map for other tiles that have wormholes connecting to the source system.
 	 *  <p>
 	 *  Also takes into account player abilities and agendas
@@ -415,6 +492,7 @@ public class FoWHelper {
 		for (String wormholeID : wormholeIDs) {
 			wormholeTiles.addAll(Mapper.getWormholesTiles(wormholeID));
 		}
+		
 
 		for (Tile tile_ : allTiles) {
 			String position_ = tile_.getPosition();

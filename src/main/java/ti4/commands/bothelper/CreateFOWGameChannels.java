@@ -6,26 +6,21 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.commons.lang3.StringUtils;
 
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
-import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import net.dv8tion.jda.api.requests.restaction.ChannelAction;
 import ti4.MapGenerator;
 import ti4.commands.game.GameCreate;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -233,38 +228,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         }
     }
 
-    private static ArrayList<Integer> getAllExistingPBDNumbers() {
-        List<Guild> guilds = MapGenerator.jda.getGuilds();
-        ArrayList<Integer> pbdNumbers = new ArrayList<>();
-
-        // GET ALL PBD ROLES FROM ALL GUILDS
-        for (Guild guild : guilds) {
-            System.out.println(guild.getName());
-            List<Role> pbdRoles = guild.getRoles().stream()
-                .filter(r -> r.getName().startsWith("pbd"))
-                .toList();
-
-            //EXISTING ROLE NAMES
-            for (Role role : pbdRoles) {
-                String pbdNum = role.getName().replace("pbd", "");
-                if (Helper.isInteger(pbdNum)) {
-                    pbdNumbers.add(Integer.parseInt(pbdNum));
-                }
-            }
-        }
-
-        // GET ALL EXISTING PBD MAP NAMES
-        List<String> mapNames = MapManager.getInstance().getMapList().keySet().stream()
-            .filter(mapName -> mapName.startsWith("pbd"))
-            .toList();
-        for (String mapName : mapNames) {
-            String pbdNum = mapName.replace("pbd", "");
-            if (Helper.isInteger(pbdNum)) {
-                pbdNumbers.add(Integer.parseInt(pbdNum));
-            }
-        }
-        return pbdNumbers;
-    }
+   
     private static ArrayList<Integer> getAllExistingFOWNumbers() {
         List<Guild> guilds = MapGenerator.jda.getGuilds();
         ArrayList<Integer> pbdNumbers = new ArrayList<>();
@@ -298,15 +262,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         return pbdNumbers;
     }
 
-    private static Guild getNextAvailableServer() {
-        if (serverCanHostNewGame(MapGenerator.guildPrimary)) {
-            return MapGenerator.guildPrimary;
-        } else if (serverCanHostNewGame(MapGenerator.guildSecondary)) {
-            return MapGenerator.guildSecondary;
-        } else {
-            return null;
-        }
-    }
+   
 
     private static boolean serverCanHostNewGame(Guild guild) {
         if (guild != null   && serverHasRoomForNewRole(guild)
@@ -336,13 +292,7 @@ public class CreateFOWGameChannels extends BothelperSubcommandData {
         return true;
     }
 
-    private static String getCategoryNameForGame(String gameName) {
-        if (!gameName.startsWith("fow")) return null;
-        String gameNumber = StringUtils.substringAfter(gameName, "fow");
-        if (!Helper.isInteger(gameNumber)) return null;
-        int gameNum = Integer.parseInt(gameNumber);     
-        return "FOW #" + gameNum;
-    }
+   
     
     public static List<Category> getAllAvailablePBDCategories() {
         List<Category> categories = MapGenerator.jda.getCategories().stream()

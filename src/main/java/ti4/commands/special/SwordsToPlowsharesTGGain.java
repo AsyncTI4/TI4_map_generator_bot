@@ -5,15 +5,13 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
-import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
-import java.util.HashSet;
 import java.util.List;
 
 public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
@@ -67,7 +65,7 @@ public class SwordsToPlowsharesTGGain extends SpecialSubcommandData {
                 channel = player.getPrivateChannel();
             }
             MessageHelper.sendMessageToChannel(channel,message );
-        ButtonHelper.pillageCheck(player, activeMap);
+        ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
 
     }
 

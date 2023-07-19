@@ -151,6 +151,40 @@ public class Helper {
         }
         return player;
     }
+    public static boolean isAllianceModeAndPreviouslyOwnedCheck(Map activeMap, String planet) {
+        return (activeMap.isAllianceMode() && doesAnyoneOwnPlanet(activeMap, planet));
+    }
+     public static boolean isSaboAllowed(Map activeMap, Player player) {
+       
+        if(activeMap.getName().equalsIgnoreCase("pbd100")){
+            return true;
+        }
+        if(activeMap.getDiscardActionCards().containsKey("sabo1") && activeMap.getDiscardActionCards().containsKey("sabo2") && activeMap.getDiscardActionCards().containsKey("sabo3") && activeMap.getDiscardActionCards().containsKey("sabo4")){
+            return false;
+        }
+        if(player.hasTech("tp") && activeMap.getActivePlayer() != null && activeMap.getActivePlayer().equalsIgnoreCase(player.getUserID())){
+            for(Player p2 : activeMap.getRealPlayers()){
+                if(p2 == player){
+                    continue;
+                }
+                if(!p2.isPassed()){
+                    return true;
+                }
+            }
+            return false;
+        }
+        return true;
+    
+    }
+
+    public static boolean doesAnyoneOwnPlanet(Map activeMap, String planet) {
+        for(Player player : activeMap.getRealPlayers()){
+            if(player.getPlanets().contains(planet)){
+                return true;
+            }
+        }
+        return false;
+    }
     public static Player getPlayerFromAbility(Map activeMap, String ability) {
         Player player = null;
         if (ability != null) {
@@ -558,7 +592,7 @@ public class Helper {
         return ident;
     }
     
-    public static List<Button> getRemainingSCButtons(GenericInteractionCreateEvent event, Map activeMap) {
+    public static List<Button> getRemainingSCButtons(GenericInteractionCreateEvent event, Map activeMap, Player playerPicker) {
         List<Button> scButtons = new ArrayList<>();
 
         for (Integer sc : activeMap.getSCList()) {
@@ -577,9 +611,9 @@ public class Helper {
             Emoji scEmoji = Emoji.fromFormatted(getSCBackEmojiFromInteger(sc));
             Button button;
             if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
-                button = Button.secondary("scPick_" + sc, " ").withEmoji(scEmoji);
+                button = Button.secondary("FFCC_"+playerPicker.getFaction()+"_scPick_" + sc, " ").withEmoji(scEmoji);
             } else {
-                button = Button.secondary("scPick_" + sc, "" + sc);
+                button = Button.secondary("FFCC_"+playerPicker.getFaction()+"_scPick_" + sc, "" + sc);
             }
             scButtons.add(button);
         }
@@ -669,7 +703,16 @@ public class Helper {
                         continue;
                     }
                 }
+                
                 String pp = planet.getName();
+                if (warfareNOtherstuff.equalsIgnoreCase("genericBuild")) {
+                    Button sdButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_sd_"+pp, "Place 1 Space Dock on "+Helper.getPlanetRepresentation(pp, activeMap));
+                    sdButton = sdButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("spacedock")));
+                    unitButtons.add(sdButton);
+                    Button pdsButton = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_pds_"+pp, "Place 1 PDS on "+Helper.getPlanetRepresentation(pp, activeMap));
+                    pdsButton = pdsButton.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("pds")));
+                    unitButtons.add(pdsButton);
+                }
                 Button inf1Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_infantry_"+pp, "Produce 1 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap));
                 inf1Button = inf1Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
                 unitButtons.add(inf1Button);

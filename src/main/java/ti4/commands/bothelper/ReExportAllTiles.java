@@ -3,7 +3,6 @@ package ti4.commands.bothelper;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.jetbrains.annotations.NotNull;
 import ti4.generator.TileHelper;
 import ti4.helpers.Constants;
 
