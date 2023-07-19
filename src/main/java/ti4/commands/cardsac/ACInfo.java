@@ -183,7 +183,7 @@ public class ACInfo extends ACCardsSubcommandData {
                 acButtons.add(nekroButton);
             }
             if (player.hasLeader("hacanagent")&&!player.getLeaderByID("hacanagent").isExhausted()) {
-                Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+                Button nekroButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
                 acButtons.add(nekroButton);
             }
         }
