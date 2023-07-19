@@ -15,9 +15,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -180,6 +178,14 @@ public class ACInfo extends ACCardsSubcommandData {
                 }
             }
             acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
+            if (player.hasLeader("nekroagent")&&!player.getLeaderByID("nekroagent").isExhausted()) {
+                Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro")));
+                acButtons.add(nekroButton);
+            }
+            if (player.hasLeader("hacanagent")&&!player.getLeaderByID("hacanagent").isExhausted()) {
+                Button nekroButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+                acButtons.add(nekroButton);
+            }
         }
         return acButtons;
     }

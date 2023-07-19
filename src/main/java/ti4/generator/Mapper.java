@@ -1,16 +1,14 @@
 package ti4.generator;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
-import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.model.*;
 
@@ -215,9 +213,13 @@ public class Mapper {
     public static Set<String> getWormholesTiles(String wormholeID) {
         WormholeModel wormholeModel = new WormholeModel();
         WormholeModel.Wormhole wormhole = wormholeModel.getWormholeFromString(wormholeID);
+        if(wormhole == null){
+            Set<String> empty = new HashSet<String>();
+            return empty;
+        }
+
         return TileHelper.getAllTiles().values().stream()
-                .filter(tileModel -> tileModel.getWormholes() != null)
-                .filter(tileModel -> tileModel.getWormholes().contains(wormhole))
+                .filter(tileModel -> tileModel.getWormholes() != null && tileModel.getWormholes().contains(wormhole))
                 .map(TileModel::getId)
                 .collect(Collectors.toSet());
     }

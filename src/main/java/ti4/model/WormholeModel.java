@@ -1,7 +1,6 @@
 package ti4.model;
 
 import java.util.Arrays;
-import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
@@ -42,6 +41,8 @@ public class WormholeModel {
         WHNARROWS,
         WHPROBABILITY,
         WHCHAMPION,
+        WHETA,
+        WHZETA,
         WHVOYAGE;
 
         @Override

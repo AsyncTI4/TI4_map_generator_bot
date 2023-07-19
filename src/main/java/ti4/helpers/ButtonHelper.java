@@ -1,10 +1,12 @@
 package ti4.helpers;
+import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.MessageReaction;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.component.ButtonInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.ActionRow;
@@ -18,8 +20,9 @@ import java.util.*;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
+import org.jetbrains.annotations.NotNull;
 
+import ti4.buttons.ButtonListener;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.explore.ExpFrontier;
@@ -33,10 +36,9 @@ import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
-import ti4.generator.PositionMapper;
-import ti4.generator.UnitTokenPosition;
 import ti4.map.Leader;
 import ti4.map.Map;
+import ti4.map.MapManager;
 import ti4.map.MapSaveLoadManager;
 import ti4.map.Planet;
 import ti4.map.Player;
@@ -63,35 +65,18 @@ public class ButtonHelper {
                 Button lost3TG = Button.danger("reduceTG_3", "Spend 3 TGs");
                 buttons.add(lost3TG);
             }
-            if (player.hasLeader("keleresagent")&&player.getCommodities() > 0) {
+            if (player.hasLeader("keleresagent")&&!player.getLeader("keleresagent").isExhausted()&&player.getCommodities() > 0) {
                 Button lost1C = Button.danger("reduceComm_1", "Spend 1 comm");
                 buttons.add(lost1C);
             }
-            if (player.hasLeader("keleresagent")&&player.getCommodities() > 1) {
+            if (player.hasLeader("keleresagent")&&!player.getLeader("keleresagent").isExhausted()&&player.getCommodities() > 1) {
                 Button lost2C = Button.danger("reduceComm_2", "Spend 2 comms");
                 buttons.add(lost2C);
             }
             
             return buttons;
     }
-     public static void giveKeleresCommsNTg(Map activeMap, GenericInteractionCreateEvent event){
-
-        for(Player player : activeMap.getPlayers().values()){
-            if(player.isRealPlayer() && player.hasAbility("council_patronage")){
-                MessageChannel channel = activeMap.getActionsChannel();
-                if(activeMap.isFoWMode()){
-                    channel = player.getPrivateChannel();
-                }
-                player.setTg(player.getTg()+1);
-                player.setCommodities(player.getCommoditiesTotal());
-                String message = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " due to your council patronage ability, 1tg has been added to your total and your commodities have been refreshed";
-                MessageHelper.sendMessageToChannel(channel, message);
-                ButtonHelper.pillageCheck(player, activeMap);
-                ButtonHelper.resolveMinisterOfCommerceCheck(activeMap, player, event);
-
-            }
-        }
-     }
+    
     public static List<Player> getPlayersWhoHaventReacted(String messageId, Map activeMap){
         List<Player> playersWhoAreMissed = new ArrayList<Player>();
         if(messageId == null || messageId.equalsIgnoreCase("")){
@@ -175,8 +160,8 @@ public class ButtonHelper {
                 List<Button> buttons = new ArrayList<Button>();
                 buttons.add(Button.success("useTA_"+player.getColor(), "Use TA"));
                 buttons.add(Button.danger("deleteButtons", "Decline to use TA"));
-                String message = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) +" a player who's TA you hold has refreshed their comms, would you like to play the TA?";
-                MessageHelper.sendMessageToChannelWithButtons(p2.getPrivateChannel(), message, buttons);
+                String message = Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true) +" a player who's TA you hold has refreshed their comms, would you like to play the TA?";
+                MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeMap), message, buttons);
             }
         }
     }
@@ -194,36 +179,14 @@ public class ButtonHelper {
                     String message = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Minister of Commerce triggered, your tgs have increased due to your "+numOfNeighbors+" neighbors ("+player.getTg()+"->"+(player.getTg()+numOfNeighbors)+")";
                     player.setTg(numOfNeighbors+player.getTg());
                     MessageHelper.sendMessageToChannel(channel, message);
-                    ButtonHelper.pillageCheck(player, activeMap);
+                    ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
                     
                 }
             }
         }
     }
 
-    public static void resolveDarkPactCheck(Map activeMap, Player sender, Player receiver, int numOfComms, GenericInteractionCreateEvent event) {
-        for(String pn : sender.getPromissoryNotesInPlayArea()){
-            if(pn.equalsIgnoreCase("dark_pact") && activeMap.getPNOwner(pn).getFaction().equalsIgnoreCase(receiver.getFaction())){
-                if(numOfComms == sender.getCommoditiesTotal()){
-                    MessageChannel channel = event.getMessageChannel();
-                    if(activeMap.isFoWMode()){
-                        channel = sender.getPrivateChannel();
-                    }
-                    String message =  Helper.getPlayerRepresentation(sender, activeMap, activeMap.getGuild(), true)+" Dark Pact triggered, your tgs have increased by 1 ("+sender.getTg()+"->"+(sender.getTg()+1)+")";
-                    sender.setTg(sender.getTg()+1);
-                    MessageHelper.sendMessageToChannel(channel, message);
-                    message =  Helper.getPlayerRepresentation(receiver, activeMap, activeMap.getGuild(), true)+" Dark Pact triggered, your tgs have increased by 1 ("+receiver.getTg()+"->"+(receiver.getTg()+1)+")";
-                    receiver.setTg(receiver.getTg()+1);
-                    if(activeMap.isFoWMode()){
-                        channel = receiver.getPrivateChannel();
-                    }
-                    MessageHelper.sendMessageToChannel(channel, message);
-                    ButtonHelper.pillageCheck(sender, activeMap);
-                    ButtonHelper.pillageCheck(receiver, activeMap);    
-                }
-            }
-        }
-    }
+    
 
 
     public static int resolveOnActivationEnemyAbilities(Map activeMap, Tile activeSystem, Player player, boolean justChecking) {
@@ -258,7 +221,7 @@ public class ButtonHelper {
                     int cTG = nonActivePlayer.getTg();
                     nonActivePlayer.setTg(cTG+4);
                     MessageHelper.sendMessageToChannel(channel, ident + " gained 4 tg ("+cTG+"->"+nonActivePlayer.getTg()+")");
-                    ButtonHelper.pillageCheck(nonActivePlayer, activeMap);
+                    ButtonHelperFactionSpecific.pillageCheck(nonActivePlayer, activeMap);
                 }
             }
             //neuroglaive
@@ -346,6 +309,14 @@ public class ButtonHelper {
         }
         return techPresent;
     }
+     public static  List<Button> getXxchaAgentReadyButtons(Map activeMap, Player player) {
+        List<Button> buttons = new ArrayList<Button>();
+        for(String planet : player.getExhaustedPlanets()){
+            buttons.add(Button.success("refresh_"+planet, "Ready "+Helper.getPlanetRepresentation(planet, activeMap)));
+        }
+        buttons.add(Button.danger("deleteButtons_spitItOut", "Delete These Buttons"));
+        return buttons;
+     }
     public static void sendAllTechsNTechSkipPlanetsToReady(Map activeMap, GenericInteractionCreateEvent event, Player player) {
         List<Button> buttons = new ArrayList<Button>();
         for(String tech : player.getExhaustedTechs()){
@@ -558,7 +529,7 @@ public class ButtonHelper {
         }
     }
     public static List<String> getPlanetsWithSleeperTokens(Player player, Map activeMap, Tile tile) {
-        List<String> planetsWithSleepers = new ArrayList();
+        List<String> planetsWithSleepers = new ArrayList<String>();
         for(UnitHolder unitHolder :tile.getUnitHolders().values()){
             if(unitHolder instanceof Planet planet){
                 if(planet.getTokenList().contains(Constants.TOKEN_SLEEPER_PNG)){
@@ -585,7 +556,7 @@ public class ButtonHelper {
     
     
     public static List<String> getPlanetsWithSpecificUnit(Player player, Map activeMap, Tile tile,String unit) {
-        List<String> planetsWithUnit = new ArrayList();
+        List<String> planetsWithUnit = new ArrayList<String>();
         for(UnitHolder unitHolder :tile.getUnitHolders().values()){
             if(unitHolder instanceof Planet planet){
                 if(planet.getUnits().keySet().contains(Mapper.getUnitID(AliasHandler.resolveUnit(unit), player.getColor()))){
@@ -596,7 +567,7 @@ public class ButtonHelper {
         return planetsWithUnit;
     }
     public static List<String> getAllPlanetsWithSleeperTokens(Player player, Map activeMap) {
-        List<String> planetsWithSleepers = new ArrayList();
+        List<String> planetsWithSleepers = new ArrayList<String>();
         for(Tile tile :activeMap.getTileMap().values()){
             planetsWithSleepers.addAll(getPlanetsWithSleeperTokens(player, activeMap, tile));
         }
@@ -606,7 +577,7 @@ public class ButtonHelper {
          String finChecker = "FFCC_"+player.getFaction() + "_";
        
         for(String planet : ButtonHelper.getPlanetsWithSleeperTokens(player, activeMap, tile)){
-            List<Button> planetsWithSleepers = new ArrayList();
+            List<Button> planetsWithSleepers = new ArrayList<Button>();
             planetsWithSleepers.add(Button.success(finChecker+"replaceSleeperWith_pds_"+planet, "Replace sleeper on "+planet+ " with a pds."));
             if(ButtonHelper.getNumberOfUnitsOnTheBoard(activeMap, player, "mech") < 4){
                 planetsWithSleepers.add(Button.success(finChecker+"replaceSleeperWith_mech_"+planet, "Replace sleeper on "+planet+ " with a mech and an infantry."));
@@ -619,7 +590,7 @@ public class ButtonHelper {
     }
     public static List<Button> getButtonsForTurningPDSIntoFS(Player player, Map activeMap, Tile tile) {
          String finChecker = "FFCC_"+player.getFaction() + "_";
-        List<Button> planetsWithPDS = new ArrayList();
+        List<Button> planetsWithPDS = new ArrayList<Button>();
         for(String planet : ButtonHelper.getPlanetsWithSpecificUnit(player, activeMap, tile, "pds")){
             planetsWithPDS.add(Button.success(finChecker+"replacePDSWithFS_"+planet, "Replace pds on "+planet+ " with your flagship."));
         }
@@ -628,7 +599,7 @@ public class ButtonHelper {
     }
     public static List<Button> getButtonsForRemovingASleeper(Player player, Map activeMap) {
          String finChecker = "FFCC_"+player.getFaction() + "_";
-        List<Button> planetsWithSleepers = new ArrayList();
+        List<Button> planetsWithSleepers = new ArrayList<Button>();
         for(String planet : ButtonHelper.getAllPlanetsWithSleeperTokens(player, activeMap)){
             planetsWithSleepers.add(Button.success(finChecker+"removeSleeperFromPlanet_"+planet, "Remove the sleeper on "+planet+ "."));
         }
@@ -718,29 +689,75 @@ public class ButtonHelper {
         return buttonsToRemoveCC;
     }
 
-    public static void pillageCheck(Player player, Map activeMap) {
-        if(player.getPromissoryNotesInPlayArea().contains("pop")){
-            return;
+    
+    public static List<Button> getButtonsToExploreAllPlanets(Player player, Map activeMap){
+        List<Button> buttons = new ArrayList<Button>();
+        for(String plan : player.getPlanets()){
+            UnitHolder planetUnit = activeMap.getPlanetsInfo().get(plan);
+            Planet planetReal =  (Planet) planetUnit;    
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null) {
+                List<Button> planetButtons = getPlanetExplorationButtons(activeMap, planetReal);
+                buttons.addAll(planetButtons);
+            }
         }
-        if(Helper.getPlayerFromAbility(activeMap, "pillage") != null && !Helper.getPlayerFromAbility(activeMap, "pillage").getFaction().equalsIgnoreCase(player.getFaction())){
-             
-            Player pillager = Helper.getPlayerFromAbility(activeMap, "pillage");
-            String finChecker = "FFCC_"+pillager.getFaction() + "_";
-            if(player.getTg() > 2 && Helper.getNeighbouringPlayers(activeMap, player).contains(pillager)){
-                List<Button> buttons = new ArrayList<Button>();
-                String playerIdent = StringUtils.capitalize(player.getFaction());
-                MessageChannel channel = activeMap.getMainGameChannel();
-                if(activeMap.isFoWMode()){
-                    playerIdent = StringUtils.capitalize(player.getColor());
-                    channel = pillager.getPrivateChannel();
-                }
-                String message = Helper.getPlayerRepresentation(pillager, activeMap, activeMap.getGuild(), true) + " you may have the opportunity to pillage "+playerIdent+". Please check this is a valid pillage opportunity, and use buttons to resolve.";
-                buttons.add(Button.danger(finChecker+"pillage_"+player.getColor()+"_unchecked","Pillage "+playerIdent));
-                buttons.add(Button.success(finChecker+"deleteButtons","Decline Pillage Window"));
-                MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+        return buttons;
+    }
+    public static List<Button> getButtonsForAgentSelection(Map activeMap, String agent){
+        List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, "exhaustAgent_"+agent, null);
+        return buttons;
+    }
+    public static List<Button> getButtonsForPictureCombats(Map activeMap, String pos){
+        
+        List<Button> buttons = new ArrayList<>();
+        buttons.add(Button.danger("getDamageButtons_"+pos, "Assign Hits"));
+        buttons.add(Button.primary("refreshViewOfSystem_"+pos, "Refresh Picture"));
+        Player titans = Helper.getPlayerFromUnlockedLeader(activeMap, "titansagent");
+        if(titans != null && !titans.getLeaderByID("titansagent").isExhausted()){
+            String finChecker = "FFCC_"+titans.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"exhaustAgent_titansagent", "Use Titans Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("titans"))));
+        }
+        Player sol = Helper.getPlayerFromUnlockedLeader(activeMap, "solagent");
+        if(sol != null && !sol.getLeaderByID("solagent").isExhausted()){
+            String finChecker = "FFCC_"+sol.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"exhaustAgent_solagent", "Use Sol Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sol"))));
+        }
+        Player letnev = Helper.getPlayerFromUnlockedLeader(activeMap, "letnevagent");
+        if(letnev != null && !letnev.getLeaderByID("letnevagent").isExhausted()){
+            String finChecker = "FFCC_"+letnev.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"exhaustAgent_letnevagent", "Use Letnev Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("letnev"))));
+        }
+        Player nomad = Helper.getPlayerFromUnlockedLeader(activeMap, "nomadagentthundarian");
+        if(nomad != null && !nomad.getLeaderByID("nomadagentthundarian").isExhausted()){
+            String finChecker = "FFCC_"+nomad.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"exhaustAgent_nomadagentthundarian", "Use Thundarian").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nomad"))));
+        }
+        Player yin = Helper.getPlayerFromUnlockedLeader(activeMap, "yinagent");
+        if(yin != null && !yin.getLeaderByID("yinagent").isExhausted()){
+            String finChecker = "FFCC_"+yin.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"yinagent_"+pos, "Use Yin Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("yin"))));
+        }
+        return buttons;
+    }
+    public static List<Button> getYinAgentButtons(Player player, Map activeMap, String pos) {
+        List<Button> buttons = new ArrayList<>();
+        Tile tile = activeMap.getTileByPosition(pos);
+        String placePrefix = "placeOneNDone_skipbuild";
+        String tp = tile.getPosition();
+        Button ff2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2ff_"+tp, "Place 2 Fighters" );
+        ff2Button = ff2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("fighter")));
+        buttons.add(ff2Button);
+        for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+            if (unitHolder instanceof Planet planet){
+                String pp = planet.getName();
+                Button inf2Button = Button.success("FFCC_"+player.getFaction()+"_"+placePrefix+"_2gf_"+pp, "Place 2 Infantry on "+Helper.getPlanetRepresentation(pp, activeMap) );
+                inf2Button = inf2Button.withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("infantry")));
+                buttons.add(inf2Button);
             }
         }
 
+
+
+        return buttons;
     }
     public static List<Button> getEndOfTurnAbilities(Player player, Map activeMap) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
@@ -771,6 +788,10 @@ public class ButtonHelper {
         if(player.getTechs().contains("bs") && !player.getExhaustedTechs().contains("bs")){
             endButtons.add(Button.success(finChecker+"exhaustTech_bs", "Exhaust Bio-Stims"));
         }
+        if(player.hasLeader("naazagent")&& !player.getLeader("naazagent").isExhausted()){
+            endButtons.add(Button.success(finChecker+"exhaustAgent_naazagent", "Use NRA Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("naaz"))));
+        }
+
         endButtons.add(Button.danger("deleteButtons", "Delete these buttons"));
         return endButtons;
     }
@@ -1008,6 +1029,20 @@ public class ButtonHelper {
         }
         return buttons;
     }
+    public static void resolveEmpyCommanderCheck(Player player, Map activeMap, Tile tile, GenericInteractionCreateEvent event) {
+
+        for(Player p2 : activeMap.getRealPlayers()){
+            if(p2 != player && AddCC.hasCC(event, p2.getColor(), tile) && activeMap.playerHasLeaderUnlockedOrAlliance(p2, "empyreancommander")){
+                MessageChannel channel = activeMap.getMainGameChannel();
+                if(activeMap.isFoWMode()){
+                    channel = p2.getPrivateChannel();
+                }
+                RemoveCC.removeCC(event, p2.getColor(), tile, activeMap);
+                String message = Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true)+ " due to having the empyrean commander, the cc you had in the active system has been removed. Reminder that this is optional but was done automatically";
+                MessageHelper.sendMessageToChannel(channel, message);
+            }
+        }
+    }
 
     public static List<Tile> getTilesWithShipsInTheSystem(Player player, Map activeMap) {
         List<Tile> buttons = new ArrayList<>();
@@ -1044,6 +1079,13 @@ public class ButtonHelper {
         buttons.add(validTile2);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Choose to either add units (build) or remove them", buttons);
     }
+    public static MessageChannel getCorrectChannel(Player player, Map activeMap, GenericInteractionCreateEvent event){
+        if(activeMap.isFoWMode()){
+            return player.getPrivateChannel();
+        }else{
+            return event.getMessageChannel();
+        }
+    }
 
 
     public static List<Button> getTilesToMoveFrom(Player player, Map activeMap, GenericInteractionCreateEvent event) {
@@ -1056,6 +1098,14 @@ public class ButtonHelper {
                 buttons.add(validTile);
 			}
 		}
+        if (player.hasLeader("saaragent")&&!player.getLeaderByID("saaragent").isExhausted()) {
+            Button saarButton = Button.secondary("exhaustAgent_saaragent", "Use Saar Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("saar")));
+            buttons.add(saarButton);
+        }
+        if (player.hasLeader("ghostagent")&&!player.getLeaderByID("ghostagent").isExhausted() && FoWHelper.doesTileHaveWHs(activeMap, activeMap.getActiveSystem(), player)) {
+            Button ghostButton = Button.secondary("exhaustAgent_ghostagent", "Use Ghost Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("ghost")));
+            buttons.add(ghostButton);
+        }
         Button validTile = Button.danger(finChecker+"concludeMove", "Done moving");
         buttons.add(validTile);
         Button validTile2 = Button.primary(finChecker+"ChooseDifferentDestination", "Activate a different system");
@@ -1076,13 +1126,12 @@ public class ButtonHelper {
         }
         int cc = player.getTacticalCC();
         
-        if (!AddCC.hasCC(event, player.getColor(), tile)) {
+        if (!activeMap.getNaaluAgent()&&!AddCC.hasCC(event, player.getColor(), tile)) {
             cc -= 1;
             player.setTacticalCC(cc);
             AddCC.addCC(event, player.getColor(), tile, true);
         }
         for(String unit :displacedUnits.keySet()){
-            System.out.println(unit);
             int amount = displacedUnits.get(unit);
             if(unit.contains("damaged")){
                 unit = unit.replace("damaged", "");
@@ -1224,7 +1273,7 @@ public class ButtonHelper {
         activeMap.resetCurrentMovedUnitsFrom1System();
         Button buildButton = Button.success(finChecker+"tacticalActionBuild_"+activeMap.getActiveSystem(), "Build in this system");
         buttons.add(buildButton);
-        Button concludeMove = Button.danger(finChecker+"doneWithTacticalAction", "Conclude tactical action");
+        Button concludeMove = Button.danger(finChecker+"doneWithTacticalAction", "Conclude tactical action (will auto DET explore if applicable)");
         buttons.add(concludeMove);
         return buttons;
     }
@@ -1593,18 +1642,18 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 + " UP TO PICK SC\n";
         activeMap.updateActivePlayer(speaker);
         activeMap.setCurrentPhase("strategy");
-        ButtonHelper.giveKeleresCommsNTg(activeMap, event);
+        ButtonHelperFactionSpecific.giveKeleresCommsNTg(activeMap, event);
         if (activeMap.isFoWMode()) {
             if (!activeMap.isHomeBrewSCMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(speaker.getPrivateChannel(),
-                        message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                        message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, speaker));
             } else {
                 MessageHelper.sendPrivateMessageToPlayer(speaker, activeMap, message);
             }
         } else {
             if (!activeMap.isHomeBrewSCMode()) {
                 MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(),
-                        message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                        message + "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, speaker));
             } else {
                 MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
             }
@@ -1801,9 +1850,9 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 if(p2.getLeaderIDs().contains("hacancommander") && !p2.hasLeaderUnlocked("hacancommander")){
 					ButtonHelper.commanderUnlockCheck(p2, activeMap, "hacan", event);
 				}
-                ButtonHelper.pillageCheck(p1, activeMap);
-                ButtonHelper.pillageCheck(p2, activeMap);
-                ButtonHelper.resolveDarkPactCheck(activeMap, p1, p2, tgAmount, event);
+                ButtonHelperFactionSpecific.pillageCheck(p1, activeMap);
+                ButtonHelperFactionSpecific.pillageCheck(p2, activeMap);
+                ButtonHelperFactionSpecific.resolveDarkPactCheck(activeMap, p1, p2, tgAmount, event);
                 message2 = ident + " sent " + tgAmount+ " Commodities to "+ident2;
             }
             case "ACs" -> {
@@ -1884,20 +1933,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
     
     }
 
-    public static List<Button> getButtonsToTakeSomeonesAC(Map activeMap, Player thief, Player victim)
-    {
-        List<Button> takeACs = new ArrayList<>();
-        String secretScoreMsg = "_ _\nClick a button to take an Action Card";
-        List<Button> acButtons = ACInfo.getToBeStolenActionCardButtons(activeMap, victim);
-        if (acButtons != null && !acButtons.isEmpty()) {
-            List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
-            ThreadChannel cardsInfoThreadChannel = thief.getCardsInfoThread(activeMap);
-            for (MessageCreateData message : messageList) {
-                cardsInfoThreadChannel.sendMessage(message).queue();
-            }
-        }
-        return takeACs;
-    }
+    
 
     public static List<Button> getAllPossibleCompButtons(Map activeMap, Player p1, GenericInteractionCreateEvent event) {
         String finChecker = "FFCC_"+p1.getFaction() + "_";
@@ -2042,36 +2078,97 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         return compButtons;
     }
 
-    public static boolean isNextToEmpyMechs(Map activeMap, Player ACPlayer, Player EmpyPlayer)
-    {
-        if(ACPlayer == null || EmpyPlayer == null)
-        {
-            return false;
+    public static String mechOrInfCheck(String planetName, Map activeMap, Player player) {
+        String message = "";
+        Tile tile = activeMap.getTile(AliasHandler.resolveTile(planetName));
+        UnitHolder unitHolder = tile.getUnitHolders().get(planetName);
+        int numMechs = 0;
+        int numInf = 0;
+        String colorID = Mapper.getColorID(player.getColor());
+        String mechKey = colorID + "_mf.png";
+        String infKey = colorID + "_gf.png";
+        if (unitHolder.getUnits() != null) {
+
+            if (unitHolder.getUnits().get(mechKey) != null) {
+                numMechs = unitHolder.getUnits().get(mechKey);
+            }
+            if (unitHolder.getUnits().get(infKey) != null) {
+                numInf = unitHolder.getUnits().get(infKey);
+            }
         }
-        boolean isNextTo = false;
-        if(ACPlayer.getFaction().equalsIgnoreCase(EmpyPlayer.getFaction()))
-        {
-            return false;
+        if (numMechs > 0 || numInf > 0) {
+            if (numMechs > 0) {
+                message = "Planet had a mech. ";
+            } else {
+                message = "Planet did not have a mech. Removed 1 infantry (" + numInf + "->" + (numInf - 1) + "). ";
+                tile.removeUnit(planetName, infKey, 1);
+            }
+        } else {
+            message = "Planet did not have a mech or infantry. Please try again.";
         }
-        List<Tile> tiles = getTilesOfPlayersSpecificUnit(activeMap, EmpyPlayer, "mech");
-        for(Tile tile : tiles)
-        {
-            
-            Set<String> adjTiles = FoWHelper.getAdjacentTiles(activeMap, tile.getPosition(), EmpyPlayer, true);
-            for(String adjTile : adjTiles)
-            {
-                
-                Tile adjT = activeMap.getTileMap().get(adjTile);
-                if(FoWHelper.playerHasUnitsInSystem(ACPlayer, adjT))
-                {
-                    isNextTo = true;
-                    return isNextTo;
-                }
+        return message;
+    }
+
+    public static void addReaction(@NotNull ButtonInteractionEvent event, boolean skipReaction, boolean sendPublic,
+            String message, String additionalMessage) {
+        String userID = event.getUser().getId();
+        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
+        Player player = Helper.getGamePlayer(activeMap, null, event.getMember(), userID);
+        if (player == null || !player.isRealPlayer()) {
+            event.getChannel().sendMessage("You're not an active player of the game").queue();
+            return;
+        }
+        String playerFaction = player.getFaction();
+        Guild guild = event.getGuild();
+        if (guild == null) {
+            event.getChannel().sendMessage("Could not find server Emojis").queue();
+            return;
+        }
+        HashMap<String, Emoji> emojiMap = new ButtonListener().emoteMap.get(guild);
+        List<RichCustomEmoji> emojis = guild.getEmojis();
+        if (emojiMap != null && emojiMap.size() != emojis.size()) {
+            emojiMap.clear();
+        }
+        if (emojiMap == null || emojiMap.isEmpty()) {
+            emojiMap = new HashMap<>();
+            for (Emoji emoji : emojis) {
+                emojiMap.put(emoji.getName().toLowerCase(), emoji);
             }
         }
 
+        Message mainMessage = event.getInteraction().getMessage();
+        Emoji emojiToUse = Helper.getPlayerEmoji(activeMap, player, mainMessage);
+        String messageId = mainMessage.getId();
 
-        return isNextTo;
+        if (!skipReaction) {
+            if (event.getMessageChannel() instanceof ThreadChannel) {
+                
+                activeMap.getActionsChannel().addReactionById(event.getChannel().getId(), emojiToUse).queue();
+            }
+
+            event.getChannel().addReactionById(messageId, emojiToUse).queue();
+            new ButtonListener().checkForAllReactions(event, activeMap);
+            if (message == null || message.isEmpty())
+                return;
+        }
+
+        String text = Helper.getPlayerRepresentation(player, activeMap) + " " + message;
+        if (activeMap.isFoWMode() && sendPublic) {
+            text = message;
+        } else if (activeMap.isFoWMode() && !sendPublic) {
+            text = "(You) " + emojiToUse.getFormatted() + " " + message;
+        }
+
+        if (!additionalMessage.isEmpty()) {
+            text += Helper.getGamePing(event.getGuild(), activeMap) + " " + additionalMessage;
+        }
+
+        if (activeMap.isFoWMode() && !sendPublic) {
+            MessageHelper.sendPrivateMessageToPlayer(player, activeMap, text);
+            return;
+        }
+
+        MessageHelper.sendMessageToChannel(Helper.getThreadChannelIfExists(event), text);
     }
 
     public static String getListOfStuffAvailableToSpend(Player player, Map activeMap){
@@ -2136,18 +2233,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         }
         return count;  
     }
-    public static void firstStepOfChaos(Map activeMap, Player p1, ButtonInteractionEvent event){
-        List<Button> buttons = new ArrayList<Button>();
-        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, p1, "spacedock");
-        if(tiles.isEmpty()){
-            tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, p1, "cabalspacedock");
-        }
-        for(Tile tile : tiles){
-            Button tileButton = Button.success("produceOneUnitInTile_"+tile.getPosition()+"_chaosM", tile.getRepresentationForButtons(activeMap,p1));
-            buttons.add(tileButton);
-        }
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Select which tile you would like to chaos map in.", buttons);
-    }
+    
 
     public static void resolvePressedCompButton(Map activeMap, Player p1, ButtonInteractionEvent event, String buttonID) {
         String prefix = "componentActionRes_";
@@ -2183,14 +2269,18 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 Leader playerLeader = p1.getLeader(buttonID);
 		
                 if(buttonID.contains("agent")){
-                    playerLeader.setExhausted(true);
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),Helper.getFactionLeaderEmoji(playerLeader));
-                    StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(p1, activeMap))
-                            .append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(),messageText.toString());
-                    List<Button> buttons = AgendaHelper.getPlayerOutcomeButtons(activeMap, null, buttonID, null);
-                    String message = "Use buttons to select the user of the agent";
-                    //MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                    if(!buttonID.equalsIgnoreCase("naaluagent") && !buttonID.equalsIgnoreCase("muaatagent") && !buttonID.equalsIgnoreCase("xxchaagent")){
+                        playerLeader.setExhausted(true);
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),Helper.getFactionLeaderEmoji(playerLeader));
+                        StringBuilder messageText = new StringBuilder(Helper.getPlayerRepresentation(p1, activeMap))
+                                .append(" exhausted ").append(Helper.getLeaderFullRepresentation(playerLeader));
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(),messageText.toString());
+                    }else{
+                        List<Button> buttons = ButtonHelper.getButtonsForAgentSelection(activeMap, buttonID);
+                        String message = Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" Use buttons to select the user of the agent";
+                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+                    }
+                    
                 }
                 else {
                     StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(p1, activeMap)).append(" played ").append(Helper.getLeaderFullRepresentation(playerLeader));
@@ -2219,8 +2309,18 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                             }
                         }
                         if ("solhero".equals(playerLeader.getId())) {
-                            
-                            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"Removed every one of your ccs from the board");
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" removed all of your ccs from the board");
+                            for(Tile t : activeMap.getTileMap().values()){
+                                if (AddCC.hasCC(event, p1.getColor(), t)) {
+                                    RemoveCC.removeCC(event, p1.getColor(), t, activeMap);
+                                }
+                            }   
+                        }
+                        if ("yinhero".equals(playerLeader.getId())) {
+                            List<Button> buttons = new ArrayList<Button>();
+                            buttons.add(Button.primary(finChecker+"yinHeroStart", "Invade a planet with Yin Hero"));
+                            buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.", buttons);
                             for(Tile t : activeMap.getTileMap().values()){
                                 if (AddCC.hasCC(event, p1.getColor(), t)) {
                                     RemoveCC.removeCC(event, p1.getColor(), t, activeMap);
@@ -2405,37 +2505,6 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         File file = GenerateMap.getInstance().saveImage(activeMap, DisplayType.all, event);
     }
 
-    public static void resolveMuaatCommanderCheck(Player player, Map activeMap, GenericInteractionCreateEvent event) {
-        if (activeMap.playerHasLeaderUnlockedOrAlliance(player, "muaatcommander")) {
-            int old = player.getTg();
-            int newTg = player.getTg()+1;
-            player.setTg(player.getTg()+1);
-            String mMessage = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Since you have muaat commander unlocked, 1tg has been added automatically ("+old+"->"+newTg+")";
-            if(activeMap.isFoWMode())
-            {
-                MessageHelper.sendMessageToChannel(player.getPrivateChannel(),mMessage);
-            }
-            else{
-                MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
-            }
-        }
-    }
-    public static void offerTerraformButtons(Player player, Map activeMap, GenericInteractionCreateEvent event) {
-        List<Button> buttons = new ArrayList<Button>();
-        for(String planet : player.getPlanets()){
-            UnitHolder unitHolder = activeMap.getPlanetsInfo().get(planet);
-            Planet planetReal = (Planet) unitHolder;
-            boolean oneOfThree = false;
-            if (planetReal != null && planetReal.getOriginalPlanetType() != null && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous"))) {
-                oneOfThree = true;
-            }
-            if ( oneOfThree || planet.contains("custodiavigilia")) {
-                buttons.add(Button.success("terraformPlanet_"+planet, Helper.getPlanetRepresentation(planet, activeMap)));
-            }
-        }
-        String message = "Use buttons to select which planet to terraform";
-        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-    }
      public static void offerNanoforgeButtons(Player player, Map activeMap, GenericInteractionCreateEvent event) {
         List<Button> buttons = new ArrayList<Button>();
         for(String planet : player.getPlanets()){
@@ -2488,7 +2557,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         Player owner = Helper.getPlayerFromColorOrFaction(activeMap, pnOwner); 
         //TERRAFORM TIP
         if (id.equalsIgnoreCase("terraform")) {
-            ButtonHelper.offerTerraformButtons(player, activeMap, event);
+            ButtonHelperFactionSpecific.offerTerraformButtons(player, activeMap, event);
         }
        
        

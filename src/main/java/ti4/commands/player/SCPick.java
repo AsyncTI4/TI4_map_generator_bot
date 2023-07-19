@@ -122,6 +122,7 @@ public class SCPick extends PlayerSubcommandData {
             int player_SCCount = player_.getSCs().size();
             if (nextCorrectPing && player_SCCount < maxSCsPerPlayer && player_.getFaction() != null) {
                 msgExtra += Helper.getPlayerRepresentation(player_, activeMap, event.getGuild(), true) + " To Pick SC";
+                activeMap.setCurrentPhase("strategy");
                 privatePlayer = player_;
                 allPicked = false;
                 break;
@@ -195,13 +196,12 @@ public class SCPick extends PlayerSubcommandData {
             
             if(!allPicked)
             {
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                activeMap.setCurrentPhase("strategy");
+                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), "Use Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, privatePlayer));
             }
             else{
                    
-                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false, event));
-
-                    
+                MessageHelper.sendMessageToChannelWithButtons(privatePlayer.getPrivateChannel(), msgExtra + "\n Use Buttons to do turn.", ButtonHelper.getStartOfTurnButtons(privatePlayer, activeMap, false, event));     
                     
                 }
 
@@ -213,7 +213,8 @@ public class SCPick extends PlayerSubcommandData {
                 if(!allPicked && !activeMap.isHomeBrewSCMode())
                 {
                     activeMap.updateActivePlayer(privatePlayer);
-                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra+"\nUse Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap));
+                    MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), msgExtra+"\nUse Buttons to Pick SC", Helper.getRemainingSCButtons(event, activeMap, privatePlayer));
+                    activeMap.setCurrentPhase("strategy");
                 }
                 else{
                     if(allPicked)
