@@ -48,6 +48,13 @@ public class WormholeModel {
         public String toString() {
             return super.toString().toLowerCase();
         }
+
+        public String getWhString() {
+            if(!super.toString().startsWith("wh") && !super.toString().startsWith("custom")) {
+                return "wh" + super.toString();
+            }
+            return super.toString();
+        }
     }
     public Wormhole getWormholeFromString(String wh) {
         Map<String, Wormhole> allWormholes = Arrays.stream(Wormhole.values())
