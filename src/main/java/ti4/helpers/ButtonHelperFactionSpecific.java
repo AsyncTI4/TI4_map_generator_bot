@@ -319,7 +319,7 @@ public class ButtonHelperFactionSpecific {
         player2.removeActionCard(acNum);
         player.setActionCard(acID);
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + "Acquired " + acID);
-        MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(activeMap), "# "+ Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+" Lost " + acID +" to mageon");
+        MessageHelper.sendMessageToChannel(player2.getCardsInfoThread(activeMap), "# "+ Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)+" Lost " + acID +" to mageon (or perhaps Yssaril hero)");
         ACInfo.sendActionCardInfo(activeMap, player2);
         ACInfo.sendActionCardInfo(activeMap, player);
         event.getMessage().delete().queue();

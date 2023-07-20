@@ -1,7 +1,11 @@
 package ti4.commands.bothelper;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.MapGenerator;
+import ti4.helpers.DiceHelper;
+import ti4.helpers.DiceHelper.Die;
 import ti4.message.MessageHelper;
 
 import java.util.Arrays;
@@ -11,6 +15,10 @@ import java.util.List;
 public class JazzCommand extends BothelperSubcommandData {
     public JazzCommand() {
         super("jazz_command", "Jazz's custom command");
+        addOptions(new OptionData(OptionType.INTEGER, "num_dice", "description", true).setRequiredRange(0, 1000));
+        addOptions(new OptionData(OptionType.INTEGER, "threshold", "description", true).setRequiredRange(1, 10));
+        addOptions(new OptionData(OptionType.INTEGER, "num_dice_2", "description", true).setRequiredRange(0, 1000));
+        addOptions(new OptionData(OptionType.INTEGER, "threshold_2", "description", true).setRequiredRange(1, 10));
     }
 
     @Override
@@ -21,15 +29,14 @@ public class JazzCommand extends BothelperSubcommandData {
             return;
         }
 
-        List<String> myList = Arrays.asList("1","2","3","4","5","6","7","8","9","10","11","12","13","14","15","16","17","18","19","20","21","22","23","24","25","26");
-        
-        Collections.shuffle(myList);
+        int num1 = event.getOption("num_dice").getAsInt();
+        int t1 = event.getOption("threshold").getAsInt();
+        int num2 = event.getOption("num_dice_2").getAsInt();
+        int t2 = event.getOption("threshold_2").getAsInt();
 
-        StringBuilder sb = new StringBuilder();
-        for (String s : myList) {
-            sb.append(s).append("\n");
-        }
+        List<Die> roll_em = DiceHelper.rollDice(t1, num1);
+        roll_em.addAll(DiceHelper.rollDice(t2, num2));
 
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), sb.toString());
+        sendMessage(DiceHelper.formatDiceOutput(roll_em));
     }
 }
