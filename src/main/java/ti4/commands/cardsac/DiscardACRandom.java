@@ -1,10 +1,12 @@
 package ti4.commands.cardsac;
 
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -43,6 +45,10 @@ public class DiscardACRandom extends ACCardsSubcommandData {
             MessageHelper.sendMessageToChannel(event.getChannel(), "No Action Cards in hand");
             return;
         }
+        discardRandomAC(event, activeMap, player, count);
+        
+    }
+    public void discardRandomAC(GenericInteractionCreateEvent event, Map activeMap, Player player, int count){
         StringBuilder sb = new StringBuilder();
         sb.append("Player: ").append(player.getUserName()).append(" - ");
         sb.append("Discarded Action Card:").append("\n");
@@ -53,14 +59,13 @@ public class DiscardACRandom extends ACCardsSubcommandData {
             String acID = cards_.get(0);
             boolean removed = activeMap.discardActionCard(player.getUserID(), actionCards_.get(acID));
             if (!removed) {
-                MessageHelper.sendMessageToChannel(event.getChannel(), "No such Action Cards found, please retry");
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), "No such Action Cards found, please retry");
                 return;
             }
             sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
             count--;
         }
-
-        MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap, event), sb.toString());
         ACInfo.sendActionCardInfo(activeMap, player);
     }
 }

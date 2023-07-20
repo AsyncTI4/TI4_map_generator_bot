@@ -26,6 +26,7 @@ import ti4.commands.agenda.RevealAgenda;
 
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsac.ACInfo_Legacy;
+import ti4.commands.cardsac.DiscardACRandom;
 import ti4.map.UnitHolder;
 import ti4.commands.cardsac.PlayAC;
 import ti4.commands.cardsac.ShowAllAC;
@@ -302,6 +303,8 @@ public class ButtonListener extends ListenerAdapter {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
             }
         } else if (buttonID.startsWith("yinHeroInfantry_")) {
+            ButtonHelperFactionSpecific.lastStepOfYinHero(buttonID, event, activeMap, player, ident);
+        } else if (buttonID.startsWith("acToSendTo_")) {
             ButtonHelperFactionSpecific.lastStepOfYinHero(buttonID, event, activeMap, player, ident);
         } else if (buttonID.startsWith("yinHeroPlanet_")) {
             String planet = buttonID.replace("yinHeroPlanet_", "");
@@ -1232,6 +1235,29 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("yinagent_")) {
             ButtonHelperFactionSpecific.yinAgent(buttonID, event, activeMap, player, ident, trueIdentity);
+        } else if (buttonID.startsWith("yssarilHeroRejection_")) {
+            String playerFaction = buttonID.replace("yssarilHeroRejection_", "");
+            Player notYssaril = Helper.getPlayerFromColorOrFaction(activeMap, playerFaction);
+            String message = Helper.getPlayerRepresentation(notYssaril, activeMap, activeMap.getGuild(), true) + " the player of the yssaril hero has rejected your offering and is forcing you to discard 3 random ACs. The ACs have been automatically discarded";
+             MessageHelper.sendMessageToChannel((MessageChannel)notYssaril.getCardsInfoThread(activeMap), message);
+            new DiscardACRandom().discardRandomAC(event, activeMap, notYssaril, 3);
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("yssarilHeroInitialOffering_")) {
+            List<Button> acButtons = new ArrayList<Button>();
+            buttonID = buttonID.replace("yssarilHeroInitialOffering_", "");
+            String acID = buttonID.split("_")[0];
+            String yssarilFaction = buttonID.split("_")[1];
+            String acName = buttonLabel;
+            Player yssaril = Helper.getPlayerFromColorOrFaction(activeMap, yssarilFaction);
+            String offerName = player.getFaction();
+            if(activeMap.isFoWMode()){
+                offerName = player.getColor();
+            }
+            acButtons.add(Button.success("takeAC_" + acID + "_"+player.getFaction(), acName).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+            acButtons.add(Button.danger("yssarilHeroRejection_"+player.getFaction(), "Reject " + acName +" and force them to discard of 3 random ACs"));
+            String message = Helper.getPlayerRepresentation(yssaril, activeMap, activeMap.getGuild(), true) + " "+offerName +" has offered you the action card "+ acName + " for your Yssaril Hero play. Use buttons to accept or reject it";
+            MessageHelper.sendMessageToChannelWithButtons((MessageChannel)yssaril.getCardsInfoThread(activeMap), message, acButtons);
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("genericReact")) {
             String message = activeMap.isFoWMode() ? "Turned down window" : null;
             ButtonHelper.addReaction(event, false, false, message, "");
@@ -1485,12 +1511,23 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelper.addReaction(event, true, true, "Playing " + riderName, riderName + " Played");
             List<Button> riderButtons = AgendaHelper.getAgendaButtons(riderName, activeMap,
                     finsFactionCheckerPrefix);
-            MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel,
-                    "Please select your rider target", activeMap, player, riderButtons);
+            
             List<Button> afterButtons = AgendaHelper.getAfterButtons(activeMap);
             if (riderName.equalsIgnoreCase("Keleres Rider")) {
-                ButtonHelper.resolvePNPlay(AliasHandler.resolvePromissory(riderName), player, activeMap, event);
+                String pnKey = "fin";
+                for(String pn : player.getPromissoryNotes().keySet()){
+                    if(pn.contains("rider")){
+                        pnKey = pn;
+                    }
+                }
+                if(pnKey.equalsIgnoreCase("fin")){
+                    MessageHelper.sendMessageToChannel(mainGameChannel,"You don't have a Keleres Rider");
+                    return;
+                }
+                ButtonHelper.resolvePNPlay(pnKey, player, activeMap, event);
             }
+            MessageHelper.sendMessageToChannelWithFactionReact(mainGameChannel,
+                    "Please select your rider target", activeMap, player, riderButtons);
             if (riderName.equalsIgnoreCase("Keleres Xxcha Hero")) {
                 Leader playerLeader = player.getLeader("keleresheroodlynn");
                 StringBuilder message = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap))
