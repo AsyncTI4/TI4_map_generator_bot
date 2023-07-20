@@ -5,6 +5,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.utils.messages.MessageCreateData;
@@ -59,6 +60,10 @@ public class PNInfo extends PNCardsSubcommandData {
                 cardsInfoThreadChannel.sendMessage(message).queue();
             }
         }
+        List<Button> buttons = new ArrayList<Button>();
+        Button transaction = Button.primary("transaction", "Transaction");
+        buttons.add(transaction);
+        MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeMap), "You can use this button to resolve a transaction", buttons);
     }
 
     private static List<Button> getPlayablePNButtons(Map activeMap, Player player) {
