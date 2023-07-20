@@ -31,7 +31,6 @@ public class WormholeModel {
         CHI,
         PSI,
         OMEGA,
-
         CUSTOM_ERONOUS_WHEPSILON,
         CUSTOM_ERONOUS_WHETA,
         CUSTOM_ERONOUS_WHIOTA,
@@ -52,7 +51,7 @@ public class WormholeModel {
 
         public String getWhString() {
             if(!super.toString().startsWith("wh") && !super.toString().startsWith("custom")) {
-                return "wh" + super.toString();
+                return "wh" + super.toString().toLowerCase();
             }
             return super.toString();
         }
