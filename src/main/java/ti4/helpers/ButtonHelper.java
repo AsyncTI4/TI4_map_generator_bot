@@ -1083,7 +1083,7 @@ public class ButtonHelper {
         if(activeMap.isFoWMode()){
             return player.getPrivateChannel();
         }else{
-            return event.getMessageChannel();
+            return activeMap.getMainGameChannel();
         }
     }
 
@@ -1770,7 +1770,13 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                         continue;
                     }
                     PromissoryNoteModel promissoryNote = Mapper.getPromissoryNoteByID(pnShortHand);
-                    Button transact = Button.success(finChecker+"send_PNs_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName());
+                    Player owner = activeMap.getPNOwner(pnShortHand);
+                    Button transact;
+                    if(activeMap.isFoWMode()){
+                        transact = Button.success(finChecker+"send_PNs_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), owner.getColor() +" "+ promissoryNote.getName());
+                    }else{
+                        transact = Button.success(finChecker+"send_PNs_" + p2.getFaction() + "_" + p1.getPromissoryNotes().get(pnShortHand), promissoryNote.getName()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(owner.getFaction())));
+                    }
                     stuffToTransButtons.add(transact);
                 }
                 MessageHelper.sendMessageToChannelWithButtons(p1.getCardsInfoThread(activeMap),message, stuffToTransButtons);
@@ -2320,12 +2326,18 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                             List<Button> buttons = new ArrayList<Button>();
                             buttons.add(Button.primary(finChecker+"yinHeroStart", "Invade a planet with Yin Hero"));
                             buttons.add(Button.danger("deleteButtons", "Delete Buttons"));
-                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.", buttons);
-                            for(Tile t : activeMap.getTileMap().values()){
-                                if (AddCC.hasCC(event, p1.getColor(), t)) {
-                                    RemoveCC.removeCC(event, p1.getColor(), t, activeMap);
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" use the button to do individual invasions, then delete the buttons when you have placed 3 total infantry.", buttons);  
+                        }
+                        if ("yssarilhero".equals(playerLeader.getId())) {
+                            for(Player p2 : activeMap.getRealPlayers()){
+                                if(p2 == p1 || p2.getAc() == 0){
+                                    continue;
                                 }
-                            }   
+                                List<Button> buttons = new ArrayList<Button>();
+                                buttons.addAll(ACInfo.getYssarilHeroActionCardButtons(activeMap, p1, p2));
+                                MessageHelper.sendMessageToChannelWithButtons(p2.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true)+ " Yssaril hero played.  Use buttons to select which AC you will offer to them.", buttons);
+                            }
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" sent everyone a ping in their private threads with buttons to send you an AC");
                         }
                         if ("keleresheroharka".equals(playerLeader.getId())) {
                             new KeleresHeroMentak().secondHalf(activeMap, p1, event);  
@@ -2527,20 +2539,14 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         PromissoryNoteModel pn = Mapper.getPromissoryNoteByID(id);
         String pnName = pn.getName();
         String pnOwner = Mapper.getPromissoryNoteOwner(id);
+        Player owner = activeMap.getPNOwner(id);
         if (pn.getPlayArea()) {
             player.setPromissoryNotesInPlayArea(id);
         } else {
             player.removePromissoryNote(id);
-            for (Player player_ : activeMap.getPlayers().values()) {
-                String playerColor = player_.getColor();
-                String playerFaction = player_.getFaction();
-                if (playerColor != null && playerColor.equals(pnOwner) || playerFaction != null && playerFaction.equals(pnOwner)) {
-                    player_.setPromissoryNote(id);
-                    PNInfo.sendPromissoryNoteInfo(activeMap, player_, false);
-                    pnOwner = player_.getFaction();
-                    break;
-                }
-            }
+            owner.setPromissoryNote(id);
+            PNInfo.sendPromissoryNoteInfo(activeMap, owner, false);
+            PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
         }
         String emojiToUse = activeMap.isFoWMode() ? "" : Helper.getFactionIconFromDiscord(pnOwner);
         StringBuilder sb = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap) + " played promissory note: "+pnName+"\n");
@@ -2554,7 +2560,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             pnText = Mapper.getPromissoryNote(id, longPNDisplay);
         }
         sb.append(pnText).append("\n");
-        Player owner = activeMap.getPNOwner(id);
+        
         
         //TERRAFORM TIP
         if (id.equalsIgnoreCase("terraform")) {

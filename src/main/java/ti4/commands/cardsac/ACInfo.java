@@ -38,14 +38,14 @@ public class ACInfo extends ACCardsSubcommandData {
     }
 
     public static void sendActionCardInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendActionCardInfo(activeMap, player);
         sendTrapCardInfo(activeMap, player);
     }
 
     public static void sendActionCardInfo(Map activeMap, Player player, GenericInteractionCreateEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used something";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " used something";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendActionCardInfo(activeMap, player);
         sendTrapCardInfo(activeMap, player);
@@ -220,6 +220,21 @@ public class ACInfo extends ACCardsSubcommandData {
                 String ac_name = Mapper.getActionCardName(key);
                 if (ac_name != null) {
                     acButtons.add(Button.primary("ac_discard_from_hand_" + value + stall, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                }
+            }
+        }
+        return acButtons;
+    }
+     public static List<Button> getYssarilHeroActionCardButtons(Map activeMap, Player yssaril, Player notYssaril) {
+        List<Button> acButtons = new ArrayList<>();
+        LinkedHashMap<String, Integer> actionCards = notYssaril.getActionCards();
+        if (actionCards != null && !actionCards.isEmpty()) {
+            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCardName(key);
+                if (ac_name != null) {
+                    acButtons.add(Button.danger("yssarilHeroInitialOffering_" + value + "_"+yssaril.getFaction(), ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }
