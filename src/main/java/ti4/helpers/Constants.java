@@ -475,6 +475,7 @@ public class Constants {
     public static final String STATUS = "status";
     public static final String SYSTEM = "system";
     public static final String CLEANUP = "cleanup";
+    public static final String PERSONAL_CLEANUP = "personal_cleanup";
     public static final String REVEAL_STATGE1 = "po_reveal_stage1";
     public static final String ADD_CUSTOM = "po_add_custom";
     public static final String MAKE_SO_INTO_PO = "so_into_po";
