@@ -359,6 +359,7 @@ public class FoWHelper {
 				for(WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
 					if(token.contains(wh.getWhString())) {
 						wormholeIDs.add(wh.getWhString());
+						wormholeIDs.add(wh.toString());
 					}
 				}
 				/*if (token.contains(Constants.ALPHA)) {
@@ -443,6 +444,7 @@ public class FoWHelper {
 				for(WormholeModel.Wormhole wh : WormholeModel.Wormhole.values())
 					if(token.contains(wh.getWhString())) {
 						wormholeIDs.add(wh.getWhString());
+						wormholeIDs.add(wh.toString());
 					}
 				/*if (token.contains(Constants.ALPHA)) {
 					wormholeIDs.add(Constants.ALPHA);
