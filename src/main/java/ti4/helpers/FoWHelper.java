@@ -442,7 +442,7 @@ public class FoWHelper {
 			HashSet<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
 				for(WormholeModel.Wormhole wh : WormholeModel.Wormhole.values())
-					if(token.contains(wh.getWhString())) {
+					if(token.contains(wh.getWhString()) || token.contains(wh.toString())) {
 						wormholeIDs.add(wh.getWhString());
 						wormholeIDs.add(wh.toString());
 					}
