@@ -36,12 +36,9 @@ public class WormholeModel {
         CUSTOM_ERONOUS_WHIOTA,
         CUSTOM_ERONOUS_WHTHETA,
         CUSTOM_ERONOUS_WHZETA,
-        WHEPSILON,
         WHNARROWS,
         WHPROBABILITY,
         WHCHAMPION,
-        WHETA,
-        WHZETA,
         WHVOYAGE;
 
         @Override
