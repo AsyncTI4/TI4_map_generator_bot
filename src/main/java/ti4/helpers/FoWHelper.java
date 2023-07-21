@@ -441,10 +441,12 @@ public class FoWHelper {
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			HashSet<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
+				String tokenName = "wh" + token.replace("token_", "").replace(".png", "");
 				for(WormholeModel.Wormhole wh : WormholeModel.Wormhole.values())
-					if(token.contains(wh.getWhString()) || token.contains(wh.toString())) {
+					if(tokenName.contains(wh.getWhString())) {
 						wormholeIDs.add(wh.getWhString());
 						wormholeIDs.add(wh.toString());
+						break;
 					}
 				/*if (token.contains(Constants.ALPHA)) {
 					wormholeIDs.add(Constants.ALPHA);
