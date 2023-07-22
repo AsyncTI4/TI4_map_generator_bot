@@ -404,6 +404,7 @@ public class MapSaveLoadManager {
         writer.write(Constants.CREATION_DATE + " " + activeMap.getCreationDate());
         writer.write(System.lineSeparator());
         long time = keepModifiedDate ? activeMap.getLastModifiedDate() : new Date().getTime();
+        activeMap.setLastModifiedDate(time);
         writer.write(Constants.LAST_MODIFIED_DATE + " " + time);
         writer.write(System.lineSeparator());
         writer.write(Constants.ENDED_DATE + " " + activeMap.getEndedDate());

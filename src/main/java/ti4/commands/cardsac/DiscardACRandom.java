@@ -65,7 +65,7 @@ public class DiscardACRandom extends ACCardsSubcommandData {
             sb.append(Mapper.getActionCard(acID).getRepresentation()).append("\n");
             count--;
         }
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap, event), sb.toString());
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), sb.toString());
         ACInfo.sendActionCardInfo(activeMap, player);
     }
 }

@@ -187,7 +187,7 @@ public class SCPlay extends PlayerSubcommandData {
             List<Button> drawAgendaButton = new ArrayList<Button>();
             Button draw2Agenda = Button.success("FFCC_"+player.getFaction()+"_"+"drawAgenda_2", "Draw 2 agendas");
             drawAgendaButton.add(draw2Agenda);
-            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap, event), assignSpeakerMessage2, drawAgendaButton);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), assignSpeakerMessage2, drawAgendaButton);
 
         }
 
