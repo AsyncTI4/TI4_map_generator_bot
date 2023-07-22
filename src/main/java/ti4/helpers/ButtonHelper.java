@@ -629,7 +629,7 @@ public class ButtonHelper {
         }
         return playersWithShips;
     }
-    public static List<Player> getPlayersWithUnitsOnAPlanet(Map activeMap, Tile tile, Planet planet) {
+    public static List<Player> getPlayersWithUnitsOnAPlanet(Map activeMap, Tile tile, String planet) {
         List<Player> playersWithShips = new ArrayList<>();
         for(Player p2 : activeMap.getPlayers().values()){
             if(FoWHelper.playerHasUnitsOnPlanet(p2, tile, planet)){
@@ -721,14 +721,15 @@ public class ButtonHelper {
     }
     public static void makeACombatThread(Map activeMap, MessageChannel channel, Player p1, Player player2, String threadName, Tile tile, GenericInteractionCreateEvent event, String spaceOrGround){
         TextChannel textChannel = (TextChannel)channel;
-        String longMsg = " Please resolve the interaction here. The first step is any pds fire or playing of experimental battle station. Then the playing of any start of combat or start of a combat round abilities (includes skilled retreat). Then the rolling of anti-fighter-barrage. Then the declaration of retreats (includes the playing of rout). Then the rolling of dice.";
-        if(spaceOrGround.equalsIgnoreCase("ground")){
-            longMsg = " Please resolve the interaction here. The first step is any start of invasion abilities like tekklar, blitz, bunker, or disable. Then its bombardment, then committing of ground forces, followed by a parley and ghost squad window, then start of combat/start of a round of combat abilities.";
-        }
+        
         MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent("Resolve combat");
         channel.sendMessage(baseMessageObject.build()).queue(message_ -> {
             ThreadChannelAction threadChannel;
             boolean foundsomething = false;
+            String longMsg = " Please resolve the interaction here. The first step is any pds fire or playing of experimental battle station. Then the playing of any start of combat or start of a combat round abilities (includes skilled retreat). Then the rolling of anti-fighter-barrage. Then the declaration of retreats (includes the playing of rout). Then the rolling of dice.";
+            if(spaceOrGround.equalsIgnoreCase("ground")){
+                longMsg = " Please resolve the interaction here. The first step is any start of invasion abilities like tekklar, blitz, bunker, or disable. Then its bombardment, then committing of ground forces, followed by a parley and ghost squad window, then start of combat/start of a round of combat abilities.";
+            }
 
             for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
                 if (threadChannel_.getName().equals(threadName)) {
@@ -772,7 +773,11 @@ public class ButtonHelper {
                 if (threadChannels != null) {
                     for (ThreadChannel threadChannel_ : threadChannels) {
                         if (threadChannel_.getName().equals(threadName)) {
-                            MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_, Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true) + Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true) + longMsg);
+                            String longMsg2 = " Please resolve the interaction here. The first step is any pds fire or playing of experimental battle station. Then the playing of any start of combat or start of a combat round abilities (includes skilled retreat). Then the rolling of anti-fighter-barrage. Then the declaration of retreats (includes the playing of rout). Then the rolling of dice.";
+                            if(spaceOrGround.equalsIgnoreCase("ground")){
+                                longMsg2 = " Please resolve the interaction here. The first step is any start of invasion abilities like tekklar, blitz, bunker, or disable. Then its bombardment, then committing of ground forces, followed by a parley and ghost squad window, then start of combat/start of a round of combat abilities.";
+                            }
+                            MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_, Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true) + Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true) + longMsg2);
                             List<Player> playersWithPds2 = null;
                             if(activeMap.isFoWMode() || spaceOrGround.equalsIgnoreCase("ground")){
                                 playersWithPds2 = new ArrayList<Player>();
@@ -1353,10 +1358,7 @@ public class ButtonHelper {
         return successMessage;
 
     }
-    public static List<Player> findOutIfTwoPeopleOnTheSamePlanet(Player player, Map activeMap, ButtonInteractionEvent event) {
-        
-
-    }
+   
     public static List<Button> landAndGetBuildButtons(Player player, Map activeMap, ButtonInteractionEvent event) {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> buttons = new ArrayList<>();
@@ -2327,10 +2329,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         }
         return tiles;  
     }
-    public static int exploreFrontier(Map activeMap, Player p1, String unit){
-
-
-    }
+    
 
     public static int getNumberOfUnitsOnTheBoard(Map activeMap, Player p1, String unit)
     {
