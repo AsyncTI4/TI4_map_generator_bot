@@ -169,6 +169,43 @@ public class ButtonHelper {
             }
         }
     }
+    public static void drawStatusACs(Map activeMap, Player player, ButtonInteractionEvent event){
+        if(activeMap.getCurrentAgendaInfo().contains(player.getFaction())){
+            ButtonHelper.addReaction(event, true, false, "The bot thinks you already drew ACs this status phase. As such, it will not deal you more. Please draw manually if this is a mistake and let Fin know.", "");
+            return;
+        }
+        String message = "";
+        int amount = 1;
+        activeMap.drawActionCard(player.getUserID());
+        if(player.hasTech("nm")){
+            message = " Neural motivator has been accounted for.";
+            activeMap.drawActionCard(player.getUserID());
+            amount = 2;
+        }
+        if(player.hasAbility("scheming")){
+            message = message + " Scheming has been accounted for, please use blue button inside your card info thread to discard 1 AC.";
+            activeMap.drawActionCard(player.getUserID());
+            amount = amount + 1;
+        }
+        
+        for(String law : activeMap.getLaws().keySet()){
+            if(law.equalsIgnoreCase("minister_policy")){
+                if(activeMap.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && !player.hasAbility("scheming")){
+                    message = message + " Minister of Commerce has been accounted for. If this AC is political stability, you cannot play it at this time. ";
+                    activeMap.drawActionCard(player.getUserID());
+                    amount = amount + 1;
+                }
+            }
+        }
+        message = "Drew "+amount +" AC." + message;
+        ACInfo.sendActionCardInfo(activeMap, player, event);
+        if(player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")){
+            ButtonHelper.commanderUnlockCheck(player, activeMap, "yssaril", event);
+        }
+        ButtonHelper.addReaction(event, true, false, message, "");
+         ButtonHelper.checkACLimit(activeMap, event, player);
+        activeMap.setCurrentAgendaInfo(activeMap.getCurrentAgendaInfo()+"_"+player.getFaction());
+    }
 
     public static void resolveMinisterOfCommerceCheck(Map activeMap, Player player, GenericInteractionCreateEvent event) {
         resolveTACheck(activeMap, player, event);
@@ -1310,7 +1347,7 @@ public class ButtonHelper {
                 }
             }
         }
-        Button concludeMove = Button.primary(finChecker+"doneLanding", "Done landing troops");
+        Button concludeMove = Button.secondary(finChecker+"doneLanding", "Done landing troops");
         buttons.add(concludeMove);
         if(player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")){
                 ButtonHelper.commanderUnlockCheck(player, activeMap, "naaz", event);
