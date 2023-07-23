@@ -68,8 +68,7 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
 
         // @jrkd 23/07 - This code will only be triggered for existing games where the
         // explore deck is already empty. New games, or games without an empty explore
-        // deck
-        // will auto-shuffle the discard when drawing the last card.
+        // deck will auto-shuffle the discard when drawing the last card.
         String traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
         String playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
         if (deck.isEmpty() && !discardPile.isEmpty()) {
