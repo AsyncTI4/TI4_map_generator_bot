@@ -117,7 +117,7 @@ public class ButtonHelperFactionSpecific {
                                         int context = 0;
                                         File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, context, tile.getPosition(), event);
                                         MessageHelper.sendMessageWithFile((MessageChannel) threadChannel_, systemWithContext, "Picture of system", false);
-                                        List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeMap,  tile.getPosition());
+                                        List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeMap,  tile.getPosition(), p1, player2, "ground");
                                         MessageHelper.sendMessageToChannelWithButtons((MessageChannel) threadChannel_, "", buttons);
                                         
                                     }
