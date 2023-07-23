@@ -20,6 +20,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.WormholeModel;
 
 public class FoWHelper {
 
@@ -355,7 +356,13 @@ public class FoWHelper {
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			HashSet<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
-				if (token.contains(Constants.ALPHA)) {
+				for(WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
+					if(token.contains(wh.getWhString())) {
+						wormholeIDs.add(wh.getWhString());
+						wormholeIDs.add(wh.toString());
+					}
+				}
+				/*if (token.contains(Constants.ALPHA)) {
 					wormholeIDs.add(Constants.ALPHA);
 				} else if (token.contains(Constants.BETA)) {
 					wormholeIDs.add(Constants.BETA);
@@ -385,7 +392,7 @@ public class FoWHelper {
 					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHZETA);
 				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHETA)) {
 					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHETA);
-				}
+				}*/
 			}
 			if (ghostFlagship != null && unitHolder.getUnits().getOrDefault(ghostFlagship, 0) > 0) {
 				wormholeIDs.add(Constants.DELTA);
@@ -434,7 +441,14 @@ public class FoWHelper {
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			HashSet<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
-				if (token.contains(Constants.ALPHA)) {
+				String tokenName = "wh" + token.replace("token_", "").replace(".png", "");
+				for(WormholeModel.Wormhole wh : WormholeModel.Wormhole.values())
+					if(tokenName.contains(wh.getWhString())) {
+						wormholeIDs.add(wh.getWhString());
+						wormholeIDs.add(wh.toString());
+						break;
+					}
+				/*if (token.contains(Constants.ALPHA)) {
 					wormholeIDs.add(Constants.ALPHA);
 				} else if (token.contains(Constants.BETA)) {
 					wormholeIDs.add(Constants.BETA);
@@ -464,7 +478,7 @@ public class FoWHelper {
 					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHZETA);
 				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHETA)) {
 					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHETA);
-				}
+				}*/
 			}
 			if (ghostFlagship != null && unitHolder.getUnits().getOrDefault(ghostFlagship, 0) > 0) {
 				wormholeIDs.add(Constants.DELTA);

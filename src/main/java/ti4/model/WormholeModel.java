@@ -31,23 +31,26 @@ public class WormholeModel {
         CHI,
         PSI,
         OMEGA,
-
         CUSTOM_ERONOUS_WHEPSILON,
         CUSTOM_ERONOUS_WHETA,
         CUSTOM_ERONOUS_WHIOTA,
         CUSTOM_ERONOUS_WHTHETA,
         CUSTOM_ERONOUS_WHZETA,
-        WHEPSILON,
         WHNARROWS,
         WHPROBABILITY,
         WHCHAMPION,
-        WHETA,
-        WHZETA,
         WHVOYAGE;
 
         @Override
         public String toString() {
             return super.toString().toLowerCase();
+        }
+
+        public String getWhString() {
+            if(!super.toString().startsWith("wh") && !super.toString().startsWith("custom")) {
+                return "wh" + super.toString().toLowerCase();
+            }
+            return super.toString();
         }
     }
     public Wormhole getWormholeFromString(String wh) {
