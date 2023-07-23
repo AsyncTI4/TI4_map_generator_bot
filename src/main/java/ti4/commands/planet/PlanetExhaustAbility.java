@@ -37,7 +37,11 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             MessageHelper.sendMessageToChannel(channel, "Chose to Exhaust Hope's End Ability");
             message = "Use buttons to drop a mech on a planet or draw an AC";
             buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, activeMap, "mech", "placeOneNDone_skipbuild"));
-            buttons.add(Button.success("draw_1_ACDelete","Draw 1 AC"));
+            if(player.hasAbility("scheming")){
+                buttons.add(Button.success("draw_2_ACDelete", "Draw 2 AC (With Scheming)"));
+            }else{
+                buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
+            }
         }
         if(AliasHandler.resolvePlanet(planet).equalsIgnoreCase("primor")){
             MessageHelper.sendMessageToChannel(channel, "Chose to Exhaust Primor's Ability");

@@ -749,19 +749,27 @@ public class ButtonListener extends ListenerAdapter {
             if(AliasHandler.resolveTech(tech).equalsIgnoreCase("iihq")){
                 message = message + "\n Automatically added the Custodia Vigilia planet";
             }
+            ButtonHelperFactionSpecific.resolveNekroCommanderCheck(player, tech, activeMap);
             if(player.getLeaderIDs().contains("jolnarcommander") && !player.hasLeaderUnlocked("jolnarcommander")){
-            ButtonHelper.commanderUnlockCheck(player, activeMap, "jolnar", event);
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "jolnar", event);
+            }
+            if(player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "nekro", event);
             }
             List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
             if (player.hasTechReady("aida")) {
-                        Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
-                        buttons.add(aiDEVButton);
-                    }
+                Button aiDEVButton = Button.danger("exhaustTech_aida", "Exhaust AIDEV");
+                buttons.add(aiDEVButton);
+            }
             Button DoneExhausting = Button.danger("deleteButtons_technology", "Done Exhausting Planets");
             buttons.add(DoneExhausting);
+            
             if (activeMap.isFoWMode()) {
                 MessageHelper.sendMessageToChannel(event.getChannel(), message);
-                MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+                if(!player.hasAbility("technological_singularity")){
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+                }
+                
             } else {
                 String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-technology";            
                 List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
@@ -774,8 +782,10 @@ public class ButtonListener extends ListenerAdapter {
                 } else {
                     MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
                 }
-                MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player.getCardsInfoThread(activeMap),
-                        message2, buttons);
+                if(!player.hasAbility("technological_singularity")){
+                    MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player.getCardsInfoThread(activeMap),
+                            message2, buttons);
+                }
             }
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("takeAC_")) {
@@ -2445,14 +2455,16 @@ public class ButtonListener extends ListenerAdapter {
                     event.getMessage().delete().queue();
                     ButtonHelper.checkACLimit(activeMap, event, player);
                 }
-                case "draw_2_AC" -> {
+
+                case "draw_2_ACDelete" -> {
                     activeMap.drawActionCard(player.getUserID());
                     activeMap.drawActionCard(player.getUserID());
                     if(player.getLeaderIDs().contains("yssarilcommander") && !player.hasLeaderUnlocked("yssarilcommander")){
                         ButtonHelper.commanderUnlockCheck(player, activeMap, "yssaril", event);
                     }
                     ACInfo.sendActionCardInfo(activeMap, player, event);
-                    ButtonHelper.addReaction(event, true, false, "Drew 2 AC", "");
+                    ButtonHelper.addReaction(event, true, false, "Drew 2 AC With Scheming. Please Discard An AC", "");
+                     event.getMessage().delete().queue();
                      ButtonHelper.checkACLimit(activeMap, event, player);
                 }
                 case "pass_on_abilities" -> {
@@ -2560,11 +2572,12 @@ public class ButtonListener extends ListenerAdapter {
                                 String messageCombat = "Resolve space combat.";
                                 MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(messageCombat);
                                 String threadName =  activeMap.getName() + "-round-" + activeMap.getRound() + "-system-" + tile.getPosition()+"-"+player.getFaction()+"-vs-"+player2.getFaction();
+                                
                                 Player p1 = player;
                                 if(!activeMap.isFoWMode()){
                                     ButtonHelper.makeACombatThread(activeMap, actionsChannel, p1,player2, threadName,  tile, event, "space");
                                 }else{
-                                    threadName = threadName+ "-private";
+                                    threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-system-" + tile.getPosition()+"-"+player.getColor()+"-vs-"+player2.getColor()+ "-private";
                                     ButtonHelper.makeACombatThread(activeMap, p1.getPrivateChannel(), p1,player2, threadName, tile, event, "space");
                                     ButtonHelper.makeACombatThread(activeMap, player2.getPrivateChannel(), player2,p1, threadName, tile, event, "space");
                                 }
@@ -2603,7 +2616,7 @@ public class ButtonListener extends ListenerAdapter {
                                 if(!activeMap.isFoWMode()){
                                     ButtonHelper.makeACombatThread(activeMap, actionsChannel, p1,player2, threadName,  tile, event, "ground");
                                 }else{
-                                    threadName = threadName+ "-private";
+                                    threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-system-" + tile.getPosition()+"-"+player.getColor()+"-vs-"+player2.getColor()+ "-private";
                                     ButtonHelper.makeACombatThread(activeMap, p1.getPrivateChannel(), p1,player2, threadName, tile, event, "ground");
                                     ButtonHelper.makeACombatThread(activeMap, player2.getPrivateChannel(), player2,p1, threadName, tile, event, "ground");
                                 }

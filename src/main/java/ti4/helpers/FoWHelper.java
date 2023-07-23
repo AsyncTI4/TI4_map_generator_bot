@@ -418,7 +418,10 @@ public class FoWHelper {
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			HashSet<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
-				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("ion", "");
+				String tokenName = "wh" + token.replace("token_", "").replace(".png", "");
+				if(!tokenName.contains("champion")){
+					tokenName=tokenName.replace("ion", "");
+				}
 				for(WormholeModel.Wormhole wh : WormholeModel.Wormhole.values())
 					if(tokenName.contains(wh.getWhString())) {
 						wormholeIDs.add(wh.getWhString());
