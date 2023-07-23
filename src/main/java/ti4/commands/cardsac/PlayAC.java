@@ -154,7 +154,22 @@ public class PlayAC extends ACCardsSubcommandData {
                 MessageHelper.sendMessageToChannel(mainGameChannel, sb.toString());
                 MessageHelper.sendMessageToChannel(mainGameChannel, "Either all sabos were in the discard or active player had Transparasteel Plating and everyone was passed. Instinct training and watcher mechs may still be viable, who knows. ");
             }
-            
+            if(actionCardTitle.contains("Manipulate Investments")){
+                MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, activeMap);
+                List<Button> scButtons = new ArrayList<Button>();
+                for(int sc = 1; sc < 9; sc++){
+                    Emoji scEmoji = Emoji.fromFormatted(Helper.getSCBackEmojiFromInteger(sc));
+                    Button button;
+                    if (scEmoji != null && scEmoji.getName().contains("SC") && scEmoji.getName().contains("Back")) {
+                        button = Button.secondary("FFCC_"+player.getFaction()+"_increaseTGonSC_" + sc, " ").withEmoji(scEmoji);
+                    } else {
+                        button = Button.secondary("FFCC_"+player.getFaction()+"_increaseTGonSC_" + sc, "" + sc);
+                    }
+                    scButtons.add(button);
+                }
+                scButtons.add(Button.danger("deleteButtons", "Done adding TG"));
+                MessageHelper.sendMessageToChannelWithButtons(channel2, Helper.getPlayerRepresentation(player, activeMap, guild, false)+" Use buttons to increase tgs on SCs. Each press adds 1tg.", scButtons);
+            }
 
             if (actionCardWindow.contains("After an agenda is revealed")) {
                 

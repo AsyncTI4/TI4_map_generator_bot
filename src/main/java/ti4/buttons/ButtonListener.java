@@ -649,6 +649,13 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("distant_suns_")) {
             ButtonHelperFactionSpecific.distantSuns(buttonID, event, activeMap, player, ident);
+        } else if (buttonID.startsWith("increaseTGonSC_")) {
+            String sc = buttonID.replace("increaseTGonSC_","");
+            int scNum = Integer.parseInt(sc);
+            LinkedHashMap<Integer, Integer> scTradeGoods = activeMap.getScTradeGoods();
+            int tgCount = scTradeGoods.get(scNum);
+            activeMap.setScTradeGood(scNum, (tgCount+1));
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added 1tg to SC #"+scNum + ". There are now "+(tgCount+1)+ " tgs on it.");
         } else if (buttonID.startsWith("strategicAction_")) {
             int scNum = Integer.parseInt(buttonID.replace("strategicAction_", ""));
             new SCPlay().playSC(event, scNum, activeMap, mainGameChannel, player);
@@ -694,15 +701,25 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("assignDamage_")) {
                 ButtonHelperModifyUnits.assignDamage(buttonID, event, activeMap, player, ident);
+         } else if (buttonID.startsWith("repairDamage_")) {
+                ButtonHelperModifyUnits.repairDamage(buttonID, event, activeMap, player, ident);
         } else if (buttonID.startsWith("refreshViewOfSystem_")) {
-            String pos = buttonID.replace("refreshViewOfSystem_", "");       
+            String rest = buttonID.replace("refreshViewOfSystem_", "");  
+            String pos = rest.split("_")[0];
+            Player p1 = Helper.getPlayerFromColorOrFaction(activeMap,  rest.split("_")[1]);
+            Player p2 = Helper.getPlayerFromColorOrFaction(activeMap,  rest.split("_")[2]); 
+            String groundOrSpace = rest.split("_")[3];
             File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, 0, pos, event);
             MessageHelper.sendMessageWithFile(event.getMessageChannel(), systemWithContext, "Picture of system", false);
-            List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeMap,  pos);
+            List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeMap,  pos, p1, p2, groundOrSpace);
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "", buttons);
         } else if (buttonID.startsWith("getDamageButtons_")) {
             String pos = buttonID.replace("getDamageButtons_", "");
             List<Button> buttons = ButtonHelper.getButtonsForRemovingAllUnitsInSystem(player, activeMap, activeMap.getTileByPosition(pos));
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity+" Use buttons to resolve", buttons);
+        } else if (buttonID.startsWith("getRepairButtons_")) {
+            String pos = buttonID.replace("getRepairButtons_", "");
+            List<Button> buttons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, activeMap, activeMap.getTileByPosition(pos));
             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity+" Use buttons to resolve", buttons);
         } else if (buttonID.startsWith("assignHits_")) {
             ButtonHelperModifyUnits.assignHits(buttonID, event, activeMap, player, ident, buttonLabel);
