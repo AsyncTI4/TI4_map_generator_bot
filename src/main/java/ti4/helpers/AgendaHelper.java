@@ -11,6 +11,7 @@ import java.util.*;
 
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands.agenda.ListVoteCount;
+import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.special.RiseOfMessiah;
@@ -177,7 +178,7 @@ public class AgendaHelper {
                 }
             }
             String summary = AgendaHelper.getSummaryOfVotes(activeMap, false);
-            List<Player> riders = AgendaHelper.getWinningRiders(summary, winner, activeMap);
+            List<Player> riders = AgendaHelper.getWinningRiders(summary, winner, activeMap, event);
             String ridSum = "People had riders to resolve.";
             for (Player rid : riders) {
                 String rep = Helper.getPlayerRepresentation(rid, activeMap, event.getGuild(), true);
@@ -944,7 +945,7 @@ public class AgendaHelper {
 
     }
 
-    public static List<Player> getWinningRiders(String summary, String winner, Map activeMap) {
+    public static List<Player> getWinningRiders(String summary, String winner, Map activeMap, GenericInteractionCreateEvent event) {
         List<Player> winningRs = new ArrayList<Player>();
         HashMap<String, String> outcomes = activeMap.getCurrentAgendaVotes();
 
@@ -958,6 +959,72 @@ public class AgendaHelper {
 
                     if (winningR != null && (specificVote.contains("Rider") || winningR.hasAbility("future_sight"))) {
 
+                        MessageChannel channel = ButtonHelper.getCorrectChannel(winningR, activeMap);
+                        String identity = Helper.getPlayerRepresentation(winningR, activeMap, activeMap.getGuild(), true);
+                        if(specificVote.contains("Galactic Threat Rider")){
+                            List<Player> voters = AgendaHelper.getWinningVoters(winner, activeMap);
+                            List<String> potentialTech = new ArrayList<String>();
+                            for(Player techGiver : voters){
+                                potentialTech = ButtonHelperFactionSpecific.getPossibleTechForNekroToGainFromPlayer(winningR, techGiver, potentialTech, activeMap);
+                            }
+                            MessageHelper.sendMessageToChannelWithButtons(channel, identity+" resolve Galactic Threat Rider using the buttons", ButtonHelperFactionSpecific.getButtonsForPossibleTechForNekro(winningR, potentialTech, activeMap));
+                        }
+                        if(specificVote.contains("Technology Rider") && !winningR.hasAbility("technological_singularity")){
+                            activeMap.setComponentAction(true);
+                            Button getTech = Button.success("acquireATech", "Get a tech");
+                            List<Button> buttons = new ArrayList();
+                            buttons.add(getTech);
+                            MessageHelper.sendMessageToChannelWithButtons(channel, identity+" resolve Technology Rider by using the button to get a tech", buttons);
+                        }
+                        if(specificVote.contains("Leadership Rider") || (specificVote.contains("Technology Rider") && winningR.hasAbility("technological_singularity"))){
+                            Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+                            Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+                            Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+                            Button DoneGainingCC = Button.danger("deleteButtons", "Done Gaining CCs");
+                            List<Button> buttons = List.of(getTactic, getFleet, getStrat, DoneGainingCC);
+                            String message = identity + "! Your current CCs are " + Helper.getPlayerCCs(winningR)
+                            + ". Use buttons to gain CCs";
+                            MessageHelper.sendMessageToChannel(channel, identity+" resolve rider by using the button to get 3 command counters");
+                            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+                        }
+                        if(specificVote.contains("Keleres Rider")){
+                            int cTG = winningR.getTg();
+                            winningR.setTg(cTG+2);
+                            activeMap.drawActionCard(winningR.getUserID());
+                            ACInfo.sendActionCardInfo(activeMap, winningR, event);
+                            MessageHelper.sendMessageToChannel(channel, identity+" due to having a winning Keleres Rider, you have been given an AC and 2 tg ("+cTG+"->"+winningR.getTg()+")");
+                            ButtonHelperFactionSpecific.pillageCheck(winningR, activeMap);
+                        }
+                        if(specificVote.contains("Politics Rider")){
+                            int amount = 3;
+                            if(winningR.hasAbility("scheming")){
+                                amount = 4;
+                                activeMap.drawActionCard(winningR.getUserID());
+                            }
+                            activeMap.drawActionCard(winningR.getUserID());
+                            activeMap.drawActionCard(winningR.getUserID());
+                            activeMap.drawActionCard(winningR.getUserID());
+                            ACInfo.sendActionCardInfo(activeMap, winningR, event);
+                            activeMap.setSpeaker(winningR.getUserID());
+                            MessageHelper.sendMessageToChannel(channel, identity+" due to having a winning Politics Rider, you have been given "+amount+" AC and the speaker token");
+                            ButtonHelperFactionSpecific.pillageCheck(winningR, activeMap);
+                        }
+                        if(specificVote.contains("Trade Rider")){
+                            int cTG = winningR.getTg();
+                            winningR.setTg(cTG+5);
+                            MessageHelper.sendMessageToChannel(channel, identity+" due to having a winning Trade Rider, you have been given 5 tg ("+cTG+"->"+winningR.getTg()+")");
+                            ButtonHelperFactionSpecific.pillageCheck(winningR, activeMap);
+                        }
+                        if(specificVote.contains("Imperial Rider")){
+                            String msg =  identity+" due to having a winning Imperial Rider, you have scored a pt\n";
+                            int poIndex = 5;
+                            poIndex = activeMap.addCustomPO("Imperial Rider", 1);
+                            msg = msg+ "Custom PO 'Imperial Rider' has been added.\n";
+                            activeMap.scorePublicObjective(winningR.getUserID(), poIndex);
+                            msg = msg + Helper.getPlayerRepresentation(winningR, activeMap)+" scored 'Imperial Rider'\n";
+                            MessageHelper.sendMessageToChannel(channel,msg);
+                            ButtonHelperFactionSpecific.pillageCheck(winningR, activeMap);
+                        }
                         if(!winningRs.contains(winningR))
                         {
                             winningRs.add(winningR);
