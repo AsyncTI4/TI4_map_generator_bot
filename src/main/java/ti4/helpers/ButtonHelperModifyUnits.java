@@ -313,6 +313,36 @@ public class ButtonHelperModifyUnits {
         }
         event.getMessage().delete().queue();
     }
+    public static void spaceLandedUnits(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident, String buttonLabel){
+        String rest = buttonID.replace("spaceUnits_", "");
+        String pos = rest.substring(0, rest.indexOf("_"));
+        rest = rest.replace(pos + "_", "");
+        int amount = Integer.parseInt(rest.charAt(0) + "");
+        rest = rest.substring(1, rest.length());
+        String unitkey = "";
+        String planet = "";
+        if (rest.contains("_")) {
+            unitkey = rest.split("_")[0];
+            planet = rest.split("_")[1].replace(" ", "").toLowerCase();
+        } else {
+            unitkey = rest;
+        }
+        if(buttonLabel.toLowerCase().contains("damaged")){
+            new AddUnits().unitParsing(event, player.getColor(),
+            activeMap.getTileByPosition(pos), amount +" " +unitkey, activeMap);
+             activeMap.getTileByPosition(pos).addUnitDamage("space", unitkey,amount);
+        }else{
+             new AddUnits().unitParsing(event, player.getColor(),
+            activeMap.getTileByPosition(pos), amount +" " +unitkey, activeMap);
+        }
+       
+        String key = Mapper.getUnitID(AliasHandler.resolveUnit(unitkey), player.getColor());
+        activeMap.getTileByPosition(pos).removeUnit(planet,key, amount);
+        List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+"Undid landing of "+amount+ " "+unitkey + " on "+planet);
+        event.getMessage().editMessage(event.getMessage().getContentRaw())
+                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+    }
     public static void landingUnits(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident, String buttonLabel){
         String rest = buttonID.replace("landUnits_", "");
         String pos = rest.substring(0, rest.indexOf("_"));
@@ -328,17 +358,20 @@ public class ButtonHelperModifyUnits {
             unitkey = rest;
         }
         if(buttonLabel.toLowerCase().contains("damaged")){
-            rest = rest+"damaged";
+            
+            new AddUnits().unitParsing(event, player.getColor(),
+            activeMap.getTileByPosition(pos), amount +" " +unitkey+" "+planet, activeMap);
+             activeMap.getTileByPosition(pos).addUnitDamage(planet, unitkey,amount);
+        }else{
+             new AddUnits().unitParsing(event, player.getColor(),
+            activeMap.getTileByPosition(pos), amount +" " +unitkey+" "+planet, activeMap);
         }
-        HashMap<String, Integer> currentSystem = activeMap.getCurrentMovedUnitsFrom1System();
-        if (currentSystem.containsKey(rest)) {
-            activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
-        } else {
-            activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, amount);
-        }
-        String message = ButtonHelper.buildMessageFromDisplacedUnits(activeMap, true, player, "Move");
+       
+        String key = Mapper.getUnitID(AliasHandler.resolveUnit(unitkey), player.getColor());
+        activeMap.getTileByPosition(pos).removeUnit("space",key, amount);
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
-        event.getMessage().editMessage(message)
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+" Landed "+amount+ " "+unitkey + " on "+planet);
+        event.getMessage().editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
     public static void movingUnitsInTacticalAction(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident, String buttonLabel){
@@ -348,15 +381,15 @@ public class ButtonHelperModifyUnits {
        String rest = "";
        if(buttonID.contains("Remove")){
            remove = "Remove";
-           rest = buttonID.replace("unitTacticalRemove_", "");
+           rest = buttonID.replace("unitTacticalRemove_", "").toLowerCase();
        }else{
-           rest = buttonID.replace("unitTacticalMove_", "");
+           rest = buttonID.replace("unitTacticalMove_", "").toLowerCase();
        }
        String pos = rest.substring(0, rest.indexOf("_"));
        Tile tile = activeMap.getTileByPosition(pos);
        rest = rest.replace(pos + "_", "");
 
-       if(rest.contains("All")){
+       if(rest.contains("all")){
           
            if(rest.contains("reverse"))
            {
@@ -714,6 +747,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().editMessage(message)
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2);
+        ButtonHelperFactionSpecific.resolveLetnevCommanderCheck(player, activeMap);
     }
 
 }

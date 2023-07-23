@@ -162,6 +162,28 @@ public class ButtonHelperFactionSpecific {
                 "Use Buttons to Pay For The Mech", buttons);
         event.getMessage().delete().queue();
     }
+     public static void resolveLetnevCommanderCheck(Player player, Map activeMap) {
+        MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeMap);
+        if(activeMap.playerHasLeaderUnlockedOrAlliance(player, "letnevcommander")){
+            int old = player.getTg();
+            int newTg = player.getTg()+1;
+            player.setTg(player.getTg()+1);
+            String mMessage = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Since you have Barony commander unlocked, 1tg has been added automatically ("+old+"->"+newTg+")";
+            MessageHelper.sendMessageToChannel(channel, mMessage);
+            ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
+        }
+     }
+     public static List<Button> getEmpyHeroButtons(Player player, Map activeMap){
+        String finChecker = "FFCC_"+player.getFaction() + "_";
+        List<Button> empties = new ArrayList<Button>();
+        for(Tile tile :activeMap.getTileMap().values()){
+            if(tile.getUnitHolders().values().size() > 1 && FoWHelper.playerHasShipsInSystem(player, tile)){
+                continue;
+            }
+            empties.add(Button.primary(finChecker+"exploreFront_"+tile.getPosition(), "Explore "+tile.getRepresentationForButtons(activeMap, player)));
+        }
+        return empties;
+    }
     public static void pillageCheck(Player player, Map activeMap) {
         if(player.getPromissoryNotesInPlayArea().contains("pop")){
             return;
@@ -190,7 +212,7 @@ public class ButtonHelperFactionSpecific {
         for(String pn : sender.getPromissoryNotesInPlayArea()){
             if(pn.equalsIgnoreCase("dark_pact") && activeMap.getPNOwner(pn).getFaction().equalsIgnoreCase(receiver.getFaction())){
                 if(numOfComms == sender.getCommoditiesTotal()){
-                    MessageChannel channel = event.getMessageChannel();
+                    MessageChannel channel = activeMap.getActionsChannel();
                     if(activeMap.isFoWMode()){
                         channel = sender.getPrivateChannel();
                     }

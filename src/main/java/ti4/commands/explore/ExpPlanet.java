@@ -78,7 +78,7 @@ public class ExpPlanet extends ExploreSubcommandData {
             return;
         }
 
-        if (player.ownsUnit("naaz_mech")) {
+        if (player.hasAbility("distant_suns")) {
             if (Helper.mechCheck(planetName, activeMap, player)) {
                 if (!NRACheck) {
                     if (player.hasTech("pfa")) { //Pre-Fab Arcologies

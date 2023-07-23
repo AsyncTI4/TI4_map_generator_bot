@@ -617,6 +617,23 @@ public class FoWHelper {
 		}
 		return false;
 	}
+	public static boolean playerHasUnitsOnPlanet(Player player, Tile tile, String planet) {
+		String colorID = Mapper.getColorID(player.getColor());
+		if (colorID == null) return false; // player doesn't have a color
+
+		HashMap<String, Integer> units = new HashMap<>();
+		UnitHolder unitHolder =tile.getUnitHolders().get(planet);
+		units.putAll(unitHolder.getUnits());
+		
+		for (String key : units.keySet()) {
+			if (key != null) {
+				if (key.startsWith(colorID)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	/** Ping the players adjacent to a given system */
 	public static void pingSystem(Map activeMap, GenericInteractionCreateEvent event, String position, String message) {

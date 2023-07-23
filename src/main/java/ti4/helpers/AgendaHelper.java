@@ -375,7 +375,7 @@ public class AgendaHelper {
                 }
             }
     }
-    public static void resolvingAnAgendaVote(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
+    public static void resolvingAnAgendaVote(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player){
             boolean resolveTime = false;
             String winner = "";
             String votes = buttonID.substring(buttonID.lastIndexOf("_") + 1, buttonID.length());
@@ -445,11 +445,13 @@ public class AgendaHelper {
                     String realIdentity = "";
                     realIdentity = Helper.getPlayerRepresentation(nextInLine, activeMap, event.getGuild(), true);
                     String pFaction = StringUtils.capitalize(nextInLine.getFaction());
-                    
-                    Button Vote = Button.success("vote", pFaction + " Choose To Vote");
-                    Button Abstain = Button.danger("delete_buttons_0", pFaction + " Choose To Abstain");
+                    String finChecker = "FFCC_"+nextInLine.getFaction() + "_";
+                    Button Vote = Button.success(finChecker+"vote", pFaction + " Choose To Vote");
+                    Button Abstain = Button.danger(finChecker+"delete_buttons_0", pFaction + " Choose To Abstain");
+                    Button ForcedAbstain = Button.secondary("forceAbstainForPlayer_"+nextInLine.getFaction(),
+                            "(For Others) Abstain for this player");
                     activeMap.updateActivePlayer(nextInLine);
-                    List<Button> buttons = List.of(Vote, Abstain);
+                    List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
                     if (activeMap.isFoWMode()) {
                         if (nextInLine.getPrivateChannel() != null) {
                             MessageHelper.sendMessageToChannel(nextInLine.getPrivateChannel(),AgendaHelper.getSummaryOfVotes(activeMap, true) + "\n ");
@@ -775,15 +777,18 @@ public class AgendaHelper {
 
             String pFaction = StringUtils.capitalize(nextInLine.getFaction());
             message = realIdentity + message;
-            Button Vote= Button.success("vote", pFaction+" Choose To Vote");
-            Button Abstain = Button.danger("delete_buttons_0", pFaction+" Choose To Abstain");
+            String finChecker = "FFCC_"+nextInLine.getFaction() + "_";
+            Button Vote= Button.success(finChecker+"vote", pFaction+" Choose To Vote");
+            Button Abstain = Button.danger(finChecker+"delete_buttons_0", pFaction+" Choose To Abstain");
+            Button ForcedAbstain = Button.secondary("forceAbstainForPlayer_"+nextInLine.getFaction(),
+                            "(For Others) Abstain for this player");
             try {
                     activeMap.updateActivePlayer(nextInLine);
                 } catch (Exception e) {
                     BotLogger.log(event, "Could not update active player", e);
                 }
             
-            List<Button> buttons = List.of(Vote, Abstain);
+            List<Button> buttons = List.of(Vote, Abstain, ForcedAbstain);
             if (activeMap.isFoWMode()) {
                 if (nextInLine.getPrivateChannel() != null) {
                     MessageHelper.sendMessageToChannelWithButtons(nextInLine.getPrivateChannel(), message, buttons);

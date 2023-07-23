@@ -63,7 +63,9 @@ public class PNInfo extends PNCardsSubcommandData {
         List<Button> buttons = new ArrayList<Button>();
         Button transaction = Button.primary("transaction", "Transaction");
         buttons.add(transaction);
-        MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeMap), "You can use this button to resolve a transaction", buttons);
+        Button modify = Button.secondary("getModifyTiles", "Modify Units");
+        buttons.add(modify);
+        MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeMap), "You can use this button to resolve a transaction or to modify units", buttons);
     }
 
     private static List<Button> getPlayablePNButtons(Map activeMap, Player player) {
