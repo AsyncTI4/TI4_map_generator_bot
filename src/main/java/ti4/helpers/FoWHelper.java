@@ -353,6 +353,9 @@ public class FoWHelper {
 		boolean absol_recon = activeMap.getLaws().keySet().contains("absol_recon");
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
+		if(wormholeIDs == null){
+			wormholeIDs = new HashSet<String>();
+		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			HashSet<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
@@ -362,37 +365,7 @@ public class FoWHelper {
 						wormholeIDs.add(wh.toString());
 					}
 				}
-				/*if (token.contains(Constants.ALPHA)) {
-					wormholeIDs.add(Constants.ALPHA);
-				} else if (token.contains(Constants.BETA)) {
-					wormholeIDs.add(Constants.BETA);
-				} else if (token.contains(Constants.GAMMA)) {
-					wormholeIDs.add(Constants.GAMMA);
-				} else if (token.contains(Constants.DELTA)) {
-					wormholeIDs.add(Constants.DELTA);
-				} else if (token.contains(Constants.EPSILON)) {
-					wormholeIDs.add(Constants.EPSILON);
-				} else if (token.contains(Constants.VOYAGE)) {
-					wormholeIDs.add(Constants.VOYAGE);
-				} else if (token.contains(Constants.CHAMPION)) {
-					wormholeIDs.add(Constants.CHAMPION);
-				} else if (token.contains(Constants.NARROWS)) {
-					wormholeIDs.add(Constants.NARROWS);
-				} else if (token.contains(Constants.ZETA)) {
-					wormholeIDs.add(Constants.ZETA);
-				} else if (token.contains(Constants.ETA)) {
-					wormholeIDs.add(Constants.ETA);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHEPSILON)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHEPSILON);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHIOTA)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHIOTA);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHTHETA)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHTHETA);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHZETA)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHZETA);
-				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHETA)) {
-					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHETA);
-				}*/
+				
 			}
 			if (ghostFlagship != null && unitHolder.getUnits().getOrDefault(ghostFlagship, 0) > 0) {
 				wormholeIDs.add(Constants.DELTA);
@@ -438,10 +411,13 @@ public class FoWHelper {
 		boolean absol_recon = activeMap.getLaws().keySet().contains("absol_recon");
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
+		if(wormholeIDs == null){
+			wormholeIDs = new HashSet<String>();
+		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			HashSet<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
-				String tokenName = "wh" + token.replace("token_", "").replace(".png", "");
+				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("ion", "");
 				for(WormholeModel.Wormhole wh : WormholeModel.Wormhole.values())
 					if(tokenName.contains(wh.getWhString())) {
 						wormholeIDs.add(wh.getWhString());
