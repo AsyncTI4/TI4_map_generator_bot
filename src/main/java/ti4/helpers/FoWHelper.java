@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 
@@ -622,6 +623,8 @@ public class FoWHelper {
 		for (Player player_ : players) {
 			String playerMessage = Helper.getPlayerRepresentation(player_, activeMap) + " - System " + position + " has been pinged:\n>>> " + message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
+			MessageChannel channel = player_.getPrivateChannel();
+			MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system", ButtonHelper.getButtonsForPictureCombats(activeMap, position, player_, player_, "justPicture"));
 			successfulCount += success ? 1 : 0;
 		}
 		feedbackMessage(event, successfulCount, players.size());

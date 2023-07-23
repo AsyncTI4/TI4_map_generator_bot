@@ -710,6 +710,44 @@ public class ButtonHelperModifyUnits {
                         .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2);
     }
+    public static void repairDamage(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
+        String rest = "";
+        rest = buttonID.replace("repairDamage_", "");
+        
+        String pos = rest.substring(0, rest.indexOf("_"));
+        Tile tile = activeMap.getTileByPosition(pos);
+        rest = rest.replace(pos + "_", "");
+        
+        int amount = Integer.parseInt(rest.charAt(0) + "");
+        rest = rest.substring(1, rest.length());
+        String unitkey = "";
+        String planet = "";
+        if (rest.contains("_")) {
+            unitkey = rest.split("_")[0];
+            planet = rest.split("_")[1].toLowerCase().replace(" ", "");
+        } else {
+            unitkey = rest;
+        }
+        String planetName = "";
+        unitkey = unitkey.replace("damaged", "");
+        planet = planet.replace("damaged", "");
+        String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitkey), player.getColor());
+        rest = rest.replace("damaged", "");
+        if (planet.equalsIgnoreCase("")) {
+            planetName = "space";
+        } else {
+            planetName = planet.toLowerCase().replace(" ", "");
+            planetName = planet.replace("'", "");
+            planetName = AliasHandler.resolvePlanet(planetName);
+        }       
+        tile.removeUnitDamage(planetName, unitID, amount);             
+        String message = event.getMessage().getContentRaw();
+        String message2 =  ident+ " Repaired "+amount + " "+unitkey+" from "+planetName+" in tile "+tile.getRepresentationForButtons(activeMap, player);
+        List<Button> systemButtons = ButtonHelper.getButtonsForRepairingUnitsInASystem(player, activeMap, tile);
+        event.getMessage().editMessage(message)
+                    .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2);
+    }
     public static void assignDamage(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
         String rest = "";
         rest = buttonID.replace("assignDamage_", "");
