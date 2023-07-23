@@ -64,17 +64,30 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
         // }
 
         ArrayList<String> deck = activeMap.getExploreDeck(trait);
-        if (deck.isEmpty()) {
-            sendMessage("Explore deck is empty");
-            //reshuffle discards into deck
-            return;
+        ArrayList<String> discardPile = activeMap.getExploreDiscard(trait);
+
+        // @jrkd 23/07 - This code will only be triggered for existing games where the
+        // explore deck is already empty. New games, or games without an empty explore
+        // deck
+        // will auto-shuffle the discard when drawing the last card.
+        String traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
+        String playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
+        if (deck.isEmpty() && !discardPile.isEmpty()) {
+            activeMap.shuffleDiscardsIntoExploreDeck(trait);
+            sendMessage(traitNameWithEmoji + " explore deck is empty, reshuffling discards into deck");
         }
+        if (deck.isEmpty() && discardPile.isEmpty()) {
+            sendMessage(traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
+        }
+
         StringBuilder sb = new StringBuilder();
-        sb.append("__**Look at Top of " + Helper.getEmojiFromDiscord(trait) + trait + " Deck**__\n");
+        sb.append("__**Look at Top of " + traitNameWithEmoji + " Deck**__\n");
         String topCard = deck.get(0);
         sb.append(displayExplore(topCard));
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
+        sendMessage("top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
+                + " Cards info thread.");
 
     }
 }

@@ -1613,20 +1613,25 @@ public class Map {
 
     public String drawExplore(String reqType) {
         List<String> deck = getExplores(reqType, explore);
+        String result = null;
         if (!deck.isEmpty()) {
             String id = deck.get(0);
             discardExplore(id);
-            return id;
-        } else {
-            deck = getExplores(reqType, discardExplore);
-            if (!deck.isEmpty()) {
-                explore.addAll(deck);
-                Collections.shuffle(explore);
-                discardExplore.removeAll(deck);
-                return drawExplore(reqType);
-            }
+            result = id;
         }
-        return null;
+
+        // If deck is empty after draw, auto refresh deck from discard
+        if (deck.isEmpty()) {
+            shuffleDiscardsIntoExploreDeck(reqType);
+        }
+        return result;
+    }
+
+    public void shuffleDiscardsIntoExploreDeck(String reqType) {
+        var discardsOfType = getExplores(reqType, discardExplore);
+        explore.addAll(discardsOfType);
+        Collections.shuffle(explore);
+        discardExplore.removeAll(discardsOfType);
     }
 
     public void discardExplore(String id) {
