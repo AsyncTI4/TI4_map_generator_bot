@@ -78,13 +78,10 @@ public class ExpPlanet extends ExploreSubcommandData {
             return;
         }
 
+
         if (player.hasAbility("distant_suns")) {
             if (Helper.mechCheck(planetName, activeMap, player)) {
                 if (!NRACheck) {
-                    if (player.hasTech("pfa")) { //Pre-Fab Arcologies
-                        new PlanetRefresh().doAction(player, planetName, activeMap);
-                        MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Planet has been automatically refreshed because you have Pre-Fab");
-                    }
                     String message = "Please decide whether or not to use your distant suns (explore twice) ability.";
                     Button resolveExplore1  = Button.success("distant_suns_accept_"+planetName+"_"+drawColor, "Choose to Explore Twice");
                     Button resolveExplore2 = Button.success("distant_suns_decline_"+planetName+"_"+drawColor, "Decline Distant Suns");

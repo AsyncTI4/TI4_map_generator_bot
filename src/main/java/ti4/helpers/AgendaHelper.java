@@ -387,7 +387,7 @@ public class AgendaHelper {
                         pfaction2 = player.getFaction();
                     }
                     if (pfaction2 != null) {
-                        ButtonHelper.addReaction(event, true, true, "Abstained.", "");
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), Helper.getPlayerRepresentation(player, activeMap)+ " Abstained");
                         event.getMessage().delete().queue();
                     } 
 
