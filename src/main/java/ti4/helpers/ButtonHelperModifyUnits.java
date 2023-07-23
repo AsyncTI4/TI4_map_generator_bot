@@ -339,7 +339,7 @@ public class ButtonHelperModifyUnits {
         String key = Mapper.getUnitID(AliasHandler.resolveUnit(unitkey), player.getColor());
         activeMap.getTileByPosition(pos).removeUnit(planet,key, amount);
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Undid landing of "+amount+ " "+unitkey + " on "+planet);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+"Undid landing of "+amount+ " "+unitkey + " on "+planet);
         event.getMessage().editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
@@ -370,7 +370,7 @@ public class ButtonHelperModifyUnits {
         String key = Mapper.getUnitID(AliasHandler.resolveUnit(unitkey), player.getColor());
         activeMap.getTileByPosition(pos).removeUnit("space",key, amount);
         List<Button> systemButtons = ButtonHelper.moveAndGetLandingTroopsButtons(player, activeMap, event);
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Landed "+amount+ " "+unitkey + " on "+planet);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+" Landed "+amount+ " "+unitkey + " on "+planet);
         event.getMessage().editMessage(event.getMessage().getContentRaw())
                 .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
@@ -381,15 +381,15 @@ public class ButtonHelperModifyUnits {
        String rest = "";
        if(buttonID.contains("Remove")){
            remove = "Remove";
-           rest = buttonID.replace("unitTacticalRemove_", "");
+           rest = buttonID.replace("unitTacticalRemove_", "").toLowerCase();
        }else{
-           rest = buttonID.replace("unitTacticalMove_", "");
+           rest = buttonID.replace("unitTacticalMove_", "").toLowerCase();
        }
        String pos = rest.substring(0, rest.indexOf("_"));
        Tile tile = activeMap.getTileByPosition(pos);
        rest = rest.replace(pos + "_", "");
 
-       if(rest.contains("All")){
+       if(rest.contains("all")){
           
            if(rest.contains("reverse"))
            {
