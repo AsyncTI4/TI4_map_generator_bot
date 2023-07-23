@@ -208,7 +208,7 @@ public class Turn extends PlayerSubcommandData {
         if (!activeMap.isStratPings()) return null;
         boolean sendReminder = false;
 
-        StringBuilder sb = new StringBuilder("> Please react to ");
+        StringBuilder sb = new StringBuilder("> "+Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Please react to ");
 
         for (int sc : activeMap.getPlayedSCs()) {
             if (!player.hasFollowedSC(sc)) {

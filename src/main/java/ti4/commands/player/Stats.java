@@ -304,7 +304,7 @@ public class Stats extends PlayerSubcommandData {
 				int tg = player.getTg();
 				tg += tgCount;
 				messageToSend = Helper.getColourAsMention(event.getGuild(),player.getColor()) +" gained "+tgCount +" tgs from picking SC #"+scNumber;
-				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),"You gained "+tgCount +" tgs from picking SC #"+scNumber);
+				MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),Helper.getPlayerRepresentation(player,activeMap)+" gained "+tgCount +" tgs from picking SC #"+scNumber);
 				if (activeMap.isFoWMode()) {
 					FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, messageToSend);
 				}
