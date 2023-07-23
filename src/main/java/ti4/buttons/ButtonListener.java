@@ -773,14 +773,14 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-technology";            
                 List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
-                if (!activeMap.getComponentAction()) {
+                if (!activeMap.getComponentAction() && !player.hasAbility("technological_singularity") ) {
                     for (ThreadChannel threadChannel_ : threadChannels) {
                         if (threadChannel_.getName().equals(threadName)) {
                             MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_, message);
                         }
                     }
                 } else {
-                    MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
+                    MessageHelper.sendMessageToChannel(event.getChannel(), message);
                 }
                 if(!player.hasAbility("technological_singularity")){
                     MessageHelper.sendMessageToChannelWithButtons((MessageChannel) player.getCardsInfoThread(activeMap),
@@ -1329,7 +1329,30 @@ public class ButtonListener extends ListenerAdapter {
             }else{
                 event.getMessage().delete().queue();
             }
-
+        } else if (buttonID.startsWith("nekroStealTech_")) {
+            String faction = buttonID.replace("nekroStealTech_", "");
+            Player p2 = Helper.getPlayerFromColorOrFaction(activeMap, faction);
+            List<String> potentialTech = new ArrayList<String>();
+            potentialTech = ButtonHelperFactionSpecific.getPossibleTechForNekroToGainFromPlayer(player, p2, potentialTech, activeMap);
+            List<Button> buttons = ButtonHelperFactionSpecific.getButtonsForPossibleTechForNekro(player, potentialTech, activeMap);
+            if(buttons.size() > 0){
+                MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), trueIdentity+" get enemy tech using the buttons", buttons);
+            }else{
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), trueIdentity+" no tech available to gain");
+            }
+        } else if (buttonID.startsWith("mahactStealCC_")) {
+            String color = buttonID.replace("mahactStealCC_", "");
+            if(!player.getMahactCC().contains(color)){
+                player.addMahactCC(color);
+                MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+" added a "+color+" CC to their fleet pool");
+            }
+            else{
+                 MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+" already had a "+color+" CC in their fleet pool");
+            }
+            if(player.getLeaderIDs().contains("mahactcommander") && !player.hasLeaderUnlocked("mahactcommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "mahact", event);
+            }
+           
         } else if (buttonID.startsWith("freelancersBuild_")) {
             String planet = buttonID.replace("freelancersBuild_", "");
             List<Button> buttons = new ArrayList<Button>();
@@ -1808,6 +1831,22 @@ public class ButtonListener extends ListenerAdapter {
                     new DrawAgenda().drawAgenda(event, 2, activeMap, player);
                     event.getMessage().delete().queue();
                 }
+                case "nekroFollowTech" -> {
+                    Button getTactic= Button.success("increase_tactic_cc", "Gain 1 Tactic CC");
+                    Button getFleet = Button.success("increase_fleet_cc", "Gain 1 Fleet CC");
+                    Button getStrat= Button.success("increase_strategy_cc", "Gain 1 Strategy CC");
+                    Button exhaust = Button.danger("nekroTechExhaust", "Exhaust Planets");
+                    Button DoneGainingCC = Button.danger("deleteButtons_technology", "Done Gaining CCs");
+                    String message = trueIdentity + "! Your current CCs are " + Helper.getPlayerCCs(player)
+                            + ". Use buttons to gain CCs";
+                    List<Button> buttons = List.of(getTactic, getFleet, getStrat, exhaust, DoneGainingCC);
+                    if (!activeMap.isFoWMode()) {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeMap), message,
+                                buttons);
+                    } else {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+                    }
+                }
                 case "diploRefresh2" -> {
                     player.addFollowedSC(2);
                     ButtonHelper.addReaction(event, false, false, "", "");
@@ -1826,9 +1865,20 @@ public class ButtonListener extends ListenerAdapter {
                 case "leadershipExhaust" -> {
                     ButtonHelper.addReaction(event, false, false, "", "");
                     String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
-
                     List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
                     Button DoneExhausting = Button.danger("deleteButtons_leadership", "Done Exhausting Planets");
+                    buttons.add(DoneExhausting);
+                    if (!activeMap.isFoWMode()) {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeMap), message,
+                                buttons);
+                    } else {
+                        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), message, buttons);
+                    }
+                }
+                case "nekroTechExhaust" -> {
+                    String message = trueIdentity + " Click the names of the planets you wish to exhaust.";
+                    List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
+                    Button DoneExhausting = Button.danger("deleteButtons_technology", "Done Exhausting Planets");
                     buttons.add(DoneExhausting);
                     if (!activeMap.isFoWMode()) {
                         MessageHelper.sendMessageToChannelWithButtons(player.getCardsInfoThread(activeMap), message,

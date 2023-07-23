@@ -131,6 +131,9 @@ public class SCPlay extends PlayerSubcommandData {
             //GET BUTTONS
             ActionRow actionRow = null;
             List<Button> scButtons = new ArrayList<>(getSCButtons(scToDisplay, activeMap));
+            if(!activeMap.isFoWMode() && scToDisplay == 7 && Helper.getPlayerFromAbility(activeMap, "propagation") != null){
+                scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro"))));
+            }
             if (scButtons != null && !scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
             if (actionRow != null) baseMessageObject.addComponents(actionRow);
 

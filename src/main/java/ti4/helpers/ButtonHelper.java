@@ -897,6 +897,23 @@ public class ButtonHelper {
             String finChecker = "FFCC_"+yin.getFaction() + "_";
             buttons.add(Button.secondary(finChecker+"yinagent_"+pos, "Use Yin Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("yin"))));
         }
+        if(p1.hasAbility("technological_singularity")){
+            String finChecker = "FFCC_"+p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"nekroStealTech_"+p2.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro"))));
+        }
+        if(p2.hasAbility("technological_singularity") && !activeMap.isFoWMode()){
+            String finChecker = "FFCC_"+p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"nekroStealTech_"+p1.getFaction(), "Steal Tech").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro"))));
+        }
+        if((p2.hasAbility("edict") || p2.hasAbility("imperia"))  && !activeMap.isFoWMode()){
+            String finChecker = "FFCC_"+p2.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"mahactStealCC_"+p1.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("mahact"))));
+        }
+        if(p1.hasAbility("edict") || p1.hasAbility("imperia")){
+            String finChecker = "FFCC_"+p1.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"mahactStealCC_"+p2.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("mahact"))));
+        }
+
 
         
         return buttons;
