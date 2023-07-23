@@ -8,6 +8,7 @@ import ti4.commands.player.PlayerSubcommandData;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -50,6 +51,7 @@ public abstract class TechAddRemove extends TechSubcommandData {
         parseParameter(event, player, event.getOption(Constants.TECH2));
         parseParameter(event, player, event.getOption(Constants.TECH3));
         parseParameter(event, player, event.getOption(Constants.TECH4));
+        
         if(player.getLeaderIDs().contains("nekrocommander") && !player.hasLeaderUnlocked("nekrocommander")){
             ButtonHelper.commanderUnlockCheck(player, activeMap, "nekro", event);
         }
@@ -75,6 +77,7 @@ public abstract class TechAddRemove extends TechSubcommandData {
                     return;
                 }
                 doAction(player, possibleTechs.get(0), event);
+                
             }
         }
     }
