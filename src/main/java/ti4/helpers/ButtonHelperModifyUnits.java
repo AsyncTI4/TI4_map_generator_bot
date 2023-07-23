@@ -389,7 +389,7 @@ public class ButtonHelperModifyUnits {
        Tile tile = activeMap.getTileByPosition(pos);
        rest = rest.replace(pos + "_", "");
 
-       if(rest.contains("reverseall") || rest.contains("moveeall")){
+       if(rest.contains("reverseall") || rest.contains("moveall")){
           
            if(rest.contains("reverse"))
            {
