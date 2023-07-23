@@ -1431,8 +1431,8 @@ public class ButtonListener extends ListenerAdapter {
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("ringTile_")) {
             String pos = buttonID.replace("ringTile_", "");
-            List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, activeMap, event);
             activeMap.setActiveSystem(pos);
+            List<Button> systemButtons = ButtonHelper.getTilesToMoveFrom(player, activeMap, event);
             MessageHelper.sendMessageToChannel(event.getChannel(), trueIdentity + " activated "
                     + activeMap.getTileByPosition(pos).getRepresentationForButtons(activeMap, player));
             
@@ -2564,8 +2564,9 @@ public class ButtonListener extends ListenerAdapter {
                                 if(!activeMap.isFoWMode()){
                                     ButtonHelper.makeACombatThread(activeMap, actionsChannel, p1,player2, threadName,  tile, event, "space");
                                 }else{
+                                    threadName = threadName+ "-private";
                                     ButtonHelper.makeACombatThread(activeMap, p1.getPrivateChannel(), p1,player2, threadName, tile, event, "space");
-                                    ButtonHelper.makeACombatThread(activeMap, player2.getPrivateChannel(), p1,player2, threadName, tile, event, "space");
+                                    ButtonHelper.makeACombatThread(activeMap, player2.getPrivateChannel(), player2,p1, threadName, tile, event, "space");
                                 }
                             }
                         }
@@ -2602,8 +2603,9 @@ public class ButtonListener extends ListenerAdapter {
                                 if(!activeMap.isFoWMode()){
                                     ButtonHelper.makeACombatThread(activeMap, actionsChannel, p1,player2, threadName,  tile, event, "ground");
                                 }else{
+                                    threadName = threadName+ "-private";
                                     ButtonHelper.makeACombatThread(activeMap, p1.getPrivateChannel(), p1,player2, threadName, tile, event, "ground");
-                                    ButtonHelper.makeACombatThread(activeMap, player2.getPrivateChannel(), p1,player2, threadName, tile, event, "ground");
+                                    ButtonHelper.makeACombatThread(activeMap, player2.getPrivateChannel(), player2,p1, threadName, tile, event, "ground");
                                 }
                             }
                         }
