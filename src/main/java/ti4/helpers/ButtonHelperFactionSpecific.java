@@ -35,6 +35,38 @@ import ti4.message.MessageHelper;
 
 public class ButtonHelperFactionSpecific {
 
+    public static void resolveNekroCommanderCheck(Player player, String tech, Map activeMap){
+        if(activeMap.playerHasLeaderUnlockedOrAlliance(player, "nekrocommander")){
+            if(Mapper.getTech(AliasHandler.resolveTech(tech)).getFaction().equals("") || !player.hasAbility("technological_singularity")){
+                List<Button> buttons = new ArrayList<Button>();
+                if(player.hasAbility("scheming")){
+                    buttons.add(Button.success("draw_2_ACDelete", "Draw 2 AC (With Scheming)"));
+                }else{
+                    buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
+                }
+                 buttons.add(Button.danger("deleteButtons", "Delete These Buttons"));
+                MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+ " You gained tech while having Nekro commander, use buttons to resolve. ", buttons);
+            }
+        }
+    }
+
+    public static List<Button> getButtonsForPossibleTechForNekro(Player nekro, List<String> currentList, Map activeMap){
+        List<Button> techToGain = new ArrayList<Button>();
+        for(String tech : currentList){
+            techToGain.add(Button.success("getTech_"+Mapper.getTech(tech).getName(), Mapper.getTech(tech).getName()));
+        }
+        return techToGain;
+    }
+    public static List<String> getPossibleTechForNekroToGainFromPlayer(Player nekro, Player victim, List<String> currentList, Map activeMap){
+        List<String> techToGain = new ArrayList<String>();
+        techToGain.addAll(currentList);
+        for(String tech : victim.getTechs()){
+            if(!nekro.getTechs().contains(tech) && !techToGain.contains(tech)){
+                techToGain.add(tech);
+            }
+        }
+        return techToGain;
+    }
     public static void removeSleeper(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
         buttonID = buttonID.replace("removeSleeperFromPlanet_", "");
         String planet = buttonID;
