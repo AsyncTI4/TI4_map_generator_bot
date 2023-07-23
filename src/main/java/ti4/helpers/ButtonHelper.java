@@ -2748,10 +2748,11 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             }
         }
         if (id.endsWith("_ta")) {
+            int comms = owner.getCommodities();
             owner.setCommodities(0);
             String reducedMsg = Helper.getPlayerRepresentation(owner, activeMap, activeMap.getGuild(), true ) + " your TA was played.";
-            String reducedMsg2 = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true ) + " you gained tgs equal to the value of the played TA ("+player.getTg()+"->"+(player.getTg()+owner.getCommoditiesTotal())+")";
-            player.setTg(player.getTg()+owner.getCommoditiesTotal());
+            String reducedMsg2 = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true ) + " you gained tgs equal to the number of comms the player had. ("+player.getTg()+"->"+(player.getTg()+comms)+"). Please follow up with the player if this number seems off";
+            player.setTg(player.getTg()+comms);
             if(activeMap.isFoWMode()){
                 MessageHelper.sendMessageToChannel(owner.getPrivateChannel(), reducedMsg);
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(), reducedMsg2);
