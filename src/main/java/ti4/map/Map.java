@@ -1614,6 +1614,14 @@ public class Map {
     public String drawExplore(String reqType) {
         List<String> deck = getExplores(reqType, explore);
         String result = null;
+
+        //MIGRATION CODE TODO: Remove this once we are fairly certain no exising games have an existing empty deck - implemented 2023-07
+        if (deck.isEmpty()) {
+            shuffleDiscardsIntoExploreDeck(reqType);
+            deck = getExplores(reqType, explore);
+            BotLogger.log("Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType + " deck was empty, shuffling discards into deck.");
+        } //end of migration code
+        
         if (!deck.isEmpty()) {
             String id = deck.get(0);
             discardExplore(id);
