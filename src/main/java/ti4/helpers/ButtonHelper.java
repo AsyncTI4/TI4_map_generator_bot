@@ -783,7 +783,12 @@ public class ButtonHelper {
             for (ThreadChannel threadChannel_ : textChannel.getThreadChannels()) {
                 if (threadChannel_.getName().equals(threadName)) {
                     foundsomething = true;
-                    MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_, Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true) + Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), false) + longMsg);
+                    if(activeMap.isFoWMode()){
+                        longMsg = Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true) + longMsg;
+                    }else{
+                        longMsg = Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true) + Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), false) + longMsg;
+                    }
+                    MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_, longMsg);
                     List<Player> playersWithPds2 = null;
                     if(activeMap.isFoWMode() || spaceOrGround.equalsIgnoreCase("ground")){
                         playersWithPds2 = new ArrayList<Player>();
