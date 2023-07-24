@@ -969,7 +969,7 @@
         "sustainDamage": true,
         "canBeDirectHit": true,
         "isShip": true,
-        "ability": "This unit is also treated as a space dock with a PRODUCTION value equal to the number of command tokens in your fleet pool."
+        "ability": "While in play, this unit is also treated as a space dock with a PRODUCTION value equal to the number of tokens in your fleet pool."
     },
     {
         "id": "ghoti_mech",
