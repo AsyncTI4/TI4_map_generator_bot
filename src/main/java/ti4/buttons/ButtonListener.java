@@ -2562,7 +2562,7 @@ public class ButtonListener extends ListenerAdapter {
 
                 case "doneWithTacticalAction" -> {
                     ButtonHelper.exploreDET(player, activeMap, event);
-                    if(player.getRelics().contains("emphidia") && !player.getExhaustedRelics().contains("emphidia")){
+                    if(!activeMap.isAbsolMode() && player.getRelics().contains("emphidia") && !player.getExhaustedRelics().contains("emphidia")){
                          String message = trueIdentity+" You can use the button to explore using crown of emphidia";
                         List<Button> systemButtons2 = new ArrayList<Button>();
                         systemButtons2.add(Button.success("crownofemphidiaexplore", "Use Crown To Explore a Planet"));
