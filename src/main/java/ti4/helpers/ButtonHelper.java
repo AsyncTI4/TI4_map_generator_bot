@@ -199,6 +199,11 @@ public class ButtonHelper {
             activeMap.drawActionCard(player.getUserID());
             amount = amount + 1;
         }
+        if(player.getRelics().contains("absol_codex")){
+            amount = amount + 1;
+            activeMap.drawActionCard(player.getUserID());
+            message = message + " Absol Codex has been accounted for.";
+        }
         
         for(String law : activeMap.getLaws().keySet()){
             if(law.equalsIgnoreCase("minister_policy")){
@@ -399,8 +404,17 @@ public class ButtonHelper {
             return;
         }
         int limit = 7;
-        if(activeMap.getLaws().containsKey("sanctions")){
+        if(activeMap.getLaws().containsKey("sanctions") && !activeMap.isAbsolMode()){
             limit = 3;
+        }
+        if(activeMap.getLaws().containsKey("absol_sanctions")){
+            limit = 3;
+            if(activeMap.getLawsInfo().get("absol_sanctions").equalsIgnoreCase(player.getFaction())){
+                limit = 5;
+            }
+        }
+        if(player.getRelics().contains("absol_codex")){
+            limit = limit+5;
         }
         if(player.getAc() > limit){
             MessageChannel channel = activeMap.getMainGameChannel();

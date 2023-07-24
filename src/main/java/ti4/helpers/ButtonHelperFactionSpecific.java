@@ -61,7 +61,7 @@ public class ButtonHelperFactionSpecific {
         List<String> techToGain = new ArrayList<String>();
         techToGain.addAll(currentList);
         for(String tech : victim.getTechs()){
-            if(!nekro.getTechs().contains(tech) && !techToGain.contains(tech)){
+            if(!nekro.getTechs().contains(tech) && !techToGain.contains(tech) && !tech.equalsIgnoreCase("iihq")){
                 techToGain.add(tech);
             }
         }
