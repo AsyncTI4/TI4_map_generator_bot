@@ -1854,7 +1854,7 @@
     "source": "ds"
   },
   {
-    "alias": "free_trade_initiative",
+    "alias": "free_trade_network",
     "name": "Free Trade Initiative",
     "phase": "Action",
     "window": "ACTION:",
