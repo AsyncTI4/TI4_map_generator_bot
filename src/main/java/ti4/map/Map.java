@@ -174,6 +174,8 @@ public class Map {
 
     private List<String> publicObjectives1 = new ArrayList<>();
     private List<String> publicObjectives2 = new ArrayList<>();
+    private List<String> publicObjectives1Peakable = new ArrayList<>();
+    private List<String> publicObjectives2Peakable = new ArrayList<>();
     private ArrayList<String> soToPoList = new ArrayList<>();
 
     @JsonIgnore
@@ -988,22 +990,103 @@ public class Map {
     public List<String> getPublicObjectives1() {
         return publicObjectives1;
     }
+    public List<String> getPublicObjectives1Peakable() {
+        return publicObjectives1Peakable;
+    }
 
     public List<String> getPublicObjectives2() {
         return publicObjectives2;
     }
+    public List<String> getPublicObjectives2Peakable() {
+        return publicObjectives2Peakable;
+    }
 
     public java.util.Map.Entry<String, Integer> revealState1() {
-        return revealObjective(publicObjectives1);
+        if(publicObjectives1Peakable.isEmpty()){
+            return revealObjective(publicObjectives1);
+        }else{
+            return revealObjective(publicObjectives1Peakable);
+        }
     }
 
     public java.util.Map.Entry<String, Integer> revealState2() {
-        return revealObjective(publicObjectives2);
+        if(publicObjectives2Peakable.isEmpty()){
+            return revealObjective(publicObjectives2);
+        }else{
+            return revealObjective(publicObjectives2Peakable);
+        }
+    }
+
+    public void setUpPeakableObjectives(int num) {
+        for(int x = 0; x < num; x++){
+            if (!publicObjectives1.isEmpty()) {
+                Collections.shuffle(publicObjectives1);
+                String id = publicObjectives1.get(0);
+                publicObjectives1.remove(id);
+                publicObjectives1Peakable.add(id);
+            }
+            if (!publicObjectives2.isEmpty()) {
+                Collections.shuffle(publicObjectives2);
+                String id = publicObjectives2.get(0);
+                publicObjectives2.remove(id);
+                publicObjectives2Peakable.add(id);
+            }
+        }
+    }
+    public String peakAtStage1(int place) {
+        return peakAtObjective(publicObjectives1Peakable, place);
+    }
+    public String peakAtStage2(int place) {
+        return peakAtObjective(publicObjectives2Peakable, place);
+    }
+    public java.util.Map.Entry<String, Integer> revealSpecificStage1(String id) {
+        return revealSpecificObjective(publicObjectives1, id);
+    }
+    public java.util.Map.Entry<String, Integer> revealSpecificStage2(String id) {
+        return revealSpecificObjective(publicObjectives2, id);
+    }
+
+    public void swapStage1(int place1, int place2) {
+        swapObjective(publicObjectives1Peakable, place1, place2);
+    }
+    public void swapStage2(int place1, int place2) {
+        swapObjective(publicObjectives2Peakable, place1, place2);
+    }
+
+    public void swapObjective(List<String> objectiveList, int place1, int place2) {
+        if (!objectiveList.isEmpty()) {
+            place1 = place1 - 1;
+            place2 = place2 - 1;
+            String id = objectiveList.get(place1);
+            String id2 = objectiveList.get(place2);
+            objectiveList.set(place1, id2);
+            objectiveList.set(place2, id);
+        }
+    }
+    public String peakAtObjective(List<String> objectiveList, int place) {
+        if (!objectiveList.isEmpty()) {
+            place = place -1;
+            String id = objectiveList.get(place);
+            return id;
+        }
+        return null;
     }
 
     public java.util.Map.Entry<String, Integer> revealObjective(List<String> objectiveList) {
         if (!objectiveList.isEmpty()) {
             String id = objectiveList.get(0);
+            objectiveList.remove(id);
+            addRevealedPublicObjective(id);
+            for (java.util.Map.Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
+                if (entry.getKey().equals(id)) {
+                    return entry;
+                }
+            }
+        }
+        return null;
+    }
+    public java.util.Map.Entry<String, Integer> revealSpecificObjective(List<String> objectiveList, String id) {
+        if (objectiveList.contains(id)) {
             objectiveList.remove(id);
             addRevealedPublicObjective(id);
             for (java.util.Map.Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
@@ -1205,6 +1288,13 @@ public class Map {
 
     public void setPublicObjectives2(ArrayList<String> publicObjectives2) {
         this.publicObjectives2 = publicObjectives2;
+    }
+    public void setPublicObjectives1Peakable(ArrayList<String> publicObjectives1) {
+        this.publicObjectives1Peakable = publicObjectives1;
+    }
+
+    public void setPublicObjectives2Peakable(ArrayList<String> publicObjectives2) {
+        this.publicObjectives2Peakable = publicObjectives2;
     }
 
     public void removePublicObjective1(String key) {
