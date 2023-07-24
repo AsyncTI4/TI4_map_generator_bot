@@ -291,7 +291,7 @@
     "abilities": ["star_forge", "gashlai_physiology"],
     "leaders": ["muaatagent", "muaatcommander", "muaathero"],
     "promissoryNotes": ["fires"],
-    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "muaat_flagship", "muaat_warsun", "muaat_infantry", "mech", "pds", "spacedock"]
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "muaat_flagship", "muaat_warsun", "infantry", "muaat_mech", "pds", "spacedock"]
   },
   {
     "alias": "naalu",
