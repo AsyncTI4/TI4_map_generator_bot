@@ -33,6 +33,7 @@ import ti4.commands.map.*;
 import ti4.commands.milty.MiltyCommand;
 import ti4.commands.planet.PlanetCommand;
 import ti4.commands.player.PlayerCommand;
+import ti4.commands.special.CombatRoll;
 import ti4.commands.special.SpecialCommand;
 import ti4.commands.statistics.StatisticsCommand;
 import ti4.commands.status.StatusCommand;
@@ -127,6 +128,7 @@ public class MapGenerator {
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
         bothelperRoles.add(jda.getRoleById("1063464689218105354"));// FoW Server Game Admin
+        bothelperRoles.add(jda.getRoleById("1131925041219653714"));
 
         bothelperRoles.removeIf(Objects::isNull);
 
@@ -182,7 +184,6 @@ public class MapGenerator {
         commandManager.addCommand(new StatisticsCommand());
         commandManager.addCommand(new TechCommand());
         commandManager.addCommand(new PlanetCommand());
-
 
         CommandListUpdateAction commands = guildPrimary.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
