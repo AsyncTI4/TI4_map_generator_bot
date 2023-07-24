@@ -477,6 +477,17 @@ public class Constants {
     public static final String CLEANUP = "cleanup";
     public static final String PERSONAL_CLEANUP = "personal_cleanup";
     public static final String REVEAL_STATGE1 = "po_reveal_stage1";
+    public static final String REVEAL_SPECIFIC_STATGE1 = "reveal_specific_stage1";
+    public static final String REVEAL_SPECIFIC_STATGE2 = "reveal_specific_stage2";
+    public static final String SETUP_PEAKABLE_OBJECTIVES = "setup_peakable_objectives";
+    public static final String NUMBER_OF_OBJECTIVES = "number_of_objectives";
+    public static final String SWAP_STAGE2 = "swap_stage2";
+    public static final String SWAP_STAGE1 = "swap_stage1";
+    public static final String LOCATION1 = "location1";
+    public static final String LOCATION2 = "location2";
+    public static final String PEAK_AT_STAGE1 = "peak_at_stage1";
+    public static final String PEAK_AT_STAGE2 = "peak_at_stage2";
+   
     public static final String ADD_CUSTOM = "po_add_custom";
     public static final String MAKE_SO_INTO_PO = "so_into_po";
     public static final String SO_TO_PO = "so_to_po";
@@ -501,6 +512,8 @@ public class Constants {
     public static final String TWO_WAY = "two_way";
     public static final String PO1 = "publicObjectives1";
     public static final String PO2 = "publicObjectives2";
+    public static final String PO1PEAKABLE = "publicObjectives1peakable";
+    public static final String PO2PEAKABLE = "publicObjectives2peakable";
     public static final String PRIMARY_TILE_DIRECTION = "primary_tile_direction";
 
     public static final String TURN_ORDER = "turn_order";

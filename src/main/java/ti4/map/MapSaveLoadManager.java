@@ -359,6 +359,10 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.PURGED_PN + " " + String.join(",", activeMap.getPurgedPN()));
         writer.write(System.lineSeparator());
+         writer.write(Constants.PO1PEAKABLE + " " + String.join(",", activeMap.getPublicObjectives1Peakable()));
+        writer.write(System.lineSeparator());
+        writer.write(Constants.PO2PEAKABLE + " " + String.join(",", activeMap.getPublicObjectives2Peakable()));
+        writer.write(System.lineSeparator());
 
 
         DisplayType displayTypeForced = activeMap.getDisplayTypeForced();
@@ -1041,6 +1045,8 @@ public class MapSaveLoadManager {
                 case Constants.AC -> activeMap.setActionCards(getCardList(info));
                 case Constants.PO1 -> activeMap.setPublicObjectives1(getCardList(info));
                 case Constants.PO2 -> activeMap.setPublicObjectives2(getCardList(info));
+                case Constants.PO1PEAKABLE -> activeMap.setPublicObjectives1Peakable(getCardList(info));
+                case Constants.PO2PEAKABLE -> activeMap.setPublicObjectives2Peakable(getCardList(info));
                 case Constants.SO_TO_PO -> activeMap.setSoToPoList(getCardList(info));
                 case Constants.PURGED_PN -> activeMap.setPurgedPNs(getCardList(info));
                 case Constants.REVEALED_PO -> activeMap.setRevealedPublicObjectives(getParsedCards(info));
