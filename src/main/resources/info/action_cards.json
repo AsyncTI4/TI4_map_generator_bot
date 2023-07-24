@@ -1966,7 +1966,7 @@
     "name": "Aggressive Broker",
     "phase": "Any",
     "window": "When a player purges a component:",
-    "text": "Gain 2 trade goods.",
+    "text": "That player must choose to allow you to either gain 2 trade goods or replenish your commodities.",
     "flavorText": "Kado checked his firearm. “Yeah, I know what we did with it, but they don’t. They brought the money, let’s make this quick.”",
     "source": "ds"
   },
@@ -2144,9 +2144,9 @@
   {
     "alias": "professional_archeologists",
     "name": "Professional Archeologists",
-    "phase": "Any",
-    "window": "At any time:",
-    "text": "Look at the top card of each exploration deck, and the relic deck.",
+    "phase": "Action",
+    "window": "ACTION:",
+    "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise place that card on the top of its corresponding deck.",
     "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
     "source": "ds"
   },
