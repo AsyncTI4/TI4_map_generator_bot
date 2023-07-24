@@ -1629,14 +1629,14 @@ public class Map {
         }
 
         // If deck is empty after draw, auto refresh deck from discard
-        if (deck.isEmpty()) {
+        if (getExplores(reqType, explore).isEmpty()) {
             shuffleDiscardsIntoExploreDeck(reqType);
         }
         return result;
     }
 
     public void shuffleDiscardsIntoExploreDeck(String reqType) {
-        var discardsOfType = getExplores(reqType, discardExplore);
+        List<String> discardsOfType = getExplores(reqType, discardExplore);
         explore.addAll(discardsOfType);
         Collections.shuffle(explore);
         discardExplore.removeAll(discardsOfType);
