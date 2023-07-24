@@ -1854,11 +1854,11 @@
     "source": "ds"
   },
   {
-    "alias": "free_trade_network",
-    "name": "Free Trade Network",
+    "alias": "free_trade_initiative",
+    "name": "Free Trade Initiative",
     "phase": "Action",
     "window": "ACTION:",
-    "text": "For each planet trait, if any of your units are adjacent to a planet of that trait which you do not control, you may gain 2 commodities or convert up to 2 of your commodities to trade goods.",
+    "text": "For each planet trait, if you control a planet of that trait, gain 2 commodities or convert 2 of your commodities to trade goods.",
     "flavorText": "Celdauri trade ports were a sight to behold, boasting goods from across the known galaxy.",
     "source": "ds"
   },
@@ -1867,7 +1867,7 @@
     "name": "Carapace Plating",
     "phase": "Action",
     "window": "After your opponent produces 1 or more hits during ground combat:",
-    "text": "Cancel up to 3 of those hits.",
+    "text": "Cancel up to 2 of those hits.",
     "flavorText": "Phquaiset clicked delightedly as the plating fell away, it was time for a counterattack.",
     "source": "ds"
   },
@@ -2056,7 +2056,7 @@
     "name": "Singularity Charge",
     "phase": "Action",
     "window": "At the start of a round of combat:",
-    "text": "Each unit with SUSTAIN DAMAGE in the active system becomes damaged, if able.",
+    "text": "Choose 1 unit participating in that combat; that unit becomes damaged, if able.",
     "flavorText": "Mosk Graezon knew the time had come, if he couldn’t have the system, he’d take as many down with him as he could.",
     "source": "ds"
   },
@@ -2190,7 +2190,7 @@
     "alias": "classified_weapons",
     "name": "Classified Weapons",
     "phase": "Action",
-    "window": "Before 1 or more of your units would make a roll for a unit ability:",
+    "window": "Before 1 or more of your units would make a combat roll or roll for a unit ability:",
     "text": "Hits produced by that roll cannot be canceled.",
     "flavorText": "Dr. Morden stood still, in awe. “They’re… beautiful.”",
     "source": "ds"
