@@ -450,7 +450,8 @@ public class ButtonHelperModifyUnits {
                                unitKey = unitKey.replace(".png", "");
                                unitKey = ButtonHelper.getUnitName(unitKey);
                                int amount = unitEntry.getValue();
-                               rest = unitKey+"_"+unitHolder.getName();
+                               rest = unitKey.toLowerCase()+"_"+unitHolder.getName().toLowerCase();
+                               System.out.println(rest);
                                if (currentSystem.containsKey(rest)) {
                                    activeMap.setSpecificCurrentMovedUnitsFrom1System(rest, currentSystem.get(rest) + amount);
                                } else {
@@ -569,11 +570,9 @@ public class ButtonHelperModifyUnits {
            if (planet.equalsIgnoreCase("")) {
                planetName = "space";
            } else {
-
                planetName = planet.toLowerCase().replace(" ", "");
                planetName = planet.replace("'", "");
                planetName = AliasHandler.resolvePlanet(planetName);
-
            }
            
            if(buttonLabel.toLowerCase().contains("damaged")){
