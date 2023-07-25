@@ -425,7 +425,7 @@ public class FoWHelper {
 				for(WormholeModel.Wormhole wh : WormholeModel.Wormhole.values())
 					if(tokenName.contains(wh.getWhString())) {
 						wormholeIDs.add(wh.getWhString());
-						if(!wh.toString().contains("eta")){
+						if(!wh.toString().contains("eta") || wh.toString().contains("beta")){
 							wormholeIDs.add(wh.toString());
 						}
 						break;
