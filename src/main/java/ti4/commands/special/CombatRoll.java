@@ -30,7 +30,7 @@ import ti4.model.UnitModel;
 public class CombatRoll extends SpecialSubcommandData {
     public CombatRoll() {
         super(Constants.COMBAT_ROLL,
-                "*EXPERIMENTAL* Combat rolls for player's units on tile. Does not consider abilities etc, only units on tile.");
+                "*BETA* Combat rolls for units on tile. Doesnt consider abilities/upgrades etc, only units on tile");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_MODIFIERS,
