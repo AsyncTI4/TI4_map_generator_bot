@@ -209,6 +209,9 @@ public class Constants {
     public static final String ROUND = "round";
 
     public static final String COMBAT_INFO = "combat_info";
+    public static final String COMBAT_ROLL = "combat_roll";
+    public static final String COMBAT_MODIFIERS = "mods";
+    public static final String COMBAT_EXTRA_ROLLS = "extrarolls";
     public static final String SYSTEM_INFO = "system_info";
     public static final String DIPLO_SYSTEM = "diplo_system";
 
