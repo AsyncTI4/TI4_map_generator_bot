@@ -1009,6 +1009,21 @@ public class AgendaHelper {
                             MessageHelper.sendMessageToChannel(channel, identity+" due to having a winning Politics Rider, you have been given "+amount+" AC and the speaker token");
                             ButtonHelperFactionSpecific.pillageCheck(winningR, activeMap);
                         }
+                        if(specificVote.contains("Diplomacy Rider")){
+                            String message = identity + " You have a diplo rider to resolve. Click the name of the planet who's system you wish to diplo";
+                            List<Button> buttons = Helper.getPlanetSystemDiploButtons(event, winningR, activeMap, true);
+                            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+                        }
+                        if(specificVote.contains("Construction Rider")){
+                            String message = identity + " You have a construction rider to resolve. Click the name of the planet you wish to put your space dock on";
+                            List<Button> buttons = Helper.getPlanetPlaceUnitButtons(winningR, activeMap, "sd", "place");
+                            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+                        }
+                        if(specificVote.contains("Warfare Rider")){
+                            String message = identity + " You have a warfare rider to resolve. Select the system to put the dread";
+                            List<Button> buttons = Helper.getTileWithShipsPlaceUnitButtons(winningR, activeMap, "dreadnought", "placeOneNDone_skipbuild");
+                            MessageHelper.sendMessageToChannelWithButtons(channel, message, buttons);
+                        }
                         if(specificVote.contains("Trade Rider")){
                             int cTG = winningR.getTg();
                             winningR.setTg(cTG+5);
