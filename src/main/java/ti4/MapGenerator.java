@@ -183,7 +183,6 @@ public class MapGenerator {
         commandManager.addCommand(new TechCommand());
         commandManager.addCommand(new PlanetCommand());
 
-
         CommandListUpdateAction commands = guildPrimary.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
         commands.queue();
