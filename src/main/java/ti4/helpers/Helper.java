@@ -747,12 +747,13 @@ public class Helper {
         return unitButtons;
     }
 
-    public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Map activeMap) {
+    public static List<Button> getPlanetSystemDiploButtons(GenericInteractionCreateEvent event, Player player, Map activeMap, boolean ac) {
         List<Button> planetButtons = new ArrayList<>();
         List<String> planets = new ArrayList<>(player.getPlanets());
+        String finsFactionCheckerPrefix = "FFCC_" + player.getFaction() + "_";
         for (String planet : planets) {
-            if (!Helper.getPlanetRepresentation(planet,activeMap).toLowerCase().contains("mecatol")) {
-                Button button = Button.danger("diplo_"+planet, Helper.getPlanetRepresentation(planet,activeMap) + " System");
+            if (!Helper.getPlanetRepresentation(planet,activeMap).toLowerCase().contains("mecatol") || ac) {
+                Button button = Button.secondary(finsFactionCheckerPrefix+"diplo_"+planet, Helper.getPlanetRepresentation(planet,activeMap) + " System");
                 planetButtons.add(button);
             }
 

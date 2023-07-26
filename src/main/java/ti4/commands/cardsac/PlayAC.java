@@ -170,6 +170,11 @@ public class PlayAC extends ACCardsSubcommandData {
                 scButtons.add(Button.danger("deleteButtons", "Done adding TG"));
                 MessageHelper.sendMessageToChannelWithButtons(channel2, Helper.getPlayerRepresentation(player, activeMap, guild, false)+" Use buttons to increase tgs on SCs. Each press adds 1tg.", scButtons);
             }
+            if(actionCardTitle.contains("Archaeological Expedition")){
+                MessageChannel channel2 = ButtonHelper.getCorrectChannel(player, activeMap);
+                List<Button> scButtons = ButtonHelper.getArcExpButtons(activeMap, player);
+                MessageHelper.sendMessageToChannelWithButtons(channel2, Helper.getPlayerRepresentation(player, activeMap, guild, false)+" After checking for sabos, use buttons to explore a planet type x 3 and gain any frags", scButtons);
+            }
 
             if (actionCardWindow.contains("After an agenda is revealed")) {
                 

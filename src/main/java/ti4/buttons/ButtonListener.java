@@ -95,12 +95,15 @@ public class ButtonListener extends ListenerAdapter {
         MessageListener.setActiveGame(event.getMessageChannel(), id, "button", "no sub command");
         String buttonID = event.getButton().getId();
         String buttonLabel = event.getButton().getLabel();
+        
         String lastchar = StringUtils.right(buttonLabel, 2).replace("#", "");
         String lastcharMod = StringUtils.right(buttonID, 1);
         if (buttonID == null) {
             event.getChannel().sendMessage("Button command not found").queue();
             return;
         }
+
+
 
         // BotLogger.log(event, ""); //TEMPORARY LOG ALL BUTTONS
 
@@ -307,6 +310,8 @@ public class ButtonListener extends ListenerAdapter {
             }
         } else if (buttonID.startsWith("yinHeroInfantry_")) {
             ButtonHelperFactionSpecific.lastStepOfYinHero(buttonID, event, activeMap, player, ident);
+         } else if (buttonID.startsWith("arcExp_")) {
+            ButtonHelper.resolveArcExpButtons(activeMap, player, buttonID, event, trueIdentity);
         } else if (buttonID.startsWith("acToSendTo_")) {
             ButtonHelperFactionSpecific.lastStepOfYinHero(buttonID, event, activeMap, player, ident);
         } else if (buttonID.startsWith("yinHeroPlanet_")) {
@@ -332,6 +337,21 @@ public class ButtonListener extends ListenerAdapter {
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), "Use buttons to select which player owns the planet you want to land on", buttons);
         } else if (buttonID.startsWith("hacanAgentRefresh_")) {
             ButtonHelperFactionSpecific.hacanAgentRefresh(buttonID, event, activeMap, player, ident, trueIdentity);
+        } else if (buttonID.startsWith("retreatGroundUnits_")) {
+           ButtonHelperModifyUnits.retreatGroundUnits(buttonID, event, activeMap, player, ident, buttonLabel);
+        } else if (buttonID.startsWith("retreatUnitsFrom_")) {
+            ButtonHelperModifyUnits.retreatSpaceUnits(buttonID, event, activeMap, player);
+            String both = buttonID.replace("retreatUnitsFrom_","");
+            String pos1 = both.split("_")[0];
+            String pos2 = both.split("_")[1];
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident + " retreated all units in space to "+activeMap.getTileByPosition(pos2).getRepresentationForButtons(activeMap,player));
+            String message = trueIdentity + " Use below buttons to move any ground forces or conclude retreat.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatingGroundTroopsButtons(player, activeMap, event, pos1, pos2));
+            event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("retreat_")) {
+            String pos = buttonID.replace("retreat_","");
+            String message = trueIdentity + " Use buttons to select a system to retreat too. Warning: bot does not know what the valid retreat tiles are, you will need to verify these.";
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ButtonHelperModifyUnits.getRetreatSystemButtons(player, activeMap, pos));
         } else if (buttonID.startsWith("exhaustAgent_")) {
             String agent = buttonID.replace("exhaustAgent_","");
             String rest = agent;
@@ -1950,7 +1970,7 @@ public class ButtonListener extends ListenerAdapter {
                 case "diploSystem" -> {
                     String message = trueIdentity + " Click the name of the planet who's system you wish to diplo";
 
-                    List<Button> buttons = Helper.getPlanetSystemDiploButtons(event, player, activeMap);
+                    List<Button> buttons = Helper.getPlanetSystemDiploButtons(event, player, activeMap, false);
                     if (!activeMap.isFoWMode()) {
                         List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
                         if (threadChannels == null)
