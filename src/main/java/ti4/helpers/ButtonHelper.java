@@ -28,6 +28,8 @@ import ti4.buttons.ButtonListener;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardspn.PNInfo;
 import ti4.commands.explore.ExpFrontier;
+import ti4.commands.explore.ExploreAndDiscard;
+import ti4.commands.explore.ExploreSubcommandData;
 import ti4.commands.explore.SendFragments;
 import ti4.commands.leaders.UnlockLeader;
 import ti4.commands.planet.PlanetRefresh;
@@ -55,6 +57,56 @@ import ti4.model.TechnologyModel;
 
 public class ButtonHelper {
 
+    public static List<String> getTypesOfPlanetPlayerHas(Map activeMap, Player player){
+        List<String> types = new ArrayList<String>();
+        for(String planet : player.getPlanets()){
+            UnitHolder unitHolder = activeMap.getPlanetsInfo().get(planet);
+            Planet planetReal = (Planet) unitHolder;
+            boolean oneOfThree = false;
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous"))) {
+                oneOfThree = true;
+            }
+            if (oneOfThree && !types.contains(planetReal.getOriginalPlanetType())) {
+                types.add(planetReal.getOriginalPlanetType());
+            }
+        }
+        return types;
+    }
+    public static List<Button> getArcExpButtons(Map activeMap, Player player){
+        List<Button> buttons = new ArrayList<Button>();
+        List<String> types = ButtonHelper.getTypesOfPlanetPlayerHas(activeMap, player);
+        for(String type : types){
+            if(type.equals("industrial")){
+                buttons.add(Button.success("arcExp_industrial", "Explore Industrials X3"));
+            }
+            if(type.equals("cultural")){
+                buttons.add(Button.primary("arcExp_cultural", "Explore Culturals X3"));
+            }
+            if(type.equals("hazardous")){
+                buttons.add(Button.danger("arcExp_hazardous", "Explore Hazardous X3"));
+            }
+        }
+        return buttons;
+    }
+    public static void resolveArcExpButtons(Map activeMap, Player player, String buttonID, ButtonInteractionEvent event, String trueIdentity){
+        String type = buttonID.replace("arcExp_", "");
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 3; i++) {
+            String cardID = activeMap.drawExplore(type);
+            sb.append(((ExploreSubcommandData) new ExploreAndDiscard()).displayExplore(cardID)).append(System.lineSeparator());
+            String card = Mapper.getExplore(cardID);
+            String[] cardInfo = card.split(";");
+            String cardType = cardInfo[3];
+            if (cardType.equalsIgnoreCase(Constants.FRAGMENT)) {
+                sb.append(trueIdentity+" Gained relic fragment\n");
+                player.addFragment(cardID);
+                activeMap.purgeExplore(cardID);
+            }
+        }
+        MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeMap);
+        MessageHelper.sendMessageToChannel(channel, sb.toString());
+        event.getMessage().delete().queue();
+    }
     public static List<Button> getExhaustButtonsWithTG(Map activeMap, Player player, GenericInteractionCreateEvent event){
             List<Button> buttons = Helper.getPlanetExhaustButtons(event, player, activeMap);
             if (player.getTg() > 0) {
@@ -813,7 +865,7 @@ public class ButtonHelper {
                     if(playersWithPds2.size()> 0){
                         context =1;
                     }
-                    File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, context, tile.getPosition(), event);
+                    File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, context, tile.getPosition(), event, p1);
                     MessageHelper.sendMessageWithFile((MessageChannel) threadChannel_, systemWithContext, "Picture of system", false);
                     List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeMap,  tile.getPosition(), p1, player2, spaceOrGround);
                     MessageHelper.sendMessageToChannelWithButtons((MessageChannel) threadChannel_, "", buttons);
@@ -845,7 +897,12 @@ public class ButtonHelper {
                             if(spaceOrGround.equalsIgnoreCase("ground")){
                                 longMsg2 = " Please resolve the interaction here. The first step is any start of invasion abilities like tekklar, blitz, bunker, or disable. Then its bombardment, then committing of ground forces, followed by a parley and ghost squad window, then start of combat/start of a round of combat abilities.";
                             }
-                            MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_, Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true) + Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true) + longMsg2);
+                            if(activeMap.isFoWMode()){
+                                longMsg2 = Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true) + longMsg2;
+                            }else{
+                                longMsg2 = Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true) + Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), false) + longMsg2;
+                            }
+                            MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_, longMsg2);
                             List<Player> playersWithPds2 = null;
                             if(activeMap.isFoWMode() || spaceOrGround.equalsIgnoreCase("ground")){
                                 playersWithPds2 = new ArrayList<Player>();
@@ -856,7 +913,7 @@ public class ButtonHelper {
                             if(playersWithPds2.size()> 0){
                                 context =1;
                             }
-                            File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, context, tile.getPosition(), event);
+                            File systemWithContext = GenerateTile.getInstance().saveImage(activeMap, context, tile.getPosition(), event, p1);
                             MessageHelper.sendMessageWithFile((MessageChannel) threadChannel_, systemWithContext, "Picture of system", false);
                             List<Button> buttons = ButtonHelper.getButtonsForPictureCombats(activeMap,  tile.getPosition(), p1, player2, spaceOrGround);
                             MessageHelper.sendMessageToChannelWithButtons((MessageChannel) threadChannel_, "", buttons);
@@ -897,22 +954,22 @@ public class ButtonHelper {
             buttons.add(Button.secondary(finChecker+"exhaustAgent_titansagent", "Use Titans Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("titans"))));
         }
         Player sol = Helper.getPlayerFromUnlockedLeader(activeMap, "solagent");
-        if(!activeMap.isFoWMode() &&sol != null && !sol.getLeaderByID("solagent").isExhausted() && groundOrSace.equalsIgnoreCase("ground")){
+        if((!activeMap.isFoWMode() || sol == p1) &&sol != null && !sol.getLeaderByID("solagent").isExhausted() && groundOrSace.equalsIgnoreCase("ground")){
             String finChecker = "FFCC_"+sol.getFaction() + "_";
             buttons.add(Button.secondary(finChecker+"exhaustAgent_solagent", "Use Sol Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sol"))));
         }
         Player letnev = Helper.getPlayerFromUnlockedLeader(activeMap, "letnevagent");
-        if(!activeMap.isFoWMode() &&letnev != null && !letnev.getLeaderByID("letnevagent").isExhausted()&& groundOrSace.equalsIgnoreCase("space")){
+        if((!activeMap.isFoWMode() || letnev == p1) &&letnev != null && !letnev.getLeaderByID("letnevagent").isExhausted()&& groundOrSace.equalsIgnoreCase("space")){
             String finChecker = "FFCC_"+letnev.getFaction() + "_";
             buttons.add(Button.secondary(finChecker+"exhaustAgent_letnevagent", "Use Letnev Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("letnev"))));
         }
         Player nomad = Helper.getPlayerFromUnlockedLeader(activeMap, "nomadagentthundarian");
-        if(!activeMap.isFoWMode() &&nomad != null && !nomad.getLeaderByID("nomadagentthundarian").isExhausted()){
+        if((!activeMap.isFoWMode() || nomad ==p1) &&nomad != null && !nomad.getLeaderByID("nomadagentthundarian").isExhausted()){
             String finChecker = "FFCC_"+nomad.getFaction() + "_";
             buttons.add(Button.secondary(finChecker+"exhaustAgent_nomadagentthundarian", "Use Thundarian").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nomad"))));
         }
         Player yin = Helper.getPlayerFromUnlockedLeader(activeMap, "yinagent");
-        if(!activeMap.isFoWMode() &&yin != null && !yin.getLeaderByID("yinagent").isExhausted()){
+        if((!activeMap.isFoWMode() || yin == p1) &&yin != null && !yin.getLeaderByID("yinagent").isExhausted()){
             String finChecker = "FFCC_"+yin.getFaction() + "_";
             buttons.add(Button.secondary(finChecker+"yinagent_"+pos, "Use Yin Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("yin"))));
         }
@@ -931,6 +988,13 @@ public class ButtonHelper {
         if(p1.hasAbility("edict") || p1.hasAbility("imperia")){
             String finChecker = "FFCC_"+p1.getFaction() + "_";
             buttons.add(Button.secondary(finChecker+"mahactStealCC_"+p2.getColor(), "Add Opponent CC to Fleet").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("mahact"))));
+        }
+        if(!activeMap.isFoWMode() &&sol != null && !sol.getLeaderByID("solagent").isExhausted() && groundOrSace.equalsIgnoreCase("ground")){
+            String finChecker = "FFCC_"+sol.getFaction() + "_";
+            buttons.add(Button.secondary(finChecker+"exhaustAgent_solagent", "Use Sol Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("sol"))));
+        }
+        if(groundOrSace.equalsIgnoreCase("space")){
+            buttons.add(Button.danger("retreat_"+pos, "Retreat"));
         }
 
 
@@ -1154,6 +1218,7 @@ public class ButtonHelper {
                 }
             }
         }
+        ringButtons.add(Button.danger("ChooseDifferentDestination", "Get a different ring"));
 
         return ringButtons;
     }
