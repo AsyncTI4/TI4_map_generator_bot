@@ -3,14 +3,14 @@ package ti4.commands.special;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Random;
 import java.util.StringTokenizer;
+import java.util.Map.Entry;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 
-import lombok.experimental.var;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -29,29 +29,38 @@ import ti4.model.UnitModel;
 
 public class CombatRoll extends SpecialSubcommandData {
     public CombatRoll() {
-        super("combat_roll", "Combat rolls for player's units on tile.");// Constants.COMBAT_ROLL
+        super("combat_roll", "*WIP* *EXPERIMENTAL* Combat rolls for player's units on tile.");// Constants.COMBAT_ROLL
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true)
                 .setAutoComplete(true));
-        addOptions(new OptionData(OptionType.STRING, "mods",
+        addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_MODIFIERS,
                 "+/- <unit type>. Eg -1 all, +2 mech, +1 fighter").setRequired(false));
-        // addOptions(new OptionData(OptionType.STRING, "mod1for", // add constant
-        // "Comma separated list of '{count} unit' Example: Dread, 2 Warsuns, 4
-        // Infantry").setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.PLANET,
+                "(optional) Planet to have combat on. By default rolls for space combat.").setAutoComplete(true)
+                .setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_EXTRA_ROLLS,
+                "comma list of <count> <unit> eg 2 fighter 1 dreadnought for extra roll")
+                .setRequired(false));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
-        // if (activeMap.isFoWMode()) {
-        // sendMessage("This is disabled for FoW for now.");
-        // return;
-        // }
+
         OptionMapping tileOption = event.getOption(Constants.TILE_NAME);
-        OptionMapping mods = event.getOption("mods");
+        OptionMapping mods = event.getOption(Constants.COMBAT_MODIFIERS);
+        OptionMapping planetOption = event.getOption(Constants.PLANET);
+        OptionMapping extraRollsOption = event.getOption(Constants.COMBAT_EXTRA_ROLLS);
 
         if (tileOption == null) {
             return;
         }
+
+        String unitHolderName = Constants.SPACE;
+        if (planetOption != null) {
+            unitHolderName = planetOption.getAsString();
+        }
+
+        // Get tile info
         String tileID = AliasHandler.resolveTile(tileOption.getAsString().toLowerCase());
         Tile tile = AddRemoveUnits.getTile(event, tileID, activeMap);
         if (tile == null) {
@@ -59,6 +68,12 @@ public class CombatRoll extends SpecialSubcommandData {
                     "Tile " + tileOption.getAsString() + " not found");
             return;
         }
+        String tileName = tile.getTilePath();
+        tileName = tileName.substring(tileName.indexOf("_") + 1);
+        tileName = tileName.substring(0, tileName.indexOf(".png"));
+        tileName = " - " + tileName + "[" + tile.getTileID() + "]";
+        StringBuilder sb = new StringBuilder();
+
         Player player = activeMap.getPlayer(getUser().getId());
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
@@ -67,30 +82,34 @@ public class CombatRoll extends SpecialSubcommandData {
             return;
         }
 
-        // java.util.Map<String, String> colorToId = Mapper.getColorToId();
-        String tileName = tile.getTilePath();
-        tileName = tileName.substring(tileName.indexOf("_") + 1);
-        tileName = tileName.substring(0, tileName.indexOf(".png"));
-        tileName = " - " + tileName + "[" + tile.getTileID() + "]";
-        StringBuilder sb = new StringBuilder();
+        UnitHolder combatOnHolder = tile.getUnitHolders().get(unitHolderName);
+        java.util.HashMap<UnitModel, Integer> unitsByQuantity = getUnitsFromUnitHolder(player, combatOnHolder);
+        HashMap<String, Integer> modsParsed = new HashMap<String, Integer>();
+        if (mods != null) {
+            modsParsed = parseUnits(mods.getAsString());
+        }
+        // TODO: add faction ability specific mods
+        // TODO: add tech specific mods that player owns
+        // TODO: add PN specific mods that player owns
+        // TOOD: add leader specific mods that player has unlocked
+        HashMap<String, Integer> extraRollsParsed = new HashMap<String, Integer>();
+        if (extraRollsOption != null) {
+            extraRollsParsed = parseUnits(extraRollsOption.getAsString());
+        }
 
-        // String playerColor = player.getColor();
-        // String playerColorKey = getFactionColorId(activeMap, colorToId, playerColor,
-        // event);
-
-        java.util.HashMap<UnitModel, Integer> unitsByQuantity = convertToUnitModels(player, tile.getUnitHolders());
-        HashMap<String, Integer> modsParsed = parseUnits(mods.getAsString());
-        String results = rollUnits(unitsByQuantity, modsParsed);
+        String message = String.format("%s combat rolls for %s on %s: \n",
+                StringUtils.capitalize(combatOnHolder.getName()), Helper.getFactionIconFromDiscord(player.getFaction()),
+                tile.getPosition());
+        message += rollUnits(unitsByQuantity, modsParsed, extraRollsParsed);
 
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
-        String message = results;
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 
-    private UnitModel convertFromUnitHolderToModel(String unitHolderString, Player player) {
-        var unitRepresentation = Mapper.getUnitImageSuffixes();
-        var filteredList = unitRepresentation
+    private UnitModel getUnitModel(String unitHolderString, Player player) {
+        java.util.Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
+        List<Entry<String, String>> filteredList = unitRepresentation
                 .entrySet()
                 .stream()
                 .filter(rep -> unitHolderString.endsWith(rep.getKey())
@@ -107,46 +126,30 @@ public class CombatRoll extends SpecialSubcommandData {
         return result;
     }
 
-    private java.util.HashMap<UnitModel, Integer> convertToUnitModels(Player player,
-            java.util.HashMap<String, UnitHolder> unitHolders) {
-        // var spaceUnits = unitHolders["space"]
-        java.util.Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
-        String playerColorKey = player.getColor();
-
-        var spaceUnitHolder = unitHolders.get("space");// unitHolders.entrySet().stream().filter().collect(Collectors.toMap(Entry::getKey,
-                                                       // Entry::getValue));
+    private java.util.HashMap<UnitModel, Integer> getUnitsFromUnitHolder(Player player, UnitHolder unitHolder) {
         java.util.HashMap<UnitModel, Integer> unitModels = new HashMap<>();
 
-        HashMap<String, Integer> units = spaceUnitHolder.getUnits();
-        String playerColor = player.getColor();
-        // String playerColorKey = getFactionColorId(activeMap, colorToId, playerColor,
-        // event);
+        HashMap<String, Integer> units = unitHolder.getUnits();
         for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
 
             String unitType = unitEntry.getKey();
             Integer quantity = unitEntry.getValue();
 
-            UnitModel unitModel = convertFromUnitHolderToModel(unitType, player);
+            UnitModel unitModel = getUnitModel(unitType, player);
             if (unitModel != null) {
-                unitModels.put(unitModel, quantity);
+                // TODO: Check for racial exceptions like:
+                // - Nekro & NRA mechs that could be in space
+                // - (For ground combat) titan pds
+                if (unitHolder.getName() == Constants.SPACE && unitModel.getIsShip() != null && unitModel.getIsShip()) {
+                    unitModels.put(unitModel, quantity);
+                } else if (unitHolder.getName() != Constants.SPACE
+                        && unitModel.getIsGroundForce() != null
+                        && unitModel.getIsGroundForce()) {
+                    unitModels.put(unitModel, quantity);
+                }
             }
-
         }
         return unitModels;
-    }
-
-    private String getFactionColorId(Map activeMap, java.util.Map<String, String> colorToId, String playerColor,
-            SlashCommandInteractionEvent event) {
-
-        String colorKeyValue = "";
-        for (java.util.Map.Entry<String, String> colorEntry : colorToId.entrySet()) {
-            String colorKey = colorEntry.getKey();
-            String color = colorEntry.getValue();
-            if (playerColor.equals(color)) {
-                colorKeyValue = colorKey;
-            }
-        }
-        return colorKeyValue;
     }
 
     @Override
@@ -154,13 +157,15 @@ public class CombatRoll extends SpecialSubcommandData {
         super.reply(event);
     }
 
-    private String rollUnits(java.util.Map<UnitModel, Integer> units, HashMap<String, Integer> mods) {
-        String result = "Combat rolls: \n";
-        var unitsWithModifiers = units.keySet().stream().filter(unit -> mods.containsKey(unit.getAsyncId()))
+    private String rollUnits(java.util.Map<UnitModel, Integer> units, HashMap<String, Integer> mods,
+            HashMap<String, Integer> extraRolls) {
+        String result = "";
+        List<UnitModel> unitsWithModifiers = units.keySet().stream().filter(unit -> mods.containsKey(unit.getAsyncId()))
                 .collect(Collectors.toList());
         if (!mods.isEmpty()) {
 
-            result += "With modifiers: \n";
+            result += "With modifiers: ";
+            ArrayList<String> modifierMessages = new ArrayList<String>();
 
             if (mods.containsKey("all")) {
                 String plusPrefix = "+";
@@ -168,7 +173,7 @@ public class CombatRoll extends SpecialSubcommandData {
                 if (modifierValue < 0) {
                     plusPrefix = "";
                 }
-                result += String.format("%s%s applied to all\n", plusPrefix, modifierValue);
+                modifierMessages.add(String.format("%s%s for all", plusPrefix, modifierValue));
             }
             for (UnitModel unit : unitsWithModifiers) {
                 String plusPrefix = "+";
@@ -177,39 +182,50 @@ public class CombatRoll extends SpecialSubcommandData {
                 if (modifierValue < 0) {
                     plusPrefix = "";
                 }
-                result += String.format("%s%s applied to %s\n", plusPrefix, modifierValue, unitAsnycEmoji);
+                modifierMessages.add(String.format("%s%s for %s", plusPrefix, modifierValue, unitAsnycEmoji));
             }
+            result += String.join(", ", modifierMessages) + "\n";
+        }
 
+        List<UnitModel> unitsWithExtraRolls = units.keySet().stream()
+                .filter(unit -> extraRolls.containsKey(unit.getAsyncId()))
+                .collect(Collectors.toList());
+        if (!extraRolls.isEmpty()) {
+            result += "With ";
+            ArrayList<String> extraRollMessages = new ArrayList<String>();
+            for (UnitModel unit : unitsWithExtraRolls) {
+                String plusPrefix = "+";
+                Integer numExtraRolls = extraRolls.get(unit.getAsyncId());
+                String unitAsnycEmoji = Helper.getEmojiFromDiscord(unit.getBaseType());
+                if (numExtraRolls < 0) {
+                    plusPrefix = "";
+                }
+                extraRollMessages.add(String.format("%s%s rolls for %s", plusPrefix, numExtraRolls, unitAsnycEmoji));
+            }
+            result += String.join(", ", extraRollMessages) + "\n";
         }
 
         int totalHits = 0;
-
-        //
         for (java.util.Map.Entry<UnitModel, Integer> entry : units.entrySet()) {
             UnitModel unit = entry.getKey();
             int numOfUnit = entry.getValue();
 
             int toHit = unit.getCombatHitsOn();
             int modifierToHit = getTotalModifications(unit, mods);
-            int numRollsPerUnit = unit.getCombatDieCount();
-            int[] resultRolls = new int[numOfUnit * numRollsPerUnit];
-            for (int index = 0; index < numOfUnit; index++) {
-                for (int rollIndex = 0; rollIndex < numRollsPerUnit; ++rollIndex) {
-                    resultRolls[index] = randomRange(1, 10);
-                }
+            int extraRollsForUnit = 0;
+            if (extraRolls.containsKey(unit.getAsyncId())) {
+                extraRollsForUnit = extraRolls.get(unit.getAsyncId());
             }
-
-            String quantitySuffix = "";
-            if (numOfUnit > 1) {
-                quantitySuffix = "s";
+            int numRollsPerUnit = unit.getCombatDieCount();
+            int numRolls = (numOfUnit * numRollsPerUnit) + extraRollsForUnit;
+            int[] resultRolls = new int[numRolls];
+            for (int index = 0; index < numRolls; index++) {
+                resultRolls[index] = randomRange(1, 10);
             }
 
             int[] hitRolls = Arrays.stream(resultRolls)
                     .filter(roll -> {
-                        // if (inScope(roll, index, modifierScope)) {
-                        // toHit += modifier;
-                        // }
-                        return roll >= toHit + modifierToHit;
+                        return roll >= toHit - modifierToHit;
                     })
                     .toArray();
 
@@ -219,35 +235,36 @@ public class CombatRoll extends SpecialSubcommandData {
                 rollsSuffix = "s";
             }
 
-            String unitTypeHitsInfo = String.format("(hits on %s)", toHit);
+            String unitTypeHitsInfo = String.format("hits on %s", toHit);
             if (unit.getCombatDieCount() > 1) {
-                unitTypeHitsInfo = String.format("(%s rolls, hits on %s)", unit.getCombatDieCount(), toHit);
+                unitTypeHitsInfo = String.format("%s rolls, hits on %s", unit.getCombatDieCount(), toHit);
             }
             if (modifierToHit != 0) {
                 String modifierToHitString = Integer.toString(modifierToHit);
                 if (modifierToHit > 0) {
                     modifierToHitString = "+" + modifierToHitString;
                 }
-                unitTypeHitsInfo = String.format("(hits on %s, with %s mods)", toHit, modifierToHitString);
+                unitTypeHitsInfo = String.format("hits on %s (%s mods)", (toHit - modifierToHit),
+                        modifierToHitString);
                 if (unit.getCombatDieCount() > 1) {
-                    unitTypeHitsInfo = String.format("(%s rolls, hits on %s, with %s mods)", unit.getCombatDieCount(),
-                            toHit, modifierToHitString);
+                    unitTypeHitsInfo = String.format("%s rolls, hits on %s, (%s mods)", unit.getCombatDieCount(),
+                            (toHit - modifierToHit), modifierToHitString);
                 }
             }
 
-            var unitEmoji = Helper.getEmojiFromDiscord(unit.getBaseType());
+            String unitEmoji = Helper.getEmojiFromDiscord(unit.getBaseType());
             result += String.format("%s %s %s %s - %s hit%s\n", numOfUnit, unitEmoji, unitTypeHitsInfo,
                     Arrays.toString(resultRolls), hitRolls.length, rollsSuffix);
         }
 
-        result += String.format("Total hits %s\n", totalHits);
+        result += String.format("\n**Total hits %s**\n", totalHits);
         return result.toString();
     }
 
     private Integer getTotalModifications(UnitModel unit, HashMap<String, Integer> mods) {
         Integer modValue = 0;
         if (mods.containsKey("all")) {
-            modValue += mods.get(unit.getAsyncId());
+            modValue += mods.get("all");
         }
         if (mods.containsKey(unit.getAsyncId())) {
             modValue += mods.get(unit.getAsyncId());
@@ -262,15 +279,6 @@ public class CombatRoll extends SpecialSubcommandData {
         while (unitListTokenizer.hasMoreTokens()) {
             String unitListToken = unitListTokenizer.nextToken();
             StringTokenizer unitInfoTokenizer = new StringTokenizer(unitListToken, " ");
-
-            int tokenCount = unitInfoTokenizer.countTokens();
-            if (tokenCount > 3) {
-                // MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(),
-                // "Warning: Unit list should have a maximum of 3 parts `{count} {unit}
-                // {planet}` - `" + unitListToken + "` has " + tokenCount + " parts. There may
-                // be errors.");
-            }
-
             int count = 1;
             boolean numberIsSet = false;
 
@@ -288,38 +296,12 @@ public class CombatRoll extends SpecialSubcommandData {
                 unit = AliasHandler.resolveUnit(unitInfoTokenizer.nextToken());
             }
 
-            // color = recheckColorForUnit(unit, color, event);
-
-            // String unitID = Mapper.getUnitID(unit, color);
-            // String unitPath = Tile.getUnitPath(unitID);
             if (unit != null) {
                 resultList.put(unit, count);
-            } else {
-                // MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), "Unit:
-                // `" + unit + "` is not valid and not supported. Please redo this part: `" +
-                // unitListToken + "`");
-                // continue;
             }
-            // if (unitInfoTokenizer.hasMoreTokens()) {
-            // String planetToken = unitInfoTokenizer.nextToken();
-            // planetName = AliasHandler.resolvePlanet(planetToken);
-            // // if (!Mapper.isValidPlanet(planetName)) {
-            // // MessageHelper.sendMessageToChannel(event.getChannel(), "Planet: `" +
-            // planetToken + "` is not valid and not supported. Please redo this part: `" +
-            // unitListToken + "`");
-            // // continue;
-            // // }
-            // }
-
-            // planetName = getPlanet(event, tile, planetName);
-            // unitAction(event, tile, count, planetName, unitID, color);
-
-            // addPlanetToPlayArea(event, tile, planetName, activeMap);
         }
         return resultList;
     }
-
-    // private string inScope(int rollValue, )
 
     private static int randomRange(int min, int max) {
         Random random = new Random();
