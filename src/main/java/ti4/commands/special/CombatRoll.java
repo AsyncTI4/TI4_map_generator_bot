@@ -29,7 +29,8 @@ import ti4.model.UnitModel;
 
 public class CombatRoll extends SpecialSubcommandData {
     public CombatRoll() {
-        super("combat_roll", "*WIP* *EXPERIMENTAL* Combat rolls for player's units on tile.");// Constants.COMBAT_ROLL
+        super(Constants.COMBAT_ROLL,
+                "*EXPERIMENTAL* Combat rolls for player's units on tile. Does not consider abilities etc, only units on tile.");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_MODIFIERS,
@@ -160,6 +161,8 @@ public class CombatRoll extends SpecialSubcommandData {
     private String rollUnits(java.util.Map<UnitModel, Integer> units, HashMap<String, Integer> mods,
             HashMap<String, Integer> extraRolls) {
         String result = "";
+
+        // Display modifiers info
         List<UnitModel> unitsWithModifiers = units.keySet().stream().filter(unit -> mods.containsKey(unit.getAsyncId()))
                 .collect(Collectors.toList());
         if (!mods.isEmpty()) {
@@ -187,6 +190,7 @@ public class CombatRoll extends SpecialSubcommandData {
             result += String.join(", ", modifierMessages) + "\n";
         }
 
+        // Display extra rolls info
         List<UnitModel> unitsWithExtraRolls = units.keySet().stream()
                 .filter(unit -> extraRolls.containsKey(unit.getAsyncId()))
                 .collect(Collectors.toList());
@@ -205,6 +209,7 @@ public class CombatRoll extends SpecialSubcommandData {
             result += String.join(", ", extraRollMessages) + "\n";
         }
 
+        // Actually roll for each unit
         int totalHits = 0;
         for (java.util.Map.Entry<UnitModel, Integer> entry : units.entrySet()) {
             UnitModel unit = entry.getKey();
