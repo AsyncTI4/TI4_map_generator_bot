@@ -418,7 +418,7 @@ public class FoWHelper {
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			HashSet<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
-				String tokenName = "wh" + token.replace("token_", "").replace(".png", "");
+				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
 				if(!tokenName.contains("champion")){
 					tokenName=tokenName.replace("ion", "");
 				}

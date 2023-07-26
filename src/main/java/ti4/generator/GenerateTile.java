@@ -87,7 +87,10 @@ public class GenerateTile {
         return saveImage(activeMap, 1, "000", event);
     }
 
-    public File saveImage(Map activeMap, int context, String focusTile, @Nullable GenericInteractionCreateEvent event) {
+     public File saveImage(Map activeMap, int context, String focusTile, @Nullable GenericInteractionCreateEvent event) {
+            return saveImage(activeMap, context, focusTile, event, null);
+     }
+    public File saveImage(Map activeMap, int context, String focusTile, @Nullable GenericInteractionCreateEvent event,@Nullable Player p1) {
         init(context, focusTile);
         reset();
 
@@ -105,11 +108,15 @@ public class GenerateTile {
             if (event.getMessageChannel().getName().endsWith(Constants.PRIVATE_CHANNEL)) {
                 isFoWPrivate = true;
                 Player player = getFowPlayer(activeMap, event);
-
+                if(p1 != null){
+                    player = p1;
+                }
                 // IMPORTANT NOTE : This method used to be local and was refactored to extract
                 // any references to tilesToDisplay
                 fowPlayer = Helper.getGamePlayer(activeMap, player, event, null);
-
+                if(p1 != null){
+                    fowPlayer = p1;
+                }
                 Set<String> tilesToShow = FoWHelper.fowFilter(activeMap, fowPlayer);
                 Set<String> keys = new HashSet<>(tilesToDisplay.keySet());
                 keys.removeAll(tilesToShow);
