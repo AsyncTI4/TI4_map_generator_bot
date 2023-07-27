@@ -110,11 +110,11 @@ public class CombatRoll extends SpecialSubcommandData {
 
     private UnitModel getUnitModel(String unitHolderString, Player player) {
         UnitModel result = null;
-        String color = player.getColor();
+        String colorID = Mapper.getColorID(player.getColor());
         String unitHolderFileSuffix = ".png";
-        if (unitHolderString.startsWith(color)) {
+        if (unitHolderString.startsWith(colorID)) {
             // format is <color>_<asyncID>.png
-            String modelName = unitHolderString.substring(color.length());
+            String modelName = unitHolderString.substring(colorID.length());
             modelName = modelName.substring(1, modelName.length() - unitHolderFileSuffix.length());
             result = player.getUnitByAsyncID(modelName.toLowerCase());
         }
