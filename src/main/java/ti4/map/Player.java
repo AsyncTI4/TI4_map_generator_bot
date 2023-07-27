@@ -1199,8 +1199,8 @@ public class Player {
             if (unitModel != null && unitModel.getUpgradesFromUnitId() != null) {
                 if (getUnitsOwned().contains(unitModel.getUpgradesFromUnitId())) {
                     removeOwnedUnitByID(unitModel.getUpgradesFromUnitId());
-                    addOwnedUnitByID(unitModel.getId());
                 }
+                addOwnedUnitByID(unitModel.getId());
             }
         }
     }
