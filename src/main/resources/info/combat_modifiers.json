@@ -1,0 +1,59 @@
+{
+    {
+        "alias": "plus1_1round_all",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "",
+        "persistanceType": "ONE_ROUND",
+        "related":[
+            {"type": "technology", "alias":"sc"},
+            {"type": "action_cards", "alias": "morale_boost_ds"},
+            {"type": "action_cards", "alias": "mb1"},
+            {"type": "action_cards", "alias": "mb2"},
+            {"type": "action_cards", "alias": "mb3"},
+            {"type": "action_cards", "alias": "mb4"}
+        ]
+    },
+    {
+        "alias": "plus3_1round_all",
+        "type": "DIE_MOD",
+        "value": "+3",
+        "scope": "",
+        "persistanceType": "ONE_ROUND",
+        "related":[
+            {"type": "action_cards", "alias": "close_quarters"},
+        ]
+    },
+    {
+        "alias": "minus1_always_all",
+        "type": "DIE_MOD",
+        "value": "-1",
+        "persistanceType": "ALWAYS",
+        "scope": "",
+        "related":[
+            {"type": "faction_abilities", "alias": "fragile"}
+        ]
+    },
+    {
+        "alias": "plus1_always_all",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "persistanceType": "ALWAYS",
+        "scope": "",
+        "related":[
+            {"type": "faction_abilities", "alias": "unrelenting"}
+        ]
+    },
+    {
+        "alias": "plus1_1round_fighter",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "fighter",
+        "persistanceType": "ONE_ROUND",
+        "related":[
+            {"type": "promissory_notes", "alias":"tekklar"},
+            {"type": "promissory_notes", "alias":"dspnkjal"},
+            {"type": "action_cards", "alias":"f_prototype"}
+        ]
+    }
+}

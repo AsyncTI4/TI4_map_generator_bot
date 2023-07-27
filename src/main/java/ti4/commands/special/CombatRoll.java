@@ -25,6 +25,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.model.CombatModifierModel;
 import ti4.model.UnitModel;
 
 public class CombatRoll extends SpecialSubcommandData {
@@ -98,14 +99,40 @@ public class CombatRoll extends SpecialSubcommandData {
             extraRollsParsed = parseUnits(extraRollsOption.getAsString());
         }
 
+        HashMap<String, Integer> alwaysOnMods = new HashMap<>();
+        alwaysOnMods = getAlwaysOnMods(player);
+
         String message = String.format("%s combat rolls for %s on %s: \n",
                 StringUtils.capitalize(combatOnHolder.getName()), Helper.getFactionIconFromDiscord(player.getFaction()),
                 tile.getPosition());
-        message += rollUnits(unitsByQuantity, modsParsed, extraRollsParsed);
+        message += rollUnits(unitsByQuantity, modsParsed, extraRollsParsed, alwaysOnMods);
 
         MessageHelper.sendMessageToChannel(event.getChannel(), sb.toString());
         message = StringUtils.removeEnd(message, ";\n");
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
+    }
+
+    private HashMap<String, Integer> getAlwaysOnMods(Player player) {
+        HashMap<String, Integer> alwaysOnMods = new HashMap<>();
+        HashMap<String, CombatModifierModel> combatModifiers = Mapper.getCombatModifiers();
+
+        for (var ability : player.getAbilities()) {
+            CombatModifierModel modifierForAbility = combatModifiers.values()
+                    .stream()
+                    .filter(modifier -> modifier.isRelevantTo("faction_abilities", ability))
+                    .findFirst().get();
+            if (modifierForAbility != null) {
+                String scope = "all";
+                if (modifierForAbility.getScope() != null) {
+                    scope = modifierForAbility.getScope();
+                }
+                Integer modifierValue = Integer.parseInt(modifierForAbility.getValue());
+                if (modifierValue != null) {
+                    alwaysOnMods.put(scope, modifierValue);
+                }
+            }
+        }
+        return alwaysOnMods;
     }
 
     private UnitModel getUnitModel(String unitHolderString, Player player) {
@@ -153,12 +180,38 @@ public class CombatRoll extends SpecialSubcommandData {
     }
 
     private String rollUnits(java.util.Map<UnitModel, Integer> units, HashMap<String, Integer> mods,
-            HashMap<String, Integer> extraRolls) {
+            HashMap<String, Integer> extraRolls, HashMap<String, Integer> alwaysOnMods) {
         String result = "";
 
         // Display modifiers info
-        List<UnitModel> unitsWithModifiers = units.keySet().stream().filter(unit -> mods.containsKey(unit.getAsyncId()))
+        List<UnitModel> unitsWithModifiers = units.keySet().stream()
+                .filter(unit -> mods.containsKey(unit.getAsyncId()) || alwaysOnMods.containsKey(unit.getAsyncId()))
                 .collect(Collectors.toList());
+        if (!alwaysOnMods.isEmpty()) {
+
+            result += "With always applied modifiers: ";
+            ArrayList<String> modifierMessages = new ArrayList<String>();
+
+            if (alwaysOnMods.containsKey("all")) {
+                String plusPrefix = "+";
+                Integer modifierValue = alwaysOnMods.get("all");
+                if (modifierValue < 0) {
+                    plusPrefix = "";
+                }
+                modifierMessages.add(String.format("%s%s for all", plusPrefix, modifierValue));
+            }
+            for (UnitModel unit : unitsWithModifiers) {
+                String plusPrefix = "+";
+                Integer modifierValue = alwaysOnMods.get(unit.getAsyncId());
+                String unitAsnycEmoji = Helper.getEmojiFromDiscord(unit.getBaseType());
+                if (modifierValue < 0) {
+                    plusPrefix = "";
+                }
+                modifierMessages.add(String.format("%s%s for %s", plusPrefix, modifierValue, unitAsnycEmoji));
+            }
+            result += String.join(", ", modifierMessages) + "\n";
+        }
+
         if (!mods.isEmpty()) {
 
             result += "With modifiers: ";
