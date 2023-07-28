@@ -1,4 +1,4 @@
-{
+[
     {
         "alias": "plus1_1round_all",
         "type": "DIE_MOD",
@@ -21,7 +21,7 @@
         "scope": "",
         "persistanceType": "ONE_ROUND",
         "related":[
-            {"type": "action_cards", "alias": "close_quarters"},
+            {"type": "action_cards", "alias": "close_quarters"}
         ]
     },
     {
@@ -41,7 +41,9 @@
         "persistanceType": "ALWAYS",
         "scope": "",
         "related":[
-            {"type": "faction_abilities", "alias": "unrelenting"}
+            {"type": "faction_abilities", "alias": "unrelenting"}, 
+            {"type":"relics", "alias":"starfall_array"},
+            {"type":"relics", "alias":"absol_thalnos"}
         ]
     },
     {
@@ -55,5 +57,15 @@
             {"type": "promissory_notes", "alias":"dspnkjal"},
             {"type": "action_cards", "alias":"f_prototype"}
         ]
+    },
+    {
+        "alias": "plus1_always_fighter",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "scope": "fighter",
+        "persistanceType": "ALWAYS",
+        "related":[
+            {"type": "agendas", "alias":"prophecy"}
+        ]
     }
-}
+]

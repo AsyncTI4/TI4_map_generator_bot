@@ -3,15 +3,17 @@ package ti4.model;
 import java.util.List;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import lombok.Data;
 
 @Data
 public class CombatModifierModel implements ModelInterface {
     private String type;
-    private String value;
+    private Integer value;
     private String persistanceType;
-    @JsonFormat(with = JsonFormat.Feature.)
+
+    @JsonProperty("related")
     private List<CombatModifierRelatedModel> related;
     private String alias;
     private String scope;
