@@ -12,6 +12,7 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.model.ActionCardModel;
+import ti4.model.SecretObjectiveModel;
 
 public class MakeCopiesOfACs extends ACCardsSubcommandData {
     public MakeCopiesOfACs() {
@@ -38,12 +39,11 @@ public class MakeCopiesOfACs extends ACCardsSubcommandData {
             activeMap.addActionCardDuplicates(ACs);
         }
         if (count ==3) {
-            HashMap<String, ActionCardModel> actionCards2 = Mapper.getActionCards("extra1");
-            List<String> ACs2 = new ArrayList<>(actionCards2.keySet());
-            activeMap.addActionCardDuplicates(ACs2);
-            actionCards2 = Mapper.getActionCards("extra2");
-            ACs2 = new ArrayList<>(actionCards2.keySet());
-            activeMap.addActionCardDuplicates(ACs2);
+            activeMap.triplicateRelics();
+            activeMap.triplicateExplores();
+            activeMap.triplicateACs();
+            activeMap.triplicateSOs();
+
         }
     }
 }

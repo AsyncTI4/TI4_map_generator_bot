@@ -446,6 +446,9 @@ public class ButtonHelperModifyUnits {
                 }
 
             }
+            if(player.getLeaderIDs().contains("l1z1xcommander") && !player.hasLeaderUnlocked("l1z1xcommander")){
+                ButtonHelper.commanderUnlockCheck(player, activeMap, "l1z1x", event);
+            }
         }
         MessageHelper.sendMessageToChannel(event.getChannel(), playerRep + " " + successMessage);
         String message2 = trueIdentity + " Click the names of the planets you wish to exhaust.";
