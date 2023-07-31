@@ -105,8 +105,11 @@ public class ButtonHelperModifyUnits {
              new AddUnits().unitParsing(event, player.getColor(),
             activeMap.getTileByPosition(pos2), amount +" " +unitkey, activeMap);
         }
+
         String key = Mapper.getUnitID(AliasHandler.resolveUnit(unitkey), player.getColor());
-        activeMap.getTileByPosition(pos1).removeUnit(planet,key, amount);
+        //activeMap.getTileByPosition(pos1).removeUnit(planet,key, amount);
+        new RemoveUnits().removeStuff(event,activeMap.getTileByPosition(pos1), amount, planet, key, player.getColor(), false);
+
         List<Button> systemButtons = ButtonHelperModifyUnits.getRetreatingGroundTroopsButtons(player, activeMap, event, pos1, pos2);
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+" Retreated "+amount+ " "+unitkey + " on "+planet +" to "+activeMap.getTileByPosition(pos2).getRepresentationForButtons(activeMap,player));
         event.getMessage().editMessage(event.getMessage().getContentRaw())

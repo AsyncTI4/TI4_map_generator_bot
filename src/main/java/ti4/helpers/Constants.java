@@ -72,6 +72,7 @@ public class Constants {
     public static final String REPLACE = "replace";
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
+    public static final String SWAP = "swap";
 
 
     public static final String SET_SETTING = "setting";
