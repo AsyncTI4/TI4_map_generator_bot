@@ -51,6 +51,9 @@ public class Cleanup extends StatusSubcommandData {
         for (java.util.Map.Entry<Integer, Boolean> sc : scPlayed.entrySet()) {
             sc.setValue(false);
         }
+
+        returnEndStatusPNs(activeMap); // return any PNs with "end of status phase" return timing
+
         LinkedHashMap<String, Player> players = activeMap.getPlayers();
 
         for (Player player : players.values()) {
@@ -58,7 +61,7 @@ public class Cleanup extends StatusSubcommandData {
             Set<Integer> SCs = player.getSCs();
             for (int sc : SCs) {
                 activeMap.setScTradeGood(sc, 0);
-            }
+            }            
             player.clearSCs();
             player.clearFollowedSCs();
             player.cleanExhaustedTechs();
@@ -84,6 +87,31 @@ public class Cleanup extends StatusSubcommandData {
     }
 
     @Override
+
+    public void returnEndStatusPNs(Map activeMap) {
+        LinkedHashMap<String, Player> players = activeMap.getPlayers();
+         for (Player player : players.values()) {
+           List<String> pns = new ArrayList<String>();
+            pns.addAll(player.getPromissoryNotesInPlayArea());
+            for(String pn: pns){
+                Player pnOwner = activeMap.getPNOwner(pn);
+                if(!pnOwner.isRealPlayer() || !pnOwner.getFaction().equalsIgnoreCase(nonActivePlayer.getFaction())){
+                    continue;
+                }
+                PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
+                if(pnModel.getText().contains("return this card") && pnModel.getText().contains("end of the status phase")){
+                        player.removePromissoryNote(pn);
+                        nonActivePlayer.setPromissoryNote(pn);  
+                        PNInfo.sendPromissoryNoteInfo(activeMap, nonActivePlayer, false);
+		                PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
+                        MessageHelper.sendMessageToChannel(channel, pnModel.getName() + " was returned");
+                    }
+                }
+            }
+    }
+    
+    @Override
+
     public void reply(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
         int prevRound = activeMap.getRound() - 1;
