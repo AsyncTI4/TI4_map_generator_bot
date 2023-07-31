@@ -301,8 +301,28 @@ public class Turn extends PlayerSubcommandData {
                 .addComponents(actionRows).build();
 
         gameChannel.sendMessage(messageObject).queue();
-
-
+        
+        // return beginning of status phase PNs
+        LinkedHashMap<String, Player> players = activeMap.getPlayers();
+         for (Player player : players.values()) {
+           List<String> pns = new ArrayList<String>();
+            pns.addAll(player.getPromissoryNotesInPlayArea());
+            for(String pn: pns){
+                Player pnOwner = activeMap.getPNOwner(pn);
+                if(!pnOwner.isRealPlayer() || !pnOwner.getFaction().equalsIgnoreCase(nonActivePlayer.getFaction())){
+                    continue;
+                }
+                PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
+                if(pnModel.getText().contains("return this card") && (pnModel.getText().contains("start of the status phase") || pnModel.getText().contains("beginning of the status phase"))){
+                        player.removePromissoryNote(pn);
+                        nonActivePlayer.setPromissoryNote(pn);  
+                        PNInfo.sendPromissoryNoteInfo(activeMap, nonActivePlayer, false);
+		                PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
+                        MessageHelper.sendMessageToChannel(channel, pnModel.getName() + " was returned");
+                    }
+                }
+            }
+    
 
         Player arborec = Helper.getPlayerFromAbility(activeMap, "mitosis");
         if (arborec != null) {
