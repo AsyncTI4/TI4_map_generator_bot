@@ -99,7 +99,7 @@ public class Turn extends PlayerSubcommandData {
             max--;
         }
 
-        //FIND CURRENT PLAYER AND ???
+        //FIND CURRENT PLAYER AND if they are holding the highest possible SC, it sets the next SC as 1, otherwise, sets the next SC as current SC+1. 
         for (Player player : activeMap.getPlayers().values()) {
             if (mainPlayer.getUserID().equals(player.getUserID())) {
                 int sc = player.getLowestSC();
@@ -123,9 +123,6 @@ public class Turn extends PlayerSubcommandData {
             String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, activeMap, Integer.toString(sc));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 scPassed.put(0, player.isPassed());
-                if (player.isPassed()) {
-                    scPassed.put(sc, player.isPassed());
-                }
             } else {
                 scPassed.put(sc, player.isPassed());
             }
@@ -141,7 +138,8 @@ public class Turn extends PlayerSubcommandData {
 
         int tempProtection = 0;
         int nextSCFound = -1;
-        while (tempProtection < (activeMap.getSCList().size() + 5)) {
+        //Tries to see if the previously determined next up SC is held by an unpassed player. If it is not, it searches the next highest or, if it was at the max, it starts the search over from 0
+        while (tempProtection < (activeMap.getPlayers().size())) {
             Boolean isPassed = scPassed.get(scNext);
             if (isPassed != null && !isPassed) {
                 nextSCFound = scNext;
@@ -154,7 +152,7 @@ public class Turn extends PlayerSubcommandData {
 
         for (Player player : activeMap.getPlayers().values()) {
             int sc = player.getLowestSC();
-            if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
+            if ((sc != 0 && sc == nextSCFound) || (nextSCFound == 0 && naaluSC == sc)) {
                 if(!activeMap.isFoWMode())
                 {
                     try {
@@ -176,9 +174,9 @@ public class Turn extends PlayerSubcommandData {
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, activeMap, event, text, fail, success);
                     MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
-                 if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
-                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeMap, player));
-                }
+                    if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
+                        MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeMap, player));
+                    }
 
                     activeMap.setPingSystemCounter(0);
                     for (int x = 0; x < 10; x++) {
@@ -187,9 +185,6 @@ public class Turn extends PlayerSubcommandData {
                     return "";
                 } else {
                    MessageHelper.sendMessageToChannel(gameChannel, text);
-                   
-                   
-                    
                     MessageHelper.sendMessageToChannelWithButtons(gameChannel,buttonText, buttons);
                     if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
                         MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeMap, player));
