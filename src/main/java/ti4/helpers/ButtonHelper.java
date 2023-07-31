@@ -77,13 +77,13 @@ public class ButtonHelper {
         List<String> types = ButtonHelper.getTypesOfPlanetPlayerHas(activeMap, player);
         for(String type : types){
             if(type.equals("industrial")){
-                buttons.add(Button.success("arcExp_industrial", "Explore Industrials X3"));
+                buttons.add(Button.success("arcExp_industrial", "Explore Industrials X 3"));
             }
             if(type.equals("cultural")){
-                buttons.add(Button.primary("arcExp_cultural", "Explore Culturals X3"));
+                buttons.add(Button.primary("arcExp_cultural", "Explore Culturals X 3"));
             }
             if(type.equals("hazardous")){
-                buttons.add(Button.danger("arcExp_hazardous", "Explore Hazardous X3"));
+                buttons.add(Button.danger("arcExp_hazardous", "Explore Hazardous X 3"));
             }
         }
         return buttons;

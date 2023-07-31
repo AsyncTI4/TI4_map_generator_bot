@@ -101,6 +101,7 @@ public class GameCommand implements Command {
         subcommands.add(new ChangeToBaseGame());
         subcommands.add(new SetDeck());
         subcommands.add(new GameCreate());
+        subcommands.add(new Swap());
         return subcommands;
     }
 
