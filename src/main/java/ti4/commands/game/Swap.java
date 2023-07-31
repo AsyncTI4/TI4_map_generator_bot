@@ -8,7 +8,9 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.MapGenerator;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -18,6 +20,7 @@ import ti4.message.MessageHelper;
 
 import java.util.Collection;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 
 public class Swap extends GameSubcommandData {
@@ -78,10 +81,37 @@ public class Swap extends GameSubcommandData {
                         value.add(removedPlayer.getUserID());
                     }
                 }
+                if(player.isDummy()){
+                    player.setDummy(false);
+                    swapperPlayer.setDummy(true);
+                }
+                LinkedHashSet<Integer> holder = new LinkedHashSet<Integer>();
+                holder.addAll(player.getSCs());
+                player.setSCs(swapperPlayer.getSCs());
+                swapperPlayer.setSCs(holder);
                 swapperPlayer.setUserName(removedPlayer.getUserName());
                 swapperPlayer.setUserID(removedPlayer.getUserID());
                 player.setUserName(addedUser.getName());
                 player.setUserID(addedUser.getId());
+                if(activeMap.getActivePlayer().equalsIgnoreCase(player.getUserID())){
+                    if(!activeMap.isFoWMode())
+                    {
+                        try {
+                            if (activeMap.getLatestTransactionMsg() != null && activeMap.getLatestTransactionMsg() != "") {
+                                activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestTransactionMsg()).queue();
+                                activeMap.setLatestTransactionMsg("");
+                            }
+                        }
+                        catch(Exception e) {
+                            //  Block of code to handle errors
+                        }
+                    }
+                    String text = "# " + Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true) + " UP NEXT";
+                    String buttonText = "Use buttons to do your turn. ";
+                    List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeMap, false, event);
+                    MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), text);
+                    MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), buttonText, buttons);
+                }
             } else {
                 MessageHelper.replyToMessage(event, "Specify player that is in game to be swapped");
                 return;

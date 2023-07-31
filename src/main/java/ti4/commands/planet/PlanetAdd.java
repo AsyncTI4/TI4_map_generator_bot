@@ -120,6 +120,7 @@ public class PlanetAdd extends PlanetAddRemove {
         if(planet.equalsIgnoreCase("mr")&& player.hasAbility("reclamation")){
              new AddUnits().unitParsing(event, player.getColor(),
                             activeMap.getTile(AliasHandler.resolveTile(planet)), "sd " + planet + ", pds "+planet, activeMap);
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Due to the reclamation ability, pds and SD have been added to rex. This is optional though.");
         }
     }
 }
