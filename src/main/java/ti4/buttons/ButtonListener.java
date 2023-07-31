@@ -162,7 +162,9 @@ public class ButtonListener extends ListenerAdapter {
         String trueIdentity = Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true);
         String ident = Helper.getFactionIconFromDiscord(player.getFaction());
   try {
-                    
+        if(activeMap.getActivePlayer() != null && player.getUserID().equalsIgnoreCase(activeMap.getActivePlayer())){
+            activeMap.setLastActivePlayerPing(new Date());
+        }            
         if (buttonID.startsWith(Constants.AC_PLAY_FROM_HAND)) {
             String acID = buttonID.replace(Constants.AC_PLAY_FROM_HAND, "");
             MessageChannel channel = null;
@@ -2463,7 +2465,6 @@ public class ButtonListener extends ListenerAdapter {
                     if(player.getLeaderIDs().contains("hacancommander") && !player.hasLeaderUnlocked("hacancommander")){
                         ButtonHelper.commanderUnlockCheck(player, activeMap, "hacan", event);
                     }
-                    ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
                     if (!activeMap.isFoWMode() && event.getMessageChannel() != activeMap.getMainGameChannel()) {
                         MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), message);
                     }
@@ -2665,7 +2666,10 @@ public class ButtonListener extends ListenerAdapter {
                     ButtonHelper.updateMap(activeMap, event);
                  }
                 case "doneLanding" -> {
-                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
+                    if(!event.getMessage().getContentRaw().contains("Moved all units to the space area.")){
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), event.getMessage().getContentRaw());
+                    }
+                    
 
                     String message = "Landed troops. Use buttons to decide if you want to build or finish the activation";
                     Tile tile = activeMap.getTileByPosition(activeMap.getActiveSystem());

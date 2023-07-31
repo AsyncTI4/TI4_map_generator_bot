@@ -1038,7 +1038,6 @@ public class AgendaHelper {
                             activeMap.scorePublicObjective(winningR.getUserID(), poIndex);
                             msg = msg + Helper.getPlayerRepresentation(winningR, activeMap)+" scored 'Imperial Rider'\n";
                             MessageHelper.sendMessageToChannel(channel,msg);
-                            ButtonHelperFactionSpecific.pillageCheck(winningR, activeMap);
                         }
                         if(!winningRs.contains(winningR))
                         {

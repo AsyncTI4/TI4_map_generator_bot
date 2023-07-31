@@ -30,6 +30,7 @@ public class PlanetAdd extends PlanetAddRemove {
     }
 
     public void doAction(Player player, String planet, Map activeMap, GenericInteractionCreateEvent event) {
+        boolean doubleCheck = Helper.isAllianceModeAndPreviouslyOwnedCheck(activeMap, planet);
         player.addPlanet(planet);
         player.exhaustPlanet(planet);
         if (planet.equals("mirage")){
@@ -96,7 +97,7 @@ public class PlanetAdd extends PlanetAddRemove {
             player.setTg(player.getTg()+1);
             ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
         }
-        if (!alreadyOwned && !Helper.isAllianceModeAndPreviouslyOwnedCheck(activeMap, planet) && (!planet.equals("mirage"))&& !activeMap.isBaseGameMode()) {
+        if (!alreadyOwned && !doubleCheck && (!planet.equals("mirage"))&& !activeMap.isBaseGameMode()) {
             Planet planetReal = (Planet) unitHolder;
             List<Button> buttons = ButtonHelper.getPlanetExplorationButtons(activeMap, planetReal);
             if (event != null && buttons != null && !buttons.isEmpty()) {
