@@ -141,7 +141,7 @@ public class Turn extends PlayerSubcommandData {
         int tempProtection = 0;
         int nextSCFound = -1;
         //Tries to see if the previously determined next up SC is held by an unpassed player. If it is not, it searches the next highest or, if it was at the max, it starts the search over from 0
-        while (tempProtection < (activeMap.getPlayers().size())) {
+        while (tempProtection < (activeMap.getPlayers().size() +8)) {
             Boolean isPassed = scPassed.get(scNext);
             if (isPassed != null && !isPassed) {
                 nextSCFound = scNext;
