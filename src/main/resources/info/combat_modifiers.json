@@ -67,5 +67,92 @@
         "related":[
             {"type": "agendas", "alias":"prophecy"}
         ]
+    },
+    {
+        "alias": "plus_x_frag_1round_flagship",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "fragment",
+        "persistanceType": "ALWAYS",
+        "scope": "flagship",
+        "related":[
+            {"type": "units", "alias": "bentor_flagship"}
+        ]
+    },
+    {
+        "alias": "plus_x_law_1round_flagship",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "law",
+        "persistanceType": "ALWAYS",
+        "scope": "flagship",
+        "related":[
+            {"type": "units", "alias": "edyn_flagship"}
+        ]
+    },
+    {
+        "alias": "plus_x_po_others_scored_always_mech",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "po_others_scored",
+        "persistanceType": "ALWAYS",
+        "scope": "mech",
+        "related":[
+            {"type": "units", "alias": "kyro_mech"}
+        ]
+    },
+    {
+        "alias": "plus_2x_unit_tech_always_mech",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "2x_unit_tech",
+        "persistanceType": "ALWAYS",
+        "scope": "mech",
+        "related":[
+            {"type": "units", "alias": "mirveda_mech"}
+        ]
+    },
+    {
+        "alias": "plus_2x_destroyers_always_flagship",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "2x_destroyers",
+        "persistanceType": "ALWAYS",
+        "scope": "flagship",
+        "related":[
+            {"type": "units", "alias": "nokar_flagship"}
+        ]
+    },
+    {
+        "alias": "plus_1_always_other_units_with_flagship",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "persistanceType": "ALWAYS",
+        "scope": "other_units_with_flagship",
+        "related":[
+            {"type": "units", "alias": "sardakk_flagship"}
+        ]
+    },
+    {
+        "alias": "plus_x_opponent_unit_tech_always_flagship",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "x_opponent_unit_tech",
+        "persistanceType": "ALWAYS",
+        "scope": "flagship",
+        "related":[
+            {"type": "units", "alias": "zealots_flagship"}
+        ]
+    },
+    {
+        "alias": "plus_x_opponent_faction_tech_always_mech",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "valueScalingType": "x_opponent_faction_tech",
+        "persistanceType": "ALWAYS",
+        "scope": "mech",
+        "related":[
+            {"type": "units", "alias": "zealots_mech"}
+        ]
     }
 ]
