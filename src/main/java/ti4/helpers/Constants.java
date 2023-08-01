@@ -6,6 +6,8 @@ import java.util.ArrayList;
 public class Constants {
     public static final String SHOW_GAME = "show_game";
     public static final String FOWGM = "fowgm";
+    public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
+    public static final String ALLIANCE_MEMBERS = "alliance_members";
     public static final String FOW_CATEGORY = "fow_category";
     public static final String SWORDS_TO_PLOWSHARES = "swords_to_plowshares";
     public static final String ELIMINATE = "eliminate";

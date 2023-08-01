@@ -56,7 +56,31 @@ import ti4.model.TechnologyModel;
 
 
 public class ButtonHelper {
+    
 
+    public static MessageChannel getSCFollowChannel(Map activeMap, Player player, int scNum){
+        String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-";
+        switch (scNum) {
+            case 1 -> threadName = threadName + "leadership";
+            case 2 -> threadName = threadName + "diplomacy";
+            case 3 -> threadName = threadName + "politics";
+            case 4 -> threadName = threadName + "construction";
+            case 5 -> threadName = threadName + "trade";
+            case 6 -> threadName = threadName + "warfare";
+            case 7 -> threadName = threadName + "technology";
+            case 8 -> threadName = threadName + "imperial";
+            default -> {
+                return ButtonHelper.getCorrectChannel(player, activeMap);
+            }
+        };
+        List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+        for (ThreadChannel threadChannel_ : threadChannels) {
+            if (threadChannel_.getName().equals(threadName)) {
+                return (MessageChannel) threadChannel_;
+            }
+        }
+        return ButtonHelper.getCorrectChannel(player, activeMap);
+    }
     public static List<String> getTypesOfPlanetPlayerHas(Map activeMap, Player player){
         List<String> types = new ArrayList<String>();
         for(String planet : player.getPlanets()){
@@ -769,9 +793,17 @@ public class ButtonHelper {
         String whatIsItFor = buttonID.split("_")[0];
         String pos = buttonID.split("_")[1];
         Tile tile = activeMap.getTileByPosition(pos);
+        String tileRep = tile.getRepresentationForButtons(activeMap, player);
+        String ident = Helper.getFactionIconFromDiscord(player.getFaction());
+        String msg = ident+" removed CC from "+tileRep;
+        if(whatIsItFor.contains("mahactAgent")){
+            String faction = whatIsItFor.replace("mahactAgent", "");
+            player = Helper.getPlayerFromColorOrFaction(activeMap, faction);
+            msg = msg + " using Mahact agent";
+        }
         RemoveCC.removeCC(event, player.getColor(), tile, activeMap);
-         String ident = Helper.getFactionIconFromDiscord(player.getFaction());
-        MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+" removed CC from "+tile.getRepresentationForButtons(activeMap, player));
+         
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
 
         if(whatIsItFor.equalsIgnoreCase("mahactCommander")){
             MessageHelper.sendMessageToChannel(event.getMessageChannel(), ident+ "reduced their tactic CCs from " + player.getTacticalCC() +" to "+ (player.getTacticalCC()-1));
@@ -814,6 +846,16 @@ public class ButtonHelper {
         for (Tile tile : ButtonHelper.getTilesWithYourCC(player, activeMap, event)) {
 			buttonsToRemoveCC.add(Button.success(finChecker+"removeCCFromBoard_"+whatIsItFor+"_"+tile.getPosition(), "Remove CC from "+tile.getRepresentationForButtons(activeMap, player)));
 		}
+        return buttonsToRemoveCC;
+    }
+    public static List<Button> getButtonsToSwitchWithAllianceMembers(Player player, Map activeMap) {
+        List<Button> buttonsToRemoveCC = new ArrayList<Button>();
+        for(Player player2 : activeMap.getPlayers().values()){
+            if(player.getAllianceMembers().contains(player2.getFaction())){
+                buttonsToRemoveCC.add(Button.success("swapToFaction_"+player2.getFaction(), "Swap to "+player2.getFaction()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(player2.getFaction()))));
+            }
+        }
+        buttonsToRemoveCC.add(Button.danger("deleteButtons", "Delete These Buttons"));
         return buttonsToRemoveCC;
     }
 
@@ -2742,6 +2784,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
 
                     List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, p1, "warsun");
                     List<Button> buttons = new ArrayList<Button>();
+                    MessageHelper.sendMessageToChannel(event.getChannel(), "Chose to use the starforge ability");
                     String message = "Select the tile you would like to starforge in";
                     for(Tile tile : tiles)
                     {
