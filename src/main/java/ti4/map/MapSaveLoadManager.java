@@ -497,6 +497,9 @@ public class MapSaveLoadManager {
             writer.write(Constants.COLOR + " " + playerColor);
             writer.write(System.lineSeparator());
 
+             writer.write(Constants.ALLIANCE_MEMBERS + " " + player.getAllianceMembers());
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.ROLE_FOR_COMMUNITY + " " + player.getRoleIDForCommunity());
             writer.write(System.lineSeparator());
 
@@ -1500,6 +1503,7 @@ public class MapSaveLoadManager {
             switch (data) {
                 case Constants.FACTION -> player.setFaction(tokenizer.nextToken());
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
+                case Constants.ALLIANCE_MEMBERS -> player.setAllianceMembers(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
                 case Constants.PLAYER_PRIVATE_CHANNEL -> player.setPrivateChannelID(tokenizer.nextToken());
                 case Constants.TACTICAL -> player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));

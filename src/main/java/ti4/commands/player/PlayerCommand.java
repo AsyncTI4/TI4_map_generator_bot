@@ -117,6 +117,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new SendCommodities());
         subcommands.add(new ChangeColor());
         subcommands.add(new UnitInfo());
+        subcommands.add(new AddAllianceMember());
         return subcommands;
     }
 

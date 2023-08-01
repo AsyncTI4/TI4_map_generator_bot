@@ -4,12 +4,14 @@ import net.dv8tion.jda.api.entities.Guild;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.MapGenerator;
+import ti4.commands.cardsso.SOInfo;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
@@ -65,9 +67,20 @@ public class Swap extends GameSubcommandData {
                 return;
             }
             User addedUser = addOption.getAsUser();
-
+            secondHalfOfSwap(activeMap, swapperPlayer, removedPlayer, addedUser, event);
+        } else {
+            MessageHelper.replyToMessage(event, "Specify player to swap");
+            return;
+        }
+        MapSaveLoadManager.saveMap(activeMap, event);
+        MapSaveLoadManager.reload(activeMap);
+        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+    }
+     public void secondHalfOfSwap(Map activeMap, Player swapperPlayer, Player removedPlayer, User addedUser, GenericInteractionCreateEvent event) {
+        String message;
+        Collection<Player> players = activeMap.getPlayers().values();
             if (players.stream().anyMatch(player -> player.getUserID().equals(removedPlayer.getUserID()))) {
-                message = "User controlling faction: " + removedPlayer.getFaction() + " swapped with player controlling: " + swapperPlayer.getFaction();
+                 message = "User controlling faction: " + removedPlayer.getFaction() + " swapped with player controlling: " + swapperPlayer.getFaction();
                 Player player = activeMap.getPlayer(removedPlayer.getUserID());
                 LinkedHashMap<String, List<String>> scoredPublicObjectives = activeMap.getScoredPublicObjectives();
                 for (java.util.Map.Entry<String, List<String>> poEntry : scoredPublicObjectives.entrySet()) {
@@ -93,6 +106,7 @@ public class Swap extends GameSubcommandData {
                 swapperPlayer.setUserID(removedPlayer.getUserID());
                 player.setUserName(addedUser.getName());
                 player.setUserID(addedUser.getId());
+                
                 if(activeMap.getActivePlayer().equalsIgnoreCase(player.getUserID())){
                     if(!activeMap.isFoWMode())
                     {
@@ -116,12 +130,10 @@ public class Swap extends GameSubcommandData {
                 MessageHelper.replyToMessage(event, "Specify player that is in game to be swapped");
                 return;
             }
-        } else {
-            MessageHelper.replyToMessage(event, "Specify player to swap");
-            return;
-        }
         MapSaveLoadManager.saveMap(activeMap, event);
         MapSaveLoadManager.reload(activeMap);
-        MessageHelper.sendMessageToChannel(event.getChannel(), message);
+       // SOInfo.sendSecretObjectiveInfo(activeMap, swapperPlayer);
+       // SOInfo.sendSecretObjectiveInfo(activeMap, removedPlayer);
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
     }
 }

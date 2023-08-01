@@ -194,6 +194,28 @@ public class SCPlay extends PlayerSubcommandData {
 
         }
 
+        if(scToPlay != 1 ){
+            //"scepterE_follow_") || buttonID.startsWith("mahactA_follow_")){
+            List<Button> empNMahButtons = new ArrayList<Button>();
+            Button deleteB = Button.danger("deleteButtons", "Delete These Buttons");
+            empNMahButtons.add(deleteB);
+            Button emelpar = Button.danger("scepterE_follow_"+scToPlay, "Exhaust Scepter of Emelpar");
+            Button mahactA = Button.danger("mahactA_follow_"+scToPlay, "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("mahact")));
+            for(Player player3 : activeMap.getPlayers().values()){
+                if(player3 == player){
+                    continue;
+                }
+                if(player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")){
+                    empNMahButtons.add(0,emelpar);    
+                    MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player3, activeMap, activeMap.getGuild(), true)+" You can follow SC #"+scToPlay+" with the scepter of emelpar", empNMahButtons);
+                }
+                if(player3.hasLeader("mahactagent") && !player3.getLeader("mahactagent").isExhausted() && ButtonHelper.getTilesWithYourCC(player, activeMap, event).size() > 0){
+                    empNMahButtons.add(0,mahactA);
+                    MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player3, activeMap, activeMap.getGuild(), true)+" You can follow SC #"+scToPlay+" with mahact agent", empNMahButtons);
+                }
+            }
+        }
+
         List<Button> conclusionButtons = new ArrayList<Button>();
         Button endTurn = Button.danger("turnEnd", "End Turn");
         Button deleteButton = Button.danger("doAnotherAction", "Do Another Action");

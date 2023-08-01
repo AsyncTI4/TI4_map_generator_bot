@@ -379,7 +379,7 @@ public class Helper {
     public static Emoji getPlayerEmoji(Map activeMap, Player player, Message message) {
         Emoji emojiToUse = null;
         String playerFaction = player.getFaction();
-        if (emojiToUse == null) emojiToUse = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(playerFaction));
+        emojiToUse = Emoji.fromFormatted(Helper.getFactionIconFromDiscord(playerFaction));
         String messageId = message.getId();
 
         if (activeMap.isFoWMode()) {
