@@ -63,6 +63,7 @@ public class CombatRoll extends SpecialSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_EXTRA_ROLLS,
                 "comma list of <count> <unit> eg 2 fighter 1 dreadnought for extra roll")
                 .setRequired(false));
+        addOptions(new OptionData(OptionType.USER, Constants.PLAYER, "roll for player (by default your units)").setRequired(false));
     }
 
     @Override
@@ -73,6 +74,7 @@ public class CombatRoll extends SpecialSubcommandData {
         OptionMapping mods = event.getOption(Constants.COMBAT_MODIFIERS);
         OptionMapping planetOption = event.getOption(Constants.PLANET);
         OptionMapping extraRollsOption = event.getOption(Constants.COMBAT_EXTRA_ROLLS);
+        OptionMapping playerOption = event.getOption(Constants.PLAYER);
 
         if (tileOption == null) {
             return;
@@ -97,7 +99,11 @@ public class CombatRoll extends SpecialSubcommandData {
         tileName = " - " + tileName + "[" + tile.getTileID() + "]";
         StringBuilder sb = new StringBuilder();
 
-        Player player = activeMap.getPlayer(getUser().getId());
+        String userID = getUser().getId();
+        if(playerOption != null){
+            userID = playerOption.getAsUser().getId();
+        }
+        Player player = activeMap.getPlayer(userID);
         player = Helper.getGamePlayer(activeMap, player, event, null);
         player = Helper.getPlayer(activeMap, player, event);
         if (player == null) {
@@ -196,9 +202,9 @@ public class CombatRoll extends SpecialSubcommandData {
         String unitHolderFileSuffix = ".png";
         if (unitHolderString.startsWith(colorID)) {
             // format is <color>_<asyncID>.png
-            String modelName = unitHolderString.substring(colorID.length());
-            modelName = modelName.substring(1, modelName.length() - unitHolderFileSuffix.length());
-            result = player.getUnitByAsyncID(modelName.toLowerCase());
+            String unitAsyncID = unitHolderString.substring(colorID.length());
+            unitAsyncID = unitAsyncID.substring(1, unitAsyncID.length() - unitHolderFileSuffix.length());
+            result = player.getUnitByAsyncID(unitAsyncID.toLowerCase());
         }
         return result;
     }
