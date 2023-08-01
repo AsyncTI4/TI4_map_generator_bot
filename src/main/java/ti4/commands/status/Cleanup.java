@@ -95,22 +95,20 @@ public class Cleanup extends StatusSubcommandData {
             pns.addAll(player.getPromissoryNotesInPlayArea());
             for(String pn: pns){
                 Player pnOwner = activeMap.getPNOwner(pn);
-                if(!pnOwner.isRealPlayer() || !pnOwner.getFaction().equalsIgnoreCase(nonActivePlayer.getFaction())){
+                if(!pnOwner.isRealPlayer() ){
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                 if(pnModel.getText().contains("return this card") && pnModel.getText().contains("end of the status phase")){
                         player.removePromissoryNote(pn);
-                        nonActivePlayer.setPromissoryNote(pn);  
-                        PNInfo.sendPromissoryNoteInfo(activeMap, nonActivePlayer, false);
+                        pnOwner.setPromissoryNote(pn);  
+                        PNInfo.sendPromissoryNoteInfo(activeMap, pnOwner, false);
 		                PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
-                        MessageHelper.sendMessageToChannel(channel, pnModel.getName() + " was returned");
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), pnModel.getName() + " was returned");
                     }
                 }
             }
-    }
-    
-    @Override
+    }    
 
     public void reply(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
