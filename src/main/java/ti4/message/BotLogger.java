@@ -56,6 +56,12 @@ public class BotLogger {
     public static void log(GenericInteractionCreateEvent event, String msg, Exception e) {
         TextChannel botLogChannel = getBotLogChannel(event);
         if (msg == null) msg = "";
+
+        //Adding so we dont cause an exception by attempting to log 
+        if(msg.length() > 2000){
+            String ellipses = "...(log message too long)";
+            msg = msg.substring(0, 2000 - ellipses.length() - 1) + ellipses;
+        }
         if (botLogChannel != null) {
             if (event == null) { //NON-EVENT LOGS
                 if (e == null) {
