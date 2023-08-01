@@ -194,6 +194,8 @@ public class Map {
     @JsonIgnore
     List<SimpleEntry<String, String>> planetNameAutocompleteOptionsCache = null;
 
+    private ArrayList<String> runDataMigrations = new ArrayList<>(); 
+
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
         lastModifiedDate = new Date().getTime();
@@ -2498,5 +2500,19 @@ public class Map {
 
     public void incrementMapImageGenerationCount() {
         this.mapImageGenerationCount++;
+    }
+
+    public boolean hasRunMigration(String string) {
+        return this.runDataMigrations.contains(string);
+    }
+
+    public void addMigration(String string) {
+        if(!this.runDataMigrations.contains(string)){
+            this.runDataMigrations.add(string);    
+        }
+    }
+
+    public ArrayList<String> getRunMigrations(){
+        return this.runDataMigrations;
     }
 }
