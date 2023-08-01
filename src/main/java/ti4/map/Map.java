@@ -194,7 +194,6 @@ public class Map {
     @JsonIgnore
     List<SimpleEntry<String, String>> planetNameAutocompleteOptionsCache = null;
 
-    @ExportableField
     private ArrayList<String> runDataMigrations = new ArrayList<>(); 
 
     public Map() {
