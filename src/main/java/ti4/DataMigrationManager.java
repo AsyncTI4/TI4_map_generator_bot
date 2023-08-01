@@ -35,18 +35,24 @@ public class DataMigrationManager {
     /// which means you might need to do different checks depending on the age of
     /// the game & how the saved data was structured for older games.
     ///
-    /// Its worth getting a complete list of old game data and making sure your migration code
-    /// runs properly on all before deploying to the main server. 
+    /// Its worth getting a complete list of old game data and making sure your
+    /// migration code
+    /// runs properly on all before deploying to the main server.
     ///
     public static void runMigrations() {
-
-        runMigration("migrateFixkeleresUnits_010823", (map) -> migrateFixkeleresUnits_010823(map));
-        runMigration("migrateOwnedUnits_010823", (map) -> migrateOwnedUnits_010823(map));
-        // runMigration("migrateExampleMigration_241223", (map) -> migrateExampleMigration_241223(map));
+        try {
+            runMigration("migrateFixkeleresUnits_010823", (map) -> migrateFixkeleresUnits_010823(map));
+            runMigration("migrateOwnedUnits_010823", (map) -> migrateOwnedUnits_010823(map));
+            // runMigration("migrateExampleMigration_241223", (map) ->
+            // migrateExampleMigration_241223(map));
+        } catch (Exception e) {
+            BotLogger.log("Issue running migrations:", e);
+        }
     }
 
     /// MIGRATION: Example Migration method
-    /// <Description of how data is changing, and optionally what code fix it relates to>
+    /// <Description of how data is changing, and optionally what code fix it
+    /// relates to>
     public static void migrateExampleMigration_241223(Map map) {
         // Do your migration here for each non-finshed map
         // This will run once, and the map will log that it has had your migration run
