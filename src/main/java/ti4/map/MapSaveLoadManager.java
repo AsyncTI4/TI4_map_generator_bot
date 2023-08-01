@@ -469,6 +469,9 @@ public class MapSaveLoadManager {
         writer.write(Constants.IMAGE_GEN_COUNT + " " + activeMap.getMapImageGenerationCount());
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",",activeMap.getRunMigrations()));
+        writer.write(System.lineSeparator());
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -842,7 +845,7 @@ public class MapSaveLoadManager {
                     if (isTxtExtention(file)) {
                         try {
                             Map activeMap = loadMap(file);
-                            if (activeMap != null) {
+                            if (activeMap != null && activeMap.getName() != null) {
                                 mapList.put(activeMap.getName(), activeMap);
                             }
                         } catch (Exception e) {
@@ -1434,6 +1437,13 @@ public class MapSaveLoadManager {
                         activeMap.setMapImageGenerationCount(count);
                     } catch (Exception e) {
                         //Do nothing
+                    }
+                }
+                case Constants.RUN_DATA_MIGRATIONS -> {
+                    StringTokenizer migrationInfo = new StringTokenizer(info, ",");
+    
+                    while (migrationInfo.hasMoreTokens()) {
+                        activeMap.addMigration(migrationInfo.nextToken());
                     }
                 }
             }
