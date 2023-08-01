@@ -97,7 +97,7 @@ public class Cleanup extends StatusSubcommandData {
            List<String> pns = new ArrayList<String>();
             pns.addAll(player.getPromissoryNotesInPlayArea());
             for(String pn: pns){
-                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Checking a new pn");
+                //MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Checking a new pn");
                 Player pnOwner = activeMap.getPNOwner(pn);
                 if(!pnOwner.isRealPlayer() ){
                     continue;
