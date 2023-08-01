@@ -309,16 +309,16 @@ public class Turn extends PlayerSubcommandData {
             pns.addAll(player.getPromissoryNotesInPlayArea());
             for(String pn: pns){
                 Player pnOwner = activeMap.getPNOwner(pn);
-                if(!pnOwner.isRealPlayer() || !pnOwner.getFaction().equalsIgnoreCase(nonActivePlayer.getFaction())){
+                if(!pnOwner.isRealPlayer()){
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
                 if(pnModel.getText().contains("return this card") && (pnModel.getText().contains("start of the status phase") || pnModel.getText().contains("beginning of the status phase"))){
                         player.removePromissoryNote(pn);
-                        nonActivePlayer.setPromissoryNote(pn);  
-                        PNInfo.sendPromissoryNoteInfo(activeMap, nonActivePlayer, false);
-		                PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
-                        MessageHelper.sendMessageToChannel(channel, pnModel.getName() + " was returned");
+                        pnOwner.setPromissoryNote(pn);  
+                        PNInfo.sendPromissoryNoteInfo(activeMap, pnOwner, false);
+		        PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), pnModel.getName() + " was returned");
                     }
                 }
             }
