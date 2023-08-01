@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
-import java.util.Map.Entry;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -24,53 +24,50 @@ import ti4.model.UnitModel;
 
 public class DataMigrationManager {
 
+    ///
+    /// To add a new migration,
+    /// 1. include a new static method below named
+    /// migration<Description>_<current-date>(Map map)
+    /// 2. Add a line at the bottom of runMigrations() below, including the name of
+    /// your migration & the method itself
+    ///
+    /// NB: The method will be run against EVERY game map that is still current
+    /// which means you might need to do different checks depending on the age of
+    /// the game & how the saved data was structured for older games.
+    ///
+    /// Its worth getting a complete list of old game data and making sure your
+    /// migration code
+    /// runs properly on all before deploying to the main server.
+    ///
     public static void runMigrations() {
-        HashMap<String, List<String>> migrationsAppliedToMaps = new HashMap<>();
-        HashMap<String, Map> loadedMaps = MapManager.getInstance().getMapList();
-
-        migrationsAppliedToMaps.put("migrateFixkeleresUnits_010823", new ArrayList<String>());
-        migrationsAppliedToMaps.put("migrateOwnedUnits_010823", new ArrayList<String>());
-        for (Map map : loadedMaps.values()) {
-            Boolean endVPReachedButNotEnded = map.getPlayers().values().stream()
-                    .anyMatch(player -> player.getTotalVictoryPoints(map) >= map.getVp());
-            if (map.isHasEnded() || endVPReachedButNotEnded) {
-                continue;
-            }
-
-            if (!map.hasRunMigration("migrateFixkeleresUnits_010823")) {
-                migrateFixkeleresUnits_010823(map);
-                map.addMigration("migrateFixkeleresUnits_010823");
-
-                migrationsAppliedToMaps.get("migrateFixkeleresUnits_010823").add(map.getName());
-            }
-
-            if (!map.hasRunMigration("migrateOwnedUnits_010823")) {
-                migrateOwnedUnits_010823(map);
-                map.addMigration("migrateOwnedUnits_010823");
-
-                migrationsAppliedToMaps.get("migrateOwnedUnits_010823").add(map.getName());
-            }
+        try {
+            runMigration("migrateFixkeleresUnits_010823", (map) -> migrateFixkeleresUnits_010823(map));
+            runMigration("migrateOwnedUnits_010823", (map) -> migrateOwnedUnits_010823(map));
+            // runMigration("migrateExampleMigration_241223", (map) ->
+            // migrateExampleMigration_241223(map));
+        } catch (Exception e) {
+            BotLogger.log("Issue running migrations:", e);
         }
+    }
 
-        if (migrationsAppliedToMaps.size() > 0) {
-
-            for (Entry<String, List<String>> entry : migrationsAppliedToMaps.entrySet()) {
-                String mapNames = String.join(", ", entry.getValue());
-                if (entry.getValue().size() > 0) {
-                    BotLogger.log(
-                            String.format("Migration %s run on following maps successfully: %s", entry.getKey(),
-                                    mapNames));
-                }
-            }
-        }
+    /// MIGRATION: Example Migration method
+    /// <Description of how data is changing, and optionally what code fix it
+    /// relates to>
+    public static void migrateExampleMigration_241223(Map map) {
+        // Do your migration here for each non-finshed map
+        // This will run once, and the map will log that it has had your migration run
+        // so it doesnt re-run next time.
     }
 
     /// MIGRATION: Refresh owned units
     /// There was a bug recently in Player.doAdditionalThingsWhenAddingTech
-    /// That didnt allow for unit upgrades to be included when there wasnt a pre-req (eg war sun)
-    /// Additionally, there are historical issues of unit upgrades not being included in units_owned
+    /// That didnt allow for unit upgrades to be included when there wasnt a pre-req
+    /// (eg war sun)
+    /// Additionally, there are historical issues of unit upgrades not being
+    /// included in units_owned
     /// This migration looks to each players' faction setup for its base units
-    /// Then looks to the player.techs for any upgrades to the base units to get an uptodate list of owned units. 
+    /// Then looks to the player.techs for any upgrades to the base units to get an
+    /// uptodate list of owned units.
     ///
     public static void migrateOwnedUnits_010823(Map map) {
         try {
@@ -114,7 +111,8 @@ public class DataMigrationManager {
                                 Boolean isHomeSystemUsedBySomeoneElse = false;
                                 for (String factionId : map.getFactions()) {
                                     FactionModel otherFactionSetup = Mapper.getFactionSetup(factionId);
-                                    if (otherFactionSetup.getHomeSystem().equals(homeSystem.getTileID())) {
+                                    if (otherFactionSetup != null
+                                            && otherFactionSetup.getHomeSystem().equals(homeSystem.getTileID())) {
                                         isHomeSystemUsedBySomeoneElse = true;
                                         break;
                                     }
@@ -157,10 +155,9 @@ public class DataMigrationManager {
         } catch (Exception e) {
             BotLogger.log("Failed to migrate owned units for map" + map.getName(), e);
         }
-
     }
 
-    /// MIGRATION: Fix Keleres units 
+    /// MIGRATION: Fix Keleres units
     /// We've updated faction_setup.json so that the keleres factions all share the
     /// same unit type
     /// and this migration checks for any suffixed keleres units already existing
@@ -181,6 +178,31 @@ public class DataMigrationManager {
             }
 
             player.setUnitsOwned(new HashSet<String>(ownedUnitIDs));
+        }
+    }
+
+    private static void runMigration(String migrationName, Consumer<Map> migrationMethod) {
+
+        List<String> migrationsAppliedThisTime = new ArrayList<>();
+        HashMap<String, Map> loadedMaps = MapManager.getInstance().getMapList();
+        for (Map map : loadedMaps.values()) {
+            Boolean endVPReachedButNotEnded = map.getPlayers().values().stream()
+                    .anyMatch(player -> player.getTotalVictoryPoints(map) >= map.getVp());
+            if (map.isHasEnded() || endVPReachedButNotEnded) {
+                continue;
+            }
+
+            if (!map.hasRunMigration(migrationName)) {
+                migrationMethod.accept(map);
+                map.addMigration(migrationName);
+
+                migrationsAppliedThisTime.add(map.getName());
+            }
+        }
+        if (migrationsAppliedThisTime.size() > 0) {
+            String mapNames = String.join(", ", migrationsAppliedThisTime);
+            BotLogger.log(
+                    String.format("Migration %s run on following maps successfully: \n%s", migrationName, mapNames));
         }
     }
 }

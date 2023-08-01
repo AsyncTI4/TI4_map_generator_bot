@@ -194,7 +194,6 @@ public class Map {
     @JsonIgnore
     List<SimpleEntry<String, String>> planetNameAutocompleteOptionsCache = null;
 
-    @ExportableField
     private ArrayList<String> runDataMigrations = new ArrayList<>(); 
 
     public Map() {
@@ -364,6 +363,10 @@ public class Map {
     public void addActionCardDuplicates(List<String> ACs) {
         actionCards.addAll(ACs);
         Collections.shuffle(this.actionCards);
+    }
+    public void addSecretDuplicates(List<String> SOs) {
+        secretObjectives.addAll(SOs);
+        Collections.shuffle(this.secretObjectives);
     }
 
     public void setPurgedPNs(ArrayList<String> purgedPN) {
@@ -1761,6 +1764,40 @@ public class Map {
         explore.addAll(exp);
     }
 
+    public void triplicateExplores() {
+        this.explore = Mapper.getDecks().get("explores_pok").getShuffledCardList();
+        Collections.shuffle(this.explore);
+        for(String relic : Mapper.getDecks().get("explores_pok").getShuffledCardList()){
+            String copy1 = relic + "extra1";
+            String copy2 = relic + "extra2";
+            explore.add(copy1);
+            explore.add(copy2);
+        }
+        Collections.shuffle(this.explore);
+    }
+     public void triplicateACs() {
+        this.actionCards = Mapper.getDecks().get("action_cards_pok").getShuffledCardList();
+        Collections.shuffle(this.actionCards);
+        for(String relic : Mapper.getDecks().get("action_cards_pok").getShuffledCardList()){
+            String copy1 = relic + "extra1";
+            String copy2 = relic + "extra2";
+            actionCards.add(copy1);
+            actionCards.add(copy2);
+        }
+        Collections.shuffle(this.actionCards);
+    }
+    public void triplicateSOs() {
+        this.secretObjectives = Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList();
+        Collections.shuffle(this.secretObjectives);
+        for(String relic : Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList()){
+            String copy1 = relic + "extra1";
+            String copy2 = relic + "extra2";
+            secretObjectives.add(copy1);
+            secretObjectives.add(copy2);
+        }
+        Collections.shuffle(this.secretObjectives);
+    }
+
     public String drawRelic() {
         ArrayList<String> relics_ = new ArrayList<>(relics);
         Collections.shuffle(relics_);
@@ -2067,6 +2104,27 @@ public class Map {
         } else {
             this.relics = Mapper.getDecks().get("relics_pok").getShuffledCardList();
         }
+        Collections.shuffle(this.relics);
+    }
+    public void triplicateRelics() {
+        if (this.absolMode) {
+            this.relics = Mapper.getDecks().get("relics_absol").getShuffledCardList();
+            for(String relic : Mapper.getDecks().get("relics_absol").getShuffledCardList()){
+                String copy1 = relic + "extra1";
+                String copy2 = relic + "extra2";
+                relics.add(copy1);
+                relics.add(copy2);
+            }
+        } else {
+            this.relics = Mapper.getDecks().get("relics_pok").getShuffledCardList();
+            for(String relic : Mapper.getDecks().get("relics_pok").getShuffledCardList()){
+                String copy1 = relic + "extra1";
+                String copy2 = relic + "extra2";
+                relics.add(copy1);
+                relics.add(copy2);
+            }
+        }
+        
         Collections.shuffle(this.relics);
     }
 
