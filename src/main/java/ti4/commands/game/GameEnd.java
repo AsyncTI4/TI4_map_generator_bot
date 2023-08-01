@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.channel.concrete.Category;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
@@ -114,10 +115,23 @@ public class GameEnd extends GameSubcommandData {
                 MessageHelper.sendMessageToChannel(event.getChannel(), msg);
                 
             });
-            TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
-            if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
-            
         }
+        TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
+        //if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
+        List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
+        if (threadChannels == null){
+             return;
+        }
+        String threadName = "game-starts-and-ends";
+        // SEARCH FOR EXISTING OPEN THREAD
+        for (ThreadChannel threadChannel_ : threadChannels) {
+            if (threadChannel_.getName().equals(threadName)) {
+                MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_,
+                        "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
+            }
+        }
+            
+        
         
         //MOVE CHANNELS TO IN-LIMBO
         Category inLimboCategory = event.getGuild().getCategoriesByName("The in-limbo PBD Archive", true).get(0);
