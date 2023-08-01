@@ -42,7 +42,7 @@ public class Player {
     //abilities
     //factiontech
     //home
-
+    private String allianceMembers = "";
     private String color;
     private String autoCompleteRepresentation = null;
 
@@ -904,6 +904,24 @@ public class Player {
     public void setColor(String color) {
         if (!color.equals("null")) {
             this.color = AliasHandler.resolveColor(color);
+        }
+    }
+    public void addAllianceMember(String color) {
+        if (!color.equals("null")) {
+            this.allianceMembers = allianceMembers+color;
+        }
+    }
+    public void setAllianceMembers(String color) {
+        if (!color.equals("null")) {
+            this.allianceMembers = color;
+        }
+    }
+    public String getAllianceMembers() {
+        return allianceMembers;
+    }
+    public void removeAllianceMember(String color) {
+        if (!color.equals("null")) {
+            this.allianceMembers = allianceMembers.replace(color, "");
         }
     }
 

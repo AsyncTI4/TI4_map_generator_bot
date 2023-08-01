@@ -37,6 +37,7 @@ import ti4.commands.cardsso.ScoreSO;
 import ti4.commands.explore.DrawRelic;
 import ti4.commands.explore.ExpFrontier;
 import ti4.commands.explore.ExpPlanet;
+import ti4.commands.game.Swap;
 import ti4.commands.planet.PlanetExhaust;
 import ti4.commands.planet.PlanetExhaustAbility;
 import ti4.commands.planet.PlanetRefresh;
@@ -310,6 +311,10 @@ public class ButtonListener extends ListenerAdapter {
             } else {
                 MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong. Please report to Fin");
             }
+        //
+         } else if (buttonID.startsWith("swapToFaction_")) {
+            String faction = buttonID.replace("swapToFaction_", "");
+            new Swap().secondHalfOfSwap(activeMap, player, Helper.getPlayerFromColorOrFaction(activeMap, faction), event.getUser(), event);
         } else if (buttonID.startsWith("yinHeroInfantry_")) {
             ButtonHelperFactionSpecific.lastStepOfYinHero(buttonID, event, activeMap, player, ident);
          } else if (buttonID.startsWith("arcExp_")) {
@@ -624,6 +629,48 @@ public class ButtonListener extends ListenerAdapter {
             }
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("scepterE_follow_") || buttonID.startsWith("mahactA_follow_")){
+            boolean setstatus = true;
+            int scnum = 1;
+            try {
+                scnum = Integer.parseInt(lastcharMod);
+            } catch (NumberFormatException e) {
+                setstatus = false;
+            }
+            if (setstatus) {
+                player.addFollowedSC(scnum);
+            }
+            MessageChannel channel = ButtonHelper.getSCFollowChannel(activeMap, player, scnum);
+            if(buttonID.contains("mahact")){
+                MessageHelper.sendMessageToChannel(channel, ident + " exhausted Mahact agent to follow SC#"+scnum);
+                Leader playerLeader = player.getLeader("mahactagent");
+                playerLeader.setExhausted(true);
+                for(Player p2 : activeMap.getPlayers().values()){
+                    for(Integer sc2 : p2.getSCs()){
+                        if(sc2 == scnum){
+                            List<Button> buttonsToRemoveCC = new ArrayList<>();
+                            String finChecker = "FFCC_"+player.getFaction() + "_";
+                            for (Tile tile : ButtonHelper.getTilesWithYourCC(p2, activeMap, event)) {
+                                buttonsToRemoveCC.add(Button.success(finChecker+"removeCCFromBoard_mahactAgent"+p2.getFaction()+"_"+tile.getPosition(), "Remove CC from "+tile.getRepresentationForButtons(activeMap, player)));
+                            }
+                            MessageHelper.sendMessageToChannelWithButtons(channel, trueIdentity+" Use buttons to remove a CC", buttonsToRemoveCC);
+                        }
+                    }
+                }
+                
+            }else{
+                MessageHelper.sendMessageToChannel(channel, trueIdentity + " exhausted Scepter of Empelar to follow SC#"+scnum);
+                player.addExhaustedRelic("emelpar");
+            }
+            Emoji emojiToUse =  Emoji.fromFormatted(Helper.getFactionIconFromDiscord(player.getFaction()));
+        
+            if (channel instanceof ThreadChannel) {
+                activeMap.getActionsChannel().addReactionById(channel.getId(), emojiToUse).queue();
+            }else{
+                MessageHelper.sendMessageToChannel(channel, "Hey, something went wrong leaving a react, please just hit the no follow button on the SC to do so.");
+            }
+            event.getMessage().delete().queue();
+        
         } else if (buttonID.startsWith("sc_follow_") && (!buttonID.contains("leadership"))
                 && (!buttonID.contains("trade"))) {
             boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
@@ -2635,7 +2682,7 @@ public class ButtonListener extends ListenerAdapter {
                                 continue;
                             }
                             List<Player> players = ButtonHelper.getOtherPlayersWithShipsInTheSystem(player, activeMap, tile);
-                            if(players.size() > 0){
+                            if(players.size() > 0 && !player.getAllianceMembers().contains(players.get(0).getFaction())){
                                 Player player2 = players.get(0);
                                 if(player2 == player){
                                     player2 = players.get(1);
@@ -2678,7 +2725,7 @@ public class ButtonListener extends ListenerAdapter {
                                 continue;
                             }
                             List<Player> players = ButtonHelper.getPlayersWithUnitsOnAPlanet(activeMap, tile, unitHolder.getName());
-                            if(players.size() > 1){
+                            if(players.size() > 1 && !player.getAllianceMembers().contains(players.get(0).getFaction()) && !player.getAllianceMembers().contains(players.get(1).getFaction())){
                                 Player player2 = players.get(0);
                                 if(player2 == player){
                                     player2 = players.get(1);

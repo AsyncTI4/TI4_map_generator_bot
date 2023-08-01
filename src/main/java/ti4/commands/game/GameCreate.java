@@ -1,12 +1,17 @@
 package ti4.commands.game;
 
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import net.dv8tion.jda.api.entities.Member;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import ti4.MapGenerator;
 import ti4.helpers.Constants;
 import ti4.map.Map;
 import ti4.map.MapManager;
@@ -58,6 +63,23 @@ public class GameCreate extends GameSubcommandData {
             MessageHelper.replyToMessage(event, "Could not assign active Game " + mapName);
         }
         MapSaveLoadManager.saveMap(newMap, event);
+        if(MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).size() > 0){
+            TextChannel bothelperLoungeChannel = MapGenerator.guildPrimary.getTextChannelsByName("bothelper-lounge", true).get(0);
+            //if (bothelperLoungeChannel != null) MessageHelper.sendMessageToChannel(bothelperLoungeChannel, "Game: **" + gameName + "** on server **" + event.getGuild().getName() + "** has concluded.");
+            List<ThreadChannel> threadChannels = bothelperLoungeChannel.getThreadChannels();
+            if (threadChannels == null){
+                return newMap;
+            }
+            String threadName = "game-starts-and-ends";
+            // SEARCH FOR EXISTING OPEN THREAD
+            for (ThreadChannel threadChannel_ : threadChannels) {
+                if (threadChannel_.getName().equals(threadName)) {
+                    MessageHelper.sendMessageToChannel((MessageChannel) threadChannel_,
+                            "Game: **" + mapName + "** on server **" + event.getGuild().getName() + "** has been created.");
+                }
+            }
+        }
+        
         return newMap;
     }
     
