@@ -5,11 +5,15 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.leaders.RefreshLeader;
+import ti4.commands.cardspn.PNInfo;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
 import ti4.helpers.DisplayType;
 import ti4.map.*;
 import ti4.message.MessageHelper;
+import ti4.helpers.ButtonHelper;
+import ti4.generator.Mapper;
+import ti4.model.PromissoryNoteModel;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -85,8 +89,7 @@ public class Cleanup extends StatusSubcommandData {
         
         activeMap.setRound(round);
     }
-
-    @Override
+  
 
     public void returnEndStatusPNs(Map activeMap) {
         LinkedHashMap<String, Player> players = activeMap.getPlayers();
@@ -94,12 +97,13 @@ public class Cleanup extends StatusSubcommandData {
            List<String> pns = new ArrayList<String>();
             pns.addAll(player.getPromissoryNotesInPlayArea());
             for(String pn: pns){
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Checking a new pn");
                 Player pnOwner = activeMap.getPNOwner(pn);
                 if(!pnOwner.isRealPlayer() ){
                     continue;
                 }
                 PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
-                if(pnModel.getText().contains("return this card") && pnModel.getText().contains("end of the status phase")){
+                if(pnModel.getText().contains("eturn this card") && pnModel.getText().contains("end of the status phase")){
                         player.removePromissoryNote(pn);
                         pnOwner.setPromissoryNote(pn);  
                         PNInfo.sendPromissoryNoteInfo(activeMap, pnOwner, false);
@@ -109,6 +113,8 @@ public class Cleanup extends StatusSubcommandData {
                 }
             }
     }    
+
+    @Override
 
     public void reply(SlashCommandInteractionEvent event) {
         Map activeMap = getActiveMap();
