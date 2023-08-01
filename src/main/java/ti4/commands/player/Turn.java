@@ -15,6 +15,7 @@ import org.apache.commons.collections4.ListUtils;
 
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
+import ti4.model.PromissoryNoteModel;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -25,6 +26,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.commands.cardspn.PNInfo;
 
 import java.util.*;
 
@@ -296,8 +298,28 @@ public class Turn extends PlayerSubcommandData {
                 .addComponents(actionRows).build();
 
         gameChannel.sendMessage(messageObject).queue();
-
-
+        
+        // return beginning of status phase PNs
+        LinkedHashMap<String, Player> players = activeMap.getPlayers();
+         for (Player player : players.values()) {
+           List<String> pns = new ArrayList<String>();
+            pns.addAll(player.getPromissoryNotesInPlayArea());
+            for(String pn: pns){
+                Player pnOwner = activeMap.getPNOwner(pn);
+                if(!pnOwner.isRealPlayer()){
+                    continue;
+                }
+                PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
+                if(pnModel.getText().contains("eturn this card") && (pnModel.getText().contains("start of the status phase") || pnModel.getText().contains("beginning of the status phase"))){
+                        player.removePromissoryNote(pn);
+                        pnOwner.setPromissoryNote(pn);  
+                        PNInfo.sendPromissoryNoteInfo(activeMap, pnOwner, false);
+		                PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), pnModel.getName() + " was returned");
+                    }
+                }
+            }
+    
 
         Player arborec = Helper.getPlayerFromAbility(activeMap, "mitosis");
         if (arborec != null) {
