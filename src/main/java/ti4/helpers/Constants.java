@@ -816,6 +816,7 @@ public class Constants {
     public static final String FLIP_GRACE = "flip_grace";
     public static final String SIGIL = "token_ds_sigil.png";
     public static final String IMAGE_GEN_COUNT = "image_gen_count";
+    public static final String RUN_DATA_MIGRATIONS = "run_data_migrations";
     public static final String ENDED_DATE = "ended_date";
     public static final String AVERAGE_TURN_TIME = "average_turn_time";
     public static final String TOP_LIMIT = "top_limit";

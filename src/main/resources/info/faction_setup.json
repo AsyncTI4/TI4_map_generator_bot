@@ -473,7 +473,7 @@
     "abilities": ["the_tribuni", "council_patronage", "laws_order"],
     "leaders": ["keleresagent", "kelerescommander", "keleresheroharka"],
     "promissoryNotes": ["riderm"],
-    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleresm_flagship", "infantry", "keleresm_mech", "pds", "spacedock"]
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleres_flagship", "infantry", "keleres_mech", "pds", "spacedock"]
   },
   {
     "alias": "keleresx",
@@ -487,7 +487,7 @@
     "abilities": ["the_tribuni", "council_patronage", "laws_order"],
     "leaders": ["keleresagent", "kelerescommander", "keleresheroodlynn"],
     "promissoryNotes": ["riderx"],
-    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleresx_flagship", "infantry", "keleresx_mech", "pds", "spacedock"]
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleres_flagship", "infantry", "keleres_mech", "pds", "spacedock"]
   },
   {
     "alias": "keleresa",
@@ -501,7 +501,7 @@
     "abilities": ["the_tribuni", "council_patronage", "laws_order"],
     "leaders": ["keleresagent", "kelerescommander", "keleresherokuuasi"],
     "promissoryNotes": ["ridera"],
-    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleresa_flagship", "infantry", "keleresa_mech", "pds", "spacedock"]
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleres_flagship", "infantry", "keleres_mech", "pds", "spacedock"]
   },
   {
     "alias": "admins",
