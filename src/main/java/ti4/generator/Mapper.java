@@ -352,6 +352,8 @@ public class Mapper {
     }
 
     public static SecretObjectiveModel getSecretObjective(String id) {
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         return secretObjectives.get(id);
     }
 
@@ -409,10 +411,14 @@ public class Mapper {
     }
 
     public static String getExplore(String id) {
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         return (String) explore.get(id);
     }
 
     public static String getRelic(String id) {
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         return (String) relics.get(id);
     }
 
@@ -480,6 +486,14 @@ public class Mapper {
 
     public static HashMap<String, SecretObjectiveModel> getSecretObjectives() {
         HashMap<String, SecretObjectiveModel> soList = new HashMap<>(secretObjectives);
+        return soList;
+    }
+
+    public static HashMap<String, SecretObjectiveModel> getSecretObjectives(String extra) {
+        HashMap<String, SecretObjectiveModel> soList = new HashMap<>();
+        for (Map.Entry<String, SecretObjectiveModel> entry : secretObjectives.entrySet()) {
+            soList.put(entry.getKey() + extra, entry.getValue());
+        }
         return soList;
     }
 
@@ -638,6 +652,15 @@ public class Mapper {
         return poList;
     }
 
+    public static HashMap<String, String> getExplores(String extra) {
+        HashMap<String, String> expList = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : explore.entrySet()) {
+            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
+            expList.put((String) entry.getKey()+extra, tokenizer.nextToken());
+        }
+        return expList;
+    }
+
     public static HashMap<String, String> getExplores() {
         HashMap<String, String> expList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : explore.entrySet()) {
@@ -645,6 +668,14 @@ public class Mapper {
             expList.put((String) entry.getKey(), tokenizer.nextToken());
         }
         return expList;
+    }
+    public static HashMap<String, String> getRelics(String extra) {
+        HashMap<String, String> relicList = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : relics.entrySet()) {
+            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
+            relicList.put((String) entry.getKey()+extra, tokenizer.nextToken());
+        }
+        return relicList;
     }
 
     public static HashMap<String, String> getRelics() {

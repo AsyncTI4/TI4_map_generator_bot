@@ -39,7 +39,7 @@ public class AgendaHelper {
                 LinkedHashMap<String, Integer> discardAgendas = activeMap.getDiscardAgendas();
                 AgendaModel agendaDetails = Mapper.getAgenda(id2);
                 String agendaName = agendaDetails.getName();
-                MessageHelper.sendMessageToChannel(actionsChannel, "The hidden agenda was " + agendaName
+                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), "The hidden agenda was " + agendaName
                         + "! You can find it added as a law or in the discard.");
                 Integer uniqueID = discardAgendas.get(id2);
                 aID = uniqueID;
@@ -1038,7 +1038,6 @@ public class AgendaHelper {
                             activeMap.scorePublicObjective(winningR.getUserID(), poIndex);
                             msg = msg + Helper.getPlayerRepresentation(winningR, activeMap)+" scored 'Imperial Rider'\n";
                             MessageHelper.sendMessageToChannel(channel,msg);
-                            ButtonHelperFactionSpecific.pillageCheck(winningR, activeMap);
                         }
                         if(!winningRs.contains(winningR))
                         {
