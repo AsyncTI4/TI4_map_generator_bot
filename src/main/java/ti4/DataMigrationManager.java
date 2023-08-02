@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -53,10 +54,13 @@ public class DataMigrationManager {
     /// MIGRATION: Example Migration method
     /// <Description of how data is changing, and optionally what code fix it
     /// relates to>
-    public static void migrateExampleMigration_241223(Map map) {
+    public static Boolean migrateExampleMigration_241223(Map map) {
+        Boolean mapNeededMigrating = false;
         // Do your migration here for each non-finshed map
         // This will run once, and the map will log that it has had your migration run
         // so it doesnt re-run next time.
+
+        return mapNeededMigrating;
     }
 
     /// MIGRATION: Refresh owned units
@@ -69,7 +73,8 @@ public class DataMigrationManager {
     /// Then looks to the player.techs for any upgrades to the base units to get an
     /// uptodate list of owned units.
     ///
-    public static void migrateOwnedUnits_010823(Map map) {
+    public static Boolean migrateOwnedUnits_010823(Map map) {
+        Boolean mapNeededMigrating = false;
         try {
             for (Player player : map.getRealPlayers()) {
                 FactionModel factionSetupInfo = player.getFactionSetupInfo();
@@ -150,11 +155,17 @@ public class DataMigrationManager {
                         }
                     }
                 }
-                player.setUnitsOwned(new HashSet<String>(ownedUnitIDs));
+                HashSet<String> updatedUnitIDs = new HashSet<String>(ownedUnitIDs);
+                if (!player.getUnitsOwned().equals(updatedUnitIDs)) {
+                    mapNeededMigrating = true;
+                    player.setUnitsOwned(updatedUnitIDs);
+                }
+
             }
         } catch (Exception e) {
             BotLogger.log("Failed to migrate owned units for map" + map.getName(), e);
         }
+        return mapNeededMigrating;
     }
 
     /// MIGRATION: Fix Keleres units
@@ -162,26 +173,33 @@ public class DataMigrationManager {
     /// same unit type
     /// and this migration checks for any suffixed keleres units already existing
     /// incorrectly in games.
-    public static void migrateFixkeleresUnits_010823(Map map) {
-
+    public static Boolean migrateFixkeleresUnits_010823(Map map) {
+        Boolean mapNeededMigrating = false;
         for (Player player : map.getRealPlayers()) {
 
             List<String> ownedUnitIDs = new ArrayList<>(player.getUnitsOwned());
             for (String unitID : ownedUnitIDs) {
                 Integer unitIndex = ownedUnitIDs.indexOf(unitID);
-                if (unitID.startsWith("keleres") && unitID.endsWith("_flagship")) {
+                if (!unitID.equals("keleres_flagship")
+                        && unitID.startsWith("keleres")
+                        && unitID.endsWith("_flagship")) {
                     ownedUnitIDs.set(unitIndex, "keleres_flagship");
+                    mapNeededMigrating = true;
                 }
-                if (unitID.startsWith("keleres") && unitID.endsWith("_mech")) {
+                if (!unitID.equals("keleres_mech")
+                        && unitID.startsWith("keleres")
+                        && unitID.endsWith("_mech")) {
                     ownedUnitIDs.set(unitIndex, "keleres_mech");
+                    mapNeededMigrating = true;
                 }
             }
 
             player.setUnitsOwned(new HashSet<String>(ownedUnitIDs));
         }
+        return mapNeededMigrating;
     }
 
-    private static void runMigration(String migrationName, Consumer<Map> migrationMethod) {
+    private static void runMigration(String migrationName, Function<Map, Boolean> migrationMethod) {
 
         List<String> migrationsAppliedThisTime = new ArrayList<>();
         HashMap<String, Map> loadedMaps = MapManager.getInstance().getMapList();
@@ -193,10 +211,12 @@ public class DataMigrationManager {
             }
 
             if (!map.hasRunMigration(migrationName)) {
-                migrationMethod.accept(map);
+                Boolean changesMade = migrationMethod.apply(map);
                 map.addMigration(migrationName);
 
-                migrationsAppliedThisTime.add(map.getName());
+                if (changesMade) {
+                    migrationsAppliedThisTime.add(map.getName());
+                }
             }
         }
         if (migrationsAppliedThisTime.size() > 0) {

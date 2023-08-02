@@ -580,11 +580,17 @@ public class ButtonListener extends ListenerAdapter {
                             Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
                                     + "Reminder this is the window to do manipulate investments.");
                 }
+                if (player2.hasRelic("mawofworlds") && activeMap.isCustodiansScored()) {
+                    MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
+                            Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
+                                    + "Reminder this is the window to use maw of worlds.");
+                }
                 if (player2.getActionCards() != null && player2.getActionCards().keySet().contains("stability")) {
                     MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
                             Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
                                     + "Reminder this is the window to play political stability.");
                 }
+
                 for (String pn : player2.getPromissoryNotes().keySet()) {
 
                     if (!player2.ownsPromissoryNote("ce") && pn.equalsIgnoreCase("ce")) {
@@ -887,6 +893,7 @@ public class ButtonListener extends ListenerAdapter {
             Player player2 = Helper.getPlayerFromColorOrFaction(activeMap, player2Color);
             ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
             ButtonHelperFactionSpecific.pillageCheck(player2, activeMap);
+            ButtonHelper.checkTransactionLegality(activeMap, player, player2);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("sabotage_")) {
             String typeNName = buttonID.replace("sabotage_", "");

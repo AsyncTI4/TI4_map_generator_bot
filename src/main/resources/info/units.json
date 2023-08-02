@@ -2181,7 +2181,7 @@
         "ability": "If this unit is in the space area of the active system at the start of a space combat, flip this card."
     },
     {
-        "id": "naaz_mech_ship",
+        "id": "naaz_mech_space",
         "baseType": "mech",
         "asyncId": "mf",
         "imageFileSuffix": "_mf.png",
