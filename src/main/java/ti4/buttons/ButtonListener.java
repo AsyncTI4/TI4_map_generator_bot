@@ -1400,6 +1400,9 @@ public class ButtonListener extends ListenerAdapter {
                     actionRow2.add(ActionRow.of(buttonRow));
                 }
             }
+            if(exhaustedMessage == null || exhaustedMessage.equalsIgnoreCase("")){
+                exhaustedMessage = "Explore";
+            }
             if(actionRow2.size() > 0 ){
                  event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
             }else{
@@ -1816,8 +1819,16 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "warfareBuild" -> {
                     List<Button> buttons = new ArrayList<Button>();
+                    Tile tile = activeMap.getTile(AliasHandler.resolveTile(player.getFaction()));
+                    if(tile == null)
+                    {
+                        tile = ButtonHelper.getTileOfPlanetWithNoTrait(player, activeMap);
+                    }
+                    if(tile == null){
+                        MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeMap), "Could not find a HS, sorry bro");
+                    }
                     buttons = Helper.getPlaceUnitButtons(event, player, activeMap,
-                            activeMap.getTile(AliasHandler.resolveTile(player.getFaction())), "warfare", "place");
+                            tile, "warfare", "place");
                     String message = Helper.getPlayerRepresentation(player, activeMap)
                             + " Use the buttons to produce. Reminder that when following warfare, you can only use 1 dock in your home system. "
                             + ButtonHelper.getListOfStuffAvailableToSpend(player, activeMap);
