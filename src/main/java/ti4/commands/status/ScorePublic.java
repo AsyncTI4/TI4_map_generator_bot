@@ -6,8 +6,10 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -17,6 +19,7 @@ import ti4.message.MessageHelper;
 
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.List;
 
 public class ScorePublic extends StatusSubcommandData {
 	public ScorePublic() {
@@ -86,6 +89,81 @@ public class ScorePublic extends StatusSubcommandData {
 			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, message);
 		}
         Helper.checkIfHeroUnlocked(event, activeMap, player);
+		if(poName.toLowerCase().contains("sway the council") || poName.toLowerCase().contains("build a monument") || poName.toLowerCase().contains("found a golden age") || poName.toLowerCase().contains("amass wealth") || poName.toLowerCase().contains("manipulate galactic law") || poName.toLowerCase().contains("hold vast reserves")){
+			String message2 = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " Click the names of the planets you wish to exhaust to score the objective.";
+			List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
+			Button DoneExhausting =  Button.danger("deleteButtons", "Done Exhausting Planets");
+			buttons.add(DoneExhausting);
+			MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), message2, buttons);
+		}
+		if(poName.contains("Negotiate Trade Routes")){
+			int oldtg = player.getTg();
+			if(oldtg > 4){
+				player.setTg(oldtg-5);
+				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap) + " Automatically deducted 5tg ("+oldtg+"->"+player.getTg()+")");
+			}else{
+				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Did not deduct 5tg because you didnt have that");
+			}
+		}
+		if(poName.contains("Centralize Galactic Trade")){
+			int oldtg = player.getTg();
+			if(oldtg > 9){
+				player.setTg(oldtg-10);
+				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap) + " Automatically deducted 10tg ("+oldtg+"->"+player.getTg()+")");
+			}else{
+				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Did not deduct 10tg because you didnt have that");
+			}
+		}
+		if(poName.contains("Lead From the Front")){
+			int currentStrat = player.getStrategicCC();
+			int currentTact = player.getTacticalCC();
+			if(currentStrat+ currentTact > 2){
+				if(currentStrat > 2){
+					for(int x = 0; x < 3; x++){
+						ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeMap, event);
+					}
+					player.setStrategicCC(currentStrat-3);
+					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap) + " Automatically deducted 3 strat cc ("+currentStrat+"->"+player.getStrategicCC()+")");
+				}else{
+					String currentCC = Helper.getPlayerCCs(player);
+					int subtract = 3 - currentStrat;
+					for(int x = 0; x < currentStrat; x++){
+						ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeMap, event);
+					}
+					player.setStrategicCC(0);
+					player.setTacticalCC(currentTact-subtract);
+					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap) + " Automatically deducted 3 strat/tactic cc ("+currentCC+"->"+Helper.getPlayerCCs(player)+")");
+				}
+			}else{
+				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Did not deduct 3cc because you didnt have that");
+			}
+		}
+		if(poName.contains("Galvanize the People")){
+			int currentStrat = player.getStrategicCC();
+			int currentTact = player.getTacticalCC();
+			if(currentStrat+ currentTact > 5){
+				if(currentStrat > 5){
+					for(int x = 0; x < 6; x++){
+						ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeMap, event);
+					}
+					player.setStrategicCC(currentStrat-6);
+					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap) + " Automatically deducted 6 strat cc ("+currentStrat+"->"+player.getStrategicCC()+")");
+				}else{
+					String currentCC = Helper.getPlayerCCs(player);
+					int subtract = 6 - currentStrat;
+					for(int x = 0; x < currentStrat; x++){
+						ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeMap, event);
+					}
+					player.setStrategicCC(0);
+					player.setTacticalCC(currentTact-subtract);
+					MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap) + " Automatically deducted 6 strat/tactic cc ("+currentCC+"->"+Helper.getPlayerCCs(player)+")");
+				}
+			}else{
+				MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), "Did not deduct 6cc because you didnt have that");
+			}
+		}
+
+
     }
 
 	@Override

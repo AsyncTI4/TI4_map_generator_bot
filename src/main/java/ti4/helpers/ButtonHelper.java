@@ -58,6 +58,12 @@ import ti4.model.TechnologyModel;
 public class ButtonHelper {
     
 
+    public static void checkTransactionLegality(Map activeMap, Player player, Player player2){
+        if(activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("convoys") || player2.hasAbility("convoys") || Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
+            return;
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " this is a friendly reminder that you are not neighbors with that person.");
+    }
     public static MessageChannel getSCFollowChannel(Map activeMap, Player player, int scNum){
         String threadName = activeMap.getName() + "-round-" + activeMap.getRound() + "-";
         switch (scNum) {
@@ -284,7 +290,7 @@ public class ButtonHelper {
         for(String law : activeMap.getLaws().keySet()){
             if(law.equalsIgnoreCase("minister_policy")){
                 if(activeMap.getLawsInfo().get(law).equalsIgnoreCase(player.getFaction()) && !player.hasAbility("scheming")){
-                    message = message + " Minister of Commerce has been accounted for. If this AC is political stability, you cannot play it at this time. ";
+                    message = message + " Minister of Policy has been accounted for. If this AC is political stability, you cannot play it at this time. ";
                     activeMap.drawActionCard(player.getUserID());
                     amount = amount + 1;
                 }
