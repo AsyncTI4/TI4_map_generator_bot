@@ -209,7 +209,7 @@ public class ButtonHelperFactionSpecific {
         String finChecker = "FFCC_"+player.getFaction() + "_";
         List<Button> empties = new ArrayList<Button>();
         for(Tile tile :activeMap.getTileMap().values()){
-            if(tile.getUnitHolders().values().size() > 1 && FoWHelper.playerHasShipsInSystem(player, tile)){
+            if(tile.getUnitHolders().values().size() > 1 || !FoWHelper.playerHasShipsInSystem(player, tile)){
                 continue;
             }
             empties.add(Button.primary(finChecker+"exploreFront_"+tile.getPosition(), "Explore "+tile.getRepresentationForButtons(activeMap, player)));
