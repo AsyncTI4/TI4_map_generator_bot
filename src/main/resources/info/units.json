@@ -770,7 +770,8 @@
         "combatDieCount": 1,
         "afbHitsOn": 9,
         "afbDieCount": 1,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
+        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "isShip": true
     },
     {
         "id": "florzen_fighter2",
@@ -789,7 +790,8 @@
         "combatDieCount": 1,
         "afbHitsOn": 8,
         "afbDieCount": 1,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
+        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "isShip": true
     },
     {
         "id": "florzen_flagship",
@@ -1646,7 +1648,8 @@
         "combatHitsOn": 9,
         "combatDieCount": 1,
         "bombardHitsOn": 9,
-        "bombardDieCount": 1
+        "bombardDieCount": 1,
+        "isShip": true
     },
     {
         "id": "lizho_fighter2",
@@ -1665,7 +1668,8 @@
         "combatDieCount": 1,
         "bombardHitsOn": 8,
         "bombardDieCount": 1,
-        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool."
+        "ability": "This unit may move without being transported. Fighters in excess of your ships' capacity count against your fleet pool.",
+        "isShip": true
     },
     {
         "id": "lizho_flagship",
@@ -2072,7 +2076,10 @@
         "upgradesToUnitId": "naalu_fighter2",
         "source": "base",
         "faction": "Naalu",
-        "capacityUsed": 1
+        "capacityUsed": 1,
+        "isShip": true,
+        "combatHitsOn": 8,
+        "combatDieCount": 1
     },
     {
         "id": "naalu_fighter2",
@@ -2084,7 +2091,10 @@
         "requiredTechId": "hcf2",
         "source": "base",
         "faction": "Naalu",
-        "capacityUsed": 1
+        "capacityUsed": 1,
+        "isShip": true,
+        "combatHitsOn": 7,
+        "combatDieCount": 1
     },
     {
         "id": "naalu_flagship",
@@ -2171,7 +2181,7 @@
         "ability": "If this unit is in the space area of the active system at the start of a space combat, flip this card."
     },
     {
-        "id": "naaz_mech_ship",
+        "id": "naaz_mech_space",
         "baseType": "mech",
         "asyncId": "mf",
         "imageFileSuffix": "_mf.png",
