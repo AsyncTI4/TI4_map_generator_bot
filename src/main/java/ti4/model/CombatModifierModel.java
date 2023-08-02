@@ -11,12 +11,17 @@ import lombok.Data;
 public class CombatModifierModel implements ModelInterface {
     private String type;
     private Integer value;
+    private String valueScalingType;
+    private Double valueScalingMultipler = 1.0;
+
     private String persistanceType;
 
     @JsonProperty("related")
     private List<CombatModifierRelatedModel> related;
     private String alias;
     private String scope;
+    private String scopeExcept;
+    private String condition;
 
     public CombatModifierModel() {
     }
