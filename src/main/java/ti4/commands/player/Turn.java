@@ -171,7 +171,12 @@ public class Turn extends PlayerSubcommandData {
                 String buttonText = "Use buttons to do your turn. ";
                 List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeMap, false, event);
                 activeMap.updateActivePlayer(player);
+                activeMap.setCurrentPhase("action");
                 if (isFowPrivateGame) {
+                    
+                    FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "ended turn");
+                    FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "started turn");
+                    
                     String fail = "User for next faction not found. Report to ADMIN";
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, activeMap, event, text, fail, success);
@@ -221,7 +226,7 @@ public class Turn extends PlayerSubcommandData {
                 sendReminder = true;
             }
         }
-        sb.append(" above before taking your turn.");
+        sb.append(" above before doing anything else.");
         return sendReminder ? sb.toString() : null;
     }
 
@@ -320,6 +325,12 @@ public class Turn extends PlayerSubcommandData {
                 }
             }
     
+        for(Player p2 : activeMap.getRealPlayers()){
+            String ms2 = getMissedSCFollowsText(activeMap, p2);
+            if (ms2 != null && !ms2.equalsIgnoreCase("")) {
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeMap), ms2);
+            }
+        }
 
         Player arborec = Helper.getPlayerFromAbility(activeMap, "mitosis");
         if (arborec != null) {

@@ -560,7 +560,19 @@ public class Mapper {
         }
         return agendaList;
     }
-
+    public static HashMap<String, String> getAgendaJustNames(ti4.map.Map activeMap) {
+        HashMap<String, String> agendaList = new HashMap<>();
+        for (AgendaModel agenda : agendas.values()) {
+            if(activeMap.isAbsolMode() && agenda.getAlias().contains("absol_")){
+                agendaList.put(agenda.getAlias(), agenda.getName());
+            }
+            if(!activeMap.isAbsolMode() && !agenda.getAlias().contains("absol_")){
+                agendaList.put(agenda.getAlias(), agenda.getName());
+            }
+            
+        }
+        return agendaList;
+    }
     @Nullable
     public static String getCCPath(String ccID) {
         String ccPath = ResourceHelper.getInstance().getCCFile(ccID);

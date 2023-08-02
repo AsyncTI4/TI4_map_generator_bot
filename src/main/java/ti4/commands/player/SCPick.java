@@ -178,6 +178,10 @@ public class SCPick extends PlayerSubcommandData {
                 msgExtra += " " + Helper.getPlayerRepresentation(nextPlayer, activeMap) + " is up for an action";
                 privatePlayer = nextPlayer;
                 activeMap.updateActivePlayer(nextPlayer);
+                if(activeMap.isFoWMode()){
+                    FoWHelper.pingAllPlayersWithFullStats(activeMap, event, nextPlayer, "started turn");
+                }
+                
                 activeMap.setCurrentPhase("action");
             }
         }
