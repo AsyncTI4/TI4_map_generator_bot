@@ -89,7 +89,7 @@ public class ScorePublic extends StatusSubcommandData {
 			FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, message);
 		}
         Helper.checkIfHeroUnlocked(event, activeMap, player);
-		if(poName.toLowerCase().contains("sway the council") || poName.toLowerCase().contains("build a monument") || poName.toLowerCase().contains("found a golden age") || poName.toLowerCase().contains("amass wealth") || poName.toLowerCase().contains("manipulate galactic law") || poName.toLowerCase().contains("hold vast reserves")){
+		if(poName.toLowerCase().contains("sway the council") || poName.toLowerCase().contains("erect a monument") || poName.toLowerCase().contains("found a golden age") || poName.toLowerCase().contains("amass wealth") || poName.toLowerCase().contains("manipulate galactic law") || poName.toLowerCase().contains("hold vast reserves")){
 			String message2 = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " Click the names of the planets you wish to exhaust to score the objective.";
 			List<Button> buttons = ButtonHelper.getExhaustButtonsWithTG(activeMap, player, event);
 			Button DoneExhausting =  Button.danger("deleteButtons", "Done Exhausting Planets");
