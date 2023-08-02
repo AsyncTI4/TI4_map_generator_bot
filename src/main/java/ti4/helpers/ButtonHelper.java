@@ -2576,6 +2576,23 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         MessageHelper.sendMessageToChannel(Helper.getThreadChannelIfExists(event), text);
     }
 
+    public static Tile getTileOfPlanetWithNoTrait(Player player, Map activeMap){
+        
+        for(String planet : player.getPlanets()){
+            UnitHolder unitHolder = activeMap.getPlanetsInfo().get(planet);
+            Planet planetReal = (Planet) unitHolder;
+            boolean oneOfThree = false;
+            if (planetReal != null && planetReal.getOriginalPlanetType() != null && (planetReal.getOriginalPlanetType().equalsIgnoreCase("industrial") || planetReal.getOriginalPlanetType().equalsIgnoreCase("cultural") || planetReal.getOriginalPlanetType().equalsIgnoreCase("hazardous"))) {
+                oneOfThree = true;
+            }
+            if(!planet.equalsIgnoreCase("mr") && !planet.equalsIgnoreCase("custodiavigilia") && !oneOfThree){
+                return Helper.getTileFromPlanet(planet, activeMap);
+            }
+        }
+
+        return null;
+
+    }
     public static String getListOfStuffAvailableToSpend(Player player, Map activeMap){
         String youCanSpend = "You have available to you to spend: ";
         List<String> planets = new ArrayList<>(player.getPlanets());
