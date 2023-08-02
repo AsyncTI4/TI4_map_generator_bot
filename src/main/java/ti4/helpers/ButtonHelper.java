@@ -59,7 +59,7 @@ public class ButtonHelper {
     
 
     public static void checkTransactionLegality(Map activeMap, Player player, Player player2){
-        if(activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("convoys") || player2.hasAbility("convoys") || Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
+        if(!activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("convoys") || player2.hasAbility("convoys") || Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
             return;
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " this is a friendly reminder that you are not neighbors with that person.");
@@ -79,7 +79,7 @@ public class ButtonHelper {
                 return ButtonHelper.getCorrectChannel(player, activeMap);
             }
         };
-        List<ThreadChannel> threadChannels = activeMap.getActionsChannel().getThreadChannels();
+        List<ThreadChannel> threadChannels = activeMap.getMainGameChannel().getThreadChannels();
         for (ThreadChannel threadChannel_ : threadChannels) {
             if (threadChannel_.getName().equals(threadName)) {
                 return (MessageChannel) threadChannel_;
@@ -1158,6 +1158,9 @@ public class ButtonHelper {
         {
             activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestTransactionMsg()).queue();
             activeMap.setLatestTransactionMsg("");
+        }
+        if(ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeMap).size() > 1 && activeMap.getActionCards().size() > 130){
+            startButtons.addAll(ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeMap));
         }
         
 

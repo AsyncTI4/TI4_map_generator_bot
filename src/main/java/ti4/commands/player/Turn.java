@@ -174,7 +174,7 @@ public class Turn extends PlayerSubcommandData {
                 activeMap.setCurrentPhase("action");
                 if (isFowPrivateGame) {
                     
-                    FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "ended turn");
+                    FoWHelper.pingAllPlayersWithFullStats(activeMap, event, mainPlayer, "ended turn");
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "started turn");
                     
                     String fail = "User for next faction not found. Report to ADMIN";
