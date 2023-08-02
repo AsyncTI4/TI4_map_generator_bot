@@ -2656,7 +2656,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     MessageHelper.sendMessageToChannelWithButtons(channel, message, systemButtons);
                     event.getMessage().delete().queue();
-                    ButtonHelper.updateMap(activeMap, event);
+                    //ButtonHelper.updateMap(activeMap, event);
 
                 }
                 case "doAnotherAction" -> {
@@ -2711,7 +2711,7 @@ public class ButtonListener extends ListenerAdapter {
                     }
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, systemButtons);
                     event.getMessage().delete().queue();
-                    ButtonHelper.updateMap(activeMap, event);
+                   // ButtonHelper.updateMap(activeMap, event);
 
                 }
                  case "doneRemoving" -> {
