@@ -18,6 +18,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
+import software.amazon.awssdk.services.s3.endpoints.internal.Value.Bool;
 import ti4.commands.player.AbilityInfo;
 import ti4.commands.tech.TechInfo;
 import ti4.commands.units.AddRemoveUnits;
@@ -35,6 +36,7 @@ import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
 import ti4.model.CombatModifierModel;
 import ti4.model.TechnologyModel;
+import ti4.model.TileModel;
 import ti4.model.UnitModel;
 
 public class CombatRoll extends SpecialSubcommandData {
@@ -63,7 +65,8 @@ public class CombatRoll extends SpecialSubcommandData {
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_EXTRA_ROLLS,
                 "comma list of <count> <unit> eg 2 fighter 1 dreadnought for extra roll")
                 .setRequired(false));
-        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "roll for player (by default your units)").setAutoComplete(true).setRequired(false));
+        addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "roll for player (by default your units)")
+                .setAutoComplete(true).setRequired(false));
     }
 
     @Override
@@ -122,7 +125,8 @@ public class CombatRoll extends SpecialSubcommandData {
             extraRollsParsed = parseUnits(extraRollsOption.getAsString());
         }
 
-        modsParsed.addAll(getAlwaysOnMods(player));
+        List<UnitModel> unitsInCombat = new ArrayList<>(unitsByQuantity.keySet());
+        modsParsed.addAll(getAlwaysOnMods(player, unitsInCombat));
 
         String message = String.format("%s combat rolls for %s on %s: \n",
                 StringUtils.capitalize(combatOnHolder.getName()), Helper.getFactionIconFromDiscord(player.getFaction()),
@@ -134,7 +138,7 @@ public class CombatRoll extends SpecialSubcommandData {
         MessageHelper.sendMessageToChannel(event.getChannel(), message);
     }
 
-    private List<NamedCombatModifier> getAlwaysOnMods(Player player) {
+    private List<NamedCombatModifier> getAlwaysOnMods(Player player, List<UnitModel> unitsInCombat) {
         List<NamedCombatModifier> alwaysOnMods = new ArrayList<>();
         HashMap<String, CombatModifierModel> combatModifiers = Mapper.getCombatModifiers();
 
@@ -189,7 +193,71 @@ public class CombatRoll extends SpecialSubcommandData {
                 alwaysOnMods.add(new NamedCombatModifier(modifierForTech, Emojis.Agenda + " " + agenda.getName()));
             }
         }
+
+        for (var unit : unitsInCombat) {
+            Optional<CombatModifierModel> filteredModifierForUnit = combatModifiers.values()
+                    .stream()
+                    .filter(modifier -> modifier.isRelevantTo("units", unit.getAlias()))
+                    .findFirst();
+            if (filteredModifierForUnit.isPresent()) {
+                CombatModifierModel modifier = filteredModifierForUnit.get();
+                if (modifier.isValid()) {
+                    Boolean meetsCondition = true;
+                    if (modifier.getCondition().length() > 0) {
+                        Boolean meetsCondition = false;
+                        switch modifier.getCondition(){
+                            case "opponent_frag":{
+                                Player opponentInCombat = null;//TODO: identify opponent
+                                meetsCondition = opponentInCombat.getFragments().size() > 0;
+                            }break;
+                            case "opponent_stolen_faction_tech":{
+                                Player opponentInCombat = null;
+                                String opponentFaction = opponentInCombat.getFaction();
+                                meetsCondition = player.getTechs().stream().anyMatch(tech -> Mapper.getTech(tech).isFaction(opponentFaction));
+                            }break;
+                            case: "planet_mr_legendary_home":{
+                                TileModel currentTile = null;//TODO pass tile info through
+                                if(currentTile.getId().equals(player.getFactionSetupInfo().getHomeSystem()){
+                                    meetsCondition = true;
+                                }
+                                if(currentTile.getPlanets().anyMatch(planetId -> Mapper.getPlanet(planetId).legendaryAbilityName.length() > 0)){
+                                    meetsCondition = true;
+                                }
+                                if(currentTile.getPlanets().contains(Constants.MR)){
+                                    meetsCondition = true;
+                                }
+                            }
+                        }
+                    }
+                    if(meetsCondition){
+                        alwaysOnMods.add(
+                            new NamedCombatModifier(modifier, unit.getName() + " " + unit.getAbility()));
+                    }
+                    
+                }
+            }
+        }
         return alwaysOnMods;
+    }
+
+    private List<NamedCombatModifier> getConditionalMods(Player player, List<UnitModel> unitsInCombat) {
+        List<NamedCombatModifier> conditionalMods = new ArrayList<>();
+        HashMap<String, CombatModifierModel> combatModifiers = Mapper.getCombatModifiers();
+
+        for (var unit : unitsInCombat) {
+            Optional<CombatModifierModel> filteredModifierForUnit = combatModifiers.values()
+                    .stream()
+                    .filter(modifier -> modifier.isRelevantTo("units", unit.getAlias()))
+                    .findFirst();
+            if (filteredModifierForUnit.isPresent()) {
+                CombatModifierModel modifier = filteredModifierForUnit.get();
+                if (modifier.isValid()) {
+                    conditionalMods.add(
+                            new NamedCombatModifier(modifier, unit.getName() + " " + unit.getAbility()));
+                }
+            }
+        }
+        return conditionalMods;
     }
 
     private UnitModel getUnitModel(String unitHolderString, Player player) {

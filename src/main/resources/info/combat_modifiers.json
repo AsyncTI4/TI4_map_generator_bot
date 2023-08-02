@@ -11,7 +11,8 @@
             {"type": "action_cards", "alias": "mb1"},
             {"type": "action_cards", "alias": "mb2"},
             {"type": "action_cards", "alias": "mb3"},
-            {"type": "action_cards", "alias": "mb4"}
+            {"type": "action_cards", "alias": "mb4"},
+            {"type": "leaders", "alias": "vaylerianhero"}
         ]
     },
     {
@@ -50,7 +51,7 @@
         "alias": "plus1_1round_fighter",
         "type": "DIE_MOD",
         "value": "+1",
-        "scope": "fighter",
+        "scope": "ff",
         "persistanceType": "ONE_ROUND",
         "related":[
             {"type": "promissory_notes", "alias":"tekklar"},
@@ -62,30 +63,30 @@
         "alias": "plus1_always_fighter",
         "type": "DIE_MOD",
         "value": "+1",
-        "scope": "fighter",
+        "scope": "ff",
         "persistanceType": "ALWAYS",
         "related":[
             {"type": "agendas", "alias":"prophecy"}
         ]
     },
     {
-        "alias": "plus_x_frag_1round_flagship",
+        "alias": "plus_x_frag_always_flagship",
         "type": "DIE_MOD",
         "value": "+1",
         "valueScalingType": "fragment",
         "persistanceType": "ALWAYS",
-        "scope": "flagship",
+        "scope": "fs",
         "related":[
             {"type": "units", "alias": "bentor_flagship"}
         ]
     },
     {
-        "alias": "plus_x_law_1round_flagship",
+        "alias": "plus_x_law_always_flagship",
         "type": "DIE_MOD",
         "value": "+1",
         "valueScalingType": "law",
         "persistanceType": "ALWAYS",
-        "scope": "flagship",
+        "scope": "fs",
         "related":[
             {"type": "units", "alias": "edyn_flagship"}
         ]
@@ -94,20 +95,21 @@
         "alias": "plus_x_po_others_scored_always_mech",
         "type": "DIE_MOD",
         "value": "+1",
-        "valueScalingType": "po_others_scored",
+        "valueScalingType": "po_others_exclusively_scored",
         "persistanceType": "ALWAYS",
-        "scope": "mech",
+        "scope": "mf",
         "related":[
             {"type": "units", "alias": "kyro_mech"}
         ]
     },
     {
-        "alias": "plus_2x_unit_tech_always_mech",
+        "alias": "plus_half_unit_tech_always_mech",
         "type": "DIE_MOD",
         "value": "+1",
-        "valueScalingType": "2x_unit_tech",
+        "valueScalingType": "unit_tech",
+        "valueScalingMultipler": 0.5,
         "persistanceType": "ALWAYS",
-        "scope": "mech",
+        "scope": "mf",
         "related":[
             {"type": "units", "alias": "mirveda_mech"}
         ]
@@ -116,9 +118,10 @@
         "alias": "plus_2x_destroyers_always_flagship",
         "type": "DIE_MOD",
         "value": "+1",
-        "valueScalingType": "2x_destroyers",
+        "valueScalingType": "destroyers",
+        "valueScalingMultipler": 0.5,
         "persistanceType": "ALWAYS",
-        "scope": "flagship",
+        "scope": "fs",
         "related":[
             {"type": "units", "alias": "nokar_flagship"}
         ]
@@ -128,7 +131,8 @@
         "type": "DIE_MOD",
         "value": "+1",
         "persistanceType": "ALWAYS",
-        "scope": "other_units_with_flagship",
+        "scope": "",
+        "scopeExcept":"fs",
         "related":[
             {"type": "units", "alias": "sardakk_flagship"}
         ]
@@ -137,9 +141,9 @@
         "alias": "plus_x_opponent_unit_tech_always_flagship",
         "type": "DIE_MOD",
         "value": "+1",
-        "valueScalingType": "x_opponent_unit_tech",
+        "valueScalingType": "opponent_unit_tech",
         "persistanceType": "ALWAYS",
-        "scope": "flagship",
+        "scope": "fs",
         "related":[
             {"type": "units", "alias": "zealots_flagship"}
         ]
@@ -148,11 +152,44 @@
         "alias": "plus_x_opponent_faction_tech_always_mech",
         "type": "DIE_MOD",
         "value": "+1",
-        "valueScalingType": "x_opponent_faction_tech",
+        "valueScalingType": "opponent_faction_tech",
         "persistanceType": "ALWAYS",
-        "scope": "mech",
+        "scope": "mf",
         "related":[
             {"type": "units", "alias": "zealots_mech"}
+        ]
+    },
+    {
+        "alias": "plus_2_opponent_frag_conditional_mech",
+        "type": "DIE_MOD",
+        "value": "+2",
+        "persistanceType": "CONDITIONAL",
+        "condition": "opponent_frag",
+        "scope": "mf",
+        "related":[
+            {"type": "units", "alias": "naalu_mech"}
+        ]
+    },
+    {
+        "alias": "plus_2_opponent_stolen_faction_tech_conditional_mech",
+        "type": "DIE_MOD",
+        "value": "+2",
+        "persistanceType": "CONDITIONAL",
+        "condition":"opponent_stolen_faction_tech",
+        "scope": "mf",
+        "related":[
+            {"type": "units", "alias": "nekro_mech"}
+        ]
+    },
+    {
+        "alias": "plus_2_mr_legendary_home_conditional",
+        "type": "DIE_MOD",
+        "value": "+2",
+        "persistanceType": "CONDITIONAL",
+        "condition": "planet_mr_legendary_home",
+        "scope": "",
+        "related":[
+            {"type": "leaders", "alias": "winnucommander"}
         ]
     }
 ]
