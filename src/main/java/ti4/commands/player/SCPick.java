@@ -103,6 +103,9 @@ public class SCPick extends PlayerSubcommandData {
                 .filter(player_ -> player_.isRealPlayer())
                 .collect(Collectors.toList());
         int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
+        if(maxSCsPerPlayer < 1){
+            maxSCsPerPlayer = 1;
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append(Helper.getPlayerRepresentation(player, activeMap, event.getGuild(), true));
