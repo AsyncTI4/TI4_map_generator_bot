@@ -223,6 +223,10 @@ public class MapGenerator {
         BotLogger.log("BOT STARTED UP: " + guildPrimary.getName());
         MapSaveLoadManager.loadMaps();
 
+        BotLogger.log("BOT CHECKING FOR DATA MIGRATIONS");
+        DataMigrationManager.runMigrations(); 
+        BotLogger.log("BOT FINISHED CHECKING FOR DATA MIGRATIONS");
+
         readyToReceiveCommands = true;
         BotLogger.log("BOT HAS FINISHED LOADING MAPS");
 
