@@ -1,6 +1,7 @@
 package ti4.commands.help;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -23,11 +24,18 @@ public class ListPublicObjectives extends HelpSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         HashMap<String, PublicObjectiveModel> poList = Mapper.getPublicObjectives();
-        String message = "**__Public Objective List__**\n" + poList.entrySet().stream()
+        List<String> searchedList = poList.entrySet().stream()
             .map(e -> e.getKey() + " = " + e.getValue().getRepresentation())
-            .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
-            .sorted()
-            .collect(Collectors.joining("\n"));
-        MessageHelper.sendMessageToThread(event.getChannel(), "Public Objective List", message);
+            .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString.toLowerCase()))
+            .sorted().toList();
+        
+        String searchDescription = searchString == null ? "" : " search: " + searchString;
+        String message = "**__Public Objective List__**" + searchDescription + "\n" + searchedList.stream().collect(Collectors.joining("\n"));
+        if (searchedList.size() > 5) {
+            String threadName = "/help list_public_objectives" + searchDescription;
+            MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);
+        } else if (searchedList.size() > 0) {
+            event.getChannel().sendMessage(message).queue();
+        }
     }
 }

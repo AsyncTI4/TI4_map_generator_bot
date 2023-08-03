@@ -1,6 +1,7 @@
 package ti4.commands.help;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -23,11 +24,18 @@ public class ListRelics extends HelpSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         HashMap<String, String> relicList = Mapper.getRelics();
-        String message = "**__Relic List__**\n" + relicList.entrySet().stream()
+        List<String> searchedList = relicList.entrySet().stream()
             .map(e -> e.getKey() + " = " + Helper.getRelicRepresentation(e.getKey()))
-            .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
-            .sorted()
-            .collect(Collectors.joining("\n"));
-        MessageHelper.sendMessageToThread(event.getChannel(), "Relic List", message);
+            .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString.toLowerCase()))
+            .sorted().toList();
+        
+        String searchDescription = searchString == null ? "" : " search: " + searchString;
+        String message = "**__Relic List__**" + searchDescription + "\n" + searchedList.stream().collect(Collectors.joining("\n"));
+        if (searchedList.size() > 3) {
+            String threadName = "/help list_relics" + searchDescription;
+            MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);
+        } else if (searchedList.size() > 0) {
+            event.getChannel().sendMessage(message).queue();
+        }
     }
 }
