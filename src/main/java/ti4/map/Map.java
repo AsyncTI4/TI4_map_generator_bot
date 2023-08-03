@@ -1,5 +1,7 @@
 package ti4.map;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -27,6 +29,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
 
 import java.awt.*;
@@ -103,6 +106,8 @@ public class Map {
     private boolean testBetaFeaturesMode = false;
     private boolean hasEnded = false;
     private long endedDate;
+    @Getter @Setter
+    private java.util.Map<Pair<String, Integer>, BorderAnomalyModel.BorderAnomalyType> borderAnomalies = new HashMap<>();
     @Nullable
     private String tableTalkChannelID = null;
     @Nullable
@@ -264,6 +269,9 @@ public class Map {
     }
     public int getNumberOfSOsInTheDeck(){
         return secretObjectives.size();
+    }
+    public void addBorderAnomaly(String tile, Integer direction, BorderAnomalyModel.BorderAnomalyType anomalyType) {
+        this.borderAnomalies.put(Pair.of(tile, direction), anomalyType);
     }
     public int getNumberOfSOsInPlayersHands(){
         int soNum = 0;

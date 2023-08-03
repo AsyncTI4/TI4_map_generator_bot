@@ -16,6 +16,7 @@ import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.BorderAnomalyModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
 
@@ -2625,10 +2626,14 @@ public class GenerateMap {
                 int direction = 0;
                 for (String secondaryTile : adj) {
                     if (secondaryTile != null) {
-                        addAdjacencyArrow(tile, direction, secondaryTile, tileGraphics, activeMap);
+                        addBorderDecoration(tile, direction, secondaryTile, tileGraphics, activeMap, BorderAnomalyModel.BorderAnomalyType.ARROW);
                     }
                     direction++;
                 }
+
+                activeMap.getBorderAnomalies().forEach((stringIntegerPair, anomalyType) -> {
+                    addBorderDecoration(activeMap.getTileByPosition(stringIntegerPair.getLeft()), stringIntegerPair.getRight(), null, tileGraphics, activeMap, anomalyType);
+                });
             }
             case Units -> {
                 if (tileIsFoggy) return tileOutput;
@@ -2698,12 +2703,12 @@ public class GenerateMap {
         return outputImage;
     }
 
-    private static void addAdjacencyArrow(Tile tile, int direction, String secondaryTile, Graphics tileGraphics, Map activeMap) {
+    private static void addBorderDecoration(Tile tile, int direction, String secondaryTile, Graphics tileGraphics, Map activeMap, BorderAnomalyModel.BorderAnomalyType decorationType) {
         int deltaX = 0;
         int deltaY = 0;
         int textOffsetX = 12;
         int textOffsetY = 40;
-        BufferedImage arrowImage = null;
+        BufferedImage borderDecorationImage = null;
 
         int degrees = 0;
         switch (direction) {
@@ -2742,25 +2747,34 @@ public class GenerateMap {
             }
         }
         try {
-            BufferedImage outputImage = ImageIO.read(new File(Helper.getAdjacencyOverridePath(direction)));
-            arrowImage = outputImage;
-
-            Graphics arrow = arrowImage.getGraphics();
-
-            arrow.setFont(Storage.getFont16());
-            if (secondaryTile.length() > 3) {
-                arrow.setFont(Storage.getFont14());
+            BufferedImage outputImage = null;
+            if(decorationType.equals(BorderAnomalyModel.BorderAnomalyType.ARROW)) {
+                outputImage = ImageIO.read(new File(Helper.getAdjacencyOverridePath(direction)));
             }
-            arrow.setColor(Color.BLACK);
-            arrow.drawString(secondaryTile, textOffsetX, textOffsetY);
+            else {
+                outputImage = ImageIO.read(decorationType.getImageFile());
+            }
+
+            borderDecorationImage = outputImage;
+
+            if(decorationType.equals(BorderAnomalyModel.BorderAnomalyType.ARROW)) {
+                Graphics arrow = borderDecorationImage.getGraphics();
+
+                arrow.setFont(Storage.getFont16());
+                if (secondaryTile.length() > 3) {
+                    arrow.setFont(Storage.getFont14());
+                }
+                arrow.setColor(Color.BLACK);
+                arrow.drawString(secondaryTile, textOffsetX, textOffsetY);
+            }
 
             double rotation = Math.toRadians(degrees);
-            double rotateX = arrowImage.getWidth() / 2;
-            double rotateY = arrowImage.getHeight() / 2;
+            double rotateX = borderDecorationImage.getWidth() / 2;
+            double rotateY = borderDecorationImage.getHeight() / 2;
             AffineTransform tx = AffineTransform.getRotateInstance(rotation, rotateX, rotateY);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
-            tileGraphics.drawImage(op.filter(arrowImage, null), TILE_PADDING + deltaX, TILE_PADDING + deltaY, null);
+            tileGraphics.drawImage(op.filter(borderDecorationImage, null), TILE_PADDING + deltaX, TILE_PADDING + deltaY, null);
         } catch (Exception e) {}
     }
 
