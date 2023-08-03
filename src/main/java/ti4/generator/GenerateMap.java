@@ -5,6 +5,7 @@ import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.utils.ImageProxy;
 
+import net.dv8tion.jda.internal.utils.tuple.Pair;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
@@ -247,6 +248,8 @@ public class GenerateMap {
                 tileMap.remove(null);
                 Set<String> tiles = tileMap.keySet();
                 Set<String> tilesWithExtra = new HashSet<String>(activeMap.getAdjacentTileOverrides().values());
+                tilesWithExtra.addAll(activeMap.getBorderAnomalies().keySet().stream().map(Pair::getLeft).collect(Collectors.toSet()));
+
                 tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Tile));
                 tilesWithExtra.stream().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Extras));
                 tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Units));
@@ -2630,9 +2633,9 @@ public class GenerateMap {
                     }
                     direction++;
                 }
-
                 activeMap.getBorderAnomalies().forEach((stringIntegerPair, anomalyType) -> {
-                    addBorderDecoration(activeMap.getTileByPosition(stringIntegerPair.getLeft()), stringIntegerPair.getRight(), null, tileGraphics, activeMap, anomalyType);
+                    if(stringIntegerPair.getLeft().equals(tile.getPosition()))
+                        addBorderDecoration(tile, stringIntegerPair.getRight(), null, tileGraphics, activeMap, anomalyType);
                 });
             }
             case Units -> {
@@ -2711,7 +2714,7 @@ public class GenerateMap {
         BufferedImage borderDecorationImage = null;
 
         int degrees = 0;
-        switch (direction) {
+        switch (direction-1) {
             case 0 -> {
                 deltaX = 118;
                 deltaY = -28;
@@ -2774,7 +2777,7 @@ public class GenerateMap {
             AffineTransform tx = AffineTransform.getRotateInstance(rotation, rotateX, rotateY);
             AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
 
-            tileGraphics.drawImage(op.filter(borderDecorationImage, null), TILE_PADDING + deltaX, TILE_PADDING + deltaY, null);
+            tileGraphics.drawImage(op.filter(borderDecorationImage, null), TILE_PADDING + deltaX-borderDecorationImage.getWidth()/2, TILE_PADDING + deltaY, null);
         } catch (Exception e) {}
     }
 
