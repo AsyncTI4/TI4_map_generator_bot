@@ -95,7 +95,7 @@
         "alias": "plus_x_po_others_scored_always_mech",
         "type": "DIE_MOD",
         "value": "+1",
-        "valueScalingType": "po_others_exclusively_scored",
+        "valueScalingType": "po_opponent_exclusively_scored",
         "persistanceType": "ALWAYS",
         "scope": "mf",
         "related":[
