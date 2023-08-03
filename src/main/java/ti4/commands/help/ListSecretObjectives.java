@@ -1,6 +1,7 @@
 package ti4.commands.help;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -24,12 +25,18 @@ public class ListSecretObjectives extends HelpSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         HashMap<String, SecretObjectiveModel> soList = Mapper.getSecretObjectives();
-        String message = "**__Secret Objective List__**\n" + soList.entrySet().stream()
+        List<String> searchedList = soList.entrySet().stream()
             .map(e -> e.getKey() + " = " + SOInfo.getSecretObjectiveRepresentation(e.getKey()))
             .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
-            .filter(s -> !s.contains("_pbd100"))
-            .sorted()
-            .collect(Collectors.joining("\n"));
-        MessageHelper.sendMessageToThread(event.getChannel(), "Secret Objective List", message);
+            .sorted().toList();
+
+        String searchDescription = searchString == null ? "" : " search: " + searchString;
+        String message = "**__Secret Objective List__**" + searchDescription + "\n" + searchedList.stream().collect(Collectors.joining("\n"));
+        if (searchedList.size() > 5) {
+            String threadName = "/help list_secret_objectives" + searchDescription;
+            MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);
+        } else if (searchedList.size() > 0) {
+            event.getChannel().sendMessage(message).queue();
+        }
     }
 }
