@@ -1,6 +1,7 @@
 package ti4.commands.help;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
@@ -23,11 +24,18 @@ public class ListActionCards extends HelpSubcommandData {
     public void execute(SlashCommandInteractionEvent event) {
         String searchString = event.getOption(Constants.SEARCH, null, OptionMapping::getAsString);
         HashMap<String, ActionCardModel> acList = Mapper.getActionCards();
-        String message = "**__Action Card List__**\n" + acList.entrySet().stream()
+        List<String> searchedList = acList.entrySet().stream()
             .map(e -> e.getKey() + " = " + e.getValue().getRepresentation())
             .filter(s -> searchString == null ? true : s.toLowerCase().contains(searchString))
-            .sorted()
-            .collect(Collectors.joining("\n"));
-        MessageHelper.sendMessageToThread(event.getChannel(), "Action Card List", message);
+            .sorted().toList();          
+            
+        String searchDescription = searchString == null ? "" : " search: " + searchString;
+        String message = "**__Action Card List__**" + searchDescription + "\n" + searchedList.stream().collect(Collectors.joining("\n"));
+        if (searchedList.size() > 3) {
+            String threadName = "/help list_action_cards" + searchDescription;
+            MessageHelper.sendMessageToThread(event.getChannel(), threadName, message);
+        } else if (searchedList.size() > 0) {
+            event.getChannel().sendMessage(message).queue();
+        }
     }
 }
