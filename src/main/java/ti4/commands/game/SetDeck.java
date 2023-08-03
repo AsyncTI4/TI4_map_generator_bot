@@ -1,9 +1,7 @@
 package ti4.commands.game;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -47,10 +45,10 @@ public class SetDeck extends GameSubcommandData {
                 if(deckType.equals(Constants.STRATEGY_CARD_SET)) {
                     StrategyCardModel strategyCardModel = Mapper.getStrategyCardSets().get(value);
                     activeMap.setHomeBrewSCMode(true);
+                    activeMap.setScTradeGoods(new LinkedHashMap<>());
                     activeMap.setScSet(strategyCardModel.getAlias());
-                    for(int i = 8; i < strategyCardModel.getNumberOfCards(); i++) {
-                        activeMap.addSC(i+1);
-                    }
+
+                    strategyCardModel.getCardValues().forEach(scValue -> activeMap.setScTradeGood(scValue, 0));
                 }
                 else {
                     DeckModel deckModel = Mapper.getDecks().get(value);
