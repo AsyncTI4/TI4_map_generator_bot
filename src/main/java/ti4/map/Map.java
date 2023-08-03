@@ -1,5 +1,6 @@
 package ti4.map;
 
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,6 +27,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.DeckModel;
 
 import java.awt.*;
 import java.lang.reflect.Field;
@@ -2134,6 +2136,28 @@ public class Map {
 
     public void setActionCards(List<String> actionCards) {
         this.actionCards = actionCards;
+    }
+
+    public void validateAndSetActionCardDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+        if (this.getDiscardActionCards().size() > 0) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change action card deck while there are action cards in the discard pile.");
+            return;
+        }
+        for (Player player : this.getPlayers().values()) {
+            if (player.getActionCards().size() > 0) {
+                MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change action card deck while there are action cards in player hands.");
+                return;
+            }
+        }
+        this.setActionCards(deck.getShuffledCardList());
+    }
+
+    public void validateAndSetAgendaDeck(SlashCommandInteractionEvent event, DeckModel deck) {
+        if (this.getDiscardAgendas().size() > 0) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Cannot change agenda deck while there are agendas in the discard pile.");
+            return;
+        }
+        this.setAgendas(deck.getShuffledCardList());
     }
 
     @JsonSetter
