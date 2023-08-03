@@ -1,6 +1,7 @@
 package ti4.helpers;
 
 import net.dv8tion.jda.api.entities.channel.Channel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.interaction.GenericInteractionCreateEvent;
 import net.dv8tion.jda.api.events.interaction.command.GenericCommandInteractionEvent;
 
@@ -20,6 +21,7 @@ import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
 import ti4.model.FactionModel;
+import ti4.model.WormholeModel;
 
 public class FoWHelper {
 
@@ -333,6 +335,62 @@ public class FoWHelper {
 		return tiles;
 	}
 
+
+
+	public static boolean doesTileHaveWHs(Map activeMap, String position, Player player) {
+		Set<String> adjacentPositions = new HashSet<>();
+		Set<Tile> allTiles = new HashSet<Tile>(activeMap.getTileMap().values());
+		Tile tile = activeMap.getTileByPosition(position);
+
+		String ghostFlagship = null;
+		for (Player p : activeMap.getPlayers().values()) {
+			if (p.ownsUnit("ghost_flagship")) {
+				ghostFlagship = Mapper.getUnitID("fs", p.getColor());
+				break;
+			}
+		}
+
+		boolean wh_recon = activeMap.getLaws().keySet().contains("wormhole_recon");
+		boolean absol_recon = activeMap.getLaws().keySet().contains("absol_recon");
+
+		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
+		if(wormholeIDs == null){
+			wormholeIDs = new HashSet<String>();
+		}
+		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
+			HashSet<String> tokenList = unitHolder.getTokenList();
+			for (String token : tokenList) {
+				for(WormholeModel.Wormhole wh : WormholeModel.Wormhole.values()) {
+					if(token.contains(wh.getWhString())) {
+						wormholeIDs.add(wh.getWhString());
+						wormholeIDs.add(wh.toString());
+					}
+				}
+				
+			}
+			if (ghostFlagship != null && unitHolder.getUnits().getOrDefault(ghostFlagship, 0) > 0) {
+				wormholeIDs.add(Constants.DELTA);
+			}
+		}
+
+		if ((player != null && player.hasAbility("quantum_entanglement")) || wh_recon || absol_recon) {
+			if (wormholeIDs.contains(Constants.ALPHA)) {
+				wormholeIDs.add(Constants.BETA);
+			} else if (wormholeIDs.contains(Constants.BETA)) {
+				wormholeIDs.add(Constants.ALPHA);
+			}
+		}
+
+		if (wormholeIDs.isEmpty()) {
+			return false;
+		}else{
+			return true;
+		}
+	}
+
+
+
+
 	/** Check the map for other tiles that have wormholes connecting to the source system.
 	 *  <p>
 	 *  Also takes into account player abilities and agendas
@@ -354,10 +412,25 @@ public class FoWHelper {
 		boolean absol_recon = activeMap.getLaws().keySet().contains("absol_recon");
 
 		Set<String> wormholeIDs = Mapper.getWormholes(tile.getTileID());
+		if(wormholeIDs == null){
+			wormholeIDs = new HashSet<String>();
+		}
 		for (UnitHolder unitHolder : tile.getUnitHolders().values()) {
 			HashSet<String> tokenList = unitHolder.getTokenList();
 			for (String token : tokenList) {
-				if (token.contains(Constants.ALPHA)) {
+				String tokenName = "wh" + token.replace("token_", "").replace(".png", "").replace("creuss", "");
+				if(!tokenName.contains("champion")){
+					tokenName=tokenName.replace("ion", "");
+				}
+				for(WormholeModel.Wormhole wh : WormholeModel.Wormhole.values())
+					if(tokenName.contains(wh.getWhString())) {
+						wormholeIDs.add(wh.getWhString());
+						if(!wh.toString().contains("eta") || wh.toString().contains("beta")){
+							wormholeIDs.add(wh.toString());
+						}
+						break;
+					}
+				/*if (token.contains(Constants.ALPHA)) {
 					wormholeIDs.add(Constants.ALPHA);
 				} else if (token.contains(Constants.BETA)) {
 					wormholeIDs.add(Constants.BETA);
@@ -387,7 +460,7 @@ public class FoWHelper {
 					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHZETA);
 				} else if (token.contains(Constants.CUSTOM_ERONOUS_WHETA)) {
 					wormholeIDs.add(Constants.CUSTOM_ERONOUS_WHETA);
-				}
+				}*/
 			}
 			if (ghostFlagship != null && unitHolder.getUnits().getOrDefault(ghostFlagship, 0) > 0) {
 				wormholeIDs.add(Constants.DELTA);
@@ -410,6 +483,7 @@ public class FoWHelper {
 		for (String wormholeID : wormholeIDs) {
 			wormholeTiles.addAll(Mapper.getWormholesTiles(wormholeID));
 		}
+		
 
 		for (Tile tile_ : allTiles) {
 			String position_ = tile_.getPosition();
@@ -525,6 +599,23 @@ public class FoWHelper {
 		}
 		return false;
 	}
+	public static boolean playerHasUnitsOnPlanet(Player player, Tile tile, String planet) {
+		String colorID = Mapper.getColorID(player.getColor());
+		if (colorID == null) return false; // player doesn't have a color
+
+		HashMap<String, Integer> units = new HashMap<>();
+		UnitHolder unitHolder =tile.getUnitHolders().get(planet);
+		units.putAll(unitHolder.getUnits());
+		
+		for (String key : units.keySet()) {
+			if (key != null) {
+				if (key.startsWith(colorID)) {
+					return true;
+				}
+			}
+		}
+		return false;
+	}
 
 	/** Ping the players adjacent to a given system */
 	public static void pingSystem(Map activeMap, GenericInteractionCreateEvent event, String position, String message) {
@@ -537,6 +628,8 @@ public class FoWHelper {
 		for (Player player_ : players) {
 			String playerMessage = Helper.getPlayerRepresentation(player_, activeMap) + " - System " + position + " has been pinged:\n>>> " + message;
 			boolean success = MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, playerMessage);
+			MessageChannel channel = player_.getPrivateChannel();
+			MessageHelper.sendMessageToChannelWithButtons(channel, "Use Button to refresh view of system", ButtonHelper.getButtonsForPictureCombats(activeMap, position, player_, player_, "justPicture"));
 			successfulCount += success ? 1 : 0;
 		}
 		feedbackMessage(event, successfulCount, players.size());

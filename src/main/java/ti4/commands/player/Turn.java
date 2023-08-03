@@ -15,6 +15,7 @@ import org.apache.commons.collections4.ListUtils;
 
 import ti4.generator.GenerateMap;
 import ti4.generator.Mapper;
+import ti4.model.PromissoryNoteModel;
 import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
@@ -25,6 +26,7 @@ import ti4.map.Player;
 import ti4.map.Tile;
 import ti4.map.UnitHolder;
 import ti4.message.MessageHelper;
+import ti4.commands.cardspn.PNInfo;
 
 import java.util.*;
 
@@ -51,8 +53,8 @@ public class Turn extends PlayerSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(),Helper.getPlayerRepresentation(mainPlayer, activeMap)+ " ended turn");
         }
-        String nextMessage = pingNextPlayer(event, activeMap, mainPlayer);
-        if (!nextMessage.isEmpty()) sendMessage(nextMessage);
+        pingNextPlayer(event, activeMap, mainPlayer);
+        //if (!nextMessage.isEmpty()) sendMessage(nextMessage); Sending message in ping next Player
     }
 
     public void execute(GenericInteractionCreateEvent event, Player mainPlayer, Map activeMap) {
@@ -99,7 +101,7 @@ public class Turn extends PlayerSubcommandData {
             max--;
         }
 
-        //FIND CURRENT PLAYER AND ???
+        //FIND CURRENT PLAYER AND if they are holding the highest possible SC, it sets the next SC as 1, otherwise, sets the next SC as current SC+1. 
         for (Player player : activeMap.getPlayers().values()) {
             if (mainPlayer.getUserID().equals(player.getUserID())) {
                 int sc = player.getLowestSC();
@@ -123,9 +125,6 @@ public class Turn extends PlayerSubcommandData {
             String scNumberIfNaaluInPlay = GenerateMap.getSCNumberIfNaaluInPlay(player, activeMap, Integer.toString(sc));
             if (scNumberIfNaaluInPlay.startsWith("0/")) {
                 scPassed.put(0, player.isPassed());
-                if (player.isPassed()) {
-                    scPassed.put(sc, player.isPassed());
-                }
             } else {
                 scPassed.put(sc, player.isPassed());
             }
@@ -141,7 +140,8 @@ public class Turn extends PlayerSubcommandData {
 
         int tempProtection = 0;
         int nextSCFound = -1;
-        while (tempProtection < (activeMap.getSCList().size() + 5)) {
+        //Tries to see if the previously determined next up SC is held by an unpassed player. If it is not, it searches the next highest or, if it was at the max, it starts the search over from 0
+        while (tempProtection < (activeMap.getPlayers().size() +8)) {
             Boolean isPassed = scPassed.get(scNext);
             if (isPassed != null && !isPassed) {
                 nextSCFound = scNext;
@@ -154,7 +154,7 @@ public class Turn extends PlayerSubcommandData {
 
         for (Player player : activeMap.getPlayers().values()) {
             int sc = player.getLowestSC();
-            if (sc != 0 && sc == nextSCFound || nextSCFound == 0 && naaluSC == sc) {
+            if ((sc != 0 && sc == nextSCFound) || (nextSCFound == 0 && naaluSC == sc)) {
                 if(!activeMap.isFoWMode())
                 {
                     try {
@@ -171,18 +171,19 @@ public class Turn extends PlayerSubcommandData {
                 String buttonText = "Use buttons to do your turn. ";
                 List<Button> buttons = ButtonHelper.getStartOfTurnButtons(player, activeMap, false, event);
                 activeMap.updateActivePlayer(player);
+                activeMap.setCurrentPhase("action");
                 if (isFowPrivateGame) {
+                    
+                    FoWHelper.pingAllPlayersWithFullStats(activeMap, event, mainPlayer, "ended turn");
+                    FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "started turn");
+                    
                     String fail = "User for next faction not found. Report to ADMIN";
                     String success = "The next player has been notified";
                     MessageHelper.sendPrivateMessageToPlayer(player, activeMap, event, text, fail, success);
-                
-                   // if(!activeMap.isFoWMode())
-                  //  {
-                        MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(),buttonText, buttons);
-                 //   }
-                 if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
-                    MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeMap, player));
-                }
+                    MessageHelper.sendMessageToChannelWithButtons(player.getPrivateChannel(), buttonText, buttons);
+                    if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
+                        MessageHelper.sendMessageToChannel(player.getPrivateChannel(), getMissedSCFollowsText(activeMap, player));
+                    }
 
                     activeMap.setPingSystemCounter(0);
                     for (int x = 0; x < 10; x++) {
@@ -191,9 +192,6 @@ public class Turn extends PlayerSubcommandData {
                     return "";
                 } else {
                    MessageHelper.sendMessageToChannel(gameChannel, text);
-                   
-                   
-                    
                     MessageHelper.sendMessageToChannelWithButtons(gameChannel,buttonText, buttons);
                     if (getMissedSCFollowsText(activeMap, player) != null && !getMissedSCFollowsText(activeMap, player).equalsIgnoreCase("")) {
                         MessageHelper.sendMessageToChannel(gameChannel, getMissedSCFollowsText(activeMap, player));
@@ -204,6 +202,7 @@ public class Turn extends PlayerSubcommandData {
                 }
             }
         }
+        MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Next player not found");
         return "Next Player not found";
     }
 
@@ -211,7 +210,7 @@ public class Turn extends PlayerSubcommandData {
         if (!activeMap.isStratPings()) return null;
         boolean sendReminder = false;
 
-        StringBuilder sb = new StringBuilder("> Please react to ");
+        StringBuilder sb = new StringBuilder("> "+Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Please react to ");
 
         for (int sc : activeMap.getPlayedSCs()) {
             if (!player.hasFollowedSC(sc)) {
@@ -227,7 +226,7 @@ public class Turn extends PlayerSubcommandData {
                 sendReminder = true;
             }
         }
-        sb.append(" above before taking your turn.");
+        sb.append(" above before doing anything else.");
         return sendReminder ? sb.toString() : null;
     }
 
@@ -304,8 +303,34 @@ public class Turn extends PlayerSubcommandData {
                 .addComponents(actionRows).build();
 
         gameChannel.sendMessage(messageObject).queue();
-
-
+        
+        // return beginning of status phase PNs
+        LinkedHashMap<String, Player> players = activeMap.getPlayers();
+         for (Player player : players.values()) {
+           List<String> pns = new ArrayList<String>();
+            pns.addAll(player.getPromissoryNotesInPlayArea());
+            for(String pn: pns){
+                Player pnOwner = activeMap.getPNOwner(pn);
+                if(!pnOwner.isRealPlayer()){
+                    continue;
+                }
+                PromissoryNoteModel pnModel = Mapper.getPromissoryNotes().get(pn);
+                if(pnModel.getText().contains("eturn this card") && (pnModel.getText().contains("start of the status phase") || pnModel.getText().contains("beginning of the status phase"))){
+                        player.removePromissoryNote(pn);
+                        pnOwner.setPromissoryNote(pn);  
+                        PNInfo.sendPromissoryNoteInfo(activeMap, pnOwner, false);
+		                PNInfo.sendPromissoryNoteInfo(activeMap, player, false);
+                        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), pnModel.getName() + " was returned");
+                    }
+                }
+            }
+    
+        for(Player p2 : activeMap.getRealPlayers()){
+            String ms2 = getMissedSCFollowsText(activeMap, p2);
+            if (ms2 != null && !ms2.equalsIgnoreCase("")) {
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(p2, activeMap), ms2);
+            }
+        }
 
         Player arborec = Helper.getPlayerFromAbility(activeMap, "mitosis");
         if (arborec != null) {

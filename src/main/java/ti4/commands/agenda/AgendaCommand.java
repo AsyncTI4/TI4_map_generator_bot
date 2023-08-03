@@ -94,6 +94,7 @@ public class AgendaCommand implements Command {
         subcommands.add(new RevealAgenda());
         subcommands.add(new AddLaw());
         subcommands.add(new RemoveLaw());
+        subcommands.add(new ReviseLaw());
         subcommands.add(new ShowDiscardedAgendas());
         subcommands.add(new ListVoteCount());
         subcommands.add(new ShuffleAgendas());

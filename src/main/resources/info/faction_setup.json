@@ -1,7 +1,119 @@
 [
   {
-    "alias": "blank_franken_1",
+    "alias": "franken_1",
     "factionName": "Franken 1",
+    "homeSystem": "",
+    "startingFleet": "",
+    "commodities": 0,
+    "factionTech": [],
+    "startingTech": [],
+    "homePlanets": [],
+    "abilities": [],
+    "leaders": [],
+    "promissoryNotes": [],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
+  },
+  {
+    "alias": "franken_2",
+    "factionName": "Franken 2",
+    "homeSystem": "",
+    "startingFleet": "",
+    "commodities": 0,
+    "factionTech": [],
+    "startingTech": [],
+    "homePlanets": [],
+    "abilities": [],
+    "leaders": [],
+    "promissoryNotes": [],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
+  },
+  {
+    "alias": "franken_3",
+    "factionName": "Franken 3",
+    "homeSystem": "",
+    "startingFleet": "",
+    "commodities": 0,
+    "factionTech": [],
+    "startingTech": [],
+    "homePlanets": [],
+    "abilities": [],
+    "leaders": [],
+    "promissoryNotes": [],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
+  },
+  {
+    "alias": "franken_4",
+    "factionName": "Franken 4",
+    "homeSystem": "",
+    "startingFleet": "",
+    "commodities": 0,
+    "factionTech": [],
+    "startingTech": [],
+    "homePlanets": [],
+    "abilities": [],
+    "leaders": [],
+    "promissoryNotes": [],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
+  },
+  {
+    "alias": "franken_5",
+    "factionName": "Franken 5",
+    "homeSystem": "",
+    "startingFleet": "",
+    "commodities": 0,
+    "factionTech": [],
+    "startingTech": [],
+    "homePlanets": [],
+    "abilities": [],
+    "leaders": [],
+    "promissoryNotes": [],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
+  },
+  {
+    "alias": "franken_6",
+    "factionName": "Franken 6",
+    "homeSystem": "",
+    "startingFleet": "",
+    "commodities": 0,
+    "factionTech": [],
+    "startingTech": [],
+    "homePlanets": [],
+    "abilities": [],
+    "leaders": [],
+    "promissoryNotes": [],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
+  },
+  {
+    "alias": "franken_7",
+    "factionName": "Franken 7",
+    "homeSystem": "",
+    "startingFleet": "",
+    "commodities": 0,
+    "factionTech": [],
+    "startingTech": [],
+    "homePlanets": [],
+    "abilities": [],
+    "leaders": [],
+    "promissoryNotes": [],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
+  },
+  {
+    "alias": "franken_8",
+    "factionName": "Franken 8",
+    "homeSystem": "",
+    "startingFleet": "",
+    "commodities": 0,
+    "factionTech": [],
+    "startingTech": [],
+    "homePlanets": [],
+    "abilities": [],
+    "leaders": [],
+    "promissoryNotes": [],
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "flagship", "infantry", "mech", "pds", "spacedock"]
+  },
+  {
+    "alias": "lazax",
+    "factionName": "Lazax",
     "homeSystem": "",
     "startingFleet": "",
     "commodities": 0,
@@ -179,7 +291,7 @@
     "abilities": ["star_forge", "gashlai_physiology"],
     "leaders": ["muaatagent", "muaatcommander", "muaathero"],
     "promissoryNotes": ["fires"],
-    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "muaat_flagship", "muaat_warsun", "muaat_infantry", "mech", "pds", "spacedock"]
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "muaat_flagship", "muaat_warsun", "infantry", "muaat_mech", "pds", "spacedock"]
   },
   {
     "alias": "naalu",
@@ -361,7 +473,7 @@
     "abilities": ["the_tribuni", "council_patronage", "laws_order"],
     "leaders": ["keleresagent", "kelerescommander", "keleresheroharka"],
     "promissoryNotes": ["riderm"],
-    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleresm_flagship", "infantry", "keleresm_mech", "pds", "spacedock"]
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleres_flagship", "infantry", "keleres_mech", "pds", "spacedock"]
   },
   {
     "alias": "keleresx",
@@ -375,7 +487,7 @@
     "abilities": ["the_tribuni", "council_patronage", "laws_order"],
     "leaders": ["keleresagent", "kelerescommander", "keleresheroodlynn"],
     "promissoryNotes": ["riderx"],
-    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleresx_flagship", "infantry", "keleresx_mech", "pds", "spacedock"]
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleres_flagship", "infantry", "keleres_mech", "pds", "spacedock"]
   },
   {
     "alias": "keleresa",
@@ -389,7 +501,7 @@
     "abilities": ["the_tribuni", "council_patronage", "laws_order"],
     "leaders": ["keleresagent", "kelerescommander", "keleresherokuuasi"],
     "promissoryNotes": ["ridera"],
-    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleresa_flagship", "infantry", "keleresa_mech", "pds", "spacedock"]
+    "units": ["fighter", "destroyer", "cruiser", "carrier", "dreadnought", "keleres_flagship", "infantry", "keleres_mech", "pds", "spacedock"]
   },
   {
     "alias": "admins",
@@ -521,10 +633,10 @@
     "alias": "edyn",
     "factionName": "Edyn Mandate",
     "homeSystem": "d03",
-    "startingFleet": "cv,2 dd,2 ff,2 inf edyn,pds o,sd edyn",
+    "startingFleet": "cv,2 dd,4 ff,3 inf edyn,pds o,sd edyn",
     "commodities": 3,
     "factionTech": ["dsedyny", "dsedyng"],
-    "startingTech": ["aida", "sdn", "det", "pa"],
+    "startingTech": [],
     "homePlanets": ["edyn", "ekko", "okke"],
     "abilities": ["grace", "decree", "radiance"],
     "leaders": ["edynagent", "edyncommander", "edynhero"],
@@ -675,7 +787,7 @@
     "alias": "kyro",
     "factionName": "Kyro Sodality",
     "homeSystem": "d10",
-    "startingFleet": "dn,cv,dd,3 inf a,sd a",
+    "startingFleet": "dn,cv,dd,ff,3 inf a,sd a",
     "commodities": 2,
     "factionTech": ["dskyrog", "dskyroy"],
     "startingTech": [],
@@ -759,7 +871,7 @@
     "alias": "nivyn",
     "factionName": "Nivyn Star Kings",
     "homeSystem": "d25",
-    "startingFleet": "cv,2 cr,3 ff,3 inf e,mech e,sd e",
+    "startingFleet": "cv,cr,dn,3 ff,3 inf e,mech e,sd e",
     "commodities": 3,
     "factionTech": ["dsnivymf", "dsnivyy"],
     "startingTech": ["ps", "det"],

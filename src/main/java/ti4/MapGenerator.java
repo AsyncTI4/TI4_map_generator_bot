@@ -111,6 +111,7 @@ public class MapGenerator {
         adminRoles.add(jda.getRoleById("1060656344581017621")); // Softnum's Server
         adminRoles.add(jda.getRoleById("1109657180170371182")); // Jazz's Server
         adminRoles.add(jda.getRoleById("1100120742093406319")); // Moo's Server
+        adminRoles.add(jda.getRoleById("1126610851034583050")); // Fin's Server
         adminRoles.removeIf(Objects::isNull);
 
         //DEVELOPER ROLES
@@ -125,6 +126,8 @@ public class MapGenerator {
         bothelperRoles.add(jda.getRoleById("970033771179028531")); // Async TI4 Server (Hub)
         bothelperRoles.add(jda.getRoleById("1090914992301281341")); // Async Secondary
         bothelperRoles.add(jda.getRoleById("1088532690803884052")); // FoW Server
+        bothelperRoles.add(jda.getRoleById("1063464689218105354"));// FoW Server Game Admin
+
         bothelperRoles.removeIf(Objects::isNull);
 
 
@@ -180,7 +183,6 @@ public class MapGenerator {
         commandManager.addCommand(new TechCommand());
         commandManager.addCommand(new PlanetCommand());
 
-
         CommandListUpdateAction commands = guildPrimary.updateCommands();
         commandManager.getCommandList().forEach(command -> command.registerCommands(commands));
         commands.queue();
@@ -220,6 +222,10 @@ public class MapGenerator {
 
         BotLogger.log("BOT STARTED UP: " + guildPrimary.getName());
         MapSaveLoadManager.loadMaps();
+
+        BotLogger.log("BOT CHECKING FOR DATA MIGRATIONS");
+        DataMigrationManager.runMigrations(); 
+        BotLogger.log("BOT FINISHED CHECKING FOR DATA MIGRATIONS");
 
         readyToReceiveCommands = true;
         BotLogger.log("BOT HAS FINISHED LOADING MAPS");

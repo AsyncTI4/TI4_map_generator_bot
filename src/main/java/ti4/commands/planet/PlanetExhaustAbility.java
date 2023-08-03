@@ -6,12 +6,10 @@ import java.util.List;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import ti4.helpers.AliasHandler;
-import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
 import ti4.map.Player;
-import ti4.map.Tile;
 import ti4.message.MessageHelper;
 
 public class PlanetExhaustAbility extends PlanetAddRemove {
@@ -39,7 +37,11 @@ public class PlanetExhaustAbility extends PlanetAddRemove {
             MessageHelper.sendMessageToChannel(channel, "Chose to Exhaust Hope's End Ability");
             message = "Use buttons to drop a mech on a planet or draw an AC";
             buttons.addAll(Helper.getPlanetPlaceUnitButtons(player, activeMap, "mech", "placeOneNDone_skipbuild"));
-            buttons.add(Button.success("draw_1_ACDelete","Draw 1 AC"));
+            if(player.hasAbility("scheming")){
+                buttons.add(Button.success("draw_2_ACDelete", "Draw 2 AC (With Scheming)"));
+            }else{
+                buttons.add(Button.success("draw_1_ACDelete", "Draw 1 AC"));
+            }
         }
         if(AliasHandler.resolvePlanet(planet).equalsIgnoreCase("primor")){
             MessageHelper.sendMessageToChannel(channel, "Chose to Exhaust Primor's Ability");

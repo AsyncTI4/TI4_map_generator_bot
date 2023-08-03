@@ -254,7 +254,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         message.append("> " + actionsChannel.getAsMention()).append("\n");
         message.append("> " + botThread.getAsMention()).append("\n");
         sendMessage(message.toString());
-
+        
         MapSaveLoadManager.saveMap(newMap, event);
     }
 
@@ -266,6 +266,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
         int nextPBDNumber = Collections.max(getAllExistingPBDNumbers()) + 1;
         return "pbd" + nextPBDNumber;
     }
+    
 
     private static boolean gameOrRoleAlreadyExists(String name) {
         List<Guild> guilds = MapGenerator.jda.getGuilds();
@@ -317,6 +318,39 @@ public class CreateGameChannels extends BothelperSubcommandData {
             .toList();
         for (String mapName : mapNames) {
             String pbdNum = mapName.replace("pbd", "");
+            if (Helper.isInteger(pbdNum)) {
+                pbdNumbers.add(Integer.parseInt(pbdNum));
+            }
+        }
+        pbdNumbers.remove(1000); //TODO: remove this after 1001 is created - this is a fix for 1000 being created early
+        return pbdNumbers;
+    }
+    private static ArrayList<Integer> getAllExistingFOWNumbers() {
+        List<Guild> guilds = MapGenerator.jda.getGuilds();
+        ArrayList<Integer> pbdNumbers = new ArrayList<>();
+
+        // GET ALL PBD ROLES FROM ALL GUILDS
+        for (Guild guild : guilds) {
+            System.out.println(guild.getName());
+            List<Role> pbdRoles = guild.getRoles().stream()
+                .filter(r -> r.getName().startsWith("fow"))
+                .toList();
+
+            //EXISTING ROLE NAMES
+            for (Role role : pbdRoles) {
+                String pbdNum = role.getName().replace("fow", "");
+                if (Helper.isInteger(pbdNum)) {
+                    pbdNumbers.add(Integer.parseInt(pbdNum));
+                }
+            }
+        }
+
+        // GET ALL EXISTING PBD MAP NAMES
+        List<String> mapNames = MapManager.getInstance().getMapList().keySet().stream()
+            .filter(mapName -> mapName.startsWith("fow"))
+            .toList();
+        for (String mapName : mapNames) {
+            String pbdNum = mapName.replace("fow", "");
             if (Helper.isInteger(pbdNum)) {
                 pbdNumbers.add(Integer.parseInt(pbdNum));
             }

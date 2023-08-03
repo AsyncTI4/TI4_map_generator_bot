@@ -174,6 +174,8 @@ public class Map {
 
     private List<String> publicObjectives1 = new ArrayList<>();
     private List<String> publicObjectives2 = new ArrayList<>();
+    private List<String> publicObjectives1Peakable = new ArrayList<>();
+    private List<String> publicObjectives2Peakable = new ArrayList<>();
     private ArrayList<String> soToPoList = new ArrayList<>();
 
     @JsonIgnore
@@ -191,6 +193,8 @@ public class Map {
     List<SimpleEntry<String, String>> tileNameAutocompleteOptionsCache = null;
     @JsonIgnore
     List<SimpleEntry<String, String>> planetNameAutocompleteOptionsCache = null;
+
+    private ArrayList<String> runDataMigrations = new ArrayList<>(); 
 
     public Map() {
         creationDate = Helper.getDateRepresentation(new Date().getTime());
@@ -359,6 +363,10 @@ public class Map {
     public void addActionCardDuplicates(List<String> ACs) {
         actionCards.addAll(ACs);
         Collections.shuffle(this.actionCards);
+    }
+    public void addSecretDuplicates(List<String> SOs) {
+        secretObjectives.addAll(SOs);
+        Collections.shuffle(this.secretObjectives);
     }
 
     public void setPurgedPNs(ArrayList<String> purgedPN) {
@@ -913,13 +921,14 @@ public class Map {
         sentAgendas.put(id, identifier);
     }
 
-    public void addDiscardAgenda(String id) {
+    public int addDiscardAgenda(String id) {
         Collection<Integer> values = discardAgendas.values();
         int identifier = new Random().nextInt(1000);
         while (values.contains(identifier)) {
             identifier = new Random().nextInt(1000);
         }
         discardAgendas.put(id, identifier);
+        return identifier;
     }
 
     public void addRevealedPublicObjective(String id) {
@@ -987,22 +996,103 @@ public class Map {
     public List<String> getPublicObjectives1() {
         return publicObjectives1;
     }
+    public List<String> getPublicObjectives1Peakable() {
+        return publicObjectives1Peakable;
+    }
 
     public List<String> getPublicObjectives2() {
         return publicObjectives2;
     }
+    public List<String> getPublicObjectives2Peakable() {
+        return publicObjectives2Peakable;
+    }
 
     public java.util.Map.Entry<String, Integer> revealState1() {
-        return revealObjective(publicObjectives1);
+        if(publicObjectives1Peakable.isEmpty()){
+            return revealObjective(publicObjectives1);
+        }else{
+            return revealObjective(publicObjectives1Peakable);
+        }
     }
 
     public java.util.Map.Entry<String, Integer> revealState2() {
-        return revealObjective(publicObjectives2);
+        if(publicObjectives2Peakable.isEmpty()){
+            return revealObjective(publicObjectives2);
+        }else{
+            return revealObjective(publicObjectives2Peakable);
+        }
+    }
+
+    public void setUpPeakableObjectives(int num) {
+        for(int x = 0; x < num; x++){
+            if (!publicObjectives1.isEmpty()) {
+                Collections.shuffle(publicObjectives1);
+                String id = publicObjectives1.get(0);
+                publicObjectives1.remove(id);
+                publicObjectives1Peakable.add(id);
+            }
+            if (!publicObjectives2.isEmpty()) {
+                Collections.shuffle(publicObjectives2);
+                String id = publicObjectives2.get(0);
+                publicObjectives2.remove(id);
+                publicObjectives2Peakable.add(id);
+            }
+        }
+    }
+    public String peakAtStage1(int place) {
+        return peakAtObjective(publicObjectives1Peakable, place);
+    }
+    public String peakAtStage2(int place) {
+        return peakAtObjective(publicObjectives2Peakable, place);
+    }
+    public java.util.Map.Entry<String, Integer> revealSpecificStage1(String id) {
+        return revealSpecificObjective(publicObjectives1, id);
+    }
+    public java.util.Map.Entry<String, Integer> revealSpecificStage2(String id) {
+        return revealSpecificObjective(publicObjectives2, id);
+    }
+
+    public void swapStage1(int place1, int place2) {
+        swapObjective(publicObjectives1Peakable, place1, place2);
+    }
+    public void swapStage2(int place1, int place2) {
+        swapObjective(publicObjectives2Peakable, place1, place2);
+    }
+
+    public void swapObjective(List<String> objectiveList, int place1, int place2) {
+        if (!objectiveList.isEmpty()) {
+            place1 = place1 - 1;
+            place2 = place2 - 1;
+            String id = objectiveList.get(place1);
+            String id2 = objectiveList.get(place2);
+            objectiveList.set(place1, id2);
+            objectiveList.set(place2, id);
+        }
+    }
+    public String peakAtObjective(List<String> objectiveList, int place) {
+        if (!objectiveList.isEmpty()) {
+            place = place -1;
+            String id = objectiveList.get(place);
+            return id;
+        }
+        return null;
     }
 
     public java.util.Map.Entry<String, Integer> revealObjective(List<String> objectiveList) {
         if (!objectiveList.isEmpty()) {
             String id = objectiveList.get(0);
+            objectiveList.remove(id);
+            addRevealedPublicObjective(id);
+            for (java.util.Map.Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
+                if (entry.getKey().equals(id)) {
+                    return entry;
+                }
+            }
+        }
+        return null;
+    }
+    public java.util.Map.Entry<String, Integer> revealSpecificObjective(List<String> objectiveList, String id) {
+        if (objectiveList.contains(id)) {
             objectiveList.remove(id);
             addRevealedPublicObjective(id);
             for (java.util.Map.Entry<String, Integer> entry : revealedPublicObjectives.entrySet()) {
@@ -1205,6 +1295,13 @@ public class Map {
     public void setPublicObjectives2(ArrayList<String> publicObjectives2) {
         this.publicObjectives2 = publicObjectives2;
     }
+    public void setPublicObjectives1Peakable(ArrayList<String> publicObjectives1) {
+        this.publicObjectives1Peakable = publicObjectives1;
+    }
+
+    public void setPublicObjectives2Peakable(ArrayList<String> publicObjectives2) {
+        this.publicObjectives2Peakable = publicObjectives2;
+    }
 
     public void removePublicObjective1(String key) {
         publicObjectives1.remove(key);
@@ -1373,6 +1470,42 @@ public class Map {
         }
         if (!id.isEmpty()) {
 
+            Collection<Integer> values = laws.values();
+            int identifier = new Random().nextInt(1000);
+            while (values.contains(identifier)) {
+                identifier = new Random().nextInt(1000);
+            }
+            discardAgendas.remove(id);
+            laws.put(id, identifier);
+            if (optionalText != null) {
+                lawsInfo.put(id, optionalText);
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public boolean reviseLaw(Integer idNumber, String optionalText) {
+
+        String id = "";
+        for (java.util.Map.Entry<String, Integer> ac : laws.entrySet()) {
+            if (ac.getValue().equals(idNumber)) {
+                id = ac.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
+            laws.remove(id);
+            lawsInfo.remove(id);
+            idNumber=addDiscardAgenda(id);
+        }
+        for (java.util.Map.Entry<String, Integer> agendas : discardAgendas.entrySet()) {
+            if (agendas.getValue().equals(idNumber)) {
+                id = agendas.getKey();
+                break;
+            }
+        }
+        if (!id.isEmpty()) {
             Collection<Integer> values = laws.values();
             int identifier = new Random().nextInt(1000);
             while (values.contains(identifier)) {
@@ -1576,20 +1709,33 @@ public class Map {
 
     public String drawExplore(String reqType) {
         List<String> deck = getExplores(reqType, explore);
+        String result = null;
+
+        //MIGRATION CODE TODO: Remove this once we are fairly certain no exising games have an existing empty deck - implemented 2023-07
+        if (deck.isEmpty()) {
+            shuffleDiscardsIntoExploreDeck(reqType);
+            deck = getExplores(reqType, explore);
+            BotLogger.log("Map: `" + getName() + "` MIGRATION CODE TRIGGERED: Explore " + reqType + " deck was empty, shuffling discards into deck.");
+        } //end of migration code
+        
         if (!deck.isEmpty()) {
             String id = deck.get(0);
             discardExplore(id);
-            return id;
-        } else {
-            deck = getExplores(reqType, discardExplore);
-            if (!deck.isEmpty()) {
-                explore.addAll(deck);
-                Collections.shuffle(explore);
-                discardExplore.removeAll(deck);
-                return drawExplore(reqType);
-            }
+            result = id;
         }
-        return null;
+
+        // If deck is empty after draw, auto refresh deck from discard
+        if (getExplores(reqType, explore).isEmpty()) {
+            shuffleDiscardsIntoExploreDeck(reqType);
+        }
+        return result;
+    }
+
+    public void shuffleDiscardsIntoExploreDeck(String reqType) {
+        List<String> discardsOfType = getExplores(reqType, discardExplore);
+        explore.addAll(discardsOfType);
+        Collections.shuffle(explore);
+        discardExplore.removeAll(discardsOfType);
     }
 
     public void discardExplore(String id) {
@@ -1616,6 +1762,40 @@ public class Map {
         discardExplore.clear();
         Set<String> exp = Mapper.getExplores().keySet();
         explore.addAll(exp);
+    }
+
+    public void triplicateExplores() {
+        this.explore = Mapper.getDecks().get("explores_pok").getShuffledCardList();
+        Collections.shuffle(this.explore);
+        for(String relic : Mapper.getDecks().get("explores_pok").getShuffledCardList()){
+            String copy1 = relic + "extra1";
+            String copy2 = relic + "extra2";
+            explore.add(copy1);
+            explore.add(copy2);
+        }
+        Collections.shuffle(this.explore);
+    }
+     public void triplicateACs() {
+        this.actionCards = Mapper.getDecks().get("action_cards_pok").getShuffledCardList();
+        Collections.shuffle(this.actionCards);
+        for(String relic : Mapper.getDecks().get("action_cards_pok").getShuffledCardList()){
+            String copy1 = relic + "extra1";
+            String copy2 = relic + "extra2";
+            actionCards.add(copy1);
+            actionCards.add(copy2);
+        }
+        Collections.shuffle(this.actionCards);
+    }
+    public void triplicateSOs() {
+        this.secretObjectives = Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList();
+        Collections.shuffle(this.secretObjectives);
+        for(String relic : Mapper.getDecks().get("secret_objectives_pok").getShuffledCardList()){
+            String copy1 = relic + "extra1";
+            String copy2 = relic + "extra2";
+            secretObjectives.add(copy1);
+            secretObjectives.add(copy2);
+        }
+        Collections.shuffle(this.secretObjectives);
     }
 
     public String drawRelic() {
@@ -1924,6 +2104,27 @@ public class Map {
         } else {
             this.relics = Mapper.getDecks().get("relics_pok").getShuffledCardList();
         }
+        Collections.shuffle(this.relics);
+    }
+    public void triplicateRelics() {
+        if (this.absolMode) {
+            this.relics = Mapper.getDecks().get("relics_absol").getShuffledCardList();
+            for(String relic : Mapper.getDecks().get("relics_absol").getShuffledCardList()){
+                String copy1 = relic + "extra1";
+                String copy2 = relic + "extra2";
+                relics.add(copy1);
+                relics.add(copy2);
+            }
+        } else {
+            this.relics = Mapper.getDecks().get("relics_pok").getShuffledCardList();
+            for(String relic : Mapper.getDecks().get("relics_pok").getShuffledCardList()){
+                String copy1 = relic + "extra1";
+                String copy2 = relic + "extra2";
+                relics.add(copy1);
+                relics.add(copy2);
+            }
+        }
+        
         Collections.shuffle(this.relics);
     }
 
@@ -2299,5 +2500,19 @@ public class Map {
 
     public void incrementMapImageGenerationCount() {
         this.mapImageGenerationCount++;
+    }
+
+    public boolean hasRunMigration(String string) {
+        return this.runDataMigrations.contains(string);
+    }
+
+    public void addMigration(String string) {
+        if(!this.runDataMigrations.contains(string)){
+            this.runDataMigrations.add(string);    
+        }
+    }
+
+    public ArrayList<String> getRunMigrations(){
+        return this.runDataMigrations;
     }
 }

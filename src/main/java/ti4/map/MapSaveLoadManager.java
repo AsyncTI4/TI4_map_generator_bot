@@ -359,6 +359,10 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.PURGED_PN + " " + String.join(",", activeMap.getPurgedPN()));
         writer.write(System.lineSeparator());
+         writer.write(Constants.PO1PEAKABLE + " " + String.join(",", activeMap.getPublicObjectives1Peakable()));
+        writer.write(System.lineSeparator());
+        writer.write(Constants.PO2PEAKABLE + " " + String.join(",", activeMap.getPublicObjectives2Peakable()));
+        writer.write(System.lineSeparator());
 
 
         DisplayType displayTypeForced = activeMap.getDisplayTypeForced();
@@ -404,6 +408,7 @@ public class MapSaveLoadManager {
         writer.write(Constants.CREATION_DATE + " " + activeMap.getCreationDate());
         writer.write(System.lineSeparator());
         long time = keepModifiedDate ? activeMap.getLastModifiedDate() : new Date().getTime();
+        activeMap.setLastModifiedDate(time);
         writer.write(Constants.LAST_MODIFIED_DATE + " " + time);
         writer.write(System.lineSeparator());
         writer.write(Constants.ENDED_DATE + " " + activeMap.getEndedDate());
@@ -464,6 +469,9 @@ public class MapSaveLoadManager {
         writer.write(Constants.IMAGE_GEN_COUNT + " " + activeMap.getMapImageGenerationCount());
         writer.write(System.lineSeparator());
 
+        writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",",activeMap.getRunMigrations()));
+        writer.write(System.lineSeparator());
+
         writer.write(ENDGAMEINFO);
         writer.write(System.lineSeparator());
 
@@ -490,6 +498,9 @@ public class MapSaveLoadManager {
                 playerColor = "null";
             }
             writer.write(Constants.COLOR + " " + playerColor);
+            writer.write(System.lineSeparator());
+
+             writer.write(Constants.ALLIANCE_MEMBERS + " " + player.getAllianceMembers());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.ROLE_FOR_COMMUNITY + " " + player.getRoleIDForCommunity());
@@ -834,7 +845,7 @@ public class MapSaveLoadManager {
                     if (isTxtExtention(file)) {
                         try {
                             Map activeMap = loadMap(file);
-                            if (activeMap != null) {
+                            if (activeMap != null && activeMap.getName() != null) {
                                 mapList.put(activeMap.getName(), activeMap);
                             }
                         } catch (Exception e) {
@@ -1040,6 +1051,8 @@ public class MapSaveLoadManager {
                 case Constants.AC -> activeMap.setActionCards(getCardList(info));
                 case Constants.PO1 -> activeMap.setPublicObjectives1(getCardList(info));
                 case Constants.PO2 -> activeMap.setPublicObjectives2(getCardList(info));
+                case Constants.PO1PEAKABLE -> activeMap.setPublicObjectives1Peakable(getCardList(info));
+                case Constants.PO2PEAKABLE -> activeMap.setPublicObjectives2Peakable(getCardList(info));
                 case Constants.SO_TO_PO -> activeMap.setSoToPoList(getCardList(info));
                 case Constants.PURGED_PN -> activeMap.setPurgedPNs(getCardList(info));
                 case Constants.REVEALED_PO -> activeMap.setRevealedPublicObjectives(getParsedCards(info));
@@ -1426,6 +1439,13 @@ public class MapSaveLoadManager {
                         //Do nothing
                     }
                 }
+                case Constants.RUN_DATA_MIGRATIONS -> {
+                    StringTokenizer migrationInfo = new StringTokenizer(info, ",");
+    
+                    while (migrationInfo.hasMoreTokens()) {
+                        activeMap.addMigration(migrationInfo.nextToken());
+                    }
+                }
             }
         }
     }
@@ -1493,6 +1513,7 @@ public class MapSaveLoadManager {
             switch (data) {
                 case Constants.FACTION -> player.setFaction(tokenizer.nextToken());
                 case Constants.COLOR -> player.setColor(tokenizer.nextToken());
+                case Constants.ALLIANCE_MEMBERS -> player.setAllianceMembers(tokenizer.nextToken());
                 case Constants.ROLE_FOR_COMMUNITY -> player.setRoleIDForCommunity(tokenizer.nextToken());
                 case Constants.PLAYER_PRIVATE_CHANNEL -> player.setPrivateChannelID(tokenizer.nextToken());
                 case Constants.TACTICAL -> player.setTacticalCC(Integer.parseInt(tokenizer.nextToken()));

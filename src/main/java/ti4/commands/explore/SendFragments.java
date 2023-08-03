@@ -10,6 +10,7 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 
 import ti4.generator.Mapper;
+import ti4.helpers.ButtonHelper;
 import ti4.helpers.Constants;
 import ti4.helpers.FoWHelper;
 import ti4.helpers.Helper;
@@ -82,7 +83,7 @@ public class SendFragments extends ExploreSubcommandData {
 		String p2 = Helper.getPlayerRepresentation(receiver, activeMap);
 		String fragString = count + " " + trait + " " + Helper.getEmojiFromDiscord(emojiName) + " relic fragments";
 		String message =  p1 + " sent " + fragString + " to " + p2;
-		MessageHelper.sendMessageToChannel(event.getMessageChannel(), message);
+		MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(receiver, activeMap), message);
 
 		if (activeMap.isFoWMode()) {
 			String fail = "User for faction not found. Report to ADMIN";

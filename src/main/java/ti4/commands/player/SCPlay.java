@@ -131,6 +131,9 @@ public class SCPlay extends PlayerSubcommandData {
             //GET BUTTONS
             ActionRow actionRow = null;
             List<Button> scButtons = new ArrayList<>(getSCButtons(scToDisplay, activeMap));
+            if(!activeMap.isFoWMode() && scToDisplay == 7 && Helper.getPlayerFromAbility(activeMap, "propagation") != null){
+                scButtons.add(Button.secondary("nekroFollowTech", "Get CCs").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro"))));
+            }
             if (scButtons != null && !scButtons.isEmpty()) actionRow = ActionRow.of(scButtons);
             if (actionRow != null) baseMessageObject.addComponents(actionRow);
 
@@ -171,21 +174,46 @@ public class SCPlay extends PlayerSubcommandData {
             });
 
         //POLITICS - SEND ADDITIONAL ASSIGN SPEAKER BUTTONS
+       
         if (!activeMap.isFoWMode() && scToPlay == 3) {
             String assignSpeakerMessage = Helper.getPlayerRepresentation(player, activeMap) + ", please click a faction below to assign Speaker " + Emojis.SpeakerToken;
-            String assignSpeakerMessage2 = Helper.getPlayerRepresentation(player, activeMap) + " after assigning speaker, check your cards info for a button with which to draw agendas. It is green, maybe scroll a bit.";
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(activeMap);
             MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), assignSpeakerMessage, assignSpeakerActionRow);
-            MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), assignSpeakerMessage2);
+            
 
         }
 
         if (scToPlay == 3 && !activeMap.isHomeBrewSCMode()) {
+             String assignSpeakerMessage2 = Helper.getPlayerRepresentation(player, activeMap) + " after assigning speaker, Use this button to draw agendas into your cards info thread.";
+            
             List<Button> drawAgendaButton = new ArrayList<Button>();
             Button draw2Agenda = Button.success("FFCC_"+player.getFaction()+"_"+"drawAgenda_2", "Draw 2 agendas");
             drawAgendaButton.add(draw2Agenda);
-            MessageHelper.sendMessageToChannelWithButtons((MessageChannel)player.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), false)+" click this after assigning speaker.", drawAgendaButton);
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), assignSpeakerMessage2, drawAgendaButton);
+
+        }
+
+        if(scToPlay != 1 ){
+            //"scepterE_follow_") || buttonID.startsWith("mahactA_follow_")){
+            List<Button> empNMahButtons = new ArrayList<Button>();
+            Button deleteB = Button.danger("deleteButtons", "Delete These Buttons");
+            empNMahButtons.add(deleteB);
+            Button emelpar = Button.danger("scepterE_follow_"+scToPlay, "Exhaust Scepter of Emelpar");
+            Button mahactA = Button.danger("mahactA_follow_"+scToPlay, "Use Mahact Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("mahact")));
+            for(Player player3 : activeMap.getPlayers().values()){
+                if(player3 == player){
+                    continue;
+                }
+                if(player3.hasRelic("emelpar") && !player3.getExhaustedRelics().contains("emelpar")){
+                    empNMahButtons.add(0,emelpar);    
+                    MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player3, activeMap, activeMap.getGuild(), true)+" You can follow SC #"+scToPlay+" with the scepter of emelpar", empNMahButtons);
+                }
+                if(player3.hasLeader("mahactagent") && !player3.getLeader("mahactagent").isExhausted() && ButtonHelper.getTilesWithYourCC(player, activeMap, event).size() > 0){
+                    empNMahButtons.add(0,mahactA);
+                    MessageHelper.sendMessageToChannelWithButtons(player3.getCardsInfoThread(activeMap), Helper.getPlayerRepresentation(player3, activeMap, activeMap.getGuild(), true)+" You can follow SC #"+scToPlay+" with mahact agent", empNMahButtons);
+                }
+            }
         }
 
         List<Button> conclusionButtons = new ArrayList<Button>();
