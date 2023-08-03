@@ -1,16 +1,14 @@
 package ti4.generator;
 
-import com.fasterxml.jackson.core.type.TypeReference;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import ti4.ResourceHelper;
 import ti4.helpers.AliasHandler;
-import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.model.*;
 
@@ -206,8 +204,11 @@ public class Mapper {
     }
 
     public static Set<String> getWormholes(String tileID) {
+        if(TileHelper.getAllTiles().get(tileID).getWormholes() == null){
+            return null;
+        }
         return TileHelper.getAllTiles().get(tileID).getWormholes().stream()
-                .filter(wormhole -> wormhole != null)
+                .filter(Objects::nonNull)
                 .map(WormholeModel.Wormhole::toString)
                 .collect(Collectors.toSet());
     }
@@ -215,9 +216,13 @@ public class Mapper {
     public static Set<String> getWormholesTiles(String wormholeID) {
         WormholeModel wormholeModel = new WormholeModel();
         WormholeModel.Wormhole wormhole = wormholeModel.getWormholeFromString(wormholeID);
+        if(wormhole == null){
+            Set<String> empty = new HashSet<String>();
+            return empty;
+        }
+
         return TileHelper.getAllTiles().values().stream()
-                .filter(tileModel -> tileModel.getWormholes() != null)
-                .filter(tileModel -> tileModel.getWormholes().contains(wormhole))
+                .filter(tileModel -> tileModel.getWormholes() != null && tileModel.getWormholes().contains(wormhole))
                 .map(TileModel::getId)
                 .collect(Collectors.toSet());
     }
@@ -345,6 +350,8 @@ public class Mapper {
     }
 
     public static SecretObjectiveModel getSecretObjective(String id) {
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         return secretObjectives.get(id);
     }
 
@@ -402,10 +409,14 @@ public class Mapper {
     }
 
     public static String getExplore(String id) {
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         return (String) explore.get(id);
     }
 
     public static String getRelic(String id) {
+        id = id.replace("extra1", "");
+        id = id.replace("extra2", "");
         return (String) relics.get(id);
     }
 
@@ -476,6 +487,14 @@ public class Mapper {
         return soList;
     }
 
+    public static HashMap<String, SecretObjectiveModel> getSecretObjectives(String extra) {
+        HashMap<String, SecretObjectiveModel> soList = new HashMap<>();
+        for (Map.Entry<String, SecretObjectiveModel> entry : secretObjectives.entrySet()) {
+            soList.put(entry.getKey() + extra, entry.getValue());
+        }
+        return soList;
+    }
+
     public static Map<String, String> getPlanetRepresentations() {
         return TileHelper.getAllPlanets().values().stream()
                 .collect(Collectors.toMap(PlanetModel::getId, PlanetModel::getNameNullSafe));
@@ -541,7 +560,19 @@ public class Mapper {
         }
         return agendaList;
     }
-
+    public static HashMap<String, String> getAgendaJustNames(ti4.map.Map activeMap) {
+        HashMap<String, String> agendaList = new HashMap<>();
+        for (AgendaModel agenda : agendas.values()) {
+            if(activeMap.isAbsolMode() && agenda.getAlias().contains("absol_")){
+                agendaList.put(agenda.getAlias(), agenda.getName());
+            }
+            if(!activeMap.isAbsolMode() && !agenda.getAlias().contains("absol_")){
+                agendaList.put(agenda.getAlias(), agenda.getName());
+            }
+            
+        }
+        return agendaList;
+    }
     @Nullable
     public static String getCCPath(String ccID) {
         String ccPath = ResourceHelper.getInstance().getCCFile(ccID);
@@ -631,6 +662,15 @@ public class Mapper {
         return poList;
     }
 
+    public static HashMap<String, String> getExplores(String extra) {
+        HashMap<String, String> expList = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : explore.entrySet()) {
+            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
+            expList.put((String) entry.getKey()+extra, tokenizer.nextToken());
+        }
+        return expList;
+    }
+
     public static HashMap<String, String> getExplores() {
         HashMap<String, String> expList = new HashMap<>();
         for (Map.Entry<Object, Object> entry : explore.entrySet()) {
@@ -638,6 +678,14 @@ public class Mapper {
             expList.put((String) entry.getKey(), tokenizer.nextToken());
         }
         return expList;
+    }
+    public static HashMap<String, String> getRelics(String extra) {
+        HashMap<String, String> relicList = new HashMap<>();
+        for (Map.Entry<Object, Object> entry : relics.entrySet()) {
+            StringTokenizer tokenizer = new StringTokenizer((String) entry.getValue(), ";");
+            relicList.put((String) entry.getKey()+extra, tokenizer.nextToken());
+        }
+        return relicList;
     }
 
     public static HashMap<String, String> getRelics() {

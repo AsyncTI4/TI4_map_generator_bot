@@ -183,7 +183,7 @@ public class AutoCompleteProvider {
             }
             case Constants.AGENDA_ID -> {
                 String enteredValue = event.getFocusedOption().getValue().toLowerCase();
-                HashMap<String, String> agendas = Mapper.getAgendaJustNames();
+                HashMap<String, String> agendas = Mapper.getAgendaJustNames(activeMap);
                 List<Command.Choice> options = agendas.entrySet().stream()
                         .filter(value -> value.getValue().toLowerCase().contains(enteredValue))
                         .limit(25)

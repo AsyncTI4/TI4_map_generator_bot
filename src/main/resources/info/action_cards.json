@@ -1836,7 +1836,7 @@
     "source": "action_deck_2"
   },
   {
-    "alias": "fulfillment_protocols",
+    "alias": "fulfillment_protocols_ds",
     "name": "Fulfillment Protocols",
     "phase": "Action",
     "window": "After a player activates a system that contains 1 or more of your ships:",
@@ -1855,10 +1855,10 @@
   },
   {
     "alias": "free_trade_network",
-    "name": "Free Trade Network",
+    "name": "Free Trade Initiative",
     "phase": "Action",
     "window": "ACTION:",
-    "text": "For each planet trait, if any of your units are adjacent to a planet of that trait which you do not control, you may gain 2 commodities or convert up to 2 of your commodities to trade goods.",
+    "text": "For each planet trait, if you control a planet of that trait, gain 2 commodities or convert 2 of your commodities to trade goods.",
     "flavorText": "Celdauri trade ports were a sight to behold, boasting goods from across the known galaxy.",
     "source": "ds"
   },
@@ -1867,7 +1867,7 @@
     "name": "Carapace Plating",
     "phase": "Action",
     "window": "After your opponent produces 1 or more hits during ground combat:",
-    "text": "Cancel up to 3 of those hits.",
+    "text": "Cancel up to 2 of those hits.",
     "flavorText": "Phquaiset clicked delightedly as the plating fell away, it was time for a counterattack.",
     "source": "ds"
   },
@@ -1908,7 +1908,7 @@
     "source": "ds"
   },
   {
-    "alias": "freedom_fighters",
+    "alias": "freedom_fighters_ds",
     "name": "Freedom Fighters",
     "phase": "Action",
     "window": "At the start of ground combat:",
@@ -1966,7 +1966,7 @@
     "name": "Aggressive Broker",
     "phase": "Any",
     "window": "When a player purges a component:",
-    "text": "Gain 2 trade goods.",
+    "text": "That player must choose to allow you to either gain 2 trade goods or replenish your commodities.",
     "flavorText": "Kado checked his firearm. “Yeah, I know what we did with it, but they don’t. They brought the money, let’s make this quick.”",
     "source": "ds"
   },
@@ -1976,10 +1976,11 @@
     "phase": "Any",
     "window": "At any time:",
     "text": "You may use the SPACE CANNON ability of 1 of your units in any system against another player’s ship in or adjacent to that system.",
+    "flavorText": "",
     "source": "ds"
   },
   {
-    "alias": "safety_overrides",
+    "alias": "safety_overrides_ds",
     "name": "Safety Overrides",
     "phase": "Action",
     "window": "After a mech you control is destroyed during ground combat:",
@@ -2015,7 +2016,7 @@
     "source": "ds"
   },
   {
-    "alias": "hostile_world",
+    "alias": "hostile_world_ds",
     "name": "Hostile World",
     "phase": "Action",
     "window": "After a player commits ground forces to land on a planet you control:",
@@ -2033,7 +2034,7 @@
     "source": "ds"
   },
   {
-    "alias": "illusory_duplication",
+    "alias": "illusory_duplication_ds",
     "name": "Illusory Duplication",
     "phase": "Action",
     "window": "At the start of space combat:",
@@ -2051,11 +2052,11 @@
     "source": "ds"
   },
   {
-    "alias": "singularity_charge",
+    "alias": "singularity_charge_ds",
     "name": "Singularity Charge",
     "phase": "Action",
     "window": "At the start of a round of combat:",
-    "text": "Each unit with SUSTAIN DAMAGE in the active system becomes damaged, if able.",
+    "text": "Choose 1 unit participating in that combat; that unit becomes damaged, if able.",
     "flavorText": "Mosk Graezon knew the time had come, if he couldn’t have the system, he’d take as many down with him as he could.",
     "source": "ds"
   },
@@ -2132,7 +2133,7 @@
     "source": "ds"
   },
   {
-    "alias": "micrometeoroid_storm",
+    "alias": "micrometeoroid_storm_ds",
     "name": "Micrometeoroid Storm",
     "phase": "Action",
     "window": "ACTION:",
@@ -2143,9 +2144,9 @@
   {
     "alias": "professional_archeologists",
     "name": "Professional Archeologists",
-    "phase": "Any",
-    "window": "At any time:",
-    "text": "Look at the top card of each exploration deck, and the relic deck.",
+    "phase": "Action",
+    "window": "ACTION:",
+    "text": "For each exploration deck, look at the top card of that deck; if that card is a relic fragment, reveal and gain that card, otherwise place that card on the top of its corresponding deck.",
     "flavorText": "What they lack in passion, they make up for in well-paid efficiency.",
     "source": "ds"
   },
@@ -2189,7 +2190,7 @@
     "alias": "classified_weapons",
     "name": "Classified Weapons",
     "phase": "Action",
-    "window": "Before 1 or more of your units would make a roll for a unit ability:",
+    "window": "Before 1 or more of your units would make a combat roll or roll for a unit ability:",
     "text": "Hits produced by that roll cannot be canceled.",
     "flavorText": "Dr. Morden stood still, in awe. “They’re… beautiful.”",
     "source": "ds"

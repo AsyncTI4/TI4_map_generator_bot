@@ -5,8 +5,14 @@ import java.util.ArrayList;
 
 public class Constants {
     public static final String SHOW_GAME = "show_game";
+    public static final String FOWGM = "fowgm";
+    public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
+    public static final String ALLIANCE_MEMBERS = "alliance_members";
+    public static final String FOW_CATEGORY = "fow_category";
+    public static final String SWORDS_TO_PLOWSHARES = "swords_to_plowshares";
     public static final String ELIMINATE = "eliminate";
     public static final String FIX_SO_DECK = "fix_so_deck";
+    public static final String REVISE_LAW = "revise_law";
     public static final String SET_THREAD_NAME = "set_thread_name";
     public static final String THREAD_NAME = "thread_name";
     public static final String SHOW_UNSCORED_SOS = "show_unscored_sos";
@@ -68,6 +74,7 @@ public class Constants {
     public static final String REPLACE = "replace";
     public static final String LEAVE = "leave";
     public static final String REMOVE = "remove";
+    public static final String SWAP = "swap";
 
 
     public static final String SET_SETTING = "setting";
@@ -205,6 +212,9 @@ public class Constants {
     public static final String ROUND = "round";
 
     public static final String COMBAT_INFO = "combat_info";
+    public static final String COMBAT_ROLL = "combat_roll";
+    public static final String COMBAT_MODIFIERS = "mods";
+    public static final String COMBAT_EXTRA_ROLLS = "extrarolls";
     public static final String SYSTEM_INFO = "system_info";
     public static final String DIPLO_SYSTEM = "diplo_system";
 
@@ -471,7 +481,19 @@ public class Constants {
     public static final String STATUS = "status";
     public static final String SYSTEM = "system";
     public static final String CLEANUP = "cleanup";
+    public static final String PERSONAL_CLEANUP = "personal_cleanup";
     public static final String REVEAL_STATGE1 = "po_reveal_stage1";
+    public static final String REVEAL_SPECIFIC_STATGE1 = "reveal_specific_stage1";
+    public static final String REVEAL_SPECIFIC_STATGE2 = "reveal_specific_stage2";
+    public static final String SETUP_PEAKABLE_OBJECTIVES = "setup_peakable_objectives";
+    public static final String NUMBER_OF_OBJECTIVES = "number_of_objectives";
+    public static final String SWAP_STAGE2 = "swap_stage2";
+    public static final String SWAP_STAGE1 = "swap_stage1";
+    public static final String LOCATION1 = "location1";
+    public static final String LOCATION2 = "location2";
+    public static final String PEAK_AT_STAGE1 = "peak_at_stage1";
+    public static final String PEAK_AT_STAGE2 = "peak_at_stage2";
+   
     public static final String ADD_CUSTOM = "po_add_custom";
     public static final String MAKE_SO_INTO_PO = "so_into_po";
     public static final String SO_TO_PO = "so_to_po";
@@ -496,6 +518,8 @@ public class Constants {
     public static final String TWO_WAY = "two_way";
     public static final String PO1 = "publicObjectives1";
     public static final String PO2 = "publicObjectives2";
+    public static final String PO1PEAKABLE = "publicObjectives1peakable";
+    public static final String PO2PEAKABLE = "publicObjectives2peakable";
     public static final String PRIMARY_TILE_DIRECTION = "primary_tile_direction";
 
     public static final String TURN_ORDER = "turn_order";
@@ -649,6 +673,7 @@ public class Constants {
     public static final String KELERES_HERO_MENTAK = "keleres_hero_mentak";
     public static final String BOTHELPER = "bothelper";
     public static final String CREATE_GAME_CHANNELS = "create_game_channels";
+    public static final String CREATE_FOW_GAME_CHANNELS = "create_fow_game_channels";
     public static final String IMPORT_TTPG = "import_ttpg";
     public static final String TTPG_FILE_NAME = "ttpg_file_name";
     public static final String GAME_FUN_NAME = "game_fun_name";
@@ -794,6 +819,7 @@ public class Constants {
     public static final String FLIP_GRACE = "flip_grace";
     public static final String SIGIL = "token_ds_sigil.png";
     public static final String IMAGE_GEN_COUNT = "image_gen_count";
+    public static final String RUN_DATA_MIGRATIONS = "run_data_migrations";
     public static final String ENDED_DATE = "ended_date";
     public static final String AVERAGE_TURN_TIME = "average_turn_time";
     public static final String TOP_LIMIT = "top_limit";

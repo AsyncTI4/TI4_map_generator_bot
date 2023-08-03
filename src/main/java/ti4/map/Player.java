@@ -42,7 +42,7 @@ public class Player {
     //abilities
     //factiontech
     //home
-
+    private String allianceMembers = "";
     private String color;
     private String autoCompleteRepresentation = null;
 
@@ -433,8 +433,36 @@ public class Player {
                 .orElse(null);
     }
 
+    public UnitModel getUnitByAsyncID(String asyncID) {
+        return getUnitsOwned().stream()
+                .map(unitID -> Mapper.getUnit(unitID))
+                .filter(unit -> asyncID.equalsIgnoreCase(unit.getAsyncId()))
+                .findFirst()
+                .orElse(null);
+    }
+
     public UnitModel getUnitByID(String unitID) {
         return Mapper.getUnit(unitID);
+    }
+
+    public String checkUnitsOwned() {
+        for (int count : getUnitsOwnedByBaseType().values()) {
+            if (count > 1) {
+                String message = "> Warning - Player: " + getUserName() + " has more than one of the same unit type.\n> Unit Counts: `" + getUnitsOwnedByBaseType() + "`\n> Units Owned: `" + getUnitsOwned() + "`";
+                BotLogger.log(message);
+                return message;
+            }
+        }
+        return null;
+    }
+
+    public Map<String, Integer> getUnitsOwnedByBaseType() {
+        Map<String, Integer> unitCount = new HashMap<>();
+        for (String unitID : getUnitsOwned()) {
+            UnitModel unitModel = Mapper.getUnit(unitID);
+            unitCount.merge(unitModel.getBaseType(), 1, (oldValue, newValue) -> oldValue + 1);
+        }
+        return unitCount;
     }
 
     public void setActionCard(String id) {
@@ -878,6 +906,24 @@ public class Player {
             this.color = AliasHandler.resolveColor(color);
         }
     }
+    public void addAllianceMember(String color) {
+        if (!color.equals("null")) {
+            this.allianceMembers = allianceMembers+color;
+        }
+    }
+    public void setAllianceMembers(String color) {
+        if (!color.equals("null")) {
+            this.allianceMembers = color;
+        }
+    }
+    public String getAllianceMembers() {
+        return allianceMembers;
+    }
+    public void removeAllianceMember(String color) {
+        if (!color.equals("null")) {
+            this.allianceMembers = allianceMembers.replace(color, "");
+        }
+    }
 
     public void changeColor(String color) {
         if (!color.equals("null")) {
@@ -1171,8 +1217,8 @@ public class Player {
             if (unitModel != null && unitModel.getUpgradesFromUnitId() != null) {
                 if (getUnitsOwned().contains(unitModel.getUpgradesFromUnitId())) {
                     removeOwnedUnitByID(unitModel.getUpgradesFromUnitId());
-                    addOwnedUnitByID(unitModel.getId());
                 }
+                addOwnedUnitByID(unitModel.getId());
             }
         }
     }

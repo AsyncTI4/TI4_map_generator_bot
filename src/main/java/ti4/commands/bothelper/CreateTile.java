@@ -5,18 +5,17 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import org.jetbrains.annotations.NotNull;
 import ti4.generator.TileHelper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
 import ti4.helpers.Storage;
-import ti4.map.Tile;
 import ti4.message.BotLogger;
 import ti4.model.*;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -91,7 +90,8 @@ public class CreateTile extends BothelperSubcommandData {
         tile.setPlanetIds(getPlanetListFromString(planetIds));
         tile.setShipPositionsType(shipPositionModel.getTypeFromString(type));
         tile.setSpaceTokenLocations(tile.getShipPositionsType().getSpaceTokenLayout());
-        tile.setWormholes(getWormholesFromString(wormholes));
+        if(!wormholes.equals(""))
+            tile.setWormholes(getWormholesFromString(wormholes));
 
         return tile;
     }
@@ -106,7 +106,13 @@ public class CreateTile extends BothelperSubcommandData {
 
     private static Set<WormholeModel.Wormhole> getWormholesFromString(String wormholeString) {
         WormholeModel wormholeModel = new WormholeModel();
-        return Stream.of(wormholeString.replace(" ", "").toLowerCase().split(",")).map(wormholeModel::getWormholeFromString).collect(Collectors.toSet());
+        return Stream.of(wormholeString
+                .replace(" ", "").
+                toLowerCase().split(","))
+                .filter(Objects::nonNull)
+                .filter(s -> !s.isBlank())
+                .map(wormholeModel::getWormholeFromString)
+                .collect(Collectors.toSet());
     }
 
     private static void exportTileModelToJson(TileModel tileModel) {

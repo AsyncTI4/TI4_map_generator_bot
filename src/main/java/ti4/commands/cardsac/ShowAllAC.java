@@ -28,28 +28,16 @@ public class ShowAllAC extends ACCardsSubcommandData {
             return;
         }
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("Game: ").append(activeMap.getName()).append("\n");
-        sb.append("Player: ").append(player.getUserName()).append("\n");
-        sb.append("Showed Action Cards:").append("\n");
-        List<String> actionCards = new ArrayList<>(player.getActionCards().keySet());
-        Collections.shuffle(actionCards);
-        int index = 1;
-        for (String id : actionCards) {
-            sb.append(index).append(". ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
-            index++;
-        }
-
         Player player_ = Helper.getPlayer(activeMap, null, event);
         if (player_ == null) {
             MessageHelper.sendMessageToChannel(event.getChannel(), "Player not found");
             return;
         }
 
-        MessageHelper.sendPrivateMessageToPlayer(player_, activeMap, sb.toString());
+        showAll(player, player_, activeMap);
     }
-    public static void showAll(Player player, Player player_, Map activeMap)
-    {
+
+    public static void showAll(Player player, Player player_, Map activeMap) {
         StringBuilder sb = new StringBuilder();
         sb.append("Game: ").append(activeMap.getName()).append("\n");
         sb.append("Player: ").append(player.getUserName()).append("\n");
@@ -61,7 +49,6 @@ public class ShowAllAC extends ACCardsSubcommandData {
             sb.append(index).append(". ").append(Mapper.getActionCard(id).getRepresentation()).append("\n");
             index++;
         }
-
-        MessageHelper.sendMessageToChannel(player_.getCardsInfoThread(activeMap), sb.toString());
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeMap, sb.toString());
     }
 }

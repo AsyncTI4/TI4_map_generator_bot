@@ -3,8 +3,6 @@ package ti4.commands.explore;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.NotNull;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
@@ -24,6 +22,7 @@ import ti4.commands.units.AddUnits;
 import ti4.generator.Mapper;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.ButtonHelper;
+import ti4.helpers.ButtonHelperFactionSpecific;
 import ti4.helpers.Constants;
 import ti4.helpers.Emojis;
 import ti4.helpers.FoWHelper;
@@ -191,7 +190,8 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 message = "Invalid token or tile";
             }
         }
-
+        cardID = cardID.replace("extra1", "");
+        cardID = cardID.replace("extra2", "");
         switch (cardID) {
             case "lc1", "lc2" -> {
                 boolean hasSchemingAbility = player.hasAbility("scheming");
@@ -248,7 +248,7 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     String fac = Helper.getFactionIconFromDiscord(player.getFaction());
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), fac+" gained 1tg from Scavenge ("+player.getTg()+"->"+(player.getTg()+1)+"). Reminder that this is optional, but was done automatically for convenience. You do not legally have this tg prior to exploring." );
                     player.setTg(player.getTg()+1);
-                    ButtonHelper.pillageCheck(player, activeMap);
+                    ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
                 }
                 StringBuilder exploredMessage = new StringBuilder(Helper.getPlayerRepresentation(player, activeMap)).append(" explored ");
                 exploredMessage.append(Helper.getEmojiFromDiscord(planetTrait));
@@ -295,17 +295,17 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                     case "minent" -> {
                         player.setTg(player.getTg()+1);
                         message = "Gained 1" + Emojis.tg + " (" +(player.getTg()-1) +" -> **"+player.getTg()+"**) ";
-                        ButtonHelper.pillageCheck(player, activeMap);
+                        ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
                     }
                     case "ent" -> {
                         player.setTg(player.getTg()+2);
                         message = "Gained 2" + Emojis.tg + " (" +(player.getTg()-2) +" -> **"+player.getTg()+"**) ";
-                        ButtonHelper.pillageCheck(player, activeMap);
+                        ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
                     }
                     case "majent" -> {
                         player.setTg(player.getTg()+3);
                         message = "Gained 3" + Emojis.tg + " (" +(player.getTg()-3) +" -> **"+player.getTg()+"**) ";
-                        ButtonHelper.pillageCheck(player, activeMap);
+                        ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
                     }
                     default -> message = "";
                 }

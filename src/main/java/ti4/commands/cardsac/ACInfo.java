@@ -15,9 +15,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.ActionCardModel;
-
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
@@ -40,14 +38,14 @@ public class ACInfo extends ACCardsSubcommandData {
     }
 
     public static void sendActionCardInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendActionCardInfo(activeMap, player);
         sendTrapCardInfo(activeMap, player);
     }
 
     public static void sendActionCardInfo(Map activeMap, Player player, GenericInteractionCreateEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used something";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " used something";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendActionCardInfo(activeMap, player);
         sendTrapCardInfo(activeMap, player);
@@ -129,6 +127,7 @@ public class ACInfo extends ACCardsSubcommandData {
         String secretScoreMsg = "_ _\nClick a button below to play an Action Card";
         List<Button> acButtons = getPlayActionCardButtons(activeMap, player);
         if (acButtons != null && !acButtons.isEmpty()) {
+            
             List<MessageCreateData> messageList = MessageHelper.getMessageCreateDataObjects(secretScoreMsg, acButtons);
             ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
             for (MessageCreateData message : messageList) {
@@ -178,6 +177,15 @@ public class ACInfo extends ACCardsSubcommandData {
                     acButtons.add(Button.danger(Constants.AC_PLAY_FROM_HAND + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
+            acButtons.add(Button.primary("getDiscardButtonsACs", "Discard an AC"));
+            if (player.hasLeader("nekroagent")&&!player.getLeaderByID("nekroagent").isExhausted()) {
+                Button nekroButton = Button.secondary("exhaustAgent_nekroagent", "Use Nekro Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("nekro")));
+                acButtons.add(nekroButton);
+            }
+            if (player.hasLeader("hacanagent")&&!player.getLeaderByID("hacanagent").isExhausted()) {
+                Button nekroButton = Button.secondary("exhaustAgent_hacanagent", "Use Hacan Agent").withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord("hacan")));
+                acButtons.add(nekroButton);
+            }
         }
         return acButtons;
     }
@@ -198,16 +206,35 @@ public class ACInfo extends ACCardsSubcommandData {
         }
         return acButtons;
     }
-    public static List<Button> getDiscardActionCardButtons(Map activeMap, Player player) {
+    public static List<Button> getDiscardActionCardButtons(Map activeMap, Player player, boolean doingAction) {
         List<Button> acButtons = new ArrayList<>();
         LinkedHashMap<String, Integer> actionCards = player.getActionCards();
+        String stall = "";
+        if(doingAction){
+            stall = "stall";
+        }
         if (actionCards != null && !actionCards.isEmpty()) {
             for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
                 Integer value = ac.getValue();
                 String key = ac.getKey();
                 String ac_name = Mapper.getActionCardName(key);
                 if (ac_name != null) {
-                    acButtons.add(Button.primary("ac_discard_from_hand_" + value, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                    acButtons.add(Button.primary("ac_discard_from_hand_" + value + stall, "(" + value + ") " + ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
+                }
+            }
+        }
+        return acButtons;
+    }
+     public static List<Button> getYssarilHeroActionCardButtons(Map activeMap, Player yssaril, Player notYssaril) {
+        List<Button> acButtons = new ArrayList<>();
+        LinkedHashMap<String, Integer> actionCards = notYssaril.getActionCards();
+        if (actionCards != null && !actionCards.isEmpty()) {
+            for (java.util.Map.Entry<String, Integer> ac : actionCards.entrySet()) {
+                Integer value = ac.getValue();
+                String key = ac.getKey();
+                String ac_name = Mapper.getActionCardName(key);
+                if (ac_name != null) {
+                    acButtons.add(Button.danger("yssarilHeroInitialOffering_" + value + "_"+yssaril.getFaction(), ac_name).withEmoji(Emoji.fromFormatted(Emojis.ActionCard)));
                 }
             }
         }

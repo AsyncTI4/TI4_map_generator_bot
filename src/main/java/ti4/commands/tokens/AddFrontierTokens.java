@@ -14,7 +14,6 @@ import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.map.*;
 import ti4.message.MessageHelper;
-import ti4.model.TileModel;
 
 import java.io.File;
 import java.util.ArrayList;

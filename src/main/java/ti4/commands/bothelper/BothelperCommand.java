@@ -72,7 +72,7 @@ public class BothelperCommand implements Command {
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-        BothelperSubcommandData subCommandExecuted = null;
+        BothelperSubcommandData subCommandExecuted;
         String subcommandName = event.getInteraction().getSubcommandName();
         for (BothelperSubcommandData subcommand : subcommandData) {
             if (Objects.equals(subcommand.getName(), subcommandName)) {
@@ -92,6 +92,7 @@ public class BothelperCommand implements Command {
         Collection<BothelperSubcommandData> subcommands = new HashSet<>();
         subcommands.add(new ImportTTPG());
         subcommands.add(new CreateGameChannels());
+        subcommands.add(new CreateFOWGameChannels());
         subcommands.add(new ServerLimitStats());
         subcommands.add(new ListOldChannels());
         subcommands.add(new ListOldThreads());
@@ -102,6 +103,7 @@ public class BothelperCommand implements Command {
         subcommands.add(new CreatePlanet());
         subcommands.add(new CreateTile());
         subcommands.add(new ReExportAllTiles());
+        subcommands.add(new JazzCommand());
         return subcommands;
     }
 

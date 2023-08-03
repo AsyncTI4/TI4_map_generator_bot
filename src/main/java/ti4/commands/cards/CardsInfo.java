@@ -98,7 +98,7 @@ public class CardsInfo implements Command {
     }
 
     public static void sendCardsInfo(Map activeMap, Player player, SlashCommandInteractionEvent event) {
-        String headerText = Helper.getPlayerRepresentation(player, activeMap) + " used `" + event.getCommandString() + "`";
+        String headerText = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " used `" + event.getCommandString() + "`";
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, headerText);
         sendCardsInfo(activeMap, player);
     }

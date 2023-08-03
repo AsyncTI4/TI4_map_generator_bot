@@ -1,12 +1,8 @@
 package ti4.commands.cardsso;
-
-import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
-import ti4.MapGenerator;
-import ti4.generator.Mapper;
 import ti4.helpers.Constants;
 import ti4.helpers.Helper;
 import ti4.map.Map;
@@ -60,13 +56,9 @@ public class ShowSO extends SOCardsSubcommandData {
             sendMessage("Player not found");
             return;
         }
-        User user = MapGenerator.jda.getUserById(player_.getUserID());
-        if (user == null) {
-            sendMessage("User for faction not found. Report to ADMIN");
-            return;
-        }
-
-        sendMessage("SO shown to player - check DMs");
-        MessageHelper.sendMessageToUser(sb.toString(), user);
+        
+        sendMessage("SO shown to player");
+        SOInfo.sendSecretObjectiveInfo(activeMap, player);
+        MessageHelper.sendMessageToPlayerCardsInfoThread(player_, activeMap, sb.toString());
     }
 }

@@ -32,49 +32,24 @@ public class ExploreLookAtTop extends ExploreSubcommandData {
             sendMessage("Trait not found");
             return;
         }
-        // KEEPING CODE INCASE NEED TO SEE ALL OR MORE AT ONCE
-        // ArrayList<String> traitsToLookAt = new ArrayList<String>();
-        // OptionMapping reqType = event.getOption(Constants.TRAIT);
-        // if (reqType != null) {
-        //     traitsToLookAt.add(reqType.getAsString());
-        // }
-        // else {
-        //     traitsToLookAt.add(Constants.CULTURAL);
-        //     traitsToLookAt.add(Constants.INDUSTRIAL);
-        //     traitsToLookAt.add(Constants.HAZARDOUS);
-        //     traitsToLookAt.add(Constants.FRONTIER);
-        // }
-        // for (String currentType : traitsToLookAt) {
-        //     StringBuilder info = new StringBuilder();
-        //     ArrayList<String> deck = activeMap.getExploreDeck(currentType);
-        //     Collections.sort(deck);
-        //     Integer deckCount = deck.size();
-        //     Double deckDrawChance = deckCount == 0 ? 0.0 : 1.0 / deckCount;
-        //     NumberFormat formatPercent = NumberFormat.getPercentInstance();
-        //     formatPercent.setMaximumFractionDigits(1);
-        //     ArrayList<String> discard = activeMap.getExploreDiscard(currentType);
-        //     Collections.sort(discard);
-        //     Integer discardCount = discard.size();
-
-        //     info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DECK** (").append(String.valueOf(deckCount)).append(") _").append(formatPercent.format(deckDrawChance)).append("_\n");
-        //     info.append(listNames(deck)).append("\n");
-        //     info.append(Helper.getEmojiFromDiscord(currentType)).append("**").append(currentType.toUpperCase()).append(" EXPLORE DISCARD** (").append(String.valueOf(discardCount)).append(")\n");
-        //     info.append(listNames(discard)).append("\n_ _\n");
-        //     sendMessage(info.toString());
-        // }
 
         ArrayList<String> deck = activeMap.getExploreDeck(trait);
-        if (deck.isEmpty()) {
-            sendMessage("Explore deck is empty");
-            //reshuffle discards into deck
-            return;
+        ArrayList<String> discardPile = activeMap.getExploreDiscard(trait);
+
+        String traitNameWithEmoji = Helper.getEmojiFromDiscord(trait) + trait;
+        String playerFactionNameWithEmoji = Helper.getFactionIconFromDiscord(player.getFaction());
+        if (deck.isEmpty() && discardPile.isEmpty()) {
+            sendMessage(traitNameWithEmoji + " explore deck & discard is empty - nothing to look at.");
         }
+
         StringBuilder sb = new StringBuilder();
-        sb.append("__**Look at Top of " + Helper.getEmojiFromDiscord(trait) + trait + " Deck**__\n");
+        sb.append("__**Look at Top of " + traitNameWithEmoji + " Deck**__\n");
         String topCard = deck.get(0);
         sb.append(displayExplore(topCard));
 
         MessageHelper.sendMessageToPlayerCardsInfoThread(player, activeMap, sb.toString());
+        sendMessage("top of " + traitNameWithEmoji + " explore deck has been set to " + playerFactionNameWithEmoji
+                + " Cards info thread.");
 
     }
 }
