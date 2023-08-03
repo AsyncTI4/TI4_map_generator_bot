@@ -24,24 +24,32 @@ public class BorderAnomalyModel {
         @Getter
         private final File imageFile;
 
-        BorderAnomalyType(String name, String fileName) {
-            this.name = name;
-            this.imageFile = new File(ResourceHelper.getInstance().getResourceFromFolder("border/", fileName, "Could not find file"));
+        BorderAnomalyType(String anomalyName, String fileName) {
+            this.name = anomalyName;
+            if(anomalyName.equals("Arrow")) {
+                this.imageFile = null;
+            }
+            else {
+                String filePath = ResourceHelper.getInstance().getResourceFromFolder("borders/", fileName, "Could not find file");
+                this.imageFile = new File(filePath);
+            }
         }
+
         @Override
         public String toString() {
             return super.toString().toLowerCase();
         }
 
         public String toNameString() {
-            return this.getName().toLowerCase().replace(" ","").replace("-","");
+            return this.toString().toLowerCase().replace("_","");
         }
     }
 
-    public static BorderAnomalyType getBorderAnomalyTypeFromString(String type) {
+    public BorderAnomalyType getBorderAnomalyTypeFromString(String type) {
         if (type == null) {
             return null;
         }
+        BorderAnomalyType.values();
         Map<String, BorderAnomalyType> allTypes = Arrays.stream(BorderAnomalyType.values())
                 .collect(
                         Collectors.toMap(
