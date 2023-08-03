@@ -34,10 +34,10 @@ public class ListUnits extends HelpSubcommandData {
                 messageEmbeds.add(unitRepresentationEmbed);
             }
         }
-        if (messageEmbeds.size() > 5) {
+        if (messageEmbeds.size() > 3) {
             String threadName = "/help list_units" + (searchString == null ? "" : " search: " + searchString);
             MessageHelper.sendMessageEmbedsToThread(event.getChannel(), threadName, messageEmbeds);
-        } else {
+        } else if (messageEmbeds.size() > 0) {
             event.getChannel().sendMessageEmbeds(messageEmbeds).queue();
         }
     }
