@@ -462,6 +462,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.HOMEBREW_SC_MODE + " " + activeMap.isHomeBrewSCMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.STRATEGY_CARD_SET + " " + activeMap.getScSet());
+        writer.write(System.lineSeparator());
 
         writer.write(Constants.GAME_HAS_ENDED + " " + activeMap.isHasEnded());
         writer.write(System.lineSeparator());
@@ -1058,6 +1060,7 @@ public class MapSaveLoadManager {
                 case Constants.REVEALED_PO -> activeMap.setRevealedPublicObjectives(getParsedCards(info));
                 case Constants.CUSTOM_PO_VP -> activeMap.setCustomPublicVP(getParsedCards(info));
                 case Constants.SCORED_PO -> activeMap.setScoredPublicObjectives(getParsedCardsForScoredPO(info));
+                case Constants.STRATEGY_CARD_SET -> activeMap.setScSet(info);
                 case Constants.CUSTOM_ADJACENT_TILES -> {
 
                     LinkedHashMap<String, List<String>> adjacentTiles = getParsedCardsForScoredPO(info);
