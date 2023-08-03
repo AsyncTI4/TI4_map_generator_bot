@@ -330,6 +330,15 @@ public class CombatRoll extends SpecialSubcommandData {
         super.reply(event);
     }
 
+    private static Boolean inScopeForUnits(List<UnitModel> units, CombatModifierModel modifier) {
+        for (UnitModel unitModel : units) {
+            if (getIsInScope(unitModel, modifier)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private String rollUnits(java.util.Map<UnitModel, Integer> units,
             HashMap<String, Integer> extraRolls, List<NamedCombatModifier> mods, Player player, Player opponent,
             Map map) {
@@ -339,13 +348,15 @@ public class CombatRoll extends SpecialSubcommandData {
         List<NamedCombatModifier> alwaysOnModifiers = mods.stream()
                 .filter(model -> model.modifier.getPersistanceType() != null
                         && !model.modifier.getPersistanceType().equals("CUSTOM"))
+                .filter(model -> inScopeForUnits(new ArrayList<>(units.keySet()), model.modifier))
                 .toList();
         List<NamedCombatModifier> customModifiers = mods.stream()
                 .filter(model -> model.modifier.getPersistanceType() != null
                         && model.modifier.getPersistanceType().equals("CUSTOM"))
+                .filter(model -> inScopeForUnits(new ArrayList<>(units.keySet()), model.modifier))
                 .toList();
-        result += getModifiersText("With always on modifiers; \n", units, alwaysOnModifiers);
-        result += getModifiersText("With custom modifiers; \n", units, customModifiers);
+        result += getModifiersText("With automatic modifiers: \n", units, alwaysOnModifiers);
+        result += getModifiersText("With custom modifiers: \n", units, customModifiers);
 
         // Display extra rolls info
         List<UnitModel> unitsWithExtraRolls = units.keySet().stream()
@@ -411,14 +422,14 @@ public class CombatRoll extends SpecialSubcommandData {
                     unitTypeHitsInfo = String.format("always hits (%s mods)",
                             modifierToHitString);
                     if (unit.getCombatDieCount() > 1) {
-                        unitTypeHitsInfo = String.format("%s rolls, always hits, (%s mods)", unit.getCombatDieCount(),
+                        unitTypeHitsInfo = String.format("%s rolls, always hits (%s mods)", unit.getCombatDieCount(),
                                 modifierToHitString);
                     }
                 } else {
                     unitTypeHitsInfo = String.format("hits on %s (%s mods)", (toHit - modifierToHit),
                             modifierToHitString);
                     if (unit.getCombatDieCount() > 1) {
-                        unitTypeHitsInfo = String.format("%s rolls, hits on %s, (%s mods)", unit.getCombatDieCount(),
+                        unitTypeHitsInfo = String.format("%s rolls, hits on %s (%s mods)", unit.getCombatDieCount(),
                                 (toHit - modifierToHit), modifierToHitString);
                     }
                 }
@@ -476,23 +487,29 @@ public class CombatRoll extends SpecialSubcommandData {
         return result;
     }
 
+    private static Boolean getIsInScope(UnitModel unit, CombatModifierModel modifier) {
+        Boolean isInScope = false;
+        if (modifier.getScopeExcept() != null) {
+            if (!modifier.getScopeExcept().equals(unit.getAsyncId())) {
+                isInScope = true;
+            }
+        } else {
+            if (StringUtils.isBlank(modifier.getScope())
+                    || modifier.getScope().equals("all")
+                    || modifier.getScope().equals(unit.getAsyncId())) {
+                isInScope = true;
+            }
+        }
+        return isInScope;
+    }
+
     private Integer getTotalModifications(UnitModel unit, List<NamedCombatModifier> modifiers, Player player,
             Player opponent, Map map) {
         Integer modValue = 0;
         for (NamedCombatModifier namedModifier : modifiers) {
             CombatModifierModel modifier = namedModifier.getModifier();
-            Boolean isInScope = false;
-            if (modifier.getScopeExcept() != null) {
-                if (!modifier.getScopeExcept().equals(unit.getAsyncId())) {
-                    isInScope = true;
-                }
-            } else {
-                if (StringUtils.isBlank(modifier.getScope())
-                        || modifier.getScope().equals("all")
-                        || modifier.getScope().equals(unit.getAsyncId())) {
-                    isInScope = true;
-                }
-            }
+            Boolean isInScope = getIsInScope(unit, modifier);
+
             if (isInScope) {
                 modValue += getValueScaledModification(modifier, player, opponent, map);
             }
