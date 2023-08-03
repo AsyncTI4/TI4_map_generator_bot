@@ -481,6 +481,83 @@ public class AutoCompleteProvider {
                     .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.AC_DECK -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, DeckModel> decks = Mapper.getDecks();
+                List<Command.Choice> options = decks.values().stream()
+                        .filter(deckModel -> deckModel.getType().equals(Constants.ACTION_CARD))
+                        .filter(value -> value.getAlias().contains(enteredValue))
+                        .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
+                        .limit(25)
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.SO_DECK -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, DeckModel> decks = Mapper.getDecks();
+                List<Command.Choice> options = decks.values().stream()
+                        .filter(deckModel -> deckModel.getType().equals(Constants.SECRET_OBJECTIVE))
+                        .filter(value -> value.getAlias().contains(enteredValue))
+                        .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
+                        .limit(25)
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.STAGE_1_PUBLIC_DECK -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, DeckModel> decks = Mapper.getDecks();
+                List<Command.Choice> options = decks.values().stream()
+                        .filter(deckModel -> deckModel.getType().equals(Constants.STAGE_1_PUBLIC))
+                        .filter(value -> value.getAlias().contains(enteredValue))
+                        .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
+                        .limit(25)
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.STAGE_2_PUBLIC_DECK -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, DeckModel> decks = Mapper.getDecks();
+                List<Command.Choice> options = decks.values().stream()
+                        .filter(deckModel -> deckModel.getType().equals(Constants.STAGE_2_PUBLIC))
+                        .filter(value -> value.getAlias().contains(enteredValue))
+                        .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
+                        .limit(25)
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.RELIC_DECK -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, DeckModel> decks = Mapper.getDecks();
+                List<Command.Choice> options = decks.values().stream()
+                        .filter(deckModel -> deckModel.getType().equals(Constants.RELIC))
+                        .filter(value -> value.getAlias().contains(enteredValue))
+                        .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
+                        .limit(25)
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.AGENDA_DECK -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, DeckModel> decks = Mapper.getDecks();
+                List<Command.Choice> options = decks.values().stream()
+                        .filter(deckModel -> deckModel.getType().equals(Constants.AGENDA))
+                        .filter(value -> value.getAlias().contains(enteredValue))
+                        .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
+                        .limit(25)
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.EXPLORATION_DECKS -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, DeckModel> decks = Mapper.getDecks();
+                List<Command.Choice> options = decks.values().stream()
+                        .filter(deckModel -> deckModel.getType().equals(Constants.EXPLORE))
+                        .filter(value -> value.getAlias().contains(enteredValue))
+                        .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
+                        .limit(25)
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
             case Constants.VERBOSITY -> {
                 event.replyChoiceStrings(Constants.VERBOSITY_OPTIONS).queue();
             }
