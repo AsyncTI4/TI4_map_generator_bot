@@ -65,7 +65,6 @@ public class SCPlay extends PlayerSubcommandData {
 
         Integer scToPlay = event.getOption(Constants.STRATEGY_CARD, Collections.min(player.getSCs()), OptionMapping::getAsInt);
         playSC(event, scToPlay, activeMap, mainGameChannel, player);
-
     }
 
     public void playSC(GenericInteractionCreateEvent event, Integer scToPlay, Map activeMap, MessageChannel mainGameChannel, Player player) {
@@ -122,11 +121,9 @@ public class SCPlay extends PlayerSubcommandData {
         }
 
         if (activeMap.getOutputVerbosity().equals(Constants.VERBOSITY_VERBOSE)) {
-            MessageHelper.sendMessageToChannel(mainGameChannel, Helper.getSCImageLink(scToDisplay));
+            MessageHelper.sendFileToChannel(mainGameChannel, Helper.getSCImageFile(scToDisplay, activeMap));
+            //MessageHelper.sendMessageToChannel(mainGameChannel, Helper.getSCImageLink(scToDisplay, activeMap));
         }
-
-
-        
             MessageCreateBuilder baseMessageObject = new MessageCreateBuilder().addContent(message);
             //GET BUTTONS
             ActionRow actionRow = null;
@@ -180,8 +177,6 @@ public class SCPlay extends PlayerSubcommandData {
 
             List<Button> assignSpeakerActionRow = getPoliticsAssignSpeakerButtons(activeMap);
             MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), assignSpeakerMessage, assignSpeakerActionRow);
-            
-
         }
 
         if (scToPlay == 3 && !activeMap.isHomeBrewSCMode()) {
@@ -225,8 +220,6 @@ public class SCPlay extends PlayerSubcommandData {
         }
         conclusionButtons.add(deleteButton);
         MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use the buttons to end turn or take another action.", conclusionButtons);
-
-
 
         if (player.ownsPromissoryNote("acq") && scToPlay != 1) {
             for (Player player2 :activeMap.getPlayers().values()) {

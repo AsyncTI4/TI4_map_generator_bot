@@ -1,21 +1,10 @@
 package ti4.helpers;
 
 import java.awt.Point;
+import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -360,18 +349,16 @@ public class Helper {
         };
     }
 
-    public static String getSCImageLink(Integer sc) {
-        return switch (sc) {
-            case 1 -> Constants.LEADERSHIP_IMAGE_LINK;
-            case 2 -> Constants.DIPLOMACY_IMAGE_LINK;
-            case 3 -> Constants.POLITICS_IMAGE_LINK;
-            case 4 -> Constants.CONSTRUCTION_IMAGE_LINK;
-            case 5 -> Constants.TRADE_IMAGE_LINK;
-            case 6 -> Constants.WARFARE_IMAGE_LINK;
-            case 7 -> Constants.TECHNOLOGY_IMAGE_LINK;
-            case 8 -> Constants.IMPERIAL_IMAGE_LINK;
-            default -> null;
-        };
+    public static File getSCImageFile(Integer sc, Map activeMap) {
+        String scSet = activeMap.getScSet();
+        if(Optional.ofNullable(activeMap.getScSet()).isEmpty()) {
+            scSet = "pok";
+        }
+        File scFile = new File(ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", scSet + "_" + sc + ".png", "Could not find SC image!"));
+        if (Optional.ofNullable(scFile).isEmpty()) {
+            return new File(ResourceHelper.getInstance().getResourceFromFolder("strat_cards", "sadFace.png", ""));
+        }
+        return scFile;
     }
 
     //private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
