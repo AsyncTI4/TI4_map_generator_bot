@@ -2,6 +2,8 @@ package ti4.model;
 
 import java.util.List;
 
+import org.apache.commons.lang3.StringUtils;
+
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -38,5 +40,21 @@ public class CombatModifierModel implements ModelInterface {
                 .filter(related -> related.getAlias().equals(relatedAlias)
                         && related.getType().equals(relatedType))
                 .count() > 0;
+    }
+
+    public Boolean isInScopeForUnit(UnitModel unit) {
+        Boolean isInScope = false;
+        if (getScopeExcept() != null) {
+            if (!getScopeExcept().equals(unit.getAsyncId())) {
+                isInScope = true;
+            }
+        } else {
+            if (StringUtils.isBlank(getScope())
+                    || getScope().equals("all")
+                    || getScope().equals(unit.getAsyncId())) {
+                isInScope = true;
+            }
+        }
+        return isInScope;
     }
 }
