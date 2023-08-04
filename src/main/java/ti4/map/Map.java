@@ -29,6 +29,7 @@ import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.DeckModel;
 
@@ -107,7 +108,7 @@ public class Map {
     private boolean hasEnded = false;
     private long endedDate;
     @Getter @Setter
-    private java.util.Map<Pair<String, Integer>, BorderAnomalyModel.BorderAnomalyType> borderAnomalies = new HashMap<>();
+    private List<BorderAnomalyHolder> borderAnomalies = new ArrayList<>();
     @Nullable
     private String tableTalkChannelID = null;
     @Nullable
@@ -271,7 +272,7 @@ public class Map {
         return secretObjectives.size();
     }
     public void addBorderAnomaly(String tile, Integer direction, BorderAnomalyModel.BorderAnomalyType anomalyType) {
-        this.borderAnomalies.put(Pair.of(tile, direction), anomalyType);
+        this.borderAnomalies.add(new BorderAnomalyHolder(tile, direction, anomalyType));
     }
     public int getNumberOfSOsInPlayersHands(){
         int soNum = 0;

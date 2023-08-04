@@ -21,6 +21,7 @@ import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.jetbrains.annotations.Nullable;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -39,6 +40,8 @@ import ti4.helpers.DisplayType;
 import ti4.helpers.Helper;
 import ti4.helpers.Storage;
 import ti4.message.BotLogger;
+import ti4.model.BorderAnomalyHolder;
+import ti4.model.BorderAnomalyModel;
 import ti4.model.FactionModel;
 
 public class MapSaveLoadManager {
@@ -463,6 +466,11 @@ public class MapSaveLoadManager {
         writer.write(Constants.HOMEBREW_SC_MODE + " " + activeMap.isHomeBrewSCMode());
         writer.write(System.lineSeparator());
 
+        ObjectMapper mapper = new ObjectMapper();
+        String anomaliesJson = mapper.writeValueAsString(activeMap.getBorderAnomalies()); //much easier than manually (de)serialising
+        writer.write(Constants.BORDER_ANOMALIES + " " + anomaliesJson);
+        writer.write(System.lineSeparator());
+
         writer.write(Constants.GAME_HAS_ENDED + " " + activeMap.isHasEnded());
         writer.write(System.lineSeparator());
 
@@ -500,7 +508,7 @@ public class MapSaveLoadManager {
             writer.write(Constants.COLOR + " " + playerColor);
             writer.write(System.lineSeparator());
 
-             writer.write(Constants.ALLIANCE_MEMBERS + " " + player.getAllianceMembers());
+            writer.write(Constants.ALLIANCE_MEMBERS + " " + player.getAllianceMembers());
             writer.write(System.lineSeparator());
 
             writer.write(Constants.ROLE_FOR_COMMUNITY + " " + player.getRoleIDForCommunity());
@@ -1072,6 +1080,16 @@ public class MapSaveLoadManager {
                     }
 
                     activeMap.setCustomAdjacentTiles(adjacentTilesMigrated);
+                }
+                case Constants.BORDER_ANOMALIES -> {
+                    if(info.equals("[]"))
+                        break;
+                    ObjectMapper mapper = new ObjectMapper();
+                    try {
+                        activeMap.setBorderAnomalies(mapper.readValue(info, new TypeReference<List<BorderAnomalyHolder>>(){}));
+                    } catch (Exception e) {
+                        BotLogger.log("Error reading border anomalies from save file!", e);
+                    }
                 }
                 case Constants.ADJACENCY_OVERRIDES -> {
                     try {
