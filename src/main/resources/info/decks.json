@@ -89,7 +89,7 @@
         "type": "relic",
         "description": "Weaker PoK relics replaced with Absol, plus absol uniques, plus pok relics",
         "cardIDs": [
-            "codex","absol_dominusorb","dynamiscore","emelpar","emphidia","absol_mawofworlds","nanoforge","obsidian","prophetstears","absol_stellarconverter","thalnos","titanprototype","absol_luxarchtreatise","absol_plenaryorbital","absol_quantumcore","absol_shardofthethrone1","absol_syncretone","absol_tyrantslament"
+            "codex","absol_dominusorb","dynamiscore","emelpar","emphidia","absol_mawofworlds","nanoforge","obsidian","prophetstears","absol_stellarconverter","thalnos","titanprototype","absol_luxarchtreatise","absol_plenaryorbital","absol_quantumcore","absol_shardofthethrone1","absol_syncretone","absol_tyrantslament",
             "boon_of_the_cerulean_god","decrypted_cartoglyph","e6-g0_network","eye_of_vogul","starfall_array","throne_of_the_false_emperor","twilight_mirror"
         ]
     },    
