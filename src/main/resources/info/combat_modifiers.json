@@ -171,6 +171,17 @@
         ]
     },
     {
+        "alias": "plus_1_inf_with_mech",
+        "type": "DIE_MOD",
+        "value": "+1",
+        "persistanceType": "CONDITIONAL",
+        "condition": "has_ability_fragile",
+        "scope": "gf",
+        "related":[
+            {"type": "units", "alias": "jolnar_mech"}
+        ]
+    },
+    {
         "alias": "plus_2_opponent_stolen_faction_tech_conditional_mech",
         "type": "DIE_MOD",
         "value": "+2",

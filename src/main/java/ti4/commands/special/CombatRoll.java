@@ -56,11 +56,12 @@ public class CombatRoll extends SpecialSubcommandData {
 
     public CombatRoll() {
         super(Constants.COMBAT_ROLL,
-                "*BETA* Combat rolls for units on tile. Doesnt consider abilities/upgrades etc, only units on tile");
+                "*BETA* Combat rolls for units on tile. *Auto includes always on mods* (from units, abilities, etc");
         addOptions(new OptionData(OptionType.STRING, Constants.TILE_NAME, "System/Tile name").setRequired(true)
                 .setAutoComplete(true));
         addOptions(new OptionData(OptionType.STRING, Constants.COMBAT_MODIFIERS,
-                "+/- <unit type>. Eg -1 all, +2 mech, +1 fighter").setRequired(false));
+                "+/- <unit type>. Eg -1 all, +2 mech. Temp ACs/PN/exhaust-tech mods should be added here")
+                .setRequired(false));
         addOptions(new OptionData(OptionType.STRING, Constants.PLANET,
                 "(optional) Planet to have combat on. By default rolls for space combat.").setAutoComplete(true)
                 .setRequired(false));
@@ -547,6 +548,8 @@ public class CombatRoll extends SpecialSubcommandData {
                     meetsCondition = true;
                 }
                 break;
+            case "has_ability_fragile":
+                meetsCondition = player.getAbilities().contains("fragile");
             default:
                 break;
         }
@@ -630,7 +633,6 @@ public class CombatRoll extends SpecialSubcommandData {
             }
             value = value * multipler * scalingCount.doubleValue();
         }
-        value = Math.max(value, 0);
         value = Math.floor(value); // to make sure eg +1 per 2 destroyer doesnt return 2.5 etc
         return value.intValue();
     }
