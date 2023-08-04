@@ -15,7 +15,7 @@ public class BorderAnomalyModel {
         GRAVITY_WAVE("Gravity Wave", "gravity_wave_border.png"),
         ION_STORM("Ion Storm", "ion_storm_border.png"),
         MINEFIELD("Minefield", "minefield_border.png"),
-        ARROW("Arrow", null),
+        ARROW("Arrow", "adjacency_arrow.png"),
         NO_SPACE("No-space", "no-space_border.png");
 
         @Getter
@@ -26,13 +26,8 @@ public class BorderAnomalyModel {
 
         BorderAnomalyType(String anomalyName, String fileName) {
             this.name = anomalyName;
-            if(anomalyName.equals("Arrow")) {
-                this.imageFile = null;
-            }
-            else {
-                String filePath = ResourceHelper.getInstance().getResourceFromFolder("borders/", fileName, "Could not find file");
-                this.imageFile = new File(filePath);
-            }
+            String filePath = ResourceHelper.getInstance().getResourceFromFolder("borders/", fileName, "Could not find file");
+            this.imageFile = new File(filePath);
         }
 
         @Override

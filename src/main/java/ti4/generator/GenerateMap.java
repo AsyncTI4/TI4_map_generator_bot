@@ -1514,9 +1514,7 @@ public class GenerateMap {
                 AffineTransform originalTransform = g2.getTransform();
                 g2.rotate(Math.toRadians(-90));
                 g2.setFont(Storage.getFont20());
-                String name = Optional.ofNullable(Mapper.getPlanet(planetName).getShortName()).isPresent() ?
-                        Mapper.getPlanet(planetName).getShortName() :
-                        Mapper.getPlanet(planetName).getName();
+                String name = Optional.ofNullable(Mapper.getPlanet(planetName).getShortName()).orElse(Mapper.getPlanet(planetName).getName());
                 g2.drawString(name.substring(0, Math.min(name.length(), 10)).toUpperCase(),
                         (y+146)*-1, //See https://www.codejava.net/java-se/graphics/how-to-draw-text-vertically-with-graphics2d
                         x + 6 + g2.getFontMetrics().getHeight()/2);
@@ -2707,78 +2705,43 @@ public class GenerateMap {
     }
 
     private static void addBorderDecoration(Tile tile, int direction, String secondaryTile, Graphics tileGraphics, Map activeMap, BorderAnomalyModel.BorderAnomalyType decorationType) {
-        int deltaX = 0;
-        int deltaY = 0;
-        int textOffsetX = 12;
-        int textOffsetY = 40;
-        BufferedImage borderDecorationImage = null;
+        Graphics2D tileGraphics2d = (Graphics2D) tileGraphics;
 
-        int degrees = 0;
-        switch (direction-1) {
-            case 0 -> {
-                deltaX = 118;
-                deltaY = -28;
-                degrees = 0;
-            }
-            case 1 -> {
-                deltaX = 257;
-                deltaY = 26;
-                degrees = 60;
-            }
-            case 2 -> {
-                deltaX = 283;
-                deltaY = 167;
-                degrees = 300;
-                textOffsetY = 25;
-            }
-            case 3 -> {
-                deltaX = 167;
-                deltaY = 273;
-                degrees = 0;
-                textOffsetY = 25;
-            }
-            case 4 -> {
-                deltaX = 28;
-                deltaY = 210;
-                degrees = 60;
-                textOffsetY = 25;
-            }
-            case 5 -> {
-                deltaX = 0;
-                deltaY = 69;
-                degrees = 300;
-            }
-        }
         try {
-            BufferedImage outputImage = null;
+            BufferedImage borderDecorationImage = ImageIO.read(decorationType.getImageFile());
+            int imageCenterX = borderDecorationImage.getWidth()/2;
+            int imageCenterY = borderDecorationImage.getHeight()/2;
+
+            AffineTransform originalTileTransform = tileGraphics2d.getTransform();
+            //Translate the graphics so that a rectangle drawn at 0,0 with same size as the tile (345x299) is centered
+            tileGraphics2d.translate(100, 100);
+            int centerX = 173;
+            int centerY = 150;
+
             if(decorationType.equals(BorderAnomalyModel.BorderAnomalyType.ARROW)) {
-                outputImage = ImageIO.read(new File(Helper.getAdjacencyOverridePath(direction)));
-            }
-            else {
-                outputImage = ImageIO.read(decorationType.getImageFile());
-            }
+                int textOffsetX = 11;
+                int textOffsetY = 40;
+                Graphics2D arrow = (Graphics2D) borderDecorationImage.getGraphics();
+                AffineTransform arrowTextTransform = arrow.getFont().getTransform();
 
-            borderDecorationImage = outputImage;
-
-            if(decorationType.equals(BorderAnomalyModel.BorderAnomalyType.ARROW)) {
-                Graphics arrow = borderDecorationImage.getGraphics();
-
-                arrow.setFont(Storage.getFont16());
-                if (secondaryTile.length() > 3) {
-                    arrow.setFont(Storage.getFont14());
-                }
+                arrow.setFont(secondaryTile.length() > 3 ? Storage.getFont14() : Storage.getFont16());
                 arrow.setColor(Color.BLACK);
+
+                if(direction >= 2 && direction <= 4) { //all the south directions
+                    arrow.rotate(Math.toRadians(180), imageCenterX, imageCenterY);
+                    textOffsetY = 25;
+                }
                 arrow.drawString(secondaryTile, textOffsetX, textOffsetY);
+                arrow.setTransform(arrowTextTransform);
             }
 
-            double rotation = Math.toRadians(degrees);
-            double rotateX = borderDecorationImage.getWidth() / 2;
-            double rotateY = borderDecorationImage.getHeight() / 2;
-            AffineTransform tx = AffineTransform.getRotateInstance(rotation, rotateX, rotateY);
-            AffineTransformOp op = new AffineTransformOp(tx, AffineTransformOp.TYPE_BILINEAR);
+            tileGraphics2d.rotate(Math.toRadians((direction) * 60), centerX, centerY);
+            tileGraphics2d.drawImage(borderDecorationImage, null, centerX - imageCenterX, -imageCenterY);
+            tileGraphics2d.setTransform(originalTileTransform);
 
-            tileGraphics.drawImage(op.filter(borderDecorationImage, null), TILE_PADDING + deltaX-borderDecorationImage.getWidth()/2, TILE_PADDING + deltaY, null);
-        } catch (Exception e) {}
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 
     private static void addCC(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Map activeMap, Player frogPlayer, Boolean isFrogPrivate) {
