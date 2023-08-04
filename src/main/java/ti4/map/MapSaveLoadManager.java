@@ -469,13 +469,7 @@ public class MapSaveLoadManager {
         writer.write(Constants.IMAGE_GEN_COUNT + " " + activeMap.getMapImageGenerationCount());
         writer.write(System.lineSeparator());
 
-        String migrationLine = Constants.RUN_DATA_MIGRATIONS + " " + String.join(",", activeMap.getRunMigrations());
-        if (activeMap.getName().equals("pbd688")) {
-            String debugLine = String.format(
-                    "TEMP: MapSaveLoadManager - pbd688 save map - run data migrations line: (%s)", migrationLine);
-            BotLogger.log(debugLine);
-        }
-        writer.write(migrationLine);
+        writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",", activeMap.getRunMigrations()));
         writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
@@ -1446,18 +1440,11 @@ public class MapSaveLoadManager {
                     }
                 }
                 case Constants.RUN_DATA_MIGRATIONS -> {
-                    if (activeMap.getName().equals("pbd688")) {
-                        BotLogger.log("Loading pbd688 data_migrations start");
-                        BotLogger.log(String.format("info obj for load %s", info));
-                        StringTokenizer migrationInfo = new StringTokenizer(info, ",");
+                    StringTokenizer migrationInfo = new StringTokenizer(info, ",");
 
-                        while (migrationInfo.hasMoreTokens()) {
-                            String migration = migrationInfo.nextToken();
-                            BotLogger.log(
-                                    String.format("Loading pbd688 data_migrations adding migration: %s", migration));
-                            activeMap.addMigration(migration);
-                        }
-                        BotLogger.log("Loading pbd688 data_migrations end");
+                    while (migrationInfo.hasMoreTokens()) {
+                        String migration = migrationInfo.nextToken();
+                        activeMap.addMigration(migration);
                     }
                 }
             }
