@@ -60,7 +60,7 @@ public class AddBorderAnomaly implements Command {
         User user = event.getUser();
         Map activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
 
-        activeMap.addBorderAnomaly(tile, direction, anomalyType);
+        activeMap.addBorderAnomaly(tile, direction-1, anomalyType);
         MapSaveLoadManager.saveMap(activeMap, event);
         File file = GenerateMap.getInstance().saveImage(activeMap, event);
         MessageHelper.replyToMessage(event, file);
