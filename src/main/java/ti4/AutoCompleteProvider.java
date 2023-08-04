@@ -558,6 +558,19 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.BORDER_TYPE -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                java.util.Map<String, String> anomalies = Arrays.stream(BorderAnomalyModel.BorderAnomalyType.values()) //Search string:name
+                        .filter(anomalyType -> !anomalyType.equals(BorderAnomalyModel.BorderAnomalyType.ARROW ))
+                        .collect(Collectors.toMap(BorderAnomalyModel.BorderAnomalyType::toSearchString,
+                                BorderAnomalyModel.BorderAnomalyType::getName));
+                List<Command.Choice> options = anomalies.entrySet().stream()
+                        .filter(anomaly -> anomaly.getValue().contains(enteredValue))
+                        .map(anomaly -> new Command.Choice(anomaly.getValue(), anomaly.getKey()))
+                        .limit(25)
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
             case Constants.VERBOSITY -> {
                 event.replyChoiceStrings(Constants.VERBOSITY_OPTIONS).queue();
             }

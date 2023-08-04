@@ -525,6 +525,7 @@ public class Constants {
     public static final String CUSTOM_ADJACENT_TILES = "customAdjacentTiles";
     public static final String ADJACENCY_OVERRIDES = "adjacencyOverrides";
     public static final String PRIMARY_TILE = "primary_tile";
+    public static final String BORDER_TILE = "border_tile";
     public static final String SECONDARY_TILE = "secondary_tile";
     public static final String ADJACENT_TILES = "adjacent_tiles";
     public static final String BORDER_TYPE = "border_anomaly_type";

@@ -2,7 +2,6 @@ package ti4.model;
 
 import lombok.Getter;
 import ti4.ResourceHelper;
-import ti4.helpers.Helper;
 
 import java.io.File;
 import java.util.Arrays;
@@ -24,8 +23,8 @@ public class BorderAnomalyModel {
         @Getter
         private final File imageFile;
 
-        BorderAnomalyType(String anomalyName, String fileName) {
-            this.name = anomalyName;
+        BorderAnomalyType(String name, String fileName) {
+            this.name = name;
             String filePath = ResourceHelper.getInstance().getResourceFromFolder("borders/", fileName, "Could not find file");
             this.imageFile = new File(filePath);
         }
@@ -35,7 +34,7 @@ public class BorderAnomalyModel {
             return super.toString().toLowerCase();
         }
 
-        public String toNameString() {
+        public String toSearchString() {
             return this.toString().toLowerCase().replace("_","");
         }
     }
@@ -48,7 +47,7 @@ public class BorderAnomalyModel {
         Map<String, BorderAnomalyType> allTypes = Arrays.stream(BorderAnomalyType.values())
                 .collect(
                         Collectors.toMap(
-                                BorderAnomalyType::toNameString,
+                                BorderAnomalyType::toSearchString,
                                 (t -> t)
                         )
                 );
