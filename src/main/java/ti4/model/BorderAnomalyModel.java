@@ -12,10 +12,10 @@ public class BorderAnomalyModel {
     public enum BorderAnomalyType {
         ASTEROID("Asteroid Field", "asteroid_border.png"),
         GRAVITY_WAVE("Gravity Wave", "gravity_wave_border.png"),
-        ION_STORM("Ion Storm", "ion_storm_border.png"),
+        NEBULA("Nebula", "nebula_border.png"),
         MINEFIELD("Minefield", "minefield_border.png"),
         ARROW("Arrow", "adjacency_arrow.png"),
-        NO_SPACE("No-space", "no-space_border.png");
+        SPATIAL_TEAR("Spatial Tear", "spatial_tear_border.png");
 
         @Getter
         private final String name;
