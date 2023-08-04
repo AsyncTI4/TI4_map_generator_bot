@@ -17,6 +17,7 @@ import ti4.map.Map;
 import ti4.map.*;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
+import ti4.model.BorderAnomalyHolder;
 import ti4.model.BorderAnomalyModel;
 import ti4.model.PromissoryNoteModel;
 import ti4.model.TechnologyModel;
@@ -248,7 +249,9 @@ public class GenerateMap {
                 tileMap.remove(null);
                 Set<String> tiles = tileMap.keySet();
                 Set<String> tilesWithExtra = new HashSet<String>(activeMap.getAdjacentTileOverrides().values());
-                tilesWithExtra.addAll(activeMap.getBorderAnomalies().keySet().stream().map(Pair::getLeft).collect(Collectors.toSet()));
+                tilesWithExtra.addAll(activeMap.getBorderAnomalies().stream()
+                        .map(BorderAnomalyHolder::getTile)
+                        .collect(Collectors.toSet()));
 
                 tiles.stream().sorted().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Tile));
                 tilesWithExtra.stream().forEach(key -> addTile(tileMap.get(key), activeMap, TileStep.Extras));
@@ -2631,9 +2634,9 @@ public class GenerateMap {
                     }
                     direction++;
                 }
-                activeMap.getBorderAnomalies().forEach((stringIntegerPair, anomalyType) -> {
-                    if(stringIntegerPair.getLeft().equals(tile.getPosition()))
-                        addBorderDecoration(tile, stringIntegerPair.getRight(), null, tileGraphics, activeMap, anomalyType);
+                activeMap.getBorderAnomalies().forEach(borderAnomalyHolder -> {
+                    if(borderAnomalyHolder.getTile().equals(tile.getPosition()))
+                        addBorderDecoration(tile, borderAnomalyHolder.getDirection(), null, tileGraphics, activeMap, borderAnomalyHolder.getType());
                 });
             }
             case Units -> {
@@ -2707,41 +2710,45 @@ public class GenerateMap {
     private static void addBorderDecoration(Tile tile, int direction, String secondaryTile, Graphics tileGraphics, Map activeMap, BorderAnomalyModel.BorderAnomalyType decorationType) {
         Graphics2D tileGraphics2d = (Graphics2D) tileGraphics;
 
+        BufferedImage borderDecorationImage = null;
+
         try {
-            BufferedImage borderDecorationImage = ImageIO.read(decorationType.getImageFile());
-            int imageCenterX = borderDecorationImage.getWidth()/2;
-            int imageCenterY = borderDecorationImage.getHeight()/2;
-
-            AffineTransform originalTileTransform = tileGraphics2d.getTransform();
-            //Translate the graphics so that a rectangle drawn at 0,0 with same size as the tile (345x299) is centered
-            tileGraphics2d.translate(100, 100);
-            int centerX = 173;
-            int centerY = 150;
-
-            if(decorationType.equals(BorderAnomalyModel.BorderAnomalyType.ARROW)) {
-                int textOffsetX = 11;
-                int textOffsetY = 40;
-                Graphics2D arrow = (Graphics2D) borderDecorationImage.getGraphics();
-                AffineTransform arrowTextTransform = arrow.getFont().getTransform();
-
-                arrow.setFont(secondaryTile.length() > 3 ? Storage.getFont14() : Storage.getFont16());
-                arrow.setColor(Color.BLACK);
-
-                if(direction >= 2 && direction <= 4) { //all the south directions
-                    arrow.rotate(Math.toRadians(180), imageCenterX, imageCenterY);
-                    textOffsetY = 25;
-                }
-                arrow.drawString(secondaryTile, textOffsetX, textOffsetY);
-                arrow.setTransform(arrowTextTransform);
-            }
-
-            tileGraphics2d.rotate(Math.toRadians((direction) * 60), centerX, centerY);
-            tileGraphics2d.drawImage(borderDecorationImage, null, centerX - imageCenterX, -imageCenterY);
-            tileGraphics2d.setTransform(originalTileTransform);
-
+            borderDecorationImage = ImageIO.read(decorationType.getImageFile());
         } catch (Exception e) {
-            System.out.println(e);
+            BotLogger.log("Could not find border decoration image! Decoration was " + decorationType.toString());
+            return;
         }
+        int imageCenterX = borderDecorationImage.getWidth()/2;
+        int imageCenterY = borderDecorationImage.getHeight()/2;
+
+        AffineTransform originalTileTransform = tileGraphics2d.getTransform();
+        //Translate the graphics so that a rectangle drawn at 0,0 with same size as the tile (345x299) is centered
+        tileGraphics2d.translate(100, 100);
+        int centerX = 173;
+        int centerY = 150;
+
+        if(decorationType.equals(BorderAnomalyModel.BorderAnomalyType.ARROW)) {
+            int textOffsetX = 11;
+            int textOffsetY = 40;
+            Graphics2D arrow = (Graphics2D) borderDecorationImage.getGraphics();
+            AffineTransform arrowTextTransform = arrow.getFont().getTransform();
+
+            arrow.setFont(secondaryTile.length() > 3 ? Storage.getFont14() : Storage.getFont16());
+            arrow.setColor(Color.BLACK);
+
+            if(direction >= 2 && direction <= 4) { //all the south directions
+                arrow.rotate(Math.toRadians(180), imageCenterX, imageCenterY);
+                textOffsetY = 25;
+            }
+            arrow.drawString(secondaryTile, textOffsetX, textOffsetY);
+            arrow.setTransform(arrowTextTransform);
+        }
+
+        tileGraphics2d.rotate(Math.toRadians((direction) * 60), centerX, centerY);
+        if(decorationType.equals(BorderAnomalyModel.BorderAnomalyType.ARROW))
+            centerX -= 20;
+        tileGraphics2d.drawImage(borderDecorationImage, null, centerX - imageCenterX, -imageCenterY);
+        tileGraphics2d.setTransform(originalTileTransform);
     }
 
     private static void addCC(Tile tile, Graphics tileGraphics, UnitHolder unitHolder, Map activeMap, Player frogPlayer, Boolean isFrogPrivate) {

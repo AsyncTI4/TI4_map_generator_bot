@@ -738,6 +738,7 @@ public class Constants {
     public static final String RELIC_LOOK_AT_TOP = "relic_look_at_top";
     public static final String CARDS_INFO_THREAD_CHANNEL_ID = "cards_info_thread_channel_id";
     public static final String LATEST_COMMAND = "latest_command";
+    public static final String BORDER_ANOMALIES = "border_anomalies";
     public static final String LATEST_OUTCOME_VOTED_FOR = "latest_outcome_voted_for";
     public static final String LATEST_AFTER_MSG = "latest_after_msg";
     public static final String LATEST_WHEN_MSG = "latest_when_msg";
