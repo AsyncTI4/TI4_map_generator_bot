@@ -1,9 +1,14 @@
 package ti4;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -201,9 +206,28 @@ public class DataMigrationManager {
 
     private static void runMigration(String migrationName, Function<Map, Boolean> migrationMethod) {
 
+        String migrationDateString = migrationName.substring(migrationName.indexOf("_") + 1);
+        DateFormat format = new SimpleDateFormat("ddMMyy");
+        Date migrationForGamesBeforeDate = null;
+        try {
+            migrationForGamesBeforeDate = format.parse(migrationDateString);
+        } catch (ParseException e) {
+            BotLogger.log(String.format(
+                    "Migration needs a name ending in _DDMMYY (eg 251223 for 25th dec, 2023) (migration name: %s)",
+                    migrationDateString), e);
+        }
         List<String> migrationsAppliedThisTime = new ArrayList<>();
         HashMap<String, Map> loadedMaps = MapManager.getInstance().getMapList();
         for (Map map : loadedMaps.values()) {
+            DateFormat mapCreatedOnFormat = new SimpleDateFormat("yyyy.MM.dd");
+            Date mapCreatedOn = null;
+            try {
+                mapCreatedOn = mapCreatedOnFormat.parse(map.getCreationDate());
+            } catch (ParseException e) {
+            }
+            if (mapCreatedOn == null || mapCreatedOn.after(migrationForGamesBeforeDate)) {
+                continue;
+            }
             Boolean endVPReachedButNotEnded = map.getPlayers().values().stream()
                     .anyMatch(player -> player.getTotalVictoryPoints(map) >= map.getVp());
             if (map.isHasEnded() || endVPReachedButNotEnded) {
@@ -217,6 +241,13 @@ public class DataMigrationManager {
                 if (changesMade) {
                     migrationsAppliedThisTime.add(map.getName());
                 }
+            }
+            if (map.getName().equals("pbd688")) {
+                String testingMessage = String.format(
+                        "TEMP: Checking pbd688 status against %s. \nHas migration run this time? (migrationsAppliedThisTime.contains(\"pbd688\")=(%s).\nHas map added migration to data? map.hasRunMigration(migrationDateString)=%s)\n",
+                        migrationName, migrationsAppliedThisTime.contains("pbd688"),
+                        map.hasRunMigration(migrationDateString));
+                BotLogger.log(testingMessage);
             }
         }
         if (migrationsAppliedThisTime.size() > 0) {
