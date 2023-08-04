@@ -73,7 +73,27 @@
         ]
     },
     
-    
+    {
+        "alias": "relics_absol_ds",
+        "name": "Absol's Relics plus Discordant Stars Relics",
+        "type": "relic",
+        "description": "All Absol Relics plus Discordant Stars Relics - see: https://docs.google.com/document/d/1__dcZuELlmiMme6zqqqvx6jkmf250n5S/edit",
+        "cardIDs": [
+            "absol_codex","absol_dominusorb","absol_dynamiscore","absol_emelpar","absol_emphidia","absol_jr","absol_luxarchtreatise","absol_mawofworlds","absol_nanoforge","absol_obsidian","absol_plenaryorbital","absol_prophetstears","absol_quantumcore","absol_shardofthethrone1","absol_shardofthethrone2","absol_shardofthethrone3",
+            "absol_stellarconverter","absol_syncretone","absol_thalnos","absol_tyrantslament","boon_of_the_cerulean_god","decrypted_cartoglyph","e6-g0_network","eye_of_vogul","starfall_array","throne_of_the_false_emperor","twilight_mirror"
+        ]
+    },
+    {
+        "alias": "relics_ds-pok-absol mix",
+        "name": "Curated mix of relics from DS, Absol and PoK",
+        "type": "relic",
+        "description": "Weaker PoK relics replaced with Absol, plus absol uniques, plus pok relics",
+        "cardIDs": [
+            "codex","absol_dominusorb","dynamiscore","emelpar","emphidia","absol_mawofworlds","nanoforge","obsidian","prophetstears","absol_stellarconverter","thalnos","titanprototype","absol_luxarchtreatise","absol_plenaryorbital","absol_quantumcore","absol_shardofthethrone1","absol_syncretone","absol_tyrantslament"
+            "boon_of_the_cerulean_god","decrypted_cartoglyph","e6-g0_network","eye_of_vogul","starfall_array","throne_of_the_false_emperor","twilight_mirror"
+        ]
+    },    
+  
     {
         "alias": "relics_ds",
         "name": "Discordant Stars Relics",
