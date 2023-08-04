@@ -8,9 +8,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
 import java.util.Optional;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -241,13 +239,6 @@ public class DataMigrationManager {
                 if (changesMade) {
                     migrationsAppliedThisTime.add(map.getName());
                 }
-            }
-            if (map.getName().equals("pbd688")) {
-                String testingMessage = String.format(
-                        "TEMP: Checking pbd688 status against %s. \nHas migration run this time? (migrationsAppliedThisTime.contains(\"pbd688\")=(%s).\nHas map added migration to data? map.hasRunMigration(migrationName)=%s)\n",
-                        migrationName, migrationsAppliedThisTime.contains("pbd688"),
-                        map.hasRunMigration(migrationName));
-                BotLogger.log(testingMessage);
             }
         }
         if (migrationsAppliedThisTime.size() > 0) {
