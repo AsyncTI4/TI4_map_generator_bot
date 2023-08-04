@@ -46,21 +46,31 @@ public class AddBorderAnomaly implements Command {
     @Override
     public void execute(SlashCommandInteractionEvent event) {
         String tile = event.getOption(Constants.PRIMARY_TILE, null, OptionMapping::getAsString);
-        Integer direction = event.getOption(Constants.PRIMARY_TILE_DIRECTION, null, OptionMapping::getAsInt);
+        String direction = event.getOption(Constants.PRIMARY_TILE_DIRECTION, null, OptionMapping::getAsString);
         String anomalyTypeString = event.getOption(Constants.BORDER_TYPE, null, OptionMapping::getAsString);
         BorderAnomalyModel model = new BorderAnomalyModel();
 
         BorderAnomalyModel.BorderAnomalyType anomalyType = model.getBorderAnomalyTypeFromString(anomalyTypeString);
 
-        if(!List.of(1,2,3,4,5,6).contains(direction)) {
-            MessageHelper.replyToMessage(event, "Invalid direction value! Valid options are 1-6, corresponding to the edges clockwise from the top");
+        int directionVal = -1;
+        switch (direction.toLowerCase()) {
+            case "north" -> directionVal = 0;
+            case "northeast" -> directionVal = 1;
+            case "southeast" -> directionVal = 2;
+            case "south" -> directionVal = 3;
+            case "southwest" -> directionVal = 4;
+            case "northwest" -> directionVal = 5;
+        }
+
+        if(directionVal == -1) {
+            MessageHelper.sendMessageToChannel(event.getChannel(), "Invalid direction");
             return;
         }
 
         User user = event.getUser();
         Map activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
 
-        activeMap.addBorderAnomaly(tile, direction-1, anomalyType);
+        activeMap.addBorderAnomaly(tile, directionVal, anomalyType);
         MapSaveLoadManager.saveMap(activeMap, event);
         File file = GenerateMap.getInstance().saveImage(activeMap, event);
         MessageHelper.replyToMessage(event, file);
@@ -71,9 +81,9 @@ public class AddBorderAnomaly implements Command {
     public void registerCommands(CommandListUpdateAction commands) {
         commands.addCommands(Commands.slash(getActionID(), "Add a border anomaly to a tile")
                 .addOptions(
-                        new OptionData(OptionType.STRING, Constants.PRIMARY_TILE, "Tile the border will be linked to").setRequired(true),
-                        new OptionData(OptionType.INTEGER, Constants.PRIMARY_TILE_DIRECTION, "Side of the tile the anomaly will be on (clockwise from top 1-6)").setRequired(true),
-                        new OptionData(OptionType.STRING, Constants.BORDER_TYPE, "Type of anomaly").setRequired(true)
+                        new OptionData(OptionType.STRING, Constants.PRIMARY_TILE, "Tile the border will be linked to").setRequired(true).setAutoComplete(true),
+                        new OptionData(OptionType.STRING, Constants.PRIMARY_TILE_DIRECTION, "Side of the tile the anomaly will be on").setRequired(true).setAutoComplete(true),
+                        new OptionData(OptionType.STRING, Constants.BORDER_TYPE, "Type of anomaly").setRequired(true).setAutoComplete(true)
                 )
         );
     }
