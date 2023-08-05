@@ -2531,9 +2531,7 @@ public class Map {
     }
 
     public void addMigration(String string) {
-        if(!this.runDataMigrations.contains(string)){
-            this.runDataMigrations.add(string);    
-        }
+        this.runDataMigrations.add(string);    
     }
 
     public ArrayList<String> getRunMigrations(){

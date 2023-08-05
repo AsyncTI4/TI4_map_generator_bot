@@ -469,7 +469,7 @@ public class MapSaveLoadManager {
         writer.write(Constants.IMAGE_GEN_COUNT + " " + activeMap.getMapImageGenerationCount());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",",activeMap.getRunMigrations()));
+        writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",", activeMap.getRunMigrations()));
         writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
@@ -1441,9 +1441,10 @@ public class MapSaveLoadManager {
                 }
                 case Constants.RUN_DATA_MIGRATIONS -> {
                     StringTokenizer migrationInfo = new StringTokenizer(info, ",");
-    
+
                     while (migrationInfo.hasMoreTokens()) {
-                        activeMap.addMigration(migrationInfo.nextToken());
+                        String migration = migrationInfo.nextToken();
+                        activeMap.addMigration(migration);
                     }
                 }
             }
