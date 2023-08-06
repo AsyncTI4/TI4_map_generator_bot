@@ -1057,7 +1057,7 @@ public class Helper {
         if (activeMap != null && activeMap.isCommunityMode()) {
             Role roleForCommunity = player.getRoleForCommunity();
             if (roleForCommunity == null) {
-                return "[No Community Role Found]";
+                return defaultPlayerRepresentation(player, guild);
             } else {
                 return getRoleMentionByName(guild, roleForCommunity.getName());
             }
