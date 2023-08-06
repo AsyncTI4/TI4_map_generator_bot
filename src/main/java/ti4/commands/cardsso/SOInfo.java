@@ -69,7 +69,7 @@ public class SOInfo extends SOCardsSubcommandData {
             ThreadChannel cardsInfoThreadChannel = player.getCardsInfoThread(activeMap);
             buttons.add(scoreB);
             buttons.add(discardB);
-            if(ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeMap).size() > 1 && activeMap.getActionCards().size() > 130){
+            if(activeMap.getActionCards().size() > 130 && ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeMap).size() > 1){
                 buttons.addAll(ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeMap));
             }
             MessageHelper.sendMessageToChannelWithButtons(cardsInfoThreadChannel, secretMsg, buttons);

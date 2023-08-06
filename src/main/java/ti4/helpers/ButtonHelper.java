@@ -59,7 +59,7 @@ public class ButtonHelper {
     
 
     public static void checkTransactionLegality(Map activeMap, Player player, Player player2){
-        if(!activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("convoys") || player2.hasAbility("convoys") || Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
+        if(!activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("guild_ships") || player2.hasAbility("guild_ships") || Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
             return;
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " this is a friendly reminder that you are not neighbors with that person.");
@@ -856,7 +856,7 @@ public class ButtonHelper {
     }
     public static List<Button> getButtonsToSwitchWithAllianceMembers(Player player, Map activeMap) {
         List<Button> buttonsToRemoveCC = new ArrayList<Button>();
-        for(Player player2 : activeMap.getPlayers().values()){
+        for(Player player2 : activeMap.getRealPlayers()){
             if(player.getAllianceMembers().contains(player2.getFaction())){
                 buttonsToRemoveCC.add(Button.success("swapToFaction_"+player2.getFaction(), "Swap to "+player2.getFaction()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(player2.getFaction()))));
             }
@@ -1159,7 +1159,7 @@ public class ButtonHelper {
             activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestTransactionMsg()).queue();
             activeMap.setLatestTransactionMsg("");
         }
-        if(ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeMap).size() > 1 && activeMap.getActionCards().size() > 130){
+        if(activeMap.getActionCards().size() > 130 && ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeMap).size() > 1){
             startButtons.addAll(ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeMap));
         }
         
