@@ -756,7 +756,6 @@ public class GenerateMap {
             deltaX += 48;
             if (Constants.COMMANDER.equals(leader.getType()) && player.hasAbility("imperia")) {
                 List<String> mahactCCs = player.getMahactCC();
-
                 Collection<Player> players = activeMap.getPlayers().values();
                 for (Player player_ : players) {
                     if (player_ != player) {
@@ -1102,7 +1101,7 @@ public class GenerateMap {
         if (colorID.startsWith("ylw") || colorID.startsWith("org") || colorID.startsWith("pnk")
                 || colorID.startsWith("tan") || colorID.startsWith("crm") || colorID.startsWith("sns") || colorID.startsWith("tqs")
                 || colorID.startsWith("gld") || colorID.startsWith("lme") || colorID.startsWith("lvn") || colorID.startsWith("rse")
-                || colorID.startsWith("spr") || colorID.startsWith("tea") || colorID.startsWith("lgy")) {
+                || colorID.startsWith("spr") || colorID.startsWith("tea") || colorID.startsWith("lgy") || colorID.startsWith("eth")) {
             text += "_blk.png";
         } else {
             text += "_wht.png";

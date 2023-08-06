@@ -56,6 +56,9 @@ public class ChangeColor extends PlayerSubcommandData {
         player.changeColor(color);
         String oldColorID = Mapper.getColorID(oldColor);
         String colorID = Mapper.getColorID(color);
+        
+        String oldColorSuffix = "_" + oldColorID + ".";
+        String newColorSuffix = "_" + colorID + ".";
 
         for (Player playerInfo : players.values()) {
             LinkedHashMap<String, Integer> promissoryNotes = playerInfo.getPromissoryNotes();
@@ -136,11 +139,11 @@ public class ChangeColor extends PlayerSubcommandData {
                     unitHolder.addControl(control);
                 }
 
+                
                 HashSet<String> ccList = new HashSet<>(unitHolder.getCCList());
                 for (String cc : ccList) {
-                    if (!cc.startsWith(oldColorID)) continue;
                     unitHolder.removeCC(cc);
-                    cc = cc.replace(oldColorID, colorID);
+                    cc = cc.replace(oldColorSuffix, newColorSuffix);
                     unitHolder.addCC(cc);
                 }
             }
