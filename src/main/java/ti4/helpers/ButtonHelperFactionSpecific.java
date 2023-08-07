@@ -353,8 +353,13 @@ public class ButtonHelperFactionSpecific {
     public static void mageon(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident, String trueIdentity){
         buttonID = buttonID.replace("takeAC_", "");
         int acNum = Integer.parseInt(buttonID.split("_")[0]);
+
         String faction2 = buttonID.split("_")[1];
         Player player2 = Helper.getPlayerFromColorOrFaction(activeMap, faction2);
+        if(!player2.getActionCards().values().contains((Integer) acNum)){
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that AC, no AC added/lost");
+            return;
+       }
         String ident2 = Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), false);
         String message2 = trueIdentity + " took AC #" + acNum + " from " + ident2;
         String acID = null;

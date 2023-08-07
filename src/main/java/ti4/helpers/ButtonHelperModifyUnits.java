@@ -475,7 +475,7 @@ public class ButtonHelperModifyUnits {
         String planet = "";
         if (rest.contains("_")) {
             unitkey = rest.split("_")[0];
-            planet = rest.split("_")[1].replace(" ", "").toLowerCase();
+            planet = rest.split("_")[1].replace(" ", "").toLowerCase().replace("-","").replace("'","");
         } else {
             unitkey = rest;
         }
@@ -505,7 +505,7 @@ public class ButtonHelperModifyUnits {
         String planet = "";
         if (rest.contains("_")) {
             unitkey = rest.split("_")[0];
-            planet = rest.split("_")[1].replace(" ", "").toLowerCase().replace("'","");
+            planet = rest.split("_")[1].replace(" ", "").toLowerCase().replace("'","").replace("-","");
         } else {
             unitkey = rest;
         }
