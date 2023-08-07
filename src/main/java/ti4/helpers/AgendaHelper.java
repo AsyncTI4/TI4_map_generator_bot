@@ -991,6 +991,7 @@ public class AgendaHelper {
                             int cTG = winningR.getTg();
                             winningR.setTg(cTG+2);
                             activeMap.drawActionCard(winningR.getUserID());
+                            ButtonHelper.checkACLimit(activeMap, event, winningR);
                             ACInfo.sendActionCardInfo(activeMap, winningR, event);
                             MessageHelper.sendMessageToChannel(channel, identity+" due to having a winning Keleres Rider, you have been given an AC and 2 tg ("+cTG+"->"+winningR.getTg()+")");
                             ButtonHelperFactionSpecific.pillageCheck(winningR, activeMap);
@@ -1004,6 +1005,7 @@ public class AgendaHelper {
                             activeMap.drawActionCard(winningR.getUserID());
                             activeMap.drawActionCard(winningR.getUserID());
                             activeMap.drawActionCard(winningR.getUserID());
+                            ButtonHelper.checkACLimit(activeMap, event, winningR);
                             ACInfo.sendActionCardInfo(activeMap, winningR, event);
                             activeMap.setSpeaker(winningR.getUserID());
                             MessageHelper.sendMessageToChannel(channel, identity+" due to having a winning Politics Rider, you have been given "+amount+" AC and the speaker token");
