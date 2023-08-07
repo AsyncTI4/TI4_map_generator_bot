@@ -1725,7 +1725,10 @@ public class ButtonHelper {
                 for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
 
                     String key = unitEntry.getKey();
-                    
+                   
+                    if (key.endsWith("gf.png") || key.endsWith("mf.png") || (!player.hasFF2Tech() && key.endsWith("ff.png"))) {
+                        continue;
+                    }
                    
                     for (String unitRepresentationKey : unitRepresentation.keySet()) {
                         if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {
@@ -1758,9 +1761,6 @@ public class ButtonHelper {
                     }
                 }
             }
-            
-           
-            
         }
         Button concludeMove = null;
         Button doAll = null;
