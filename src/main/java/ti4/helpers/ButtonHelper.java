@@ -59,7 +59,7 @@ public class ButtonHelper {
     
 
     public static void checkTransactionLegality(Map activeMap, Player player, Player player2){
-        if(!activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("convoys") || player2.hasAbility("convoys") || Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
+        if(!activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("guild_ships") || player2.hasAbility("guild_ships") || Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
             return;
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " this is a friendly reminder that you are not neighbors with that person.");
@@ -856,7 +856,7 @@ public class ButtonHelper {
     }
     public static List<Button> getButtonsToSwitchWithAllianceMembers(Player player, Map activeMap) {
         List<Button> buttonsToRemoveCC = new ArrayList<Button>();
-        for(Player player2 : activeMap.getPlayers().values()){
+        for(Player player2 : activeMap.getRealPlayers()){
             if(player.getAllianceMembers().contains(player2.getFaction())){
                 buttonsToRemoveCC.add(Button.success("swapToFaction_"+player2.getFaction(), "Swap to "+player2.getFaction()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(player2.getFaction()))));
             }
@@ -1159,7 +1159,7 @@ public class ButtonHelper {
             activeMap.getMainGameChannel().deleteMessageById(activeMap.getLatestTransactionMsg()).queue();
             activeMap.setLatestTransactionMsg("");
         }
-        if(ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeMap).size() > 1 && activeMap.getActionCards().size() > 130){
+        if(activeMap.getActionCards().size() > 130 && ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeMap).size() > 1){
             startButtons.addAll(ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeMap));
         }
         
@@ -2151,7 +2151,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(),message, stuffToTransButtons);
             }
             case "ACs" -> {
-                String message = Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" Click the AC you would like to send";
+                String message = Helper.getPlayerRepresentation(p1, activeMap, activeMap.getGuild(), true)+" Click the GREEN button that indicates the AC you would like to send";
                 for(String acShortHand : p1.getActionCards().keySet())
                 {
                     Button transact = Button.success(finChecker+"send_ACs_"+p2.getFaction() + "_"+p1.getActionCards().get(acShortHand), Mapper.getActionCardName(acShortHand));
@@ -2261,9 +2261,14 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 message2 = ident + " sent " + tgAmount+ " Commodities to "+ident2;
             }
             case "ACs" -> {
+                
                 message2 =ident + " sent AC #" + amountToTrans+ " to "+ident2;
                int acNum = Integer.parseInt(amountToTrans);
                String acID = null;
+               if(!p1.getActionCards().values().contains((Integer) acNum)){
+                    MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Could not find that AC, no AC sent");
+                    return;
+               }
                for (java.util.Map.Entry<String, Integer> so : p1.getActionCards().entrySet()) {
                    if (so.getValue().equals(acNum)) {
                        acID = so.getKey();
@@ -3016,6 +3021,8 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             String reducedMsg = Helper.getPlayerRepresentation(owner, activeMap, activeMap.getGuild(), true ) + " your TA was played.";
             String reducedMsg2 = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true ) + " you gained tgs equal to the number of comms the player had. ("+player.getTg()+"->"+(player.getTg()+comms)+"). Please follow up with the player if this number seems off";
             player.setTg(player.getTg()+comms);
+            ButtonHelperFactionSpecific.resolveDarkPactCheck(activeMap, owner, player, owner.getCommoditiesTotal(), event);
+
             if(activeMap.isFoWMode()){
                 MessageHelper.sendMessageToChannel(owner.getPrivateChannel(), reducedMsg);
                 MessageHelper.sendMessageToChannel(player.getPrivateChannel(), reducedMsg2);

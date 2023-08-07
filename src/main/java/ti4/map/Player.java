@@ -214,8 +214,8 @@ public class Player {
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + getUserName().replaceAll("/", "");
         if (activeMap.isFoWMode()) {
-                threadName = activeMap.getName() + "-" + "cards-info-"+ getUserName().replaceAll("/", "") + "-private";
-            }
+            threadName = activeMap.getName() + "-" + "cards-info-"+ getUserName().replaceAll("/", "") + "-private";
+        }
 
         //ATTEMPT TO FIND BY ID
         String cardsInfoThreadID = getCardsInfoThreadID();
@@ -281,6 +281,9 @@ public class Player {
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
         boolean isPrivateChannel = (!activeMap.isCommunityMode() && !activeMap.isFoWMode());
+        if(activeMap.getName().contains("pbd100") || activeMap.getName().contains("pbd500")){
+            isPrivateChannel = true;
+        }
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
         threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
         if (isPrivateChannel) {

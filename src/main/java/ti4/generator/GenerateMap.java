@@ -756,7 +756,6 @@ public class GenerateMap {
             deltaX += 48;
             if (Constants.COMMANDER.equals(leader.getType()) && player.hasAbility("imperia")) {
                 List<String> mahactCCs = player.getMahactCC();
-
                 Collection<Player> players = activeMap.getPlayers().values();
                 for (Player player_ : players) {
                     if (player_ != player) {
@@ -1102,7 +1101,7 @@ public class GenerateMap {
         if (colorID.startsWith("ylw") || colorID.startsWith("org") || colorID.startsWith("pnk")
                 || colorID.startsWith("tan") || colorID.startsWith("crm") || colorID.startsWith("sns") || colorID.startsWith("tqs")
                 || colorID.startsWith("gld") || colorID.startsWith("lme") || colorID.startsWith("lvn") || colorID.startsWith("rse")
-                || colorID.startsWith("spr") || colorID.startsWith("tea") || colorID.startsWith("lgy")) {
+                || colorID.startsWith("spr") || colorID.startsWith("tea") || colorID.startsWith("lgy") || colorID.startsWith("eth")) {
             text += "_blk.png";
         } else {
             text += "_wht.png";
@@ -2484,7 +2483,7 @@ public class GenerateMap {
                 return new Color(186, 193, 195);
             case "sunset":
                 return new Color(173, 106, 248);
-            case "torquoise":
+            case "turquoise":
                 return new Color(37, 255, 232);
             case "gold":
                 return new Color(215, 1, 247);
@@ -2508,6 +2507,8 @@ public class GenerateMap {
                 return Color.decode("#d59de2");
             case "spring":
                 return Color.decode("#cedd8e");
+            case "ethereal":
+                return Color.decode("#31559e");
             default:
                 return Color.WHITE;
         }
@@ -3136,7 +3137,7 @@ public class GenerateMap {
             if (unitID.startsWith("ylw") || unitID.startsWith("org") || unitID.startsWith("pnk")
                     || unitID.startsWith("tan") || unitID.startsWith("crm") || unitID.startsWith("sns") || unitID.startsWith("tqs")
                     || unitID.startsWith("gld") || unitID.startsWith("lme") || unitID.startsWith("lvn") || unitID.startsWith("rse")
-                    || unitID.startsWith("spr") || unitID.startsWith("tea") || unitID.startsWith("lgy")) {
+                    || unitID.startsWith("spr") || unitID.startsWith("tea") || unitID.startsWith("lgy") || unitID.startsWith("eth")) {
                 groupUnitColor = Color.BLACK;
             }
             if (unitID.endsWith(Constants.COLOR_FF)) {
