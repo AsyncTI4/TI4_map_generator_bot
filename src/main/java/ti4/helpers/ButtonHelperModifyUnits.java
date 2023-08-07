@@ -194,6 +194,9 @@ public class ButtonHelperModifyUnits {
                         activeMap.getTile(AliasHandler.resolveTile(planetName)), "csd " + planetName, activeMap);
                 successMessage = "Placed a cabal space dock on "
                         + Helper.getPlanetRepresentation(planetName, activeMap) + ".";
+                if(player.getLeaderIDs().contains("cabalcommander") && !player.hasLeaderUnlocked("cabalcommander")){
+                    ButtonHelper.commanderUnlockCheck(player, activeMap, "cabal", event);
+                }
             } else {
                 new AddUnits().unitParsing(event, player.getColor(),
                         activeMap.getTile(AliasHandler.resolveTile(planetName)), unit + " " + planetName,

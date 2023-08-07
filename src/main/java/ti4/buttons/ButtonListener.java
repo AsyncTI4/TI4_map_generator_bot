@@ -425,7 +425,7 @@ public class ButtonListener extends ListenerAdapter {
                     channel = p2.getPrivateChannel();
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Sent buttons to the selected player");
                 }
-                String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex.";
+                String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex. Mallice is in the corner";
                 List<Button> ringButtons = ButtonHelper.getPossibleRings(p2, activeMap);
                 activeMap.resetCurrentMovedUnitsFrom1TacticalAction();
                 MessageHelper.sendMessageToChannelWithButtons(channel,Helper.getPlayerRepresentation(p2, activeMap, activeMap.getGuild(), true)+" Use buttons to resolve tactical action from Naalu agent. Reminder it is not legal to do a tactical action in a home system.\n" + message, ringButtons);
@@ -2608,13 +2608,13 @@ public class ButtonListener extends ListenerAdapter {
                 }
                 case "tacticalAction" -> {
                     activeMap.setNaaluAgent(false);
-                    String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex.";
+                    String message = "Doing a tactical action. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex. Mallice is in the corner";
                     List<Button> ringButtons = ButtonHelper.getPossibleRings(player, activeMap);
                     activeMap.resetCurrentMovedUnitsFrom1TacticalAction();
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
                 }
                 case "ChooseDifferentDestination" -> {
-                    String message = "Choosing a different system to activate. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex.";
+                    String message = "Choosing a different system to activate. Please select the ring of the map that the system you want to activate is located in. Reminder that a normal 6 player map is 3 rings, with ring 1 being adjacent to Rex. Mallice is in the corner";
                     List<Button> ringButtons = ButtonHelper.getPossibleRings(player, activeMap);
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, ringButtons);
                     event.getMessage().delete().queue();
