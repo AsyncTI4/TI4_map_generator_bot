@@ -198,6 +198,13 @@ public class Player {
         }
         return false;
     }
+    public boolean hasFF2Tech() {
+        if(getTechs().contains("ff2") ||getTechs().contains("hcf2") ||getTechs().contains("dsflorff") ||getTechs().contains("dslizhff"))
+        {
+            return true; 
+        }
+        return false;
+    }
 
     public void setCardsInfoThreadID(String cardsInfoThreadID) {
         this.cardsInfoThreadID = cardsInfoThreadID;
