@@ -89,7 +89,7 @@ public class ScorePublic extends StatusSubcommandData {
         String poName1 = publicObjectivesState1.get(id);
         String poName2 = publicObjectivesState2.get(id);
         String poName = id;
-        String emojiName = "";
+        String emojiName = "Custom";
         if (poName1 != null) {
             poName = poName1;
             emojiName = Emojis.Public1alt;
