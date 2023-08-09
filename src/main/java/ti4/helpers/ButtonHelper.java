@@ -1858,7 +1858,7 @@ public class ButtonHelper {
         Button concludeMove1 = null;
         
         doAll = Button.secondary(finChecker+"riftAllUnits_"+tile.getPosition(), "Rift all units");
-        concludeMove1 = Button.danger("getDamageButtons_"+tile.getPosition(), "Remove excess inf/ff");
+        concludeMove1 = Button.primary("getDamageButtons_"+tile.getPosition(), "Remove excess inf/ff");
         concludeMove = Button.danger("deleteButtons", "Done rifting units and removing excess capacity");
         
         buttons.add(doAll);
