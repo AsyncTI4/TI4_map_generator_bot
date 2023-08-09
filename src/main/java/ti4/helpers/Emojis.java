@@ -311,6 +311,7 @@ public class Emojis {
 
     // OTHER
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
+     public static final String GRift = "<:grift:1136836649003782254>";
     public static final String WHbeta = "<:WHbeta:1056593596012302366>";
     public static final String WHgamma = "<:WHgamma:1056593568766111814>";
     public static final String CreussAlpha = "<:CreussAlpha:1103868613254971463>";

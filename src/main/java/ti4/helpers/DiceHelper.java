@@ -15,6 +15,7 @@ public class DiceHelper {
         
         public int getResult() { return result; }
         public int getThreshold() { return threshold; }
+       
         
         public String printResult() {
             if (isSuccess()) {

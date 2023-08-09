@@ -982,6 +982,7 @@ public class Helper {
 
             //OTHER
             case "whalpha" -> Emojis.WHalpha;
+             case "grift" -> Emojis.GRift;
             case "whbeta" -> Emojis.WHbeta;
             case "whgamma" -> Emojis.WHgamma;
             case "creussalpha" -> Emojis.CreussAlpha;
