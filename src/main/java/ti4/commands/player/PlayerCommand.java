@@ -115,7 +115,7 @@ public class PlayerCommand implements Command {
         subcommands.add(new Speaker());
         subcommands.add(new SendTG());
         subcommands.add(new SendCommodities());
-        subcommands.add(new DebtSend());
+        subcommands.add(new SendDebt());
         subcommands.add(new ClearDebt());
         subcommands.add(new ChangeColor());
         subcommands.add(new UnitInfo());

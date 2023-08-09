@@ -5,15 +5,12 @@ import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.helpers.Constants;
-import ti4.helpers.Emojis;
 import ti4.helpers.Helper;
 import ti4.map.Map;
-import ti4.map.MapManager;
-import ti4.map.MapSaveLoadManager;
 import ti4.map.Player;
 
-public class DebtSend extends PlayerSubcommandData {
-    public DebtSend() {
+public class SendDebt extends PlayerSubcommandData {
+    public SendDebt() {
         super(Constants.SEND_DEBT, "Send a debt token (control token) to player/faction");
         addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to send").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send Debt").setAutoComplete(true).setRequired(true));
