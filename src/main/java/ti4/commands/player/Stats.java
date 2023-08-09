@@ -237,6 +237,7 @@ public class Stats extends PlayerSubcommandData {
 			sb.append("      No SC Picked");
 		}
 		sb.append("\n");
+		sb.append("> Debt: ").append(player.getDebtTokens()).append("\n");
 		sb.append("> Speaker: ").append(getActiveMap().getSpeaker().equals(player.getUserID())).append("\n");
 		sb.append("> Passed: ").append(player.isPassed()).append("\n");
 		sb.append("> Dummy: ").append(player.isDummy()).append("\n");

@@ -78,10 +78,10 @@ public class Player {
     @JsonProperty("leaders")
     private List<Leader> leaders = new ArrayList<>();
 
-    private HashMap<String,String> debt_tokens = new HashMap<>();
-    private HashMap<String,String> fow_seenTiles = new HashMap<>();
-    private HashMap<String,Integer> unitCaps = new HashMap<>();
-    private HashMap<String,String> fow_customLabels = new HashMap<>();
+    private Map<String, Integer> debt_tokens = new LinkedHashMap<>(); //colour, count
+    private HashMap<String, String> fow_seenTiles = new HashMap<>();
+    private HashMap<String, Integer> unitCaps = new HashMap<>();
+    private HashMap<String, String> fow_customLabels = new HashMap<>();
     private String fowFogFilter = null;
     private boolean fogInitialized = false;
 
@@ -1471,5 +1471,27 @@ public class Player {
 
     public void setHasFoundUnkFrag(boolean hasFoundUnkFrag) {
         this.hasFoundUnkFrag = hasFoundUnkFrag;
+    }
+
+    public Map<String, Integer> getDebtTokens() {
+        return debt_tokens;
+    }
+
+    public void setDebtTokens(Map<String, Integer> debt_tokens) {
+        this.debt_tokens = debt_tokens;
+    }
+
+    public void addDebtToken(String tokenColour) {
+        if (debt_tokens.containsKey(tokenColour)) {
+            debt_tokens.put(tokenColour, debt_tokens.get(tokenColour) + 1);
+        } else {
+            debt_tokens.put(tokenColour, 1);
+        }
+    }
+
+    public void removeDebtToken(String tokenColour) {
+        if (debt_tokens.containsKey(tokenColour)) {
+            debt_tokens.put(tokenColour, debt_tokens.get(tokenColour) - 1);
+        }
     }
 }
