@@ -14,47 +14,40 @@ import ti4.map.Player;
 
 public class DebtSend extends PlayerSubcommandData {
     public DebtSend() {
-        super(Constants.SEND_DEBT, "Sent Debt to player/faction");
-        addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Debt count").setRequired(true));
+        super(Constants.SEND_DEBT, "Send a debt token (control token) to player/faction");
+        addOptions(new OptionData(OptionType.INTEGER, Constants.DEBT_COUNT, "Number of tokens to send").setRequired(true));
         addOptions(new OptionData(OptionType.STRING, Constants.FACTION_COLOR, "Faction or Color to which you send Debt").setAutoComplete(true).setRequired(true));
     }
 
     @Override
     public void execute(SlashCommandInteractionEvent event) {
-
         Map activeMap = getActiveMap();
-        Player player = activeMap.getPlayer(getUser().getId());
-        player = Helper.getGamePlayer(activeMap, player, event, null);
-        if (player == null) {
+        Player sendingPlayer = activeMap.getPlayer(getUser().getId());
+        sendingPlayer = Helper.getGamePlayer(activeMap, sendingPlayer, event, null);
+        if (sendingPlayer == null) {
             sendMessage("Player could not be found");
             return;
         }
-        Player player_ = Helper.getPlayer(activeMap, player, event);
-        if (player_ == null) {
+
+        Player receivingPlayer = Helper.getPlayer(activeMap, sendingPlayer, event);
+        if (receivingPlayer == null) {
             sendMessage("Player to send Debt could not be found");
             return;
         }
 
-        OptionMapping optionTG = event.getOption(Constants.DEBT_COUNT);
-        if (optionTG != null) {
-            int sendTG = optionTG.getAsInt();
-            int tg = player.getTg();
-            sendTG = Math.min(sendTG, tg);
-            tg -= sendTG;
-            player.setTg(tg);
-
-            int targetTG = player_.getTg();
-            targetTG += sendTG;
-            player_.setTg(targetTG);
-
-            sendMessage(Helper.getPlayerRepresentation(player, activeMap) + " sent " + sendTG + Emojis.tg + " trade goods to " + Helper.getPlayerRepresentation(player_, activeMap));
+        int debtCountToSend = event.getOption(Constants.DEBT_COUNT, 0, OptionMapping::getAsInt);
+        if (debtCountToSend <= 0 ) {
+            sendMessage("Debt count must be a positive integer");
+            return;
         }
+
+        sendDebt(sendingPlayer, receivingPlayer, debtCountToSend);
+        sendMessage(Helper.getPlayerRepresentation(sendingPlayer, activeMap) + " sent " + debtCountToSend + " debt tokens to " + Helper.getPlayerRepresentation(receivingPlayer, activeMap));
+        
     }
 
-    @Override
-    public void reply(SlashCommandInteractionEvent event) {
-        String userID = event.getUser().getId();
-        Map activeMap = MapManager.getInstance().getUserActiveMap(userID);
-        MapSaveLoadManager.saveMap(activeMap, event);
+    public static void sendDebt(Player sendingPlayer, Player receivingPlayer, int debtCountToSend) {
+        String sendingPlayerColour = sendingPlayer.getColor();
+        receivingPlayer.addDebtTokens(sendingPlayerColour, debtCountToSend);
     }
 }
