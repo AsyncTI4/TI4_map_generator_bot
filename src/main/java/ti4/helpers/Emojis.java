@@ -252,7 +252,7 @@ public class Emojis {
     public static final String Mallice = "";
     public static final String Mirage = "";
     public static final String planet = "<:planet:948433122263969802>";
-    public static final String PlanetArchonVail = "<:PlanetArchonVail:1072808333188268102>";
+    public static final String PlanetArchonVail = "<:PlanetArchonVail:1137029658118991932>";
     public static final String PlanetMeharXull = "<:PlanetMeharXull:1072808307514945586>";
     public static final String PlanetPerimeter = "<:PlanetPerimeter:1072808270147887174>";
     public static final String SemLor = "<:SemLor:1072075882618961930>";
@@ -262,11 +262,11 @@ public class Emojis {
     // LIST OF SEM-LORES
     public static List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor);
 
-    // ANOMOLIES - THESE HAVE BEEN REMOVED
-    // public static final String Supernova = "<:Supernova:1068081584978284635>";
-    // public static final String Asteroid = "<:Asteroid:1068567369305292842>";
-    // public static final String GravRift = "<:GravRift:1068079069893234750>";
-    // public static final String Nebula = "<:Nebula:1068567639498166313>";
+    // ANOMOLIES
+    public static final String Supernova = "<:supernova:1137029705946640445>";
+    public static final String Asteroid = "<:asteroidbelt:1137029604050210846>";
+    public static final String GRift = "<:grift:1136836649003782254>";
+    public static final String Nebula = "<:nebula:1137029690004090900>";
 
     // TECHNOLOGY
     public static final String PropulsionTech = "<:Propulsiontech:947250608145068074>";
@@ -311,7 +311,6 @@ public class Emojis {
 
     // OTHER
     public static final String WHalpha = "<:WHalpha:1056593618250518529>";
-     public static final String GRift = "<:grift:1136836649003782254>";
     public static final String WHbeta = "<:WHbeta:1056593596012302366>";
     public static final String WHgamma = "<:WHgamma:1056593568766111814>";
     public static final String CreussAlpha = "<:CreussAlpha:1103868613254971463>";
