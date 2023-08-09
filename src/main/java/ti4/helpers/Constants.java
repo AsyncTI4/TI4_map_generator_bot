@@ -846,4 +846,5 @@ public class Constants {
     public static final String UNIT_REMOVE = "unit_remove";
     public static final String UNIT_ADD = "unit_add";
     public static final String UNIT_INFO = "unit_info";
+    public static final String CLEAR_DEBT = "clear_debt";
 }

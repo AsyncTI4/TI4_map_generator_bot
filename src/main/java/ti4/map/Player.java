@@ -1498,4 +1498,12 @@ public class Player {
     public void clearAllDebtTokens(String tokenColour) {
         debt_tokens.remove(tokenColour);
     }
+
+    public int getDebtTokenCount(String tokenColour) {
+        if (debt_tokens.containsKey(tokenColour)) {
+            return debt_tokens.get(tokenColour);
+        } else {
+            return 0;
+        }
+    }
 }
