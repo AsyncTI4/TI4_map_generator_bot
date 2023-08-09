@@ -863,6 +863,13 @@ public class ButtonListener extends ListenerAdapter {
                 }
             }
             event.getMessage().delete().queue();
+        } else if (buttonID.startsWith("riftUnit_")) {
+            ButtonHelper.riftUnitButton(buttonID, event, activeMap, player, ident);
+        } else if (buttonID.startsWith("getRiftButtons_")) {
+            Tile tile = activeMap.getTileByPosition(buttonID.replace("getRiftButtons_",""));
+            MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), ident+ " use buttons to rift units", ButtonHelper.getButtonsForRiftingUnitsInSystem(player, activeMap, tile));
+        } else if (buttonID.startsWith("riftAllUnits_")) {
+            ButtonHelper.riftAllUnitsButton(buttonID, event, activeMap, player, ident);
         } else if (buttonID.startsWith("takeAC_")) {
             ButtonHelperFactionSpecific.mageon(buttonID, event, activeMap, player, ident, trueIdentity);
         } else if (buttonID.startsWith("spend_")) {

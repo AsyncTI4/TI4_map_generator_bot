@@ -39,6 +39,7 @@ import ti4.commands.tokens.AddFrontierTokens;
 import ti4.commands.tokens.RemoveCC;
 import ti4.commands.units.AddUnits;
 import ti4.commands.units.MoveUnits;
+import ti4.commands.units.RemoveUnits;
 import ti4.generator.GenerateMap;
 import ti4.generator.GenerateTile;
 import ti4.generator.Mapper;
@@ -65,12 +66,100 @@ public class ButtonHelper {
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " this is a friendly reminder that you are not neighbors with that person.");
     }
+    public static void riftUnitsButton(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
+        Tile tile = activeMap.getTileByPosition(buttonID.replace("getRiftButtons_",""));
+        MessageHelper.sendMessageToChannelWithButtons(ButtonHelper.getCorrectChannel(player, activeMap), ident+ " Use buttons to rift units", ButtonHelper.getButtonsForRiftingUnitsInSystem(player, activeMap, tile));
+    }
 
-    public static void rollRiftDice(int num1){
+    public static void riftUnitButton(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
+       String rest = buttonID.replace("riftUnit_", "").toLowerCase();
+       String pos = rest.substring(0, rest.indexOf("_"));
+       Tile tile = activeMap.getTileByPosition(pos);
+       rest = rest.replace(pos + "_", "");
+       int amount = Integer.parseInt(rest.charAt(0) + "");
+       rest = rest.substring(1, rest.length());
+       String unit = rest;
+        for(int x = 0; x < amount; x++){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap),ident + " "+ButtonHelper.riftUnit(unit, tile, activeMap, event, player));
+        }
+       String message = event.getMessage().getContentRaw();
+       List<Button> systemButtons = ButtonHelper.getButtonsForRiftingUnitsInSystem(player, activeMap,tile);
+       event.getMessage().editMessage(message)
+               .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+    }
+    public static void riftAllUnitsButton(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
+       String pos = buttonID.replace("riftAllUnits_", "").toLowerCase();
+       Tile tile = activeMap.getTileByPosition(pos);
+       
+       java.util.Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
+        java.util.Map<String, String> planetRepresentations = Mapper.getPlanetRepresentations();
+        String cID = Mapper.getColorID(player.getColor());
+        for (java.util.Map.Entry<String, UnitHolder> entry : tile.getUnitHolders().entrySet()) {
+            String name = entry.getKey();
+            String representation = planetRepresentations.get(name);
+            if (representation == null){
+                representation = name;
+            }
+            UnitHolder unitHolder = entry.getValue();
+            HashMap<String, Integer> units = unitHolder.getUnits();
+            if (unitHolder instanceof Planet planet) {
+                continue;
+            }
+            else{
+                java.util.Map<String, Integer> tileUnits = new HashMap<>();
+                tileUnits.putAll(units);
+                for (java.util.Map.Entry<String, Integer> unitEntry : tileUnits.entrySet()) {
+                    String key = unitEntry.getKey();
+                    if (key.endsWith("gf.png") || key.endsWith("mf.png") || (!player.hasFF2Tech() && key.endsWith("ff.png"))) {
+                        continue;
+                    }
+                    for (String unitRepresentationKey : unitRepresentation.keySet()) {
+                        if (key.endsWith(unitRepresentationKey) && key.contains(cID)) {
+                            String unitKey = key.replace(cID+"_", "");
+                            int totalUnits = unitEntry.getValue();
+                            unitKey  = unitKey.replace(".png", "");
+                            unitKey = ButtonHelper.getUnitName(unitKey);
+                            int damagedUnits = 0;
+                            if(unitHolder.getUnitDamage() != null && unitHolder.getUnitDamage().get(key) != null){
+                                damagedUnits = unitHolder.getUnitDamage().get(key);
+                            }
+                            for(int x = 1; x < damagedUnits +1; x++){
+                                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap),ident + " "+ButtonHelper.riftUnit(unitKey+"damaged", tile, activeMap, event, player));
+                            }
+                            totalUnits = totalUnits-damagedUnits;
+                            for(int x = 1; x < totalUnits +1; x++){
+                                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap),ident + " "+ButtonHelper.riftUnit(unitKey, tile, activeMap, event, player));
+                            }
+                        }
+                    }
+                }
+            }
+        }
+       String message = event.getMessage().getContentRaw();
+       List<Button> systemButtons = ButtonHelper.getButtonsForRiftingUnitsInSystem(player, activeMap,tile);
+       event.getMessage().editMessage(message)
+               .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+    }
 
-        List<Die> roll_em = DiceHelper.rollDice(3, num1);
-
-        String msg = DiceHelper.formatDiceOutput(roll_em);
+    public static String riftUnit(String unit, Tile tile, Map activeMap, GenericInteractionCreateEvent event, Player player){
+        boolean damaged = false;
+        if(unit.contains("damaged")){
+                unit = unit.replace("damaged", "");
+                damaged = true;
+        }
+        Die d1 = new Die(4);
+        String msg = Helper.getEmojiFromDiscord(unit.toLowerCase()) +" rolled a "+d1.getResult();
+        if(damaged){
+            msg = "A damaged " + msg;
+        }
+        if(d1.isSuccess()){
+            msg = msg + " and survived. May you always be so lucky.";
+        }else{
+            String key = Mapper.getUnitID(AliasHandler.resolveUnit(unit), player.getColor());
+            new RemoveUnits().removeStuff(event,tile, 1, "space", key, player.getColor(),damaged);
+            msg = msg + " and failed. Condolences for your loss.";
+        }
+        return msg;
     }
 
 
@@ -1537,6 +1626,8 @@ public class ButtonHelper {
                 }
             }
         }
+        Button rift = Button.success(finChecker+"getRiftButtons_"+tile.getPosition(), "Rift some units").withEmoji(Emoji.fromFormatted(Helper.getEmojiFromDiscord("grift")));
+        buttons.add(rift);
         Button concludeMove = Button.secondary(finChecker+"doneLanding", "Done landing troops");
         buttons.add(concludeMove);
         if(player.getLeaderIDs().contains("naazcommander") && !player.hasLeaderUnlocked("naazcommander")){
@@ -1764,12 +1855,14 @@ public class ButtonHelper {
         }
         Button concludeMove = null;
         Button doAll = null;
+        Button concludeMove1 = null;
         
-        doAll = Button.secondary(finChecker+"riftUnit_"+tile.getPosition()+"_all", "Rift all units");
-        concludeMove = Button.danger("getDamageButtons_"+tile.getPosition(), "Remove excess inf/ff");
+        doAll = Button.secondary(finChecker+"riftAllUnits_"+tile.getPosition(), "Rift all units");
+        concludeMove1 = Button.danger("getDamageButtons_"+tile.getPosition(), "Remove excess inf/ff");
         concludeMove = Button.danger("deleteButtons", "Done rifting units and removing excess capacity");
         
         buttons.add(doAll);
+        buttons.add(concludeMove1);
         buttons.add(concludeMove);
         
         
