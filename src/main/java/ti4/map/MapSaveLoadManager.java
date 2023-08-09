@@ -541,15 +541,6 @@ public class MapSaveLoadManager {
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
             writer.write(System.lineSeparator());
 
-            //MIGRATION CODE - TODO: remove after the first save/load of all maps
-            if (player.getUnitsOwned().isEmpty()) {
-                String playerFaction = player.getFaction();
-                if (playerFaction != null) {
-                    FactionModel factionModel = Mapper.getFactionSetup(playerFaction);
-                    if (factionModel != null) player.setUnitsOwned(new HashSet<String>(factionModel.getUnits()));
-                }    
-            }
-
             writer.write(Constants.UNITS_OWNED + " " + String.join(",", player.getUnitsOwned()));
             writer.write(System.lineSeparator());
 
