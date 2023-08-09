@@ -1481,17 +1481,21 @@ public class Player {
         this.debt_tokens = debt_tokens;
     }
 
-    public void addDebtToken(String tokenColour) {
+    public void addDebtTokens(String tokenColour, int count) {
         if (debt_tokens.containsKey(tokenColour)) {
-            debt_tokens.put(tokenColour, debt_tokens.get(tokenColour) + 1);
+            debt_tokens.put(tokenColour, debt_tokens.get(tokenColour) + count);
         } else {
-            debt_tokens.put(tokenColour, 1);
+            debt_tokens.put(tokenColour, count);
         }
     }
 
-    public void removeDebtToken(String tokenColour) {
+    public void removeDebtTokens(String tokenColour, int count) {
         if (debt_tokens.containsKey(tokenColour)) {
-            debt_tokens.put(tokenColour, debt_tokens.get(tokenColour) - 1);
+            debt_tokens.put(tokenColour, Math.max(debt_tokens.get(tokenColour) - count, 0));
         }
+    }
+
+    public void clearAllDebtTokens(String tokenColour) {
+        debt_tokens.remove(tokenColour);
     }
 }
