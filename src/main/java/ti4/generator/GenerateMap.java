@@ -802,7 +802,7 @@ public class GenerateMap {
         Graphics2D g2 = (Graphics2D) graphics;
         g2.setStroke(new BasicStroke(2));
              
-        String bankImage = "vaden".equals(player.getFaction().toLowerCase()) ? "pa_ds_vaden_bank.png" : "pa_ds_vaden_bank.png"; //TODO: add generic bank image
+        String bankImage = "vaden".equals(player.getFaction().toLowerCase()) ? "pa_ds_vaden_bank.png" : "pa_debtaccount.png"; //TODO: add generic bank image
         drawPAImage(x + deltaX, y, bankImage);
         
         deltaX += 24;
