@@ -32,6 +32,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -548,6 +549,10 @@ public class GenerateMap {
                     xDelta = leaderInfo(player, xDelta, yPlayArea, activeMap);
                 }
 
+                if (player.getDebtTokens().values().stream().anyMatch(i -> i > 0)) {
+                    xDelta = debtInfo(player, xDelta, yPlayArea, activeMap);
+                }
+
                 if (!player.getAbilities().isEmpty()) {
                     xDelta = abilityInfo(player, xDelta, yPlayArea, activeMap);
                 }
@@ -788,6 +793,77 @@ public class GenerateMap {
             }
         }
         return x + deltaX + 20;
+    }
+
+    private int debtInfo(Player player, int x, int y, Map activeMap) {
+        int deltaX = 0;
+        int deltaY = 0;
+
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+             
+        String bankImage = "vaden".equals(player.getFaction().toLowerCase()) ? "pa_ds_vaden_bank.png" : "pa_ds_vaden_bank.png"; //TODO: add generic bank image
+        drawPAImage(x + deltaX, y, bankImage);
+        
+        deltaX += 24;
+        deltaY += 2;
+
+        BufferedImage factionImage = null;
+        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(activeMap, player, fowPlayer);
+
+        int tokenDeltaY = 0;
+        int playerCount = 0;
+        int maxTokenDeltaX = 0;
+        for (Entry<String, Integer> debtToken : player.getDebtTokens().entrySet()) {
+            int tokenDeltaX = 0;
+            String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(debtToken.getKey());
+            if (controlID.contains("null")) {
+                continue;
+            }
+            factionImage = null;
+            float scale = 0.60f;
+            if (!convertToGeneric) {
+                String faction = getFactionByControlMarker(activeMap.getPlayers().values(), controlID);
+                if (faction != null) {
+                    String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
+                    if (factionImagePath != null) {
+                        try {
+                            factionImage = resizeImage(ImageIO.read(new File(factionImagePath)), scale);
+                        } catch (Exception e) {
+                            // TODO: handle exception
+                        }
+                    }
+                }
+            }
+
+            BufferedImage bufferedImage = null;
+            try {
+                bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), scale);
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+
+            for (int i = 0; i < debtToken.getValue(); i++) {
+                graphics.drawImage(bufferedImage, x + deltaX + tokenDeltaX, y + deltaY + tokenDeltaY, null);
+                if (!convertToGeneric) {
+                    graphics.drawImage(factionImage, x + deltaX + tokenDeltaX, y + deltaY + tokenDeltaY, null);
+                }
+                tokenDeltaX += 15;
+            }
+            tokenDeltaY += 29;
+            maxTokenDeltaX = Math.max(maxTokenDeltaX, tokenDeltaX + 35);
+            playerCount++;
+            if (playerCount % 5 == 0) {
+                tokenDeltaY = 0;
+                deltaX += maxTokenDeltaX;
+                maxTokenDeltaX = 0;
+            }
+        }
+        deltaX = Math.max(deltaX + maxTokenDeltaX, 152);
+        graphics.setColor(Color.WHITE);
+        graphics.drawRect(x - 2, y - 2, deltaX, 152);
+
+        return x + deltaX + 10;
     }
 
     private int abilityInfo(Player player, int x, int y, Map activeMap) {
