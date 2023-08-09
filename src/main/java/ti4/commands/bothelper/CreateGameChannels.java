@@ -396,13 +396,17 @@ public class CreateGameChannels extends BothelperSubcommandData {
         return true;
     }
 
-    private static String getCategoryNameForGame(String gameName) {
+    public static String getCategoryNameForGame(String gameName) {
         if (!gameName.startsWith("pbd")) return null;
         String gameNumber = StringUtils.substringAfter(gameName, "pbd");
         if (!Helper.isInteger(gameNumber)) return null;
         int gameNum = Integer.parseInt(gameNumber);
         int lowerBound = gameNum - gameNum % 25 + 1;
         int upperBound = lowerBound + 24;
+        if (gameNum % 25 == 0) {
+            lowerBound = gameNum - 24;
+            upperBound = gameNum;
+        }
         return "PBD #" + lowerBound + "-" + upperBound;
     }
     
