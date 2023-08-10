@@ -1145,7 +1145,6 @@ public class AgendaHelper {
     }
 
     public static int[] getVoteTotal(GenericInteractionCreateEvent event, Player player, Map activeMap) {
-
         List<String> planets = new ArrayList<>(player.getPlanets());
         planets.removeAll(player.getExhaustedPlanets());
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
@@ -1283,16 +1282,26 @@ public class AgendaHelper {
                 planetButtons.add(button);
             }
         }
+
+        // //TODO: Use ListVoteCount.getAdditionalVotesFromOtherSources to build these buttons
+        // java.util.Map<String, Integer> additionalVotes = ListVoteCount.getAdditionalVotesFromOtherSources(activeMap, player);
+        // for (java.util.Map.Entry<String, Integer> entry : additionalVotes.entrySet()) {
+        //     if (entry.getValue() > 0) {
+        //         Button button = Button.primary("use_additional_generic_votes_" + entry.getKey().replaceAll(" ", "_").toLowerCase(), entry.getKey() + " ("+entry.getValue()+")");
+        //         planetButtons.add(button);
+        //     }
+        // }
+
         if (player.hasAbility("zeal")) {
             int numPlayers = 0;
             for (Player player_ : activeMap.getPlayers().values()) {
                 if (player_.isRealPlayer()) numPlayers++;
             }
-            Button button = Button.primary("exhaust_argent", "Special Argent Votes ("+numPlayers+")");
+            Button button = Button.primary("exhaust_argent", "Special Argent Votes ("+numPlayers+")").withEmoji(Emoji.fromFormatted(Emojis.Argent));
             planetButtons.add(button);
         }
         if (player.hasTechReady("pi")) {
-            Button button = Button.primary("exhaust_predictive", "Use Predictive Votes (3)");
+            Button button = Button.primary("exhaust_predictive", "Use Predictive Votes (3)").withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
             planetButtons.add(button);
         }
 
