@@ -319,6 +319,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.lastStepOfYinHero(buttonID, event, activeMap, player, ident);
          } else if (buttonID.startsWith("arcExp_")) {
             ButtonHelper.resolveArcExpButtons(activeMap, player, buttonID, event, trueIdentity);
+         } else if (buttonID.startsWith("cabalHeroTile_")) {
+           ButtonHelperFactionSpecific.executeCabalHero(buttonID, player, activeMap, event);
         } else if (buttonID.startsWith("acToSendTo_")) {
             ButtonHelperFactionSpecific.lastStepOfYinHero(buttonID, event, activeMap, player, ident);
         } else if (buttonID.startsWith("yinHeroPlanet_")) {
