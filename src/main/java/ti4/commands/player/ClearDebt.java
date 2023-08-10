@@ -38,7 +38,7 @@ public class ClearDebt extends PlayerSubcommandData {
             return;
         }
 
-        if (debtCountToClear > clearingPlayer.getDebtTokenCount(clearingPlayer.getColor())) {
+        if (debtCountToClear > clearingPlayer.getDebtTokenCount(clearedPlayer.getColor())) {
             sendMessage("You cannot clear more debt tokens than you have");
             return;
         }
