@@ -263,25 +263,18 @@ public class AgendaHelper {
         String voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome)
                 + ". Click buttons for amount of votes";
         activeMap.setLatestOutcomeVotedFor(outcome);
-        int[] voteArray = AgendaHelper.getVoteTotal(event, player, activeMap);
-        int minvote = 1;
-        if (player.hasAbility("zeal")) {
-            int numPlayers = 0;
-            for (Player player_ : activeMap.getPlayers().values()) {
-                if (player_.isRealPlayer())
-                    numPlayers++;
-            }
-            minvote = minvote + numPlayers;   
-        }
+        int maxVotes = ListVoteCount.getTotalVoteCount(activeMap, player);
+        int minVotes = 1;
+
         if (activeMap.getLaws() != null && (activeMap.getLaws().keySet().contains("rep_govt") || activeMap.getLaws().keySet().contains("absol_government"))) {
-                minvote = 1;
-                voteArray[0] = 1;
+                minVotes = 1;
+                maxVotes = 1;
         }
-        if (voteArray[0] - minvote > 20) {
+        if (maxVotes - minVotes > 20) {
             voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome)
                     + ". You have more votes than discord has buttons. Please further specify your desired vote count by clicking the button which contains your desired vote amount (or largest button).";
         }
-        List<Button> voteActionRow = AgendaHelper.getVoteButtons(minvote, voteArray[0]);
+        List<Button> voteActionRow = AgendaHelper.getVoteButtons(minVotes, maxVotes);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
         event.getMessage().delete().queue();
     }
