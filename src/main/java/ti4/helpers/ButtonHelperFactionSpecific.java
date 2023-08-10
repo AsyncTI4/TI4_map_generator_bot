@@ -229,20 +229,25 @@ public class ButtonHelperFactionSpecific {
     public static void cabalEatsUnit(Player player, Map activeMap, Player cabal, int amount, String unit, GenericInteractionCreateEvent event){
         String msg = Helper.getPlayerRepresentation(cabal, activeMap, activeMap.getGuild(), true)+" has failed to eat "+amount+" of the "+unit +"s owned by " + Helper.getPlayerRepresentation(player, activeMap) + " because they were blockaded. Wah-wah.";
         if(!isCabalBlockadedByPlayer(player, activeMap, cabal)){
-            msg = Helper.getPlayerRepresentation(cabal, activeMap, activeMap.getGuild(), true)+" has devoured "+amount+" of the "+unit +"s owned by " + Helper.getPlayerRepresentation(player, activeMap) + ". Chomp chomp.";
+            msg = Helper.getFactionIconFromDiscord(cabal.getFaction())+" has devoured "+amount+" of the "+unit +"s owned by " + player.getColor() + ". Chomp chomp.";
             String color = player.getColor();
             String unitP = AliasHandler.resolveUnit(unit);
             if (unitP.contains("ff") || unitP.contains("gf")) {
                 color = cabal.getColor();
             }
-            msg.replace("Infantrys","infantry");
+            msg = msg.replace("Infantrys","infantry");
             if (unitP.contains("sd") || unitP.contains("pds")) {
                 return;
             }
             
             new AddUnits().unitParsing(event, color, cabal.getNomboxTile(), amount +" " +unit, activeMap);
         }
-        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(cabal, activeMap), msg);
+        if(activeMap.isFoWMode()){
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(cabal, activeMap), msg);
+        }else{
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), msg);
+        }
+        
     }
     public static void executeCabalHero(String buttonID, Player player, Map activeMap, ButtonInteractionEvent event){
         String pos = buttonID.replace("cabalHeroTile_","");

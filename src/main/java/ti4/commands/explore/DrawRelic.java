@@ -33,6 +33,8 @@ public class DrawRelic extends GenericRelicAction {
             MessageHelper.sendMessageToChannel((MessageChannel) event.getMessageChannel(), "Relic deck is empty");
             return;
         }
+        relicID = relicID.replace("extra1","");
+        relicID = relicID.replace("extra2","");
         player.addRelic(relicID);
         String[] relicData = Mapper.getRelic(relicID).split(";");
         StringBuilder message = new StringBuilder();
