@@ -793,7 +793,7 @@ public class ButtonHelperModifyUnits {
                                     rest = unitKey+"_"+unitHolder.getName();
                                     String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
                                     new RemoveUnits().removeStuff(event, activeMap.getTileByPosition(pos), unitEntry.getValue(), unitHolder.getName(), unitID, player.getColor(), false);
-                                    if(cabal != null && !cabal.getFaction().equalsIgnoreCase(player.getFaction())){
+                                    if(cabal != null && FoWHelper.playerHasUnitsOnPlanet(cabal, tile, unitHolder.getName())&&!cabal.getFaction().equalsIgnoreCase(player.getFaction())){
                                         ButtonHelperFactionSpecific.cabalEatsUnit(player, activeMap, cabal, unitEntry.getValue(), unitKey, event);
                                     }
 
@@ -816,7 +816,7 @@ public class ButtonHelperModifyUnits {
                                         }
                                         String unitID = Mapper.getUnitID(AliasHandler.resolveUnit(unitKey), player.getColor());
                                         new RemoveUnits().removeStuff(event, activeMap.getTileByPosition(pos), totalUnits, "space", unitID, player.getColor(), false);
-                                        if(cabal != null && !cabal.getFaction().equalsIgnoreCase(player.getFaction())){
+                                        if(cabal != null && FoWHelper.playerHasShipsInSystem(cabal, tile)&&!cabal.getFaction().equalsIgnoreCase(player.getFaction())){
                                             ButtonHelperFactionSpecific.cabalEatsUnit(player, activeMap, cabal, totalUnits, unitKey, event);
                                         }
                                     }
@@ -850,19 +850,23 @@ public class ButtonHelperModifyUnits {
             String planetName = "";
             if (planet.equalsIgnoreCase("")) {
                 planetName = "space";
+                if(cabal != null && !cabal.getFaction().equalsIgnoreCase(player.getFaction())&& FoWHelper.playerHasShipsInSystem(cabal, tile)){
+                    ButtonHelperFactionSpecific.cabalEatsUnit(player, activeMap, cabal, amount, unitkey, event);
+                }
             } else {
                 planetName = planet.toLowerCase().replace(" ", "");
                 planetName = planet.replace("'", "");
                 planetName = AliasHandler.resolvePlanet(planetName);
+                if(cabal != null && !cabal.getFaction().equalsIgnoreCase(player.getFaction())&& FoWHelper.playerHasUnitsOnPlanet(cabal, tile, planetName)){
+                    ButtonHelperFactionSpecific.cabalEatsUnit(player, activeMap, cabal, amount, unitkey, event);
+                }
             }
             if(buttonLabel.toLowerCase().contains("damaged")){
                 new RemoveUnits().removeStuff(event, activeMap.getTileByPosition(pos), amount, planetName, unitID, player.getColor(), true);
             }else{
                 new RemoveUnits().removeStuff(event, activeMap.getTileByPosition(pos), amount, planetName, unitID, player.getColor(), false);
             }
-            if(cabal != null && !cabal.getFaction().equalsIgnoreCase(player.getFaction())){
-                ButtonHelperFactionSpecific.cabalEatsUnit(player, activeMap, cabal, amount, unitkey, event);
-            }
+            
             
             String message = event.getMessage().getContentRaw();
             
