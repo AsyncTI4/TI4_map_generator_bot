@@ -235,6 +235,10 @@ public class ButtonHelperFactionSpecific {
             if (unitP.contains("ff") || unitP.contains("gf")) {
                 color = cabal.getColor();
             }
+            msg.replace("Infantrys","infantry");
+            if (unitP.contains("sd") || unitP.contains("pds")) {
+                return;
+            }
             
             new AddUnits().unitParsing(event, color, cabal.getNomboxTile(), amount +" " +unit, activeMap);
         }
