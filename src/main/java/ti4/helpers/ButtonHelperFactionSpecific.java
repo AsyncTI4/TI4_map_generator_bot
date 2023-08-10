@@ -216,6 +216,69 @@ public class ButtonHelperFactionSpecific {
         }
         return empties;
     }
+    public static boolean isCabalBlockadedByPlayer(Player player, Map activeMap, Player cabal){
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, cabal, "csd");
+        for(Tile tile : tiles){
+            if(FoWHelper.playerHasShipsInSystem(player, tile) && !FoWHelper.playerHasShipsInSystem(cabal, tile)){
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void cabalEatsUnit(Player player, Map activeMap, Player cabal, int amount, String unit, GenericInteractionCreateEvent event){
+        String msg = Helper.getPlayerRepresentation(cabal, activeMap, activeMap.getGuild(), true)+" has failed to eat "+amount+" of the "+unit +"s owned by " + Helper.getPlayerRepresentation(player, activeMap) + " because they were blockaded. Wah-wah.";
+        if(!isCabalBlockadedByPlayer(player, activeMap, cabal)){
+            msg = Helper.getPlayerRepresentation(cabal, activeMap, activeMap.getGuild(), true)+" has devoured "+amount+" of the "+unit +"s owned by " + Helper.getPlayerRepresentation(player, activeMap) + ". Chomp chomp.";
+            String color = player.getColor();
+            String unitP = AliasHandler.resolveUnit(unit);
+            if (unitP.contains("ff") || unitP.contains("gf")) {
+                color = cabal.getColor();
+            }
+            
+            new AddUnits().unitParsing(event, color, cabal.getNomboxTile(), amount +" " +unit, activeMap);
+        }
+        MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(cabal, activeMap), msg);
+    }
+    public static void executeCabalHero(String buttonID, Player player, Map activeMap, ButtonInteractionEvent event){
+        String pos = buttonID.replace("cabalHeroTile_","");
+        Tile tile = activeMap.getTileByPosition(pos);
+        Player cabal = player;
+        UnitHolder space = tile.getUnitHolders().get("space");
+        HashMap<String, Integer> units1 = space.getUnits();
+        String cID = Mapper.getColorID(player.getColor());
+        HashMap<String, Integer> units = new HashMap<String, Integer>();
+        units.putAll(units1);
+        for(Player p2 : activeMap.getRealPlayers()){
+            if(FoWHelper.playerHasShipsInSystem(p2, tile) && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, activeMap, cabal)){
+                ButtonHelper.riftAllUnitsInASystem(pos, event, activeMap, p2, Helper.getFactionIconFromDiscord(p2.getFaction()), cabal);
+            }
+            if(FoWHelper.playerHasShipsInSystem(p2, tile) && ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(p2, activeMap, cabal)){
+                String msg = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" has failed to eat units owned by " + Helper.getPlayerRepresentation(player, activeMap) + " because they were blockaded. Wah-wah.";
+                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), msg);
+            }
+        }
+
+    }
+
+    public static List<Button> getCabalHeroButtons(Player player, Map activeMap){
+        String finChecker = "FFCC_"+player.getFaction() + "_";
+        List<Button> empties = new ArrayList<Button>();
+        List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, player, "csd");
+        List<Tile> adjtiles = new ArrayList<Tile>();
+        for(Tile tile : tiles){
+            for(String pos : FoWHelper.getAdjacentTiles(activeMap, tile.getPosition(), player, false)){
+                Tile tileToAdd = activeMap.getTileByPosition(pos);
+                if(!adjtiles.contains(tileToAdd) && !tile.getPosition().equalsIgnoreCase(pos)){
+                    adjtiles.add(tileToAdd);
+                }
+            }
+        }
+        for(Tile tile : adjtiles){
+            empties.add(Button.primary(finChecker+"cabalHeroTile_"+tile.getPosition(), "Roll for units in "+tile.getRepresentationForButtons(activeMap, player)));
+        }
+        return empties;
+    }
     public static void pillageCheck(Player player, Map activeMap) {
         if(player.getPromissoryNotesInPlayArea().contains("pop")){
             return;
