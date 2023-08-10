@@ -61,7 +61,7 @@ public class ButtonHelper {
     
 
     public static void checkTransactionLegality(Map activeMap, Player player, Player player2){
-        if(!activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("guild_ships") || player2.hasAbility("guild_ships") || Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
+        if(!activeMap.getCurrentPhase().equalsIgnoreCase("action") || player.hasAbility("guild_ships") ||player.getPromissoryNotes().keySet().contains("convoys") ||player2.getPromissoryNotes().keySet().contains("convoys") || player2.hasAbility("guild_ships") || Helper.getNeighbouringPlayers(activeMap, player).contains(player2)){
             return;
         }
         MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap), Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + " this is a friendly reminder that you are not neighbors with that person.");
@@ -80,7 +80,7 @@ public class ButtonHelper {
        rest = rest.substring(1, rest.length());
        String unit = rest;
         for(int x = 0; x < amount; x++){
-            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap),ident + " "+ButtonHelper.riftUnit(unit, tile, activeMap, event, player));
+            MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap),ident + " "+ButtonHelper.riftUnit(unit, tile, activeMap, event, player, null));
         }
        String message = event.getMessage().getContentRaw();
        List<Button> systemButtons = ButtonHelper.getButtonsForRiftingUnitsInSystem(player, activeMap,tile);
@@ -88,7 +88,11 @@ public class ButtonHelper {
                .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
     }
     public static void riftAllUnitsButton(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident){
-       String pos = buttonID.replace("riftAllUnits_", "").toLowerCase();
+        String pos = buttonID.replace("riftAllUnits_", "").toLowerCase();
+        riftAllUnitsInASystem(pos, event, activeMap, player, ident, null);
+    }
+
+    public static void riftAllUnitsInASystem(String pos, ButtonInteractionEvent event, Map activeMap, Player player, String ident, Player cabal){
        Tile tile = activeMap.getTileByPosition(pos);
        
        java.util.Map<String, String> unitRepresentation = Mapper.getUnitImageSuffixes();
@@ -124,24 +128,48 @@ public class ButtonHelper {
                                 damagedUnits = unitHolder.getUnitDamage().get(key);
                             }
                             for(int x = 1; x < damagedUnits +1; x++){
-                                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap),ident + " "+ButtonHelper.riftUnit(unitKey+"damaged", tile, activeMap, event, player));
+                                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap),ident + " "+ButtonHelper.riftUnit(unitKey+"damaged", tile, activeMap, event, player, cabal));
                             }
                             totalUnits = totalUnits-damagedUnits;
                             for(int x = 1; x < totalUnits +1; x++){
-                                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap),ident + " "+ButtonHelper.riftUnit(unitKey, tile, activeMap, event, player));
+                                MessageHelper.sendMessageToChannel(ButtonHelper.getCorrectChannel(player, activeMap),ident + " "+ButtonHelper.riftUnit(unitKey, tile, activeMap, event, player, cabal));
                             }
                         }
                     }
                 }
             }
         }
-       String message = event.getMessage().getContentRaw();
-       List<Button> systemButtons = ButtonHelper.getButtonsForRiftingUnitsInSystem(player, activeMap,tile);
-       event.getMessage().editMessage(message)
-               .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+        if(cabal == null){
+            String message = event.getMessage().getContentRaw();
+            List<Button> systemButtons = ButtonHelper.getButtonsForRiftingUnitsInSystem(player, activeMap,tile);
+            event.getMessage().editMessage(message)
+                    .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
+        }else{
+            List<ActionRow> actionRow2 = new ArrayList<>();
+           String exhaustedMessage = event.getMessage().getContentRaw();
+            for (ActionRow row : event.getMessage().getActionRows()) {
+                List<ItemComponent> buttonRow = row.getComponents();
+                int buttonIndex = buttonRow.indexOf(event.getButton());
+                if (buttonIndex > -1) {
+                    buttonRow.remove(buttonIndex);
+                }
+                if (buttonRow.size() > 0) {
+                    actionRow2.add(ActionRow.of(buttonRow));
+                }
+            }
+            if(exhaustedMessage == null || exhaustedMessage.equalsIgnoreCase("")){
+                exhaustedMessage = "Rift";
+            }
+            if(actionRow2.size() > 0 ){
+                 event.getMessage().editMessage(exhaustedMessage).setComponents(actionRow2).queue();
+            }else{
+                event.getMessage().delete().queue();
+            }
+        }
+       
     }
 
-    public static String riftUnit(String unit, Tile tile, Map activeMap, GenericInteractionCreateEvent event, Player player){
+    public static String riftUnit(String unit, Tile tile, Map activeMap, GenericInteractionCreateEvent event, Player player, Player cabal){
         boolean damaged = false;
         if(unit.contains("damaged")){
                 unit = unit.replace("damaged", "");
@@ -158,7 +186,11 @@ public class ButtonHelper {
             String key = Mapper.getUnitID(AliasHandler.resolveUnit(unit), player.getColor());
             new RemoveUnits().removeStuff(event,tile, 1, "space", key, player.getColor(),damaged);
             msg = msg + " and failed. Condolences for your loss.";
+            if(cabal != null && cabal != player && !ButtonHelperFactionSpecific.isCabalBlockadedByPlayer(player, activeMap, cabal)){
+                ButtonHelperFactionSpecific.cabalEatsUnit(player, activeMap, cabal, 1, unit, event);
+            }
         }
+        
         return msg;
     }
 
@@ -2937,6 +2969,9 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                              new AddFrontierTokens().parsingForTile(event,activeMap);
                              MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Added frontier tokens");  
                             MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use Buttons to explore empties", ButtonHelperFactionSpecific.getEmpyHeroButtons(p1, activeMap));  
+                        }
+                        if ("cabalhero".equals(playerLeader.getId())) {
+                            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Use Buttons to capture people", ButtonHelperFactionSpecific.getCabalHeroButtons(p1, activeMap));  
                         }
                         if ("yssarilhero".equals(playerLeader.getId())) {
                             for(Player p2 : activeMap.getRealPlayers()){
