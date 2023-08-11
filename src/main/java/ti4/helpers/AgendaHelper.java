@@ -1267,7 +1267,7 @@ public class AgendaHelper {
                 voteAmount+=p.getResources();
             }
             String planetNameProper = planet;
-            if(planetModel.getName() == null) {
+            if(planetModel.getName() != null) {
                 planetNameProper = planetModel.getName();
             } else {
                 BotLogger.log(event.getChannel().getAsMention() + " TEMP BOTLOG: A bad PlanetModel was found for planet: " + planet + " - using the planet id instead of the model name");
