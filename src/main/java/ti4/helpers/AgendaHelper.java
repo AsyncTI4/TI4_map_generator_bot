@@ -298,7 +298,7 @@ public class AgendaHelper {
         voteActionRow.add(exhausteverything);
         voteActionRow.add(concludeExhausting);
         voteActionRow.add(OopsMistake);
-        String voteMessage2 = "";
+        String voteMessage2 = "Exhaust stuff";
         MessageHelper.sendMessageToChannel(event.getChannel(), voteMessage);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage2, voteActionRow);
         event.getMessage().delete().queue();
