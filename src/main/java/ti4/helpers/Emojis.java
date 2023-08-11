@@ -251,10 +251,10 @@ public class Emojis {
     public static final String Primor = "<:Primor:1068567710990077952>";
     public static final String Mallice = "";
     public static final String Mirage = "";
-    public static final String planet = "<:planet:948433122263969802>";
-    public static final String PlanetArchonVail = "<:PlanetArchonVail:1072808333188268102>";
-    public static final String PlanetMeharXull = "<:PlanetMeharXull:1072808307514945586>";
-    public static final String PlanetPerimeter = "<:PlanetPerimeter:1072808270147887174>";
+    public static final String planet = "";
+    public static final String PlanetArchonVail = "<:PlanetArchonVail:1137029658118991932>";
+    public static final String PlanetMeharXull = "";
+    public static final String PlanetPerimeter = "";
     public static final String SemLor = "<:SemLor:1072075882618961930>";
     public static final String SemLord = "<:SemLord:1072076401462738965>";
     public static final String SemiLor = "<:SemiLor:1072076567053869106>";
@@ -262,11 +262,11 @@ public class Emojis {
     // LIST OF SEM-LORES
     public static List<String> SemLores = Arrays.asList(SemLor, SemLord, SemiLor);
 
-    // ANOMOLIES - THESE HAVE BEEN REMOVED
-    // public static final String Supernova = "<:Supernova:1068081584978284635>";
-    // public static final String Asteroid = "<:Asteroid:1068567369305292842>";
-    // public static final String GravRift = "<:GravRift:1068079069893234750>";
-    // public static final String Nebula = "<:Nebula:1068567639498166313>";
+    // ANOMOLIES
+    public static final String Supernova = "<:supernova:1137029705946640445>";
+    public static final String Asteroid = "<:asteroidbelt:1137029604050210846>";
+    public static final String GRift = "<:grift:1136836649003782254>";
+    public static final String Nebula = "<:nebula:1137029690004090900>";
 
     // TECHNOLOGY
     public static final String PropulsionTech = "<:Propulsiontech:947250608145068074>";

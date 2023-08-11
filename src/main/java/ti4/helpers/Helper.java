@@ -506,8 +506,6 @@ public class Helper {
             case "mr" -> Emojis.MecatolRex;
             case "hopesend" -> Emojis.HopesEnd;
             case "primor" -> Emojis.Primor;
-            case "meharxull" -> Emojis.PlanetMeharXull;
-            case "perimeter" -> Emojis.PlanetPerimeter;
             case "archonvail" -> Emojis.PlanetArchonVail;
             case "semlore" -> getRandomSemLore();
             default -> Emojis.SemLor;
@@ -616,8 +614,7 @@ public class Helper {
 
     public static List<Button> getPlanetExhaustButtons(GenericInteractionCreateEvent event, Player player, Map activeMap) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         for (String planet : planets) {
             Button button = Button.danger("spend_"+planet, Helper.getPlanetRepresentation(planet, activeMap));
             planetButtons.add(button);
@@ -976,6 +973,7 @@ public class Helper {
 
             //OTHER
             case "whalpha" -> Emojis.WHalpha;
+             case "grift" -> Emojis.GRift;
             case "whbeta" -> Emojis.WHbeta;
             case "whgamma" -> Emojis.WHgamma;
             case "creussalpha" -> Emojis.CreussAlpha;
@@ -1051,7 +1049,7 @@ public class Helper {
         if (activeMap != null && activeMap.isCommunityMode()) {
             Role roleForCommunity = player.getRoleForCommunity();
             if (roleForCommunity == null) {
-                return "[No Community Role Found]";
+                return defaultPlayerRepresentation(player, guild);
             } else {
                 return getRoleMentionByName(guild, roleForCommunity.getName());
             }
@@ -1260,8 +1258,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int resourcesCount = 0;
@@ -1302,8 +1299,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
@@ -1339,8 +1335,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int influenceCount = 0;
@@ -1382,8 +1377,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
@@ -1418,8 +1412,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
