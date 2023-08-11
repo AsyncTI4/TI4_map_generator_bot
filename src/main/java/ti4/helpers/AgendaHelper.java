@@ -330,7 +330,7 @@ public class AgendaHelper {
             if (!buttonID.contains("argent") && !buttonID.contains("blood") && !buttonID.contains("predictive")
                     && !buttonID.contains("everything")) {
 
-                if (totalVotesSoFar == null || totalVotesSoFar.equalsIgnoreCase("")) {
+                if (totalVotesSoFar == null || totalVotesSoFar.equalsIgnoreCase("Exhaust stuff")) {
                     totalVotesSoFar = "Total votes exhausted so far: " + votes + "\n Planets exhausted so far are: "
                             + Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName, activeMap);
                 } else {
