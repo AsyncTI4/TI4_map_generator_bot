@@ -351,10 +351,17 @@ public class Helper {
 
     public static File getSCImageFile(Integer sc, Map activeMap) {
         String scSet = activeMap.getScSet();
-        if(Optional.ofNullable(activeMap.getScSet()).isEmpty()) {
+        if(Optional.ofNullable(activeMap.getScSet()).isEmpty() || activeMap.getScSet().equals("null")) { //I don't know *why* this is a thing that can happen, but it is
             scSet = "pok";
         }
-        File scFile = new File(ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", scSet + "_" + sc + ".png", "Could not find SC image!"));
+        boolean pbd100or500 = activeMap.getName().equals("pbd100") || activeMap.getName().equals("pbd500");
+        String scAsString = String.valueOf(sc);
+        if(pbd100or500) {
+            char scValue = String.valueOf(sc).charAt(0);
+            scAsString = String.valueOf(scValue);
+        }
+
+        File scFile = new File(ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", scSet + "_" + scAsString + ".png", "Could not find SC image!"));
         if (Optional.ofNullable(scFile).isEmpty()) {
             return new File(ResourceHelper.getInstance().getResourceFromFolder("strat_cards", "sadFace.png", ""));
         }
