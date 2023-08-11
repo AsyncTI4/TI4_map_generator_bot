@@ -175,7 +175,7 @@ public class CreateGameChannels extends BothelperSubcommandData {
             }
         }
         if (missingMembers.size() > 0) {
-            sendMessage("The following players are not members of the server **" + guild.getName() + "**.\nPlease use the invite below to join the server and then try this command again.\nAdd a react to your name below once you've joined!");
+            sendMessage("Sorry for the inconvenience! Due to Discord's limits on Role/Channel/Thread count, we need to create this game on another server.\nThe following players are not members of the server **" + guild.getName() + "**.\nPlease use the invite below to join the server and then try this command again.\nAdd a react to your name below once you've joined!");
             for (Member member : missingMembers) {
                 sendMessage("> " + member.getAsMention());
             }
