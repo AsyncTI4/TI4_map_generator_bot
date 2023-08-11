@@ -622,8 +622,7 @@ public class Helper {
 
     public static List<Button> getPlanetExhaustButtons(GenericInteractionCreateEvent event, Player player, Map activeMap) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         for (String planet : planets) {
             Button button = Button.danger("spend_"+planet, Helper.getPlanetRepresentation(planet, activeMap));
             planetButtons.add(button);
@@ -1267,8 +1266,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int resourcesCount = 0;
@@ -1309,8 +1307,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
@@ -1346,8 +1343,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int influenceCount = 0;
@@ -1389,8 +1385,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
@@ -1425,8 +1420,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
