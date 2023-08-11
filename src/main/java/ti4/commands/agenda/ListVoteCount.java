@@ -86,8 +86,7 @@ public class ListVoteCount extends AgendaSubcommandData {
     }
 
     public static int getVoteCountFromPlanets(Map activeMap, Player player) {
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int baseResourceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
         int baseInfluenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
