@@ -284,7 +284,7 @@ public class Turn extends PlayerSubcommandData {
         return poButtons;
      }
 
-    private void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Map activeMap, MessageChannel gameChannel) {
+    public void showPublicObjectivesWhenAllPassed(GenericInteractionCreateEvent event, Map activeMap, MessageChannel gameChannel) {
         String message = "All players passed. Please score objectives. " + Helper.getGamePing(event, activeMap);
         activeMap.setCurrentPhase("status");
         List<Button> poButtons = getScoreObjectiveButtons(event, activeMap);
@@ -292,6 +292,9 @@ public class Turn extends PlayerSubcommandData {
         Button noSOScoring = Button.danger(Constants.SO_NO_SCORING, "No SO Scored");
         poButtons.add(noPOScoring);
         poButtons.add(noSOScoring);
+        if(activeMap.getActionCards().size() > 130 && Helper.getPlayerFromColorOrFaction(activeMap,"hacan") != null && ButtonHelper.getButtonsToSwitchWithAllianceMembers(Helper.getPlayerFromColorOrFaction(activeMap,"hacan"), activeMap, false).size() > 0){
+            poButtons.add(Button.secondary("getSwapButtons_", "Swap"));
+        }
         poButtons.removeIf(Objects::isNull);
         List<List<Button>> partitions = ListUtils.partition(poButtons, 5);
         List<ActionRow> actionRows = new ArrayList<>();
