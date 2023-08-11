@@ -131,6 +131,8 @@ public class Constants {
     public static final String UNIT_NAMES = "unit_names";
     public static final String UNIT_NAME = "unit_name";
     public static final String CHANGE_TO_BASE_GAME = "change_to_base_game";
+    public static final String START_PHASE = "start_phase";
+    public static final String SPECIFIC_PHASE = "specific_phase";
     public static final String REMOVE_CODEX_AC = "remove_codex_ac";
     public static final String PRIORITY_NO_DAMAGE = "priority_no_damage";
     public static final String UNIT_NAMES_TO = "unit_names_to";

@@ -521,121 +521,7 @@ public class ButtonListener extends ListenerAdapter {
                 new RevealStage1().revealS1(event, event.getChannel());
             }
 
-            int playersWithSCs = 0;
-
-            for (Player player2 : activeMap.getPlayers().values()) {
-
-                if (playersWithSCs > 1) {
-                    new Cleanup().runStatusCleanup(activeMap);
-                    ButtonHelper.addReaction(event, false, true, "Running Status Cleanup. ", "Status Cleanup Run!");
-                    playersWithSCs = -30;
-                    if(!activeMap.isFoWMode()){
-                    DisplayType displayType = DisplayType.map;
-                    File stats_file = GenerateMap.getInstance().saveImage(activeMap, displayType, event);
-                    MessageHelper.sendFileToChannel(activeMap.getActionsChannel(), stats_file);
-        }
-                }
-                if (player2.isRealPlayer()) {
-                    if (player2.getSCs() != null && player2.getSCs().size() > 0
-                            && !player2.getSCs().contains(Integer.valueOf(0))) {
-                        playersWithSCs = playersWithSCs + 1;
-                    }
-                } else {
-                    continue;
-                }
-
-                if (player2.hasLeader("naaluhero") && player2.getLeaderByID("naaluhero") != null
-                        && !player2.getLeaderByID("naaluhero").isLocked()) {
-                    MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
-                            Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
-                                    + "Reminder this is the window to do Naalu Hero");
-                }
-                if (player2.getRelics() != null && player2.hasRelic("mawofworlds") && activeMap.isCustodiansScored()) {
-                    MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
-                            Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
-                                    + "Reminder this is the window to do Maw of Worlds");
-                }
-                if (player2.getRelics() != null && player2.hasRelic("emphidia")) {
-                    for (String pl : player2.getPlanets()) {
-                        Tile tile = activeMap.getTile(AliasHandler.resolveTile(pl));
-                        if(tile == null){
-                            continue;
-                        }
-                        UnitHolder unitHolder = tile.getUnitHolders().get(pl);
-                        if (unitHolder.getTokenList() != null
-                                && unitHolder.getTokenList().contains("attachment_tombofemphidia.png")) {
-                            MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
-                                    Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
-                                            + "Reminder this is the window to purge Crown of Emphidia if you want to. Command to make a new custom public for crown is /status po_add_custom public_name:");
-                        }
-                    }
-                }
-                if (player2.getActionCards() != null && player2.getActionCards().keySet().contains("summit")
-                        && !activeMap.isCustodiansScored()) {
-                    MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
-                            Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
-                                    + "Reminder this is the window to do summit");
-                }
-                if (player2.getActionCards() != null && (player2.getActionCards().keySet().contains("investments")
-                        && !activeMap.isCustodiansScored())) {
-                    MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
-                            Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
-                                    + "Reminder this is the window to do manipulate investments.");
-                }
-                if (player2.hasRelic("mawofworlds") && activeMap.isCustodiansScored()) {
-                    MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
-                            Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
-                                    + "Reminder this is the window to use maw of worlds.");
-                }
-                if (player2.getActionCards() != null && player2.getActionCards().keySet().contains("stability")) {
-                    MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
-                            Helper.getPlayerRepresentation(player2, activeMap, activeMap.getGuild(), true)
-                                    + "Reminder this is the window to play political stability.");
-                }
-
-                for (String pn : player2.getPromissoryNotes().keySet()) {
-
-                    if (!player2.ownsPromissoryNote("ce") && pn.equalsIgnoreCase("ce")) {
-                        String cyberMessage = Helper.getPlayerRepresentation(player2, activeMap, event.getGuild(), true)
-                                + " reminder to use cybernetic enhancements!";
-                        MessageHelper.sendMessageToChannel((MessageChannel) player2.getCardsInfoThread(activeMap),
-                                cyberMessage);
-                    }
-                }
-            }
-            String message2 = "Resolve status homework using the buttons. Only the Ready for [X] button is essential to hit, all others are optional. ";
-            activeMap.setCurrentAgendaInfo("");
-            Button draw1AC = Button.success("drawStatusACs", "Draw Status Phase ACs").withEmoji(Emoji.fromFormatted(Emojis.ActionCard));
-            Button getCCs = Button.success("redistributeCCButtons", "Redistribute, Gain, & Confirm CCs").withEmoji(Emoji.fromFormatted("🔺"));
-            boolean custodiansTaken = activeMap.isCustodiansScored();
-            Button passOnAbilities;
-            if (custodiansTaken) {
-                passOnAbilities = Button.danger("pass_on_abilities", "Ready For Agenda");
-                message2 = message2
-                        + " Ready for Agenda means you are done playing/passing on playing political stability, ancient burial sites, maw of worlds, Naalu hero, and crown of emphidia.";
-            } else {
-                passOnAbilities = Button.danger("pass_on_abilities", "Ready For Strategy Phase");
-                message2 = message2
-                        + " Ready for Strategy Phase means you are done playing/passing on playing political stability, summit, and manipulate investments. ";
-            }
-            List<Button> buttons = null;
-            if (activeMap.isFoWMode()) {
-                buttons = List.of(draw1AC, getCCs);
-                message2 = "Resolve status homework using the buttons";
-                for (Player p1 : activeMap.getPlayers().values()) {
-                    if (p1 == null || p1.isDummy() || p1.getFaction() == null || p1.getPrivateChannel() == null) {
-                        continue;
-                    } else {
-                        MessageHelper.sendMessageToChannelWithButtons(p1.getPrivateChannel(), message2, buttons);
-
-                    }
-                }
-                buttons = List.of(passOnAbilities);
-            } else {
-
-                buttons = List.of(draw1AC, getCCs, passOnAbilities);
-            }
-            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message2, buttons);
+            ButtonHelper.startStatusHomework(event, activeMap);
             event.getMessage().delete().queue();
         } else if (buttonID.startsWith("scepterE_follow_") || buttonID.startsWith("mahactA_follow_")){
             boolean setstatus = true;
@@ -1485,6 +1371,8 @@ public class ButtonListener extends ListenerAdapter {
             ButtonHelperFactionSpecific.starforgeTile(buttonID, event, activeMap, player, ident);
         } else if (buttonID.startsWith("starforge_")) {
             ButtonHelperFactionSpecific.starforge(buttonID, event, activeMap, player, ident);
+         } else if (buttonID.startsWith("getSwapButtons_")) {
+            MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), "Swap", ButtonHelper.getButtonsToSwitchWithAllianceMembers(player, activeMap, true));
         } else if (buttonID.startsWith("planetAbilityExhaust_")) {
             String planet = buttonID.replace("planetAbilityExhaust_", "");
             new PlanetExhaustAbility().doAction(player, planet, activeMap);
