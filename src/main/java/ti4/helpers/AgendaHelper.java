@@ -8,7 +8,9 @@ import net.dv8tion.jda.api.interactions.components.ItemComponent;
 import net.dv8tion.jda.api.interactions.components.buttons.Button;
 
 import java.util.*;
+import java.util.Map.Entry;
 
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.cardsac.ACInfo;
@@ -25,6 +27,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.model.PlanetModel;
 
 
 public class AgendaHelper {
@@ -263,25 +266,18 @@ public class AgendaHelper {
         String voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome)
                 + ". Click buttons for amount of votes";
         activeMap.setLatestOutcomeVotedFor(outcome);
-        int[] voteArray = AgendaHelper.getVoteTotal(event, player, activeMap);
-        int minvote = 1;
-        if (player.hasAbility("zeal")) {
-            int numPlayers = 0;
-            for (Player player_ : activeMap.getPlayers().values()) {
-                if (player_.isRealPlayer())
-                    numPlayers++;
-            }
-            minvote = minvote + numPlayers;   
-        }
+        int maxVotes = getTotalVoteCount(activeMap, player);
+        int minVotes = 1;
+
         if (activeMap.getLaws() != null && (activeMap.getLaws().keySet().contains("rep_govt") || activeMap.getLaws().keySet().contains("absol_government"))) {
-                minvote = 1;
-                voteArray[0] = 1;
+                minVotes = 1;
+                maxVotes = 1;
         }
-        if (voteArray[0] - minvote > 20) {
+        if (maxVotes - minVotes > 20) {
             voteMessage = "Chose to vote for " + StringUtils.capitalize(outcome)
                     + ". You have more votes than discord has buttons. Please further specify your desired vote count by clicking the button which contains your desired vote amount (or largest button).";
         }
-        List<Button> voteActionRow = AgendaHelper.getVoteButtons(minvote, voteArray[0]);
+        List<Button> voteActionRow = AgendaHelper.getVoteButtons(minVotes, maxVotes);
         MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
         event.getMessage().delete().queue();
     }
@@ -1159,35 +1155,9 @@ public class AgendaHelper {
     }
 
     public static int[] getVoteTotal(GenericInteractionCreateEvent event, Player player, Map activeMap) {
-
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
-        HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
-        int hasXxchaAlliance = 0;
-        int hasXxchaHero = 0;
-        int influenceCount = 0;
-
-        int influenceCountFromPlanets = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                .map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
-        influenceCount += influenceCountFromPlanets;
-
-
-        if (activeMap.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
-            influenceCount += planets.size();
-            hasXxchaAlliance = 1;
-        }
-
-        if (player.hasLeaderUnlocked("xxchahero")) {
-           
-                int influenceCountFromPlanetsRes = planets.stream().map(planetsInfo::get).filter(Objects::nonNull)
-                        .map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
-                influenceCount += influenceCountFromPlanetsRes;
-                hasXxchaHero = 1;
-            
-        } 
-        influenceCount = ListVoteCount.getTotalVoteCount(activeMap, player);
-
-
+        int hasXxchaAlliance = activeMap.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander") ? 1 : 0;
+        int hasXxchaHero = player.hasLeaderUnlocked("xxchahero") ? 1 : 0;
+        int influenceCount = getTotalVoteCount(activeMap, player);
 
         if (activeMap.getLaws() != null && (activeMap.getLaws().keySet().contains("rep_govt") || activeMap.getLaws().keySet().contains("absol_government"))) {
             influenceCount = 1;
@@ -1275,11 +1245,11 @@ public class AgendaHelper {
 
     public static List<Button> getPlanetButtons(GenericInteractionCreateEvent event, Player player, Map activeMap) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         int[] voteInfo = getVoteTotal(event, player, activeMap);
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         for (String planet : planets) {
+            PlanetModel planetModel = Mapper.getPlanet(planet);
             int voteAmount = 0;
             Planet p = (Planet) planetsInfo.get(planet);
             if(p == null){
@@ -1293,20 +1263,35 @@ public class AgendaHelper {
                 voteAmount+=p.getResources();
             }
             if (voteAmount != 0) {
-                Button button = Button.secondary("exhaust_"+planet, planet + " ("+voteAmount+")");
-                planetButtons.add(button);
+                if (Emojis.SemLor.equals(Helper.getPlanetEmoji(planet))) {
+                    Button button = Button.secondary("exhaust_" + planet, planetModel.getNameNullSafe() + " ("+voteAmount+")");
+                    planetButtons.add(button);
+                } else {
+                    Button button = Button.secondary("exhaust_" + planet, planetModel.getNameNullSafe() + " ("+voteAmount+")").withEmoji(Emoji.fromFormatted(Helper.getPlanetEmoji(planet)));
+                    planetButtons.add(button);
+                }
             }
         }
+
+        // //TODO: Use ListVoteCount.getAdditionalVotesFromOtherSources to build these buttons
+        // java.util.Map<String, Integer> additionalVotes = ListVoteCount.getAdditionalVotesFromOtherSources(activeMap, player);
+        // for (java.util.Map.Entry<String, Integer> entry : additionalVotes.entrySet()) {
+        //     if (entry.getValue() > 0) {
+        //         Button button = Button.primary("use_additional_generic_votes_" + entry.getKey().replaceAll(" ", "_").toLowerCase(), entry.getKey() + " ("+entry.getValue()+")");
+        //         planetButtons.add(button);
+        //     }
+        // }
+
         if (player.hasAbility("zeal")) {
             int numPlayers = 0;
             for (Player player_ : activeMap.getPlayers().values()) {
                 if (player_.isRealPlayer()) numPlayers++;
             }
-            Button button = Button.primary("exhaust_argent", "Special Argent Votes ("+numPlayers+")");
+            Button button = Button.primary("exhaust_argent", "Special Argent Votes ("+numPlayers+")").withEmoji(Emoji.fromFormatted(Emojis.Argent));
             planetButtons.add(button);
         }
         if (player.hasTechReady("pi")) {
-            Button button = Button.primary("exhaust_predictive", "Use Predictive Votes (3)");
+            Button button = Button.primary("exhaust_predictive", "Use Predictive Votes (3)").withEmoji(Emoji.fromFormatted(Emojis.CyberneticTech));
             planetButtons.add(button);
         }
 
@@ -1439,8 +1424,6 @@ public class AgendaHelper {
         return summary;
     }
 
-    
-
     public static String getWinner(String summary) {
         String winner = null;
         StringTokenizer vote_info = new StringTokenizer(summary, ":");
@@ -1474,5 +1457,161 @@ public class AgendaHelper {
             return null;
         }
         return winner;
+    }
+
+    public static String getPlayerVoteText(Map activeMap, Player player) {
+        StringBuilder sb = new StringBuilder();
+        int voteCount = getVoteCountFromPlanets(activeMap, player);
+        java.util.Map<String, Integer> additionalVotes = getAdditionalVotesFromOtherSources(activeMap, player);
+        String additionalVotesText = getAdditionalVotesFromOtherSourcesText(additionalVotes);
+
+        if (activeMap.isFoWMode()) {
+            sb.append(" vote count: **???**");
+            return sb.toString();
+        } else if (player.hasAbility("galactic_threat") && !activeMap.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
+            sb.append(" NOT VOTING (Galactic Threat)");
+            return sb.toString();
+        } else if (player.hasLeaderUnlocked("xxchahero")) {
+            sb.append(" vote count: **" + Emojis.ResInf + " " + voteCount);
+        } else if (player.hasAbility("lithoids")) { // Vote with planet resources, not influence
+            sb.append(" vote count: **" + Emojis.resources + " " + voteCount);
+        } else if (player.hasAbility("biophobic")) {
+            sb.append(" vote count: **" + Emojis.SemLor + " " + voteCount);
+        } else {
+            sb.append(" vote count: **" + Emojis.influence + " " + voteCount);
+        }
+        if (!additionalVotesText.isEmpty()) {
+            int additionalVoteCount = additionalVotes.values().stream().mapToInt(Integer::intValue).sum();
+            if (additionalVoteCount > 0) {
+                sb.append(" + " + additionalVoteCount + "** additional votes from:  ");
+            }
+            else {
+                sb.append("**");
+            }
+            sb.append("  ").append(additionalVotesText);
+        } else sb.append("**");
+
+        return sb.toString();
+    }
+
+    public static int getTotalVoteCount(Map activeMap, Player player) {
+        return getVoteCountFromPlanets(activeMap, player) + getAdditionalVotesFromOtherSources(activeMap, player).values().stream().mapToInt(Integer::intValue).sum();
+    }
+
+    public static int getVoteCountFromPlanets(Map activeMap, Player player) {
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
+        HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
+        int baseResourceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getResources).sum();
+        int baseInfluenceCount = planets.stream().map(planetsInfo::get).filter(Objects::nonNull).map(planet -> (Planet) planet).mapToInt(Planet::getInfluence).sum();
+        int voteCount = baseInfluenceCount; //default
+
+        //NEKRO unless XXCHA ALLIANCE
+        if (player.hasAbility("galactic_threat") && !activeMap.playerHasLeaderUnlockedOrAlliance(player,"xxchacommander")) {
+            return 0;
+        }
+        
+        //KHRASK
+        if (player.hasAbility("lithoids")) { // Vote with planet resources, not influence
+            voteCount = baseResourceCount;
+        }
+        
+        //ZELIAN PURIFIER BIOPHOBIC ABILITY - 1 planet = 1 vote
+        if (player.hasAbility("biophobic")) {
+            voteCount = planets.size();
+        }
+
+        //XXCHA
+        if (player.hasLeaderUnlocked("xxchahero")) {
+            voteCount = baseResourceCount + baseInfluenceCount;
+        }
+
+        //Xxcha Alliance - +1 vote for each planet
+        if (activeMap.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
+            int readyPlanetCount = planets.size();
+            voteCount += readyPlanetCount;
+        }
+
+        return voteCount;
+    }
+
+    public static String getAdditionalVotesFromOtherSourcesText(java.util.Map<String, Integer> additionalVotes) {
+        StringBuilder sb = new StringBuilder();
+        for (Entry<String, Integer> entry : additionalVotes.entrySet()) {
+            if (entry.getValue() > 0) {
+                sb.append("(+").append(entry.getValue()).append(" for ").append(entry.getKey()).append(")");
+            } else {
+                sb.append("(").append(entry.getKey()).append(")");
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * @param activeMap
+     * @param player
+     * @return (K, V) -> K = additionalVotes / V = text explanation of votes
+     */
+    public static java.util.Map<String, Integer> getAdditionalVotesFromOtherSources(Map activeMap, Player player) {
+        java.util.Map<String, Integer> additionalVotesAndSources = new LinkedHashMap<>();
+
+        //Argent Zeal
+        if (player.hasAbility("zeal")) {
+            long playerCount = activeMap.getPlayers().values().stream().filter(Player::isRealPlayer).count();
+            additionalVotesAndSources.put(Emojis.Argent + "Zeal", Math.toIntExact(playerCount));
+        }
+
+        //Blood Pact
+        if (player.getPromissoryNotesInPlayArea().contains("blood_pact")) {
+            additionalVotesAndSources.put(Emojis.Empyrean + Emojis.PN + "Blood Pact", 4);
+        }
+
+        //Predictive Intelligence
+        if (player.hasTechReady("pi")) {
+            additionalVotesAndSources.put(Emojis.CyberneticTech + "Predictive Intelligence", 3);
+        }
+
+        //Xxcha Alliance
+        if (activeMap.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander")) {
+            additionalVotesAndSources.put(Emojis.Xxcha + "Alliance has been counted for", 0);
+        }
+
+        //Absol Shard of the Throne
+        if (CollectionUtils.containsAny(player.getRelics(), List.of("absol_shardofthethrone1", "absol_shardofthethrone2", "absol_shardofthethrone3"))) {
+            int count = player.getRelics().stream().filter(s -> s.contains("absol_shardofthethrone")).toList().size(); //  +2 votes per Absol shard
+            int shardVotes = 2 * count;
+            additionalVotesAndSources.put("(" + count + "x)" + Emojis.Relic + "Shard of the Throne" + Emojis.Absol, shardVotes);
+        }
+
+        //Absol's Syncretone - +1 vote for each neighbour
+        if (player.hasRelicReady("absol_syncretone")) {
+            int count = Helper.getNeighbourCount(activeMap, player);
+            additionalVotesAndSources.put(Emojis.Relic + "Syncretone", count);
+        }
+
+        //Ghoti Wayfarer Tech
+        if (player.hasTechReady("dsghotg")) {
+            int fleetCC = player.getFleetCC();
+            additionalVotesAndSources.put(Emojis.BioticTech + "Exhaust Networked Command", fleetCC);
+        }
+
+        // //Edyn Mandate Sigil - Planets in Sigil systems gain +1 vote //INCOMPLETE, POSSIBLY CHANGING ON DS END
+        // Player edynMechPlayer = Helper.getPlayerFromColorOrFaction(activeMap, "edyn");
+        // if (edynMechPlayer != null) {
+        //     int count = 0;
+        //     List<Tile> edynMechTiles = activeMap.getTileMap().values().stream().filter(t -> Helper.playerHasMechInSystem(t, activeMap, edynMechPlayer)).toList();
+        //     for (Tile tile : edynMechTiles) {
+        //         for (String planet : tile.getUnitHolders().keySet()) {
+        //             if (player.getPlanets().contains(planet) && !player.getExhaustedPlanets().contains(planet)) {
+        //                 count++;
+        //             }
+        //         }
+        //     }
+        //     if (count != 0) {
+        //         sb.append(" (+" + count + " for (" + count + "x) Planets in " + Emojis.edyn + "Sigil Systems)");
+        //         additionalVotes += count;
+        //     }
+        // }
+
+        return additionalVotesAndSources;
     }
 }
