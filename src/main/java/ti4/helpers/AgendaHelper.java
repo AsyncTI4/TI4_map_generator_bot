@@ -304,8 +304,8 @@ public class AgendaHelper {
 
     }
     public static void exhaustStuffForVoting(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident, String buttonLabel){
-            String planetName = buttonID.substring(buttonID.indexOf("_") + 1, buttonID.length());
-            String votes = buttonLabel.substring(buttonLabel.indexOf("(") + 1, buttonLabel.indexOf(")"));
+            String planetName = StringUtils.substringAfter(buttonID, "_");
+            String votes = StringUtils.substringBetween(buttonLabel, "(", ")");
             if (!buttonID.contains("argent") && !buttonID.contains("blood") && !buttonID.contains("predictive")
                     && !buttonID.contains("everything")) {
                 new PlanetExhaust().doAction(player, planetName, activeMap);
