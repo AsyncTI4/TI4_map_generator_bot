@@ -82,7 +82,7 @@ public class ButtonHelperModifyUnits {
         return buttons;
     }
     public static void retreatGroundUnits(String buttonID, ButtonInteractionEvent event, Map activeMap, Player player, String ident, String buttonLabel){
-        String rest = buttonID.replace("retreatGroundUnits_", "");
+        String rest = buttonID.replace("retreatGroundUnits_", "").replace("'","");
         String pos1 = rest.substring(0, rest.indexOf("_"));
         rest = rest.replace(pos1 + "_", "");
         String pos2 = rest.substring(0, rest.indexOf("_"));

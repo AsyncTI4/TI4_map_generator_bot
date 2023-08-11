@@ -512,77 +512,84 @@ public class AgendaHelper {
                 winner = buttonID.substring(buttonID.lastIndexOf("*") + 2, buttonID.length());
             }
             if (resolveTime) {
-                List<Player> losers = AgendaHelper.getLosers(winner, activeMap);
-                String summary2 = AgendaHelper.getSummaryOfVotes(activeMap, true);
-                MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), summary2 + "\n \n");
-                activeMap.setCurrentPhase("agendaEnd");
-                activeMap.setActivePlayer(null);
-                String resMessage = "Please hold while people resolve shenanigans. " + losers.size()
-                        + " players have the opportunity to play deadly plot.";
-                if ((!activeMap.isACInDiscard("Bribery") || !activeMap.isACInDiscard("Deadly Plot"))
-                        && (losers.size() > 0 || activeMap.isAbsolMode())) {
-                    Button noDeadly = Button.primary("genericReact1", "No Deadly Plot");
-                    Button noBribery = Button.primary("genericReact2", "No Bribery");
-                    List<Button> deadlyActionRow = List.of(noBribery, noDeadly);
-
-                    MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), resMessage,
-                            deadlyActionRow);
-                    if (!activeMap.isFoWMode()) {
-                        String loseMessage = "";
-                        for (Player los : losers) {
-                            if (los != null) {
-                                loseMessage = loseMessage
-                                        + Helper.getPlayerRepresentation(los, activeMap, event.getGuild(), true);
-                            }
-                        }
-                        event.getChannel().sendMessage(loseMessage + " Please respond to bribery/deadly plot window")
-                                .queue();
-                    } else {
-                        MessageHelper.privatelyPingPlayerList(losers, activeMap,
-                                "Please respond to bribery/deadly plot window");
-                    }
-                } else {
-                    String messageShen = "Either both bribery and deadly plot were in the discard or noone could legally play them.";
-                    
-                    if (activeMap.getCurrentAgendaInfo().contains("Elect Player")&& (!activeMap.isACInDiscard("Confounding") || !activeMap.isACInDiscard("Confusing"))){
-
-                    } else{
-                        messageShen = messageShen + " There are no shenanigans possible. Please resolve the agenda. ";
-                    }
-                    activeMap.getMainGameChannel().sendMessage(messageShen).queue();
-                }
-                if (activeMap.getCurrentAgendaInfo().contains("Elect Player")
-                        && (!activeMap.isACInDiscard("Confounding") || !activeMap.isACInDiscard("Confusing"))) {
-                    String resMessage2 = Helper.getGamePing(activeMap.getGuild(), activeMap)
-                            + " please react to no confusing/confounding";
-                    Button noConfounding = Button.primary("genericReact3", "Refuse Confounding Legal Text");
-                    Button noConfusing = Button.primary("genericReact4", "Refuse Confusing Legal Text");
-                    List<Button> buttons = List.of(noConfounding, noConfusing);
-                    MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), resMessage2, buttons);
-
-                } else {
-                    if (activeMap.getCurrentAgendaInfo().contains("Elect Player")) {
-                        activeMap.getMainGameChannel()
-                                .sendMessage("Both confounding and confusing are in the discard pile. ").queue();
-
-                    }
-                }
-
-                String resMessage3 = "Current winner is " + StringUtils.capitalize(winner) + ". "
-                        + Helper.getGamePing(activeMap.getGuild(), activeMap)
-                        + "When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.";
-                Button autoResolve = Button.primary("agendaResolution_" + winner, "Resolve with current winner");
-                Button manualResolve = Button.danger("autoresolve_manual", "Resolve it Manually");
-                List<Button> deadlyActionRow3 = List.of(autoResolve, manualResolve);
-                MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), resMessage3,
-                        deadlyActionRow3);
-
+                AgendaHelper.resolveTime(event, activeMap, winner);
             }
             if (!votes.equalsIgnoreCase("0")) {
                 event.getMessage().delete().queue();
             }
             MapSaveLoadManager.saveMap(activeMap, event);
 
+
+    }
+    public static void resolveTime(GenericInteractionCreateEvent event, Map activeMap, String winner){
+        if(winner == null){
+            String summary = AgendaHelper.getSummaryOfVotes(activeMap, false);
+            winner = AgendaHelper.getWinner(summary);
+        }
+        List<Player> losers = AgendaHelper.getLosers(winner, activeMap);
+        String summary2 = AgendaHelper.getSummaryOfVotes(activeMap, true);
+        MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), summary2 + "\n \n");
+        activeMap.setCurrentPhase("agendaEnd");
+        activeMap.setActivePlayer(null);
+        String resMessage = "Please hold while people resolve shenanigans. " + losers.size()
+                + " players have the opportunity to play deadly plot.";
+        if ((!activeMap.isACInDiscard("Bribery") || !activeMap.isACInDiscard("Deadly Plot"))
+                && (losers.size() > 0 || activeMap.isAbsolMode())) {
+            Button noDeadly = Button.primary("genericReact1", "No Deadly Plot");
+            Button noBribery = Button.primary("genericReact2", "No Bribery");
+            List<Button> deadlyActionRow = List.of(noBribery, noDeadly);
+
+            MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), resMessage,
+                    deadlyActionRow);
+            if (!activeMap.isFoWMode()) {
+                String loseMessage = "";
+                for (Player los : losers) {
+                    if (los != null) {
+                        loseMessage = loseMessage
+                                + Helper.getPlayerRepresentation(los, activeMap, event.getGuild(), true);
+                    }
+                }
+                event.getMessageChannel().sendMessage(loseMessage + " Please respond to bribery/deadly plot window")
+                        .queue();
+            } else {
+                MessageHelper.privatelyPingPlayerList(losers, activeMap,
+                        "Please respond to bribery/deadly plot window");
+            }
+        } else {
+            String messageShen = "Either both bribery and deadly plot were in the discard or noone could legally play them.";
+            
+            if (activeMap.getCurrentAgendaInfo().contains("Elect Player")&& (!activeMap.isACInDiscard("Confounding") || !activeMap.isACInDiscard("Confusing"))){
+
+            } else{
+                messageShen = messageShen + " There are no shenanigans possible. Please resolve the agenda. ";
+            }
+            activeMap.getMainGameChannel().sendMessage(messageShen).queue();
+        }
+        if (activeMap.getCurrentAgendaInfo().contains("Elect Player")
+                && (!activeMap.isACInDiscard("Confounding") || !activeMap.isACInDiscard("Confusing"))) {
+            String resMessage2 = Helper.getGamePing(activeMap.getGuild(), activeMap)
+                    + " please react to no confusing/confounding";
+            Button noConfounding = Button.primary("genericReact3", "Refuse Confounding Legal Text");
+            Button noConfusing = Button.primary("genericReact4", "Refuse Confusing Legal Text");
+            List<Button> buttons = List.of(noConfounding, noConfusing);
+            MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), resMessage2, buttons);
+
+        } else {
+            if (activeMap.getCurrentAgendaInfo().contains("Elect Player")) {
+                activeMap.getMainGameChannel()
+                        .sendMessage("Both confounding and confusing are in the discard pile. ").queue();
+
+            }
+        }
+
+        String resMessage3 = "Current winner is " + StringUtils.capitalize(winner) + ". "
+                + Helper.getGamePing(activeMap.getGuild(), activeMap)
+                + "When shenanigans have concluded, please confirm resolution or discard the result and manually resolve it yourselves.";
+        Button autoResolve = Button.primary("agendaResolution_" + winner, "Resolve with current winner");
+        Button manualResolve = Button.danger("autoresolve_manual", "Resolve it Manually");
+        List<Button> deadlyActionRow3 = List.of(autoResolve, manualResolve);
+        MessageHelper.sendMessageToChannelWithButtons(activeMap.getMainGameChannel(), resMessage3,
+                deadlyActionRow3);
 
     }
 
