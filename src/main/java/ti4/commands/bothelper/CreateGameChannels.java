@@ -168,24 +168,26 @@ public class CreateGameChannels extends BothelperSubcommandData {
 
         //CHECK IF GUILD HAS ALL PLAYERS LISTED
         List<String> guildMemberIDs = guild.getMembers().stream().map(m -> m.getId()).toList();
-        boolean sendInviteLink = false;
+        List<Member> missingMembers = new ArrayList<>();
         for (Member member : members) {
             if (!guildMemberIDs.contains(member.getId())) {
-                sendMessage(member.getAsMention() + " is not a member of the server **" + guild.getName() + "**. Please use the invite below to join the server and then try this command again.");
-                sendInviteLink = true;
+                missingMembers.add(member);
             }
         }
-        if (sendInviteLink) {
+        if (missingMembers.size() > 0) {
+            sendMessage("The following players are not members of the server **" + guild.getName() + "**.\nPlease use the invite below to join the server and then try this command again.\nAdd a react to your name below once you've joined!");
+            for (Member member : missingMembers) {
+                sendMessage("> " + member.getAsMention());
+            }
             sendMessage(Helper.getGuildInviteURL(guild));
             return;
         }
 
         //CREATE ROLE
         Role role = guild.createRole()
-        .setName(gameName)
-        .setMentionable(true)
-        .complete();
-
+            .setName(gameName)
+            .setMentionable(true)
+            .complete();
 
         //ADD PLAYERS TO ROLE
         for (Member member : members) {
