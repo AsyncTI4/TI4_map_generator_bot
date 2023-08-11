@@ -12,7 +12,6 @@ import java.util.Map.Entry;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import ti4.commands.agenda.ListVoteCount;
 import ti4.commands.cardsac.ACInfo;
 import ti4.commands.cardsso.SOInfo;
 import ti4.commands.planet.PlanetExhaust;
@@ -1157,23 +1156,28 @@ public class AgendaHelper {
     public static int[] getVoteTotal(GenericInteractionCreateEvent event, Player player, Map activeMap) {
         int hasXxchaAlliance = activeMap.playerHasLeaderUnlockedOrAlliance(player, "xxchacommander") ? 1 : 0;
         int hasXxchaHero = player.hasLeaderUnlocked("xxchahero") ? 1 : 0;
-        int influenceCount = getTotalVoteCount(activeMap, player);
+        int voteCount = getTotalVoteCount(activeMap, player);
+
+        //Check if Player only has additional votes but not any "normal" votes, if so, they can't vote
+        if (getVoteCountFromPlanets(activeMap, player) == 0) {
+            voteCount = 0;
+        }
 
         if (activeMap.getLaws() != null && (activeMap.getLaws().keySet().contains("rep_govt") || activeMap.getLaws().keySet().contains("absol_government"))) {
-            influenceCount = 1;
+            voteCount = 1;
         }
 
         if (player.getFaction().equals("nekro") && hasXxchaAlliance == 0) {
-            influenceCount = 0;
+            voteCount = 0;
         }
         List<Player> riders = getRiders(activeMap);
         if (riders.indexOf(player) > -1) {
             if (hasXxchaAlliance == 0) {
-                influenceCount = 0;
+                voteCount = 0;
             }
         }
 
-        int[] voteArray = {influenceCount, hasXxchaHero, hasXxchaAlliance};
+        int[] voteArray = {voteCount, hasXxchaHero, hasXxchaAlliance};
         return voteArray;
     }
 
@@ -1262,7 +1266,13 @@ public class AgendaHelper {
             if (voteInfo[1] != 0) {
                 voteAmount+=p.getResources();
             }
-            String planetNameProper = planetModel.getName() == null ? planet : planetModel.getName();
+            String planetNameProper = planet;
+            if(planetModel.getName() == null) {
+                planetNameProper = planetModel.getName();
+            } else {
+                BotLogger.log(event.getChannel().getAsMention() + " TEMP BOTLOG: A bad PlanetModel was found for planet: " + planet + " - using the planet id instead of the model name");
+            }
+
             if (voteAmount != 0) {
                 if (Emojis.SemLor.equals(Helper.getPlanetEmoji(planet))) {
                     Button button = Button.secondary("exhaust_" + planet, planetNameProper + " ("+voteAmount+")");
