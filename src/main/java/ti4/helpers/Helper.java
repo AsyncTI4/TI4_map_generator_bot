@@ -354,7 +354,7 @@ public class Helper {
         if(Optional.ofNullable(activeMap.getScSet()).isEmpty() || activeMap.getScSet().equals("null")) { //I don't know *why* this is a thing that can happen, but it is
             scSet = "pok";
         }
-        boolean pbd100or500 = activeMap.getName().equals("pbd100") || activeMap.getName().equals("pbd500");
+        boolean pbd100or500 = activeMap.getName().equals("pbd100") || activeMap.getName().equals("pbd500") && !scSet.equals("tribunal");
         String scAsString = String.valueOf(sc);
         if(pbd100or500) {
             char scValue = String.valueOf(sc).charAt(0);
