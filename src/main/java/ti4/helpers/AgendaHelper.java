@@ -1279,8 +1279,7 @@ public class AgendaHelper {
                     Button button = Button.secondary("exhaust_" + planet, planetNameProper + " ("+voteAmount+")");
                     planetButtons.add(button);
                 } else {
-                    Button button = Button.secondary("exhaust_" + planet, planetNameProper + " ("+voteAmount+")");
-
+                    Button button = Button.secondary("exhaust_" + planet, planetNameProper + " ("+voteAmount+")").withEmoji(emoji);
                     planetButtons.add(button);
                 }
             }

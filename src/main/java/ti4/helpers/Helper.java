@@ -512,8 +512,6 @@ public class Helper {
             case "mr" -> Emojis.MecatolRex;
             case "hopesend" -> Emojis.HopesEnd;
             case "primor" -> Emojis.Primor;
-            case "meharxull" -> Emojis.PlanetMeharXull;
-            case "perimeter" -> Emojis.PlanetPerimeter;
             case "archonvail" -> Emojis.PlanetArchonVail;
             case "semlore" -> getRandomSemLore();
             default -> Emojis.SemLor;

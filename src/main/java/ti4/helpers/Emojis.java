@@ -251,10 +251,10 @@ public class Emojis {
     public static final String Primor = "<:Primor:1068567710990077952>";
     public static final String Mallice = "";
     public static final String Mirage = "";
-    public static final String planet = "<:planet:948433122263969802>";
+    public static final String planet = "";
     public static final String PlanetArchonVail = "<:PlanetArchonVail:1137029658118991932>";
-    public static final String PlanetMeharXull = "<:PlanetMeharXull:1072808307514945586>";
-    public static final String PlanetPerimeter = "<:PlanetPerimeter:1072808270147887174>";
+    public static final String PlanetMeharXull = "";
+    public static final String PlanetPerimeter = "";
     public static final String SemLor = "<:SemLor:1072075882618961930>";
     public static final String SemLord = "<:SemLord:1072076401462738965>";
     public static final String SemiLor = "<:SemiLor:1072076567053869106>";
