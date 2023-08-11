@@ -107,7 +107,7 @@ public class Swap extends GameSubcommandData {
                 player.setUserName(addedUser.getName());
                 player.setUserID(addedUser.getId());
                 
-                if(activeMap.getActivePlayer().equalsIgnoreCase(player.getUserID())){
+                if(activeMap.getActivePlayer() != null && activeMap.getActivePlayer().equalsIgnoreCase(player.getUserID())){
                     if(!activeMap.isFoWMode())
                     {
                         try {
