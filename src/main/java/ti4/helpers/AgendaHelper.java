@@ -348,7 +348,7 @@ public class AgendaHelper {
                 // "+Helper.getPlanetRepresentationPlusEmojiPlusResourceInfluence(planetName,
                 // activeMap) + " as "+ votes + " votes", "");
             } else {
-                if (totalVotesSoFar == null || totalVotesSoFar.equalsIgnoreCase("")) {
+                if (totalVotesSoFar == null || totalVotesSoFar.equalsIgnoreCase("Exhaust stuff")) {
                     totalVotesSoFar = "Total votes exhausted so far: " + votes
                             + "\n Planets exhausted so far are: all planets";
                 } else {
@@ -1278,7 +1278,7 @@ public class AgendaHelper {
                     Button button = Button.secondary("exhaust_" + planet, planetNameProper + " ("+voteAmount+")");
                     planetButtons.add(button);
                 } else {
-                    Button button = Button.secondary("exhaust_" + planet, planetNameProper + " ("+voteAmount+")").withEmoji(Emoji.fromFormatted(Helper.getPlanetEmoji(planet)));
+                    Button button = Button.secondary("exhaust_" + planet, planetNameProper + " ("+voteAmount+")");
                     planetButtons.add(button);
                 }
             }
