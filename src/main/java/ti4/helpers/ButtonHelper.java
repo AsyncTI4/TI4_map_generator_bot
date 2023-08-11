@@ -3043,8 +3043,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
     }
     public static String getListOfStuffAvailableToSpend(Player player, Map activeMap){
         String youCanSpend = "You have available to you to spend: ";
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         for (String planet : planets) {
             youCanSpend = youCanSpend + Helper.getPlanetRepresentation(planet, activeMap) +", ";
         }
