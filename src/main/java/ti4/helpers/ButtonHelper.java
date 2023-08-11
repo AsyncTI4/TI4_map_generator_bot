@@ -2448,9 +2448,10 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             message2 = message2
                     + " Ready for Strategy Phase means you are done playing/passing on playing political stability, summit, and manipulate investments. ";
         }
-        List<Button> buttons = null;
+        List<Button> buttons = new ArrayList<Button>();
         if (activeMap.isFoWMode()) {
-            buttons = List.of(draw1AC, getCCs);
+            buttons.add(draw1AC);
+            buttons.add(getCCs);
             message2 = "Resolve status homework using the buttons";
             for (Player p1 : activeMap.getPlayers().values()) {
                 if (p1 == null || p1.isDummy() || p1.getFaction() == null || p1.getPrivateChannel() == null) {
@@ -2460,10 +2461,14 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
 
                 }
             }
-            buttons = List.of(passOnAbilities);
+            buttons = new ArrayList<Button>();
+            buttons.add(passOnAbilities);
         } else {
 
-            buttons = List.of(draw1AC, getCCs, passOnAbilities);
+            
+            buttons.add(draw1AC);
+            buttons.add(getCCs);
+            buttons.add(passOnAbilities);
         }
         if(activeMap.getActionCards().size() > 130 && Helper.getPlayerFromColorOrFaction(activeMap,"hacan") != null && ButtonHelper.getButtonsToSwitchWithAllianceMembers(Helper.getPlayerFromColorOrFaction(activeMap,"hacan"), activeMap, false).size() > 0){
             buttons.add(Button.secondary("getSwapButtons_", "Swap"));
