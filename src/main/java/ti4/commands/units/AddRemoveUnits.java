@@ -351,7 +351,7 @@ abstract public class AddRemoveUnits implements Command {
     }
 
     public void unitParsing(GenericInteractionCreateEvent event, String color, Tile tile, String unitList, Map activeMap) {
-        unitList = unitList.replace(", ", ",");
+        unitList = unitList.replace(", ", ",").replace("-","").replace("'","").toLowerCase();
         StringTokenizer unitListTokenizer = new StringTokenizer(unitList, ",");
         while (unitListTokenizer.hasMoreTokens()) {
             String unitListToken = unitListTokenizer.nextToken();
