@@ -1262,12 +1262,13 @@ public class AgendaHelper {
             if (voteInfo[1] != 0) {
                 voteAmount+=p.getResources();
             }
+            String planetNameProper = planetModel.getName() == null ? planet : planetModel.getName();
             if (voteAmount != 0) {
                 if (Emojis.SemLor.equals(Helper.getPlanetEmoji(planet))) {
-                    Button button = Button.secondary("exhaust_" + planet, planetModel.getNameNullSafe() + " ("+voteAmount+")");
+                    Button button = Button.secondary("exhaust_" + planet, planetNameProper + " ("+voteAmount+")");
                     planetButtons.add(button);
                 } else {
-                    Button button = Button.secondary("exhaust_" + planet, planetModel.getNameNullSafe() + " ("+voteAmount+")").withEmoji(Emoji.fromFormatted(Helper.getPlanetEmoji(planet)));
+                    Button button = Button.secondary("exhaust_" + planet, planetNameProper + " ("+voteAmount+")").withEmoji(Emoji.fromFormatted(Helper.getPlanetEmoji(planet)));
                     planetButtons.add(button);
                 }
             }
