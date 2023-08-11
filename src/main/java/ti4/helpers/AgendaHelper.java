@@ -25,6 +25,7 @@ import ti4.map.UnitHolder;
 import ti4.message.BotLogger;
 import ti4.message.MessageHelper;
 import ti4.model.AgendaModel;
+import ti4.model.PlanetModel;
 
 
 public class AgendaHelper {
@@ -1263,6 +1264,7 @@ public class AgendaHelper {
         int[] voteInfo = getVoteTotal(event, player, activeMap);
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         for (String planet : planets) {
+            PlanetModel planetModel = Mapper.getPlanet(planet);
             int voteAmount = 0;
             Planet p = (Planet) planetsInfo.get(planet);
             if(p == null){
@@ -1276,8 +1278,13 @@ public class AgendaHelper {
                 voteAmount+=p.getResources();
             }
             if (voteAmount != 0) {
-                Button button = Button.secondary("exhaust_"+planet, planet + " ("+voteAmount+")");
-                planetButtons.add(button);
+                if (Emojis.SemLor.equals(Helper.getPlanetEmoji(planet))) {
+                    Button button = Button.secondary("exhaust_" + planet, planetModel.getNameNullSafe() + " ("+voteAmount+")");
+                    planetButtons.add(button);
+                } else {
+                    Button button = Button.secondary("exhaust_" + planet, planetModel.getNameNullSafe() + " ("+voteAmount+")").withEmoji(Emoji.fromFormatted(Helper.getPlanetEmoji(planet)));
+                    planetButtons.add(button);
+                }
             }
         }
 
