@@ -1274,11 +1274,12 @@ public class AgendaHelper {
             }
 
             if (voteAmount != 0) {
-                if (Emojis.SemLor.equals(Helper.getPlanetEmoji(planet))) {
+                Emoji emoji = Emoji.fromFormatted(Helper.getPlanetEmoji(planet));
+                if (Emojis.SemLor.equals(Helper.getPlanetEmoji(planet)) || emoji == null) {
                     Button button = Button.secondary("exhaust_" + planet, planetNameProper + " ("+voteAmount+")");
                     planetButtons.add(button);
                 } else {
-                    Button button = Button.secondary("exhaust_" + planet, planetNameProper + " ("+voteAmount+")").withEmoji(Emoji.fromFormatted(Helper.getPlanetEmoji(planet)));
+                    Button button = Button.secondary("exhaust_" + planet, planetNameProper + " ("+voteAmount+")").withEmoji(emoji);
                     planetButtons.add(button);
                 }
             }
