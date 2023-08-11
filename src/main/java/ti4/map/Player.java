@@ -1143,6 +1143,12 @@ public class Player {
         this.planets = planets;
     }
 
+    public List<String> getReadiedPlanets() {
+        List<String> planets = new ArrayList<>(getPlanets());
+        planets.removeAll(getExhaustedPlanets());
+        return planets;
+    }
+
     public List<String> getExhaustedPlanets() {
         return exhaustedPlanets;
     }

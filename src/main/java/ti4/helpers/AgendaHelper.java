@@ -1145,8 +1145,7 @@ public class AgendaHelper {
     }
 
     public static int[] getVoteTotal(GenericInteractionCreateEvent event, Player player, Map activeMap) {
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int hasXxchaAlliance = 0;
         int hasXxchaHero = 0;
@@ -1260,8 +1259,7 @@ public class AgendaHelper {
 
     public static List<Button> getPlanetButtons(GenericInteractionCreateEvent event, Player player, Map activeMap) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         int[] voteInfo = getVoteTotal(event, player, activeMap);
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         for (String planet : planets) {
