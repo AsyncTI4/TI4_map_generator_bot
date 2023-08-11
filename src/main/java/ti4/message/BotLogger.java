@@ -73,7 +73,7 @@ public class BotLogger {
                     }));
                 }
             } else if (event instanceof SlashCommandInteractionEvent) { //SLASH COMMAND EVENT LOGS
-                String channelName = event.getChannel().getAsMention();
+                String channelName = event.getChannel().getName();
                 String commandString = ((SlashCommandInteractionEvent) event).getCommandString();
                 if (e == null) {
                     botLogChannel.sendMessage(channelName + " [command: `" + commandString + "`]\n" + msg).queue();
@@ -85,7 +85,7 @@ public class BotLogger {
                     }));
                 }
             } else if (event instanceof ButtonInteractionEvent) { //BUTTON EVENT LOGS
-                String channelName = event.getChannel().getAsMention();
+                String channelName = event.getChannel().getName();
                 Button button = ((ButtonInteractionEvent) event).getButton();
                 if (e == null) {
                     botLogChannel.sendMessage(channelName + " [button: `" + button.getId() + "` pressed]\n" + msg).queue();
