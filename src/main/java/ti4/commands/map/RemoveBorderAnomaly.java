@@ -1,7 +1,5 @@
 package ti4.commands.map;
 
-import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.Role;
 import net.dv8tion.jda.api.entities.User;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -9,7 +7,6 @@ import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.Commands;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import net.dv8tion.jda.api.requests.restaction.CommandListUpdateAction;
-import ti4.MapGenerator;
 import ti4.commands.Command;
 import ti4.generator.GenerateMap;
 import ti4.helpers.Constants;
@@ -20,12 +17,12 @@ import ti4.message.MessageHelper;
 import ti4.model.BorderAnomalyModel;
 
 import java.io.File;
-import java.util.List;
 
-public class AddBorderAnomaly implements Command {
+public class RemoveBorderAnomaly implements Command {
+
     @Override
     public String getActionID() {
-        return Constants.ADD_BORDER_ANOMALY;
+        return Constants.REMOVE_BORDER_ANOMALY;
     }
 
     @Override
@@ -47,10 +44,6 @@ public class AddBorderAnomaly implements Command {
     public void execute(SlashCommandInteractionEvent event) {
         String tile = event.getOption(Constants.PRIMARY_TILE, null, OptionMapping::getAsString);
         String direction = event.getOption(Constants.PRIMARY_TILE_DIRECTION, null, OptionMapping::getAsString);
-        String anomalyTypeString = event.getOption(Constants.BORDER_TYPE, null, OptionMapping::getAsString);
-        BorderAnomalyModel model = new BorderAnomalyModel();
-
-        BorderAnomalyModel.BorderAnomalyType anomalyType = model.getBorderAnomalyTypeFromString(anomalyTypeString);
 
         int directionVal = -1;
         switch (direction.toLowerCase()) {
@@ -70,12 +63,7 @@ public class AddBorderAnomaly implements Command {
         User user = event.getUser();
         Map activeMap = MapManager.getInstance().getUserActiveMap(user.getId());
 
-        if(activeMap.hasBorderAnomalyOn(tile, directionVal)) {
-            MessageHelper.sendMessageToChannel(event.getChannel(), "Tile already has an anomaly there!");
-            return;
-        }
-
-        activeMap.addBorderAnomaly(tile, directionVal, anomalyType);
+        activeMap.removeBorderAnomaly(tile, directionVal);
         MapSaveLoadManager.saveMap(activeMap, event);
         File file = GenerateMap.getInstance().saveImage(activeMap, event);
         MessageHelper.replyToMessage(event, file);
@@ -84,11 +72,10 @@ public class AddBorderAnomaly implements Command {
     @SuppressWarnings("ResultOfMethodCallIgnored")
     @Override
     public void registerCommands(CommandListUpdateAction commands) {
-        commands.addCommands(Commands.slash(getActionID(), "Add a border anomaly to a tile")
+        commands.addCommands(Commands.slash(getActionID(), "Remove a border anomaly from a tile")
                 .addOptions(
                         new OptionData(OptionType.STRING, Constants.PRIMARY_TILE, "Tile the border will be linked to").setRequired(true).setAutoComplete(true),
-                        new OptionData(OptionType.STRING, Constants.PRIMARY_TILE_DIRECTION, "Side of the tile the anomaly will be on").setRequired(true).setAutoComplete(true),
-                        new OptionData(OptionType.STRING, Constants.BORDER_TYPE, "Type of anomaly").setRequired(true).setAutoComplete(true)
+                        new OptionData(OptionType.STRING, Constants.PRIMARY_TILE_DIRECTION, "Side of the tile the anomaly will be on").setRequired(true).setAutoComplete(true)
                 )
         );
     }

@@ -3,6 +3,7 @@ package ti4.map;
 import lombok.Getter;
 import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
 
@@ -274,9 +275,23 @@ public class Map {
     public int getNumberOfSOsInTheDeck(){
         return secretObjectives.size();
     }
+
+    public boolean hasBorderAnomalyOn(String tile, Integer direction) {
+        List anomaliesOnBorder = this.borderAnomalies.stream()
+                .filter(anomaly -> !anomaly.getType().equals(BorderAnomalyModel.BorderAnomalyType.ARROW))
+                .filter(anomaly -> anomaly.getTile().equals(tile))
+                .filter(anomaly -> anomaly.getDirection() == direction)
+                .collect(Collectors.toList());
+        return CollectionUtils.isNotEmpty(anomaliesOnBorder);
+    }
     public void addBorderAnomaly(String tile, Integer direction, BorderAnomalyModel.BorderAnomalyType anomalyType) {
         this.borderAnomalies.add(new BorderAnomalyHolder(tile, direction, anomalyType));
     }
+
+    public void removeBorderAnomaly(String tile, Integer direction) {
+        this.borderAnomalies.removeIf(anom -> anom.getTile().equals(tile) && anom.getDirection() == direction);
+    }
+
     public int getNumberOfSOsInPlayersHands(){
         int soNum = 0;
         for(Player player : getPlayers().values()){
