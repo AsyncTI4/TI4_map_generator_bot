@@ -1,12 +1,16 @@
 package ti4.commands.special;
 
+import java.io.File;
+
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.interactions.commands.OptionType;
 import net.dv8tion.jda.api.interactions.commands.build.OptionData;
 import ti4.commands.units.AddRemoveUnits;
+import ti4.generator.GenerateMap;
 import ti4.helpers.AliasHandler;
 import ti4.helpers.Constants;
+import ti4.helpers.DisplayType;
 import ti4.map.*;
 import ti4.message.MessageHelper;
 
@@ -52,5 +56,8 @@ public class SwapTwoSystems extends SpecialSubcommandData {
         activeMap.setTile(tile);
         activeMap.setTile(tileTo);
         activeMap.rebuildTilePositionAutoCompleteList();
+        DisplayType displayType = DisplayType.map;
+        File file = GenerateMap.getInstance().saveImage(activeMap, displayType, event);
+        MessageHelper.sendFileToChannel(event.getChannel(), file);
     }
 }

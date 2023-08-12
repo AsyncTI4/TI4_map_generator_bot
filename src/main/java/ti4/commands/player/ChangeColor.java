@@ -27,8 +27,8 @@ public class ChangeColor extends PlayerSubcommandData {
         Map activeMap = getActiveMap();
 
         @SuppressWarnings("ConstantConditions")
-        String color = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
-        if (!Mapper.isColorValid(color)) {
+        String newColour = AliasHandler.resolveColor(event.getOption(Constants.COLOR).getAsString().toLowerCase());
+        if (!Mapper.isColorValid(newColour)) {
             sendMessage("Color not valid");
             return;
         }
@@ -43,8 +43,8 @@ public class ChangeColor extends PlayerSubcommandData {
         LinkedHashMap<String, Player> players = activeMap.getPlayers();
         for (Player playerInfo : players.values()) {
             if (playerInfo != player) {
-                if (color.equals(playerInfo.getColor())) {
-                    sendMessage("Player:" + playerInfo.getUserName() + " already uses color:" + color);
+                if (newColour.equals(playerInfo.getColor())) {
+                    sendMessage("Player:" + playerInfo.getUserName() + " already uses color:" + newColour);
                     return;
                 }
             }
@@ -52,10 +52,10 @@ public class ChangeColor extends PlayerSubcommandData {
 
         String oldColor = player.getColor();
         String oldColorKey = oldColor + "_";
-        String newColorKey = color + "_";
-        player.changeColor(color);
+        String newColorKey = newColour + "_";
+        player.changeColor(newColour);
         String oldColorID = Mapper.getColorID(oldColor);
-        String colorID = Mapper.getColorID(color);
+        String colorID = Mapper.getColorID(newColour);
         
         String oldColorSuffix = "_" + oldColorID + ".";
         String newColorSuffix = "_" + colorID + ".";
@@ -89,9 +89,18 @@ public class ChangeColor extends PlayerSubcommandData {
             List<String> mahactCC = new ArrayList<>(playerInfo.getMahactCC());
             for (String cc : mahactCC) {
                 if (cc.equals(oldColor)) {
-                    String replacedCC = cc.replace(oldColor, color);
+                    String replacedCC = cc.replace(oldColor, newColour);
                     playerInfo.removeMahactCC(cc);
                     playerInfo.addMahactCC(replacedCC);
+                }
+            }
+
+            java.util.Map<String, Integer> debtTokens = new LinkedHashMap<>(playerInfo.getDebtTokens());
+            for (String colour : debtTokens.keySet()) {
+                if (colour.equals(oldColor)) {
+                    Integer count = debtTokens.get(colour);
+                    playerInfo.clearAllDebtTokens(colour);
+                    playerInfo.addDebtTokens(newColour, count);
                 }
             }
         }

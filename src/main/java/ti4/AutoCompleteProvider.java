@@ -388,6 +388,15 @@ public class AutoCompleteProvider {
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
             }
+            case Constants.SPECIFIC_PHASE -> {
+                String enteredValue = event.getFocusedOption().getValue();
+                List<Command.Choice> options = Stream.of("strategy", "voting", "statusScoring", "statusHomework", "action", "agendaResolve")
+                        .filter(value -> value.contains(enteredValue))
+                        .limit(25)
+                        .map(value -> new Command.Choice(value, value))
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
             case Constants.CREUSS_TOKEN_NAME -> {
                 String enteredValue = event.getFocusedOption().getValue();
                 List<Command.Choice> options = Stream.of("alpha", "beta", "gamma")
@@ -554,6 +563,17 @@ public class AutoCompleteProvider {
                         .filter(deckModel -> deckModel.getType().equals(Constants.EXPLORE))
                         .filter(value -> value.getAlias().contains(enteredValue))
                         .map((deck) -> new Command.Choice(deck.getName(), deck.getAlias()))
+                        .limit(25)
+                        .collect(Collectors.toList());
+                event.replyChoices(options).queue();
+            }
+            case Constants.STRATEGY_CARD_SET -> {
+                String enteredValue = event.getFocusedOption().getValue().toLowerCase();
+                HashMap<String, StrategyCardModel> decks = Mapper.getStrategyCardSets();
+                List<Command.Choice> options = decks.values().stream()
+                        .filter(scSet -> !scSet.getAlias().equals("template"))
+                        .filter(value -> value.getAlias().contains(enteredValue))
+                        .map((scSet) -> new Command.Choice(scSet.getName(), scSet.getAlias()))
                         .limit(25)
                         .collect(Collectors.toList());
                 event.replyChoices(options).queue();
