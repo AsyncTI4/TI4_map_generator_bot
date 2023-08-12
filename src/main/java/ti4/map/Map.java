@@ -74,6 +74,9 @@ public class Map {
     @ExportableField
     private int playerCountForMap = 6;
 
+    @Getter @Setter
+    private boolean reverseSpeakerOrder = false;
+
     @ExportableField
     private int activationCount = 0;
     @ExportableField
