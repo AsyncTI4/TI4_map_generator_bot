@@ -77,9 +77,7 @@ public class SCPick extends PlayerSubcommandData {
             {
                 return;
             }
-            
         }
-
         //ONLY DEAL WITH EXTRA PICKS IF IN FoW
         if (playerSCs.isEmpty()) {
             sendMessage("No SC picked.");
@@ -87,9 +85,6 @@ public class SCPick extends PlayerSubcommandData {
         }
         secondHalfOfSCPick(event, player, activeMap, scPicked);
     }
-
-        
-
 
     public void secondHalfOfSCPick(GenericInteractionCreateEvent event, Player player, Map activeMap, int scPicked)
     {
@@ -99,9 +94,12 @@ public class SCPick extends PlayerSubcommandData {
         String msgExtra = "";
         boolean allPicked = true;
         Player privatePlayer = null;
-        Collection<Player> activePlayers = activeMap.getPlayers().values().stream()
+        List<Player> activePlayers = activeMap.getPlayers().values().stream()
                 .filter(player_ -> player_.isRealPlayer())
                 .collect(Collectors.toList());
+        if(activeMap.isReverseSpeakerOrder()) {
+            Collections.reverse(activePlayers);
+        }
         int maxSCsPerPlayer = activeMap.getSCList().size() / activePlayers.size();
         if(maxSCsPerPlayer < 1){
             maxSCsPerPlayer = 1;
@@ -235,8 +233,6 @@ public class SCPick extends PlayerSubcommandData {
                         MessageHelper.sendMessageToChannel(activeMap.getMainGameChannel(), msgExtra);
                     }
                 }
-
-
             }
         }
     }
