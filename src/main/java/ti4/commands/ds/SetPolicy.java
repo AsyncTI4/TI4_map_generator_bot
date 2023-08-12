@@ -101,67 +101,81 @@ public class SetPolicy extends DiscordantStarsSubcommandData {
         //sendMessage("debug  finalset - pol1" + pol1 + " pol2 " + pol2 + " pol3 " + pol3); (debug messagesender if more work is needed)
         
         // go through each option and set the policy accordingly
-        if (pol1.equals("-"))
-        {   
-            if(player.hasAbility("policy_the_people_connect")) 
-            {
-                player.removeAbility("policy_the_people_connect");
-                sendMessage("removed Policy - The People: Connect (+).");
-            }            
-            player.addAbility("policy_the_people_control");
-            sendMessage("added Policy - The People: Control (-).");
-        }       
-            else if (pol1.equals("+"))
+        if (pol1 != null) {
+            if (pol1.equals("-"))
             {   
-                if(player.hasAbility("policy_the_people_control"))
+                if(player.hasAbility("policy_the_people_connect")) 
                 {
-                    player.removeAbility("policy_the_people_control"); 
-                    sendMessage("removed Policy - The People: Control (-).");
+                    player.removeAbility("policy_the_people_connect");
+                    sendMessage("removed Policy - The People: Connect (+).");
                 }            
-                player.addAbility("policy_the_people_connect");
-                sendMessage("added Policy - The People: Connect (+).");
-            }
-                   
-        if (pol2.equals("-"))
-        {   
-            if(player.hasAbility("policy_the_environment_preserve")) 
-            {
-                player.removeAbility("policy_the_environment_preserve");
-                sendMessage("removed Policy - The Environment: Preserve (-).");
-            }            
-            player.addAbility("policy_the_environment_plunder");
-            sendMessage("added Policy - The Environment: Plunder (-).");
+                player.addAbility("policy_the_people_control");
+                sendMessage("added Policy - The People: Control (-).");
+            }       
+                else if (pol1.equals("+"))
+                {   
+                    if(player.hasAbility("policy_the_people_control"))
+                    {
+                        player.removeAbility("policy_the_people_control"); 
+                        sendMessage("removed Policy - The People: Control (-).");
+                    }            
+                    player.addAbility("policy_the_people_connect");
+                    sendMessage("added Policy - The People: Connect (+).");
+                }
         }
-        else if (pol2.equals("+"))
-            {
-                if(player.hasAbility("policy_the_environment_plunder"))
-                {
-                    player.removeAbility("policy_the_environment_plunder");
-                    sendMessage("removed Policy - The Environment: Plunder (-).");
-                }            
-                player.addAbility("policy_the_environment_preserve");
-                sendMessage("added Policy - The Environment: Preserve (+).");
-            }
-        if (pol3.equals("-"))
-        {   
-            if(player.hasAbility("policy_the_economy_empower"))
-            {
-                player.removeAbility("policy_the_economy_empower"); 
-                sendMessage("removed Policy - The Economy: Empower (+).");
-            }            
-            player.addAbility("policy_the_economy_exploit"); 
-            sendMessage("added Policy - The Economy: Exploit (-).");
-        }
-        else if (pol3.equals("+"))
+        if (pol2 != null) {
+            if (pol2.equals("-"))
             {   
-                if(player.hasAbility("policy_the_economy_exploit"))
+                if(player.hasAbility("policy_the_environment_preserve")) 
                 {
-                    player.removeAbility("policy_the_economy_exploit");
-                    sendMessage("removed Policy - The Economy: Exploit (-).");
+                    player.removeAbility("policy_the_environment_preserve");
+                    sendMessage("removed Policy - The Environment: Preserve (-).");
                 }            
-                player.addAbility("policy_the_economy_empower");
-                sendMessage("added Policy - The Economy: Empower (+).");
+                player.addAbility("policy_the_environment_plunder");
+                sendMessage("added Policy - The Environment: Plunder (-).");
             }
+            else if (pol2.equals("+"))
+                {
+                    if(player.hasAbility("policy_the_environment_plunder"))
+                    {
+                        player.removeAbility("policy_the_environment_plunder");
+                        sendMessage("removed Policy - The Environment: Plunder (-).");
+                    }            
+                    player.addAbility("policy_the_environment_preserve");
+                    sendMessage("added Policy - The Environment: Preserve (+).");
+                }
+        }
+        if (pol3 != null){
+            if (pol3.equals("-"))
+            {   
+                if(player.hasAbility("policy_the_economy_empower"))
+                {
+                    player.removeAbility("policy_the_economy_empower"); 
+                    sendMessage("removed Policy - The Economy: Empower (+).");
+                }            
+                if (!player.hasAbility("policy_the_economy_exploit")) 
+                {
+                    player.addAbility("policy_the_economy_exploit"); 
+                    player.setCommoditiesTotal(player.getCommoditiesTotal()-1);
+                    sendMessage("added Policy - The Economy: Exploit (-). Decreased Commodities total by 1 - double check the value is correct!");
+                }
+                else if (player.hasAbility("policy_the_economy_exploit")){
+                    player.addAbility("policy_the_economy_exploit"); 
+                    sendMessage("added Policy - The Economy: Exploit (-). You already had this policy, so your Commodities total is unchanged.");
+                }
+            }            
+            else if (pol3.equals("+"))
+                {   
+                    if(player.hasAbility("policy_the_economy_exploit"))
+                    {
+                        player.removeAbility("policy_the_economy_exploit");
+                        player.setCommoditiesTotal(player.getCommoditiesTotal()+1);
+                        sendMessage("removed Policy - The Economy: Exploit (-). Increased Commodities total by 1 - double check the value is correct!.");
+                    }            
+                    player.addAbility("policy_the_economy_empower");
+                    sendMessage("added Policy - The Economy: Empower (+).");
+                }
+        }
     }    
 
         public String convertChoice(String inputChoice) {
