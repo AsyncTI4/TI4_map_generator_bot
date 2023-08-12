@@ -53,6 +53,20 @@ public class ScorePublic extends StatusSubcommandData {
 	}
 
 	public static void scorePO(GenericInteractionCreateEvent event, MessageChannel channel, Map activeMap, Player player, int poID) {
+		String both = getNameNEMoji(activeMap, poID);
+        String poName = both.split("_")[0];
+        if(poName.toLowerCase().contains("push boundaries")){
+			int aboveN = 0;
+			for(Player p2 : Helper.getNeighbouringPlayers(activeMap, player)){
+				if(player.getPlanets().size() > p2.getPlanets().size()){
+					aboveN = aboveN + 1;
+				}
+			}
+			if(aboveN < 2){
+				MessageHelper.sendMessageToChannel(channel, "You do not have more planets than 2 neighbors");
+				return;
+			}
+		}
 		boolean scored = activeMap.scorePublicObjective(player.getUserID(), poID);
 		if (!scored) {
 			MessageHelper.sendMessageToChannel(channel, "No such Public Objective ID found or already scored, please retry");
@@ -61,10 +75,10 @@ public class ScorePublic extends StatusSubcommandData {
 		}
 	}
 
-    public static void informAboutScoring(GenericInteractionCreateEvent event, MessageChannel channel, Map activeMap, Player player, int poID) {
-        LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
-        String id = "";
-        for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
+	public static String getNameNEMoji(Map activeMap, int poID){
+		String id = "";
+		LinkedHashMap<String, Integer> revealedPublicObjectives = activeMap.getRevealedPublicObjectives();
+		for (java.util.Map.Entry<String, Integer> po : revealedPublicObjectives.entrySet()) {
             if (po.getValue().equals(poID)) {
                 id = po.getKey();
                 break;
@@ -75,7 +89,7 @@ public class ScorePublic extends StatusSubcommandData {
         String poName1 = publicObjectivesState1.get(id);
         String poName2 = publicObjectivesState2.get(id);
         String poName = id;
-        String emojiName = "";
+        String emojiName = "Custom";
         if (poName1 != null) {
             poName = poName1;
             emojiName = Emojis.Public1alt;
@@ -83,6 +97,14 @@ public class ScorePublic extends StatusSubcommandData {
             poName = poName2;
             emojiName = Emojis.Public2alt;
         }
+		return poName+"_"+emojiName;
+	}
+
+    public static void informAboutScoring(GenericInteractionCreateEvent event, MessageChannel channel, Map activeMap, Player player, int poID) {
+        String both = getNameNEMoji(activeMap, poID);
+        String poName = both.split("_")[0];
+        String emojiName =  both.split("_")[1];
+        
         String message = Helper.getPlayerRepresentation(player, activeMap) + " scored " + emojiName + " __**" + poName + "**__";
         MessageHelper.sendMessageToChannel(channel, message);
 		if (activeMap.isFoWMode()) {

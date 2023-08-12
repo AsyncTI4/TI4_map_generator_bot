@@ -1,0 +1,38 @@
+[
+  {
+    "name": "SC Set Template",
+    "alias": "template",
+    "cardValues": [1,2,3,4,5,6,7,8],
+    "description": "A template json strategy card set"
+  },
+  {
+    "name": "PoK Strategy Cards",
+    "alias": "pok",
+    "cardValues": [1,2,3,4,5,6,7,8],
+    "description": "The \"default\" set of strategy cards, used in PoK"
+  },
+  {
+    "name": "Base Game Strategy Cards",
+    "alias": "base_game",
+    "cardValues": [1,2,3,4,5,6,7,8],
+    "description": "The original set of strategy cards, before Diplomacy and Construction were updated"
+  },
+  {
+    "name": "Tispoon Ten",
+    "alias": "tispoon",
+    "cardValues": [1,2,3,4,5,6,7,8,9,10],
+    "description": "A set of 10 strategy cards by HolyTispoon used in FoW41"
+  },
+  {
+    "name": "Tispoon's Tribunal",
+    "alias": "tribunal",
+    "cardValues": [1,2,3,4,5,6,7,8,9,10],
+    "description": "A set of 10 strategy cards by HolyTispoon used in PBD500"
+  },
+  {
+    "name": "Asteroid's Anarchy",
+    "alias": "asteroid",
+    "cardValues": [1,2,3,4,5,6,7,8,9,10,11],
+    "description": "Asteroid's set of 11 custom SCs"
+  }
+]

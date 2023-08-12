@@ -1,9 +1,7 @@
 package ti4.commands.game;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.interactions.commands.OptionMapping;
@@ -16,6 +14,7 @@ import ti4.map.Map;
 import ti4.map.Player;
 import ti4.message.MessageHelper;
 import ti4.model.DeckModel;
+import ti4.model.StrategyCardModel;
 
 public class SetDeck extends GameSubcommandData {
 
@@ -43,21 +42,31 @@ public class SetDeck extends GameSubcommandData {
         this.deckTypes.forEach(deckType -> {
             String value = event.getOption(deckType, null, OptionMapping::getAsString);
             if (Optional.ofNullable(value).isPresent()) {
-                DeckModel deckModel = Mapper.getDecks().get(value);
-                if(Optional.ofNullable(deckModel).isPresent()) {
-                    switch (deckType) {
-                        case Constants.AC_DECK -> activeMap.validateAndSetActionCardDeck(event, deckModel);
-                        case Constants.SO_DECK -> activeMap.setSecretObjectives(deckModel.getShuffledCardList());
-                        case Constants.STAGE_1_PUBLIC_DECK -> activeMap.setPublicObjectives1(new ArrayList<>(deckModel.getShuffledCardList()));
-                        case Constants.STAGE_2_PUBLIC_DECK -> activeMap.setPublicObjectives2(new ArrayList<>(deckModel.getShuffledCardList()));
-                        case Constants.RELIC_DECK -> activeMap.setRelics(new ArrayList<>(deckModel.getShuffledCardList()));
-                        case Constants.AGENDA_DECK -> activeMap.validateAndSetAgendaDeck(event, deckModel);
-                        case Constants.EXPLORATION_DECKS -> activeMap.setExploreDeck(new ArrayList<>(deckModel.getShuffledCardList()));
-                    }
-                    changedDecks.put(deckModel.getType(), deckModel);
+                if(deckType.equals(Constants.STRATEGY_CARD_SET)) {
+                    StrategyCardModel strategyCardModel = Mapper.getStrategyCardSets().get(value);
+                    activeMap.setHomeBrewSCMode(true);
+                    activeMap.setScTradeGoods(new LinkedHashMap<>());
+                    activeMap.setScSet(strategyCardModel.getAlias());
+
+                    strategyCardModel.getCardValues().forEach(scValue -> activeMap.setScTradeGood(scValue, 0));
                 }
                 else {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong, and the deck " + value + " could not be found, try executing the command again (without copy/pasting).");
+                    DeckModel deckModel = Mapper.getDecks().get(value);
+                    if(Optional.ofNullable(deckModel).isPresent()) {
+                        switch (deckType) {
+                            case Constants.AC_DECK -> activeMap.validateAndSetActionCardDeck(event, deckModel);
+                            case Constants.SO_DECK -> activeMap.setSecretObjectives(deckModel.getShuffledCardList());
+                            case Constants.STAGE_1_PUBLIC_DECK -> activeMap.setPublicObjectives1(new ArrayList<>(deckModel.getShuffledCardList()));
+                            case Constants.STAGE_2_PUBLIC_DECK -> activeMap.setPublicObjectives2(new ArrayList<>(deckModel.getShuffledCardList()));
+                            case Constants.RELIC_DECK -> activeMap.setRelics(new ArrayList<>(deckModel.getShuffledCardList()));
+                            case Constants.AGENDA_DECK -> activeMap.validateAndSetAgendaDeck(event, deckModel);
+                            case Constants.EXPLORATION_DECKS -> activeMap.setExploreDeck(new ArrayList<>(deckModel.getShuffledCardList()));
+                        }
+                        changedDecks.put(deckModel.getType(), deckModel);
+                    }
+                    else {
+                        MessageHelper.sendMessageToChannel(event.getChannel(), "Something went wrong, and the deck " + value + " could not be found, try executing the command again (without copy/pasting).");
+                    }
                 }
             }
         });

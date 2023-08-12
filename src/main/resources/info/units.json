@@ -1252,7 +1252,7 @@
         "combatHitsOn": 8,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may ignore the movement effects of non-supernova anomalies."
+        "ability": "This unit may ignore the movement effects of non-supernova anomalies. [Note: This does not ignore Gravity Rifts/non-movement-effects!]"
     },
     {
         "id": "kjalengard_carrier2",
@@ -1271,7 +1271,7 @@
         "combatHitsOn": 7,
         "combatDieCount": 1,
         "isShip": true,
-        "ability": "This unit may ignore the movement effects of anomalies."
+        "ability": "This unit may ignore the movement effects of anomalies. [Note: This does not ignore Gravity Rifts/non-movement-effects!]"
     },
     {
         "id": "kjalengard_flagship",

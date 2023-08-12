@@ -166,7 +166,7 @@ public class MessageHelper {
 		while (iterator.hasNext()) {
 			MessageCreateData messageCreateData = iterator.next();
 			if (iterator.hasNext()) { //not  message
-				channel.sendMessage(messageCreateData).queue();
+				channel.sendMessage(messageCreateData).queue(null, (error) -> BotLogger.log(getRestActionFailureMessage(channel, messageText, error)));
 			} else { //last message, do action
 				channel.sendMessage(messageCreateData).queue(complete -> {
 
@@ -193,7 +193,7 @@ public class MessageHelper {
 								String message = activeMap.getLatestUpNextMsg().substring(activeMap.getLatestUpNextMsg().indexOf("_")+1, activeMap.getLatestUpNextMsg().length()).replace("#", "");
 								message = message.replace("UP NEXT", "started their turn");
 								
-								activeMap.getActionsChannel().editMessageById(id, message).queue();
+								activeMap.getActionsChannel().editMessageById(id, message).queue(null, (error) -> BotLogger.log(getRestActionFailureMessage(channel, messageText, error)));
 							}
 							
 							activeMap.setLatestUpNextMsg(complete.getId()+"_"+messageText);
@@ -204,9 +204,13 @@ public class MessageHelper {
 					}
 					
 					if (restAction != null) restAction.run(complete);
-				});
+				}, (error) -> BotLogger.log(getRestActionFailureMessage(channel, messageText, error)));
 			}
 		}
+	}
+
+	private static String getRestActionFailureMessage(MessageChannel channel, String messageText, Throwable error) {
+		return channel.getAsMention() + "  RestAction Failure within MessageHelper.splitAndSentWithAction:\nMessageText: " + messageText + "\n```" + error.getMessage() + "```";
 	}
 
 	/**
