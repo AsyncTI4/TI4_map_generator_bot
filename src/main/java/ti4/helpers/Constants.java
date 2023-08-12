@@ -832,6 +832,10 @@ public class Constants {
     public static final String PN_REMOVE = "pn_remove";
     public static final String PN_ADD = "pn_add";
     public static final String FLIP_GRACE = "flip_grace";
+    public static final String SET_POLICY = "set_policy";
+    public static final String SET_PEOPLE = "set_people";
+    public static final String SET_ENVIRONMENT = "set_environment";
+    public static final String SET_ECONOMY = "set_economy";    
     public static final String SIGIL = "token_ds_sigil.png";
     public static final String IMAGE_GEN_COUNT = "image_gen_count";
     public static final String RUN_DATA_MIGRATIONS = "run_data_migrations";
