@@ -65,6 +65,7 @@ public class Constants {
     public static final String LOG_MESSAGE = "log_message";
     public static final String SET_GAME = "set_game";
     public static final String ADD_BORDER_ANOMALY = "add_border_anomaly";
+    public static final String REMOVE_BORDER_ANOMALY = "remove_border_anomaly";
     public static final String SET_STATUS = "set_status";
     public static final String REMOVE_PLAYER = "remove_player";
     public static final String PLAYER_NAME = "player_name";
