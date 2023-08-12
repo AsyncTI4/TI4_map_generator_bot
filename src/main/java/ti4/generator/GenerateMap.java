@@ -35,6 +35,7 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Map.Entry;
 import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -555,6 +556,10 @@ public class GenerateMap {
                     xDelta = leaderInfo(player, xDelta, yPlayArea, activeMap);
                 }
 
+                if (player.getDebtTokens().values().stream().anyMatch(i -> i > 0)) {
+                    xDelta = debtInfo(player, xDelta, yPlayArea, activeMap);
+                }
+
                 if (!player.getAbilities().isEmpty()) {
                     xDelta = abilityInfo(player, xDelta, yPlayArea, activeMap);
                 }
@@ -763,7 +768,6 @@ public class GenerateMap {
             deltaX += 48;
             if (Constants.COMMANDER.equals(leader.getType()) && player.hasAbility("imperia")) {
                 List<String> mahactCCs = player.getMahactCC();
-
                 Collection<Player> players = activeMap.getPlayers().values();
                 for (Player player_ : players) {
                     if (player_ != player) {
@@ -796,6 +800,77 @@ public class GenerateMap {
             }
         }
         return x + deltaX + 20;
+    }
+
+    private int debtInfo(Player player, int x, int y, Map activeMap) {
+        int deltaX = 0;
+        int deltaY = 0;
+
+        Graphics2D g2 = (Graphics2D) graphics;
+        g2.setStroke(new BasicStroke(2));
+             
+        String bankImage = "vaden".equals(player.getFaction().toLowerCase()) ? "pa_ds_vaden_bank.png" : "pa_debtaccount.png"; //TODO: add generic bank image
+        drawPAImage(x + deltaX, y, bankImage);
+        
+        deltaX += 24;
+        deltaY += 2;
+
+        BufferedImage factionImage = null;
+        boolean convertToGeneric = isFoWPrivate != null && isFoWPrivate && !FoWHelper.canSeeStatsOfPlayer(activeMap, player, fowPlayer);
+
+        int tokenDeltaY = 0;
+        int playerCount = 0;
+        int maxTokenDeltaX = 0;
+        for (Entry<String, Integer> debtToken : player.getDebtTokens().entrySet()) {
+            int tokenDeltaX = 0;
+            String controlID = convertToGeneric ? Mapper.getControlID("gray") : Mapper.getControlID(debtToken.getKey());
+            if (controlID.contains("null")) {
+                continue;
+            }
+            factionImage = null;
+            float scale = 0.60f;
+            if (!convertToGeneric) {
+                String faction = getFactionByControlMarker(activeMap.getPlayers().values(), controlID);
+                if (faction != null) {
+                    String factionImagePath = Mapper.getCCPath("control_faction_" + faction + ".png");
+                    if (factionImagePath != null) {
+                        try {
+                            factionImage = resizeImage(ImageIO.read(new File(factionImagePath)), scale);
+                        } catch (Exception e) {
+                            // TODO: handle exception
+                        }
+                    }
+                }
+            }
+
+            BufferedImage bufferedImage = null;
+            try {
+                bufferedImage = resizeImage(ImageIO.read(new File(Mapper.getCCPath(controlID))), scale);
+            } catch (Exception e) {
+                // TODO: handle exception
+            }
+
+            for (int i = 0; i < debtToken.getValue(); i++) {
+                graphics.drawImage(bufferedImage, x + deltaX + tokenDeltaX, y + deltaY + tokenDeltaY, null);
+                if (!convertToGeneric) {
+                    graphics.drawImage(factionImage, x + deltaX + tokenDeltaX, y + deltaY + tokenDeltaY, null);
+                }
+                tokenDeltaX += 15;
+            }
+            tokenDeltaY += 29;
+            maxTokenDeltaX = Math.max(maxTokenDeltaX, tokenDeltaX + 35);
+            playerCount++;
+            if (playerCount % 5 == 0) {
+                tokenDeltaY = 0;
+                deltaX += maxTokenDeltaX;
+                maxTokenDeltaX = 0;
+            }
+        }
+        deltaX = Math.max(deltaX + maxTokenDeltaX, 152);
+        graphics.setColor(Color.WHITE);
+        graphics.drawRect(x - 2, y - 2, deltaX, 152);
+
+        return x + deltaX + 10;
     }
 
     private int abilityInfo(Player player, int x, int y, Map activeMap) {
@@ -1109,7 +1184,7 @@ public class GenerateMap {
         if (colorID.startsWith("ylw") || colorID.startsWith("org") || colorID.startsWith("pnk")
                 || colorID.startsWith("tan") || colorID.startsWith("crm") || colorID.startsWith("sns") || colorID.startsWith("tqs")
                 || colorID.startsWith("gld") || colorID.startsWith("lme") || colorID.startsWith("lvn") || colorID.startsWith("rse")
-                || colorID.startsWith("spr") || colorID.startsWith("tea") || colorID.startsWith("lgy")) {
+                || colorID.startsWith("spr") || colorID.startsWith("tea") || colorID.startsWith("lgy") || colorID.startsWith("eth")) {
             text += "_blk.png";
         } else {
             text += "_wht.png";
@@ -2489,7 +2564,7 @@ public class GenerateMap {
                 return new Color(186, 193, 195);
             case "sunset":
                 return new Color(173, 106, 248);
-            case "torquoise":
+            case "turquoise":
                 return new Color(37, 255, 232);
             case "gold":
                 return new Color(215, 1, 247);
@@ -2513,6 +2588,8 @@ public class GenerateMap {
                 return Color.decode("#d59de2");
             case "spring":
                 return Color.decode("#cedd8e");
+            case "ethereal":
+                return Color.decode("#31559e");
             default:
                 return Color.WHITE;
         }
@@ -3123,7 +3200,7 @@ public class GenerateMap {
             if (unitID.startsWith("ylw") || unitID.startsWith("org") || unitID.startsWith("pnk")
                     || unitID.startsWith("tan") || unitID.startsWith("crm") || unitID.startsWith("sns") || unitID.startsWith("tqs")
                     || unitID.startsWith("gld") || unitID.startsWith("lme") || unitID.startsWith("lvn") || unitID.startsWith("rse")
-                    || unitID.startsWith("spr") || unitID.startsWith("tea") || unitID.startsWith("lgy")) {
+                    || unitID.startsWith("spr") || unitID.startsWith("tea") || unitID.startsWith("lgy") || unitID.startsWith("eth")) {
                 groupUnitColor = Color.BLACK;
             }
             if (unitID.endsWith(Constants.COLOR_FF)) {

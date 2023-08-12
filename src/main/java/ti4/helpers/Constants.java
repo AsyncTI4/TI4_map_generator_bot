@@ -7,6 +7,7 @@ public class Constants {
     public static final String SHOW_GAME = "show_game";
     public static final String FOWGM = "fowgm";
     public static final String ADD_ALLIANCE_MEMBER = "add_alliance_member";
+    public static final String SPIN_TILES_IN_FIRST_THREE_RINGS = "spin_tiles_in_first_three_rings";
     public static final String ALLIANCE_MEMBERS = "alliance_members";
     public static final String FOW_CATEGORY = "fow_category";
     public static final String SWORDS_TO_PLOWSHARES = "swords_to_plowshares";
@@ -131,6 +132,8 @@ public class Constants {
     public static final String UNIT_NAMES = "unit_names";
     public static final String UNIT_NAME = "unit_name";
     public static final String CHANGE_TO_BASE_GAME = "change_to_base_game";
+    public static final String START_PHASE = "start_phase";
+    public static final String SPECIFIC_PHASE = "specific_phase";
     public static final String REMOVE_CODEX_AC = "remove_codex_ac";
     public static final String PRIORITY_NO_DAMAGE = "priority_no_damage";
     public static final String UNIT_NAMES_TO = "unit_names_to";
@@ -833,6 +836,10 @@ public class Constants {
     public static final String PN_REMOVE = "pn_remove";
     public static final String PN_ADD = "pn_add";
     public static final String FLIP_GRACE = "flip_grace";
+    public static final String SET_POLICY = "set_policy";
+    public static final String SET_PEOPLE = "set_people";
+    public static final String SET_ENVIRONMENT = "set_environment";
+    public static final String SET_ECONOMY = "set_economy";    
     public static final String SIGIL = "token_ds_sigil.png";
     public static final String IMAGE_GEN_COUNT = "image_gen_count";
     public static final String RUN_DATA_MIGRATIONS = "run_data_migrations";
@@ -850,4 +857,5 @@ public class Constants {
     public static final String UNIT_REMOVE = "unit_remove";
     public static final String UNIT_ADD = "unit_add";
     public static final String UNIT_INFO = "unit_info";
+    public static final String CLEAR_DEBT = "clear_debt";
 }

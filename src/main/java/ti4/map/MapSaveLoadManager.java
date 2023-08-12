@@ -465,6 +465,8 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
         writer.write(Constants.HOMEBREW_SC_MODE + " " + activeMap.isHomeBrewSCMode());
         writer.write(System.lineSeparator());
+        writer.write(Constants.STRATEGY_CARD_SET + " " + activeMap.getScSet());
+        writer.write(System.lineSeparator());
 
         ObjectMapper mapper = new ObjectMapper();
         String anomaliesJson = mapper.writeValueAsString(activeMap.getBorderAnomalies()); //much easier than manually (de)serialising
@@ -477,7 +479,7 @@ public class MapSaveLoadManager {
         writer.write(Constants.IMAGE_GEN_COUNT + " " + activeMap.getMapImageGenerationCount());
         writer.write(System.lineSeparator());
 
-        writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",",activeMap.getRunMigrations()));
+        writer.write(Constants.RUN_DATA_MIGRATIONS + " " + String.join(",", activeMap.getRunMigrations()));
         writer.write(System.lineSeparator());
 
         writer.write(ENDGAMEINFO);
@@ -549,15 +551,6 @@ public class MapSaveLoadManager {
             writer.write(Constants.PROMISSORY_NOTES_PLAY_AREA + " " + String.join(",", player.getPromissoryNotesInPlayArea()));
             writer.write(System.lineSeparator());
 
-            //MIGRATION CODE - TODO: remove after the first save/load of all maps
-            if (player.getUnitsOwned().isEmpty()) {
-                String playerFaction = player.getFaction();
-                if (playerFaction != null) {
-                    FactionModel factionModel = Mapper.getFactionSetup(playerFaction);
-                    if (factionModel != null) player.setUnitsOwned(new HashSet<String>(factionModel.getUnits()));
-                }    
-            }
-
             writer.write(Constants.UNITS_OWNED + " " + String.join(",", player.getUnitsOwned()));
             writer.write(System.lineSeparator());
 
@@ -600,6 +593,10 @@ public class MapSaveLoadManager {
 
             writer.write(Constants.TG + " " + player.getTg());
             writer.write(System.lineSeparator());
+
+            writer.write(Constants.DEBT + " " + getStringRepresentationOfMap(player.getDebtTokens()));
+            writer.write(System.lineSeparator());
+
             writer.write(Constants.COMMODITIES + " " + player.getCommodities());
             writer.write(System.lineSeparator());
             writer.write(Constants.COMMODITIES_TOTAL + " " + player.getCommoditiesTotal());
@@ -617,12 +614,12 @@ public class MapSaveLoadManager {
             writer.write(Constants.CAPTURE + " " + units);
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.UNIT_CAP + " " + getUnitCapList(player.getUnitCaps()));
+            writer.write(Constants.UNIT_CAP + " " + getStringRepresentationOfMap(player.getUnitCaps()));
             writer.write(System.lineSeparator());
 
-            writer.write(Constants.SO + " " + getSecretList(player.getSecrets()));
+            writer.write(Constants.SO + " " + getStringRepresentationOfMap(player.getSecrets()));
             writer.write(System.lineSeparator());
-            writer.write(Constants.SO_SCORED + " " + getSecretList(player.getSecretsScored()));
+            writer.write(Constants.SO_SCORED + " " + getStringRepresentationOfMap(player.getSecretsScored()));
             writer.write(System.lineSeparator());
 
             writer.write(Constants.NUMBER_OF_TURNS + " " + player.getNumberTurns());
@@ -701,18 +698,10 @@ public class MapSaveLoadManager {
         writer.write(System.lineSeparator());
     }
 
-    private static String getSecretList(LinkedHashMap<String, Integer> secrets) {
+    private static String getStringRepresentationOfMap(java.util.Map<String, Integer> map) {
         StringBuilder sb = new StringBuilder();
-        for (java.util.Map.Entry<String, Integer> so : secrets.entrySet()) {
-            sb.append(so.getKey()).append(",").append(so.getValue()).append(";");
-        }
-        return sb.toString();
-    }
-
-    public static String getUnitCapList(HashMap<String, Integer> unitCaps) {
-        StringBuilder sb = new StringBuilder();
-        for (java.util.Map.Entry<String, Integer> unitCap : unitCaps.entrySet()) {
-            sb.append(unitCap.getKey()).append(",").append(unitCap.getValue()).append(";");
+        for (java.util.Map.Entry<String, Integer> entry : map.entrySet()) {
+            sb.append(entry.getKey()).append(",").append(entry.getValue()).append(";");
         }
         return sb.toString();
     }
@@ -1066,6 +1055,7 @@ public class MapSaveLoadManager {
                 case Constants.REVEALED_PO -> activeMap.setRevealedPublicObjectives(getParsedCards(info));
                 case Constants.CUSTOM_PO_VP -> activeMap.setCustomPublicVP(getParsedCards(info));
                 case Constants.SCORED_PO -> activeMap.setScoredPublicObjectives(getParsedCardsForScoredPO(info));
+                case Constants.STRATEGY_CARD_SET -> activeMap.setScSet(info);
                 case Constants.CUSTOM_ADJACENT_TILES -> {
 
                     LinkedHashMap<String, List<String>> adjacentTiles = getParsedCardsForScoredPO(info);
@@ -1459,9 +1449,10 @@ public class MapSaveLoadManager {
                 }
                 case Constants.RUN_DATA_MIGRATIONS -> {
                     StringTokenizer migrationInfo = new StringTokenizer(info, ",");
-    
+
                     while (migrationInfo.hasMoreTokens()) {
-                        activeMap.addMigration(migrationInfo.nextToken());
+                        String migration = migrationInfo.nextToken();
+                        activeMap.addMigration(migration);
                     }
                 }
             }
@@ -1538,6 +1529,17 @@ public class MapSaveLoadManager {
                 case Constants.FLEET -> player.setFleetCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.STRATEGY -> player.setStrategicCC(Integer.parseInt(tokenizer.nextToken()));
                 case Constants.TG -> player.setTg(Integer.parseInt(tokenizer.nextToken()));
+                case Constants.DEBT -> {
+                    StringTokenizer debtToken = new StringTokenizer(tokenizer.nextToken(), ";");
+                    java.util.Map<String, Integer> debtTokens = new LinkedHashMap<>();
+                    while (debtToken.hasMoreTokens()) {
+                        StringTokenizer debtInfo = new StringTokenizer(debtToken.nextToken(), ",");
+                        String colour = debtInfo.nextToken();
+                        Integer count = Integer.parseInt(debtInfo.nextToken());
+                        debtTokens.put(colour, count);
+                    }
+                    player.setDebtTokens(debtTokens);
+                }
                 case Constants.STRATEGY_CARD -> player.setSCs(new LinkedHashSet<Integer>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
                 case Constants.FOLLOWED_SC -> player.setFollowedSCs(new HashSet<Integer>(getCardList(tokenizer.nextToken()).stream().map(Integer::valueOf).collect(Collectors.toSet())));
                 case Constants.COMMODITIES_TOTAL -> player.setCommoditiesTotal(Integer.parseInt(tokenizer.nextToken()));

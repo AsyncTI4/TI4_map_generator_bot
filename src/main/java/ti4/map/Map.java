@@ -101,6 +101,9 @@ public class Map {
     private String largeText = "small";
     @ExportableField
     private boolean absolMode = false;
+
+    @Getter @Setter @ExportableField
+    private String scSet = null;
     @ExportableField
     private boolean discordantStarsMode = false;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
@@ -2540,9 +2543,7 @@ public class Map {
     }
 
     public void addMigration(String string) {
-        if(!this.runDataMigrations.contains(string)){
-            this.runDataMigrations.add(string);    
-        }
+        this.runDataMigrations.add(string);    
     }
 
     public ArrayList<String> getRunMigrations(){

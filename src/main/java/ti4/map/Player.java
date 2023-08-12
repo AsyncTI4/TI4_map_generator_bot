@@ -78,10 +78,10 @@ public class Player {
     @JsonProperty("leaders")
     private List<Leader> leaders = new ArrayList<>();
 
-    private HashMap<String,String> debt_tokens = new HashMap<>();
-    private HashMap<String,String> fow_seenTiles = new HashMap<>();
-    private HashMap<String,Integer> unitCaps = new HashMap<>();
-    private HashMap<String,String> fow_customLabels = new HashMap<>();
+    private Map<String, Integer> debt_tokens = new LinkedHashMap<>(); //colour, count
+    private HashMap<String, String> fow_seenTiles = new HashMap<>();
+    private HashMap<String, Integer> unitCaps = new HashMap<>();
+    private HashMap<String, String> fow_customLabels = new HashMap<>();
     private String fowFogFilter = null;
     private boolean fogInitialized = false;
 
@@ -198,6 +198,13 @@ public class Player {
         }
         return false;
     }
+    public boolean hasFF2Tech() {
+        if(getTechs().contains("ff2") ||getTechs().contains("hcf2") ||getTechs().contains("dsflorff") ||getTechs().contains("dslizhff"))
+        {
+            return true; 
+        }
+        return false;
+    }
 
     public void setCardsInfoThreadID(String cardsInfoThreadID) {
         this.cardsInfoThreadID = cardsInfoThreadID;
@@ -214,8 +221,8 @@ public class Player {
 
         String threadName = Constants.CARDS_INFO_THREAD_PREFIX + activeMap.getName() + "-" + getUserName().replaceAll("/", "");
         if (activeMap.isFoWMode()) {
-                threadName = activeMap.getName() + "-" + "cards-info-"+ getUserName().replaceAll("/", "") + "-private";
-            }
+            threadName = activeMap.getName() + "-" + "cards-info-"+ getUserName().replaceAll("/", "") + "-private";
+        }
 
         //ATTEMPT TO FIND BY ID
         String cardsInfoThreadID = getCardsInfoThreadID();
@@ -281,6 +288,9 @@ public class Player {
         // CREATE NEW THREAD
         //Make card info thread a public thread in community mode
         boolean isPrivateChannel = (!activeMap.isCommunityMode() && !activeMap.isFoWMode());
+        if(activeMap.getName().contains("pbd100") || activeMap.getName().contains("pbd500")){
+            isPrivateChannel = true;
+        }
         ThreadChannelAction threadAction = actionsChannel.createThreadChannel(threadName, isPrivateChannel);
         threadAction.setAutoArchiveDuration(ThreadChannel.AutoArchiveDuration.TIME_24_HOURS);
         if (isPrivateChannel) {
@@ -1133,6 +1143,12 @@ public class Player {
         this.planets = planets;
     }
 
+    public List<String> getReadiedPlanets() {
+        List<String> planets = new ArrayList<>(getPlanets());
+        planets.removeAll(getExhaustedPlanets());
+        return planets;
+    }
+
     public List<String> getExhaustedPlanets() {
         return exhaustedPlanets;
     }
@@ -1461,5 +1477,39 @@ public class Player {
 
     public void setHasFoundUnkFrag(boolean hasFoundUnkFrag) {
         this.hasFoundUnkFrag = hasFoundUnkFrag;
+    }
+
+    public Map<String, Integer> getDebtTokens() {
+        return debt_tokens;
+    }
+
+    public void setDebtTokens(Map<String, Integer> debt_tokens) {
+        this.debt_tokens = debt_tokens;
+    }
+
+    public void addDebtTokens(String tokenColour, int count) {
+        if (debt_tokens.containsKey(tokenColour)) {
+            debt_tokens.put(tokenColour, debt_tokens.get(tokenColour) + count);
+        } else {
+            debt_tokens.put(tokenColour, count);
+        }
+    }
+
+    public void removeDebtTokens(String tokenColour, int count) {
+        if (debt_tokens.containsKey(tokenColour)) {
+            debt_tokens.put(tokenColour, Math.max(debt_tokens.get(tokenColour) - count, 0));
+        }
+    }
+
+    public void clearAllDebtTokens(String tokenColour) {
+        debt_tokens.remove(tokenColour);
+    }
+
+    public int getDebtTokenCount(String tokenColour) {
+        if (debt_tokens.containsKey(tokenColour)) {
+            return debt_tokens.get(tokenColour);
+        } else {
+            return 0;
+        }
     }
 }

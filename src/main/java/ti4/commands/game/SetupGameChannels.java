@@ -98,8 +98,8 @@ public class SetupGameChannels extends GameSubcommandData {
             //set community mode data
             if (activeMap.isCommunityMode()) {
                 if (role == null) {
-                    MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify role for community mode: " + roleConstant + " is missing");
-                    return;
+                    //MessageHelper.sendMessageToChannel(event.getChannel(), "Must specify role for community mode: " + roleConstant + " is missing");
+                    //return;
                 } else {
                     player_.setRoleIDForCommunity(role.getAsRole().getId());
                 }
