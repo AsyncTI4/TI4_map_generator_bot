@@ -1,21 +1,10 @@
 package ti4.helpers;
 
 import java.awt.Point;
+import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Objects;
-import java.util.Random;
-import java.util.Set;
-import java.util.StringTokenizer;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -360,18 +349,23 @@ public class Helper {
         };
     }
 
-    public static String getSCImageLink(Integer sc) {
-        return switch (sc) {
-            case 1 -> Constants.LEADERSHIP_IMAGE_LINK;
-            case 2 -> Constants.DIPLOMACY_IMAGE_LINK;
-            case 3 -> Constants.POLITICS_IMAGE_LINK;
-            case 4 -> Constants.CONSTRUCTION_IMAGE_LINK;
-            case 5 -> Constants.TRADE_IMAGE_LINK;
-            case 6 -> Constants.WARFARE_IMAGE_LINK;
-            case 7 -> Constants.TECHNOLOGY_IMAGE_LINK;
-            case 8 -> Constants.IMPERIAL_IMAGE_LINK;
-            default -> null;
-        };
+    public static File getSCImageFile(Integer sc, Map activeMap) {
+        String scSet = activeMap.getScSet();
+        if(Optional.ofNullable(activeMap.getScSet()).isEmpty() || activeMap.getScSet().equals("null")) { //I don't know *why* this is a thing that can happen, but it is
+            scSet = "pok";
+        }
+        boolean pbd100or500 = activeMap.getName().equals("pbd100") || activeMap.getName().equals("pbd500") && !scSet.equals("tribunal");
+        String scAsString = String.valueOf(sc);
+        if(pbd100or500) {
+            char scValue = String.valueOf(sc).charAt(0);
+            scAsString = String.valueOf(scValue);
+        }
+
+        File scFile = new File(ResourceHelper.getInstance().getResourceFromFolder("strat_cards/", scSet + "_" + scAsString + ".png", "Could not find SC image!"));
+        if (Optional.ofNullable(scFile).isEmpty()) {
+            return new File(ResourceHelper.getInstance().getResourceFromFolder("strat_cards", "sadFace.png", ""));
+        }
+        return scFile;
     }
 
     //private static List<String> testingEmoji = Arrays.asList("🐷","🙉","💩","👺","🥵","🤯","😜","👀","🦕","🐦","🦏","🐸");
@@ -512,8 +506,6 @@ public class Helper {
             case "mr" -> Emojis.MecatolRex;
             case "hopesend" -> Emojis.HopesEnd;
             case "primor" -> Emojis.Primor;
-            case "meharxull" -> Emojis.PlanetMeharXull;
-            case "perimeter" -> Emojis.PlanetPerimeter;
             case "archonvail" -> Emojis.PlanetArchonVail;
             case "semlore" -> getRandomSemLore();
             default -> Emojis.SemLor;
@@ -622,8 +614,7 @@ public class Helper {
 
     public static List<Button> getPlanetExhaustButtons(GenericInteractionCreateEvent event, Player player, Map activeMap) {
         List<Button> planetButtons = new ArrayList<>();
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
         for (String planet : planets) {
             Button button = Button.danger("spend_"+planet, Helper.getPlanetRepresentation(planet, activeMap));
             planetButtons.add(button);
@@ -982,6 +973,7 @@ public class Helper {
 
             //OTHER
             case "whalpha" -> Emojis.WHalpha;
+             case "grift" -> Emojis.GRift;
             case "whbeta" -> Emojis.WHbeta;
             case "whgamma" -> Emojis.WHgamma;
             case "creussalpha" -> Emojis.CreussAlpha;
@@ -1266,8 +1258,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int resourcesCount = 0;
@@ -1308,8 +1299,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
@@ -1345,8 +1335,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         int influenceCount = 0;
@@ -1388,8 +1377,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {
@@ -1424,8 +1412,7 @@ public class Helper {
         if (player.getFaction() == null || player.getColor() == null || player.getColor().equals("null")) {
             return null;
         }
-        List<String> planets = new ArrayList<>(player.getPlanets());
-        planets.removeAll(player.getExhaustedPlanets());
+        List<String> planets = new ArrayList<>(player.getReadiedPlanets());
 
         HashMap<String, UnitHolder> planetsInfo = activeMap.getPlanetsInfo();
         if (player.hasLeaderUnlocked("xxchahero")) {

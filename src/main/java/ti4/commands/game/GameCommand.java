@@ -98,7 +98,8 @@ public class GameCommand implements Command {
         subcommands.add(new GameEnd());
         subcommands.add(new Ping());
         subcommands.add(new SetUnitCap());
-        subcommands.add(new ChangeToBaseGame());
+        subcommands.add(new StartPhase());
+        //subcommands.add(new ChangeToBaseGame());
         subcommands.add(new SetDeck());
         subcommands.add(new GameCreate());
         subcommands.add(new Swap());

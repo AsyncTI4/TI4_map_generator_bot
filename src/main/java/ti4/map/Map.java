@@ -1,5 +1,7 @@
 package ti4.map;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import org.apache.commons.lang3.StringUtils;
 import org.jetbrains.annotations.Nullable;
@@ -97,6 +99,9 @@ public class Map {
     private String largeText = "small";
     @ExportableField
     private boolean absolMode = false;
+
+    @Getter @Setter @ExportableField
+    private String scSet = null;
     @ExportableField
     private boolean discordantStarsMode = false;
     private String outputVerbosity = Constants.VERBOSITY_VERBOSE;
