@@ -398,6 +398,7 @@ public class MapSaveLoadManager {
         }
         writer.write(Constants.CUSTOM_ADJACENT_TILES + " " + adjacentTiles);
         writer.write(System.lineSeparator());
+        writer.write(Constants.REVERSE_SPEAKER_ORDER + " " + activeMap.isReverseSpeakerOrder());
 
         StringBuilder adjacencyOverrides = new StringBuilder();
         for (java.util.Map.Entry<Pair<String, Integer>, String> entry : activeMap.getAdjacentTileOverrides().entrySet()) {
@@ -1088,6 +1089,7 @@ public class MapSaveLoadManager {
                         BotLogger.log("Failed to load adjacency overrides", e);
                     }
                 }
+                case Constants.REVERSE_SPEAKER_ORDER -> activeMap.setReverseSpeakerOrder(info.equals("true"));
                 case Constants.AGENDAS -> activeMap.setAgendas(getCardList(info));
                 case Constants.AC_DISCARDED -> activeMap.setDiscardActionCards(getParsedCards(info));
                 case Constants.DISCARDED_AGENDAS -> activeMap.setDiscardAgendas(getParsedCards(info));
