@@ -1925,6 +1925,7 @@ public class ButtonHelper {
             if (unitHolder instanceof Planet planet) {
                 for (java.util.Map.Entry<String, Integer> unitEntry : units.entrySet()) {
                     String key = unitEntry.getKey();
+                    representation = representation.replace(" ", "").toLowerCase().replace("'","").replace("-","");
                     if ((key.endsWith("gf.png") || key.endsWith("mf.png")) &&key.contains(cID)) {
                         String unitKey = key.replace(cID+"_", "");
                         unitKey = unitKey.replace(".png", "");
@@ -2226,11 +2227,21 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                                 playersWithPds2.add(p);
                             }
                         }
-                        if(p.getFaction().equalsIgnoreCase("xxcha"))
+                        if(p.getUnitsOwned().contains("xxcha_mech"))
+                        {
+                           
+                            String unitKey3 = Mapper.getUnitID(AliasHandler.resolveUnit("mech"), p.getColor());
+                            if(area.getUnits().containsKey(unitKey3))
+                            {
+                                if(!playersWithPds2.contains(p)){
+                                    playersWithPds2.add(p);
+                                }
+                            }
+                        }
+                        if(p.getUnitsOwned().contains("xxcha_flagship"))
                         {
                             String unitKey2 = Mapper.getUnitID(AliasHandler.resolveUnit("flagship"), p.getColor());
-                            String unitKey3 = Mapper.getUnitID(AliasHandler.resolveUnit("mech"), p.getColor());
-                            if(area.getUnits().containsKey(unitKey2) || area.getUnits().containsKey(unitKey3))
+                            if(area.getUnits().containsKey(unitKey2) )
                             {
                                 if(!playersWithPds2.contains(p)){
                                     playersWithPds2.add(p);
@@ -2699,7 +2710,19 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             case "Comms" -> {
                 int tgAmount = Integer.parseInt(amountToTrans);
                 p1.setCommodities(p1.getCommodities()-tgAmount);
-                p2.setTg(p2.getTg()+tgAmount);
+                if(!p1.isPlayerMemberOfAlliance(p2)){
+                    int targetTG = p2.getTg();
+                    targetTG += tgAmount;
+                    p2.setTg(targetTG);
+                }else{
+                    int targetTG = p2.getCommodities();
+                    targetTG += tgAmount;
+                    if(targetTG > p2.getCommoditiesTotal()){
+                        targetTG = p2.getCommoditiesTotal();
+                    }
+                    p2.setCommodities(targetTG);
+                }
+                
                 if(p2.getLeaderIDs().contains("hacancommander") && !p2.hasLeaderUnlocked("hacancommander")){
 					ButtonHelper.commanderUnlockCheck(p2, activeMap, "hacan", event);
 				}
@@ -2742,7 +2765,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 boolean sendAlliance = false;
                 String promissoryNoteOwner = Mapper.getPromissoryNoteOwner(id);
                 if ((id.endsWith("_sftt") || id.endsWith("_an")) && !promissoryNoteOwner.equals(p2.getFaction())
-                        && !promissoryNoteOwner.equals(p2.getColor())) {
+                        && !promissoryNoteOwner.equals(p2.getColor()) && !p2.isPlayerMemberOfAlliance(Helper.getPlayerFromColorOrFaction(activeMap,promissoryNoteOwner))) {
                     p2.setPromissoryNotesInPlayArea(id);
                     if (id.endsWith("_sftt")) {
                         sendSftT = true;
@@ -2887,7 +2910,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         }
         //PNs
         for(String pn : p1.getPromissoryNotes().keySet()){
-            if(!Mapper.getPromissoryNoteOwner(pn).equalsIgnoreCase(p1.getFaction()) && !p1.getPromissoryNotesInPlayArea().contains(pn))
+            if(Mapper.getPromissoryNoteOwner(pn) != null && !Mapper.getPromissoryNoteOwner(pn).equalsIgnoreCase(p1.getFaction()) && !p1.getPromissoryNotesInPlayArea().contains(pn))
             {
                 String pnText = Mapper.getPromissoryNote(pn, true);
                 if(pnText.contains("Action:") && !pn.equalsIgnoreCase("bmf"))
@@ -2900,7 +2923,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
             }
         }
         //Abilities
-        if(p1.hasAbility("star_forge") && p1.getStrategicCC() > 0)
+        if(p1.hasAbility("star_forge") && p1.getStrategicCC() > 0 && ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, p1, "warsun").size() > 0)
         {
             Button abilityButton = Button.success(finChecker+prefix+"ability_starForge", "Starforge");
             compButtons.add(abilityButton);
@@ -2918,6 +2941,11 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         if(p1.hasAbility("fabrication") && p1.getFragments().size() > 0)
         {
             Button abilityButton = Button.success(finChecker+prefix+"ability_fabrication", "Purge 1 Frag for a CC");
+            compButtons.add(abilityButton);
+        }
+        if(p1.getUnitsOwned().contains("muaat_flagship") &&  p1.getStrategicCC() > 0 && ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, p1, "flagship").size() > 0)
+        {
+            Button abilityButton = Button.success(finChecker+prefix+"ability_muaatFS", "Spend a Strat CC for a Cruiser with your FS");
             compButtons.add(abilityButton);
         }
         //Get Relic
@@ -3276,12 +3304,27 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
                 } else if(buttonID.equalsIgnoreCase("orbitalDrop")){
                     String successMessage = "Reduced strategy pool CCs by 1 ("+(p1.getStrategicCC())+"->"+(p1.getStrategicCC()-1)  +")";
                     p1.setStrategicCC(p1.getStrategicCC()-1);
+                    ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(p1, activeMap, event);
                     MessageHelper.sendMessageToChannel(event.getMessageChannel(), successMessage);
                     String message = "Select the planet you would like to place 2 infantry on.";
                     List<Button> buttons = Helper.getPlanetPlaceUnitButtons(p1, activeMap, "2gf", "place");
                     buttons.add(Button.danger("orbitolDropFollowUp", "Done Dropping Infantry"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
-
+                 } else if(buttonID.equalsIgnoreCase("muaatFS")){
+                    String successMessage = "Used Muaat FS ability. Reduced strategy pool CCs by 1 ("+(p1.getStrategicCC())+"->"+(p1.getStrategicCC()-1)  +") \n";
+                    p1.setStrategicCC(p1.getStrategicCC()-1);
+                    ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(p1, activeMap, event);
+                    List<Tile> tiles = ButtonHelper.getTilesOfPlayersSpecificUnit(activeMap, p1, "flagship");
+                    Tile tile = tiles.get(0);
+                    List<Button> buttons = ButtonHelper.getStartOfTurnButtons(p1, activeMap, true, event);
+                    new AddUnits().unitParsing(event, p1.getColor(), tile, "1 cruiser", activeMap);
+                    successMessage = successMessage+"Produced 1 " + Helper.getEmojiFromDiscord("cruiser") + " in tile "
+                            + tile.getRepresentationForButtons(activeMap, p1) + ".";
+                    MessageHelper.sendMessageToChannel(event.getChannel(), successMessage);
+                    String message = "Use buttons to end turn or do another action";
+                    MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), message, buttons);
+                    event.getMessage().delete().queue();
+                    
                 }else if(buttonID.equalsIgnoreCase("fabrication")){
                     String message = "Click the fragment you'd like to purge. ";
                     List<Button> purgeFragButtons = new ArrayList<>();
@@ -3419,7 +3462,7 @@ public static List<Button> getButtonsForRemovingAllUnitsInSystem(Player player, 
         String pnName = pn.getName();
         String pnOwner = Mapper.getPromissoryNoteOwner(id);
         Player owner = activeMap.getPNOwner(id);
-        if (pn.getPlayArea()) {
+        if (pn.getPlayArea() && !player.isPlayerMemberOfAlliance(owner)) {
             player.setPromissoryNotesInPlayArea(id);
         } else {
             player.removePromissoryNote(id);

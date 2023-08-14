@@ -194,14 +194,13 @@ public class ButtonHelperFactionSpecific {
                 "Use Buttons to Pay For The Mech", buttons);
         event.getMessage().delete().queue();
     }
-     public static void resolveLetnevCommanderCheck(Player player, Map activeMap) {
-        MessageChannel channel = ButtonHelper.getCorrectChannel(player, activeMap);
+     public static void resolveLetnevCommanderCheck(Player player, Map activeMap, GenericInteractionCreateEvent event) {
         if(activeMap.playerHasLeaderUnlockedOrAlliance(player, "letnevcommander")){
             int old = player.getTg();
             int newTg = player.getTg()+1;
             player.setTg(player.getTg()+1);
             String mMessage = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Since you have Barony commander unlocked, 1tg has been added automatically ("+old+"->"+newTg+")";
-            MessageHelper.sendMessageToChannel(channel, mMessage);
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(), mMessage);
             ButtonHelperFactionSpecific.pillageCheck(player, activeMap);
         }
      }

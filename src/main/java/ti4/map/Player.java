@@ -3,6 +3,8 @@ package ti4.map;
 import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.entities.channel.concrete.ThreadChannel;
 import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.interactions.components.buttons.Button;
 import net.dv8tion.jda.api.requests.restaction.ThreadChannelAction;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Role;
@@ -34,6 +36,7 @@ public class Player {
     private String userName;
 
     private boolean passed = false;
+    private boolean readyToPassBag= false;
     private boolean searchWarrant = false;
     private boolean isDummy = false;
 
@@ -69,6 +72,8 @@ public class Player {
     private HashSet<String> unitsOwned = new HashSet<>();
     private List<String> promissoryNotesInPlayArea = new ArrayList<>();
     private List<String> techs = new ArrayList<>();
+    private List<String> frankenBagPersonal = new ArrayList<>();
+    private List<String> frankenBagToPass = new ArrayList<>();
     private List<String> exhaustedTechs = new ArrayList<>();
     private List<String> planets = new ArrayList<>();
     private List<String> exhaustedPlanets = new ArrayList<>();
@@ -315,6 +320,13 @@ public class Player {
 
     public void setPassed(boolean passed) {
         this.passed = passed;
+    }
+     public boolean isReadyToPassBag() {
+        return readyToPassBag;
+    }
+
+    public void setReadyToPassBag(boolean passed) {
+        readyToPassBag= passed;
     }
 
     public HashSet<String> getAbilities() {
@@ -1126,6 +1138,12 @@ public class Player {
     public List<String> getTechs() {
         return techs;
     }
+    public List<String> getFrankenBagPersonal() {
+        return frankenBagPersonal;
+    }
+    public List<String> getFrankenBagToPass() {
+        return frankenBagToPass;
+    }
 
     public boolean hasTech(String techID) {
         return techs.contains(techID);
@@ -1134,13 +1152,34 @@ public class Player {
     public boolean hasTechReady(String techID) {
         return hasTech(techID) && !exhaustedTechs.contains(techID);
     }
-
     public List<String> getPlanets() {
         return planets;
+    }
+    public boolean isPlayerMemberOfAlliance(Player player2) {
+        return allianceMembers.contains(player2.getFaction());
+    }
+
+    public List<String> getPlanets(ti4.map.Map activeMap) {
+        List<String> newPlanets = new ArrayList<String>();
+        newPlanets.addAll(planets);
+        if(!allianceMembers.equalsIgnoreCase("")){
+            for(Player player2 : activeMap.getRealPlayers()){
+                if(getAllianceMembers().contains(player2.getFaction())){
+                    newPlanets.addAll(player2.getPlanets());
+                }
+            }
+        }
+        return newPlanets;
     }
 
     public void setPlanets(List<String> planets) {
         this.planets = planets;
+    }
+    public void setFrankenBagPersonal(List<String> planets) {
+        frankenBagPersonal = planets;
+    }
+    public void setFrankenBagToPass(List<String> planets) {
+        frankenBagToPass = planets;
     }
 
     public List<String> getReadiedPlanets() {
@@ -1216,6 +1255,18 @@ public class Player {
 
         doAdditionalThingsWhenAddingTech(techID);
     }
+    public void addToFrankenPersonalBag(String thing) {
+        if (frankenBagPersonal.contains(thing)) {
+            return;
+        }
+        frankenBagPersonal.add(thing);
+    }
+    public void addToFrankenPassingBag(String thing) {
+        if (frankenBagToPass.contains(thing)) {
+            return;
+        }
+        frankenBagToPass.add(thing);
+    }
 
     private void doAdditionalThingsWhenAddingTech(String techID) {
         // Add Custodia Vigilia when researching IIHQ
@@ -1255,6 +1306,9 @@ public class Player {
         if (isRemoved) removeTech(tech);
         refreshTech(tech);
         //TODO: Remove unitupgrade -> fix owned units
+    }
+    public void removeElementFromBagToPass(String tech) {
+        frankenBagToPass.remove(tech);
     }
 
     public void addPlanet(String planet) {

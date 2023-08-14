@@ -44,9 +44,19 @@ public class SendCommodities extends PlayerSubcommandData {
             commodities -= sendCommodities;
             player.setCommodities(commodities);
 
-            int targetTG = player_.getTg();
-            targetTG += sendCommodities;
-            player_.setTg(targetTG);
+            if(!player.isPlayerMemberOfAlliance(player_)){
+                int targetTG = player_.getTg();
+                targetTG += sendCommodities;
+                player_.setTg(targetTG);
+            }else{
+                int targetTG = player_.getCommodities();
+                targetTG += sendCommodities;
+                if(targetTG > player_.getCommoditiesTotal()){
+                    targetTG = player_.getCommoditiesTotal();
+                }
+                player_.setCommodities(targetTG);
+            }
+            
 
 
 			String p1 = Helper.getPlayerRepresentation(player, activeMap);
