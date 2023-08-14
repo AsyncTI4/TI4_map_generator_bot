@@ -65,9 +65,9 @@ public class PNInfo extends PNCardsSubcommandData {
             }else{
                 Button transact;
                 if(activeMap.isFoWMode()){
-                    transact = Button.success("resolvePNPlay_"  + player.getPromissoryNotes().get(pnShortHand), "Play " +owner.getColor() +" "+ promissoryNote.getName());
+                    transact = Button.success("resolvePNPlay_"  + pnShortHand, "Play " +owner.getColor() +" "+ promissoryNote.getName());
                 }else{
-                    transact = Button.success("resolvePNPlay_" + player.getPromissoryNotes().get(pnShortHand), "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(owner.getFaction())));
+                    transact = Button.success("resolvePNPlay_" + pnShortHand, "Play " + promissoryNote.getName()).withEmoji(Emoji.fromFormatted(Helper.getFactionIconFromDiscord(owner.getFaction())));
                 }
                 buttons.add(transact);
             }

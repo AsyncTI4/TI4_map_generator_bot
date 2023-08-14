@@ -48,7 +48,19 @@ public class ExpFrontier extends ExploreSubcommandData {
         } else {
             MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No frontier token in given system.");
         }
-
+    }
+    public void expFrontAlreadyDone(GenericInteractionCreateEvent event, Tile tile, Map activeMap, Player player, String cardID) {
+        UnitHolder space = tile.getUnitHolders().get(Constants.SPACE);
+        String frontierFilename = Mapper.getTokenID(Constants.FRONTIER);
+        if (space.getTokenList().contains(frontierFilename)) {
+            space.removeToken(frontierFilename);
+            StringBuilder messageText = new StringBuilder(Emojis.Frontier);
+            messageText.append("Frontier *(tile "+ tile.getPosition() + ")* explored by " + Helper.getPlayerRepresentation(player, activeMap)).append(":\n");
+            messageText.append(displayExplore(cardID));
+            resolveExplore(event, cardID, tile, null, messageText.toString(), checkIfEngimaticDevice(player, cardID), player, activeMap);
+        } else {
+            MessageHelper.sendMessageToChannel(event.getMessageChannel(),"No frontier token in given system.");
+        }
     }
 
     public static boolean checkIfEngimaticDevice(@NotNull Player player, String cardID) {
