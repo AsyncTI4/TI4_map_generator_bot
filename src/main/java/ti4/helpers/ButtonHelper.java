@@ -476,7 +476,7 @@ public class ButtonHelper {
         }
         for(Player nonActivePlayer : activeMap.getPlayers().values()){
             
-            if(!nonActivePlayer.isRealPlayer() || nonActivePlayer.getFaction().equalsIgnoreCase(player.getFaction())){
+            if(!nonActivePlayer.isRealPlayer() || nonActivePlayer.isPlayerMemberOfAlliance(player) || nonActivePlayer.getFaction().equalsIgnoreCase(player.getFaction())){
                 continue;
             }
             if(activeMap.isFoWMode()){
