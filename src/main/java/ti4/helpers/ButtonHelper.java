@@ -1416,6 +1416,9 @@ public class ButtonHelper {
 
         return ringButtons;
     }
+    public static String getTrueIdentity(Player player, Map activeMap){
+        return Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true);
+    }
     public static void exploreDET(Player player, Map activeMap, ButtonInteractionEvent event) {
         Tile tile =  activeMap.getTileByPosition(activeMap.getActiveSystem());
         if(!FoWHelper.playerHasShipsInSystem(player, tile))
@@ -1424,7 +1427,38 @@ public class ButtonHelper {
         }
         if(player.hasTech("det") && tile.getUnitHolders().get("space").getTokenList().contains(Mapper.getTokenID(Constants.FRONTIER)))
         {
-            new ExpFrontier().expFront(event, tile, activeMap, player);
+            if(player.hasAbility("voidsailors")){
+                        String cardID = activeMap.drawExplore(Constants.FRONTIER);
+                        String cardID2 = activeMap.drawExplore(Constants.FRONTIER);
+                        String card = Mapper.getExplore(cardID);
+                        String[] cardInfo1 = card.split(";");
+                        String name1 = cardInfo1[0];
+                        String card2 = Mapper.getExplore(cardID2);
+                        String[] cardInfo2 = card2.split(";");
+                        String name2 = cardInfo2[0];
+
+                        Button resolveExplore1  = Button.success("resFrontier_"+cardID+"_"+tile.getPosition() + "_"+cardID2, "Choose "+name1);
+                        Button resolveExplore2 = Button.success("resFrontier_"+cardID2+"_"+tile.getPosition() + "_"+cardID, "Choose "+name2);
+                        List<Button> buttons = List.of(resolveExplore1, resolveExplore2);
+                        //code to draw 2 explores and get their names
+                        //Send Buttons to decide which one to explore
+                        String message = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true)+" Please decide which card to resolve.";
+
+                        if (activeMap != null && !activeMap.isFoWMode() &&(event.getChannel() !=  activeMap.getActionsChannel())) {
+                            
+                            String pF = Helper.getFactionIconFromDiscord(player.getFaction());
+                            MessageHelper.sendMessageToChannel(activeMap.getActionsChannel(), "Using Voidsailors,  " + pF + " found a "+name1+" and a " +name2+ " in "+tile.getRepresentation());
+                            
+                        }
+                        else
+                        {
+                            MessageHelper.sendMessageToChannel(event.getMessageChannel(), "Found a "+name1+" and a " +name2+ " in "+tile.getRepresentation());
+                        }
+                        MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), message, buttons);
+            }else{
+                 new ExpFrontier().expFront(event, tile, activeMap, player);
+            }
+           
         }
     }
     

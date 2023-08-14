@@ -220,6 +220,10 @@ public abstract class ExploreSubcommandData extends SubcommandData {
                 if (activeMap.isFoWMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew SO");
                 }
+                if(player.hasAbility("plausible_deniability")){
+                    activeMap.drawSecretObjective(player.getUserID());
+                    message = message+". Drew a second SO due to plausible deniability";
+                }
                 SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
                 MessageHelper.sendMessageToChannel((MessageChannel)event.getChannel(), messageText + "\n" + message);
             }
