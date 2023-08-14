@@ -952,7 +952,7 @@ public class ButtonHelperModifyUnits {
         event.getMessage().editMessage(message)
                     .setComponents(ButtonHelper.turnButtonListIntoActionRowList(systemButtons)).queue();
         MessageHelper.sendMessageToChannel(event.getMessageChannel(), message2);
-        ButtonHelperFactionSpecific.resolveLetnevCommanderCheck(player, activeMap);
+        ButtonHelperFactionSpecific.resolveLetnevCommanderCheck(player, activeMap, event);
     }
 
 }

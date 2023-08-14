@@ -974,7 +974,7 @@ public class AgendaHelper {
                         if(specificVote.contains("Technology Rider") && !winningR.hasAbility("technological_singularity")){
                             activeMap.setComponentAction(true);
                             Button getTech = Button.success("acquireATech", "Get a tech");
-                            List<Button> buttons = new ArrayList();
+                            List<Button> buttons = new ArrayList<Button>();
                             buttons.add(getTech);
                             MessageHelper.sendMessageToChannelWithButtons(channel, identity+" resolve Technology Rider by using the button to get a tech", buttons);
                         }

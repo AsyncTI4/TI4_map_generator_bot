@@ -569,8 +569,11 @@ public class ButtonListener extends ListenerAdapter {
                 && (!buttonID.contains("trade"))) {
             boolean used = addUsedSCPlayer(messageID, activeMap, player, event, "");
             if (!used) {
-                ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeMap, event);
+                if(player.getStrategicCC() > 0){
+                    ButtonHelperFactionSpecific.resolveMuaatCommanderCheck(player, activeMap, event);
+                }
                 String message = deductCC(player, event);
+                
                 int scnum = 1;
                 boolean setstatus = true;
                 try {
