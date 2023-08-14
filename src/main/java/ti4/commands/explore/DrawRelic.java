@@ -49,11 +49,17 @@ public class DrawRelic extends GenericRelicAction {
             }
             case "obsidian" -> {
                 activeMap.drawSecretObjective(player.getUserID());
+                
                 if (activeMap.isFoWMode()) {
                     FoWHelper.pingAllPlayersWithFullStats(activeMap, event, player, "Drew SO");
                 }
-                SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
+                
                 message.append("\nAn SO has been automatically drawn");
+                if(player.hasAbility("plausible_deniability")){
+                    activeMap.drawSecretObjective(player.getUserID());
+                    message.append(". Drew a second SO due to plausible deniability");
+                }
+                SOInfo.sendSecretObjectiveInfo(activeMap, player, event);
             }
             case "shard" -> {
                 Integer poIndex = activeMap.addCustomPO("Shard of the Throne", 1);

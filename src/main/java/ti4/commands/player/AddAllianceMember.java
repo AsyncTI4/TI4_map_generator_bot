@@ -37,21 +37,31 @@ public class AddAllianceMember extends PlayerSubcommandData {
         if(!player.getAllianceMembers().contains(player_.getFaction())){
             player.addAllianceMember(player_.getFaction()+currentMembers);
         }
+        
         for (String leaderID : player_.getLeaderIDs() ){
             if (leaderID.contains("commander") && !player.hasLeader(leaderID)) {
-                Leader leader = new Leader(leaderID);
-                player.addLeader(leaderID);
-                player.getLeader(leaderID).setLocked(false);
+                if(!leaderID.contains("mahact") && !player.hasAbility("edict")){
+                    player.addLeader(leaderID);
+                    player.getLeader(leaderID).setLocked(false);
+                    
+                }
                 player_.getLeader(leaderID).setLocked(false);
             }
         }
         for (String leaderID : player.getLeaderIDs() ){
             if (leaderID.contains("commander") && !player_.hasLeader(leaderID)) {
-                Leader leader = new Leader(leaderID);
-                player_.addLeader(leaderID);
-                player_.getLeader(leaderID).setLocked(false);
+                if(!leaderID.contains("mahact")&&!player_.hasAbility("edict")){
+                    player_.addLeader(leaderID);
+                    player_.getLeader(leaderID).setLocked(false);
+                }
                 player.getLeader(leaderID).setLocked(false);
             }
+        }
+        if(player.hasAbility("edict")){
+            player.addMahactCC(player_.getColor());
+        }
+        if(player_.hasAbility("edict")){
+            player_.addMahactCC(player.getColor());
         }
         String msg = Helper.getPlayerRepresentation(player, activeMap, activeMap.getGuild(), true) + Helper.getPlayerRepresentation(player_, activeMap, activeMap.getGuild(), true) + " pinging you into this";
         MessageHelper.sendMessageToChannel(player.getCardsInfoThread(activeMap),msg);
