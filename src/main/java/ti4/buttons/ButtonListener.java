@@ -1043,6 +1043,15 @@ public class ButtonListener extends ListenerAdapter {
             List<Button> voteActionRow = AgendaHelper.getVoteButtons(votes, votes + 5);
             MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, voteActionRow);
             event.getMessage().delete().queue();
+            
+        } else if (buttonID.startsWith("resolveWithNoEffect")) {
+            String voteMessage = "Resolving agenda with no effect. Click the buttons for next steps.";
+            Button flipNextAgenda = Button.primary("flip_agenda", "Flip Agenda");
+            Button proceedToStrategyPhase = Button.success("proceed_to_strategy",
+                    "Proceed to Strategy Phase (will run agenda cleanup and ping speaker)");
+            List<Button> resActionRow = List.of(flipNextAgenda, proceedToStrategyPhase);
+            MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), voteMessage, resActionRow);
+            event.getMessage().delete().queue();
         } else if (buttonID.startsWith("outcome_")) {
             AgendaHelper.offerVoteAmounts(buttonID, event, activeMap, player, ident, buttonLabel);
         } else if (buttonID.startsWith("votes_")) {
@@ -1052,7 +1061,7 @@ public class ButtonListener extends ListenerAdapter {
             if (result.equalsIgnoreCase("manual")) {
                 String resMessage3 = "Please select the winner.";
                 List<Button> deadlyActionRow3 = AgendaHelper.getAgendaButtons(null, activeMap, "agendaResolution");
-                deadlyActionRow3.add(Button.danger("deleteButtons", "Resolve with no result"));
+                deadlyActionRow3.add(Button.danger("resolveWithNoEffect", "Resolve with no result"));
                 MessageHelper.sendMessageToChannelWithButtons(event.getChannel(), resMessage3, deadlyActionRow3);
             }
             event.getMessage().delete().queue();
@@ -1457,6 +1466,12 @@ public class ButtonListener extends ListenerAdapter {
                     buttons.add(Button.success(finsFactionCheckerPrefix+"doActivation_"+pos, "Confirm"));
                     buttons.add(Button.danger(finsFactionCheckerPrefix+"deleteButtons", "This activation was a mistake"));
                     MessageHelper.sendMessageToChannelWithButtons(event.getMessageChannel(), ident+" You are about to automatically trigger some abilities by activating this system, are you sure you want to proceed?", buttons);
+                }
+                for(Player player_ : activeMap.getRealPlayers()){
+                    if(!player_.isPlayerMemberOfAlliance(player)||FoWHelper.playerHasUnitsInSystem(player_, activeMap.getTileByPosition(pos))){
+                        String msgA = Helper.getPlayerRepresentation(player, activeMap) + " has units in the system and has a potential window to play ACs like forward supply base, possibly counterstroke, possibly Decoy Operation, possibly ceasefire. ";
+                        MessageHelper.sendMessageToChannel(event.getMessageChannel(), msgA);
+                    }
                 }
             }else{
                  List<Player> playersAdj = FoWHelper.getAdjacentPlayers(activeMap, pos, true);
